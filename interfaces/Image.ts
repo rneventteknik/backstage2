@@ -1,3 +1,5 @@
 namespace Backstage2.Models {
-    export interface Image extends BaseEntity { }
+    export interface Image extends BaseEntityWithName {
+        ImageUrl: string;
+    }
 }

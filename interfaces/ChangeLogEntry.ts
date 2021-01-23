@@ -4,6 +4,6 @@ namespace Backstage2.Models {
         timestamp: Date;
         description: string;
     }
-    export interface BookingChangelogEntry extends BaseEntity, ChangeLogEntry { }
-    export interface EquipmentChangelogEntry extends BaseEntity, ChangeLogEntry { }
+    export interface EventChangelogEntry extends BaseEntityWithName, ChangeLogEntry { }
+    export interface EquipmentChangelogEntry extends BaseEntityWithName, ChangeLogEntry { }
 }

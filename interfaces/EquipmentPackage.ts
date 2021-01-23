@@ -1,13 +1,14 @@
 namespace Backstage2.Models {
-    export interface EquipmentPackage extends BaseEntity {
-        nameEN: string;
-        description: string;
-        descriptionEN: string;
+    export interface EquipmentPackage extends BaseEntityWithName {
         note: string;
-        imageUrl: string;
-        publiclyHidden: boolean;
+        imageId: number;
+        estimatedHours: number;
         categories: EquipmentCategory[];
-        changeLog: EquipmentChangelogEntry;
-        equipment: Equipment[];
+        equipmentEntries: EquipmentPackageEntry[];
+    }
+
+    export interface EquipmentPackageEntry extends BaseEntity {
+        equipment: Equipment;
+        numberOfUnits: number;
     }
 }

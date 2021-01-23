@@ -1,10 +1,11 @@
 namespace Backstage2.Models {
-    export interface Event extends BaseEntity {
-        responsibleUser: User;
+    export interface Event extends BaseEntityWithName {
+        ownerUser: User;
+        coOwnerUsers: User[];
         equipmenttLists: EquipmentList[];
         timeEstimates: TimeEstimate[];
         timeReports: TimeReport[];
-        changelog: BookingChangelogEntry[];
+        changelog: EventChangelogEntry[];
         eventType: EventType;
         status: Status;
         invoiceHoogiaId: number;
