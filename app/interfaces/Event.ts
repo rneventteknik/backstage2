@@ -11,12 +11,12 @@ import { Status } from "./enums/Status";
 
 
 export interface Event extends BaseEntityWithName {
-    ownerUser: User;
-    coOwnerUsers: User[];
-    equipmenttLists: EquipmentList[];
-    timeEstimates: TimeEstimate[];
-    timeReports: TimeReport[];
-    changelog: EventChangelogEntry[];
+    ownerUser?: User;
+    coOwnerUsers?: User[];
+    equipmenttLists?: EquipmentList[];
+    timeEstimates?: TimeEstimate[];
+    timeReports?: TimeReport[];
+    changelog?: EventChangelogEntry[];
     eventType: EventType;
     status: Status;
     invoiceHoogiaId: number;

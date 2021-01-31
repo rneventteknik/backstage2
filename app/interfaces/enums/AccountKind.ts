@@ -1,4 +1,4 @@
 export enum AccountKind {
-    INTERNAL = 0,
-    EXTERNAL = 1
+    EXTERNAL = 0,
+    INTERNAL = 1
 }

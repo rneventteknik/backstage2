@@ -8,7 +8,7 @@ type Props = {
 
 const EventList = ({ items }: Props) => (
   <ul>
-    {items.map((item) => (
+    {((items && items.length > 0) ? items : []).map((item) => (
       <li key={item.id}>
         <EventListItem event={item} />
       </li>

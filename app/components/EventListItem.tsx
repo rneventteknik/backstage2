@@ -10,7 +10,7 @@ type Props = {
 const EventListItem = ({ event }: Props) => (
   <Link href="/event/[id]" as={`/event/${event.id}`}>
     <a>
-      {event.id}: {event.name} ({event.ownerUser.name} [{event.ownerUser.nameTag}]) {event.status}
+      {event.id}: {event.name} ({event.ownerUser ? event.ownerUser.name : ''} [{event.ownerUser ? event.ownerUser.nameTag : ''}]) {event.status}
     </a>
   </Link>
 )

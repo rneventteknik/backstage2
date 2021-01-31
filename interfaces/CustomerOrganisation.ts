@@ -1,9 +1,0 @@
-namespace Backstage2.Models {
-    export interface CustomerOrganisation extends BaseEntityWithName {
-        invoiceHoogiaId: number;
-        invoiceAddress: string;
-        invoiceTag: string;
-        pricePlan: PricePlan;
-        accountKind: AccountKind;
-    }
-}

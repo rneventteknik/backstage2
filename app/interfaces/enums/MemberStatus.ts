@@ -1,7 +1,7 @@
 export enum MemberStatus {
     CHEF = 0,
-    GLÖMD = 1,
-    RESURS = 2,
-    AKTIV = 3,
-    ASP = 4
+    AKTIV = 1,
+    ASP = 2,
+    RESURS = 3,
+    GLÖMD = 4
 }
