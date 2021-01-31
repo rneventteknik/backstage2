@@ -1,16 +1,9 @@
-import { Event, User } from '../../interfaces'
 import Layout from '../../components/Layout'
 import EventList from '../../components/EventList'
-import { GetStaticProps } from 'next'
 import useSwr from 'swr'
 
-type Props = {
-    items: Event[]
-}
-
-
-const EventListPage = ({ items }: Props) => {
-  const {data, error} = useSwr('/api/events', fetcher);
+const EventListPage = () => {
+  const { data } = useSwr('/api/events', fetcher);
 
   return (
     <Layout title='Event list'>
