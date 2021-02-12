@@ -1,4 +1,4 @@
 export enum EventType {
     RENTAL = 0,
-    GIG = 1
+    GIG = 1,
 }

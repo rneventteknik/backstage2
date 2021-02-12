@@ -1,7 +1,8 @@
-import { ColumnValue } from 'tedious'
-import { Event } from '../../interfaces'
+import { ColumnValue } from 'tedious';
+import { Event } from '../../interfaces';
 
-const findValue = (colName: string, cols: ColumnValue[]) => cols.filter(col => col.metadata.colName === colName)[0].value;
+const findValue = (colName: string, cols: ColumnValue[]) =>
+    cols.filter((col) => col.metadata.colName === colName)[0].value;
 
 const mapEvent = (eventRow: ColumnValue[]): Event => {
     return {
@@ -28,7 +29,7 @@ const mapEvent = (eventRow: ColumnValue[]): Event => {
         contactPersonName: findValue('ContactPersonName', eventRow),
         contactPersonPhone: findValue('ContactPersonPhone', eventRow),
         contactPersonEmail: findValue('ContactPersonEmail', eventRow),
-    }
-}
+    };
+};
 
-export default mapEvent
+export default mapEvent;

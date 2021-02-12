@@ -1,3 +1,3 @@
-import { BaseEntityWithName } from "./BaseEntity";
+import { BaseEntityWithName } from './BaseEntity';
 
-export interface EquipmentCategory extends BaseEntityWithName { }
+export type EquipmentCategory = BaseEntityWithName;

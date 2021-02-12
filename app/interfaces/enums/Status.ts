@@ -7,5 +7,5 @@ export enum Status {
     DONE = 5,
     INVOICED = 6,
     PAID = 7,
-    CANCELED = 8
+    CANCELED = 8,
 }

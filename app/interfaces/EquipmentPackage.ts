@@ -1,7 +1,6 @@
-import { BaseEntity, BaseEntityWithName } from "./BaseEntity";
-import { Equipment } from "./Equipment";
-import { EquipmentCategory } from "./EquipmentCategory";
-
+import { BaseEntity, BaseEntityWithName } from './BaseEntity';
+import { Equipment } from './Equipment';
+import { EquipmentCategory } from './EquipmentCategory';
 
 export interface EquipmentPackage extends BaseEntityWithName {
     note: string;

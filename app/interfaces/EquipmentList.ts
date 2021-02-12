@@ -1,6 +1,6 @@
-import { BaseEntityWithName } from "./BaseEntity";
-import { Equipment } from "./Equipment";
-import { EquipmentPackage } from "./EquipmentPackage";
+import { BaseEntityWithName } from './BaseEntity';
+import { Equipment } from './Equipment';
+import { EquipmentPackage } from './EquipmentPackage';
 
 export interface EquipmentList extends BaseEntityWithName {
     equipmentEntries: EquipmentListEntry[];

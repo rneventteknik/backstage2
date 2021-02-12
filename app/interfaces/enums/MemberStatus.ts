@@ -3,5 +3,5 @@ export enum MemberStatus {
     AKTIV = 1,
     ASP = 2,
     RESURS = 3,
-    GLÖMD = 4
+    GLÖMD = 4,
 }

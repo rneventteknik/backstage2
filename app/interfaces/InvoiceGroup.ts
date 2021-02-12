@@ -1,5 +1,5 @@
-import { BaseEntityWithName } from "./BaseEntity";
-import { User } from "./User";
+import { BaseEntityWithName } from './BaseEntity';
+import { User } from './User';
 
 export interface InvoiceGroup extends BaseEntityWithName {
     events: Event[];

@@ -1,7 +1,7 @@
-import { BaseEntityWithName } from "./BaseEntity";
-import { EquipmentChangelogEntry } from "./ChangeLogEntry";
-import { EquipmentCategory } from "./EquipmentCategory";
-import { Image } from "./Image";
+import { BaseEntityWithName } from './BaseEntity';
+import { EquipmentChangelogEntry } from './ChangeLogEntry';
+import { EquipmentCategory } from './EquipmentCategory';
+import { Image } from './Image';
 
 export interface Equipment extends BaseEntityWithName {
     inventoryCount: number;
