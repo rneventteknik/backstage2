@@ -1,9 +1,0 @@
-{
-    "compilerOptions": {
-        "target": "es5",
-        "module": "amd",
-        "sourceMap": true,
-        "outDir": "./build",
-        "outFile": "./build/build.js"
-    }
-}
