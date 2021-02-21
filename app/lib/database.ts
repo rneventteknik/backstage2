@@ -24,14 +24,14 @@ const executeProcedure = (
     return new Promise((resolve, reject) => {
         const connection = new Connection(config);
 
-        connection.connect((err) => {
-            if (err) {
-                reject(err);
+        connection.connect((connectionErr) => {
+            if (connectionErr) {
+                reject(connectionErr);
             }
 
-            const request: Request = new Request(procedureName, (err) => {
-                if (err) {
-                    reject(err);
+            const request: Request = new Request(procedureName, (requestErr) => {
+                if (requestErr) {
+                    reject(requestErr);
                 }
                 connection.close();
             });

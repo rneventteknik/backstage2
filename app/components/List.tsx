@@ -1,12 +1,12 @@
-import * as React from 'react';
+import React from 'react';
 import ListItem from './ListItem';
-import { User, Event } from '../interfaces';
+import { User } from '../interfaces';
 
 type Props = {
-    items: (User | Event)[];
+    items: User[];
 };
 
-const List = ({ items }: Props) => (
+const List: React.FC<Props> = ({ items }: Props) => (
     <ul>
         {items.map((item) => (
             <li key={item.id}>

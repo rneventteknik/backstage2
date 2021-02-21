@@ -7,7 +7,7 @@ type Props = {
     event: Event;
 };
 
-const EventListItem = ({ event }: Props) => (
+const EventListItem: React.FC<Props> = ({ event }: Props) => (
     <Link href="/event/[id]" as={`/event/${event.id}`}>
         <a>
             {event.id}: {event.name} ({event.ownerUser ? event.ownerUser.name : ''} [
