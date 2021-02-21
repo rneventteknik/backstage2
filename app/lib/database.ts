@@ -1,16 +1,16 @@
 import { ColumnValue, TediousType, Request, Connection, ConnectionConfig } from 'tedious';
 
 const config: ConnectionConfig = {
-    server: 'backstage2-test.database.windows.net',
+    server: process.env.DB_HOST,
     authentication: {
         type: 'default',
         options: {
-            userName: 'rn',
-            password: '',
+            userName: process.env.DB_USER,
+            password: process.env.DB_PASS,
         },
     },
     options: {
-        database: 'backstage2',
+        database: process.env.DB_NAME,
         encrypt: true,
         rowCollectionOnDone: true,
     },
