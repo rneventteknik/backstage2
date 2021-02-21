@@ -16,11 +16,11 @@ const config: ConnectionConfig = {
     },
 };
 
-const executeProcedure = (
+const executeProcedure = <T>(
     procedureName: string,
-    mapperFn: (column: ColumnValue[]) => any,
-    parameters: { name: string; type: TediousType; value: any }[] = [],
-) => {
+    mapperFn: (column: ColumnValue[]) => T,
+    parameters: { name: string; type: TediousType; value: unknown }[] = [],
+): Promise<T[]> => {
     return new Promise((resolve, reject) => {
         const connection = new Connection(config);
 
