@@ -9,4 +9,5 @@
 //   name: string
 // }
 
-export type { EventApiModel } from './EventApiModel';
+export { EventApiModel } from './EventApiModel';
+export { UserApiModel } from './UserApiModel';
