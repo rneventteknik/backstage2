@@ -2,15 +2,15 @@ import { Model, RelationMappingsThunk } from 'objection';
 import { EventApiModel } from '.';
 
 export class UserApiModel extends Model {
-    static tableName = 'User';
+    static tableName = 'user';
 
     static relationMappings: RelationMappingsThunk = () => ({
         OwnsEvent: {
             relation: Model.HasManyRelation,
             modelClass: EventApiModel,
             join: {
-                from: 'User.Id',
-                to: 'Event.OwnerUserId',
+                from: 'user.id',
+                to: 'event.ownerUserId',
             },
         },
     });
@@ -24,4 +24,6 @@ export class UserApiModel extends Model {
     NameTag!: string;
     PhoneNumber!: string;
     SlackId!: string;
+
+    Events?: EventApiModel[];
 }

@@ -1,12 +1,12 @@
-CREATE TABLE "User"
+CREATE TABLE public.User
 (
-    "Id" serial PRIMARY KEY,
-    "Name" varchar,
-    "Created" timestamp,
-    "Updated" timestamp,
-    "Role" int,
-    "MemberStatus" int,
-    "NameTag" varchar,
-    "PhoneNumber" varchar,
-    "SlackId" varchar
-);
+    "id" serial PRIMARY KEY,
+    "name" varchar,
+    "created" timestamp without time zone,
+    "updated" timestamp without time zone,
+    "role" integer,
+    "memberStatus" integer,
+    "nameTag" varchar,
+    "phoneNumber" varchar,
+    "slackId" varchar
+)

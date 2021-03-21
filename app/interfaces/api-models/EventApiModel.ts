@@ -2,15 +2,15 @@ import { Model, RelationMappingsThunk } from 'objection';
 import { UserApiModel } from '.';
 
 export class EventApiModel extends Model {
-    static tableName = 'Event';
+    static tableName = 'event';
 
     static relationMappings: RelationMappingsThunk = () => ({
         OwnerUser: {
-            relation: Model.HasOneRelation,
+            relation: Model.BelongsToOneRelation,
             modelClass: UserApiModel,
             join: {
-                from: 'Event.OwnerUserId',
-                to: 'User.Id',
+                from: 'event.ownerUserId',
+                to: 'user.id',
             },
         },
     });
