@@ -8,7 +8,10 @@ INSERT INTO public.user
     "memberStatus",
     "nameTag",
     "phoneNumber",
-    "slackId"
+    "slackId",
+    "username",
+    "hashedPassword",
+    "salt"
     )
 VALUES
     ( -- first row: values for the columns in the list above
@@ -19,7 +22,10 @@ VALUES
         0,
         N'AJ',
         N'08 517 397 22',
-        NULL
+        NULL,
+        'albert',
+        '$2a$10$Pl4ESEnWlzA1Gu/JCkChPudYkoLWQedJObRl1MKn.tw8EuhR36OSa', -- Password is 'dmx'
+        '$2a$10$Pl4ESEnWlzA1Gu/JCkChPu'
     ),
     ( -- second row: values for the columns in the list above
         N'Markus Wesslén',
@@ -29,7 +35,11 @@ VALUES
         3,
         N'MW',
         N'072 704 55 93',
-        NULL
+        NULL,
+        'markus',
+        '$2a$10$HW1d7h.DwzK.mAZMKUK0VuIlBl/00NPNLdyEKWdlfuM8ZBRQLOnnW', -- Password is 'xlr'
+        '$2a$10$HW1d7h.DwzK.mAZMKUK0Vu'
+
     );
 -- add more rows here
 

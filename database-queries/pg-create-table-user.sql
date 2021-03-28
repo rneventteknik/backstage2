@@ -8,5 +8,8 @@ CREATE TABLE public.User
     "memberStatus" integer,
     "nameTag" varchar,
     "phoneNumber" varchar,
-    "slackId" varchar
+    "slackId" varchar,
+    "username" varchar,
+    "hashedPassword" varchar,
+    "salt" varchar
 )
