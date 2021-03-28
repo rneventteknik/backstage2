@@ -24,6 +24,9 @@ export class UserApiModel extends Model {
     nameTag!: string;
     phoneNumber!: string;
     slackId!: string;
+    username!: string;
+    hashedPassword!: string;
+    salt!: string;
 
     events?: EventApiModel[];
 }

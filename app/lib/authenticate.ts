@@ -1,8 +1,8 @@
 import { fetchAuthUser } from './data-interfaces/user';
 import bcrypt from 'bcryptjs';
-import { UserAuthModel } from '../interfaces/auth-models/UserAuthModel';
+import { UserApiModel } from '../interfaces/api-models/UserApiModel';
 
-const authenticate = async (username: string, password: string): Promise<UserAuthModel | null> => {
+const authenticate = async (username: string, password: string): Promise<UserApiModel | null> => {
     const user = await fetchAuthUser(username);
 
     if (!user) {
