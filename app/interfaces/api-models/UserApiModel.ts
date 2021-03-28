@@ -15,15 +15,15 @@ export class UserApiModel extends Model {
         },
     });
 
-    Id!: number;
-    Name!: string;
-    Created!: string;
-    Updated!: string;
-    Role!: number;
-    MemberStatus!: number;
-    NameTag!: string;
-    PhoneNumber!: string;
-    SlackId!: string;
+    id!: number;
+    name!: string;
+    created!: string;
+    updated!: string;
+    role!: number;
+    memberStatus!: number;
+    nameTag!: string;
+    phoneNumber!: string;
+    slackId!: string;
 
-    Events?: EventApiModel[];
+    events?: EventApiModel[];
 }

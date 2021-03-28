@@ -15,24 +15,24 @@ export class EventApiModel extends Model {
         },
     });
 
-    Id!: number;
-    Name!: string;
-    Created!: string;
-    Updated!: string;
-    OwnerUser!: UserApiModel;
-    EventType!: number;
-    Status!: number;
-    SalaryStatus!: number;
-    InvoiceHoogiaId!: number;
-    InvoiceAddress!: string;
-    InvoiceTag!: string;
-    Invoicenumber!: string;
-    Note!: string;
-    ReturnalNote!: string;
-    PricePlan!: number;
-    AccountKind!: number;
-    Location!: string;
-    ContactPersonName!: string;
-    ContactPersonPhone!: string;
-    ContactPersonEmail!: string;
+    id!: number;
+    name!: string;
+    created!: string;
+    updated!: string;
+    ownerUser!: UserApiModel;
+    eventType!: number;
+    status!: number;
+    salaryStatus!: number;
+    invoiceHoogiaId!: number;
+    invoiceAddress!: string;
+    invoiceTag!: string;
+    invoicenumber!: string;
+    note!: string;
+    returnalNote!: string;
+    pricePlan!: number;
+    accountKind!: number;
+    location!: string;
+    contactPersonName!: string;
+    contactPersonPhone!: string;
+    contactPersonEmail!: string;
 }

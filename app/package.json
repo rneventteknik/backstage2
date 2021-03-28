@@ -9,8 +9,11 @@
     "lint": "eslint '*/**/*.{js,ts,tsx}' --fix"
   },
   "dependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "bcryptjs": "^2.4.3",
     "knex": "^0.21.17",
     "next": "latest",
+    "next-iron-session": "^4.1.12",
     "objection": "^2.2.14",
     "pg": "^8.5.1",
     "react": "^16.12.0",
