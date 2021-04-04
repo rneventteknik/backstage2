@@ -6,6 +6,7 @@
 We use the branching model [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). This means that we have a production branch (does not exist yet) and separate development branch called `dev`.
 
 Our branch naming convention is based on this model and we use prefixes to indicate what type every branch has. The prefixes in use are:
+
 - `feature/` for regular feature branches
 - `bugfix/` for bugfix branches
 - and when needed also `hotfix/` which is branches fixing urgent issues in production.
