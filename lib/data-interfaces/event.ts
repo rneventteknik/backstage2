@@ -1,9 +1,8 @@
 import { EventApiModel } from '../../interfaces/api-models';
-import { knex } from '../database';
-import { Model } from 'objection';
+import { ensureDatabaseIsInitialized } from '../database';
 
 export const fetchEvents = async (): Promise<EventApiModel[]> => {
-    Model.knex(knex); // TODO: Fix this bs
+    ensureDatabaseIsInitialized();
 
     return EventApiModel.query().withGraphFetched('OwnerUser');
 };

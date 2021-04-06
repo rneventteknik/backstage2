@@ -1,9 +1,8 @@
 import { UserApiModel } from '../../interfaces/api-models/UserApiModel';
-import { knex } from '../database';
-import { Model } from 'objection';
+import { ensureDatabaseIsInitialized } from '../database';
 
 export const fetchAuthUser = async (username: string): Promise<UserApiModel> => {
-    Model.knex(knex); // TODO: Fix this bs
+    ensureDatabaseIsInitialized();
 
     return UserApiModel.query()
         .where('username', username)

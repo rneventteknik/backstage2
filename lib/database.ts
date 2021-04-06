@@ -1,6 +1,7 @@
 import Knex from 'knex';
+import { Model } from 'objection';
 
-export const knex = Knex({
+const knexConfiguration = {
     client: 'pg',
     connection: {
         host: process.env.DB_HOST,
@@ -9,4 +10,19 @@ export const knex = Knex({
         database: process.env.DB_NAME,
         ssl: process.env.DB_SLL === 'true',
     },
-});
+};
+
+let databaseIsInitialized = false;
+
+// Next.js does not support running code at startup without a custom server, so we
+// initialize the database connection using this method, which should be run before
+// any database operations.
+export const ensureDatabaseIsInitialized: () => void = () => {
+    if (databaseIsInitialized) {
+        return;
+    }
+
+    const knex = Knex(knexConfiguration);
+    Model.knex(knex);
+    databaseIsInitialized = true;
+};
