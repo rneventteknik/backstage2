@@ -23,4 +23,5 @@ DB_HOST={database host name}
 DB_USER={databse user name}
 DB_PASS={database password}
 DB_NAME={database name}
+DB_SSL={true or false}
 ```
