@@ -1,5 +1,4 @@
 import React from 'react';
-import Link from 'next/link';
 
 import { Event } from '../interfaces';
 
@@ -8,12 +7,11 @@ type Props = {
 };
 
 const EventListItem: React.FC<Props> = ({ event }: Props) => (
-    <Link href="/event/[id]" as={`/event/${event.id}`}>
-        <a>
-            {event.id}: {event.name} ({event.ownerUser ? event.ownerUser.name : ''} [
-            {event.ownerUser ? event.ownerUser.nameTag : ''}]) {event.status}
-        </a>
-    </Link>
+    <tr>
+        <td>{event.name}</td>
+        <td>{event.ownerUser.name}</td>
+        <td>{event.created}</td>
+    </tr>
 );
 
 export default EventListItem;

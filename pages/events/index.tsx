@@ -10,7 +10,7 @@ const EventListPage: React.FC = () => {
         <Layout title="Event list">
             <h1>Event List</h1>
 
-            {data && data.length > 0 ? <EventList items={data} /> : <span>No events</span>}
+            {data && data.length > 0 ? <EventList events={data} /> : <span>No events</span>}
         </Layout>
     );
 };

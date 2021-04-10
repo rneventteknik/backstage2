@@ -5,7 +5,7 @@ export class EventApiModel extends Model {
     static tableName = 'event';
 
     static relationMappings: RelationMappingsThunk = () => ({
-        OwnerUser: {
+        ownerUser: {
             relation: Model.BelongsToOneRelation,
             modelClass: UserApiModel,
             join: {

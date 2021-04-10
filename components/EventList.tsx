@@ -1,19 +1,27 @@
 import React from 'react';
 import EventListItem from './EventListItem';
 import { Event } from '../interfaces';
+import Table from 'react-bootstrap/Table';
 
 type Props = {
-    items: Event[];
+    events: Event[];
 };
 
-const EventList: React.FC<Props> = ({ items }: Props) => (
-    <ul>
-        {(items && items.length > 0 ? items : []).map((item) => (
-            <li key={item.id}>
-                <EventListItem event={item} />
-            </li>
-        ))}
-    </ul>
+const EventList: React.FC<Props> = ({ events }: Props) => (
+    <Table hover>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Responsible</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {(events && events.length > 0 ? events : []).map((event) => (
+                <EventListItem key={event.id} event={event} />
+            ))}
+        </tbody>
+    </Table>
 );
 
 export default EventList;
