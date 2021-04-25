@@ -1,4 +1,4 @@
-import React, { CSSProperties, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import Navbar from 'react-bootstrap/Navbar';
@@ -8,30 +8,11 @@ import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
 import InputGroup from 'react-bootstrap/InputGroup';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import styles from './Layout.module.css';
 
 type Props = {
     children?: ReactNode;
     title?: string;
-};
-
-const navbarStyle: CSSProperties = {
-    zIndex: 100,
-};
-
-const sidebarStyle: CSSProperties = {
-    width: '260px',
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    bottom: 0,
-    paddingTop: '60px',
-    backgroundColor: '#f6f6f6',
-    zIndex: 99,
-};
-
-const contentStyle: CSSProperties = {
-    marginLeft: '260px',
-    padding: '15px',
 };
 
 const Layout: React.FC<Props> = ({ children, title = 'This is the default title' }: Props) => (
@@ -42,7 +23,7 @@ const Layout: React.FC<Props> = ({ children, title = 'This is the default title'
             <meta name="viewport" content="initial-scale=1.0, width=device-width" />
         </Head>
         <header>
-            <Navbar bg="light" style={navbarStyle}>
+            <Navbar bg="light" className={styles.navbar}>
                 <Link href="/">
                     <Navbar.Brand as="a" href="/">
                         Backstage2
@@ -59,7 +40,7 @@ const Layout: React.FC<Props> = ({ children, title = 'This is the default title'
             </Navbar>
         </header>
 
-        <aside style={sidebarStyle}>
+        <aside className={styles.sidebar}>
             <Nav className="flex-column">
                 <Nav.Item>
                     <Link href="/">
@@ -85,7 +66,7 @@ const Layout: React.FC<Props> = ({ children, title = 'This is the default title'
             </Nav>
         </aside>
 
-        <section style={contentStyle}>
+        <section className={styles.mainContent}>
             {children}
             <footer>
                 <hr />
