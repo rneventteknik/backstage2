@@ -6,7 +6,7 @@
     "build": "next build",
     "start": "next start",
     "type-check": "tsc",
-    "lint": "eslint '*/**/*.{js,ts,tsx}' --fix"
+    "lint": "eslint \"*/**/*.{js,ts,tsx}\" --fix"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
