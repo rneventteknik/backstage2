@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { CSSProperties, ReactNode } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import Navbar from 'react-bootstrap/Navbar';
@@ -14,11 +14,11 @@ type Props = {
     title?: string;
 };
 
-const navbarStyle = {
+const navbarStyle: CSSProperties = {
     zIndex: 100,
 };
 
-const sidebarStyle = {
+const sidebarStyle: CSSProperties = {
     width: '260px',
     position: 'fixed',
     top: 0,
@@ -29,7 +29,7 @@ const sidebarStyle = {
     zIndex: 99,
 };
 
-const contentStyle = {
+const contentStyle: CSSProperties = {
     marginLeft: '260px',
     padding: '15px',
 };
