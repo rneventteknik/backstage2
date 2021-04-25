@@ -76,13 +76,6 @@ const Layout: React.FC<Props> = ({ children, title = 'This is the default title'
                     </Link>
                 </Nav.Item>
                 <Nav.Item>
-                    <Link href="/users">
-                        <Nav.Link as="a" href="/users">
-                            Users List
-                        </Nav.Link>
-                    </Link>
-                </Nav.Item>
-                <Nav.Item>
                     <Link href="/events">
                         <Nav.Link as="a" href="/events">
                             Event List
