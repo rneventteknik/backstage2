@@ -6,3 +6,12 @@ export const fetchEvents = async (): Promise<EventApiModel[]> => {
 
     return EventApiModel.query().withGraphFetched('ownerUser');
 };
+
+export const fetchEvent = async (id: number): Promise<EventApiModel> => {
+    ensureDatabaseIsInitialized();
+
+    return EventApiModel.query()
+        .where('id', id)
+        .withGraphFetched('ownerUser')
+        .then((events) => events[0]);
+};
