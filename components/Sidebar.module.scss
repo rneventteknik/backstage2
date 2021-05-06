@@ -1,0 +1,26 @@
+@import "../style/variables";
+
+$side-border-width: 3px;
+
+.main div {
+    margin-left: $side-border-width;
+    padding: 5px;
+}
+
+.main div:hover,
+.main div.activeNavItem {
+    border-left: $side-border-width solid $primary;
+    background-color: $backstage-highlight;
+    margin-left: 0px;
+}
+
+.main a {
+    color: $body-color;
+}
+
+.container h1 {
+    text-transform: uppercase;
+    font-size: smaller;
+    font-weight: 600;
+    color: $gray-600;
+}

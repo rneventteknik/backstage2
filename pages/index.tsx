@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Layout from '../components/Layout';
 
 const IndexPage: React.FC = () => (
-    <Layout title="Home | backstage2">
+    <Layout title="Hem" breadcrumbs={[]} fixedWidth={true}>
         <h1>Hello RN 👋</h1>
         <p>
             <Link href="/about">

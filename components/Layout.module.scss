@@ -1,0 +1,48 @@
+@import "../style/variables";
+
+$navbar-height-compensation: 56px;
+$sidebar-width: 260px;
+
+.navbar {
+    z-index: 100;
+    background-color: $backstage-lighter-bg;
+    box-shadow: 0 2px 4px rgb(0 0 0 / 50%);
+}
+
+.sidebar {
+    width: $sidebar-width;
+    position: fixed;
+    z-index: 99;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    padding-top: $navbar-height-compensation;
+    background-color: $backstage-lighter-bg;
+    box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
+}
+
+.mainContentContainer {
+    margin-left: $sidebar-width;
+}
+
+.mainContent {
+    margin: auto;
+}
+
+.mainContentFixedWidth {
+    margin: auto;
+    max-width: 1200px;
+}
+
+.footer {
+    border-top: 1px solid $backstage-lighter-bg;
+}
+
+.container {
+    color: #ededed;
+    position: absolute;
+    top: $navbar-height-compensation;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}

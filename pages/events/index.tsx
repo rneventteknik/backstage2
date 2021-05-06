@@ -58,13 +58,16 @@ const tableSettings: TableConfiguration<Event> = {
     ],
 };
 
+const pageTitle = 'Bokningar';
+const breadcrumbs = [{ link: 'events', displayName: pageTitle }];
+
 const EventListPage: React.FC = () => {
     const { data } = useSwr('/api/events', fetcher);
 
     return (
-        <Layout title="Bokningar">
-            <h1>Bokningar</h1>
-            <hr />
+        <Layout title={pageTitle} breadcrumbs={breadcrumbs}>
+            <h1>{pageTitle}</h1>
+
             {data && data.length > 0 ? (
                 <TableDisplay entities={data} configuration={tableSettings} />
             ) : (
