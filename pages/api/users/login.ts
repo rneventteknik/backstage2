@@ -18,8 +18,8 @@ const handler = withSession(
             const user = {
                 isLoggedIn: true,
                 username: authUser.username,
-                name: authUser.name,
-                role: authUser.role,
+                name: authUser.user?.name,
+                role: authUser.user?.role,
             };
 
             req.session.set('user', user);

@@ -1,6 +1,6 @@
 CREATE TABLE public.Event
 (
-    "id" serial PRIMARY KEY,
+    "id" int PRIMARY KEY,
     "name" varchar,
     "created" timestamp without time zone,
     "updated" timestamp without time zone,
@@ -20,4 +20,4 @@ CREATE TABLE public.Event
     "contactPersonName" varchar,
     "contactPersonPhone" varchar,
     "contactPersonEmail" varchar
-)
+);

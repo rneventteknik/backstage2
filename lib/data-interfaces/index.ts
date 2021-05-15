@@ -10,4 +10,4 @@
 // }
 
 export { fetchEvents, fetchEvent } from './event';
-export { fetchAuthUser } from './user';
+export { fetchAuthUser, fetchUser } from './user';

@@ -1,6 +1,6 @@
 CREATE TABLE public.User
 (
-    "id" serial PRIMARY KEY,
+    "id" int PRIMARY KEY,
     "name" varchar,
     "created" timestamp without time zone,
     "updated" timestamp without time zone,
@@ -15,8 +15,12 @@ CREATE TABLE public.User
     "bankAccount" varchar,
     "homeAddress" varchar,
     "zipCode" varchar,
-    "emailAddress" varchar,
-    "username" varchar,
-    "hashedPassword" varchar,
-    "salt" varchar
-)
+    "emailAddress" varchar
+);
+
+CREATE TABLE public.UserAuth
+(
+    "id" int PRIMARY KEY REFERENCES public.User,
+    "username" varchar UNIQUE,
+    "hashedPassword" varchar
+);

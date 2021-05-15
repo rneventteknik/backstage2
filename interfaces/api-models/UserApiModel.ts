@@ -5,12 +5,20 @@ export class UserApiModel extends Model {
     static tableName = 'user';
 
     static relationMappings: RelationMappingsThunk = () => ({
-        OwnsEvent: {
+        events: {
             relation: Model.HasManyRelation,
             modelClass: EventApiModel,
             join: {
                 from: 'user.id',
                 to: 'event.ownerUserId',
+            },
+        },
+        userAuth: {
+            relation: Model.HasOneRelation,
+            modelClass: UserAuthApiModel,
+            join: {
+                from: 'user.id',
+                to: 'userauth.id',
             },
         },
     });
@@ -31,9 +39,27 @@ export class UserApiModel extends Model {
     homeAddress!: string;
     zipCode!: string;
     emailAddress!: string;
-    username!: string;
-    hashedPassword!: string;
-    salt!: string;
 
     events?: EventApiModel[];
+    authUser?: UserAuthApiModel[];
+}
+
+export class UserAuthApiModel extends Model {
+    static tableName = 'userauth';
+
+    static relationMappings: RelationMappingsThunk = () => ({
+        user: {
+            relation: Model.BelongsToOneRelation,
+            modelClass: UserApiModel,
+            join: {
+                from: 'userauth.id',
+                to: 'user.id',
+            },
+        },
+    });
+
+    id!: number;
+    username!: string;
+    hashedPassword!: string;
+    user?: UserApiModel;
 }

@@ -1,6 +1,7 @@
 -- Insert rows into table '"dbo"."User"'
 INSERT INTO public.user
     ( -- columns to insert data into
+    "id",
     "name",
     "created",
     "updated",
@@ -8,13 +9,11 @@ INSERT INTO public.user
     "memberStatus",
     "nameTag",
     "phoneNumber",
-    "slackId",
-    "username",
-    "hashedPassword",
-    "salt"
+    "slackId"
     )
 VALUES
     ( -- first row: values for the columns in the list above
+        1,
         N'Albert Jansson',
         '2019-01-01 15:30',
         '2019-01-01 15:30',
@@ -22,12 +21,10 @@ VALUES
         0,
         N'AJ',
         N'08 517 397 22',
-        NULL,
-        'albert',
-        '$2a$10$Pl4ESEnWlzA1Gu/JCkChPudYkoLWQedJObRl1MKn.tw8EuhR36OSa', -- Password is 'dmx'
-        '$2a$10$Pl4ESEnWlzA1Gu/JCkChPu'
+        NULL
     ),
     ( -- second row: values for the columns in the list above
+        2,
         N'Markus Wesslén',
         '2019-01-02 15:30',
         '2019-01-02 15:30',
@@ -35,18 +32,32 @@ VALUES
         3,
         N'MW',
         N'072 704 55 93',
-        NULL,
-        'markus',
-        '$2a$10$HW1d7h.DwzK.mAZMKUK0VuIlBl/00NPNLdyEKWdlfuM8ZBRQLOnnW', -- Password is 'xlr'
-        '$2a$10$HW1d7h.DwzK.mAZMKUK0Vu'
-
+        NULL
     );
 -- add more rows here
 
+INSERT INTO public.userauth
+    (
+    "id",
+    "username",
+    "hashedPassword"
+    )
+    VALUES
+    (
+        1,
+        N'albert',
+        '$2a$10$Pl4ESEnWlzA1Gu/JCkChPudYkoLWQedJObRl1MKn.tw8EuhR36OSa' -- Password is 'dmx'
+    ),
+    (
+        2,
+        N'markus',
+        '$2a$10$HW1d7h.DwzK.mAZMKUK0VuIlBl/00NPNLdyEKWdlfuM8ZBRQLOnnW' -- Password is 'xlr'
+    );
 
 -- Insert rows into table '"dbo"."Event"'
 INSERT INTO public.event
     ( -- columns to insert data into
+    "id",
     "name",
     "created",
     "updated",
@@ -69,6 +80,7 @@ INSERT INTO public.event
     )
 VALUES
     ( -- first row: values for the columns in the list above
+        1,
         N'Kemispexet',
         '2020-06-15 19:00',
         '2020-06-15 19:00',
@@ -90,6 +102,7 @@ VALUES
         N'kemist@kth.se'
     ),
     ( -- second row: values for the columns in the list above,
+        2,
         N'METAspexet',
         '2020-05-22 18:00',
         '2020-05-22 18:00',
@@ -111,6 +124,7 @@ VALUES
         N'ljus@metaspexet.se'
     ),
     ( -- third row: values for the columns in the list above,
+        3,
         N'Lunchföreläsning KTH Future Energy Conference 2020',
         '2020-06-22 12:00',
         '2020-07-22 13:00',
@@ -130,4 +144,4 @@ VALUES
         N'Viggo',
         NULL,
         N'viggo@kth.com'
-    )
+    );
