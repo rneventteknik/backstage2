@@ -59,7 +59,7 @@ const SidebarLinkGroup: React.FC<SidebarLinkGroupProps> = ({ children, title }: 
 
 // The sidebar itself
 //
-const sidebar: React.FC<void> = () => (
+const sidebar: React.FC = () => (
     <div className={styles.container + ' pt-2'}>
         <SidebarLinkGroup>
             <SidebarLink displayName="Home" link="/" icon={faHome} exactMatch={true} />

@@ -9,9 +9,13 @@ const EventPage: React.FC = () => {
     const router = useRouter();
     const { data } = useSwr('/api/events/' + router.query.id, fetcher);
     const event: Event = data as Event;
+    const breadcrumbs = [
+        { link: '/events', displayName: 'Bokningar' },
+        { link: '/events/' + router.query.id, displayName: event?.name },
+    ];
 
     return (
-        <Layout title={event?.name ?? 'Event'}>
+        <Layout title={event?.name ?? 'Event'} breadcrumbs={breadcrumbs}>
             <h1>
                 {event?.name}{' '}
                 <small>
