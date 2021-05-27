@@ -51,6 +51,10 @@ $input-focus-bg: $input-bg;
 $input-focus-border-color: lighten($component-active-bg, 25%);
 $input-focus-color: $input-color;
 
+$input-group-addon-bg: lighten($gray-900, 15);
+$input-group-addon-border-color: $input-border-color;
+$input-group-addon-color: $input-color;
+
 /* Hr */
 $hr-border-color: $gray-800;
 
@@ -61,3 +65,5 @@ $dropdown-color: $backstage-text-color;
 $dropdown-link-color: $backstage-text-color;
 $dropdown-link-hover-bg: $backstage-highlight;
 $dropdown-link-hover-color: $backstage-text-color;
+$dropdown-divider-bg: $gray-800;
+$dropdown-header-color: darken($backstage-text-color, 20);

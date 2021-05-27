@@ -9,15 +9,13 @@ type Props = {
 };
 
 const EventTypeTag: React.FC<Props> = ({ event }: Props) => {
-    if (!event) {
-        return null;
-    }
-
-    switch (event.eventType) {
+    switch (event && event.eventType) {
         case EventType.GIG:
             return <Badge variant="success">Gigg</Badge>;
         case EventType.RENTAL:
             return <Badge variant="primary">Hyra</Badge>;
+        default:
+            return null;
     }
 };
 

@@ -1,6 +1,18 @@
 import { EventApiModel } from '../../interfaces/api-models';
 import { ensureDatabaseIsInitialized } from '../database';
 
+export const searchEvents = async (searchString: string, count: number): Promise<EventApiModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    const modifiedSearchString = '%' + searchString + '%';
+
+    return EventApiModel.query()
+        .where('name', 'ilike', modifiedSearchString)
+        .orWhere('contactPersonName', 'ilike', modifiedSearchString)
+        .orderBy('updated', 'desc')
+        .limit(count);
+};
+
 export const fetchEvents = async (): Promise<EventApiModel[]> => {
     ensureDatabaseIsInitialized();
 

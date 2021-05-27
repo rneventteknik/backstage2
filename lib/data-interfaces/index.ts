@@ -9,5 +9,5 @@
 //   name: string
 // }
 
-export { fetchEvents, fetchEvent } from './event';
-export { fetchAuthUser, fetchUser } from './user';
+export { searchEvents, fetchEvents, fetchEvent } from './event';
+export { searchUsers, fetchAuthUser, fetchUser } from './user';

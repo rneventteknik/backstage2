@@ -10,6 +10,19 @@ export const fetchAuthUser = async (username: string): Promise<UserAuthApiModel>
         .then((users) => users[0]);
 };
 
+export const searchUsers = async (searchString: string, count: number): Promise<UserApiModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    const modifiedSearchString = '%' + searchString + '%';
+
+    return UserApiModel.query()
+        .where('name', 'ilike', modifiedSearchString)
+        .orWhere('nameTag', 'ilike', modifiedSearchString)
+        .orWhere('emailAddress', 'ilike', modifiedSearchString)
+        .orderBy('updated', 'desc')
+        .limit(count);
+};
+
 export const fetchUser = async (id: number): Promise<UserApiModel> => {
     ensureDatabaseIsInitialized();
 

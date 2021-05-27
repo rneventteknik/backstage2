@@ -1,11 +1,12 @@
 import Link from 'next/link';
 import Router from 'next/router';
 import React from 'react';
-import { Navbar, InputGroup, Button, Form, FormControl, Dropdown } from 'react-bootstrap';
+import { Navbar, Dropdown } from 'react-bootstrap';
 import { CurrentUserInfo } from '../interfaces/auth/CurrentUserInfo';
 import UserDisplay from './UserDisplay';
 import UserIcon from './UserIcon';
 import styles from './Topbar.module.scss';
+import Search from './Search';
 
 type Props = {
     currentUser: CurrentUserInfo;
@@ -27,14 +28,9 @@ const Topbar: React.FC<Props> = ({ currentUser }: Props) => {
                         Backstage2
                     </Navbar.Brand>
                 </Link>
-                <Form inline className="ml-auto">
-                    <InputGroup>
-                        <FormControl type="text" placeholder="Search" />
-                        <InputGroup.Append>
-                            <Button variant="outline-primary">Search</Button>
-                        </InputGroup.Append>
-                    </InputGroup>
-                </Form>
+                <div className="ml-auto mr-auto" style={{ maxWidth: 800, width: '100%' }}>
+                    <Search />
+                </div>
                 <Dropdown>
                     <Dropdown.Toggle variant="default" id="dropdown-basic" className="py-0">
                         <UserIcon user={currentUser} />
