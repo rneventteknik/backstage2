@@ -1,11 +1,15 @@
 import React from 'react';
 import Layout from '../components/Layout';
+import { CurrentUserInfo } from '../interfaces/auth/CurrentUserInfo';
+import { useUserWithDefaultAccessControl } from '../lib/useUser';
 
+export const getServerSideProps = useUserWithDefaultAccessControl();
+type Props = { user: CurrentUserInfo };
 const pageTitle = 'Hjälp';
 const breadcrumbs = [{ link: 'about', displayName: pageTitle }];
 
-const AboutPage: React.FC = () => (
-    <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true}>
+const AboutPage: React.FC<Props> = ({ user }: Props) => (
+    <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={user}>
         <h1>{pageTitle}</h1>
 
         <p>

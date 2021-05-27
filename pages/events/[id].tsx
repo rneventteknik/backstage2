@@ -4,8 +4,13 @@ import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Event } from '../../interfaces';
 import EventTypeTag from '../../components/utils/EventTypeTag';
+import { CurrentUserInfo } from '../../interfaces/auth/CurrentUserInfo';
+import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 
-const EventPage: React.FC = () => {
+export const getServerSideProps = useUserWithDefaultAccessControl();
+type Props = { user: CurrentUserInfo };
+
+const EventPage: React.FC<Props> = ({ user }: Props) => {
     const router = useRouter();
     const { data } = useSwr('/api/events/' + router.query.id, fetcher);
     const event: Event = data as Event;
@@ -15,7 +20,7 @@ const EventPage: React.FC = () => {
     ];
 
     return (
-        <Layout title={event?.name ?? 'Event'} breadcrumbs={breadcrumbs}>
+        <Layout title={event?.name ?? 'Event'} breadcrumbs={breadcrumbs} currentUser={user} fixedWidth={true}>
             <h1>
                 {event?.name}{' '}
                 <small>

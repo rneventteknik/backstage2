@@ -2,10 +2,19 @@ import React from 'react';
 import Layout from '../../components/Layout';
 import { Event } from '../../interfaces';
 import useSwr from 'swr';
+import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { CurrentUserInfo } from '../../interfaces/auth/CurrentUserInfo';
 import Link from 'next/link';
 import EventTypeTag from '../../components/utils/EventTypeTag';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import { formatDate, getStatusName } from '../../lib/utils';
+
+export const getServerSideProps = useUserWithDefaultAccessControl();
+type Props = { user: CurrentUserInfo };
+const pageTitle = 'Bokningar';
+const breadcrumbs = [{ link: 'events', displayName: pageTitle }];
+
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 const EventNameDisplayFn = (event: Event) => (
     <>
@@ -58,16 +67,12 @@ const tableSettings: TableConfiguration<Event> = {
     ],
 };
 
-const pageTitle = 'Bokningar';
-const breadcrumbs = [{ link: 'events', displayName: pageTitle }];
-
-const EventListPage: React.FC = () => {
+const EventListPage: React.FC<Props> = ({ user }: Props) => {
     const { data } = useSwr('/api/events', fetcher);
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs}>
+        <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={user}>
             <h1>{pageTitle}</h1>
-
             {data && data.length > 0 ? (
                 <TableDisplay entities={data} configuration={tableSettings} />
             ) : (
@@ -76,7 +81,5 @@ const EventListPage: React.FC = () => {
         </Layout>
     );
 };
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default EventListPage;

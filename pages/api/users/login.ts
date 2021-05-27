@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Session } from 'next-iron-session';
+import { CurrentUserInfo } from '../../../interfaces/auth/CurrentUserInfo';
 import authenticate from '../../../lib/authenticate';
 import withSession from '../../../lib/session';
 
@@ -15,7 +16,7 @@ const handler = withSession(
         }
         const authUser = await authenticate(username, password);
         if (authUser) {
-            const user = {
+            const user: CurrentUserInfo = {
                 isLoggedIn: true,
                 username: authUser.username,
                 name: authUser.user?.name,

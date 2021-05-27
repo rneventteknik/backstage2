@@ -17,6 +17,8 @@ import {
     faUsers,
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
+import { CurrentUserInfo } from '../interfaces/auth/CurrentUserInfo';
+import { Role } from '../interfaces/enums/Role';
 
 // Component for a single link
 //
@@ -59,7 +61,10 @@ const SidebarLinkGroup: React.FC<SidebarLinkGroupProps> = ({ children, title }: 
 
 // The sidebar itself
 //
-const sidebar: React.FC = () => (
+type Props = {
+    currentUser: CurrentUserInfo;
+};
+const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
     <div className={styles.container + ' pt-2'}>
         <SidebarLinkGroup>
             <SidebarLink displayName="Home" link="/" icon={faHome} exactMatch={true} />
@@ -70,10 +75,12 @@ const sidebar: React.FC = () => (
             <SidebarLink displayName="Hjälp" link="/about" icon={faInfoCircle} />
         </SidebarLinkGroup>
 
-        <SidebarLinkGroup title="Administration">
-            <SidebarLink displayName="Löner" link="/salary" icon={faMoneyBillWave} />
-            <SidebarLink displayName="Fakturor" link="/invoices" icon={faFileInvoiceDollar} />
-        </SidebarLinkGroup>
+        {currentUser?.role === Role.ADMIN ? (
+            <SidebarLinkGroup title="Administration">
+                <SidebarLink displayName="Löner" link="/salary" icon={faMoneyBillWave} />
+                <SidebarLink displayName="Fakturor" link="/invoices" icon={faFileInvoiceDollar} />
+            </SidebarLinkGroup>
+        ) : null}
 
         <SidebarLinkGroup title="Externa länkar">
             <SidebarLink displayName="OneDrive" link="https://onedrive.live.com" icon={faExternalLinkAlt} />

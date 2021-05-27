@@ -1,9 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import Layout from '../components/Layout';
+import { useUserWithDefaultAccessControl } from '../lib/useUser';
+import { CurrentUserInfo } from '../interfaces/auth/CurrentUserInfo';
 
-const IndexPage: React.FC = () => (
-    <Layout title="Hem" breadcrumbs={[]} fixedWidth={true}>
+export const getServerSideProps = useUserWithDefaultAccessControl();
+type Props = { user: CurrentUserInfo };
+
+const IndexPage: React.FC<Props> = ({ user }: Props) => (
+    <Layout title="Hem" breadcrumbs={[]} fixedWidth={true} currentUser={user}>
         <h1>Hello RN 👋</h1>
         <p>
             <Link href="/about">

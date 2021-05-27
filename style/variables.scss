@@ -10,11 +10,13 @@ $backstage-highlight: #2e2e2e;
 $backstage-lighter-bg: #1f1f1f;
 $backstage-lightest-bg: #242424;
 
+$backstage-text-color: #ededed;
+
 /**************************
     Bootstrap overrides 
 ***************************/
+$body-color: $backstage-text-color;
 $body-bg: #121212;
-$body-color: #ededed;
 $primary: #1565c0;
 
 $border-color: $gray-700;
@@ -51,3 +53,11 @@ $input-focus-color: $input-color;
 
 /* Hr */
 $hr-border-color: $gray-800;
+
+/* Dropdown */
+$dropdown-bg: $backstage-lightest-bg;
+$dropdown-border-color: $gray-800;
+$dropdown-color: $backstage-text-color;
+$dropdown-link-color: $backstage-text-color;
+$dropdown-link-hover-bg: $backstage-highlight;
+$dropdown-link-hover-color: $backstage-text-color;
