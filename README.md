@@ -7,6 +7,10 @@ Backstage2 is a web app that is created by RN, for RN, and is used to keep track
 ### Preparing the Dev Environment ###
 Our package manager of choice is [`yarn`](https://yarnpkg.com/). After cloning the repo with `git clone`, run `yarn install` to install all the dependencies.
 
+`yarn migrate` will run the latest Knex migration which will populate your database with the latest schema.
+
+`yarn seed` will seed your database with some mock data.
+
 `yarn dev` will start a local development server.
 
 `yarn type-check` will type-check all of the code using *Typescript*.

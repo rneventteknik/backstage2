@@ -1,16 +1,6 @@
 import Knex from 'knex';
 import { Model } from 'objection';
-
-const knexConfiguration = {
-    client: 'pg',
-    connection: {
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASS,
-        database: process.env.DB_NAME,
-        ssl: process.env.DB_SSL === 'true',
-    },
-};
+import knexConfiguration from './knexConfiguration.js';
 
 let databaseIsInitialized = false;
 
@@ -22,7 +12,7 @@ export const ensureDatabaseIsInitialized: () => void = () => {
         return;
     }
 
-    const knex = Knex(knexConfiguration);
+    const knex = Knex(knexConfiguration.development); // TODO: Choose environment intelligently
     Model.knex(knex);
     databaseIsInitialized = true;
 };

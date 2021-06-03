@@ -2,23 +2,23 @@ import { Model, RelationMappingsThunk } from 'objection';
 import { EventApiModel } from '.';
 
 export class UserApiModel extends Model {
-    static tableName = 'user';
+    static tableName = 'User';
 
     static relationMappings: RelationMappingsThunk = () => ({
         events: {
             relation: Model.HasManyRelation,
             modelClass: EventApiModel,
             join: {
-                from: 'user.id',
-                to: 'event.ownerUserId',
+                from: 'User.id',
+                to: 'Event.ownerUserId',
             },
         },
         userAuth: {
             relation: Model.HasOneRelation,
             modelClass: UserAuthApiModel,
             join: {
-                from: 'user.id',
-                to: 'userauth.id',
+                from: 'User.id',
+                to: 'UserAuth.id',
             },
         },
     });
@@ -45,15 +45,15 @@ export class UserApiModel extends Model {
 }
 
 export class UserAuthApiModel extends Model {
-    static tableName = 'userauth';
+    static tableName = 'UserAuth';
 
     static relationMappings: RelationMappingsThunk = () => ({
         user: {
             relation: Model.BelongsToOneRelation,
             modelClass: UserApiModel,
             join: {
-                from: 'userauth.id',
-                to: 'user.id',
+                from: 'UserAuth.id',
+                to: 'User.id',
             },
         },
     });
