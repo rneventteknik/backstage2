@@ -2,6 +2,7 @@
 
 $navbar-height-compensation: 56px;
 $sidebar-width: 260px;
+$sidebar-transition-time: 0.1s;
 
 .sidebar {
     width: $sidebar-width;
@@ -13,9 +14,12 @@ $sidebar-width: 260px;
     padding-top: $navbar-height-compensation;
     background-color: $backstage-lighter-bg;
     box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
+
+    transition: left $sidebar-transition-time, width $sidebar-transition-time;
 }
 
 .mainContentContainer {
+    transition: margin-left $sidebar-transition-time;
     margin-left: $sidebar-width;
 }
 
@@ -39,4 +43,35 @@ $sidebar-width: 260px;
     left: 0;
     right: 0;
     bottom: 0;
+}
+
+// Handle sidebar toggle and responsive design
+//
+[data-sidebar-toggle-status="true"] .sidebar {
+    left: -$sidebar-width;
+}
+
+[data-sidebar-toggle-status="true"] .mainContentContainer {
+    margin-left: 0;
+}
+
+@media only screen and (max-width: 700px) {
+    .sidebar {
+        left: -$sidebar-width;
+    }    
+    .mainContentContainer {
+        margin-left: 0;
+    }
+
+    [data-sidebar-toggle-status="true"] {
+        .sidebar {
+            left: 0;
+        }
+    }
+}
+
+@media only screen and (max-width: 450px) {
+    [data-sidebar-toggle-status="true"] .sidebar {
+        width: 100%;
+    }
 }

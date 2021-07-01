@@ -1,18 +1,21 @@
 import Link from 'next/link';
 import Router from 'next/router';
 import React from 'react';
-import { Navbar, Dropdown } from 'react-bootstrap';
+import { Navbar, Dropdown, Button } from 'react-bootstrap';
 import { CurrentUserInfo } from '../interfaces/auth/CurrentUserInfo';
 import UserDisplay from './UserDisplay';
 import UserIcon from './UserIcon';
 import styles from './Topbar.module.scss';
 import Search from './Search';
+import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 type Props = {
     currentUser: CurrentUserInfo;
+    toggleSidebar: () => unknown;
 };
 
-const Topbar: React.FC<Props> = ({ currentUser }: Props) => {
+const Topbar: React.FC<Props> = ({ currentUser, toggleSidebar }: Props) => {
     const logOut = async () => {
         const res = await fetch('/api/users/logout');
         if (res.status === 200) {
@@ -23,6 +26,9 @@ const Topbar: React.FC<Props> = ({ currentUser }: Props) => {
     return (
         <header>
             <Navbar variant="dark" fixed="top" className={styles.container}>
+                <Button variant="none" className="mr-2" onClick={toggleSidebar}>
+                    <FontAwesomeIcon icon={faBars} size="lg" />
+                </Button>
                 <Link href="/">
                     <Navbar.Brand as="a" href="/">
                         Backstage2

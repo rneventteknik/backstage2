@@ -2,7 +2,7 @@ import Head from 'next/head';
 import Topbar from './Topbar';
 import { CurrentUserInfo } from '../interfaces/auth/CurrentUserInfo';
 import Link from 'next/link';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { Breadcrumb } from 'react-bootstrap';
 import Sidebar from './Sidebar';
 import styles from './Layout.module.scss';
@@ -22,19 +22,22 @@ const Layout: React.FC<Props> = ({
     fixedWidth = false,
     currentUser,
 }: Props) => {
+    const [sidebarIsToggled, setSidebarIsToggled] = useState(false);
+    const toggleSidebar = () => setSidebarIsToggled(!sidebarIsToggled);
+
     if (!currentUser.isLoggedIn) {
         return <div className="text-center mt-4 font-italic">Loading...</div>;
     }
 
     return (
-        <div className={styles.container}>
+        <div className={styles.container} data-sidebar-toggle-status={sidebarIsToggled}>
             <Head>
                 <title>{title} | Backstage2</title>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             </Head>
 
-            <Topbar currentUser={currentUser} />
+            <Topbar currentUser={currentUser} toggleSidebar={toggleSidebar} />
 
             <aside className={styles.sidebar}>
                 <Sidebar currentUser={currentUser} />
