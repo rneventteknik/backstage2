@@ -87,6 +87,11 @@ const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
             <SidebarLink displayName="Ljuslistan" link="." icon={faExternalLinkAlt} />
             <SidebarLink displayName="Inköpslistan" link="." icon={faExternalLinkAlt} />
         </SidebarLinkGroup>
+        <div className={styles.debugInfo}>
+            <small className="text-muted">
+                <p>{process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION}</p>
+            </small>
+        </div>
     </div>
 );
 
