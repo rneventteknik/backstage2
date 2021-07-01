@@ -28,6 +28,8 @@ DB_NAME={database name}
 DB_SSL={true or false}
 
 SECRET_COOKIE_PASSWORD={session cookie secret; >32 chars}
+
+NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS={json array with external links, where each link is an object with a title and an url attribute}
 ```
 
 ### Version Control ###

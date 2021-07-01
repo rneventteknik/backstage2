@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
-import { Nav } from 'react-bootstrap';
+import { Alert, Nav } from 'react-bootstrap';
 import styles from './Sidebar.module.scss';
 
 import {
@@ -34,7 +34,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ displayName, link, icon, exac
     const isActive = exactMatch ? link === path : path.indexOf(link) === 0;
 
     return (
-        <Nav.Item className={isActive ? styles.activeNavItem : undefined}>
+        <Nav.Item className={[isActive ? styles.activeNavItem : undefined, styles.link].join(' ')}>
             <Link href={link}>
                 <Nav.Link as="a" href={link}>
                     <FontAwesomeIcon className="fa-fw" icon={icon} />
@@ -59,6 +59,31 @@ const SidebarLinkGroup: React.FC<SidebarLinkGroupProps> = ({ children, title }: 
     </>
 );
 
+// External links
+//
+const getExternalLinksFromEnv = () => {
+    try {
+        type LinkObject = { title: string; url: string };
+        const links = (process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS
+            ? JSON.parse(process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS)
+            : []) as LinkObject[];
+
+        if (links.length === 0) {
+            return null;
+        }
+
+        return links.map((link, index) => (
+            <SidebarLink key={index} displayName={link.title} link={link.url} icon={faExternalLinkAlt} />
+        ));
+    } catch {
+        return (
+            <Alert className="mx-4 p-3" variant="danger">
+                <strong>Error</strong> Invalid JSON
+            </Alert>
+        );
+    }
+};
+
 // The sidebar itself
 //
 type Props = {
@@ -82,11 +107,10 @@ const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
             </SidebarLinkGroup>
         ) : null}
 
-        <SidebarLinkGroup title="Externa länkar">
-            <SidebarLink displayName="OneDrive" link="https://onedrive.live.com" icon={faExternalLinkAlt} />
-            <SidebarLink displayName="Ljuslistan" link="." icon={faExternalLinkAlt} />
-            <SidebarLink displayName="Inköpslistan" link="." icon={faExternalLinkAlt} />
-        </SidebarLinkGroup>
+        {getExternalLinksFromEnv() ? (
+            <SidebarLinkGroup title="Externa länkar">{getExternalLinksFromEnv()}</SidebarLinkGroup>
+        ) : null}
+
         <div className={styles.debugInfo}>
             <small className="text-muted">
                 <p>{process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION}</p>
