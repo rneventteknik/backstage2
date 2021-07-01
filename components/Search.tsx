@@ -8,6 +8,8 @@ import styles from './Search.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDay, faCube, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { EventApiModel, UserApiModel } from '../interfaces/api-models';
+import { toUser } from '../lib/mappers/user';
+import { toEvent } from '../lib/mappers/event';
 
 enum ResultType {
     EVENT,
@@ -51,21 +53,24 @@ const Search: React.FC = () => {
                 results.events.map((event) => ({
                     type: ResultType.EVENT,
                     url: '/events/' + event.id,
-                    ...event,
+                    ...toEvent(event),
                 })),
             )
             .concat(
                 results.equipment.map((equipment) => ({
                     type: ResultType.EQUIPMENT,
                     url: '/equipment/' + equipment.id,
-                    ...equipment,
+                    id: 0,
+                    name: '',
+                    created: undefined,
+                    updated: undefined,
                 })),
             )
             .concat(
                 results.users.map((user) => ({
                     type: ResultType.USER,
                     url: '/users/' + user.id,
-                    ...user,
+                    ...toUser(user),
                 })),
             );
     };

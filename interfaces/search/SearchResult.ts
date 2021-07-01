@@ -1,8 +1,9 @@
-import { EventApiModel, UserApiModel } from '../api-models';
-import { BaseEntityWithName } from '../BaseEntity';
+import { BaseApiModelWithName } from '../api-models';
+import { IEventApiModel } from '../api-models/EventApiModel';
+import { IUserApiModel } from '../api-models/UserApiModel';
 
 export interface SearchResult {
-    events: EventApiModel[];
-    equipment: BaseEntityWithName[];
-    users: UserApiModel[];
+    events: IEventApiModel[];
+    equipment: BaseApiModelWithName[];
+    users: IUserApiModel[];
 }

@@ -51,7 +51,7 @@ const tableSettings: TableConfiguration<Event> = {
         {
             key: 'date',
             displayName: 'Datum',
-            getValue: (event: Event) => formatDate(new Date(event.created)),
+            getValue: (event: Event) => (event.created ? formatDate(new Date(event.created)) : '-'),
             columnWidth: 180,
             textAlignment: 'center',
         },

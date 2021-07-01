@@ -1,8 +1,18 @@
 import { Event } from '../../interfaces';
-import { EventApiModel } from '../../interfaces/api-models/';
+import { IEventApiModel } from '../../interfaces/api-models/EventApiModel';
+import { toDateOrUndefined } from '../utils';
+import { toUser } from './user';
 
-// I have disabled the linter here until we implement the mappers
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const toEvent = (_apiModel: EventApiModel): Event => {
-    throw 'Not implemented';
+export const toEvent = (apiModel: IEventApiModel): Event => {
+    if (!apiModel.id) {
+        throw 'Invalid event';
+    }
+
+    return {
+        ...apiModel,
+        id: apiModel.id,
+        ownerUser: toUser(apiModel.ownerUser),
+        updated: toDateOrUndefined(apiModel.updated),
+        created: toDateOrUndefined(apiModel.created),
+    };
 };

@@ -7,6 +7,7 @@
 ***************************/
 
 $backstage-highlight: #2e2e2e;
+$backstage-lighter-highlight: #424242;
 $backstage-lighter-bg: #1f1f1f;
 $backstage-lightest-bg: #242424;
 
@@ -50,10 +51,17 @@ $input-border-color: $gray-600;
 $input-focus-bg: $input-bg;
 $input-focus-border-color: lighten($component-active-bg, 25%);
 $input-focus-color: $input-color;
-
 $input-group-addon-bg: lighten($gray-900, 15);
 $input-group-addon-border-color: $input-border-color;
 $input-group-addon-color: $input-color;
+
+/* Modals */
+$modal-content-bg: $backstage-lighter-bg;
+$modal-content-border-color: $backstage-lightest-bg;
+$modal-footer-border-color: $backstage-lighter-highlight;
+$modal-header-border-color: $backstage-lighter-highlight;
+$close-color: $body-color;
+$close-text-shadow: $body-bg;
 
 /* Hr */
 $hr-border-color: $gray-800;

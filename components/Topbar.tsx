@@ -14,7 +14,7 @@ type Props = {
 
 const Topbar: React.FC<Props> = ({ currentUser }: Props) => {
     const logOut = async () => {
-        const res = await fetch('api/users/logout');
+        const res = await fetch('/api/users/logout');
         if (res.status === 200) {
             Router.push('/login');
         }

@@ -15,4 +15,5 @@ export interface User extends BaseEntityWithName {
     homeAddress: string;
     zipCode: string;
     emailAddress: string;
+    username?: string;
 }

@@ -4,6 +4,6 @@ export interface BaseEntityWithName extends BaseEntity {
 
 export interface BaseEntity {
     id: number;
-    created: Date | string;
-    updated: Date | string;
+    created?: Date;
+    updated?: Date;
 }

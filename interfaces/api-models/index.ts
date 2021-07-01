@@ -11,3 +11,13 @@
 
 export { EventApiModel } from './EventApiModel';
 export { UserApiModel } from './UserApiModel';
+
+export interface BaseApiModelWithName extends BaseApiModel {
+    name: string;
+}
+
+export interface BaseApiModel {
+    id?: number;
+    created?: string;
+    updated?: string;
+}

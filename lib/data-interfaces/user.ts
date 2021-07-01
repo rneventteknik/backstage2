@@ -1,14 +1,9 @@
-import { UserApiModel, UserAuthApiModel } from '../../interfaces/api-models/UserApiModel';
+import { MemberStatus } from '../../interfaces/enums/MemberStatus';
+import { Role } from '../../interfaces/enums/Role';
+import { UserApiModel } from '../../interfaces/api-models/UserApiModel';
 import { ensureDatabaseIsInitialized } from '../database';
-
-export const fetchAuthUser = async (username: string): Promise<UserAuthApiModel> => {
-    ensureDatabaseIsInitialized();
-
-    return UserAuthApiModel.query()
-        .where('username', username)
-        .withGraphFetched('user')
-        .then((users) => users[0]);
-};
+import { isMemberOfEnum } from '../utils';
+import { removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchUsers = async (searchString: string, count: number): Promise<UserApiModel[]> => {
     ensureDatabaseIsInitialized();
@@ -26,7 +21,44 @@ export const searchUsers = async (searchString: string, count: number): Promise<
 export const fetchUser = async (id: number): Promise<UserApiModel> => {
     ensureDatabaseIsInitialized();
 
+    return UserApiModel.query().findById(id).withGraphFetched('userAuth');
+};
+
+export const fetchUsers = async (): Promise<UserApiModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return UserApiModel.query().withGraphFetched('userAuth');
+};
+
+export const updateUser = async (id: number, user: UserApiModel): Promise<UserApiModel> => {
+    ensureDatabaseIsInitialized();
+
+    return UserApiModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(user)));
+};
+
+export const insertUser = async (user: UserApiModel): Promise<UserApiModel> => {
+    ensureDatabaseIsInitialized();
+
+    return UserApiModel.query().insert(withCreatedDate(removeIdAndDates(user)));
+};
+
+export const deleteUser = async (id: number): Promise<boolean> => {
+    ensureDatabaseIsInitialized();
+
     return UserApiModel.query()
-        .where('id', id)
-        .then((users) => users[0]);
+        .deleteById(id)
+        .then((res) => res > 0);
+};
+
+export const validateUserApiModel = (user: UserApiModel): boolean => {
+    if (!user) return false;
+
+    if (!user.name) return false;
+    if (!user.nameTag) return false;
+    if (!user.emailAddress) return false;
+
+    if (!isMemberOfEnum(user.role, Role)) return false;
+    if (!isMemberOfEnum(user.memberStatus, MemberStatus)) return false;
+
+    return true;
 };
