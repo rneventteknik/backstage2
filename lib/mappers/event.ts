@@ -11,7 +11,7 @@ export const toEvent = (apiModel: IEventApiModel): Event => {
     return {
         ...apiModel,
         id: apiModel.id,
-        ownerUser: toUser(apiModel.ownerUser),
+        ownerUser: apiModel.ownerUser ? toUser(apiModel.ownerUser) : undefined,
         updated: toDateOrUndefined(apiModel.updated),
         created: toDateOrUndefined(apiModel.created),
     };

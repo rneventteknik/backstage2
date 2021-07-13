@@ -7,7 +7,7 @@ export interface IEventApiModel extends BaseApiModelWithName {
     name: string;
     created: string;
     updated: string;
-    ownerUser: IUserApiModel;
+    ownerUser?: IUserApiModel;
     eventType: number;
     status: number;
     salaryStatus: number;

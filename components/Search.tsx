@@ -77,7 +77,9 @@ const Search: React.FC = () => {
 
     const handleSelect = (selected: SearchResultViewModel[]) => {
         const selectedEntity = selected[0];
-        router.push(selectedEntity.url);
+        if (selectedEntity) {
+            router.push(selectedEntity.url);
+        }
     };
 
     type ResultSectionProps<T extends SearchResultViewModel & HasIndex> = {
@@ -175,6 +177,7 @@ const Search: React.FC = () => {
             onChange={handleSelect}
             renderMenu={renderMenu}
             placeholder="Sök..."
+            selected={[]}
         />
     );
 };
