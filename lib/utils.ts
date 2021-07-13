@@ -1,6 +1,25 @@
+import { BaseEntity } from '../interfaces/BaseEntity';
 import { MemberStatus } from '../interfaces/enums/MemberStatus';
 import { Role } from '../interfaces/enums/Role';
 import { Status } from '../interfaces/enums/Status';
+
+// Helper functions for array operations
+//
+export function onlyUnique<T>(value: T, index: number, self: T[]): boolean {
+    return self.indexOf(value) == index;
+}
+
+export function onlyUniqueByMapperFn<T>(mapperFn: (entity: T) => unknown) {
+    return (value: T, index: number, self: T[]): boolean => self.map(mapperFn).indexOf(mapperFn(value)) == index;
+}
+
+export function onlyUniqueById<T extends BaseEntity>(value: T, index: number, self: T[]): boolean {
+    return self.map((x) => x.id).indexOf(value.id) == index;
+}
+
+export function notEmpty<T>(value: T | null | undefined): value is T {
+    return value !== null && value !== undefined;
+}
 
 // Date formatter
 //
@@ -13,6 +32,10 @@ const dateFormatOptions: Intl.DateTimeFormatOptions = {
 };
 
 export const formatDate = (date: Date): string => date.toLocaleString('se-SE', dateFormatOptions);
+
+// Check if value is a valid date
+//
+export const validDate = (date: Date | undefined): boolean => !!date && date instanceof Date && !isNaN(date.getTime());
 
 // Get string from status code
 //
@@ -110,7 +133,7 @@ export function groupBy<T, K extends string | number>(array: T[], keyFn: (entity
 
 // Handle api responses in fetch calls
 //
-export async function handleApiResonse<T>(res: Response): Promise<T> {
+export async function getResponseContentOrError<T>(res: Response): Promise<T> {
     if (res.status !== 200) {
         throw Error(await res.text());
     }

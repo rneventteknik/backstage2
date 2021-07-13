@@ -1,5 +1,5 @@
 import { User } from '../../interfaces';
-import { IUserApiModel } from '../../interfaces/api-models/UserApiModel';
+import { IUserApiModel } from '../../interfaces/api-models/';
 import { toDateOrUndefined } from '../utils';
 
 export const toUser = (apiModel: IUserApiModel): User => {

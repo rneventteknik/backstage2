@@ -10,7 +10,10 @@
 // }
 
 export { EventApiModel } from './EventApiModel';
+export type { IEventApiModel } from './EventApiModel';
+
 export { UserApiModel } from './UserApiModel';
+export type { IUserApiModel } from './UserApiModel';
 
 export interface BaseApiModelWithName extends BaseApiModel {
     name: string;

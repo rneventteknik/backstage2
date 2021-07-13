@@ -2,10 +2,14 @@ import React, { ChangeEvent } from 'react';
 import { FormControl, FormGroup } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
 import { BaseEntity } from '../interfaces/BaseEntity';
+import TableFooterWithViewCount from './utils/TableFooter';
 
 export type TableConfiguration<T extends BaseEntity> = {
+    entityTypeDisplayName: string;
     defaultSortPropertyName: string;
     defaultSortAscending: boolean;
+    hideTableFilter?: boolean;
+    hideTableCountControls?: boolean;
     columns: {
         key: string;
         displayName: string;
@@ -20,14 +24,24 @@ export type TableConfiguration<T extends BaseEntity> = {
 type ListProps<T extends BaseEntity> = {
     entities: T[];
     configuration: TableConfiguration<T>;
+    filterString?: string;
 };
 
-export function TableDisplay<T extends BaseEntity>({ entities, configuration }: ListProps<T>): React.ReactElement {
+export function TableDisplay<T extends BaseEntity>({
+    entities,
+    configuration,
+    filterString: filterStringFromParent,
+}: ListProps<T>): React.ReactElement {
     // Store sort column and direction, and filter search text using state
     //
     const [sortKey, setSortKey] = React.useState<string>(configuration.defaultSortPropertyName);
     const [sortReverse, setSortReverse] = React.useState<boolean>(configuration.defaultSortAscending);
-    const [filterString, setFilterString] = React.useState<string>('');
+    const [storedFilterString, setFilterString] = React.useState<string>('');
+    const [viewCount, setViewCount] = React.useState(25);
+
+    // Check if we should use the tables filter field or the filter string from the parent
+    //
+    const filterString = configuration.hideTableFilter ? filterStringFromParent ?? '' : storedFilterString;
 
     // Set up sorting
     //
@@ -67,21 +81,24 @@ export function TableDisplay<T extends BaseEntity>({ entities, configuration }: 
     };
 
     const setFilterConfiguration = (filterString: ChangeEvent<HTMLInputElement>) => {
-        const value: string = filterString.target.value;
-        setFilterString(value);
+        setFilterString(filterString.target.value);
     };
 
     // Sort and filter the entities before we generate the table
     //
     const sortedEntities = entities.sort(sortFn).filter(filterFn);
 
+    const entitiesToShow = configuration.hideTableCountControls ? sortedEntities : sortedEntities.slice(0, viewCount);
+
     // Create the table
     //
     return (
         <div>
-            <FormGroup>
-                <FormControl placeholder="Filter" onChange={setFilterConfiguration}></FormControl>
-            </FormGroup>
+            {configuration.hideTableFilter ? null : (
+                <FormGroup>
+                    <FormControl placeholder="Filter" onChange={setFilterConfiguration}></FormControl>
+                </FormGroup>
+            )}
             <Table hover>
                 <colgroup>
                     {configuration.columns.map((p) => (
@@ -104,7 +121,7 @@ export function TableDisplay<T extends BaseEntity>({ entities, configuration }: 
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedEntities.map((entity) => (
+                    {entitiesToShow.map((entity) => (
                         <tr key={entity.id}>
                             {configuration.columns.map((p) => (
                                 <td key={p.key} className={getTextAlignmentClassName(p.textAlignment)}>
@@ -113,7 +130,7 @@ export function TableDisplay<T extends BaseEntity>({ entities, configuration }: 
                             ))}
                         </tr>
                     ))}
-                    {sortedEntities.length === 0 ? (
+                    {entitiesToShow.length === 0 ? (
                         <tr>
                             <td colSpan={configuration.columns.length} className="text-center font-italic text-muted">
                                 Inga matchingar
@@ -122,6 +139,15 @@ export function TableDisplay<T extends BaseEntity>({ entities, configuration }: 
                     ) : null}
                 </tbody>
             </Table>
+
+            {!configuration.hideTableCountControls ? (
+                <TableFooterWithViewCount
+                    viewCount={viewCount}
+                    totalCount={sortedEntities.length}
+                    setViewCount={setViewCount}
+                    entityTypeDisplayName={configuration.entityTypeDisplayName}
+                />
+            ) : null}
         </div>
     );
 }

@@ -1,5 +1,5 @@
 import { Event } from '../../interfaces';
-import { IEventApiModel } from '../../interfaces/api-models/EventApiModel';
+import { IEventApiModel } from '../../interfaces/api-models/';
 import { toDateOrUndefined } from '../utils';
 import { toUser } from './user';
 

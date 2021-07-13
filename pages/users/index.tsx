@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { User } from '../../interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { formatDate, getMemberStatusName, getRoleName, handleApiResonse } from '../../lib/utils';
+import { formatDate, getMemberStatusName, getRoleName, getResponseContentOrError } from '../../lib/utils';
 import Link from 'next/link';
 import { Alert, Button } from 'react-bootstrap';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
@@ -16,6 +16,7 @@ const UserNameDisplayFn = (user: User) => <Link href={'users/' + user.id}>{user.
 const UserActionsDisplayFn = (event: User) => <Link href={'users/' + event.id}>Redigera</Link>;
 
 const tableSettings: TableConfiguration<User> = {
+    entityTypeDisplayName: 'användare',
     defaultSortPropertyName: 'date',
     defaultSortAscending: false,
     columns: [
@@ -132,8 +133,7 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
 const fetcher = (url: string) =>
     fetch(url)
-        .then(handleApiResonse)
-        .then((data) => data as UserApiModel[])
+        .then((apiResponse) => getResponseContentOrError<UserApiModel[]>(apiResponse))
         .then((apiModel) => apiModel.map((x) => toUser(x)));
 
 export default UserListPage;

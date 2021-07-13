@@ -1,6 +1,5 @@
 import { BaseApiModelWithName } from '../api-models';
-import { IEventApiModel } from '../api-models/EventApiModel';
-import { IUserApiModel } from '../api-models/UserApiModel';
+import { IEventApiModel, IUserApiModel } from '../api-models/';
 
 export interface SearchResult {
     events: IEventApiModel[];

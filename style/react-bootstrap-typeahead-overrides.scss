@@ -1,3 +1,14 @@
+@import "variables";
+
 .rbt-input-hint {
     color:rgba(255, 255, 255, 0.35) !important;
+}
+
+.rbt-input-main {
+    color: $backstage-text-color;
+}
+
+.rbt-token {
+    background-color: lighten($backstage-highlight, 10) !important;
+    color: $backstage-text-color !important;
 }

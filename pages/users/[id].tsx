@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { Alert, Button, Collapse, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import UserForm from '../../components/users/UserForm';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
-import { handleApiResonse } from '../../lib/utils';
+import { getResponseContentOrError } from '../../lib/utils';
 import UserAuthForm from '../../components/users/UserAuthForm';
 import { UpdateAuthRequest, UpdateAuthResponse } from '../../interfaces/auth/UpdateAuthApiModels';
 import { toUser } from '../../lib/mappers/user';
@@ -85,7 +85,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         };
 
         fetch('/api/users/' + router.query.id, request)
-            .then((apiResponse) => handleApiResonse<IUserApiModel>(apiResponse))
+            .then((apiResponse) => getResponseContentOrError<IUserApiModel>(apiResponse))
             .then(toUser)
             .then((user) => {
                 mutate(user, false);
@@ -108,7 +108,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         };
 
         fetch('/api/users/' + user?.id, request)
-            .then(handleApiResonse)
+            .then(getResponseContentOrError)
             .then(() => router.push('/users/'))
             .catch((error) => {
                 console.error(error);
@@ -127,7 +127,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         };
 
         fetch('/api/users/userauth/' + router.query.id, request)
-            .then((response) => handleApiResonse<UpdateAuthResponse>(response))
+            .then((response) => getResponseContentOrError<UpdateAuthResponse>(response))
             .then((data) => {
                 mutate({ ...user, username: data.username }, false);
                 setNotificationMessage('✓', 'Inloggningsuppgifter sparade');
@@ -150,7 +150,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         };
 
         fetch('/api/users/userauth/' + user?.id, request)
-            .then(handleApiResonse)
+            .then(getResponseContentOrError)
             .then(() => {
                 mutate({ ...user, username: undefined }, false);
                 setNotificationMessage('✓', 'Inloggningsuppgifter borttagna');
@@ -275,7 +275,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
 const fetcher = (url: string) =>
     fetch(url)
-        .then((apiResponse) => handleApiResonse<IUserApiModel>(apiResponse))
+        .then((apiResponse) => getResponseContentOrError<IUserApiModel>(apiResponse))
         .then(toUser);
 
 export default UserPage;

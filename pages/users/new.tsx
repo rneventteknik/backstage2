@@ -4,7 +4,7 @@ import { useRouter } from 'next/router';
 import { Button } from 'react-bootstrap';
 import UserForm from '../../components/users/UserForm';
 import { User } from '../../interfaces';
-import { handleApiResonse } from '../../lib/utils';
+import { getResponseContentOrError } from '../../lib/utils';
 import { IUserApiModel } from '../../interfaces/api-models/UserApiModel';
 import { CurrentUserInfo } from '../../interfaces/auth/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
@@ -31,8 +31,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         };
 
         fetch('/api/users', request)
-            .then(handleApiResonse)
-            .then((data) => data as User)
+            .then((apiResponse) => getResponseContentOrError<User>(apiResponse))
             .then((data) => {
                 router.push('/users/' + data.id);
             });

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
 import { useRouter } from 'next/router';
-import { BaseEntityWithName } from '../interfaces/BaseEntity';
 import { SearchResult } from '../interfaces/search/SearchResult';
-import { groupBy, handleApiResonse } from '../lib/utils';
+import { groupBy, getResponseContentOrError } from '../lib/utils';
 import styles from './Search.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDay, faCube, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { EventApiModel, UserApiModel } from '../interfaces/api-models';
 import { toUser } from '../lib/mappers/user';
 import { toEvent } from '../lib/mappers/event';
+import { BaseEntityWithName } from '../interfaces/BaseEntity';
 
 enum ResultType {
     EVENT,
@@ -37,7 +37,7 @@ const Search: React.FC = () => {
             headers: { 'Content-Type': 'application/json' },
         };
         fetch('/api/search?s=' + searchString, request)
-            .then(handleApiResonse)
+            .then(getResponseContentOrError)
             .then((data) => data as SearchResult)
             .then(convertSearchResultsForDisplay)
             .then(setSearchResult)
