@@ -31,7 +31,7 @@ const dateFormatOptions: Intl.DateTimeFormatOptions = {
     minute: 'numeric',
 };
 
-export const formatDate = (date: Date): string => date.toLocaleString('se-SE', dateFormatOptions);
+export const formatDate = (date: Date): string => date.toLocaleString('sv-SE', dateFormatOptions);
 
 // Check if value is a valid date
 //

@@ -7,7 +7,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const versionNumber = JSON.parse(require('fs').readFileSync('package.json').toString()).version;
 const gitHash = require('child_process').execSync('git rev-parse HEAD').toString().trim().substring(0, 10);
-const currentDate = new Date().toLocaleString('se-SE', { year: 'numeric', month: 'numeric', day: 'numeric' });
+const currentDate = new Date().toLocaleString('sv-SE', { year: 'numeric', month: 'numeric', day: 'numeric' });
 
 const versionName = `${versionNumber} / ${gitHash} / ${currentDate}`;
 console.log('[Backstage2] Version ' + versionName);
