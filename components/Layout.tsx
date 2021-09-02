@@ -6,6 +6,7 @@ import React, { ReactNode, useState } from 'react';
 import { Breadcrumb } from 'react-bootstrap';
 import Sidebar from './Sidebar';
 import styles from './Layout.module.scss';
+import NotificationArea from './NotificationArea';
 
 type Props = {
     children?: ReactNode;
@@ -42,6 +43,12 @@ const Layout: React.FC<Props> = ({
             <aside className={styles.sidebar}>
                 <Sidebar currentUser={currentUser} />
             </aside>
+
+            <div className={styles.notificationsContainer}>
+                <div className={styles.notifications}>
+                    <NotificationArea />
+                </div>
+            </div>
 
             <section className={styles.mainContentContainer + ' p-4'}>
                 <div className={fixedWidth ? styles.mainContentFixedWidth : styles.mainContent}>

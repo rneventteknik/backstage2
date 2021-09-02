@@ -7,6 +7,7 @@ import styles from './Search.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDay, faCube, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { EventApiModel, UserApiModel } from '../interfaces/api-models';
+import { useNotifications } from '../lib/useNotifications';
 import { toUser } from '../lib/mappers/user';
 import { toEvent } from '../lib/mappers/event';
 import { BaseEntityWithName } from '../interfaces/BaseEntity';
@@ -26,6 +27,7 @@ interface HasIndex {
 
 const Search: React.FC = () => {
     const router = useRouter();
+    const { showErrorMessage } = useNotifications();
 
     const [searchResult, setSearchResult] = useState<SearchResultViewModel[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +43,10 @@ const Search: React.FC = () => {
             .then((data) => data as SearchResult)
             .then(convertSearchResultsForDisplay)
             .then(setSearchResult)
-            .catch(console.error)
+            .catch((error: Error) => {
+                console.error(error);
+                showErrorMessage('Sökningen misslyckades');
+            })
             .finally(() => setIsLoading(false));
     };
 

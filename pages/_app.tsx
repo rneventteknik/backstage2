@@ -2,6 +2,7 @@ import '../style/style.scss';
 import React from 'react';
 import { AppProps } from 'next/app';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import { Provider } from 'react-bus';
 
 // We include the font awesome css here to avoid flashing big icons when the page loads.
 //
@@ -10,5 +11,9 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 config.autoAddCss = false;
 
 export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
-    return <Component {...pageProps} />;
+    return (
+        <Provider>
+            <Component {...pageProps} />
+        </Provider>
+    );
 }

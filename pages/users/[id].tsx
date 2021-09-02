@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import Layout from '../../components/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Alert, Button, Collapse, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { Alert, Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import UserForm from '../../components/users/UserForm';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
 import { getResponseContentOrError } from '../../lib/utils';
 import UserAuthForm from '../../components/users/UserAuthForm';
 import { UpdateAuthRequest, UpdateAuthResponse } from '../../interfaces/auth/UpdateAuthApiModels';
 import { toUser } from '../../lib/mappers/user';
+import { useNotifications } from '../../lib/useNotifications';
 import { IUserApiModel } from '../../interfaces/api-models/UserApiModel';
 import { CurrentUserInfo } from '../../interfaces/auth/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
@@ -23,28 +24,12 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [showDeleteAuthModal, setShowDeleteAuthModal] = useState(false);
     const [showEditAuthModal, setShowEditAuthModal] = useState(false);
 
-    // This is a very simple notification system. We should replace it with something robust and shared between pages later.
-    //
-    const [messageVisible, setMessageVisible] = useState(false);
-    const [messageHeader, setMessageHeader] = useState('');
-    const [messageText, setMessageText] = useState('');
-    const [messageVariant, setMessageVariant] = useState('success');
-
-    const setNotificationMessage = (
-        header: string,
-        text: string,
-        variant: 'success' | 'warning' | 'danger' = 'success',
-        duration = 5,
-    ) => {
-        setMessageHeader(header);
-        setMessageText(text);
-        setMessageVariant(variant);
-        setMessageVisible(true);
-
-        if (duration > 0) {
-            setTimeout(() => setMessageVisible(false), duration * 1000);
-        }
-    };
+    const {
+        showSaveSuccessNotification,
+        showSaveFailedNotification,
+        showGeneralDangerMessage,
+        showGeneralSuccessMessage,
+    } = useNotifications();
 
     // Edit user
     //
@@ -89,11 +74,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             .then(toUser)
             .then((user) => {
                 mutate(user, false);
-                setNotificationMessage('✓', 'Användaren sparad');
+                showSaveSuccessNotification('Användaren');
             })
             .catch((error: Error) => {
                 console.error(error);
-                setNotificationMessage('Fel', 'Användaren kunde inte sparas', 'danger');
+                showSaveFailedNotification('Användaren');
             });
     };
 
@@ -112,7 +97,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             .then(() => router.push('/users/'))
             .catch((error) => {
                 console.error(error);
-                setNotificationMessage('Fel', 'Användaren kunde inte tas bort', 'danger');
+                showGeneralDangerMessage('Fel!', 'Användaren kunde inte tas bort');
             });
     };
 
@@ -130,11 +115,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             .then((response) => getResponseContentOrError<UpdateAuthResponse>(response))
             .then((data) => {
                 mutate({ ...user, username: data.username }, false);
-                setNotificationMessage('✓', 'Inloggningsuppgifter sparade');
+                showSaveSuccessNotification('Inloggningsuppgifterna');
             })
             .catch((error: Error) => {
                 console.error(error);
-                setNotificationMessage('Fel', 'Inloggningsuppgifterna kunde inte sparas', 'danger');
+                showSaveFailedNotification('Inloggningsuppgifterna');
             })
             .finally(() => setShowEditAuthModal(false));
     };
@@ -153,11 +138,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             .then(getResponseContentOrError)
             .then(() => {
                 mutate({ ...user, username: undefined }, false);
-                setNotificationMessage('✓', 'Inloggningsuppgifter borttagna');
+                showGeneralSuccessMessage('Borttagna', 'Inloggningsuppgifter borttagna');
             })
             .catch((error) => {
                 console.error(error);
-                setNotificationMessage('Fel', 'Användaren kunde inte tas bort', 'danger');
+                showGeneralDangerMessage('Fel!', 'Inloggningsuppgifterna kunde inte tas bort');
             });
     };
 
@@ -171,13 +156,6 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
     return (
         <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <Collapse in={messageVisible}>
-                <div>
-                    <Alert variant={messageVariant}>
-                        <strong> {messageHeader} </strong> {messageText}
-                    </Alert>
-                </div>
-            </Collapse>
             <div className="float-right">
                 <Button variant="primary" form="editUserForm" type="submit">
                     Spara användare

@@ -1,0 +1,44 @@
+@import "../style/variables";
+
+$danger-bg: #F44336;
+$warning-bg: #FF9800;
+$success-bg: #4CAF50;
+$info-bg: #2196F3;
+
+.header {
+    color: white;
+    padding: 0.6em 1.1em;
+    border-radius: 0;
+    border-width: 0
+}
+
+.success .header {
+    background-color: $success-bg;
+}
+
+.danger .header {
+    background-color: $danger-bg;
+}
+
+.warning .header {
+    background-color: $warning-bg;
+}
+
+.info .header {
+    background-color: $info-bg;
+}
+
+.iconContainer {
+    margin-right: 1.1em;
+}
+
+.iconContainer .icon {
+    width:1em;
+}
+
+.notification {
+    min-width: 22em;
+    border-radius: 0;
+    background-color: $backstage-lightest-bg;
+    border-width: 0;
+}

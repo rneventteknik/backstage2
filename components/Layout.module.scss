@@ -45,6 +45,18 @@ $sidebar-transition-time: 0.1s;
     bottom: 0;
 }
 
+.notificationsContainer {
+    position: fixed;
+    bottom: 1em;
+    left: 50%;
+    display: flex;
+    justify-content: center;
+    transform:  translate(-50%, 0);
+    z-index: 100;
+    max-height: 50vh;
+    overflow: hidden;
+}
+
 // Handle sidebar toggle and responsive design
 //
 [data-sidebar-toggle-status="true"] .sidebar {
