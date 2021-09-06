@@ -26,7 +26,7 @@ const Topbar: React.FC<Props> = ({ currentUser, toggleSidebar }: Props) => {
     return (
         <header>
             <Navbar variant="dark" fixed="top" className={styles.container}>
-                <Button variant="none" className="mr-2" onClick={toggleSidebar}>
+                <Button variant="none" className="mr-2" onClick={toggleSidebar} aria-label="Toggle Sidebar">
                     <FontAwesomeIcon icon={faBars} size="lg" />
                 </Button>
                 <Link href="/">
@@ -38,7 +38,7 @@ const Topbar: React.FC<Props> = ({ currentUser, toggleSidebar }: Props) => {
                     <Search />
                 </div>
                 <Dropdown>
-                    <Dropdown.Toggle variant="default" id="dropdown-basic" className="py-0">
+                    <Dropdown.Toggle variant="default" id="dropdown-basic" className="py-0" aria-label="User Menu">
                         <UserIcon user={currentUser} />
                     </Dropdown.Toggle>
 

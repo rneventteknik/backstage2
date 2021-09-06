@@ -18,6 +18,10 @@ export const getServerSideProps = useUser(undefined, undefined, '/');
 const LoginPage: React.FC = () => {
     const [showWrongPasswordError, setShowWrongPasswordError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
+
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
     const usernameFieldRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -30,8 +34,8 @@ const LoginPage: React.FC = () => {
         e.preventDefault();
 
         const body = {
-            username: e.currentTarget.username.value,
-            password: e.currentTarget.password.value,
+            username: username,
+            password: password,
         };
 
         const request = {
@@ -65,10 +69,21 @@ const LoginPage: React.FC = () => {
             <h1>Backstage2</h1>
             <Form action="/api/users/login" method="post" onSubmit={handleSubmit}>
                 <FormGroup>
-                    <FormControl type="text" placeholder="Användarnamn" name="username" ref={usernameFieldRef} />
+                    <FormControl
+                        type="text"
+                        placeholder="Användarnamn"
+                        name="username"
+                        ref={usernameFieldRef}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
                 </FormGroup>
                 <FormGroup>
-                    <FormControl type="password" placeholder="Lösenord" name="password" />
+                    <FormControl
+                        type="password"
+                        placeholder="Lösenord"
+                        name="password"
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
                 </FormGroup>
                 {showWrongPasswordError ? <Alert variant="danger">Felaktigt användarnamn eller lösenord</Alert> : null}
                 {showServerError ? (

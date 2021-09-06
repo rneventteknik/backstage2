@@ -9,7 +9,22 @@
     "type-check": "tsc",
     "lint": "eslint \"*/**/*.{js,ts,tsx}\" --fix",
     "migrate": "knex --esm migrate:latest",
-    "seed": "knex --esm seed:run"
+    "seed": "knex --esm seed:run",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.ts"
+    ],
+    "testPathIgnorePatterns": [
+      "<rootDir>/.next/",
+      "<rootDir>/node_modules/"
+    ],
+    "testEnvironment": "jsdom",
+    "moduleNameMapper": {
+      "\\.(scss|sass|css)$": "identity-obj-proxy"
+    }
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
@@ -34,7 +49,12 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@testing-library/dom": "^8.0.0",
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^12.0.0",
+    "@testing-library/user-event": "^13.1.9",
     "@types/bcryptjs": "^2.4.2",
+    "@types/jest": "^26.0.23",
     "@types/node": "^12.12.21",
     "@types/react": "^16.9.16",
     "@types/react-bootstrap-typeahead": "^5.1.4",
@@ -42,12 +62,18 @@
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "^4.15.0",
     "@typescript-eslint/parser": "^4.15.0",
+    "babel-jest": "^27.0.5",
     "eslint": "^7.19.0",
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.22.0",
     "husky": "^6.0.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^27.0.5",
+    "msw": "^0.30.0",
+    "next-page-tester": "^0.26.1",
     "prettier": "^2.2.1",
+    "whatwg-fetch": "^3.6.2",
     "sqlite3": "^5.0.2",
     "typescript": "^4.2.4"
   },

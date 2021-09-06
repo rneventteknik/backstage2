@@ -26,10 +26,6 @@ const Layout: React.FC<Props> = ({
     const [sidebarIsToggled, setSidebarIsToggled] = useState(false);
     const toggleSidebar = () => setSidebarIsToggled(!sidebarIsToggled);
 
-    if (!currentUser.isLoggedIn) {
-        return <div className="text-center mt-4 font-italic">Loading...</div>;
-    }
-
     return (
         <div className={styles.container} data-sidebar-toggle-status={sidebarIsToggled}>
             <Head>
@@ -51,7 +47,10 @@ const Layout: React.FC<Props> = ({
             </div>
 
             <section className={styles.mainContentContainer + ' p-4'}>
-                <div className={fixedWidth ? styles.mainContentFixedWidth : styles.mainContent}>
+                <div
+                    className={fixedWidth ? styles.mainContentFixedWidth : styles.mainContent}
+                    data-testid="main-content"
+                >
                     <section className={styles.breadcrumbs}>
                         <Breadcrumb>
                             <Breadcrumb.Item href="/" linkAs={Link} className={styles.breadcrumb}>
