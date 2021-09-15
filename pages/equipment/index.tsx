@@ -30,11 +30,9 @@ const EquipmentNameDisplayFn = (equipment: Equipment) => (
 const EquipmentCategoryDisplayFn = (equipment: Equipment) => (
     <>
         {equipment.categories.map((x) => (
-            <>
-                <Badge variant="dark" key={x.id}>
-                    {x.name}
-                </Badge>{' '}
-            </>
+            <Badge variant="dark" key={x.id} className="mr-1">
+                {x.name}
+            </Badge>
         ))}
     </>
 );
