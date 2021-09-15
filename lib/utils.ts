@@ -116,7 +116,7 @@ export const getMemberStatusName = (status: MemberStatus): string => {
 
 // Get string from role
 //
-export const getRoleName = (role: Role): string => {
+export const getRoleName = (role: Role | undefined): string => {
     switch (role) {
         case Role.ADMIN:
             return 'Administratörsbehörighet';
@@ -126,6 +126,9 @@ export const getRoleName = (role: Role): string => {
 
         case Role.READONLY:
             return 'Läsbehörighet';
+
+        default:
+            return '';
     }
 };
 

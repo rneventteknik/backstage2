@@ -11,6 +11,7 @@ export const toUser = (apiModel: IUserApiModel): User => {
         ...apiModel,
         id: apiModel.id,
         username: apiModel?.userAuth?.username,
+        role: apiModel?.userAuth?.role,
         updated: toDateOrUndefined(apiModel.updated),
         created: toDateOrUndefined(apiModel.created),
     };

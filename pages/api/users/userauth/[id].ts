@@ -18,14 +18,18 @@ import {
 } from '../../../../lib/data-interfaces/userAuth';
 import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
 
-const getUserAuthModel = async (changePasswordRequest: UpdateAuthRequest): Promise<UserAuthApiModel> =>
-    getHashedPassword(changePasswordRequest.password).then((hashedPassword) => {
-        const userAuth = new UserAuthApiModel();
-        userAuth.userId = changePasswordRequest.userId;
-        userAuth.username = changePasswordRequest.username;
-        userAuth.hashedPassword = hashedPassword;
-        return userAuth;
-    });
+const getUserAuthModel = async (updateAuthRequest: UpdateAuthRequest): Promise<UserAuthApiModel> => {
+    const userAuth = new UserAuthApiModel();
+    userAuth.userId = updateAuthRequest.userId;
+    userAuth.username = updateAuthRequest.username;
+    userAuth.role = updateAuthRequest.role;
+
+    if (updateAuthRequest.password) {
+        userAuth.hashedPassword = await getHashedPassword(updateAuthRequest.password);
+    }
+
+    return userAuth;
+};
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {

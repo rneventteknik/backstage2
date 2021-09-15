@@ -3,8 +3,7 @@ import { Col, Form, Row } from 'react-bootstrap';
 import { User } from '../../interfaces';
 import { IUserApiModel } from '../../interfaces/api-models/UserApiModel';
 import { MemberStatus } from '../../interfaces/enums/MemberStatus';
-import { Role } from '../../interfaces/enums/Role';
-import { getMemberStatusName, getRoleName } from '../../lib/utils';
+import { getMemberStatusName } from '../../lib/utils';
 
 type Props = {
     handleSubmitUser: (user: IUserApiModel) => void;
@@ -34,7 +33,6 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
             name: form.fullname.value,
             nameTag: form.nameTag.value,
             memberStatus: form.memberStatus.value,
-            role: form.role.value,
             phoneNumber: form.phoneNumber.value,
             emailAddress: form.emailAddress.value,
             slackId: form.slackId.value,
@@ -94,16 +92,6 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                         <Form.Text className="text-muted">
                             Notera att medlemsstatusen inte påverkar behörigheterna i Backstage2.
                         </Form.Text>
-                    </Form.Group>
-                </Col>
-                <Col lg="12">
-                    <Form.Group controlId="formRole">
-                        <Form.Label>Behörighet</Form.Label>
-                        <Form.Control as="select" name="role" defaultValue={user?.role ?? Role.USER}>
-                            <option value={Role.ADMIN}> {getRoleName(Role.ADMIN)}</option>
-                            <option value={Role.USER}> {getRoleName(Role.USER)}</option>
-                            <option value={Role.READONLY}> {getRoleName(Role.READONLY)}</option>
-                        </Form.Control>
                     </Form.Group>
                 </Col>
             </Row>

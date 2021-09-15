@@ -15,7 +15,6 @@ export async function seed(knex) {
                 name: 'Albert Medlem',
                 created: '2019-01-01 15:30',
                 updated: '2019-01-01 15:30',
-                role: 0,
                 memberStatus: 0,
                 nameTag: 'AM',
                 phoneNumber: '08 000 123 45',
@@ -25,7 +24,6 @@ export async function seed(knex) {
                 name: 'Markus Medlem',
                 created: '2019-01-01 15:30',
                 updated: '2019-01-01 15:30',
-                role: 1,
                 memberStatus: 3,
                 nameTag: 'MM',
                 phoneNumber: '072 000 00 00',
@@ -39,11 +37,13 @@ export async function seed(knex) {
         {
             userId: firstUserId,
             username: 'albert',
+            role: 0,
             hashedPassword: '$2a$10$Pl4ESEnWlzA1Gu/JCkChPudYkoLWQedJObRl1MKn.tw8EuhR36OSa', // Password is 'dmx'
         },
         {
             userId: firstUserId + 1,
             username: 'markus',
+            role: 1,
             hashedPassword: '$2a$10$HW1d7h.DwzK.mAZMKUK0VuIlBl/00NPNLdyEKWdlfuM8ZBRQLOnnW', // Password is 'xlr'
         },
     ]);

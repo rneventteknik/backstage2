@@ -20,7 +20,7 @@ const handler = withSession(
                 isLoggedIn: true,
                 userId: authUser.userId,
                 name: authUser.user?.name,
-                role: authUser.user?.role,
+                role: authUser.role,
             };
 
             req.session.set('user', user);

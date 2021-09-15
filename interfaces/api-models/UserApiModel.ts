@@ -7,7 +7,6 @@ export interface IUserApiModel extends BaseApiModelWithName {
     name: string;
     created?: string;
     updated?: string;
-    role: number;
     memberStatus: number;
     nameTag: string;
     phoneNumber: string;
@@ -41,7 +40,7 @@ export class UserApiModel extends Model implements IUserApiModel {
         userAuth: {
             relation: Model.HasOneRelation,
             modelClass: UserAuthApiModel,
-            filter: (query) => query.select('userId', 'username'),
+            filter: (query) => query.select('userId', 'username', 'role'),
             join: {
                 from: 'User.id',
                 to: 'UserAuth.userId',
@@ -53,7 +52,6 @@ export class UserApiModel extends Model implements IUserApiModel {
     name!: string;
     created?: string;
     updated?: string;
-    role!: number;
     memberStatus!: number;
     nameTag!: string;
     phoneNumber!: string;
@@ -73,6 +71,7 @@ export class UserApiModel extends Model implements IUserApiModel {
 export interface IUserAuthApiModel {
     userId: number;
     username: string;
+    role: number;
     hashedPassword: string;
     user?: IUserApiModel;
 }
@@ -94,6 +93,7 @@ export class UserAuthApiModel extends Model implements IUserAuthApiModel {
 
     userId!: number;
     username!: string;
+    role!: number;
     hashedPassword!: string;
     user?: UserApiModel;
 }

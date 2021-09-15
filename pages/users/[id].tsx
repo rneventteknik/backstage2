@@ -242,6 +242,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         handleSubmit={handleUpdateAuth}
                         userId={user.id}
                         previousUserName={user?.username}
+                        previousRole={user?.role}
                     />
                 </Modal.Body>
                 <Modal.Footer>

@@ -1,5 +1,4 @@
 import { MemberStatus } from '../../interfaces/enums/MemberStatus';
-import { Role } from '../../interfaces/enums/Role';
 import { UserApiModel } from '../../interfaces/api-models/UserApiModel';
 import { ensureDatabaseIsInitialized } from '../database';
 import { isMemberOfEnum } from '../utils';
@@ -29,18 +28,7 @@ export const fetchUsers = async (): Promise<UserApiModel[]> => {
 
     // Since all users can view this list, we do not include personal information here
     return UserApiModel.query()
-        .select(
-            'id',
-            'name',
-            'created',
-            'updated',
-            'role',
-            'memberStatus',
-            'nameTag',
-            'phoneNumber',
-            'slackId',
-            'emailAddress',
-        )
+        .select('id', 'name', 'created', 'updated', 'memberStatus', 'nameTag', 'phoneNumber', 'slackId', 'emailAddress')
         .withGraphFetched('userAuth');
 };
 
@@ -71,7 +59,6 @@ export const validateUserApiModel = (user: UserApiModel): boolean => {
     if (!user.nameTag) return false;
     if (!user.emailAddress) return false;
 
-    if (!isMemberOfEnum(user.role, Role)) return false;
     if (!isMemberOfEnum(user.memberStatus, MemberStatus)) return false;
 
     return true;
