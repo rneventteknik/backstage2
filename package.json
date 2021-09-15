@@ -31,6 +31,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@fortawesome/react-fontawesome": "^0.1.14",
+    "@react-pdf/renderer": "^2.0.16",
     "@types/react-bootstrap-typeahead": "^5.1.4",
     "bcryptjs": "^2.4.3",
     "bootstrap": "^4.6.0",
