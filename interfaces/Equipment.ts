@@ -1,6 +1,7 @@
 import { BaseEntityWithName } from './BaseEntity';
 import { EquipmentChangelogEntry } from './ChangeLogEntry';
 import { EquipmentCategory } from './EquipmentCategory';
+import { EquipmentPrice } from './EquipmentPrice';
 import { Image } from './Image';
 
 export interface Equipment extends BaseEntityWithName {
@@ -9,8 +10,9 @@ export interface Equipment extends BaseEntityWithName {
     description: string;
     descriptionEN: string;
     note: string;
-    image: Image;
+    image?: Image;
     publiclyHidden: boolean;
-    changeLog: EquipmentChangelogEntry;
+    changeLog: EquipmentChangelogEntry[];
     categories: EquipmentCategory[];
+    prices: EquipmentPrice[];
 }

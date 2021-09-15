@@ -6,10 +6,12 @@ import { groupBy, getResponseContentOrError } from '../lib/utils';
 import styles from './Search.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDay, faCube, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { EventApiModel, UserApiModel } from '../interfaces/api-models';
+import { IEquipmentApiModel, IEventApiModel, IUserApiModel } from '../interfaces/api-models';
 import { useNotifications } from '../lib/useNotifications';
 import { toUser } from '../lib/mappers/user';
 import { toEvent } from '../lib/mappers/event';
+import { toEquipment } from '../lib/mappers/equipment';
+import { Badge } from 'react-bootstrap';
 import { BaseEntityWithName } from '../interfaces/BaseEntity';
 
 enum ResultType {
@@ -65,10 +67,7 @@ const Search: React.FC = () => {
                 results.equipment.map((equipment) => ({
                     type: ResultType.EQUIPMENT,
                     url: '/equipment/' + equipment.id,
-                    id: 0,
-                    name: '',
-                    created: undefined,
-                    updated: undefined,
+                    ...toEquipment(equipment),
                 })),
             )
             .concat(
@@ -103,7 +102,7 @@ const Search: React.FC = () => {
         const getDescription = (entity: T, highlightText: string) => {
             switch (entity.type) {
                 case ResultType.USER:
-                    const user = (entity as unknown) as UserApiModel;
+                    const user = (entity as unknown) as IUserApiModel;
                     return (
                         <small>
                             <Typeahead.Highlighter search={highlightText}>{user.nameTag}</Typeahead.Highlighter> /{' '}
@@ -111,8 +110,23 @@ const Search: React.FC = () => {
                         </small>
                     );
 
+                case ResultType.EQUIPMENT:
+                    const equipment = (entity as unknown) as IEquipmentApiModel;
+                    return (
+                        <small>
+                            <Typeahead.Highlighter search={highlightText}>{equipment.nameEN}</Typeahead.Highlighter>{' '}
+                            {equipment.categories?.map((x) => (
+                                <>
+                                    <Badge key={x.id} variant="dark">
+                                        {x.name}
+                                    </Badge>{' '}
+                                </>
+                            ))}
+                        </small>
+                    );
+
                 case ResultType.EVENT:
-                    const event = (entity as unknown) as EventApiModel;
+                    const event = (entity as unknown) as IEventApiModel;
                     return (
                         <small>
                             <Typeahead.Highlighter search={highlightText}>

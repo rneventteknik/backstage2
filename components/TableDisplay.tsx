@@ -14,7 +14,7 @@ export type TableConfiguration<T extends BaseEntity> = {
         key: string;
         displayName: string;
         getValue: (entity: T) => string | number | Date;
-        getContentOverride?: null | ((entity: T) => React.ReactElement);
+        getContentOverride?: null | ((entity: T) => React.ReactElement | string);
         disableSort?: boolean;
         columnWidth?: number;
         textAlignment?: 'left' | 'center' | 'right';

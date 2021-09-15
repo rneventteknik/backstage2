@@ -1,3 +1,4 @@
+import { EquipmentPrice } from '../interfaces';
 import { BaseEntity } from '../interfaces/BaseEntity';
 import { MemberStatus } from '../interfaces/enums/MemberStatus';
 import { Role } from '../interfaces/enums/Role';
@@ -36,6 +37,28 @@ export const formatDate = (date: Date): string => date.toLocaleString('sv-SE', d
 // Check if value is a valid date
 //
 export const validDate = (date: Date | undefined): boolean => !!date && date instanceof Date && !isNaN(date.getTime());
+
+// Format price
+//
+export const formatPrice = (price: EquipmentPrice): string => {
+    if (price.pricePerHour && !price.pricePerUnit) {
+        return `${price.pricePerHour}kr/h`;
+    } else if (!price.pricePerHour && price.pricePerUnit) {
+        return `${price.pricePerUnit}kr/st`;
+    } else {
+        return `${price.pricePerUnit}kr + ${price.pricePerHour}kr/h`;
+    }
+};
+
+export const formatTHSPrice = (price: EquipmentPrice): string => {
+    if (price.pricePerHourTHS && !price.pricePerUnitTHS) {
+        return `${price.pricePerHourTHS}kr/h`;
+    } else if (!price.pricePerHourTHS && price.pricePerUnitTHS) {
+        return `${price.pricePerUnitTHS}kr/st`;
+    } else {
+        return `${price.pricePerUnitTHS}kr + ${price.pricePerHourTHS}kr/h`;
+    }
+};
 
 // Get string from status code
 //

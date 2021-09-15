@@ -1,20 +1,22 @@
-// You can include shared interfaces/types in a separate file
-// and then use them in any component by importing them. For
-// example, to import the interface below do:
-//
-// import { User } from 'path/to/interfaces';
-
-// export type User = {
-//   id: number
-//   name: string
-// }
+import { IUserApiModel } from './UserApiModel';
 
 export { EventApiModel } from './EventApiModel';
-export type { IEventApiModel } from './EventApiModel';
-
 export { UserApiModel } from './UserApiModel';
-export type { IUserApiModel } from './UserApiModel';
+export {
+    EquipmentApiModel,
+    EquipmentCategoryApiModel,
+    EquipmentChangelogEntryApiModel,
+    EquipmentPriceApiModel,
+} from './EquipmentApiModel';
 
+export type { IEventApiModel } from './EventApiModel';
+export type { IUserApiModel, IUserAuthApiModel } from './UserApiModel';
+export type {
+    IEquipmentApiModel,
+    IEquipmentCategoryApiModel,
+    IEquipmentChangelogEntryApiModel,
+    IEquipmentPriceApiModel,
+} from './EquipmentApiModel';
 export interface BaseApiModelWithName extends BaseApiModel {
     name: string;
 }
@@ -23,4 +25,10 @@ export interface BaseApiModel {
     id?: number;
     created?: string;
     updated?: string;
+}
+
+export interface BaseChangeLogApiModel {
+    timestamp: string;
+    description: string;
+    user?: IUserApiModel;
 }

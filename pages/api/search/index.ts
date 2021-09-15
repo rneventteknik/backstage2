@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { SearchResult } from '../../../interfaces/search/SearchResult';
-import { searchEvents, searchUsers } from '../../../lib/data-interfaces/';
+import { searchEquipment, searchEvents, searchUsers } from '../../../lib/data-interfaces/';
 
 const numberOfEachType = 8;
 
@@ -10,7 +10,7 @@ const handler = async (_req: NextApiRequest, res: NextApiResponse): Promise<void
     try {
         const result: SearchResult = {
             events: await searchEvents(searchString, numberOfEachType),
-            equipment: [], // TODO add search query once table exists
+            equipment: await searchEquipment(searchString, numberOfEachType),
             users: await searchUsers(searchString, numberOfEachType),
         };
 

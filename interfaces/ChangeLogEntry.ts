@@ -2,7 +2,7 @@ import { BaseEntityWithName } from './BaseEntity';
 import { User } from './User';
 
 export interface ChangeLogEntry {
-    user: User;
+    user?: User;
     timestamp: Date;
     description: string;
 }

@@ -1,8 +1,7 @@
-import { BaseApiModelWithName } from '../api-models';
-import { IEventApiModel, IUserApiModel } from '../api-models/';
+import { IEventApiModel, IEquipmentApiModel, IUserApiModel } from '../api-models';
 
 export interface SearchResult {
     events: IEventApiModel[];
-    equipment: BaseApiModelWithName[];
+    equipment: IEquipmentApiModel[];
     users: IUserApiModel[];
 }
