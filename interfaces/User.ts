@@ -8,12 +8,12 @@ export interface User extends BaseEntityWithName {
     nameTag: string;
     phoneNumber: string;
     slackId: string;
-    personalIdentityNumber: string;
-    bankName: string;
-    clearingNumber: string;
-    bankAccount: string;
-    homeAddress: string;
-    zipCode: string;
     emailAddress: string;
+    personalIdentityNumber?: string;
+    bankName?: string;
+    clearingNumber?: string;
+    bankAccount?: string;
+    homeAddress?: string;
+    zipCode?: string;
     username?: string;
 }

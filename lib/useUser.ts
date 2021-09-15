@@ -3,6 +3,7 @@ import { Session } from 'next-iron-session';
 import { CurrentUserInfo } from '../interfaces/auth/CurrentUserInfo';
 import { Role } from '../interfaces/enums/Role';
 import withSession from './session';
+import { getUserFromReq } from './sessionContext';
 
 type inputDataType = {
     req: NextApiRequest & { session: Session };
@@ -21,7 +22,7 @@ const useUser = (
 ): OutputType =>
     withSession(
         async ({ req }: inputDataType): Promise<GetServerSidePropsResult<{ user: CurrentUserInfo }>> => {
-            const user = req.session.get<CurrentUserInfo>('user') ?? { isLoggedIn: false };
+            const user = getUserFromReq(req);
 
             const insufficientAccess =
                 (requiredRole == Role.ADMIN && user?.role != Role.ADMIN) ||

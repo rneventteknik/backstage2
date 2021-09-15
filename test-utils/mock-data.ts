@@ -3,7 +3,7 @@ import { Role } from '../interfaces/enums/Role';
 
 export const mockAdminUser: CurrentUserInfo = {
     isLoggedIn: true,
-    username: 'admin',
+    userId: 42,
     name: 'Admin User',
     role: Role.ADMIN,
 };

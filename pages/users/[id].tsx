@@ -13,6 +13,7 @@ import { useNotifications } from '../../lib/useNotifications';
 import { IUserApiModel } from '../../interfaces/api-models/UserApiModel';
 import { CurrentUserInfo } from '../../interfaces/auth/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { IfAdmin } from '../../components/utils/IfAdmin';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -171,23 +172,28 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
                                 Redigera inloggningsuppgifter
                             </Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item onClick={() => setShowDeleteAuthModal(true)} className="text-danger">
-                                Ta bort inloggningsuppgifter
-                            </Dropdown.Item>
+                            <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
+                                <Dropdown.Divider />
+                                <Dropdown.Item onClick={() => setShowDeleteAuthModal(true)} className="text-danger">
+                                    Ta bort inloggningsuppgifter
+                                </Dropdown.Item>
+                            </IfAdmin>
                         </>
                     ) : (
                         <>
-                            {' '}
-                            <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
-                                Skapa inloggningsuppgifter
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
+                            <IfAdmin currentUser={currentUser}>
+                                <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
+                                    Skapa inloggningsuppgifter
+                                </Dropdown.Item>
+                                <Dropdown.Divider />
+                            </IfAdmin>
                         </>
                     )}
-                    <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                        Ta bort användare
-                    </Dropdown.Item>
+                    <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
+                        <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
+                            Ta bort användare
+                        </Dropdown.Item>
+                    </IfAdmin>
                 </DropdownButton>
             </div>
             <h1> {pageTitle} </h1>

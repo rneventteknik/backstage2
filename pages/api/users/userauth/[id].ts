@@ -1,6 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { UserAuthApiModel } from '../../../../interfaces/api-models/UserApiModel';
 import { UpdateAuthRequest } from '../../../../interfaces/auth/UpdateAuthApiModels';
+import { Role } from '../../../../interfaces/enums/Role';
+import {
+    respondWithAccessDeniedResponse,
+    respondWithCustomErrorMessage,
+    respondWithEntityNotFoundResponse,
+    respondWithInvalidDataResponse,
+    respondWithInvalidMethodResponse,
+} from '../../../../lib/apiResponses';
 import { getHashedPassword } from '../../../../lib/authenticate';
 import {
     deleteUserAuth,
@@ -8,9 +16,7 @@ import {
     updateUserAuth,
     validateUserAuthApiModel,
 } from '../../../../lib/data-interfaces/userAuth';
-
-const userNotFoundResponse = { statusCode: 404, message: 'User not found' };
-const invalidDataResponse = { statusCode: 500, message: 'Invalid credentials' };
+import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
 
 const getUserAuthModel = async (changePasswordRequest: UpdateAuthRequest): Promise<UserAuthApiModel> =>
     getHashedPassword(changePasswordRequest.password).then((hashedPassword) => {
@@ -21,42 +27,68 @@ const getUserAuthModel = async (changePasswordRequest: UpdateAuthRequest): Promi
         return userAuth;
     });
 
-const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<Promise<void> | void> => {
-    if (isNaN(Number(req.query.id))) {
-        res.status(404).json(userNotFoundResponse);
-        return;
-    }
+const handler = withSessionContext(
+    async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
+        const userId = Number(req.query.id);
 
-    switch (req.method) {
-        case 'DELETE':
-            return deleteUserAuth(Number(req.query.id))
-                .then((result) => res.status(200).json(result))
-                .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
-
-        case 'POST':
-            if (!validateUserAuthApiModel(req.body.changePasswordRequest)) {
-                res.status(500).json(invalidDataResponse);
-                return;
-            }
-            return getUserAuthModel(req.body.changePasswordRequest)
-                .then(insertUserAuth)
-                .then((result) => res.status(200).json({ username: result.username }))
-                .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
-
-        case 'PUT':
-            if (!validateUserAuthApiModel(req.body.changePasswordRequest)) {
-                res.status(500).json(invalidDataResponse);
-                return;
-            }
-            return getUserAuthModel(req.body.changePasswordRequest)
-                .then((model) => updateUserAuth(model.userId, model))
-                .then((result) => res.status(200).json({ username: result.username }))
-                .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
-
-        default:
-            res.status(404).json(userNotFoundResponse);
+        if (isNaN(userId)) {
+            respondWithEntityNotFoundResponse(res);
             return;
-    }
-};
+        }
+
+        switch (req.method) {
+            case 'DELETE':
+                if (context.currentUser.role != Role.ADMIN) {
+                    respondWithAccessDeniedResponse(res);
+                    return;
+                }
+
+                await deleteUserAuth(userId)
+                    .then((result) => res.status(200).json(result))
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
+
+                break;
+
+            case 'POST':
+                if (context.currentUser.role != Role.ADMIN) {
+                    respondWithAccessDeniedResponse(res);
+                    return;
+                }
+
+                if (!validateUserAuthApiModel(req.body.changePasswordRequest)) {
+                    respondWithInvalidDataResponse(res);
+                    return;
+                }
+
+                await getUserAuthModel(req.body.changePasswordRequest)
+                    .then(insertUserAuth)
+                    .then((result) => res.status(200).json({ username: result.username }))
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
+
+                break;
+
+            case 'PUT':
+                if (context.currentUser.role != Role.ADMIN && context.currentUser.userId != userId) {
+                    respondWithAccessDeniedResponse(res);
+                    return;
+                }
+
+                if (!validateUserAuthApiModel(req.body.changePasswordRequest)) {
+                    respondWithInvalidDataResponse(res);
+                    return;
+                }
+
+                await getUserAuthModel(req.body.changePasswordRequest)
+                    .then((model) => updateUserAuth(model.userId, model))
+                    .then((result) => res.status(200).json({ username: result.username }))
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
+
+                break;
+
+            default:
+                respondWithInvalidMethodResponse(res);
+        }
+    },
+);
 
 export default handler;

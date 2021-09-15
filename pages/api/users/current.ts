@@ -1,21 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Session } from 'next-iron-session';
-import { CurrentUserInfo } from '../../../interfaces/auth/CurrentUserInfo';
-import withSession from '../../../lib/session';
+import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
 
-const handler = withSession((req: NextApiRequest & { session: Session }, res: NextApiResponse): void => {
-    const user = req.session.get<CurrentUserInfo>('user');
-
-    if (user) {
-        res.json({
-            ...user,
-            isLoggedIn: true,
-        });
-    } else {
-        res.json({
-            isLoggedIn: false,
-        });
-    }
-});
+const handler = withSessionContext((_req: NextApiRequest, res: NextApiResponse, context: SessionContext): void =>
+    res.json(context.currentUser),
+);
 
 export default handler;

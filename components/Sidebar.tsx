@@ -18,7 +18,7 @@ import {
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { CurrentUserInfo } from '../interfaces/auth/CurrentUserInfo';
-import { Role } from '../interfaces/enums/Role';
+import { IfAdmin } from './utils/IfAdmin';
 
 // Component for a single link
 //
@@ -100,12 +100,12 @@ const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
             <SidebarLink displayName="Hjälp" link="/about" icon={faInfoCircle} />
         </SidebarLinkGroup>
 
-        {currentUser?.role === Role.ADMIN ? (
+        <IfAdmin currentUser={currentUser}>
             <SidebarLinkGroup title="Administration">
                 <SidebarLink displayName="Löner" link="/salary" icon={faMoneyBillWave} />
                 <SidebarLink displayName="Fakturor" link="/invoices" icon={faFileInvoiceDollar} />
             </SidebarLinkGroup>
-        ) : null}
+        </IfAdmin>
 
         {getExternalLinksFromEnv() ? (
             <SidebarLinkGroup title="Externa länkar">{getExternalLinksFromEnv()}</SidebarLinkGroup>

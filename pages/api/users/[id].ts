@@ -1,38 +1,68 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import { Role } from '../../../interfaces/enums/Role';
+import {
+    respondWithAccessDeniedResponse,
+    respondWithEntityNotFoundResponse,
+    respondWithInvalidMethodResponse,
+} from '../../../lib/apiResponses';
 import { deleteUser, fetchUser, updateUser, validateUserApiModel } from '../../../lib/data-interfaces';
+import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
 
-const userNotFoundResponse = { statusCode: 404, message: 'User not found' };
+const handler = withSessionContext(
+    async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
+        const userId = Number(req.query.id);
 
-const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<Promise<void> | void> => {
-    if (isNaN(Number(req.query.id))) {
-        res.status(404).json(userNotFoundResponse);
-        return;
-    }
-
-    switch (req.method) {
-        case 'GET':
-            return fetchUser(Number(req.query.id))
-                .then((result) => (result ? res.status(200).json(result) : res.status(404).json(userNotFoundResponse)))
-                .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
-
-        case 'DELETE':
-            return deleteUser(Number(req.query.id))
-                .then((result) => res.status(200).json(result))
-                .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
-
-        case 'PUT':
-            if (!validateUserApiModel(req.body.user)) {
-                res.status(500).json({ statusCode: 500, message: 'Invalid user' });
-                return;
-            }
-            return updateUser(Number(req.query.id), req.body.user)
-                .then((result) => res.status(200).json(result))
-                .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
-
-        default:
-            res.status(404).json(userNotFoundResponse);
+        if (isNaN(userId)) {
+            respondWithEntityNotFoundResponse(res);
             return;
-    }
-};
+        }
+
+        switch (req.method) {
+            case 'GET':
+                if (context.currentUser.role != Role.ADMIN && context.currentUser.userId != userId) {
+                    respondWithAccessDeniedResponse(res);
+                    return;
+                }
+
+                await fetchUser(userId)
+                    .then((result) => (result ? res.status(200).json(result) : respondWithEntityNotFoundResponse(res)))
+                    .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
+
+                break;
+
+            case 'DELETE':
+                if (context.currentUser.role != Role.ADMIN || context.currentUser.userId === userId) {
+                    respondWithAccessDeniedResponse(res);
+                    return;
+                }
+
+                await deleteUser(userId)
+                    .then((result) => res.status(200).json(result))
+                    .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
+
+                break;
+
+            case 'PUT':
+                if (context.currentUser.role != Role.ADMIN && context.currentUser.userId != userId) {
+                    respondWithAccessDeniedResponse(res);
+                    return;
+                }
+
+                if (!validateUserApiModel(req.body.user)) {
+                    res.status(500).json({ statusCode: 500, message: 'Invalid user' });
+                    return;
+                }
+
+                await updateUser(userId, req.body.user)
+                    .then((result) => res.status(200).json(result))
+                    .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
+
+                break;
+
+            default:
+                respondWithInvalidMethodResponse(res);
+        }
+    },
+);
 
 export default handler;

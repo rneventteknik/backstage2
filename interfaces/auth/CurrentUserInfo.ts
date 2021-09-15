@@ -2,7 +2,7 @@ import { Role } from '../enums/Role';
 
 export interface CurrentUserInfo {
     isLoggedIn: boolean;
-    username?: string;
+    userId?: number;
     name?: string;
     role?: Role;
 }

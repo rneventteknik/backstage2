@@ -27,7 +27,21 @@ export const fetchUser = async (id: number): Promise<UserApiModel> => {
 export const fetchUsers = async (): Promise<UserApiModel[]> => {
     ensureDatabaseIsInitialized();
 
-    return UserApiModel.query().withGraphFetched('userAuth');
+    // Since all users can view this list, we do not include personal information here
+    return UserApiModel.query()
+        .select(
+            'id',
+            'name',
+            'created',
+            'updated',
+            'role',
+            'memberStatus',
+            'nameTag',
+            'phoneNumber',
+            'slackId',
+            'emailAddress',
+        )
+        .withGraphFetched('userAuth');
 };
 
 export const updateUser = async (id: number, user: UserApiModel): Promise<UserApiModel> => {

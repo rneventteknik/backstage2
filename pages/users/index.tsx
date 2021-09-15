@@ -11,73 +11,7 @@ import { UserApiModel } from '../../interfaces/api-models';
 import { toUser } from '../../lib/mappers/user';
 import { CurrentUserInfo } from '../../interfaces/auth/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-
-const UserNameDisplayFn = (user: User) => <Link href={'users/' + user.id}>{user.name}</Link>;
-const UserActionsDisplayFn = (event: User) => <Link href={'users/' + event.id}>Redigera</Link>;
-
-const tableSettings: TableConfiguration<User> = {
-    entityTypeDisplayName: 'användare',
-    defaultSortPropertyName: 'date',
-    defaultSortAscending: false,
-    columns: [
-        {
-            key: 'name',
-            displayName: 'Användare',
-            getValue: (user: User) => user.name,
-            getContentOverride: UserNameDisplayFn,
-        },
-        {
-            key: 'email',
-            displayName: 'Email',
-            getValue: (user: User) => user.emailAddress,
-            columnWidth: 280,
-        },
-        {
-            key: 'nameTag',
-            displayName: 'Tagg',
-            getValue: (user: User) => user.nameTag,
-            textAlignment: 'center',
-            columnWidth: 80,
-        },
-        {
-            key: 'canNotLogIn',
-            displayName: 'Avaktiverad',
-            getValue: (user: User) => (!user.username ? '✓' : ''),
-            textAlignment: 'center',
-            columnWidth: 80,
-        },
-        {
-            key: 'status',
-            displayName: 'Medlemsstatus',
-            getValue: (user: User) => getMemberStatusName(user?.memberStatus),
-            textAlignment: 'center',
-            columnWidth: 180,
-        },
-        {
-            key: 'role',
-            displayName: 'Behörighet',
-            getValue: (user: User) => getRoleName(user?.role),
-            textAlignment: 'center',
-            columnWidth: 180,
-        },
-        {
-            key: 'date',
-            displayName: 'Datum',
-            getValue: (User: User) => (User.created ? formatDate(new Date(User.created)) : '-'),
-            columnWidth: 180,
-            textAlignment: 'center',
-        },
-        {
-            key: 'actions',
-            displayName: '',
-            getValue: () => '',
-            getContentOverride: UserActionsDisplayFn,
-            disableSort: true,
-            columnWidth: 100,
-            textAlignment: 'center',
-        },
-    ],
-};
+import { IfAdmin, IfNotAdmin } from '../../components/utils/IfAdmin';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -109,6 +43,86 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             </Layout>
         );
     }
+
+    const UserNameDisplayFn = (user: User) => (
+        <>
+            <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
+                <Link href={'users/' + user.id}>{user.name}</Link>
+            </IfAdmin>
+            <IfNotAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
+                {user.name}
+            </IfNotAdmin>
+        </>
+    );
+    const UserActionsDisplayFn = (user: User) => (
+        <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
+            <Link href={'users/' + user.id}>Redigera</Link>
+        </IfAdmin>
+    );
+
+    const tableSettings: TableConfiguration<User> = {
+        entityTypeDisplayName: 'användare',
+        defaultSortPropertyName: 'date',
+        defaultSortAscending: false,
+        columns: [
+            {
+                key: 'name',
+                displayName: 'Användare',
+                getValue: (user: User) => user.name,
+                getContentOverride: UserNameDisplayFn,
+            },
+            {
+                key: 'email',
+                displayName: 'Email',
+                getValue: (user: User) => user.emailAddress,
+                columnWidth: 280,
+            },
+            {
+                key: 'nameTag',
+                displayName: 'Tagg',
+                getValue: (user: User) => user.nameTag,
+                textAlignment: 'center',
+                columnWidth: 80,
+            },
+            {
+                key: 'canNotLogIn',
+                displayName: 'Avaktiverad',
+                getValue: (user: User) => (!user.username ? '✓' : ''),
+                textAlignment: 'center',
+                columnWidth: 80,
+            },
+            {
+                key: 'status',
+                displayName: 'Medlemsstatus',
+                getValue: (user: User) => getMemberStatusName(user?.memberStatus),
+                textAlignment: 'center',
+                columnWidth: 180,
+            },
+            {
+                key: 'role',
+                displayName: 'Behörighet',
+                getValue: (user: User) => getRoleName(user?.role),
+                textAlignment: 'center',
+                columnWidth: 180,
+            },
+            {
+                key: 'date',
+                displayName: 'Datum',
+                getValue: (User: User) => (User.created ? formatDate(new Date(User.created)) : '-'),
+                columnWidth: 180,
+                textAlignment: 'center',
+            },
+            {
+                key: 'actions',
+                displayName: '',
+                getValue: () => '',
+                getContentOverride: UserActionsDisplayFn,
+                disableSort: true,
+                columnWidth: 100,
+                textAlignment: 'center',
+            },
+        ],
+    };
 
     return (
         <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={currentUser}>

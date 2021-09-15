@@ -18,7 +18,7 @@ const handler = withSession(
         if (authUser) {
             const user: CurrentUserInfo = {
                 isLoggedIn: true,
-                username: authUser.username,
+                userId: authUser.userId,
                 name: authUser.user?.name,
                 role: authUser.user?.role,
             };

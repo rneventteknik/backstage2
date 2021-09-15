@@ -24,7 +24,10 @@ const stringToColor = (string = '') => {
 };
 
 const UserDisplay: React.FC<Props> = ({ user }: Props) => (
-    <div className={styles.profileImage + ' align-middle'} style={{ backgroundColor: stringToColor(user?.username) }}>
+    <div
+        className={styles.profileImage + ' align-middle'}
+        style={{ backgroundColor: stringToColor(('user-id-' + user?.userId).toString()) }}
+    >
         <FontAwesomeIcon icon={faUser} className={styles.profileImageContent} />
     </div>
 );

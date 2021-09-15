@@ -12,13 +12,15 @@ export interface IUserApiModel extends BaseApiModelWithName {
     nameTag: string;
     phoneNumber: string;
     slackId: string;
-    personalIdentityNumber: string;
-    bankName: string;
-    clearingNumber: string;
-    bankAccount: string;
-    homeAddress: string;
-    zipCode: string;
     emailAddress: string;
+
+    // The below properties contain personal information and are threrefore not included in all api endpoints.
+    personalIdentityNumber?: string;
+    bankName?: string;
+    clearingNumber?: string;
+    bankAccount?: string;
+    homeAddress?: string;
+    zipCode?: string;
 
     events?: IEventApiModel[];
     userAuth?: IUserAuthApiModel;
@@ -77,6 +79,7 @@ export interface IUserAuthApiModel {
 
 export class UserAuthApiModel extends Model implements IUserAuthApiModel {
     static tableName = 'UserAuth';
+    static idColumn = 'userId';
 
     static relationMappings: RelationMappingsThunk = () => ({
         user: {
