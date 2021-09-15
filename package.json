@@ -6,8 +6,9 @@
     "postinstall": "husky install",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc",
-    "lint": "eslint \"*/**/*.{js,ts,tsx}\" --fix",
+    "tc": "tsc",
+    "lint": "eslint \"*/**/*.{js,ts,tsx}\"",
+    "tcl": "tsc && eslint \"*/**/*.{js,ts,tsx}\"",
     "migrate": "knex --esm migrate:latest",
     "seed": "knex --esm seed:run",
     "test": "jest",
@@ -73,9 +74,9 @@
     "msw": "^0.30.0",
     "next-page-tester": "^0.26.1",
     "prettier": "^2.2.1",
-    "whatwg-fetch": "^3.6.2",
     "sqlite3": "^5.0.2",
-    "typescript": "^4.2.4"
+    "typescript": "^4.2.4",
+    "whatwg-fetch": "^3.6.2"
   },
   "license": "MIT"
 }
