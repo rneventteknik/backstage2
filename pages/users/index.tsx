@@ -3,7 +3,7 @@ import Layout from '../../components/Layout';
 import { User } from '../../interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { formatDate, getMemberStatusName, getRoleName, getResponseContentOrError } from '../../lib/utils';
+import { getMemberStatusName, getRoleName, getResponseContentOrError } from '../../lib/utils';
 import Link from 'next/link';
 import { Alert, Button } from 'react-bootstrap';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
@@ -12,6 +12,8 @@ import { toUser } from '../../lib/mappers/user';
 import { CurrentUserInfo } from '../../interfaces/auth/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { IfAdmin, IfNotAdmin } from '../../components/utils/IfAdmin';
+import { faBan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -48,10 +50,16 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <>
             <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
                 <Link href={'users/' + user.id}>{user.name}</Link>
+                {!user.username ? (
+                    <span className="small text-muted ml-1">
+                        <FontAwesomeIcon icon={faBan} title="Har inte inloggninguppgifter"></FontAwesomeIcon>
+                    </span>
+                ) : null}
             </IfAdmin>
             <IfNotAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
                 {user.name}
             </IfNotAdmin>
+            <p className="text-muted mb-0">{getMemberStatusName(user?.memberStatus)}</p>
         </>
     );
     const UserActionsDisplayFn = (user: User) => (
@@ -62,8 +70,8 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
     const tableSettings: TableConfiguration<User> = {
         entityTypeDisplayName: 'användare',
-        defaultSortPropertyName: 'date',
-        defaultSortAscending: false,
+        defaultSortPropertyName: 'name',
+        defaultSortAscending: true,
         columns: [
             {
                 key: 'name',
@@ -78,6 +86,12 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 columnWidth: 280,
             },
             {
+                key: 'phone',
+                displayName: 'Telefon',
+                getValue: (user: User) => user.phoneNumber,
+                columnWidth: 280,
+            },
+            {
                 key: 'nameTag',
                 displayName: 'Tagg',
                 getValue: (user: User) => user.nameTag,
@@ -85,32 +99,11 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 columnWidth: 80,
             },
             {
-                key: 'canNotLogIn',
-                displayName: 'Avaktiverad',
-                getValue: (user: User) => (!user.username ? '✓' : ''),
-                textAlignment: 'center',
-                columnWidth: 80,
-            },
-            {
-                key: 'status',
-                displayName: 'Medlemsstatus',
-                getValue: (user: User) => getMemberStatusName(user?.memberStatus),
-                textAlignment: 'center',
-                columnWidth: 180,
-            },
-            {
                 key: 'role',
                 displayName: 'Behörighet',
                 getValue: (user: User) => getRoleName(user?.role),
                 textAlignment: 'center',
                 columnWidth: 180,
-            },
-            {
-                key: 'date',
-                displayName: 'Datum',
-                getValue: (User: User) => (User.created ? formatDate(new Date(User.created)) : '-'),
-                columnWidth: 180,
-                textAlignment: 'center',
             },
             {
                 key: 'actions',
