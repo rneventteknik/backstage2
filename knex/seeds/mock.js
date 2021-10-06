@@ -31,7 +31,7 @@ export async function seed(knex) {
             },
         ])
         .returning('id')
-        .then((ids) => ids[0]);
+        .then((ids) => ids[ids.length - 1] - 1);
 
     await knex('UserAuth').insert([
         {
@@ -199,7 +199,7 @@ export async function seed(knex) {
             },
         ])
         .returning('id')
-        .then((ids) => ids[0]);
+        .then((ids) => ids[ids.length - 1] - 6);
 
     // This list is just here to make the assignments below easier to follow
     const equipmentIds = {
@@ -334,7 +334,7 @@ export async function seed(knex) {
             },
         ])
         .returning('id')
-        .then((ids) => ids[0]);
+        .then((ids) => ids[ids.length - 1] - 4);
 
     // This list is just here to make the assignments below easier to follow
     const equipmentCategoryIds = {
