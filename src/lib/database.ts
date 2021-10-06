@@ -16,3 +16,8 @@ export const ensureDatabaseIsInitialized: () => void = () => {
     Model.knex(knex);
     databaseIsInitialized = true;
 };
+
+export const getDatabaseType: () => string = () => knexConfiguration.development.client;
+
+export const getCaseInsensitiveComparisonKeyword: () => string = () =>
+    getDatabaseType() === 'postgres' ? 'ilike' : 'like';

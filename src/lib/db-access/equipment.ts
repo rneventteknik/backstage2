@@ -2,7 +2,7 @@ import {
     EquipmentObjectionModel,
     EquipmentPriceObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
-import { ensureDatabaseIsInitialized } from '../database';
+import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 import { removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchEquipment = async (searchString: string, count: number): Promise<EquipmentObjectionModel[]> => {
@@ -11,8 +11,8 @@ export const searchEquipment = async (searchString: string, count: number): Prom
     const modifiedSearchString = '%' + searchString + '%';
 
     return EquipmentObjectionModel.query()
-        .where('name', 'ilike', modifiedSearchString)
-        .orWhere('nameEN', 'ilike', modifiedSearchString)
+        .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+        .orWhere('nameEN', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
         .orderBy('updated', 'desc')
         .withGraphFetched('categories')
         .limit(count);
@@ -40,24 +40,28 @@ export const updateEquipment = async (
     ensureDatabaseIsInitialized();
 
     // Categories. To keep it simple for now we delete all the old links and create new ones.
-    if (equipment.categories) {
+    if (equipment.categories !== undefined) {
         await EquipmentObjectionModel.relatedQuery('categories').for(id).unrelate();
 
-        equipment.categories.map(async (x) => {
-            if (x.id) {
-                await EquipmentObjectionModel.relatedQuery('categories').for(id).relate(x.id);
-            }
-        });
+        await Promise.all(
+            equipment.categories.map(async (x) => {
+                if (x.id) {
+                    await EquipmentObjectionModel.relatedQuery('categories').for(id).relate(x.id);
+                }
+            }),
+        );
     }
 
     // Prices. To keep it simple for now we delete all the old prices and create new ones. Once we have
     // a client editor and are sending ids in the api we can improve this to only update whats needed.
-    if (equipment.prices) {
+    if (equipment.prices !== undefined) {
         await EquipmentObjectionModel.relatedQuery('prices').for(id).delete();
 
-        await EquipmentObjectionModel.relatedQuery('prices')
-            .for(id)
-            .insert(equipment.prices.map((x) => withCreatedDate(removeIdAndDates(x))));
+        if (equipment.prices.length > 0) {
+            await EquipmentObjectionModel.relatedQuery('prices')
+                .for(id)
+                .insert(equipment.prices.map((x) => withCreatedDate(removeIdAndDates(x))));
+        }
     }
 
     return EquipmentObjectionModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(equipment)));

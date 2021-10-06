@@ -1,5 +1,5 @@
 import { EventObjectionModel } from '../../models/objection-models';
-import { ensureDatabaseIsInitialized } from '../database';
+import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 
 export const searchEvents = async (searchString: string, count: number): Promise<EventObjectionModel[]> => {
     ensureDatabaseIsInitialized();
@@ -7,8 +7,8 @@ export const searchEvents = async (searchString: string, count: number): Promise
     const modifiedSearchString = '%' + searchString + '%';
 
     return EventObjectionModel.query()
-        .where('name', 'ilike', modifiedSearchString)
-        .orWhere('contactPersonName', 'ilike', modifiedSearchString)
+        .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+        .orWhere('contactPersonName', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
         .orderBy('updated', 'desc')
         .limit(count);
 };

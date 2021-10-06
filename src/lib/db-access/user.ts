@@ -1,6 +1,6 @@
 import { MemberStatus } from '../../models/enums/MemberStatus';
 import { UserObjectionModel } from '../../models/objection-models/UserObjectionModel';
-import { ensureDatabaseIsInitialized } from '../database';
+import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 import { isMemberOfEnum } from '../utils';
 import { removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
@@ -10,9 +10,9 @@ export const searchUsers = async (searchString: string, count: number): Promise<
     const modifiedSearchString = '%' + searchString + '%';
 
     return UserObjectionModel.query()
-        .where('name', 'ilike', modifiedSearchString)
-        .orWhere('nameTag', 'ilike', modifiedSearchString)
-        .orWhere('emailAddress', 'ilike', modifiedSearchString)
+        .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+        .orWhere('nameTag', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+        .orWhere('emailAddress', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
         .orderBy('updated', 'desc')
         .limit(count);
 };
