@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
-import Layout from '../../components/layout/Layout';
+import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Alert, Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
-import ActivityIndicator from '../../components/utils/ActivityIndicator';
-import { getResponseContentOrError } from '../../lib/utils';
-import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { IEquipmentObjectionModel } from '../../models/objection-models';
-import { toEquipment } from '../../lib/mappers/equipment';
-import EquipmentForm from '../../components/equipment/EquipmentForm';
-import { useNotifications } from '../../lib/useNotifications';
+import ActivityIndicator from '../../../components/utils/ActivityIndicator';
+import { getResponseContentOrError } from '../../../lib/utils';
+import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
+import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { IEquipmentObjectionModel } from '../../../models/objection-models';
+import { toEquipment } from '../../../lib/mappers/equipment';
+import EquipmentForm from '../../../components/equipment/EquipmentForm';
+import { useNotifications } from '../../../lib/useNotifications';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const staticPageTitle = 'Utrusning';
-const staticBreadcrumbs = [{ link: 'equipment', displayName: staticPageTitle }];
+const staticBreadcrumbs = [
+    { link: 'equipment', displayName: staticPageTitle },
+    { link: 'equipment', displayName: 'Redigera' },
+];
 
 const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -66,6 +69,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             .then((equipment) => {
                 mutate(equipment, false);
                 showSaveSuccessNotification('Utrustningen');
+                router.push('/equipment/' + equipment.id);
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -98,6 +102,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const breadcrumbs = [
         { link: '/equipment', displayName: 'Utrustning' },
         { link: '/equipment/' + equipment.id, displayName: pageTitle },
+        { link: '/equipment/' + equipment.id + '/edit', displayName: 'Redigera' },
     ];
 
     return (

@@ -19,6 +19,12 @@ export const fetchEvents = async (): Promise<EventObjectionModel[]> => {
     return EventObjectionModel.query().withGraphFetched('ownerUser');
 };
 
+export const fetchEventsForUser = async (userId: number): Promise<EventObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return EventObjectionModel.query().where('ownerUserId', userId);
+};
+
 export const fetchEvent = async (id: number): Promise<EventObjectionModel> => {
     ensureDatabaseIsInitialized();
 

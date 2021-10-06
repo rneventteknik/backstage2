@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { Toast } from 'react-bootstrap';
 import { useListener } from 'react-bus';
 import { v4 as generateGuid } from 'uuid';
-import styles from './NotificationArea.module.scss';
+import styles from './NotificationsArea.module.scss';
 
 export type NotificationData = {
     title: string;
@@ -62,7 +62,7 @@ const Notification: React.FC<NotificationProps> = ({ notification, onClose }: No
     </Toast>
 );
 
-const NotificationArea: React.FC = () => {
+const NotificationsArea: React.FC = () => {
     const [notifications, setNotifications] = useState<InternalNotificationData[]>([]);
 
     // Helper methods
@@ -98,7 +98,7 @@ const NotificationArea: React.FC = () => {
     };
 
     return (
-        <>
+        <div>
             {notifications.map((notification) => (
                 <Notification
                     key={notification.id}
@@ -106,8 +106,8 @@ const NotificationArea: React.FC = () => {
                     onClose={() => closeNotificationHandler(notification)}
                 />
             ))}
-        </>
+        </div>
     );
 };
 
-export default NotificationArea;
+export default NotificationsArea;

@@ -17,10 +17,26 @@ export const searchUsers = async (searchString: string, count: number): Promise<
         .limit(count);
 };
 
-export const fetchUser = async (id: number): Promise<UserObjectionModel> => {
+export const fetchUser = async (id: number, includePersonalInformation = false): Promise<UserObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    return UserObjectionModel.query().findById(id).withGraphFetched('userAuth');
+    const query = UserObjectionModel.query().findById(id).withGraphFetched('userAuth');
+
+    if (includePersonalInformation) {
+        return query.select(
+            'id',
+            'name',
+            'created',
+            'updated',
+            'memberStatus',
+            'nameTag',
+            'phoneNumber',
+            'slackId',
+            'emailAddress',
+        );
+    }
+
+    return query;
 };
 
 export const fetchUsers = async (): Promise<UserObjectionModel[]> => {

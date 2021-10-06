@@ -3,8 +3,8 @@ import Router from 'next/router';
 import React from 'react';
 import { Navbar, Dropdown, Button } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import UserDisplay from './UserDisplay';
-import UserIcon from './UserIcon';
+import UserDisplay from '../utils/UserDisplay';
+import UserIcon from '../utils/UserIcon';
 import styles from './Topbar.module.scss';
 import Search from './Search';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
@@ -46,6 +46,9 @@ const Topbar: React.FC<Props> = ({ currentUser, toggleSidebar }: Props) => {
                         <Dropdown.Item disabled={true}>
                             <UserDisplay user={currentUser} />
                         </Dropdown.Item>
+                        <Link href={'/users/' + currentUser.userId}>
+                            <Dropdown.Item href={'/users/' + currentUser.userId}>Profil</Dropdown.Item>
+                        </Link>
                         <Dropdown.Item onClick={logOut}>Logga ut</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>

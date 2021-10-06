@@ -79,3 +79,13 @@ $dropdown-header-color: darken($backstage-text-color, 20);
 /* Close */
 $close-color: $body-color;
 $close-text-shadow: none;
+
+/* Card */
+$card-border-color:                 $backstage-lightest-bg;
+$card-cap-bg:                       $backstage-lightest-bg;
+$card-bg:                           $backstage-lighter-bg;
+
+/* List items */
+$list-group-bg:                     $backstage-lighter-bg;
+$list-group-border-color:           $backstage-lightest-bg;
+$list-group-hover-bg:               $backstage-lightest-bg;

@@ -25,3 +25,19 @@ export const IfNotAdmin: React.FC<Props> = ({ children, currentUser, or, and }: 
         return <>{children}</>;
     }
 };
+
+export const IfReadonly: React.FC<Props> = ({ children, currentUser, or, and }: Props) => {
+    if ((currentUser.role === Role.READONLY || (or ?? false)) && (and ?? true)) {
+        return <>{children}</>;
+    } else {
+        return null;
+    }
+};
+
+export const IfNotReadonly: React.FC<Props> = ({ children, currentUser, or, and }: Props) => {
+    if ((currentUser.role === Role.READONLY || (or ?? false)) && (and ?? true)) {
+        return null;
+    } else {
+        return <>{children}</>;
+    }
+};

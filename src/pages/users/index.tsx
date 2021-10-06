@@ -11,7 +11,7 @@ import { UserObjectionModel } from '../../models/objection-models';
 import { toUser } from '../../lib/mappers/user';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { IfAdmin, IfNotAdmin } from '../../components/utils/IfAdmin';
+import { IfAdmin } from '../../components/utils/IfAdmin';
 import { faBan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
@@ -48,23 +48,20 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
     const UserNameDisplayFn = (user: User) => (
         <>
+            <Link href={'users/' + user.id}>{user.name}</Link>
             <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
-                <Link href={'users/' + user.id}>{user.name}</Link>
                 {!user.username ? (
                     <span className="small text-muted ml-1">
                         <FontAwesomeIcon icon={faBan} title="Har inte inloggninguppgifter"></FontAwesomeIcon>
                     </span>
                 ) : null}
             </IfAdmin>
-            <IfNotAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
-                {user.name}
-            </IfNotAdmin>
             <p className="text-muted mb-0">{getMemberStatusName(user?.memberStatus)}</p>
         </>
     );
     const UserActionsDisplayFn = (user: User) => (
         <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
-            <Link href={'users/' + user.id}>Redigera</Link>
+            <Link href={'users/' + user.id + '/edit'}>Redigera</Link>
         </IfAdmin>
     );
 

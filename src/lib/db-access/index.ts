@@ -1,4 +1,4 @@
-export { searchEvents, fetchEvents, fetchEvent } from './event';
+export { searchEvents, fetchEvents, fetchEvent, fetchEventsForUser } from './event';
 export {
     searchEquipment,
     fetchEquipments,

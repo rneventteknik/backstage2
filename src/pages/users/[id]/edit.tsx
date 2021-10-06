@@ -1,24 +1,27 @@
 import React, { useState } from 'react';
-import Layout from '../../components/layout/Layout';
+import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Alert, Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
-import UserForm from '../../components/users/UserForm';
-import ActivityIndicator from '../../components/utils/ActivityIndicator';
-import { getResponseContentOrError } from '../../lib/utils';
-import UserAuthForm from '../../components/users/UserAuthForm';
-import { UpdateAuthRequest, UpdateAuthResponse } from '../../models/misc/UpdateAuthApiModels';
-import { toUser } from '../../lib/mappers/user';
-import { useNotifications } from '../../lib/useNotifications';
-import { IUserObjectionModel } from '../../models/objection-models/UserObjectionModel';
-import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { IfAdmin } from '../../components/utils/IfAdmin';
+import UserForm from '../../../components/users/UserForm';
+import ActivityIndicator from '../../../components/utils/ActivityIndicator';
+import { getResponseContentOrError } from '../../../lib/utils';
+import UserAuthForm from '../../../components/users/UserAuthForm';
+import { UpdateAuthRequest, UpdateAuthResponse } from '../../../models/misc/UpdateAuthApiModels';
+import { toUser } from '../../../lib/mappers/user';
+import { useNotifications } from '../../../lib/useNotifications';
+import { IUserObjectionModel } from '../../../models/objection-models/UserObjectionModel';
+import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
+import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { IfAdmin } from '../../../components/utils/IfAdmin';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const staticPageTitle = 'Användare';
-const staticBreadcrumbs = [{ link: 'users', displayName: staticPageTitle }];
+const staticBreadcrumbs = [
+    { link: 'users', displayName: staticPageTitle },
+    { link: 'users', displayName: 'Redigera' },
+];
 
 const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -76,6 +79,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             .then((user) => {
                 mutate(user, false);
                 showSaveSuccessNotification('Användaren');
+                router.push('/users/' + user.id);
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -153,6 +157,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const breadcrumbs = [
         { link: '/users', displayName: 'Användare' },
         { link: '/users/' + user.id, displayName: pageTitle },
+        { link: '/users/' + user.id + '/edit', displayName: 'Redigera' },
     ];
 
     return (

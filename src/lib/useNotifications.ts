@@ -1,4 +1,4 @@
-import { NotificationData } from '../components/layout/NotificationArea';
+import { NotificationData } from '../components/layout/NotificationsArea';
 import { Emitter } from 'mitt';
 import {
     faCheckCircle,

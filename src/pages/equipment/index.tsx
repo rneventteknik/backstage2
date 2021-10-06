@@ -74,7 +74,9 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
             );
     }
 };
-const EquipmentActionsDisplayFn = (equipment: Equipment) => <Link href={'equipment/' + equipment.id}>Redigera</Link>;
+const EquipmentActionsDisplayFn = (equipment: Equipment) => (
+    <Link href={'equipment/' + equipment.id + '/edit'}>Redigera</Link>
+);
 
 const tableSettings: TableConfiguration<Equipment> = {
     entityTypeDisplayName: '',

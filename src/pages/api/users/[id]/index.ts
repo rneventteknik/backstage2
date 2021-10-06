@@ -1,12 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Role } from '../../../models/enums/Role';
+import { Role } from '../../../../models/enums/Role';
 import {
     respondWithAccessDeniedResponse,
     respondWithEntityNotFoundResponse,
     respondWithInvalidMethodResponse,
-} from '../../../lib/apiResponses';
-import { deleteUser, fetchUser, updateUser, validateUserObjectionModel } from '../../../lib/db-access';
-import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
+} from '../../../../lib/apiResponses';
+import { deleteUser, fetchUser, updateUser, validateUserObjectionModel } from '../../../../lib/db-access';
+import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -19,12 +19,10 @@ const handler = withSessionContext(
 
         switch (req.method) {
             case 'GET':
-                if (context.currentUser.role != Role.ADMIN && context.currentUser.userId != userId) {
-                    respondWithAccessDeniedResponse(res);
-                    return;
-                }
+                const includePersonalInformation =
+                    context.currentUser.role != Role.ADMIN && context.currentUser.userId != userId;
 
-                await fetchUser(userId)
+                await fetchUser(userId, includePersonalInformation)
                     .then((result) => (result ? res.status(200).json(result) : respondWithEntityNotFoundResponse(res)))
                     .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
 
