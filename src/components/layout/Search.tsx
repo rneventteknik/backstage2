@@ -27,7 +27,12 @@ interface HasIndex {
     index: number;
 }
 
-const Search: React.FC = () => {
+type Props = {
+    onFocus?: () => unknown;
+    onBlur?: () => unknown;
+};
+
+const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
     const router = useRouter();
     const { showErrorMessage } = useNotifications();
 
@@ -168,7 +173,15 @@ const Search: React.FC = () => {
         results: Typeahead.TypeaheadResult<SearchResultViewModel>[],
         menuProps: Typeahead.TypeaheadMenuProps<SearchResultViewModel>,
         state: Typeahead.TypeaheadState<SearchResultViewModel>,
-    ) => {
+    ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
+
+    type MenuProps = {
+        results: Typeahead.TypeaheadResult<SearchResultViewModel>[];
+        menuProps: Typeahead.TypeaheadMenuProps<SearchResultViewModel>;
+        state: Typeahead.TypeaheadState<SearchResultViewModel>;
+    };
+
+    function Menu({ results, menuProps, state }: MenuProps): React.ReactElement {
         const resultWithIndex = results.map((res, index) => ({ index: index, ...res }));
         const res = groupBy(resultWithIndex, (x) => x.type);
 
@@ -183,7 +196,7 @@ const Search: React.FC = () => {
                 <ResultSection heading="Användare" icon={faUser} results={res[ResultType.USER]} state={state} />
             </Typeahead.Menu>
         );
-    };
+    }
 
     return (
         <Typeahead.AsyncTypeahead
@@ -197,6 +210,8 @@ const Search: React.FC = () => {
             renderMenu={renderMenu}
             placeholder="Sök..."
             selected={[]}
+            onFocus={onFocus}
+            onBlur={onBlur}
         />
     );
 };
