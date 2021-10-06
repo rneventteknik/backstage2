@@ -41,7 +41,7 @@ export const validateUserAuthObjectionModel = (user: UserAuthObjectionModel): bo
 
     if (!user.username) return false;
 
-    if (!isMemberOfEnum(user.role, Role)) return false;
+    if (user.role !== undefined && !isMemberOfEnum(user.role, Role)) return false;
 
     return true;
 };

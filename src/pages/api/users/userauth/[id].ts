@@ -17,12 +17,19 @@ import {
     validateUserAuthObjectionModel,
 } from '../../../../lib/db-access/userAuth';
 import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
+import { CurrentUserInfo } from '../../../../models/misc/CurrentUserInfo';
 
-const getUserAuthModel = async (updateAuthRequest: UpdateAuthRequest): Promise<UserAuthObjectionModel> => {
+const getUserAuthModel = async (
+    updateAuthRequest: UpdateAuthRequest,
+    currentUser: CurrentUserInfo,
+): Promise<UserAuthObjectionModel> => {
     const userAuth = new UserAuthObjectionModel();
     userAuth.userId = updateAuthRequest.userId;
     userAuth.username = updateAuthRequest.username;
-    userAuth.role = updateAuthRequest.role;
+
+    if (currentUser.role == Role.ADMIN) {
+        userAuth.role = updateAuthRequest.role;
+    }
 
     if (updateAuthRequest.password) {
         userAuth.hashedPassword = await getHashedPassword(updateAuthRequest.password);
@@ -64,7 +71,7 @@ const handler = withSessionContext(
                     return;
                 }
 
-                await getUserAuthModel(req.body.changePasswordRequest)
+                await getUserAuthModel(req.body.changePasswordRequest, context.currentUser)
                     .then(insertUserAuth)
                     .then((result) => res.status(200).json({ username: result.username }))
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
@@ -82,7 +89,7 @@ const handler = withSessionContext(
                     return;
                 }
 
-                await getUserAuthModel(req.body.changePasswordRequest)
+                await getUserAuthModel(req.body.changePasswordRequest, context.currentUser)
                     .then((model) => updateUserAuth(model.userId, model))
                     .then((result) => res.status(200).json({ username: result.username }))
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));

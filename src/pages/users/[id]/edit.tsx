@@ -14,6 +14,7 @@ import { IUserObjectionModel } from '../../../models/objection-models/UserObject
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
+import { Role } from '../../../models/enums/Role';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -248,6 +249,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         userId={user.id}
                         previousUserName={user?.username}
                         previousRole={user?.role}
+                        hideRoleInput={currentUser.role != Role.ADMIN}
                     />
                 </Modal.Body>
                 <Modal.Footer>
