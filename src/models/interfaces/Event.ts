@@ -18,7 +18,7 @@ export interface Event extends BaseEntityWithName {
     changelog?: EventChangelogEntry[];
     eventType: EventType;
     status: Status;
-    invoiceHoogiaId: number;
+    invoiceHogiaId: number;
     invoiceAddress: string;
     invoiceTag: string;
     pricePlan: PricePlan;

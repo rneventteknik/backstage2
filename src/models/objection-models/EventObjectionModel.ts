@@ -11,7 +11,7 @@ export interface IEventObjectionModel extends BaseObjectionModelWithName {
     eventType: number;
     status: number;
     salaryStatus: number;
-    invoiceHoogiaId: number;
+    invoiceHogiaId: number;
     invoiceAddress: string;
     invoiceTag: string;
     invoicenumber: string;
@@ -47,7 +47,7 @@ export class EventObjectionModel extends Model {
     eventType!: number;
     status!: number;
     salaryStatus!: number;
-    invoiceHoogiaId!: number;
+    invoiceHogiaId!: number;
     invoiceAddress!: string;
     invoiceTag!: string;
     invoicenumber!: string;

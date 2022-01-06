@@ -53,8 +53,8 @@ const EventPage: React.FC<Props> = ({ user }: Props) => {
                 <dt>Status</dt>
                 <dd>{event?.status}</dd>
 
-                <dt>Invoicehoogiaid</dt>
-                <dd>{event?.invoiceHoogiaId}</dd>
+                <dt>Invoicehogiaid</dt>
+                <dd>{event?.invoiceHogiaId}</dd>
 
                 <dt>Invoiceaddress</dt>
                 <dd>{event?.invoiceAddress}</dd>
