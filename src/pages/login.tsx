@@ -1,5 +1,5 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react';
-import { Form, FormControl, Button, FormGroup, Alert } from 'react-bootstrap';
+import { Form, FormControl, Button, FormGroup, Alert, Spinner } from 'react-bootstrap';
 import Router from 'next/router';
 import { useUser } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
@@ -18,6 +18,7 @@ export const getServerSideProps = useUser(undefined, undefined, '/');
 const LoginPage: React.FC = () => {
     const [showWrongPasswordError, setShowWrongPasswordError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
+    const [waitingForResponse, setWaitingForResponse] = useState(false);
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -56,12 +57,17 @@ const LoginPage: React.FC = () => {
                 if (!user.isLoggedIn) {
                     setShowWrongPasswordError(true);
                 }
+                setWaitingForResponse(false);
                 Router.push('/');
             })
             .catch((error) => {
                 console.error('An unexpected error happened:', error);
                 setShowServerError(true);
+                setWaitingForResponse(false);
             });
+
+        setWaitingForResponse(true);
+        setShowWrongPasswordError(false);
     };
 
     return (
@@ -91,9 +97,15 @@ const LoginPage: React.FC = () => {
                         <strong>Serverfel</strong> Det gick inte att logga in, försök igen senare.
                     </Alert>
                 ) : null}
-                <Button variant="outline-primary" type="submit">
-                    Logga in
-                </Button>
+                {waitingForResponse ? (
+                    <Button variant="outline-primary" type="submit" disabled>
+                        <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Loggar in...
+                    </Button>
+                ) : (
+                    <Button variant="outline-primary" type="submit">
+                        Logga in
+                    </Button>
+                )}
             </Form>
         </div>
     );
