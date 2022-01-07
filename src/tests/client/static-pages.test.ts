@@ -4,14 +4,6 @@ import { mockWithSessionAdminFn } from '../../test-utils/mock-session';
 
 jest.mock('../../lib/session', () => mockWithSessionAdminFn);
 
-test('home matches snapshot', async () => {
-    const { render } = await getPage({ route: '/' });
-
-    render();
-
-    expect(screen.getAllByTestId('main-content')).toMatchSnapshot();
-});
-
 test('about matches snapshot', async () => {
     const { render } = await getPage({ route: '/about' });
 

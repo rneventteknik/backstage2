@@ -64,54 +64,6 @@ Array [
 ]
 `;
 
-exports[`home matches snapshot 1`] = `
-Array [
-  <div
-    class="mainContentFixedWidth"
-    data-testid="main-content"
-  >
-    <section
-      class="breadcrumbs"
-    >
-      <nav
-        aria-label="breadcrumb"
-      >
-        <ol
-          class="breadcrumb"
-        >
-          <li
-            class="breadcrumb-item breadcrumb"
-          >
-            <a
-              href="/"
-            >
-              Backstage2
-            </a>
-          </li>
-        </ol>
-      </nav>
-    </section>
-    <h1>
-      Hello RN 👋
-    </h1>
-    <p>
-      <a
-        href="/about"
-      >
-        About
-      </a>
-    </p>
-    <footer
-      class="footer text-center font-italic text-muted"
-    >
-      <small>
-        Backstage2 - 2021
-      </small>
-    </footer>
-  </div>,
-]
-`;
-
 exports[`no-access matches snapshot 1`] = `
 Array [
   <div

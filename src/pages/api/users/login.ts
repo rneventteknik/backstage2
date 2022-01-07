@@ -21,6 +21,7 @@ const handler = withSession(
                 userId: authUser.userId,
                 name: authUser.user?.name,
                 role: authUser.role,
+                loginDate: Date.now(),
             };
 
             req.session.set('user', user);

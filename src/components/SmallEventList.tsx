@@ -11,7 +11,7 @@ type Props = {
 };
 
 const SmallEventList: React.FC<Props> = ({ title, events }: Props) => (
-    <Card>
+    <Card className="mb-3">
         <Card.Header>{title}</Card.Header>
         <ListGroup variant="flush">
             {events?.map((event) => (

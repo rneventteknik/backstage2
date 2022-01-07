@@ -5,4 +5,5 @@ export interface CurrentUserInfo {
     userId?: number;
     name?: string;
     role?: Role;
+    loginDate?: number;
 }

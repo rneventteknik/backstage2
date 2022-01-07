@@ -4,11 +4,14 @@ import { mockAdminUser } from '../../test-utils/mock-data';
 import { mockWithSessionAdminFn } from '../../test-utils/mock-session';
 import { mockRouter, mockRouterPushFn } from '../../test-utils/mock-router';
 
+// Use the no access page to test since it has static content
+const layoutTestPageUrl = '/no-access';
+
 jest.mock('../../lib/session', () => mockWithSessionAdminFn);
 jest.mock('next/router', () => mockRouter);
 
 test('topbar and sidebar shows correctly', async () => {
-    const { render } = await getPage({ route: '/' });
+    const { render } = await getPage({ route: layoutTestPageUrl });
 
     render();
 
@@ -25,7 +28,7 @@ test('topbar and sidebar shows correctly', async () => {
 });
 
 test('search works (no matches)', async () => {
-    const { render } = await getPage({ route: '/' });
+    const { render } = await getPage({ route: layoutTestPageUrl });
     render();
     const searchField = screen.getByPlaceholderText(/Sök/);
 
@@ -40,7 +43,7 @@ test('search works (no matches)', async () => {
 });
 
 test('search works (matches + click)', async () => {
-    const { render } = await getPage({ route: '/' });
+    const { render } = await getPage({ route: layoutTestPageUrl });
     render();
     const searchField = screen.getByPlaceholderText(/Sök/);
 
@@ -64,7 +67,7 @@ test('search works (matches + click)', async () => {
 });
 
 test('user menu works', async () => {
-    const { render } = await getPage({ route: '/' });
+    const { render } = await getPage({ route: layoutTestPageUrl });
     render();
     const userMenuButton = screen.getByRole('button', { name: 'User Menu' });
 
