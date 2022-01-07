@@ -4,13 +4,12 @@ import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Alert, Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import ActivityIndicator from '../../../components/utils/ActivityIndicator';
-import { formatPrice, formatTHSPrice, getResponseContentOrError } from '../../../lib/utils';
+import { formatPrice, formatTHSPrice } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
-import { IEquipmentObjectionModel } from '../../../models/objection-models';
 import Link from 'next/link';
-import { toEquipment } from '../../../lib/mappers/equipment';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
+import { equipmentFetcher } from '../../../lib/fetchers';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -21,7 +20,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit user
     //
     const router = useRouter();
-    const { data: equipment, error, isValidating } = useSwr('/api/equipment/' + router.query.id, fetcher);
+    const { data: equipment, error, isValidating } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
 
     if (!equipment && !error && isValidating) {
         return (
@@ -139,10 +138,5 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         </Layout>
     );
 };
-
-const fetcher = (url: string) =>
-    fetch(url)
-        .then((apiResponse) => getResponseContentOrError<IEquipmentObjectionModel>(apiResponse))
-        .then(toEquipment);
 
 export default UserPage;

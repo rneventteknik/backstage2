@@ -2,15 +2,10 @@ import React, { FormEvent, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Equipment } from '../../models/interfaces';
-import {
-    IEquipmentObjectionModel,
-    IEquipmentCategoryObjectionModel,
-    IEquipmentPriceObjectionModel,
-} from '../../models/objection-models';
+import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../models/objection-models';
 import { EquipmentCategory } from '../../models/interfaces';
-import { toEquipmentCategory } from '../../lib/mappers/equipment';
-import { getResponseContentOrError } from '../../lib/utils';
 import useSwr from 'swr';
+import { equipmentCategoriesFetcher } from '../../lib/fetchers';
 
 type Props = {
     handleSubmitEquipment: (equipment: IEquipmentObjectionModel) => void;
@@ -21,11 +16,6 @@ type Props = {
 const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equipment, formId }: Props) => {
     const [validated, setValidated] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState(equipment?.categories ?? []);
-
-    const equipmentCategoriesFetcher = (url: string) =>
-        fetch(url)
-            .then((apiResponse) => getResponseContentOrError<IEquipmentCategoryObjectionModel[]>(apiResponse))
-            .then((equipmentList) => equipmentList.map((x) => toEquipmentCategory(x)));
 
     const { data: equipmentCategories } = useSwr('/api/equipmentCategories/', equipmentCategoriesFetcher);
 

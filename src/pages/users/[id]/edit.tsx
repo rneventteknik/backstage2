@@ -15,6 +15,7 @@ import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
 import { Role } from '../../../models/enums/Role';
+import { userFetcher } from '../../../lib/fetchers';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -39,7 +40,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit user
     //
     const router = useRouter();
-    const { data: user, error, isValidating, mutate } = useSwr('/api/users/' + router.query.id, fetcher);
+    const { data: user, error, isValidating, mutate } = useSwr('/api/users/' + router.query.id, userFetcher);
 
     if (!user && !error && isValidating) {
         return (
@@ -264,10 +265,5 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         </Layout>
     );
 };
-
-const fetcher = (url: string) =>
-    fetch(url)
-        .then((apiResponse) => getResponseContentOrError<IUserObjectionModel>(apiResponse))
-        .then(toUser);
 
 export default UserPage;

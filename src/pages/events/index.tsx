@@ -23,6 +23,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { EventObjectionModel } from '../../models/objection-models';
 import { toEvent } from '../../lib/mappers/event';
+import { eventsFetcher } from '../../lib/fetchers';
 
 interface EventViewModel extends Event {
     displayDate: string;
@@ -213,14 +214,11 @@ const EventListPage: React.FC<Props> = ({ user }: Props) => {
 
 // Calculating date formats are expensive, so precalculate the date string to increase performace.
 const fetcher = (url: string) =>
-    fetch(url)
-        .then((apiResponse) => getResponseContentOrError<EventObjectionModel[]>(apiResponse))
-        .then((events) => events.map(toEvent))
-        .then((events) =>
-            events.map((event) => ({
-                ...event,
-                displayDate: event.created ? formatDate(new Date(event.created)) : '-',
-            })),
-        );
+    eventsFetcher(url).then((events) =>
+        events.map((event) => ({
+            ...event,
+            displayDate: event.created ? formatDate(new Date(event.created)) : '-',
+        })),
+    );
 
 export default EventListPage;

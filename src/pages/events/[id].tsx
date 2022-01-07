@@ -6,13 +6,14 @@ import { Event } from '../../models/interfaces';
 import EventTypeTag from '../../components/utils/EventTypeTag';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { eventFetcher } from '../../lib/fetchers';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 
 const EventPage: React.FC<Props> = ({ user }: Props) => {
     const router = useRouter();
-    const { data } = useSwr('/api/events/' + router.query.id, fetcher);
+    const { data } = useSwr('/api/events/' + router.query.id, eventFetcher);
     const event: Event = data as Event;
     const breadcrumbs = [
         { link: '/events', displayName: 'Bokningar' },
@@ -91,5 +92,3 @@ const EventPage: React.FC<Props> = ({ user }: Props) => {
 };
 
 export default EventPage;
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());

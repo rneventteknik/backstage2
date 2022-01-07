@@ -3,18 +3,17 @@ import Layout from '../../components/layout/Layout';
 import { Equipment } from '../../models/interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { formatPrice, formatTHSPrice, getResponseContentOrError } from '../../lib/utils';
+import { formatPrice, formatTHSPrice } from '../../lib/utils';
 import Link from 'next/link';
 import { Alert, Badge, Button, Col, Collapse, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
-import { EquipmentObjectionModel, IEquipmentCategoryObjectionModel } from '../../models/objection-models';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { toEquipment, toEquipmentCategory } from '../../lib/mappers/equipment';
 import { faEyeSlash, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { EquipmentCategory } from '../../models/interfaces';
+import { equipmentCategoriesFetcher, equipmentsFetcher } from '../../lib/fetchers';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -133,7 +132,7 @@ const pageTitle = 'Utrustning';
 const breadcrumbs = [{ link: 'equipment', displayName: pageTitle }];
 
 const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
-    const { data: equipment, error, isValidating } = useSwr('/api/equipment', fetcher);
+    const { data: equipment, error, isValidating } = useSwr('/api/equipment', equipmentsFetcher);
     const { data: equipmentCategories } = useSwr('/api/equipmentCategories/', equipmentCategoriesFetcher);
 
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
@@ -249,15 +248,5 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         </Layout>
     );
 };
-
-const fetcher = (url: string) =>
-    fetch(url)
-        .then((response) => getResponseContentOrError<EquipmentObjectionModel[]>(response))
-        .then((objectionModel) => objectionModel.map((x) => toEquipment(x)));
-
-const equipmentCategoriesFetcher = (url: string) =>
-    fetch(url)
-        .then((apiResponse) => getResponseContentOrError<IEquipmentCategoryObjectionModel[]>(apiResponse))
-        .then((equipmentList) => equipmentList.map((x) => toEquipmentCategory(x)));
 
 export default EquipmentListPage;

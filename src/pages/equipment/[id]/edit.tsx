@@ -11,6 +11,7 @@ import { IEquipmentObjectionModel } from '../../../models/objection-models';
 import { toEquipment } from '../../../lib/mappers/equipment';
 import EquipmentForm from '../../../components/equipment/EquipmentForm';
 import { useNotifications } from '../../../lib/useNotifications';
+import { equipmentFetcher } from '../../../lib/fetchers';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -28,7 +29,10 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit equipment
     //
     const router = useRouter();
-    const { data: equipment, error, isValidating, mutate } = useSwr('/api/equipment/' + router.query.id, fetcher);
+    const { data: equipment, error, isValidating, mutate } = useSwr(
+        '/api/equipment/' + router.query.id,
+        equipmentFetcher,
+    );
 
     if (!equipment && !error && isValidating) {
         return (
@@ -144,10 +148,5 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         </Layout>
     );
 };
-
-const fetcher = (url: string) =>
-    fetch(url)
-        .then((apiResponse) => getResponseContentOrError<IEquipmentObjectionModel>(apiResponse))
-        .then(toEquipment);
 
 export default EquipmentPage;

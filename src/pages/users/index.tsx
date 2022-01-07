@@ -3,17 +3,16 @@ import Layout from '../../components/layout/Layout';
 import { User } from '../../models/interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { getMemberStatusName, getRoleName, getResponseContentOrError } from '../../lib/utils';
+import { getMemberStatusName, getRoleName } from '../../lib/utils';
 import Link from 'next/link';
 import { Alert, Button } from 'react-bootstrap';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
-import { UserObjectionModel } from '../../models/objection-models';
-import { toUser } from '../../lib/mappers/user';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { IfAdmin } from '../../components/utils/IfAdmin';
 import { faBan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { usersFetcher } from '../../lib/fetchers';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -21,7 +20,7 @@ const pageTitle = 'Användare';
 const breadcrumbs = [{ link: 'users', displayName: pageTitle }];
 
 const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
-    const { data: users, error, isValidating } = useSwr('/api/users', fetcher);
+    const { data: users, error, isValidating } = useSwr('/api/users', usersFetcher);
     if (!users && !error && isValidating) {
         return (
             <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
@@ -134,10 +133,5 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         </Layout>
     );
 };
-
-const fetcher = (url: string) =>
-    fetch(url)
-        .then((apiResponse) => getResponseContentOrError<UserObjectionModel[]>(apiResponse))
-        .then((objectionModel) => objectionModel.map((x) => toUser(x)));
 
 export default UserListPage;

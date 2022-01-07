@@ -4,17 +4,14 @@ import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Alert, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import ActivityIndicator from '../../../components/utils/ActivityIndicator';
-import { getMemberStatusName, getResponseContentOrError, getRoleName } from '../../../lib/utils';
-import { toUser } from '../../../lib/mappers/user';
-import { IUserObjectionModel } from '../../../models/objection-models/UserObjectionModel';
+import { getMemberStatusName, getRoleName } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
-import { IEventObjectionModel } from '../../../models/objection-models';
-import { toEvent } from '../../../lib/mappers/event';
 import Link from 'next/link';
 import SmallEventList from '../../../components/SmallEventList';
 import UserDisplay from '../../../components/utils/UserDisplay';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
+import { eventsFetcher, userFetcher } from '../../../lib/fetchers';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -25,7 +22,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit user
     //
     const router = useRouter();
-    const { data: user, error, isValidating } = useSwr('/api/users/' + router.query.id, fetcher);
+    const { data: user, error, isValidating } = useSwr('/api/users/' + router.query.id, userFetcher);
     const { data: events } = useSwr('/api/users/' + router.query.id + '/events', eventsFetcher);
 
     if (!user && !error && isValidating) {
@@ -180,15 +177,5 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         </Layout>
     );
 };
-
-const fetcher = (url: string) =>
-    fetch(url)
-        .then((apiResponse) => getResponseContentOrError<IUserObjectionModel>(apiResponse))
-        .then(toUser);
-
-const eventsFetcher = (url: string) =>
-    fetch(url)
-        .then((apiResponse) => getResponseContentOrError<IEventObjectionModel[]>(apiResponse))
-        .then((objectionModels) => objectionModels.map(toEvent));
 
 export default UserPage;
