@@ -16,8 +16,8 @@ export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const staticPageTitle = 'Utrusning';
 const staticBreadcrumbs = [
-    { link: 'equipment', displayName: staticPageTitle },
-    { link: 'equipment', displayName: 'Redigera' },
+    { link: '/equipment', displayName: staticPageTitle },
+    { link: '/equipment', displayName: 'Redigera' },
 ];
 
 const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
