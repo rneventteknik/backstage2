@@ -7,22 +7,12 @@ import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import Link from 'next/link';
 import EventTypeTag from '../../components/utils/EventTypeTag';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import {
-    validDate,
-    formatDate,
-    getStatusName,
-    notEmpty,
-    onlyUnique,
-    onlyUniqueById,
-    getResponseContentOrError,
-} from '../../lib/utils';
+import { validDate, formatDate, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Button, Col, Collapse, Form } from 'react-bootstrap';
 import { Status } from '../../models/enums/Status';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
-import { EventObjectionModel } from '../../models/objection-models';
-import { toEvent } from '../../lib/mappers/event';
 import { eventsFetcher } from '../../lib/fetchers';
 
 interface EventViewModel extends Event {
