@@ -15,7 +15,9 @@ export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     note: string;
     image: unknown; // TODO Add images
     publiclyHidden: boolean;
-    categories?: IEquipmentCategoryObjectionModel[];
+    equipmentPublicCategoryId?: number;
+    equipmentPublicCategory?: IEquipmentPublicCategoryObjectionModel;
+    tags?: IEquipmentTagObjectionModel[];
     prices?: IEquipmentPriceObjectionModel[];
     changeLog?: IEquipmentChangelogEntryObjectionModel[];
 }
@@ -24,16 +26,16 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
     static tableName = 'Equipment';
 
     static relationMappings: RelationMappingsThunk = () => ({
-        categories: {
+        tags: {
             relation: Model.ManyToManyRelation,
-            modelClass: EquipmentCategoryObjectionModel,
+            modelClass: EquipmentTagObjectionModel,
             join: {
                 from: 'Equipment.id',
                 through: {
-                    from: 'EquipmentCategoryEquipment.equipmentId',
-                    to: 'EquipmentCategoryEquipment.equipmentCategoryId',
+                    from: 'EquipmentTagEquipment.equipmentId',
+                    to: 'EquipmentTagEquipment.equipmentTagId',
                 },
-                to: 'EquipmentCategory.id',
+                to: 'EquipmentTag.id',
             },
         },
         prices: {
@@ -52,6 +54,14 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
                 to: 'EquipmentChangelogEntry.equipmentId',
             },
         },
+        equipmentPublicCategory: {
+            relation: Model.HasOneRelation,
+            modelClass: EquipmentPublicCategoryObjectionModel,
+            join: {
+                from: 'Equipment.equipmentPublicCategoryId',
+                to: 'EquipmentPublicCategory.id',
+            },
+        },
     });
 
     id?: number;
@@ -66,15 +76,18 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
     image!: unknown; // TODO Add images
     publiclyHidden!: boolean;
 
-    categories?: EquipmentCategoryObjectionModel[];
+    equipmentPublicCategoryId?: number;
+    equipmentPublicCategory?: EquipmentPublicCategoryObjectionModel;
+
+    tags?: EquipmentTagObjectionModel[];
     prices?: EquipmentPriceObjectionModel[];
     changeLog?: EquipmentChangelogEntryObjectionModel[];
 }
 
-export interface IEquipmentCategoryObjectionModel extends BaseObjectionModelWithName {}
+export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName {}
 
-export class EquipmentCategoryObjectionModel extends Model implements IEquipmentCategoryObjectionModel {
-    static tableName = 'EquipmentCategory';
+export class EquipmentTagObjectionModel extends Model implements IEquipmentTagObjectionModel {
+    static tableName = 'EquipmentTag';
 
     id?: number;
     name!: string;
@@ -101,6 +114,23 @@ export class EquipmentPriceObjectionModel extends Model implements IEquipmentPri
     pricePerHour!: number;
     pricePerUnitTHS!: number;
     pricePerHourTHS!: number;
+}
+
+export interface IEquipmentPublicCategoryObjectionModel extends BaseObjectionModelWithName {
+    description?: string;
+    sortIndex?: number;
+}
+
+export class EquipmentPublicCategoryObjectionModel extends Model implements IEquipmentPublicCategoryObjectionModel {
+    static tableName = 'EquipmentPublicCategory';
+
+    id?: number;
+    name!: string;
+    created?: string;
+    updated?: string;
+
+    description?: string;
+    sortIndex?: number;
 }
 
 export interface IEquipmentChangelogEntryObjectionModel

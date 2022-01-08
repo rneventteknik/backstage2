@@ -14,7 +14,7 @@ export const searchEquipment = async (searchString: string, count: number): Prom
         .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
         .orWhere('nameEN', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
         .orderBy('updated', 'desc')
-        .withGraphFetched('categories')
+        .withGraphFetched('tags')
         .limit(count);
 };
 
@@ -23,14 +23,38 @@ export const fetchEquipment = async (id: number): Promise<EquipmentObjectionMode
 
     return EquipmentObjectionModel.query()
         .findById(id)
-        .withGraphFetched('categories')
+        .withGraphFetched('tags')
+        .withGraphFetched('equipmentPublicCategory')
         .withGraphFetched('prices')
         .withGraphFetched('changeLog');
 };
 
 export const fetchEquipments = async (): Promise<EquipmentObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return EquipmentObjectionModel.query().withGraphFetched('prices').withGraphFetched('categories');
+    return EquipmentObjectionModel.query()
+        .withGraphFetched('prices')
+        .withGraphFetched('tags')
+        .withGraphFetched('equipmentPublicCategory');
+};
+
+// This function fetches the events, but only with information that should be publicly available.
+// It is used by the publicly exposed API for the public price list.
+export const fetchEquipmentsPublic = async (): Promise<EquipmentObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+    return EquipmentObjectionModel.query()
+        .where('publiclyHidden', '<>', 1)
+        .select('id', 'name', 'nameEN', 'description', 'descriptionEN')
+        .withGraphFetched('prices(publicPriceInfo)')
+        .withGraphFetched('equipmentPublicCategory(equipmentPublicCategoryInfo)')
+        .modifiers({
+            publicPriceInfo: (builder) => {
+                builder.select('id', 'name', 'pricePerUnit', 'pricePerHour', 'pricePerUnitTHS', 'pricePerHourTHS');
+            },
+
+            equipmentPublicCategoryInfo: (builder) => {
+                builder.select('id', 'name', 'description');
+            },
+        });
 };
 
 export const updateEquipment = async (
@@ -39,17 +63,15 @@ export const updateEquipment = async (
 ): Promise<EquipmentObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    // Categories. To keep it simple for now we delete all the old links and create new ones.
-    if (equipment.categories !== undefined) {
-        await EquipmentObjectionModel.relatedQuery('categories').for(id).unrelate();
+    // Tags. To keep it simple for now we delete all the old links and create new ones.
+    if (equipment.tags) {
+        await EquipmentObjectionModel.relatedQuery('tags').for(id).unrelate();
 
-        await Promise.all(
-            equipment.categories.map(async (x) => {
-                if (x.id) {
-                    await EquipmentObjectionModel.relatedQuery('categories').for(id).relate(x.id);
-                }
-            }),
-        );
+        equipment.tags.map(async (x) => {
+            if (x.id) {
+                await EquipmentObjectionModel.relatedQuery('tags').for(id).relate(x.id);
+            }
+        });
     }
 
     // Prices. To keep it simple for now we delete all the old prices and create new ones. Once we have
@@ -76,8 +98,8 @@ export const insertEquipment = async (equipment: EquipmentObjectionModel): Promi
 export const deleteEquipment = async (id: number): Promise<boolean> => {
     ensureDatabaseIsInitialized();
 
-    // Categories
-    await EquipmentObjectionModel.relatedQuery('categories').for(id).unrelate();
+    // Tags
+    await EquipmentObjectionModel.relatedQuery('tags').for(id).unrelate();
 
     // Prices
     await EquipmentObjectionModel.relatedQuery('prices').for(id).delete();

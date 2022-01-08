@@ -74,7 +74,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         <Card.Header>
                             <div style={{ fontSize: '1.6em' }}>{equipment.name}</div>
                             <div>
-                                {equipment.categories.map((x) => (
+                                {equipment.tags.map((x) => (
                                     <Badge variant="dark" key={x.id} className="mr-1">
                                         {x.name}
                                     </Badge>

@@ -12,8 +12,8 @@ import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { faEyeSlash, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { EquipmentCategory } from '../../models/interfaces';
-import { equipmentCategoriesFetcher, equipmentsFetcher } from '../../lib/fetchers';
+import { EquipmentTag } from '../../models/interfaces';
+import { equipmentTagsFetcher, equipmentsFetcher } from '../../lib/fetchers';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -26,9 +26,9 @@ const EquipmentNameDisplayFn = (equipment: Equipment) => (
         <p className="text-muted mb-0">{equipment.description}</p>
     </>
 );
-const EquipmentCategoryDisplayFn = (equipment: Equipment) => (
+const EquipmentTagDisplayFn = (equipment: Equipment) => (
     <>
-        {equipment.categories.map((x) => (
+        {equipment.tags.map((x) => (
             <Badge variant="dark" key={x.id} className="mr-1">
                 {x.name}
             </Badge>
@@ -90,10 +90,10 @@ const tableSettings: TableConfiguration<Equipment> = {
             getContentOverride: EquipmentNameDisplayFn,
         },
         {
-            key: 'categories',
-            displayName: 'Kategorier',
-            getValue: (equipment: Equipment) => equipment.categories.map((x) => x.name).join(', '),
-            getContentOverride: EquipmentCategoryDisplayFn,
+            key: 'tags',
+            displayName: 'Taggar',
+            getValue: (equipment: Equipment) => equipment.tags.map((x) => x.name).join(', '),
+            getContentOverride: EquipmentTagDisplayFn,
             disableSort: true,
             columnWidth: 280,
         },
@@ -133,11 +133,11 @@ const breadcrumbs = [{ link: 'equipment', displayName: pageTitle }];
 
 const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const { data: equipment, error, isValidating } = useSwr('/api/equipment', equipmentsFetcher);
-    const { data: equipmentCategories } = useSwr('/api/equipmentCategories/', equipmentCategoriesFetcher);
+    const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [filterCategories, setFilterCategories] = useState<EquipmentCategory[]>([]);
+    const [filterTags, setFilterTags] = useState<EquipmentTag[]>([]);
     const [filterPubliclyHidden, setFilterPubliclyHidden] = useState('all');
 
     if (!equipment && !error && isValidating) {
@@ -175,8 +175,7 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const equipmentToShow = equipment
         .filter(
             (equipment: Equipment) =>
-                filterCategories.length === 0 ||
-                filterCategories.every((category) => equipment.categories.some((x) => x.id === category.id)),
+                filterTags.length === 0 || filterTags.every((tag) => equipment.tags.some((x) => x.id === tag.id)),
         )
         .filter(
             (equipment: Equipment) =>
@@ -217,12 +216,12 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Kategorier</Form.Label>
-                            <Typeahead<EquipmentCategory>
-                                id="categories-typeahead"
+                            <Typeahead<EquipmentTag>
+                                id="tags-typeahead"
                                 multiple
                                 labelKey={(x) => x.name}
-                                options={equipmentCategories ?? []}
-                                onChange={(e) => setFilterCategories(e)}
+                                options={equipmentTags ?? []}
+                                onChange={(e) => setFilterTags(e)}
                                 placeholder="Filtrera på kategori"
                             />
                         </Form.Group>

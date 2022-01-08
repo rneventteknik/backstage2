@@ -2,8 +2,8 @@ export async function seed(knex) {
     await knex('Event').del();
     await knex('UserAuth').del();
     await knex('User').del();
-    await knex('EquipmentCategoryEquipment').del();
-    await knex('EquipmentCategory').del();
+    await knex('EquipmentTagEquipment').del();
+    await knex('EquipmentTag').del();
     await knex('EquipmentPrice').del();
     await knex('Equipment').del();
 
@@ -118,6 +118,31 @@ export async function seed(knex) {
 
     // Equipment
     //
+    const firstEquipmentPublicCategoryId = await knex('EquipmentPublicCategory')
+        .insert([
+            {
+                name: 'Mikrofon',
+                description: 'Vi har mikrofoner för alla tillfällen!',
+                sortIndex: 1,
+                created: '2021-07-08 00:00',
+                updated: '2021-07-08 00:00',
+            },
+            {
+                name: 'Video',
+                sortIndex: 2,
+                created: '2021-07-08 00:00',
+                updated: '2021-07-08 00:00',
+            },
+        ])
+        .returning('id')
+        .then((ids) => ids[0]);
+
+    // This list is just here to make the assignments below easier to follow
+    const equipmentPublicCategoryIds = {
+        microphone: firstEquipmentPublicCategoryId,
+        video: firstEquipmentPublicCategoryId + 1,
+    };
+
     const firstEquipmentId = await knex('Equipment')
         .insert([
             {
@@ -163,6 +188,7 @@ export async function seed(knex) {
                 descriptionEN: '',
                 note: '',
                 publiclyHidden: false,
+                equipmentPublicCategoryId: equipmentPublicCategoryIds.microphone,
             },
             {
                 name: 'Kondensatormikrofon',
@@ -174,6 +200,7 @@ export async function seed(knex) {
                 descriptionEN: '',
                 note: '',
                 publiclyHidden: false,
+                equipmentPublicCategoryId: equipmentPublicCategoryIds.microphone,
             },
             {
                 name: 'Trådlös Mikrofon (WL)',
@@ -185,6 +212,7 @@ export async function seed(knex) {
                 descriptionEN: 'Either handheld or lavalier microphone',
                 note: '',
                 publiclyHidden: true,
+                equipmentPublicCategoryId: equipmentPublicCategoryIds.microphone,
             },
             {
                 name: 'Projektor',
@@ -196,6 +224,7 @@ export async function seed(knex) {
                 descriptionEN: 'HD-projector for larger events.',
                 note: '',
                 publiclyHidden: false,
+                equipmentPublicCategoryId: equipmentPublicCategoryIds.video,
             },
         ])
         .returning('id')
@@ -305,7 +334,7 @@ export async function seed(knex) {
         },
     ]);
 
-    const firstEquipmentCategoryId = await knex('EquipmentCategory')
+    const firstEquipmentTagId = await knex('EquipmentTag')
         .insert([
             {
                 name: 'Ljud',
@@ -337,66 +366,66 @@ export async function seed(knex) {
         .then((ids) => ids[ids.length - 1] - 4);
 
     // This list is just here to make the assignments below easier to follow
-    const equipmentCategoryIds = {
-        sound: firstEquipmentCategoryId,
-        lighting: firstEquipmentCategoryId + 1,
-        video: firstEquipmentCategoryId + 2,
-        permanentlyMounted: firstEquipmentCategoryId + 3,
-        microphone: firstEquipmentCategoryId + 4,
+    const equipmentTagIds = {
+        sound: firstEquipmentTagId,
+        lighting: firstEquipmentTagId + 1,
+        video: firstEquipmentTagId + 2,
+        permanentlyMounted: firstEquipmentTagId + 3,
+        microphone: firstEquipmentTagId + 4,
     };
 
-    await knex('EquipmentCategoryEquipment').insert([
+    await knex('EquipmentTagEquipment').insert([
         {
             equipmentId: equipmentIds.largeMixer,
-            equipmentCategoryId: equipmentCategoryIds.sound,
+            equipmentTagId: equipmentTagIds.sound,
         },
         {
             equipmentId: equipmentIds.largeMixer,
-            equipmentCategoryId: equipmentCategoryIds.permanentlyMounted,
+            equipmentTagId: equipmentTagIds.permanentlyMounted,
         },
         {
             equipmentId: equipmentIds.smallMixer,
-            equipmentCategoryId: equipmentCategoryIds.sound,
+            equipmentTagId: equipmentTagIds.sound,
         },
         {
             equipmentId: equipmentIds.lightingDesk,
-            equipmentCategoryId: equipmentCategoryIds.lighting,
+            equipmentTagId: equipmentTagIds.lighting,
         },
         {
             equipmentId: equipmentIds.dynamicMicrophone,
-            equipmentCategoryId: equipmentCategoryIds.sound,
+            equipmentTagId: equipmentTagIds.sound,
         },
         {
             equipmentId: equipmentIds.dynamicMicrophone,
-            equipmentCategoryId: equipmentCategoryIds.microphone,
+            equipmentTagId: equipmentTagIds.microphone,
         },
         {
             equipmentId: equipmentIds.condenserMicrophone,
-            equipmentCategoryId: equipmentCategoryIds.sound,
+            equipmentTagId: equipmentTagIds.sound,
         },
         {
             equipmentId: equipmentIds.condenserMicrophone,
-            equipmentCategoryId: equipmentCategoryIds.microphone,
+            equipmentTagId: equipmentTagIds.microphone,
         },
         {
             equipmentId: equipmentIds.wirelessMicrophone,
-            equipmentCategoryId: equipmentCategoryIds.sound,
+            equipmentTagId: equipmentTagIds.sound,
         },
         {
             equipmentId: equipmentIds.wirelessMicrophone,
-            equipmentCategoryId: equipmentCategoryIds.microphone,
+            equipmentTagId: equipmentTagIds.microphone,
         },
         {
             equipmentId: equipmentIds.wirelessMicrophone,
-            equipmentCategoryId: equipmentCategoryIds.permanentlyMounted,
+            equipmentTagId: equipmentTagIds.permanentlyMounted,
         },
         {
             equipmentId: equipmentIds.projector,
-            equipmentCategoryId: equipmentCategoryIds.video,
+            equipmentTagId: equipmentTagIds.video,
         },
         {
             equipmentId: equipmentIds.projector,
-            equipmentCategoryId: equipmentCategoryIds.permanentlyMounted,
+            equipmentTagId: equipmentTagIds.permanentlyMounted,
         },
     ]);
 }

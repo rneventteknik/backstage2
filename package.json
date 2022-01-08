@@ -10,6 +10,7 @@
     "lint": "eslint \"*/**/*.{js,ts,tsx}\"",
     "tcl": "tsc && eslint \"*/**/*.{js,ts,tsx}\"",
     "migrate": "knex --esm migrate:latest",
+    "migrate:down": "knex --esm migrate:down",
     "seed": "knex --esm seed:run",
     "test": "jest",
     "test:coverage": "jest --coverage"

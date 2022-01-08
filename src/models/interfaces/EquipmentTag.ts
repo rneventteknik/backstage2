@@ -1,3 +1,3 @@
 import { BaseEntityWithName } from './BaseEntity';
 
-export type EquipmentCategory = BaseEntityWithName;
+export type EquipmentTag = BaseEntityWithName;

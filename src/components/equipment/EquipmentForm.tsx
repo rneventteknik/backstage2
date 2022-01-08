@@ -3,9 +3,9 @@ import { Col, Form, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Equipment } from '../../models/interfaces';
 import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../models/objection-models';
-import { EquipmentCategory } from '../../models/interfaces';
+import { EquipmentTag } from '../../models/interfaces';
 import useSwr from 'swr';
-import { equipmentCategoriesFetcher } from '../../lib/fetchers';
+import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
 
 type Props = {
     handleSubmitEquipment: (equipment: IEquipmentObjectionModel) => void;
@@ -15,9 +15,14 @@ type Props = {
 
 const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equipment, formId }: Props) => {
     const [validated, setValidated] = useState(false);
-    const [selectedCategories, setSelectedCategories] = useState(equipment?.categories ?? []);
+    const [selectedTags, setSelectedTags] = useState(equipment?.tags ?? []);
 
-    const { data: equipmentCategories } = useSwr('/api/equipmentCategories/', equipmentCategoriesFetcher);
+    const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
+
+    const { data: equipmentPublicCategories } = useSwr(
+        '/api/equipmentPublicCategories',
+        equipmentPublicCategoriesFetcher,
+    );
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -65,12 +70,13 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
             nameEN: form.equipmentNameEN.value,
             descriptionEN: form.descriptionEN.value,
 
-            categories: selectedCategories.map((x) => ({
+            tags: selectedTags.map((x) => ({
                 ...x,
                 created: x.created?.toString(),
                 updated: x.updated?.toString(),
             })),
             prices: form.prices?.value ? JSON.parse(form.prices.value) : undefined,
+            equipmentPublicCategoryId: form.publicCategory?.value ? parseInt(form.publicCategory?.value) : undefined,
 
             inventoryCount: form.inventoryCount?.value ?? 1,
             publiclyHidden: form.publiclyHidden?.value === 'true',
@@ -163,7 +169,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 <Form.Text className="text-muted">
                                     Fyll i prissättningen i JSON-format. Exempel: [&#123;&quot;name&quot;:
                                     &quot;Standardpris&quot;, &quot;pricePerUnit&quot;: 10, &quot;pricePerHour&quot;: 0,
-                                    &quot;pricePerUnitTHS&quot;: 5, &quot;pricePerHourTHS&quot;: 0 &#125;]
+                                    &quot;pricePerUnitTHS&quot;: 5, &quot;pricePerHourTHS&quot;: 0 &#125;]. Namnet på
+                                    priset visas även på den externa prislistan.
                                 </Form.Text>
                             </Form.Group>
                         </Col>
@@ -184,6 +191,20 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 />
                             </Form.Group>
                         </Col>
+                        <Col lg="9">
+                            <Form.Group>
+                                <Form.Label>Taggar</Form.Label>
+                                <Typeahead<EquipmentTag>
+                                    id="tags-typeahead"
+                                    multiple
+                                    labelKey={(x) => x.name}
+                                    options={equipmentTags ?? []}
+                                    onChange={(e) => setSelectedTags(e)}
+                                    placeholder="Taggar"
+                                    defaultSelected={equipment.tags ?? []}
+                                />
+                            </Form.Group>
+                        </Col>
                         <Col lg="3">
                             <Form.Group controlId="formPubliclyHidden">
                                 <Form.Label>Publika prislistan</Form.Label>
@@ -197,18 +218,28 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 </Form.Control>
                             </Form.Group>
                         </Col>
-                        <Col md="6">
+                        <Col lg="3">
                             <Form.Group>
-                                <Form.Label>Kategorier</Form.Label>
-                                <Typeahead<EquipmentCategory>
-                                    id="categories-typeahead"
-                                    multiple
-                                    labelKey={(x) => x.name}
-                                    options={equipmentCategories ?? []}
-                                    onChange={(e) => setSelectedCategories(e)}
-                                    placeholder="Kategorier"
-                                    defaultSelected={equipment.categories ?? []}
-                                />
+                                <Form.Label>Publik kategori</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    name="publicCategory"
+                                    defaultValue={equipment?.publiclyHidden.toString()}
+                                >
+                                    <option value={undefined}>Ingen kategori</option>
+                                    {equipmentPublicCategories?.map((x) => (
+                                        <option
+                                            key={x.id}
+                                            value={x.id}
+                                            selected={x.id === equipment.equipmentPublicCategory?.id}
+                                        >
+                                            {x.name}
+                                        </option>
+                                    ))}
+                                </Form.Control>
+                                <Form.Text className="text-muted">
+                                    I den publika prislistan grupperas utrustningen baserat på denna kategori.
+                                </Form.Text>
                             </Form.Group>
                         </Col>
                         <Col lg="12">

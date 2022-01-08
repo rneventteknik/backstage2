@@ -120,7 +120,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     return (
                         <small>
                             <Typeahead.Highlighter search={highlightText}>{equipment.nameEN}</Typeahead.Highlighter>{' '}
-                            {equipment.categories?.map((x) => (
+                            {equipment.tags?.map((x) => (
                                 <>
                                     <Badge key={x.id} variant="dark">
                                         {x.name}

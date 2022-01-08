@@ -1,14 +1,16 @@
 import { Equipment, EquipmentPrice } from '../../models/interfaces';
 import {
     IEquipmentObjectionModel,
-    IEquipmentCategoryObjectionModel,
+    IEquipmentTagObjectionModel,
     IEquipmentChangelogEntryObjectionModel,
     IEquipmentPriceObjectionModel,
+    IEquipmentPublicCategoryObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { EquipmentChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
-import { EquipmentCategory } from '../../models/interfaces';
+import { EquipmentTag } from '../../models/interfaces';
 import { toDateOrUndefined } from '../utils';
 import { toUser } from './user';
+import { EquipmentPublicCategory } from '../../models/interfaces/EquipmentPublicCategory';
 
 export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment => {
     if (!objectionModel.id) {
@@ -19,17 +21,20 @@ export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment
         ...objectionModel,
         id: objectionModel.id,
         image: undefined,
-        categories: objectionModel.categories ? objectionModel.categories.map((x) => toEquipmentCategory(x)) : [],
+        tags: objectionModel.tags ? objectionModel.tags.map((x) => toEquipmentTag(x)) : [],
         prices: objectionModel.prices ? objectionModel.prices.map((x) => toEquipmentPrice(x)) : [],
         changeLog: objectionModel.changeLog ? objectionModel.changeLog.map((x) => toEquipmentChangelogEntry(x)) : [],
+        equipmentPublicCategory: objectionModel.equipmentPublicCategory
+            ? toEquipmentPublicCategory(objectionModel.equipmentPublicCategory)
+            : undefined,
         updated: toDateOrUndefined(objectionModel.updated),
         created: toDateOrUndefined(objectionModel.created),
     };
 };
 
-export const toEquipmentCategory = (objectionModel: IEquipmentCategoryObjectionModel): EquipmentCategory => {
+export const toEquipmentTag = (objectionModel: IEquipmentTagObjectionModel): EquipmentTag => {
     if (!objectionModel.id) {
-        throw 'Invalid equipment category';
+        throw 'Invalid equipment tag';
     }
 
     return {
@@ -65,6 +70,21 @@ export const toEquipmentChangelogEntry = (
         id: objectionModel.id,
         timestamp: new Date(objectionModel.timestamp),
         user: objectionModel.user ? toUser(objectionModel.user) : undefined,
+        updated: toDateOrUndefined(objectionModel.updated),
+        created: toDateOrUndefined(objectionModel.created),
+    };
+};
+
+export const toEquipmentPublicCategory = (
+    objectionModel: IEquipmentPublicCategoryObjectionModel,
+): EquipmentPublicCategory => {
+    if (!objectionModel.id) {
+        throw 'Invalid equipment public category';
+    }
+
+    return {
+        ...objectionModel,
+        id: objectionModel.id,
         updated: toDateOrUndefined(objectionModel.updated),
         created: toDateOrUndefined(objectionModel.created),
     };

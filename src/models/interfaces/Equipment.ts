@@ -1,8 +1,9 @@
 import { BaseEntityWithName } from './BaseEntity';
 import { EquipmentChangelogEntry } from './ChangeLogEntry';
-import { EquipmentCategory } from './EquipmentCategory';
+import { EquipmentTag } from './EquipmentTag';
 import { EquipmentPrice } from './EquipmentPrice';
 import { Image } from './Image';
+import { EquipmentPublicCategory } from './EquipmentPublicCategory';
 
 export interface Equipment extends BaseEntityWithName {
     inventoryCount: number;
@@ -12,7 +13,8 @@ export interface Equipment extends BaseEntityWithName {
     note: string;
     image?: Image;
     publiclyHidden: boolean;
+    equipmentPublicCategory?: EquipmentPublicCategory;
     changeLog: EquipmentChangelogEntry[];
-    categories: EquipmentCategory[];
+    tags: EquipmentTag[];
     prices: EquipmentPrice[];
 }

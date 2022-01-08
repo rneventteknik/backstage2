@@ -2,6 +2,7 @@ export { searchEvents, fetchEvents, fetchEvent, fetchEventsForUser } from './eve
 export {
     searchEquipment,
     fetchEquipments,
+    fetchEquipmentsPublic,
     fetchEquipment,
     insertEquipment,
     updateEquipment,
@@ -24,3 +25,4 @@ export {
     deleteUserAuth,
     validateUserAuthObjectionModel,
 } from './userAuth';
+export { fetchEquipmentPublicCategories, fetchEquipmentPublicCategoriesPublic } from './equipmentPublicCategories';
