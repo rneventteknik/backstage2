@@ -3,6 +3,10 @@ import { BaseEntity } from '../models/interfaces/BaseEntity';
 import { MemberStatus } from '../models/enums/MemberStatus';
 import { Role } from '../models/enums/Role';
 import { Status } from '../models/enums/Status';
+import { PricePlan } from '../models/enums/PricePlan';
+import { AccountKind } from '../models/enums/AccountKind';
+import { EventType } from '../models/enums/EventType';
+import { SalaryStatus } from '../models/enums/SalaryStatus';
 
 // Helper functions for array operations
 //
@@ -71,7 +75,7 @@ export const getStatusName = (status: Status): string => {
             return 'Bokad';
 
         case Status.OUT:
-            return 'Ute';
+            return 'Utlämnad';
 
         case Status.ONGOING:
             return 'Pågående';
@@ -86,10 +90,50 @@ export const getStatusName = (status: Status): string => {
             return 'Fakturerad';
 
         case Status.PAID:
-            return 'Betalad';
+            return 'Betald';
 
         case Status.CANCELED:
             return 'Inställd';
+    }
+};
+
+export const getPricePlanName = (pricePlan: PricePlan): string => {
+    switch (pricePlan) {
+        case PricePlan.THS:
+            return 'THS-pris';
+
+        case PricePlan.EXTERNAL:
+            return 'Standardpris';
+    }
+};
+
+export const getAccountKindName = (accountKind: AccountKind): string => {
+    switch (accountKind) {
+        case AccountKind.EXTERNAL:
+            return 'Normal';
+
+        case AccountKind.INTERNAL:
+            return 'Intern';
+    }
+};
+
+export const getEventTypeName = (eventType: EventType): string => {
+    switch (eventType) {
+        case EventType.GIG:
+            return 'Gigg';
+
+        case EventType.RENTAL:
+            return 'Hyra';
+    }
+};
+
+export const getSalaryStatusName = (salaryStatus: SalaryStatus): string => {
+    switch (salaryStatus) {
+        case SalaryStatus.NOT_SENT:
+            return 'Inte skickad';
+
+        case SalaryStatus.SENT:
+            return 'Skickad';
     }
 };
 

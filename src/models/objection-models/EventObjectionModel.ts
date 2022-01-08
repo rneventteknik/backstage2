@@ -14,7 +14,7 @@ export interface IEventObjectionModel extends BaseObjectionModelWithName {
     invoiceHogiaId: number;
     invoiceAddress: string;
     invoiceTag: string;
-    invoicenumber: string;
+    invoiceNumber: string;
     note: string;
     returnalNote: string;
     pricePlan: number;
@@ -50,7 +50,7 @@ export class EventObjectionModel extends Model {
     invoiceHogiaId!: number;
     invoiceAddress!: string;
     invoiceTag!: string;
-    invoicenumber!: string;
+    invoiceNumber!: string;
     note!: string;
     returnalNote!: string;
     pricePlan!: number;

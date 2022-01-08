@@ -8,6 +8,7 @@ import { TimeEstimate } from './TimeEstimate';
 import { TimeReport } from './TimeReport';
 import { User } from './User';
 import { Status } from '../enums/Status';
+import { SalaryStatus } from '../enums/SalaryStatus';
 
 export interface Event extends BaseEntityWithName {
     ownerUser?: User;
@@ -18,9 +19,11 @@ export interface Event extends BaseEntityWithName {
     changelog?: EventChangelogEntry[];
     eventType: EventType;
     status: Status;
+    salaryStatus: SalaryStatus;
     invoiceHogiaId: number;
     invoiceAddress: string;
     invoiceTag: string;
+    invoiceNumber: string;
     pricePlan: PricePlan;
     accountKind: AccountKind;
     note: string;
