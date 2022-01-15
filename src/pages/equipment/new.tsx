@@ -8,6 +8,7 @@ import { IEquipmentObjectionModel } from '../../models/objection-models';
 import { toEquipment } from '../../lib/mappers/equipment';
 import EquipmentForm from '../../components/equipment/EquipmentForm';
 import { getResponseContentOrError } from '../../lib/utils';
+import { useNotifications } from '../../lib/useNotifications';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -15,6 +16,7 @@ type Props = { user: CurrentUserInfo };
 const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const router = useRouter();
     const pageTitle = 'Ny utrustning';
+    const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
 
     const breadcrumbs = [
         { link: '/equipment', displayName: 'Utrustning' },
@@ -35,6 +37,11 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             .then(toEquipment)
             .then((data) => {
                 router.push('/equipment/' + data.id);
+                showCreateSuccessNotification('Utrustningen');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showCreateFailedNotification('Utrustningen');
             });
     };
 

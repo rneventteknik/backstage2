@@ -8,13 +8,16 @@ import { getResponseContentOrError } from '../../lib/utils';
 import { IUserObjectionModel } from '../../models/objection-models/UserObjectionModel';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { Role } from '../../models/enums/Role';
+import { useNotifications } from '../../lib/useNotifications';
 
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessControl(Role.ADMIN);
 type Props = { user: CurrentUserInfo };
 
 const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const router = useRouter();
     const pageTitle = 'Ny användare';
+    const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
 
     const breadcrumbs = [
         { link: '/users', displayName: 'Users' },
@@ -34,6 +37,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             .then((apiResponse) => getResponseContentOrError<User>(apiResponse))
             .then((data) => {
                 router.push('/users/' + data.id);
+                showCreateSuccessNotification('Användaren');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showCreateFailedNotification('Användaren');
             });
     };
 

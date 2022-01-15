@@ -115,13 +115,16 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
     return (
         <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={currentUser}>
-            <div className="float-right">
-                <Link href="/users/new">
-                    <Button variant="primary" as="span">
-                        Skapa användare
-                    </Button>
-                </Link>
-            </div>
+            <IfAdmin currentUser={currentUser}>
+                <div className="float-right">
+                    <Link href="/users/new">
+                        <Button variant="primary" as="span">
+                            Skapa användare
+                        </Button>
+                    </Link>
+                </div>
+            </IfAdmin>
+
             <h1> {pageTitle} </h1>
             <hr />
 
