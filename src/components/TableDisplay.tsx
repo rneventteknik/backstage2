@@ -76,7 +76,9 @@ export function TableDisplay<T extends BaseEntity>({
     //
     const filterFn = (entity: T) => {
         return configuration.columns.some(
-            (c) => c.getValue(entity).toString().toLowerCase().indexOf(filterString.toLowerCase().trim()) > -1,
+            (c) =>
+                c.getValue(entity) &&
+                c.getValue(entity).toString().toLowerCase().indexOf(filterString.toLowerCase().trim()) > -1,
         );
     };
 
