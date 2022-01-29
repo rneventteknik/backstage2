@@ -34,6 +34,28 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
 
         const form = event.currentTarget;
 
+        // Check that the type, status, account type and price plan are valid
+        if (!form.bookingType?.value || form.bookingType?.value == '') {
+            form.bookingType.setCustomValidity('Inkorrekt prisplan');
+        } else {
+            form.bookingType.setCustomValidity('');
+        }
+        if (!form.status?.value || form.status?.value == '') {
+            form.status.setCustomValidity('Inkorrekt prisplan');
+        } else {
+            form.status.setCustomValidity('');
+        }
+        if (!form.accountKind?.value || form.accountKind?.value == '') {
+            form.accountKind.setCustomValidity('Inkorrekt prisplan');
+        } else {
+            form.accountKind.setCustomValidity('');
+        }
+        if (!form.pricePlan?.value || form.pricePlan?.value == '') {
+            form.pricePlan.setCustomValidity('Inkorrekt prisplan');
+        } else {
+            form.pricePlan.setCustomValidity('');
+        }
+
         if (form.checkValidity() === false) {
             event.stopPropagation();
             setValidated(true);
@@ -83,7 +105,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                         <Form.Label>Bokningstyp</Form.Label>
                         <Form.Control as="select" name="bookingType" defaultValue={booking.eventType}>
                             {booking.eventType ? null : (
-                                <option selected disabled>
+                                <option value="" selected disabled>
                                     Välj bokningstyp
                                 </option>
                             )}
@@ -97,7 +119,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                         <Form.Label>Bokningsstatus</Form.Label>
                         <Form.Control as="select" name="status" defaultValue={booking.status}>
                             {booking.status ? null : (
-                                <option selected disabled>
+                                <option value="" selected disabled>
                                     Välj status
                                 </option>
                             )}
@@ -131,12 +153,12 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                         <Form.Label>Ansvarig medlem</Form.Label>
                         {users ? (
                             <Form.Control as="select" name="ownerUser" defaultValue={booking.ownerUser?.id}>
+                                <option value="">Inte tilldelat</option>
                                 {users?.map((user) => (
                                     <option key={user.id} value={user.id}>
                                         {user.name}
                                     </option>
                                 ))}
-                                <option>Inte tilldelat</option>
                             </Form.Control>
                         ) : (
                             <ActivityIndicator />
@@ -148,9 +170,9 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                 <Col lg="6">
                     <Form.Group controlId="formAccountKind">
                         <Form.Label>Kontotyp</Form.Label>
-                        <Form.Control as="select" name="accountKind" defaultValue={booking.accountKind}>
+                        <Form.Control as="select" name="accountKind" defaultValue={booking.accountKind} required>
                             {booking.accountKind ? null : (
-                                <option selected disabled>
+                                <option value="" selected disabled>
                                     Välj kontotyp
                                 </option>
                             )}
@@ -162,9 +184,9 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                 <Col lg="6">
                     <Form.Group controlId="formPricePlan">
                         <Form.Label>Prisplan</Form.Label>
-                        <Form.Control as="select" name="pricePlan" defaultValue={booking.pricePlan}>
+                        <Form.Control as="select" name="pricePlan" defaultValue={booking.pricePlan} required>
                             {booking.pricePlan ? null : (
-                                <option selected disabled>
+                                <option value="" selected disabled>
                                     Välj prisplan
                                 </option>
                             )}

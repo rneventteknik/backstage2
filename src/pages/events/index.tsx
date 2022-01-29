@@ -14,6 +14,7 @@ import { Status } from '../../models/enums/Status';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import { eventsFetcher } from '../../lib/fetchers';
+import { IfNotReadonly } from '../../components/utils/IfAdmin';
 
 interface EventViewModel extends Event {
     displayDate: string;
@@ -136,6 +137,15 @@ const EventListPage: React.FC<Props> = ({ user }: Props) => {
 
     return (
         <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={user}>
+            <IfNotReadonly currentUser={user}>
+                <div className="float-right">
+                    <Link href="/events/new">
+                        <Button variant="primary" as="span">
+                            Lägg till bokning
+                        </Button>
+                    </Link>
+                </div>
+            </IfNotReadonly>
             <h1>{pageTitle}</h1>
             <hr />
 
