@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Role } from '../../../models/enums/Role';
 import {
     respondWithAccessDeniedResponse,
+    respondWithCustomErrorMessage,
     respondWithInvalidDataResponse,
     respondWithInvalidMethodResponse,
 } from '../../../lib/apiResponses';
@@ -29,16 +30,16 @@ const handler = withSessionContext(
 
                 await insertUser(req.body.user)
                     .then((result) => res.status(200).json(result))
-                    .catch((err) => res.status(500).json({ statusCode: 500, message: err.message }));
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
-                break;
+                return;
 
             case 'GET':
                 await fetchUsers()
                     .then((result) => res.status(200).json(result))
-                    .catch((err) => res.status(500).json({ statusCode: 500, message: err.message }));
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
-                break;
+                return;
 
             default:
                 respondWithInvalidMethodResponse(res);

@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Role } from '../../../../models/enums/Role';
 import {
     respondWithAccessDeniedResponse,
+    respondWithCustomErrorMessage,
     respondWithEntityNotFoundResponse,
     respondWithInvalidMethodResponse,
 } from '../../../../lib/apiResponses';
@@ -24,9 +25,9 @@ const handler = withSessionContext(
 
                 await fetchUser(userId, includePersonalInformation)
                     .then((result) => (result ? res.status(200).json(result) : respondWithEntityNotFoundResponse(res)))
-                    .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
-                break;
+                return;
 
             case 'DELETE':
                 if (context.currentUser.role != Role.ADMIN || context.currentUser.userId === userId) {
@@ -36,9 +37,9 @@ const handler = withSessionContext(
 
                 await deleteUser(userId)
                     .then((result) => res.status(200).json(result))
-                    .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
-                break;
+                return;
 
             case 'PUT':
                 if (context.currentUser.role != Role.ADMIN && context.currentUser.userId != userId) {
@@ -53,9 +54,9 @@ const handler = withSessionContext(
 
                 await updateUser(userId, req.body.user)
                     .then((result) => res.status(200).json(result))
-                    .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
-                break;
+                return;
 
             default:
                 respondWithInvalidMethodResponse(res);

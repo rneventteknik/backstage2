@@ -19,7 +19,7 @@ const handler = withSessionContext(
 
             res.status(200).json(result);
         } catch (error) {
-            respondWithCustomErrorMessage(res, error.message);
+            respondWithCustomErrorMessage(res, (error as { message: string }).message);
         }
     },
 );

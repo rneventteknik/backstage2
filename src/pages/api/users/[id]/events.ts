@@ -1,5 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { respondWithEntityNotFoundResponse, respondWithInvalidMethodResponse } from '../../../../lib/apiResponses';
+import {
+    respondWithCustomErrorMessage,
+    respondWithEntityNotFoundResponse,
+    respondWithInvalidMethodResponse,
+} from '../../../../lib/apiResponses';
 import { withSessionContext } from '../../../../lib/sessionContext';
 import { fetchEventsForUser } from '../../../../lib/db-access';
 
@@ -16,7 +20,7 @@ const handler = withSessionContext(
             case 'GET':
                 await fetchEventsForUser(userId)
                     .then((result) => (result ? res.status(200).json(result) : respondWithEntityNotFoundResponse(res)))
-                    .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
                 break;
 
