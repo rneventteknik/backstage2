@@ -2,7 +2,7 @@ import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Alert, Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
+import { Alert, Badge, Button, ButtonGroup, Card, Col, Dropdown, ListGroup, Row } from 'react-bootstrap';
 import ActivityIndicator from '../../../components/utils/ActivityIndicator';
 import { getAccountKindName, getPricePlanName, getStatusName } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
@@ -11,6 +11,8 @@ import Link from 'next/link';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import EventTypeTag from '../../../components/utils/EventTypeTag';
 import { eventFetcher } from '../../../lib/fetchers';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFileDownload } from '@fortawesome/free-solid-svg-icons';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -64,6 +66,19 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             Redigera
                         </Button>
                     </Link>
+                    <Dropdown as={ButtonGroup} className="ml-2">
+                        <Button variant="primary" href={'/api/documents/price-estimate/se/' + event.id} target="_blank">
+                            <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning
+                        </Button>
+
+                        <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" />
+
+                        <Dropdown.Menu align="right">
+                            <Dropdown.Item href={'/api/documents/price-estimate/en/' + event.id} target="_blank">
+                                <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning (engelska)
+                            </Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </div>
             </IfNotReadonly>
             <h1> {pageTitle} </h1>

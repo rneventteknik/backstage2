@@ -9,7 +9,7 @@ import { withSessionContext } from '../../../../../lib/sessionContext';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
-        if (isNaN(Number(req.query.id))) {
+        if (isNaN(Number(req.query.eventId))) {
             respondWithEntityNotFoundResponse(res);
             return;
         }
