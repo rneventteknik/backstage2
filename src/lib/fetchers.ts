@@ -1,4 +1,5 @@
 import { toEquipment, toEquipmentPublicCategory, toEquipmentTag } from './mappers/equipment';
+import { toEquipmentPackage } from './mappers/equipmentPackage';
 import { toEvent } from './mappers/event';
 import { toUser } from './mappers/user';
 import { getResponseContentOrError } from './utils';
@@ -22,6 +23,9 @@ function generateListFetcher<T, S>(mapper: (apiModel: T) => S) {
 
 export const equipmentFetcher = generateFetcher(toEquipment);
 export const equipmentsFetcher = generateListFetcher(toEquipment);
+
+export const equipmentPackageFetcher = generateFetcher(toEquipmentPackage);
+export const equipmentPackagesFetcher = generateListFetcher(toEquipmentPackage);
 
 export const equipmentTagFetcher = generateFetcher(toEquipmentTag);
 export const equipmentTagsFetcher = generateListFetcher(toEquipmentTag);

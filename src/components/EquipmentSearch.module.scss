@@ -1,0 +1,11 @@
+@import "../style/variables";
+
+.dropdownItem:hover,
+.dropdownItem[aria-selected="true"] {
+    background-color: $backstage-highlight;
+    color: $backstage-text-color;
+}
+
+.menu {
+    max-height: 500px !important;
+}

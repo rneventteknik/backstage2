@@ -187,6 +187,11 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     return (
         <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={currentUser}>
             <div className="float-right">
+                <Link href="/equipmentPackage">
+                    <Button variant="dark" as="span" className="mr-3">
+                        Redigera utrustningpaket
+                    </Button>
+                </Link>
                 <Link href="/equipment/new">
                     <Button variant="primary" as="span">
                         Lägg till utrustning
@@ -215,14 +220,14 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <Form.Row className="mb-2">
                     <Col md="4">
                         <Form.Group>
-                            <Form.Label>Kategorier</Form.Label>
+                            <Form.Label>Taggar</Form.Label>
                             <Typeahead<EquipmentTag>
                                 id="tags-typeahead"
                                 multiple
                                 labelKey={(x) => x.name}
                                 options={equipmentTags ?? []}
                                 onChange={(e) => setFilterTags(e)}
-                                placeholder="Filtrera på kategori"
+                                placeholder="Filtrera på taggar"
                             />
                         </Form.Group>
                     </Col>

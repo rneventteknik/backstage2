@@ -1,0 +1,41 @@
+import { toDateOrUndefined } from '../utils';
+import {
+    IEquipmentPackageEntryObjectionModel,
+    IEquipmentPackageObjectionModel,
+} from '../../models/objection-models/EquipmentPackageObjectionModel';
+import { EquipmentPackage, EquipmentPackageEntry } from '../../models/interfaces/EquipmentPackage';
+import { toEquipment, toEquipmentTag } from './equipment';
+
+export const toEquipmentPackage = (objectionModel: IEquipmentPackageObjectionModel): EquipmentPackage => {
+    if (!objectionModel.id) {
+        throw 'Invalid equipment package';
+    }
+
+    return {
+        ...objectionModel,
+        id: objectionModel.id,
+        image: undefined,
+        tags: objectionModel.tags ? objectionModel.tags.map((x) => toEquipmentTag(x)) : [],
+        equipmentEntries: objectionModel.equipmentEntries
+            ? objectionModel.equipmentEntries.map(toEquipmentPackageEntry)
+            : [],
+        updated: toDateOrUndefined(objectionModel.updated),
+        created: toDateOrUndefined(objectionModel.created),
+    };
+};
+
+export const toEquipmentPackageEntry = (
+    objectionModel: IEquipmentPackageEntryObjectionModel,
+): EquipmentPackageEntry => {
+    if (!objectionModel.id) {
+        throw 'Invalid equipment package entry';
+    }
+
+    return {
+        ...objectionModel,
+        id: objectionModel.id,
+        equipment: objectionModel.equipment ? toEquipment(objectionModel.equipment) : undefined,
+        updated: toDateOrUndefined(objectionModel.updated),
+        created: toDateOrUndefined(objectionModel.created),
+    };
+};

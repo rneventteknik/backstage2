@@ -8,6 +8,7 @@ export {
     EquipmentChangelogEntryObjectionModel,
     EquipmentPriceObjectionModel,
 } from './EquipmentObjectionModel';
+export { EquipmentPackageObjectionModel, EquipmentPackageEntryObjectionModel } from './EquipmentPackageObjectionModel';
 
 export type { IEventObjectionModel } from './EventObjectionModel';
 export type { IUserObjectionModel, IUserAuthObjectionModel } from './UserObjectionModel';
@@ -17,6 +18,10 @@ export type {
     IEquipmentChangelogEntryObjectionModel,
     IEquipmentPriceObjectionModel,
 } from './EquipmentObjectionModel';
+export type {
+    IEquipmentPackageObjectionModel,
+    IEquipmentPackageEntryObjectionModel,
+} from './EquipmentPackageObjectionModel';
 export interface BaseObjectionModelWithName extends BaseObjectionModel {
     name: string;
 }

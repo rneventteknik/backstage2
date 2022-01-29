@@ -2,6 +2,9 @@ export async function seed(knex) {
     await knex('Event').del();
     await knex('UserAuth').del();
     await knex('User').del();
+    await knex('EquipmentTagEquipmentPackage').del();
+    await knex('EquipmentPackageEntry').del();
+    await knex('EquipmentPackage').del();
     await knex('EquipmentTagEquipment').del();
     await knex('EquipmentTag').del();
     await knex('EquipmentPrice').del();

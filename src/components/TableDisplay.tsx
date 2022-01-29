@@ -7,6 +7,7 @@ import TableFooterWithViewCount from './utils/TableFooter';
 export type TableConfiguration<T extends BaseEntity> = {
     entityTypeDisplayName: string;
     defaultSortPropertyName: string;
+    noResultsLabel?: string;
     defaultSortAscending: boolean;
     hideTableFilter?: boolean;
     hideTableCountControls?: boolean;
@@ -135,7 +136,7 @@ export function TableDisplay<T extends BaseEntity>({
                     {entitiesToShow.length === 0 ? (
                         <tr>
                             <td colSpan={configuration.columns.length} className="text-center font-italic text-muted">
-                                Inga matchingar
+                                {configuration.noResultsLabel ?? 'Inga matchingar'}
                             </td>
                         </tr>
                     ) : null}

@@ -10,6 +10,15 @@ export {
     validateEquipmentObjectionModel,
 } from './equipment';
 export {
+    searchEquipmentPackage,
+    fetchEquipmentPackages,
+    fetchEquipmentPackage,
+    insertEquipmentPackage,
+    updateEquipmentPackage,
+    deleteEquipmentPackage,
+    validateEquipmentPackageObjectionModel,
+} from './equipmentPackage';
+export {
     searchUsers,
     fetchUsers,
     fetchUser,
