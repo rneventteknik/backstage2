@@ -2,10 +2,9 @@ import React from 'react';
 import { Alert, Table } from 'react-bootstrap';
 import useSwr from 'swr';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
-import { toEquipment, toEquipmentPublicCategory } from '../../lib/mappers/equipment';
-import { formatPrice, formatTHSPrice, getResponseContentOrError, groupBy } from '../../lib/utils';
+import { equipmentsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
+import { formatPrice, formatTHSPrice, groupBy } from '../../lib/utils';
 import { EquipmentPrice } from '../../models/interfaces';
-import { EquipmentObjectionModel, IEquipmentTagObjectionModel } from '../../models/objection-models';
 
 const containerStyle = {
     margin: 'auto',
@@ -39,7 +38,7 @@ const PriceCells: React.FC<PriceCellsProps> = ({ price, hidePriceType }: PriceCe
     );
 
 const PublicPricePage: React.FC = () => {
-    const { data: equipment, error, isValidating } = useSwr('/api/public/equipment', fetcher);
+    const { data: equipment, error, isValidating } = useSwr('/api/public/equipment', equipmentsFetcher);
     const { data: equipmentCategories } = useSwr(
         '/api/public/equipmentPublicCategories',
         equipmentPublicCategoriesFetcher,
@@ -134,15 +133,5 @@ const PublicPricePage: React.FC = () => {
         </div>
     );
 };
-
-const fetcher = (url: string) =>
-    fetch(url)
-        .then((response) => getResponseContentOrError<EquipmentObjectionModel[]>(response))
-        .then((objectionModel) => objectionModel.map((x) => toEquipment(x)));
-
-const equipmentPublicCategoriesFetcher = (url: string) =>
-    fetch(url)
-        .then((apiResponse) => getResponseContentOrError<IEquipmentTagObjectionModel[]>(apiResponse))
-        .then((equipmentList) => equipmentList.map((x) => toEquipmentPublicCategory(x)));
 
 export default PublicPricePage;
