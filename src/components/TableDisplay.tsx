@@ -3,6 +3,7 @@ import { FormControl, FormGroup } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
 import { BaseEntity } from '../models/interfaces/BaseEntity';
 import TableFooterWithViewCount from './utils/TableFooter';
+import styles from './TableDisplay.module.scss';
 
 export type TableConfiguration<T extends BaseEntity> = {
     entityTypeDisplayName: string;
@@ -19,6 +20,7 @@ export type TableConfiguration<T extends BaseEntity> = {
         disableSort?: boolean;
         columnWidth?: number;
         textAlignment?: 'left' | 'center' | 'right';
+        textTruncation?: boolean;
     }[];
 };
 
@@ -127,7 +129,13 @@ export function TableDisplay<T extends BaseEntity>({
                     {entitiesToShow.map((entity) => (
                         <tr key={entity.id}>
                             {configuration.columns.map((p) => (
-                                <td key={p.key} className={getTextAlignmentClassName(p.textAlignment)}>
+                                <td
+                                    key={p.key}
+                                    className={
+                                        getTextAlignmentClassName(p.textAlignment) +
+                                        (p.textTruncation ? styles.truncated : '')
+                                    }
+                                >
                                     {p.getContentOverride ? p.getContentOverride(entity) : p.getValue(entity)}
                                 </td>
                             ))}
