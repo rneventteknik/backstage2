@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Session } from 'next-iron-session';
-import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import authenticate from '../../../lib/authenticate';
+import { setSessionCookie, authenticate } from '../../../lib/authenticate';
 import withSession from '../../../lib/session';
 
 const handler = withSession(
@@ -16,17 +15,7 @@ const handler = withSession(
         }
         const authUser = await authenticate(username, password);
         if (authUser) {
-            const user: CurrentUserInfo = {
-                isLoggedIn: true,
-                userId: authUser.userId,
-                name: authUser.user?.name,
-                role: authUser.role,
-                loginDate: Date.now(),
-            };
-
-            req.session.set('user', user);
-            await req.session.save();
-            res.status(200).json(user);
+            await setSessionCookie(req, authUser).then((user) => res.status(200).json(user));
         } else {
             res.status(403).json({ statusCode: 403, message: 'Invalid login' });
         }

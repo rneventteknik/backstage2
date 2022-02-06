@@ -21,15 +21,17 @@ Our package manager of choice is [`yarn`](https://yarnpkg.com/). After cloning t
 A few environment variables are needed to get this app to run. To configure these, the file `.env.local` can be added to this folder. It should contain the following:
 
 ```
-DB_HOST={database host name}
-DB_USER={databse user name}
-DB_PASS={database password}
-DB_NAME={database name}
-DB_SSL={true or false}
+SECRET_COOKIE_PASSWORD={session cookie secret; >32 chars (mandatory, used to encrypt the session)}
 
-SECRET_COOKIE_PASSWORD={session cookie secret; >32 chars}
+DB_HOST={database host name (optional, only needed when using PostgreSQL)}
+DB_USER={databse user name (optional, only needed when using PostgreSQL)}
+DB_PASS={database password (optional, only needed when using PostgreSQL)}
+DB_NAME={database name (optional, only needed when using PostgreSQL)}
+DB_SSL={true or false (optional, only needed when using PostgreSQL)}
 
-NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS={json array with external links, where each link is an object with a title and an url attribute}
+NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS={json array with external links, where each link is an object with a title and an url attribute (optional, defaults to empty list)}
+
+MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay logged in. (optional, defaults to forever if not set)}
 ```
 
 ### Version Control ###
