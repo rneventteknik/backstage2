@@ -9,20 +9,20 @@ $side-border-width: 3px;
 
 .main .link:hover,
 .main .link.activeNavItem {
-    border-left: $side-border-width solid $primary;
-    background-color: $backstage-highlight;
+    border-left: $side-border-width solid $backstage-primary;
+    background-color: $backstage-color-3;
     margin-left: 0px;
 }
 
 .main a {
-    color: $body-color;
+    color: $backstage-text-color;
 }
 
 .container h1 {
     text-transform: uppercase;
     font-size: smaller;
     font-weight: 600;
-    color: $gray-600;
+    color: $backstage-dark-text-color;
 }
 
 .debugInfo {

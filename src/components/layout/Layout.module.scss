@@ -12,7 +12,7 @@ $sidebar-transition-time: 0.1s;
     left: 0;
     bottom: 0;
     padding-top: $navbar-height-compensation;
-    background-color: $backstage-lighter-bg;
+    background-color: $backstage-color-2;
     box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
 
     transition: left $sidebar-transition-time, width $sidebar-transition-time;
@@ -33,7 +33,7 @@ $sidebar-transition-time: 0.1s;
 }
 
 .footer {
-    border-top: 1px solid $backstage-lighter-bg;
+    border-top: 1px solid $backstage-color-2;
 }
 
 .container {
@@ -43,6 +43,11 @@ $sidebar-transition-time: 0.1s;
     left: 0;
     right: 0;
     bottom: 0;
+}
+
+:export {
+    skeletonColorBase: $backstage-color-1;
+    skeletonColorHighlight: $backstage-color-4;
 }
 
 // Handle sidebar toggle and responsive design

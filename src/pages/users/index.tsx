@@ -5,14 +5,17 @@ import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import { getMemberStatusName, getRoleName } from '../../lib/utils';
 import Link from 'next/link';
-import { Alert, Button } from 'react-bootstrap';
-import ActivityIndicator from '../../components/utils/ActivityIndicator';
+import { Button } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { IfAdmin } from '../../components/utils/IfAdmin';
 import { faBan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Header from '../../components/layout/Header';
+import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
 import { usersFetcher } from '../../lib/fetchers';
+import TableStyleLink from '../../components/utils/TableStyleLink';
+import { ErrorPage } from '../../components/layout/ErrorPage';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -21,33 +24,18 @@ const breadcrumbs = [{ link: 'users', displayName: pageTitle }];
 
 const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const { data: users, error, isValidating } = useSwr('/api/users', usersFetcher);
-    if (!users && !error && isValidating) {
-        return (
-            <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {pageTitle} </h1>
-                <hr />
-                <div className="text-center py-5">
-                    <ActivityIndicator />
-                </div>
-            </Layout>
-        );
+
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (error || !users) {
-        return (
-            <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {pageTitle} </h1>
-                <hr />
-                <Alert variant="danger">
-                    <strong> Fel </strong> Användarlistan kunde inte hämtas
-                </Alert>
-            </Layout>
-        );
+    if (isValidating || !users) {
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
     }
 
     const UserNameDisplayFn = (user: User) => (
         <>
-            <Link href={'users/' + user.id}>{user.name}</Link>
+            <TableStyleLink href={'users/' + user.id}>{user.name}</TableStyleLink>
             <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
                 {!user.username ? (
                     <span className="small text-muted ml-1">
@@ -55,13 +43,15 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </span>
                 ) : null}
             </IfAdmin>
-            <p className="text-muted mb-0">{getMemberStatusName(user?.memberStatus)}</p>
+            <p className="text-muted mb-0">
+                <span className="d-lg-none">
+                    {user?.emailAddress ?? 'N/A'}
+                    <IfAdmin currentUser={currentUser}>, </IfAdmin>
+                </span>
+                <IfAdmin currentUser={currentUser}>{getRoleName(user?.role)}</IfAdmin>
+            </p>
+            <p className="text-muted mb-0 d-md-none">{getMemberStatusName(user?.memberStatus)}</p>
         </>
-    );
-    const UserActionsDisplayFn = (user: User) => (
-        <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
-            <Link href={'users/' + user.id + '/edit'}>Redigera</Link>
-        </IfAdmin>
     );
 
     const tableSettings: TableConfiguration<User> = {
@@ -72,61 +62,49 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             {
                 key: 'name',
                 displayName: 'Användare',
-                getValue: (user: User) => user.name,
+                getValue: (user: User) => [user.name, user?.emailAddress].join(' '),
                 getContentOverride: UserNameDisplayFn,
-            },
-            {
-                key: 'email',
-                displayName: 'Email',
-                getValue: (user: User) => user.emailAddress,
-                columnWidth: 280,
-            },
-            {
-                key: 'phone',
-                displayName: 'Telefon',
-                getValue: (user: User) => user.phoneNumber,
-                columnWidth: 280,
             },
             {
                 key: 'nameTag',
                 displayName: 'Tagg',
                 getValue: (user: User) => user.nameTag,
                 textAlignment: 'center',
-                columnWidth: 80,
+            },
+            {
+                key: 'email',
+                displayName: 'Email',
+                getValue: (user: User) => user.emailAddress ?? '-',
+                textAlignment: 'center',
+                cellHideSize: 'lg',
             },
             {
                 key: 'role',
-                displayName: 'Behörighet',
-                getValue: (user: User) => getRoleName(user?.role),
+                displayName: 'Medlemsstatus',
+                getValue: (user: User) => getMemberStatusName(user?.memberStatus),
                 textAlignment: 'center',
                 columnWidth: 180,
-            },
-            {
-                key: 'actions',
-                displayName: '',
-                getValue: () => '',
-                getContentOverride: UserActionsDisplayFn,
-                disableSort: true,
-                columnWidth: 100,
-                textAlignment: 'center',
+                cellHideSize: 'md',
             },
         ],
     };
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={currentUser}>
-            <IfAdmin currentUser={currentUser}>
-                <div className="float-right">
+        <Layout title={pageTitle} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
+                <IfAdmin currentUser={currentUser}>
                     <Link href="/users/new">
                         <Button variant="primary" as="span">
                             Skapa användare
                         </Button>
                     </Link>
-                </div>
-            </IfAdmin>
-
-            <h1> {pageTitle} </h1>
-            <hr />
+                </IfAdmin>
+                <Link href={'users/' + currentUser.userId}>
+                    <Button variant="secondary" as="span" className="ml-2">
+                        Visa min profil
+                    </Button>
+                </Link>
+            </Header>
 
             {users && users.length > 0 ? (
                 <TableDisplay entities={users} configuration={tableSettings} />

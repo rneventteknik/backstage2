@@ -1,25 +1,22 @@
 import React, { useState } from 'react';
-import Layout from '../../components/layout/Layout';
+import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Alert, Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
-import ActivityIndicator from '../../components/utils/ActivityIndicator';
-import { getResponseContentOrError } from '../../lib/utils';
-import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { IEquipmentPackageObjectionModel } from '../../models/objection-models';
-import { useNotifications } from '../../lib/useNotifications';
-import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
-import EquipmentPackageForm from '../../components/equipmentPackage/EquipmentPackageForm';
-import { equipmentPackageFetcher } from '../../lib/fetchers';
+import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { getResponseContentOrError } from '../../../lib/utils';
+import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
+import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { IEquipmentPackageObjectionModel } from '../../../models/objection-models';
+import { useNotifications } from '../../../lib/useNotifications';
+import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
+import EquipmentPackageForm from '../../../components/equipmentPackage/EquipmentPackageForm';
+import { equipmentPackageFetcher } from '../../../lib/fetchers';
+import { ErrorPage } from '../../../components/layout/ErrorPage';
+import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
+import Header from '../../../components/layout/Header';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
-const staticPageTitle = 'Utrusning';
-const staticBreadcrumbs = [
-    { link: '/equipment', displayName: 'Utrustning' },
-    { link: '/equipmentPackage', displayName: staticPageTitle },
-];
 
 const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -34,28 +31,12 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
         equipmentPackageFetcher,
     );
 
-    if (!equipmentPackage && !error && isValidating) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <div className="text-center py-5">
-                    <ActivityIndicator />
-                </div>
-            </Layout>
-        );
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (error || !equipmentPackage) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <Alert variant="danger">
-                    <strong> Fel </strong> Ogiltigt utrustningspaket
-                </Alert>
-            </Layout>
-        );
+    if (isValidating || !equipmentPackage) {
+        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
     }
 
     const handleSubmit = async (equipmentPackage: IEquipmentPackageObjectionModel) => {
@@ -109,8 +90,8 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     ];
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <div className="float-right">
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentPackageForm" type="submit">
                     Spara utrustningspaket
                 </Button>
@@ -124,9 +105,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
                         Ta bort utrustningspaket
                     </Dropdown.Item>
                 </DropdownButton>
-            </div>
-            <h1> {pageTitle} </h1>
-            <hr />
+            </Header>
 
             <EquipmentPackageForm
                 equipmentPackage={equipmentPackage}

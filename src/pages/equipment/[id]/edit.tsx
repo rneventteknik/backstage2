@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Alert, Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
-import ActivityIndicator from '../../../components/utils/ActivityIndicator';
+import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
@@ -11,15 +10,13 @@ import { IEquipmentObjectionModel } from '../../../models/objection-models';
 import { toEquipment } from '../../../lib/mappers/equipment';
 import EquipmentForm from '../../../components/equipment/EquipmentForm';
 import { useNotifications } from '../../../lib/useNotifications';
+import Header from '../../../components/layout/Header';
+import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { equipmentFetcher } from '../../../lib/fetchers';
+import { ErrorPage } from '../../../components/layout/ErrorPage';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
-const staticPageTitle = 'Utrusning';
-const staticBreadcrumbs = [
-    { link: '/equipment', displayName: staticPageTitle },
-    { link: '/equipment', displayName: 'Redigera' },
-];
 
 const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -34,28 +31,12 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         equipmentFetcher,
     );
 
-    if (!equipment && !error && isValidating) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <div className="text-center py-5">
-                    <ActivityIndicator />
-                </div>
-            </Layout>
-        );
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (error || !equipment) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <Alert variant="danger">
-                    <strong> Fel </strong> Ogiltig utrustning
-                </Alert>
-            </Layout>
-        );
+    if (isValidating || !equipment) {
+        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
     }
 
     const handleSubmit = async (equipment: IEquipmentObjectionModel) => {
@@ -110,8 +91,8 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <div className="float-right">
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentForm" type="submit">
                     Spara utrustning
                 </Button>
@@ -125,9 +106,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         Ta bort utrustning
                     </Dropdown.Item>
                 </DropdownButton>
-            </div>
-            <h1> {pageTitle} </h1>
-            <hr />
+            </Header>
 
             <EquipmentForm equipment={equipment} handleSubmitEquipment={handleSubmit} formId="editEquipmentForm" />
 

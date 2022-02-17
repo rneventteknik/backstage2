@@ -6,14 +6,23 @@ import { EventType } from '../../models/enums/EventType';
 
 type Props = {
     event: Event;
+    className?: string;
 };
 
-const EventTypeTag: React.FC<Props> = ({ event }: Props) => {
+const EventTypeTag: React.FC<Props> = ({ event, className }: Props) => {
     switch (event && event.eventType) {
         case EventType.GIG:
-            return <Badge variant="success">Gigg</Badge>;
+            return (
+                <Badge variant="success" className={className}>
+                    Gigg
+                </Badge>
+            );
         case EventType.RENTAL:
-            return <Badge variant="primary">Hyra</Badge>;
+            return (
+                <Badge variant="primary" className={className}>
+                    Hyra
+                </Badge>
+            );
         default:
             return null;
     }

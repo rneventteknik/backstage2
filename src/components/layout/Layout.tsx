@@ -1,23 +1,20 @@
 import Head from 'next/head';
 import Topbar from './Topbar';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import Link from 'next/link';
 import React, { ReactNode, useState } from 'react';
-import { Breadcrumb } from 'react-bootstrap';
 import Sidebar from './Sidebar';
 import styles from './Layout.module.scss';
+import { SkeletonTheme } from 'react-loading-skeleton';
 
 type Props = {
     children?: ReactNode;
     title?: string;
     currentUser: CurrentUserInfo;
-    breadcrumbs: { link: string; displayName: string }[];
     fixedWidth?: boolean;
 };
 
 const Layout: React.FC<Props> = ({
     children,
-    breadcrumbs = [],
     title = 'This is the default title',
     fixedWidth = false,
     currentUser,
@@ -39,37 +36,24 @@ const Layout: React.FC<Props> = ({
                 <Sidebar currentUser={currentUser} />
             </aside>
 
-            <section className={styles.mainContentContainer + ' p-4'}>
-                <div
-                    className={fixedWidth ? styles.mainContentFixedWidth : styles.mainContent}
-                    data-testid="main-content"
-                >
-                    <section className={styles.breadcrumbs}>
-                        <Breadcrumb>
-                            <Breadcrumb.Item href="/" linkAs={Link} className={styles.breadcrumb}>
-                                Backstage2
-                            </Breadcrumb.Item>
-                            {breadcrumbs.map((b, index) => (
-                                <Breadcrumb.Item
-                                    linkAs={Link}
-                                    key={index}
-                                    href={b.link}
-                                    active={index === breadcrumbs.length - 1}
-                                    className={styles.breadcrumb}
-                                >
-                                    {b.displayName}
-                                </Breadcrumb.Item>
-                            ))}
-                        </Breadcrumb>
-                    </section>
+            <SkeletonTheme
+                baseColor={styles.skeletonColorBase}
+                highlightColor={styles.skeletonColorHighlight}
+                borderRadius={0}
+            >
+                <section className={styles.mainContentContainer + ' p-4'}>
+                    <div
+                        className={fixedWidth ? styles.mainContentFixedWidth : styles.mainContent}
+                        data-testid="main-content"
+                    >
+                        {children}
 
-                    {children}
-
-                    <footer className={styles.footer + ' text-center font-italic text-muted'}>
-                        <small>Backstage2 - 2021</small>
-                    </footer>
-                </div>
-            </section>
+                        <footer className={styles.footer + ' text-center font-italic text-muted'}>
+                            <small>Backstage2 - 2021</small>
+                        </footer>
+                    </div>
+                </section>
+            </SkeletonTheme>
         </div>
     );
 };

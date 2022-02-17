@@ -5,8 +5,7 @@ import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import { getResponseContentOrError } from '../../lib/utils';
 import Link from 'next/link';
-import { Alert, Badge, Button, Col, Collapse, Form } from 'react-bootstrap';
-import ActivityIndicator from '../../components/utils/ActivityIndicator';
+import { Badge, Button, Col, Collapse, Form } from 'react-bootstrap';
 import { EquipmentPackageObjectionModel, IEquipmentTagObjectionModel } from '../../models/objection-models';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
@@ -15,26 +14,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 import { toEquipmentTag } from '../../lib/mappers/equipment';
+import { IfNotReadonly } from '../../components/utils/IfAdmin';
+import Header from '../../components/layout/Header';
+import { ErrorPage } from '../../components/layout/ErrorPage';
+import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
+import TableStyleLink from '../../components/utils/TableStyleLink';
 
 const EquipmentPackageNameDisplayFn = (equipmentPackage: EquipmentPackage) => (
     <>
-        <Link href={'equipmentPackage/' + equipmentPackage.id}>{equipmentPackage.name}</Link>
-        <p className="text-muted mb-0">
-            {equipmentPackage.equipmentEntries.length} delar / {equipmentPackage.estimatedHours} timmar
-        </p>
-    </>
-);
-const EquipmentPackageTagsDisplayFn = (equipmentPackage: EquipmentPackage) => (
-    <>
+        <TableStyleLink href={'equipmentPackage/' + equipmentPackage.id}>{equipmentPackage.name}</TableStyleLink>
         {equipmentPackage.tags.map((x) => (
-            <Badge variant="dark" key={x.id} className="mr-1">
+            <Badge variant="dark" key={x.id} className="ml-1">
                 {x.name}
             </Badge>
         ))}
+        <p className="text-muted mb-0 d-md-none">
+            {equipmentPackage.equipmentEntries.length} delar, {equipmentPackage.estimatedHours} timmar
+        </p>
     </>
-);
-const EquipmentPackageActionsDisplayFn = (equipmentPackage: EquipmentPackage) => (
-    <Link href={'equipmentPackage/' + equipmentPackage.id}>Redigera</Link>
 );
 
 const tableSettings: TableConfiguration<EquipmentPackage> = {
@@ -50,21 +47,23 @@ const tableSettings: TableConfiguration<EquipmentPackage> = {
             getContentOverride: EquipmentPackageNameDisplayFn,
         },
         {
-            key: 'tags',
-            displayName: 'Taggar',
-            getValue: (equipmentPackage: EquipmentPackage) => equipmentPackage.tags.map((x) => x.name).join(', '),
-            getContentOverride: EquipmentPackageTagsDisplayFn,
-            disableSort: true,
-            columnWidth: 280,
+            key: 'parts',
+            displayName: 'Delar',
+            getValue: (equipmentPackage: EquipmentPackage) => equipmentPackage.equipmentEntries.length,
+            getContentOverride: (equipmentPackage: EquipmentPackage) =>
+                equipmentPackage.equipmentEntries.length + ' st',
+            textAlignment: 'center',
+            cellHideSize: 'md',
+            columnWidth: 120,
         },
         {
-            key: 'actions',
-            displayName: '',
-            getValue: () => '',
-            getContentOverride: EquipmentPackageActionsDisplayFn,
-            disableSort: true,
-            columnWidth: 100,
+            key: 'hours',
+            displayName: 'Timmar',
+            getValue: (equipmentPackage: EquipmentPackage) => equipmentPackage.estimatedHours,
+            getContentOverride: (equipmentPackage: EquipmentPackage) => equipmentPackage.estimatedHours + ' timmar',
             textAlignment: 'center',
+            cellHideSize: 'md',
+            columnWidth: 120,
         },
     ],
 };
@@ -78,35 +77,19 @@ const breadcrumbs = [
 ];
 
 const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
-    const { data: equipmentPackage, error, isValidating } = useSwr('/api/equipmentPackage', fetcher);
+    const { data: equipmentPackages, error, isValidating } = useSwr('/api/equipmentPackage', fetcher);
     const { data: equipmentPackageTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [filterTags, setFilterTags] = useState<EquipmentTag[]>([]);
 
-    if (!equipmentPackage && !error && isValidating) {
-        return (
-            <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {pageTitle} </h1>
-                <hr />
-                <div className="text-center py-5">
-                    <ActivityIndicator />
-                </div>
-            </Layout>
-        );
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (error || !equipmentPackage) {
-        return (
-            <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {pageTitle} </h1>
-                <hr />
-                <Alert variant="danger">
-                    <strong> Fel </strong> Utrustningspaketslistan kunde inte hämtas
-                </Alert>
-            </Layout>
-        );
+    if (isValidating || !equipmentPackages) {
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
     }
 
     // Handlers for changed events
@@ -117,22 +100,22 @@ const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser }: Props)
 
     // Filter list. Note that the free text filter are handled by the table and not here.
     //
-    const equipmentPackageToShow = equipmentPackage.filter(
+    const equipmentPackageToShow = equipmentPackages.filter(
         (equipmentPackage: EquipmentPackage) =>
             filterTags.length === 0 || filterTags.every((tag) => equipmentPackage.tags.some((x) => x.id === tag.id)),
     );
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={currentUser}>
-            <div className="float-right">
-                <Link href="/equipmentPackage/new">
-                    <Button variant="primary" as="span">
-                        Lägg till utrustningspaket
-                    </Button>
-                </Link>
-            </div>
-            <h1> {pageTitle} </h1>
-            <hr />
+        <Layout title={pageTitle} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
+                <IfNotReadonly currentUser={currentUser}>
+                    <Link href="/equipmentPackage/new">
+                        <Button variant="primary" as="span">
+                            Lägg till utrustningspaket
+                        </Button>
+                    </Link>
+                </IfNotReadonly>
+            </Header>
 
             <Form.Row>
                 <Col>

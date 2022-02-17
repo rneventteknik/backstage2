@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Alert, Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import UserForm from '../../../components/users/UserForm';
-import ActivityIndicator from '../../../components/utils/ActivityIndicator';
 import { getResponseContentOrError } from '../../../lib/utils';
 import UserAuthForm from '../../../components/users/UserAuthForm';
 import { UpdateAuthRequest, UpdateAuthResponse } from '../../../models/misc/UpdateAuthApiModels';
@@ -15,15 +14,13 @@ import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
 import { Role } from '../../../models/enums/Role';
+import Header from '../../../components/layout/Header';
+import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { userFetcher } from '../../../lib/fetchers';
+import { ErrorPage } from '../../../components/layout/ErrorPage';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
-const staticPageTitle = 'Användare';
-const staticBreadcrumbs = [
-    { link: '/users', displayName: staticPageTitle },
-    { link: '/users', displayName: 'Redigera' },
-];
 
 const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -42,28 +39,12 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const router = useRouter();
     const { data: user, error, isValidating, mutate } = useSwr('/api/users/' + router.query.id, userFetcher);
 
-    if (!user && !error && isValidating) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <div className="text-center py-5">
-                    <ActivityIndicator />
-                </div>
-            </Layout>
-        );
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (error || !user) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <Alert variant="danger">
-                    <strong> Fel </strong> Ogiltig användare
-                </Alert>
-            </Layout>
-        );
+    if (isValidating || !user) {
+        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
     }
 
     const handleSubmit = async (user: IUserObjectionModel) => {
@@ -163,8 +144,8 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <div className="float-right">
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editUserForm" type="submit">
                     Spara användare
                 </Button>
@@ -202,9 +183,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         </Dropdown.Item>
                     </IfAdmin>
                 </DropdownButton>
-            </div>
-            <h1> {pageTitle} </h1>
-            <hr />
+            </Header>
 
             <UserForm user={user} handleSubmitUser={handleSubmit} formId="editUserForm" />
 

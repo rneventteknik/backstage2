@@ -8,6 +8,7 @@ import { IEquipmentPackageObjectionModel } from '../../models/objection-models';
 import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 import EquipmentPackageForm from '../../components/equipmentPackage/EquipmentPackageForm';
 import { getResponseContentOrError } from '../../lib/utils';
+import Header from '../../components/layout/Header';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -40,14 +41,12 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     };
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <div className="float-right">
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentPackageForm" type="submit">
                     Lägg till utrustningspaket
                 </Button>
-            </div>
-            <h1> {pageTitle} </h1>
-            <hr />
+            </Header>
 
             <EquipmentPackageForm handleSubmitEquipmentPackage={handleSubmit} formId="editEquipmentPackageForm" />
         </Layout>

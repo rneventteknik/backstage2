@@ -4,7 +4,6 @@ import { Event } from '../../models/interfaces';
 import useSwr from 'swr';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import Link from 'next/link';
 import EventTypeTag from '../../components/utils/EventTypeTag';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import { validDate, formatDate, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../../lib/utils';
@@ -13,8 +12,13 @@ import { Button, Col, Collapse, Form } from 'react-bootstrap';
 import { Status } from '../../models/enums/Status';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import Header from '../../components/layout/Header';
+import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
 import { eventsFetcher } from '../../lib/fetchers';
+import TableStyleLink from '../../components/utils/TableStyleLink';
+import { ErrorPage } from '../../components/layout/ErrorPage';
 import { IfNotReadonly } from '../../components/utils/IfAdmin';
+import Link from 'next/link';
 
 interface EventViewModel extends Event {
     displayDate: string;
@@ -25,13 +29,16 @@ type Props = { user: CurrentUserInfo };
 const pageTitle = 'Bokningar';
 const breadcrumbs = [{ link: 'events', displayName: pageTitle }];
 
-const EventNameDisplayFn = (event: Event) => (
+const EventNameDisplayFn = (event: EventViewModel) => (
     <>
-        <Link href={'events/' + event.id}>{event.name}</Link> <EventTypeTag event={event} />
+        <TableStyleLink href={'events/' + event.id}>{event.name}</TableStyleLink>
+
+        <EventTypeTag event={event} className="ml-1" />
+        <p className="text-muted mb-0">{getStatusName(event.status)}</p>
+        <p className="text-muted mb-0 d-lg-none">{event.ownerUser?.name ?? 'Unknown user'}</p>
+        <p className="text-muted mb-0 d-sm-none">{event.displayDate}</p>
     </>
 );
-
-const EventActionsDisplayFn = (event: Event) => <Link href={'events/' + event.id}>Redigera</Link>;
 
 const tableSettings: TableConfiguration<EventViewModel> = {
     entityTypeDisplayName: 'bokningar',
@@ -47,10 +54,11 @@ const tableSettings: TableConfiguration<EventViewModel> = {
             getContentOverride: EventNameDisplayFn,
         },
         {
-            key: 'status',
-            displayName: 'Status',
-            getValue: (event: EventViewModel) => getStatusName(event.status),
+            key: 'location',
+            displayName: 'Plats',
+            getValue: (event: EventViewModel) => event.location ?? '-',
             textAlignment: 'center',
+            cellHideSize: 'xl',
             columnWidth: 180,
         },
         {
@@ -58,6 +66,7 @@ const tableSettings: TableConfiguration<EventViewModel> = {
             displayName: 'Ansvarig',
             getValue: (event: EventViewModel) => event.ownerUser?.name ?? 'Unknown user',
             textAlignment: 'center',
+            cellHideSize: 'lg',
             columnWidth: 180,
         },
         {
@@ -66,21 +75,13 @@ const tableSettings: TableConfiguration<EventViewModel> = {
             getValue: (event: EventViewModel) => event.displayDate,
             columnWidth: 180,
             textAlignment: 'center',
-        },
-        {
-            key: 'actions',
-            displayName: '',
-            getValue: () => '',
-            getContentOverride: EventActionsDisplayFn,
-            disableSort: true,
-            columnWidth: 100,
-            textAlignment: 'center',
+            cellHideSize: 'sm',
         },
     ],
 };
 
-const EventListPage: React.FC<Props> = ({ user }: Props) => {
-    const { data: events } = useSwr('/api/events', fetcher);
+const EventListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+    const { data: events, error, isValidating } = useSwr('/api/events', fetcher);
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [userIds, setUserIds] = useState<(number | undefined)[]>([]);
@@ -88,16 +89,12 @@ const EventListPage: React.FC<Props> = ({ user }: Props) => {
     const [startDate, setStartDate] = useState<Date | undefined>();
     const [endDate, setEndDate] = useState<Date | undefined>();
 
-    // Handle errors
-    //
-    if (!events || events.length == 0) {
-        return (
-            <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={user}>
-                <h1>{pageTitle}</h1>
-                <hr />
-                <p>Det finns inga bokningar att visa</p>
-            </Layout>
-        );
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+    }
+
+    if (isValidating || !events) {
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
     }
 
     // Generate option lists for filters
@@ -137,18 +134,16 @@ const EventListPage: React.FC<Props> = ({ user }: Props) => {
         .filter((event: Event) => !endDate || !validDate(endDate) || (event.created && event.created < endDate));
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={user}>
-            <IfNotReadonly currentUser={user}>
-                <div className="float-right">
+        <Layout title={pageTitle} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
+                <IfNotReadonly currentUser={currentUser}>
                     <Link href="/events/new">
                         <Button variant="primary" as="span">
                             Lägg till bokning
                         </Button>
                     </Link>
-                </div>
-            </IfNotReadonly>
-            <h1>{pageTitle}</h1>
-            <hr />
+                </IfNotReadonly>
+            </Header>
 
             <Form.Row>
                 <Col>

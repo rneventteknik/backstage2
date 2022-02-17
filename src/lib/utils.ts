@@ -205,7 +205,7 @@ export function groupBy<T, K extends string | number>(array: T[], keyFn: (entity
 //
 export async function getResponseContentOrError<T>(res: Response): Promise<T> {
     if (res.status !== 200) {
-        throw Error(await res.text());
+        throw Error(`Error ${res.status}: ${JSON.parse(await res.text()).message}`);
     }
     return res.json();
 }

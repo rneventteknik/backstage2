@@ -2,8 +2,7 @@ import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Alert, Badge, Button, ButtonGroup, Card, Col, Dropdown, ListGroup, Row } from 'react-bootstrap';
-import ActivityIndicator from '../../../components/utils/ActivityIndicator';
+import { Badge, Button, ButtonGroup, Card, Col, Dropdown, ListGroup, Row } from 'react-bootstrap';
 import { getAccountKindName, getPricePlanName, getStatusName } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
@@ -11,13 +10,14 @@ import Link from 'next/link';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import EventTypeTag from '../../../components/utils/EventTypeTag';
 import { eventFetcher } from '../../../lib/fetchers';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Header from '../../../components/layout/Header';
+import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
+import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faFileDownload } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
-const staticPageTitle = 'Bokning';
-const staticBreadcrumbs = [{ link: 'event', displayName: staticPageTitle }];
 
 const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit event
@@ -25,64 +25,46 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const router = useRouter();
     const { data: event, error, isValidating } = useSwr('/api/events/' + router.query.id, eventFetcher);
 
-    if (!event && !error && isValidating) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <div className="text-center py-5">
-                    <ActivityIndicator />
-                </div>
-            </Layout>
-        );
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (error || !event) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <Alert variant="danger">
-                    <strong> Fel </strong> Ogiltig bokning
-                </Alert>
-            </Layout>
-        );
+    if (isValidating || !event) {
+        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser}></TwoColLoadingPage>;
     }
 
     // The page itself
     //
     const pageTitle = event?.name;
     const breadcrumbs = [
-        { link: '/events', displayName: 'Bokning' },
+        { link: '/events', displayName: 'Bokningar' },
         { link: '/events/' + event.id, displayName: pageTitle },
     ];
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <IfNotReadonly currentUser={currentUser}>
-                <div className="float-right">
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
+                <IfNotReadonly currentUser={currentUser}>
                     <Link href={'/events/' + event.id + '/edit'}>
-                        <Button variant="primary" href={'/events/' + event.id + '/edit'}>
+                        <Button variant="primary" href={'/events/' + event.id + '/edit'} className="mr-2">
                             Redigera
                         </Button>
                     </Link>
-                    <Dropdown as={ButtonGroup} className="ml-2">
-                        <Button variant="primary" href={'/api/documents/price-estimate/se/' + event.id} target="_blank">
-                            <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning
-                        </Button>
+                </IfNotReadonly>
+                <Dropdown as={ButtonGroup}>
+                    <Button variant="dark" href={'/api/documents/price-estimate/se/' + event.id} target="_blank">
+                        <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning
+                    </Button>
 
-                        <Dropdown.Toggle split variant="primary" id="dropdown-split-basic" />
+                    <Dropdown.Toggle split variant="dark" id="dropdown-split-basic" />
 
-                        <Dropdown.Menu align="right">
-                            <Dropdown.Item href={'/api/documents/price-estimate/en/' + event.id} target="_blank">
-                                <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning (engelska)
-                            </Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </div>
-            </IfNotReadonly>
-            <h1> {pageTitle} </h1>
-            <hr />
+                    <Dropdown.Menu>
+                        <Dropdown.Item href={'/api/documents/price-estimate/en/' + event.id} target="_blank">
+                            <FontAwesomeIcon icon={faFileDownload} className="m-1" /> Prisuppskattning (engelska)
+                        </Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
+            </Header>
 
             <Row className="mb-3">
                 <Col xl={4}>

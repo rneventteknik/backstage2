@@ -20,6 +20,7 @@ export type TableConfiguration<T extends BaseEntity> = {
         disableSort?: boolean;
         columnWidth?: number;
         textAlignment?: 'left' | 'center' | 'right';
+        cellHideSize?: 'sm' | 'md' | 'lg' | 'xl';
         textTruncation?: boolean;
     }[];
 };
@@ -104,16 +105,19 @@ export function TableDisplay<T extends BaseEntity>({
                     <FormControl placeholder="Filter" onChange={setFilterConfiguration}></FormControl>
                 </FormGroup>
             )}
-            <Table hover>
-                <colgroup>
-                    {configuration.columns.map((p) => (
-                        <col key={p.key} style={{ width: p.columnWidth }} />
-                    ))}
-                </colgroup>
+            <Table>
                 <thead>
                     <tr>
                         {configuration.columns.map((p) => (
-                            <th key={p.key} className={getTextAlignmentClassName(p.textAlignment)}>
+                            <th
+                                key={p.key}
+                                style={{ width: p.columnWidth }}
+                                className={
+                                    getTextAlignmentClassName(p.textAlignment) +
+                                    ' ' +
+                                    getCellDisplayClassName(p.cellHideSize)
+                                }
+                            >
                                 {p.disableSort ? (
                                     <span>{p.displayName}</span>
                                 ) : (
@@ -133,7 +137,11 @@ export function TableDisplay<T extends BaseEntity>({
                                     key={p.key}
                                     className={
                                         getTextAlignmentClassName(p.textAlignment) +
-                                        (p.textTruncation ? styles.truncated : '')
+                                        ' ' +
+                                        getCellDisplayClassName(p.cellHideSize) +
+                                        ' ' +
+                                        (p.textTruncation ? styles.truncated : '') +
+                                        ' align-middle'
                                     }
                                 >
                                     {p.getContentOverride ? p.getContentOverride(entity) : p.getValue(entity)}
@@ -171,6 +179,21 @@ const getTextAlignmentClassName = (textAlignment: string | undefined) => {
             return 'text-center';
         case 'right':
             return 'text-right';
+        default:
+            return '';
+    }
+};
+
+const getCellDisplayClassName = (screenSize: string | undefined) => {
+    switch (screenSize) {
+        case 'sm':
+            return 'd-none d-sm-table-cell';
+        case 'md':
+            return 'd-none d-md-table-cell';
+        case 'lg':
+            return 'd-none d-lg-table-cell';
+        case 'xl':
+            return 'd-none d-xl-table-cell';
         default:
             return '';
     }

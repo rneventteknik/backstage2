@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from '../components/layout/Layout';
 import { useUserWithDefaultAccessControl } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
+import Header from '../components/layout/Header';
 import { Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { formatDate, getResponseContentOrError, getRoleName } from '../lib/utils';
 import { IEventObjectionModel } from '../models/objection-models';
@@ -21,9 +22,8 @@ const IndexPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ) ?? ['-', '-', '-'];
 
     return (
-        <Layout title="Hem" breadcrumbs={[]} fixedWidth={true} currentUser={currentUser}>
-            <h1>Backstage2</h1>
-            <hr />
+        <Layout title="Hem" fixedWidth={true} currentUser={currentUser}>
+            <Header title="Backstage2" breadcrumbs={[]}></Header>
             <Row className="mb-3">
                 <Col xl={4}>
                     <Card className="mb-3">

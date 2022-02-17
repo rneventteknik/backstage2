@@ -2,6 +2,7 @@ import '../style/style.scss';
 import React from 'react';
 import { AppProps } from 'next/app';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
+import 'react-loading-skeleton/dist/skeleton.css';
 import { Provider } from 'react-bus';
 
 // We put the notifications container here, outside of the pages and layout, to allow them

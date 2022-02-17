@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Alert, Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
-import ActivityIndicator from '../../../components/utils/ActivityIndicator';
+import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
@@ -12,14 +11,12 @@ import { toEvent } from '../../../lib/mappers/event';
 import EventForm from '../../../components/events/EventForm';
 import { useNotifications } from '../../../lib/useNotifications';
 import { eventFetcher } from '../../../lib/fetchers';
+import Header from '../../../components/layout/Header';
+import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
+import { ErrorPage } from '../../../components/layout/ErrorPage';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
-const staticPageTitle = 'Bokningar';
-const staticBreadcrumbs = [
-    { link: '/events', displayName: staticPageTitle },
-    { link: '/events', displayName: 'Redigera' },
-];
 
 const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -31,28 +28,12 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const router = useRouter();
     const { data: event, error, isValidating, mutate } = useSwr('/api/events/' + router.query.id, eventFetcher);
 
-    if (!event && !error && isValidating) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <div className="text-center py-5">
-                    <ActivityIndicator />
-                </div>
-            </Layout>
-        );
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (error || !event) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <Alert variant="danger">
-                    <strong> Fel </strong> Ogiltig bokning
-                </Alert>
-            </Layout>
-        );
+    if (isValidating || !event) {
+        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
     }
 
     const handleSubmit = async (event: Partial<IEventObjectionModel>) => {
@@ -107,8 +88,8 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <div className="float-right">
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEventForm" type="submit">
                     Spara bokningen
                 </Button>
@@ -122,9 +103,7 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         Ta bort bokning
                     </Dropdown.Item>
                 </DropdownButton>
-            </div>
-            <h1> {pageTitle} </h1>
-            <hr />
+            </Header>
 
             <EventForm event={event} handleSubmitEvent={handleSubmit} formId="editEventForm" />
 

@@ -1,0 +1,11 @@
+@import "../../style/variables";
+
+.breadcrumb {
+    text-transform: uppercase;
+    font-size: smaller;
+    font-weight: 600;
+
+    a {
+        color: $backstage-dark-text-color;
+    }
+}

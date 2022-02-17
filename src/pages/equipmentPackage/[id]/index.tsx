@@ -3,14 +3,13 @@ import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
-import { formatPrice, formatTHSPrice } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
 import Link from 'next/link';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
-import { equipmentFetcher } from '../../../lib/fetchers';
+import { equipmentPackageFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -20,30 +19,34 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit user
     //
     const router = useRouter();
-    const { data: equipment, error, isValidating } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
+    const { data: equipmentPackage, error, isValidating } = useSwr(
+        '/api/equipmentPackage/' + router.query.id,
+        equipmentPackageFetcher,
+    );
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (isValidating || !equipment) {
+    if (isValidating || !equipmentPackage) {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} />;
     }
 
     // The page itself
     //
-    const pageTitle = equipment?.name;
+    const pageTitle = equipmentPackage?.name;
     const breadcrumbs = [
-        { link: '/equipment', displayName: 'Utrustning' },
-        { link: '/equipment/' + equipment.id, displayName: pageTitle },
+        { link: '/equipmentPackage', displayName: 'Utrustning' },
+        { link: '/equipmentPackage', displayName: 'Utrustningspaket' },
+        { link: '/equipmentPackage/' + equipmentPackage.id, displayName: pageTitle },
     ];
 
     return (
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/equipment/' + equipment.id + '/edit'}>
-                        <Button variant="primary" href={'/equipment/' + equipment.id + '/edit'}>
+                    <Link href={'/equipmentPackage/' + equipmentPackage.id + '/edit'}>
+                        <Button variant="primary" href={'/equipmentPackage/' + equipmentPackage.id + '/edit'}>
                             Redigera
                         </Button>
                     </Link>
@@ -54,63 +57,44 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <Col xl={4}>
                     <Card className="mb-3">
                         <Card.Header>
-                            <div style={{ fontSize: '1.6em' }}>{equipment.name}</div>
+                            <div style={{ fontSize: '1.6em' }}>{equipmentPackage.name}</div>
                             <div>
-                                {equipment.tags.map((x) => (
+                                {equipmentPackage.tags.map((x) => (
                                     <Badge variant="dark" key={x.id} className="mr-1">
                                         {x.name}
                                     </Badge>
                                 ))}
                             </div>
-                            <div className="text-muted mt-2">{equipment.description}</div>
                         </Card.Header>
                         <ListGroup variant="flush">
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Namn</span>
-                                <span>{equipment.name}</span>
+                                <span>{equipmentPackage.name}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Engelskt namn</span>
-                                <span>{equipment.nameEN}</span>
-                            </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Antal</span>
-                                <span>{equipment.inventoryCount}</span>
-                            </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Synlig i publika prislistan</span>
-                                <span>{equipment.publiclyHidden ? 'Nej' : 'Ja'}</span>
-                            </ListGroup.Item>
-                            <ListGroup.Item>
-                                <div className="mb-1">Beskrivning</div>
-                                <div className="text-muted">{equipment.description}</div>
-                            </ListGroup.Item>
-                            <ListGroup.Item>
-                                <div className="mb-1">Engelsk beskrivning</div>
-                                <div className="text-muted">{equipment.descriptionEN}</div>
+                                <span className="flex-grow-1">Estimerade timmar</span>
+                                <span>{equipmentPackage.estimatedHours} timmar</span>
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
 
                     <Card className="mb-3">
-                        <Card.Header>Prissättning</Card.Header>
+                        <Card.Header>Utrustning</Card.Header>
                         <ListGroup variant="flush">
-                            {equipment.prices.map((p) => (
-                                <ListGroup.Item key={p.id} className="d-flex">
+                            {equipmentPackage.equipmentEntries.map((e) => (
+                                <ListGroup.Item key={e.id} className="d-flex">
                                     <span className="flex-grow-1">
-                                        {p.name}
+                                        {e.equipment?.name}
                                         <br />
-                                        <span className="text-muted">{p.name} (THS)</span>
+                                        <span className="text-muted">{e.equipment?.description}</span>
                                     </span>
-                                    <span>
-                                        {formatPrice(p)} <br /> <span className="text-muted">{formatTHSPrice(p)}</span>
-                                    </span>
+                                    <span>{e.numberOfUnits} st</span>
                                 </ListGroup.Item>
                             ))}
 
-                            {equipment.prices?.length === 0 ? (
+                            {equipmentPackage.equipmentEntries?.length === 0 ? (
                                 <ListGroup.Item className="text-center font-italic text-muted">
-                                    Inga priser är konfigurerade
+                                    Det här paketet har ingen utrustning
                                 </ListGroup.Item>
                             ) : null}
                         </ListGroup>

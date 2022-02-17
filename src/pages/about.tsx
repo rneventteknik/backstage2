@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from '../components/layout/Layout';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../lib/useUser';
+import Header from '../components/layout/Header';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -9,8 +10,8 @@ const pageTitle = 'Hjälp';
 const breadcrumbs = [{ link: 'about', displayName: pageTitle }];
 
 const AboutPage: React.FC<Props> = ({ user }: Props) => (
-    <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={user}>
-        <h1>{pageTitle}</h1>
+    <Layout title={pageTitle} fixedWidth={true} currentUser={user}>
+        <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
 
         <p>
             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam aliquam interdum sapien et pellentesque.

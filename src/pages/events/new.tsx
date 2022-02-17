@@ -10,6 +10,7 @@ import EventForm from '../../components/events/EventForm';
 import { getResponseContentOrError } from '../../lib/utils';
 import { Event } from '../../models/interfaces';
 import { Status } from '../../models/enums/Status';
+import Header from '../../components/layout/Header';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -45,14 +46,12 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     };
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <div className="float-right">
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEventForm" type="submit">
                     Lägg till bokning
                 </Button>
-            </div>
-            <h1> {pageTitle} </h1>
-            <hr />
+            </Header>
 
             <EventForm handleSubmitEvent={handleSubmit} formId="editEventForm" event={defaultEvent} />
         </Layout>

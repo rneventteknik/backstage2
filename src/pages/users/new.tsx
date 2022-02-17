@@ -8,6 +8,7 @@ import { getResponseContentOrError } from '../../lib/utils';
 import { IUserObjectionModel } from '../../models/objection-models/UserObjectionModel';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import Header from '../../components/layout/Header';
 import { Role } from '../../models/enums/Role';
 import { useNotifications } from '../../lib/useNotifications';
 
@@ -46,14 +47,12 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     };
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <div className="float-right">
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editUserForm" type="submit">
                     Lägg till användare
                 </Button>
-            </div>
-            <h1> {pageTitle} </h1>
-            <hr />
+            </Header>
 
             <UserForm handleSubmitUser={handleSubmit} formId="editUserForm" />
         </Layout>

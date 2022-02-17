@@ -2,8 +2,7 @@ import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Alert, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
-import ActivityIndicator from '../../../components/utils/ActivityIndicator';
+import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { getMemberStatusName, getRoleName } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
@@ -11,12 +10,13 @@ import Link from 'next/link';
 import SmallEventList from '../../../components/SmallEventList';
 import UserDisplay from '../../../components/utils/UserDisplay';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
+import Header from '../../../components/layout/Header';
+import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { eventsFetcher, userFetcher } from '../../../lib/fetchers';
+import { ErrorPage } from '../../../components/layout/ErrorPage';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
-const staticPageTitle = 'Användare';
-const staticBreadcrumbs = [{ link: 'users', displayName: staticPageTitle }];
 
 const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit user
@@ -25,28 +25,12 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const { data: user, error, isValidating } = useSwr('/api/users/' + router.query.id, userFetcher);
     const { data: events } = useSwr('/api/users/' + router.query.id + '/events', eventsFetcher);
 
-    if (!user && !error && isValidating) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <div className="text-center py-5">
-                    <ActivityIndicator />
-                </div>
-            </Layout>
-        );
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (error || !user) {
-        return (
-            <Layout title={staticPageTitle} breadcrumbs={staticBreadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {staticPageTitle} </h1>
-                <hr />
-                <Alert variant="danger">
-                    <strong> Fel </strong> Ogiltig användare
-                </Alert>
-            </Layout>
-        );
+    if (isValidating || !user) {
+        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} />;
     }
 
     // The page itself
@@ -58,18 +42,16 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-            <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
-                <div className="float-right">
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
+                <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
                     <Link href={'/users/' + user.id + '/edit'}>
                         <Button variant="primary" href={'/users/' + user.id + '/edit'}>
                             Redigera
                         </Button>
                     </Link>
-                </div>
-            </IfAdmin>
-            <h1> {pageTitle} </h1>
-            <hr />
+                </IfAdmin>
+            </Header>
 
             <Row className="mb-3">
                 <Col xl={4}>

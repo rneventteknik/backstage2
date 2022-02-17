@@ -5,36 +5,37 @@ import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import { formatPrice, formatTHSPrice } from '../../lib/utils';
 import Link from 'next/link';
-import { Alert, Badge, Button, Col, Collapse, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import ActivityIndicator from '../../components/utils/ActivityIndicator';
+import { Badge, Button, Col, Collapse, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { faEyeSlash, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
+import Header from '../../components/layout/Header';
+import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
 import { EquipmentTag } from '../../models/interfaces';
 import { equipmentTagsFetcher, equipmentsFetcher } from '../../lib/fetchers';
+import TableStyleLink from '../../components/utils/TableStyleLink';
+import { ErrorPage } from '../../components/layout/ErrorPage';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
-        <Link href={'equipment/' + equipment.id}>{equipment.name}</Link>
+        <TableStyleLink href={'equipment/' + equipment.id}>{equipment.name}</TableStyleLink>
         {equipment.publiclyHidden ? (
             <span className="small text-muted ml-1">
                 <FontAwesomeIcon icon={faEyeSlash} title="Gömd i den publika prislistan"></FontAwesomeIcon>
             </span>
         ) : null}
-        <p className="text-muted mb-0">{equipment.description}</p>
-    </>
-);
-const EquipmentTagDisplayFn = (equipment: Equipment) => (
-    <>
         {equipment.tags.map((x) => (
-            <Badge variant="dark" key={x.id} className="mr-1">
+            <Badge variant="dark" key={x.id} className="ml-1">
                 {x.name}
             </Badge>
         ))}
+        <p className="text-muted mb-0">{equipment.description}</p>
+        <p className="text-muted mb-0 d-md-none">{equipment.inventoryCount + ' st'}</p>
     </>
 );
+
 const EquipmentPriceDisplayFn = (equipment: Equipment) => {
     switch (equipment.prices.length) {
         case 0:
@@ -73,9 +74,6 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
             );
     }
 };
-const EquipmentActionsDisplayFn = (equipment: Equipment) => (
-    <Link href={'equipment/' + equipment.id + '/edit'}>Redigera</Link>
-);
 
 const tableSettings: TableConfiguration<Equipment> = {
     entityTypeDisplayName: '',
@@ -90,20 +88,13 @@ const tableSettings: TableConfiguration<Equipment> = {
             getContentOverride: EquipmentNameDisplayFn,
         },
         {
-            key: 'tags',
-            displayName: 'Taggar',
-            getValue: (equipment: Equipment) => equipment.tags.map((x) => x.name).join(', '),
-            getContentOverride: EquipmentTagDisplayFn,
-            disableSort: true,
-            columnWidth: 280,
-        },
-        {
             key: 'count',
             displayName: 'Antal',
             getValue: (equipment: Equipment) => equipment.inventoryCount,
             getContentOverride: (equipment: Equipment) => equipment.inventoryCount + ' st',
             textAlignment: 'center',
-            columnWidth: 180,
+            cellHideSize: 'md',
+            columnWidth: 120,
         },
         {
             key: 'price',
@@ -111,16 +102,7 @@ const tableSettings: TableConfiguration<Equipment> = {
             getValue: () => '',
             disableSort: true,
             getContentOverride: EquipmentPriceDisplayFn,
-            textAlignment: 'center',
-            columnWidth: 180,
-        },
-        {
-            key: 'actions',
-            displayName: '',
-            getValue: () => '',
-            getContentOverride: EquipmentActionsDisplayFn,
-            disableSort: true,
-            columnWidth: 100,
+            columnWidth: 120,
             textAlignment: 'center',
         },
     ],
@@ -140,28 +122,12 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [filterTags, setFilterTags] = useState<EquipmentTag[]>([]);
     const [filterPubliclyHidden, setFilterPubliclyHidden] = useState('all');
 
-    if (!equipment && !error && isValidating) {
-        return (
-            <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {pageTitle} </h1>
-                <hr />
-                <div className="text-center py-5">
-                    <ActivityIndicator />
-                </div>
-            </Layout>
-        );
+    if (error) {
+        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (error || !equipment) {
-        return (
-            <Layout title={pageTitle} breadcrumbs={breadcrumbs} fixedWidth={true} currentUser={currentUser}>
-                <h1> {pageTitle} </h1>
-                <hr />
-                <Alert variant="danger">
-                    <strong> Fel </strong> Utrustningslistan kunde inte hämtas
-                </Alert>
-            </Layout>
-        );
+    if (isValidating || !equipment) {
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
     }
 
     // Handlers for changed events
@@ -185,21 +151,19 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         );
 
     return (
-        <Layout title={pageTitle} breadcrumbs={breadcrumbs} currentUser={currentUser}>
-            <div className="float-right">
-                <Link href="/equipmentPackage">
-                    <Button variant="dark" as="span" className="mr-3">
-                        Redigera utrustningpaket
-                    </Button>
-                </Link>
+        <Layout title={pageTitle} currentUser={currentUser}>
+            <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Link href="/equipment/new">
-                    <Button variant="primary" as="span">
+                    <Button variant="primary" as="span" className="mr-2">
                         Lägg till utrustning
                     </Button>
                 </Link>
-            </div>
-            <h1> {pageTitle} </h1>
-            <hr />
+                <Link href="/equipmentPackage">
+                    <Button variant="dark" as="span">
+                        Redigera utrustningpaket
+                    </Button>
+                </Link>
+            </Header>
 
             <Form.Row>
                 <Col>
