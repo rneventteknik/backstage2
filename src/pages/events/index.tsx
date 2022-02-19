@@ -35,7 +35,7 @@ const EventNameDisplayFn = (event: EventViewModel) => (
 
         <EventTypeTag event={event} className="ml-1" />
         <p className="text-muted mb-0">{getStatusName(event.status)}</p>
-        <p className="text-muted mb-0 d-lg-none">{event.ownerUser?.name ?? 'Unknown user'}</p>
+        <p className="text-muted mb-0 d-lg-none">{event.ownerUser?.name ?? '-'}</p>
         <p className="text-muted mb-0 d-sm-none">{event.displayDate}</p>
     </>
 );
@@ -64,7 +64,7 @@ const tableSettings: TableConfiguration<EventViewModel> = {
         {
             key: 'ownerUser',
             displayName: 'Ansvarig',
-            getValue: (event: EventViewModel) => event.ownerUser?.name ?? 'Unknown user',
+            getValue: (event: EventViewModel) => event.ownerUser?.name ?? '-',
             textAlignment: 'center',
             cellHideSize: 'lg',
             columnWidth: 180,
