@@ -108,8 +108,8 @@ const PublicPricePage: React.FC = () => {
                         </colgroup>
                         <tbody>
                             {x.equipment.map((equipment) => (
-                                <>
-                                    <tr key={equipment.id}>
+                                <React.Fragment key={equipment.id}>
+                                    <tr>
                                         <td rowSpan={equipment.prices.length > 0 ? equipment.prices.length : 1}>
                                             <div>{equipment.name}</div>
                                             <div className="text-muted">{equipment.description}</div>
@@ -124,7 +124,7 @@ const PublicPricePage: React.FC = () => {
                                             <PriceCells price={price}></PriceCells>
                                         </tr>
                                     ))}
-                                </>
+                                </React.Fragment>
                             ))}
                         </tbody>
                     </Table>
