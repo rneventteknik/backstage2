@@ -14,6 +14,7 @@ import { equipmentPackageFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import Header from '../../../components/layout/Header';
+import { PartialDeep } from 'type-fest';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -39,7 +40,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
         return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
     }
 
-    const handleSubmit = async (equipmentPackage: IEquipmentPackageObjectionModel) => {
+    const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => {
         const body = { equipmentPackage: equipmentPackage };
 
         const request = {

@@ -1,6 +1,9 @@
-import { EquipmentPackageObjectionModel } from '../../models/objection-models/EquipmentPackageObjectionModel';
+import {
+    EquipmentPackageEntryObjectionModel,
+    EquipmentPackageObjectionModel,
+} from '../../models/objection-models/EquipmentPackageObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
-import { removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
+import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchEquipmentPackage = async (
     searchString: string,
@@ -39,30 +42,52 @@ export const updateEquipmentPackage = async (
 ): Promise<EquipmentPackageObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    // Tags. To keep it simple for now we delete all the old links and create new ones.
-    if (equipmentPackage.tags !== undefined) {
-        await EquipmentPackageObjectionModel.relatedQuery('tags').for(id).unrelate();
+    const existingDatabaseModel = await EquipmentPackageObjectionModel.query()
+        .findById(id)
+        .orderBy('id')
+        .withGraphFetched('tags')
+        .withGraphFetched('equipmentEntries');
 
-        if (equipmentPackage.tags.length > 0) {
-            equipmentPackage.tags.map(async (x) => {
-                if (x.id) {
-                    await EquipmentPackageObjectionModel.relatedQuery('tags').for(id).relate(x.id);
-                }
-            });
-        }
+    // Tags.
+    if (equipmentPackage.tags) {
+        const { toAdd: tagsToAdd, toDelete: tagsToDelete } = compareLists(
+            equipmentPackage.tags,
+            existingDatabaseModel.tags,
+        );
+
+        tagsToAdd.map(async (x) => {
+            await EquipmentPackageObjectionModel.relatedQuery('tags').for(id).relate(x.id);
+        });
+
+        tagsToDelete.map(async (x) => {
+            await EquipmentPackageObjectionModel.relatedQuery('tags').for(id).findById(x.id).unrelate();
+        });
     }
 
-    // Equipment. To keep it simple for now we delete all the old equipment entries and create new ones.
+    // EquipmentEntries.
     if (equipmentPackage.equipmentEntries !== undefined) {
-        await EquipmentPackageObjectionModel.relatedQuery('equipmentEntries').for(id).delete();
+        const {
+            toAdd: equipmentEntriesToAdd,
+            toDelete: equipmentEntriesToDelete,
+            toUpdate: equipmentEntriesToUpdate,
+        } = compareLists(equipmentPackage.equipmentEntries, existingDatabaseModel.equipmentEntries);
 
-        if (equipmentPackage.equipmentEntries.length > 0) {
-            equipmentPackage.equipmentEntries.map(async (x) => {
-                await EquipmentPackageObjectionModel.relatedQuery('equipmentEntries')
-                    .for(id)
-                    .insert(withCreatedDate(removeIdAndDates(x)));
-            });
-        }
+        equipmentEntriesToAdd.map(async (x) => {
+            await EquipmentPackageObjectionModel.relatedQuery('equipmentEntries')
+                .for(id)
+                .insert(withCreatedDate(removeIdAndDates(x)));
+        });
+
+        equipmentEntriesToDelete.map(async (x) => {
+            await EquipmentPackageEntryObjectionModel.query().deleteById(x.id);
+        });
+
+        equipmentEntriesToUpdate.map(async (x) => {
+            await EquipmentPackageEntryObjectionModel.query().patchAndFetchById(
+                x.id,
+                withUpdatedDate(removeIdAndDates(x)),
+            );
+        });
     }
 
     return EquipmentPackageObjectionModel.query().patchAndFetchById(

@@ -9,9 +9,10 @@ import { EquipmentPackage, EquipmentPackageEntry } from '../../models/interfaces
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import EquipmentSearch from '../EquipmentSearch';
 import { equipmentTagsFetcher } from '../../lib/fetchers';
+import { PartialDeep } from 'type-fest';
 
 type Props = {
-    handleSubmitEquipmentPackage: (equipmentPackage: IEquipmentPackageObjectionModel) => void;
+    handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => void;
     equipmentPackage?: EquipmentPackage;
     formId: string;
 };
@@ -121,7 +122,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             return;
         }
 
-        const modifiedEquipmentPackage: IEquipmentPackageObjectionModel = {
+        const modifiedEquipmentPackage: PartialDeep<IEquipmentPackageObjectionModel> = {
             id: equipmentPackage?.id,
             created: equipmentPackage?.created?.toString(),
             updated: equipmentPackage?.updated?.toString(),

@@ -6,9 +6,10 @@ import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../m
 import { EquipmentTag } from '../../models/interfaces';
 import useSwr from 'swr';
 import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
+import { PartialDeep } from 'type-fest';
 
 type Props = {
-    handleSubmitEquipment: (equipment: IEquipmentObjectionModel) => void;
+    handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel>) => void;
     equipment?: Equipment;
     formId: string;
 };
@@ -58,7 +59,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
             return;
         }
 
-        const modifiedEquipment: IEquipmentObjectionModel = {
+        const modifiedEquipment: PartialDeep<IEquipmentObjectionModel> = {
             id: equipment?.id,
             created: equipment?.created?.toString(),
             updated: equipment?.updated?.toString(),
@@ -159,6 +160,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     defaultValue={JSON.stringify(
                                         equipment?.prices.map((x) => ({
                                             name: x.name,
+                                            id: x.id,
                                             pricePerUnit: x.pricePerUnit,
                                             pricePerHour: x.pricePerHour,
                                             pricePerUnitTHS: x.pricePerUnitTHS,

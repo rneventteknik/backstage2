@@ -4,7 +4,7 @@ import { BaseObjectionModelWithName, BaseChangeLogObjectionModel } from '.';
 import { IUserObjectionModel, UserObjectionModel } from './UserObjectionModel';
 
 export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
-    id?: number;
+    id: number;
     name: string;
     created?: string;
     updated?: string;
@@ -64,7 +64,7 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
         },
     });
 
-    id?: number;
+    id!: number;
     name!: string;
     created?: string;
     updated?: string;
@@ -89,7 +89,7 @@ export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName 
 export class EquipmentTagObjectionModel extends Model implements IEquipmentTagObjectionModel {
     static tableName = 'EquipmentTag';
 
-    id?: number;
+    id!: number;
     name!: string;
     created?: string;
     updated?: string;
@@ -105,7 +105,7 @@ export interface IEquipmentPriceObjectionModel extends BaseObjectionModelWithNam
 export class EquipmentPriceObjectionModel extends Model implements IEquipmentPriceObjectionModel {
     static tableName = 'EquipmentPrice';
 
-    id?: number;
+    id!: number;
     name!: string;
     created?: string;
     updated?: string;
@@ -124,7 +124,7 @@ export interface IEquipmentPublicCategoryObjectionModel extends BaseObjectionMod
 export class EquipmentPublicCategoryObjectionModel extends Model implements IEquipmentPublicCategoryObjectionModel {
     static tableName = 'EquipmentPublicCategory';
 
-    id?: number;
+    id!: number;
     name!: string;
     created?: string;
     updated?: string;
@@ -151,7 +151,7 @@ export class EquipmentChangelogEntryObjectionModel extends Model implements IEqu
         },
     });
 
-    id?: number;
+    id!: number;
     name!: string;
     created?: string;
     updated?: string;

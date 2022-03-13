@@ -9,6 +9,7 @@ import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 import EquipmentPackageForm from '../../components/equipmentPackage/EquipmentPackageForm';
 import { getResponseContentOrError } from '../../lib/utils';
 import Header from '../../components/layout/Header';
+import { PartialDeep } from 'type-fest';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -23,7 +24,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
         { link: '/equipmentPackage/new', displayName: pageTitle },
     ];
 
-    const handleSubmit = async (equipmentPackage: IEquipmentPackageObjectionModel) => {
+    const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => {
         const body = { equipmentPackage: equipmentPackage };
 
         const request = {

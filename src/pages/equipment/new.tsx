@@ -10,6 +10,7 @@ import EquipmentForm from '../../components/equipment/EquipmentForm';
 import { getResponseContentOrError } from '../../lib/utils';
 import Header from '../../components/layout/Header';
 import { useNotifications } from '../../lib/useNotifications';
+import { PartialDeep } from 'type-fest';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -24,7 +25,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         { link: '/equipment/new', displayName: pageTitle },
     ];
 
-    const handleSubmit = async (equipment: IEquipmentObjectionModel) => {
+    const handleSubmit = async (equipment: PartialDeep<IEquipmentObjectionModel>) => {
         const body = { equipment: equipment };
 
         const request = {

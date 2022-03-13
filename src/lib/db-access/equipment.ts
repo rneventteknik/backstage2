@@ -3,7 +3,7 @@ import {
     EquipmentPriceObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
-import { removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
+import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchEquipment = async (searchString: string, count: number): Promise<EquipmentObjectionModel[]> => {
     ensureDatabaseIsInitialized();
@@ -63,27 +63,45 @@ export const updateEquipment = async (
 ): Promise<EquipmentObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    // Tags. To keep it simple for now we delete all the old links and create new ones.
-    if (equipment.tags) {
-        await EquipmentObjectionModel.relatedQuery('tags').for(id).unrelate();
+    const existingDatabaseModel = await EquipmentObjectionModel.query()
+        .findById(id)
+        .orderBy('id')
+        .withGraphFetched('tags')
+        .withGraphFetched('prices');
 
-        equipment.tags.map(async (x) => {
-            if (x.id) {
-                await EquipmentObjectionModel.relatedQuery('tags').for(id).relate(x.id);
-            }
+    // Tags.
+    if (equipment.tags) {
+        const { toAdd: tagsToAdd, toDelete: tagsToDelete } = compareLists(equipment.tags, existingDatabaseModel.tags);
+
+        tagsToAdd.map(async (x) => {
+            await EquipmentObjectionModel.relatedQuery('tags').for(id).relate(x.id);
+        });
+
+        tagsToDelete.map(async (x) => {
+            await EquipmentObjectionModel.relatedQuery('tags').for(id).findById(x.id).unrelate();
         });
     }
 
-    // Prices. To keep it simple for now we delete all the old prices and create new ones. Once we have
-    // a client editor and are sending ids in the api we can improve this to only update whats needed.
+    // Prices.
     if (equipment.prices !== undefined) {
-        await EquipmentObjectionModel.relatedQuery('prices').for(id).delete();
+        const { toAdd: pricesToAdd, toDelete: pricesToDelete, toUpdate: pricesToUpdate } = compareLists(
+            equipment.prices,
+            existingDatabaseModel.prices,
+        );
 
-        if (equipment.prices.length > 0) {
+        pricesToAdd.map(async (x) => {
             await EquipmentObjectionModel.relatedQuery('prices')
                 .for(id)
-                .insert(equipment.prices.map((x) => withCreatedDate(removeIdAndDates(x))));
-        }
+                .insert(withCreatedDate(removeIdAndDates(x)));
+        });
+
+        pricesToDelete.map(async (x) => {
+            await EquipmentPriceObjectionModel.query().deleteById(x.id);
+        });
+
+        pricesToUpdate.map(async (x) => {
+            await EquipmentPriceObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
+        });
     }
 
     return EquipmentObjectionModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(equipment)));

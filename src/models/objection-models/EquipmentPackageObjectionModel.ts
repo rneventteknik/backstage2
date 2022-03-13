@@ -7,7 +7,7 @@ import {
 } from './EquipmentObjectionModel';
 
 export interface IEquipmentPackageObjectionModel extends BaseObjectionModelWithName {
-    id?: number;
+    id: number;
     name: string;
     created?: string;
     updated?: string;
@@ -44,7 +44,7 @@ export class EquipmentPackageObjectionModel extends Model implements IEquipmentP
         },
     });
 
-    id?: number;
+    id!: number;
     name!: string;
     created?: string;
     updated?: string;
@@ -57,7 +57,7 @@ export class EquipmentPackageObjectionModel extends Model implements IEquipmentP
 }
 
 export interface IEquipmentPackageEntryObjectionModel extends BaseObjectionModel {
-    id?: number;
+    id: number;
     created?: string;
     updated?: string;
 
@@ -81,7 +81,7 @@ export class EquipmentPackageEntryObjectionModel extends Model implements IEquip
         },
     });
 
-    id?: number;
+    id!: number;
     created?: string;
     updated?: string;
     equipmentId!: number;
