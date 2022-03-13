@@ -54,6 +54,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
             .then((equipmentPackage) => {
                 mutate(equipmentPackage, false);
                 showSaveSuccessNotification('Paketet');
+                router.push('/equipmentPackage/' + equipmentPackage.id);
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -84,9 +85,10 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     //
     const pageTitle = equipmentPackage?.name;
     const breadcrumbs = [
-        { link: '/equipment', displayName: 'Utrustning' },
+        { link: '/equipmentPackage', displayName: 'Utrustning' },
         { link: '/equipmentPackage', displayName: 'Utrustningspaket' },
         { link: '/equipmentPackage/' + equipmentPackage.id, displayName: pageTitle },
+        { link: '/equipmentPackage/' + equipmentPackage.id + '/edit', displayName: 'Redigera' },
     ];
 
     return (
