@@ -22,9 +22,10 @@ type Props = {
     handleSubmitEvent: (event: Partial<IEventObjectionModel>) => void;
     event: Partial<Event>;
     formId: string;
+    isNewBooking?: boolean;
 };
 
-const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId }: Props) => {
+const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId, isNewBooking }: Props) => {
     const [validated, setValidated] = useState(false);
 
     const { data: users } = useSwr('/api/users', usersFetcher);
@@ -104,11 +105,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                     <Form.Group controlId="formEventType">
                         <Form.Label>Bokningstyp</Form.Label>
                         <Form.Control as="select" name="bookingType" defaultValue={booking.eventType}>
-                            {booking.eventType ? null : (
-                                <option value="" selected disabled>
-                                    Välj bokningstyp
-                                </option>
-                            )}
+                            {booking.eventType ? null : <option value="">Välj bokningstyp</option>}
                             <option value={EventType.GIG}>{getEventTypeName(EventType.GIG)}</option>
                             <option value={EventType.RENTAL}>{getEventTypeName(EventType.RENTAL)}</option>
                         </Form.Control>
@@ -118,11 +115,6 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                     <Form.Group controlId="formStatus">
                         <Form.Label>Bokningsstatus</Form.Label>
                         <Form.Control as="select" name="status" defaultValue={booking.status}>
-                            {booking.status ? null : (
-                                <option value="" selected disabled>
-                                    Välj status
-                                </option>
-                            )}
                             <option value={Status.DRAFT}>{getStatusName(Status.DRAFT)}</option>
                             <option value={Status.BOOKED}>{getStatusName(Status.BOOKED)}</option>
                             <option value={Status.OUT}>{getStatusName(Status.OUT)}</option>
@@ -171,11 +163,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                     <Form.Group controlId="formAccountKind">
                         <Form.Label>Kontotyp</Form.Label>
                         <Form.Control as="select" name="accountKind" defaultValue={booking.accountKind} required>
-                            {booking.accountKind ? null : (
-                                <option value="" selected disabled>
-                                    Välj kontotyp
-                                </option>
-                            )}
+                            {booking.accountKind ? null : <option value="">Välj kontotyp</option>}
                             <option value={AccountKind.EXTERNAL}>{getAccountKindName(AccountKind.EXTERNAL)}</option>
                             <option value={AccountKind.INTERNAL}>{getAccountKindName(AccountKind.INTERNAL)}</option>
                         </Form.Control>
@@ -185,11 +173,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                     <Form.Group controlId="formPricePlan">
                         <Form.Label>Prisplan</Form.Label>
                         <Form.Control as="select" name="pricePlan" defaultValue={booking.pricePlan} required>
-                            {booking.pricePlan ? null : (
-                                <option value="" selected disabled>
-                                    Välj prisplan
-                                </option>
-                            )}
+                            {booking.pricePlan ? null : <option value="">Välj prisplan</option>}
                             <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
                             <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
                         </Form.Control>
@@ -243,7 +227,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                     </Form.Group>
                 </Col>
             </Row>
-            {!booking ? null : (
+            {!booking || isNewBooking ? null : (
                 <>
                     <h6>Fakturainformation</h6>
                     <hr />
@@ -297,11 +281,6 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId 
                             <Form.Group controlId="formSalaryStatus">
                                 <Form.Label>Lönestatus</Form.Label>
                                 <Form.Control as="select" name="salaryStatus" defaultValue={booking.salaryStatus}>
-                                    {booking.salaryStatus ? null : (
-                                        <option selected disabled>
-                                            Välj lönestatus
-                                        </option>
-                                    )}
                                     <option value={SalaryStatus.NOT_SENT}>
                                         {getSalaryStatusName(SalaryStatus.NOT_SENT)}
                                     </option>

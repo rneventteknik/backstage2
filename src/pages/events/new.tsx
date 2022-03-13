@@ -11,6 +11,7 @@ import { getResponseContentOrError } from '../../lib/utils';
 import { Event } from '../../models/interfaces';
 import { Status } from '../../models/enums/Status';
 import Header from '../../components/layout/Header';
+import { SalaryStatus } from '../../models/enums/SalaryStatus';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -43,6 +44,7 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
     const defaultEvent: Partial<Event> = {
         status: Status.DRAFT,
+        salaryStatus: SalaryStatus.NOT_SENT,
     };
 
     return (
@@ -53,7 +55,12 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 </Button>
             </Header>
 
-            <EventForm handleSubmitEvent={handleSubmit} formId="editEventForm" event={defaultEvent} />
+            <EventForm
+                handleSubmitEvent={handleSubmit}
+                formId="editEventForm"
+                event={defaultEvent}
+                isNewBooking={true}
+            />
         </Layout>
     );
 };
