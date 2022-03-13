@@ -14,7 +14,7 @@ import { EquipmentPublicCategory } from '../../models/interfaces/EquipmentPublic
 
 export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment => {
     if (!objectionModel.id) {
-        throw 'Invalid equipment';
+        throw new Error('Invalid equipment');
     }
 
     return {
@@ -34,7 +34,7 @@ export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment
 
 export const toEquipmentTag = (objectionModel: IEquipmentTagObjectionModel): EquipmentTag => {
     if (!objectionModel.id) {
-        throw 'Invalid equipment tag';
+        throw new Error('Invalid equipment tag');
     }
 
     return {
@@ -47,7 +47,7 @@ export const toEquipmentTag = (objectionModel: IEquipmentTagObjectionModel): Equ
 
 export const toEquipmentPrice = (objectionModel: IEquipmentPriceObjectionModel): EquipmentPrice => {
     if (!objectionModel.id) {
-        throw 'Invalid equipment category';
+        throw new Error('Invalid equipment category');
     }
 
     return {
@@ -62,7 +62,7 @@ export const toEquipmentChangelogEntry = (
     objectionModel: IEquipmentChangelogEntryObjectionModel,
 ): EquipmentChangelogEntry => {
     if (!objectionModel.id) {
-        throw 'Invalid equipment change log entry';
+        throw new Error('Invalid equipment change log entry');
     }
 
     return {
@@ -79,7 +79,7 @@ export const toEquipmentPublicCategory = (
     objectionModel: IEquipmentPublicCategoryObjectionModel,
 ): EquipmentPublicCategory => {
     if (!objectionModel.id) {
-        throw 'Invalid equipment public category';
+        throw new Error('Invalid equipment public category');
     }
 
     return {

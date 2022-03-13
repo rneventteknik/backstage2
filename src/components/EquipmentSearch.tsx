@@ -12,11 +12,11 @@ import { toEquipment } from '../lib/mappers/equipment';
 import { BaseEntityWithName } from '../models/interfaces/BaseEntity';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../models/objection-models';
 
-enum ResultType {
+export enum ResultType {
     EQUIPMENT,
     EQUIPMENTPACKAGE,
 }
-interface SearchResultViewModel extends BaseEntityWithName {
+export interface SearchResultViewModel extends BaseEntityWithName {
     type: ResultType;
     url: string;
 }
@@ -139,7 +139,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 {resultWithIndex && resultWithIndex.length > 0 ? (
                     resultWithIndex.map((entity) => (
                         <Typeahead.MenuItem
-                            key={entity.id}
+                            key={entity.type + '-' + entity.id}
                             option={entity}
                             position={entity.index}
                             className={styles.dropdownItem}

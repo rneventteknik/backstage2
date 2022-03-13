@@ -1,21 +1,27 @@
+import { EquipmentPrice } from '.';
 import { BaseEntityWithName } from './BaseEntity';
 import { Equipment } from './Equipment';
-import { EquipmentPackage } from './EquipmentPackage';
 
 export interface EquipmentList extends BaseEntityWithName {
-    equipmentEntries: EquipmentListEntry[];
-    equipmentOutDatetime: Date;
-    equipmentInDatetime: Date;
-    usageStartDatetime: Date;
-    usageEndDatetime: Date;
+    equipmentListEntries: EquipmentListEntry[];
+    equipmentOutDatetime?: Date;
+    equipmentInDatetime?: Date;
+    usageStartDatetime?: Date;
+    usageEndDatetime?: Date;
 }
 
 export interface EquipmentListEntry extends BaseEntityWithName {
-    children: EquipmentListEntry[];
     equipment: Equipment;
-    package: EquipmentPackage;
-    amount: number;
+    equipmentId: number;
+    name: string;
     nameEN: string;
     description: string;
     descriptionEN: string;
+
+    numberOfUnits: number;
+    numberOfHours: number;
+
+    pricePerUnit: number;
+    pricePerHour: number;
+    equipmentPrice: EquipmentPrice;
 }

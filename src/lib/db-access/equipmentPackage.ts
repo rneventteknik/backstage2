@@ -22,7 +22,7 @@ export const fetchEquipmentPackage = async (id: number): Promise<EquipmentPackag
 
     return EquipmentPackageObjectionModel.query()
         .findById(id)
-        .withGraphFetched('equipmentEntries.equipment')
+        .withGraphFetched('equipmentEntries.equipment.prices')
         .withGraphFetched('tags');
 };
 

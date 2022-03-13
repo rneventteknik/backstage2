@@ -35,3 +35,12 @@ export {
     validateUserAuthObjectionModel,
 } from './userAuth';
 export { fetchEquipmentPublicCategories, fetchEquipmentPublicCategoriesPublic } from './equipmentPublicCategories';
+export {
+    fetchEquipmentLists,
+    fetchEquipmentListsForEvent,
+    fetchEquipmentList,
+    insertEquipmentList,
+    updateEquipmentList,
+    deleteEquipmentList,
+    validateEquipmentListObjectionModel,
+} from './equipmentList';

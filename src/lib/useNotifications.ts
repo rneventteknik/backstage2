@@ -55,6 +55,8 @@ type UseNotificationsType = {
     showSaveFailedNotification: (entityType: string) => void;
     showCreateSuccessNotification: (entityType: string) => void;
     showCreateFailedNotification: (entityType: string) => void;
+    showDeleteSuccessNotification: (entityType: string) => void;
+    showDeleteFailedNotification: (entityType: string) => void;
 };
 
 export const useNotifications = (): UseNotificationsType => {
@@ -90,5 +92,11 @@ export const useNotifications = (): UseNotificationsType => {
 
         showCreateFailedNotification: (entityType: string): void =>
             showGeneralDangerMessage(bus, 'Fel!', entityType + ' kunde inte skapas.'),
+
+        showDeleteSuccessNotification: (entityType: string): void =>
+            showGeneralSuccessMessage(bus, 'Borttagen!', entityType + ' har tagits bort.'),
+
+        showDeleteFailedNotification: (entityType: string): void =>
+            showGeneralDangerMessage(bus, 'Fel!', entityType + ' kunde inte tas bort.'),
     };
 };

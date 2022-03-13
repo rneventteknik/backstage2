@@ -15,6 +15,7 @@ import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleto
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import EquipmentLists from '../../../components/events/equipmentLists/equipmentLists';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
@@ -23,13 +24,13 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit event
     //
     const router = useRouter();
-    const { data: event, error, isValidating } = useSwr('/api/events/' + router.query.id, eventFetcher);
+    const { data: event, error } = useSwr('/api/events/' + router.query.id, eventFetcher);
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (isValidating || !event) {
+    if (!event) {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser}></TwoColLoadingPage>;
     }
 
@@ -149,6 +150,9 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
+                </Col>
+                <Col xl={8}>
+                    <EquipmentLists event={event} />
                 </Col>
             </Row>
         </Layout>

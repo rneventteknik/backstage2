@@ -3,7 +3,6 @@ import Layout from '../../components/layout/Layout';
 import { Equipment } from '../../models/interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { formatPrice, formatTHSPrice } from '../../lib/utils';
 import Link from 'next/link';
 import { Badge, Button, Col, Collapse, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
@@ -17,6 +16,7 @@ import { EquipmentTag } from '../../models/interfaces';
 import { equipmentTagsFetcher, equipmentsFetcher } from '../../lib/fetchers';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
+import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>

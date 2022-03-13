@@ -4,15 +4,15 @@ import {
     respondWithCustomErrorMessage,
     respondWithEntityNotFoundResponse,
     respondWithInvalidMethodResponse,
-} from '../../../lib/apiResponses';
-import { fetchEvent } from '../../../lib/db-access';
-import { deleteEvent, validateEventObjectionModel, updateEvent } from '../../../lib/db-access/event';
-import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
-import { Role } from '../../../models/enums/Role';
+} from '../../../../lib/apiResponses';
+import { fetchEvent } from '../../../../lib/db-access';
+import { deleteEvent, validateEventObjectionModel, updateEvent } from '../../../../lib/db-access/event';
+import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
+import { Role } from '../../../../models/enums/Role';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
-        const eventId = Number(req.query.id);
+        const eventId = Number(req.query.eventId);
 
         if (isNaN(eventId)) {
             respondWithEntityNotFoundResponse(res);

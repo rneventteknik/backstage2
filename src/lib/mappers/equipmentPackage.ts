@@ -8,7 +8,7 @@ import { toEquipment, toEquipmentTag } from './equipment';
 
 export const toEquipmentPackage = (objectionModel: IEquipmentPackageObjectionModel): EquipmentPackage => {
     if (!objectionModel.id) {
-        throw 'Invalid equipment package';
+        throw new Error('Invalid equipment package');
     }
 
     return {
@@ -28,7 +28,7 @@ export const toEquipmentPackageEntry = (
     objectionModel: IEquipmentPackageEntryObjectionModel,
 ): EquipmentPackageEntry => {
     if (!objectionModel.id) {
-        throw 'Invalid equipment package entry';
+        throw new Error('Invalid equipment package entry');
     }
 
     return {

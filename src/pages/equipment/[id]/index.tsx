@@ -3,7 +3,6 @@ import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
-import { formatPrice, formatTHSPrice } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
 import Link from 'next/link';
@@ -12,6 +11,7 @@ import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { equipmentFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
+import { formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };

@@ -3,7 +3,8 @@ import { Alert, Table } from 'react-bootstrap';
 import useSwr from 'swr';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
 import { equipmentsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
-import { formatPrice, formatTHSPrice, groupBy } from '../../lib/utils';
+import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
+import { groupBy } from '../../lib/utils';
 import { EquipmentPrice } from '../../models/interfaces';
 
 const containerStyle = {

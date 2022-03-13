@@ -4,7 +4,7 @@ import { toDateOrUndefined } from '../utils';
 
 export const toUser = (objectionModel: IUserObjectionModel): User => {
     if (!objectionModel.id) {
-        throw 'Invalid user';
+        throw new Error('Invalid user');
     }
 
     return {
