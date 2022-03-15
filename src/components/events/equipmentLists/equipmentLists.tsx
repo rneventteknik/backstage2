@@ -302,7 +302,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 <DoubleClickToEdit
                     value={entry.name}
                     onUpdate={(newValue) =>
-                        updateListEntry({ ...entry, name: newValue && newValue.length > 0 ? newValue : list.name })
+                        updateListEntry({ ...entry, name: newValue && newValue.length > 0 ? newValue : entry.name })
                     }
                     size="sm"
                 >
