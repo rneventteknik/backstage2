@@ -41,7 +41,8 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
             defaultValue={value}
             onChange={(e) => setTrackedValue(e.target.value)}
             onBlur={editingComplete}
-            onKeyDown={(e: { key: string }) => (e.key === 'Enter' ? editingComplete() : null)}
+            onKeyDown={(e: React.KeyboardEvent) => (e.key === 'Enter' ? editingComplete() : null)}
+            onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             autoFocus
         />
     );
