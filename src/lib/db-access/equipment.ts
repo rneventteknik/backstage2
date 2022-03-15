@@ -18,7 +18,7 @@ export const searchEquipment = async (searchString: string, count: number): Prom
         .limit(count);
 };
 
-export const fetchEquipment = async (id: number): Promise<EquipmentObjectionModel> => {
+export const fetchEquipment = async (id: number): Promise<EquipmentObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
     return EquipmentObjectionModel.query()
@@ -71,7 +71,7 @@ export const updateEquipment = async (
 
     // Tags.
     if (equipment.tags) {
-        const { toAdd: tagsToAdd, toDelete: tagsToDelete } = compareLists(equipment.tags, existingDatabaseModel.tags);
+        const { toAdd: tagsToAdd, toDelete: tagsToDelete } = compareLists(equipment.tags, existingDatabaseModel?.tags);
 
         tagsToAdd.map(async (x) => {
             await EquipmentObjectionModel.relatedQuery('tags').for(id).relate(x.id);
@@ -86,7 +86,7 @@ export const updateEquipment = async (
     if (equipment.prices !== undefined) {
         const { toAdd: pricesToAdd, toDelete: pricesToDelete, toUpdate: pricesToUpdate } = compareLists(
             equipment.prices,
-            existingDatabaseModel.prices,
+            existingDatabaseModel?.prices,
         );
 
         pricesToAdd.map(async (x) => {

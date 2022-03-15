@@ -17,7 +17,7 @@ export const searchUsers = async (searchString: string, count: number): Promise<
         .limit(count);
 };
 
-export const fetchUser = async (id: number, includePersonalInformation = false): Promise<UserObjectionModel> => {
+export const fetchUser = async (id: number, includePersonalInformation = false): Promise<UserObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
     const query = UserObjectionModel.query().findById(id).withGraphFetched('userAuth');

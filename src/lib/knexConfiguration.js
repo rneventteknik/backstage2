@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: './.env.local' });
 
 const sqliteConfiguration = {
-    client: 'sqlite3',
+    client: 'better-sqlite3',
     connection: {
         filename: './dev.sqlite3',
     },

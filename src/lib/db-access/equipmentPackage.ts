@@ -20,7 +20,7 @@ export const searchEquipmentPackage = async (
         .limit(count);
 };
 
-export const fetchEquipmentPackage = async (id: number): Promise<EquipmentPackageObjectionModel> => {
+export const fetchEquipmentPackage = async (id: number): Promise<EquipmentPackageObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
     return EquipmentPackageObjectionModel.query()
@@ -52,7 +52,7 @@ export const updateEquipmentPackage = async (
     if (equipmentPackage.tags) {
         const { toAdd: tagsToAdd, toDelete: tagsToDelete } = compareLists(
             equipmentPackage.tags,
-            existingDatabaseModel.tags,
+            existingDatabaseModel?.tags,
         );
 
         tagsToAdd.map(async (x) => {
@@ -70,7 +70,7 @@ export const updateEquipmentPackage = async (
             toAdd: equipmentEntriesToAdd,
             toDelete: equipmentEntriesToDelete,
             toUpdate: equipmentEntriesToUpdate,
-        } = compareLists(equipmentPackage.equipmentEntries, existingDatabaseModel.equipmentEntries);
+        } = compareLists(equipmentPackage.equipmentEntries, existingDatabaseModel?.equipmentEntries);
 
         equipmentEntriesToAdd.map(async (x) => {
             await EquipmentPackageObjectionModel.relatedQuery('equipmentEntries')

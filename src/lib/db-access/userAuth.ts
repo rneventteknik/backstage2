@@ -16,7 +16,7 @@ export const fetchUserAuth = async (username: string): Promise<UserAuthObjection
         .then((users) => users[0]);
 };
 
-export const fetchUserAuthById = async (id: number): Promise<UserAuthObjectionModel> => {
+export const fetchUserAuthById = async (id: number): Promise<UserAuthObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
     return UserAuthObjectionModel.query().findById(id).withGraphFetched('user');

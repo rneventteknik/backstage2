@@ -4,9 +4,9 @@ import {
     EventObjectionModel,
 } from '../../models/objection-models/EventObjectionModel';
 import { ensureDatabaseIsInitialized } from '../database';
-import { removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
+import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
-export const fetchEquipmentList = async (id: number): Promise<EquipmentListObjectionModel> => {
+export const fetchEquipmentList = async (id: number): Promise<EquipmentListObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
     return EquipmentListObjectionModel.query()
@@ -42,18 +42,9 @@ export const updateEquipmentList = async (
 
     // List entries.
     if (equipmentList.equipmentListEntries !== undefined) {
-        const listEntriesToAdd = equipmentList.equipmentListEntries.filter(
-            (entry) => !existingDatabaseModel.equipmentListEntries.map((x) => x.id).includes(entry.id),
-        );
-
-        const listEntriesToDelete = existingDatabaseModel.equipmentListEntries.filter(
-            (entry) => !equipmentList.equipmentListEntries.map((x) => x.id).includes(entry.id),
-        );
-
-        const listEntriesToUpdate = equipmentList.equipmentListEntries.filter(
-            (entry) =>
-                !listEntriesToAdd.map((x) => x.id).includes(entry.id) &&
-                !listEntriesToDelete.map((x) => x.id).includes(entry.id),
+        const { toAdd: listEntriesToAdd, toDelete: listEntriesToDelete, toUpdate: listEntriesToUpdate } = compareLists(
+            equipmentList.equipmentListEntries,
+            existingDatabaseModel?.equipmentListEntries,
         );
 
         listEntriesToAdd.map(async (x) => {

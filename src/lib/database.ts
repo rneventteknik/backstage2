@@ -13,7 +13,7 @@ export const ensureDatabaseIsInitialized: () => void = () => {
     }
 
     const knex = Knex(knexConfiguration.development); // TODO: Choose environment intelligently
-    Model.knex(knex);
+    Model.knex(knex as any); // TODO: Solve types
     databaseIsInitialized = true;
 };
 

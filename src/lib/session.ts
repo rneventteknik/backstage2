@@ -1,10 +1,23 @@
-import { withIronSession, Handler } from 'next-iron-session';
+import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next';
+import { NextApiHandler } from 'next';
+import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 
-const withSession = (handler: Handler): ((...args: unknown[]) => Promise<unknown>) =>
-    withIronSession(handler, {
-        password: process.env.SECRET_COOKIE_PASSWORD || '',
-        cookieName: 'backstage2',
-        cookieOptions: { secure: false },
-    });
+declare module "iron-session" {
+    interface IronSessionData {
+        user?: CurrentUserInfo
+    }
+}
 
-export default withSession;
+const options = {
+    password: process.env.SECRET_COOKIE_PASSWORD || '',
+    cookieName: 'backstage2',
+    cookieOptions: { secure: false },
+}
+
+const withApiSession = (handler: NextApiHandler): NextApiHandler =>
+    withIronSessionApiRoute(handler, options);
+
+const withSsrSession = (handler: any): any =>
+    withIronSessionSsr(handler, options)
+
+export {withApiSession, withSsrSession};

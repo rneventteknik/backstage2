@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { Session } from 'next-iron-session';
+import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import { IronSession } from 'iron-session';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { respondWithAccessDeniedResponse } from './apiResponses';
 import { getAndVerifyUser } from './authenticate';
-import withSession from './session';
+import { withApiSession } from './session';
 
 export interface SessionContext {
     currentUser: CurrentUserInfo;
@@ -13,9 +13,9 @@ export interface SessionContext {
 // user is logged in this function calls the specified handler with the standard req and res parameters,
 // as well as a context object with information about the context of the request (such as the current user)
 export const withSessionContext = (
-    handler: (req: NextApiRequest & { session: Session }, res: NextApiResponse, context: SessionContext) => unknown,
-): ((...args: unknown[]) => Promise<unknown>) => {
-    const internalHandler = async (req: NextApiRequest & { session: Session }, res: NextApiResponse) => {
+    handler: (req: NextApiRequest & { session: IronSession }, res: NextApiResponse, context: SessionContext) => void,
+): NextApiHandler => {
+    const internalHandler = async (req: NextApiRequest & { session: IronSession }, res: NextApiResponse) => {
         const currentUser = await getAndVerifyUser(req);
 
         if (!currentUser.isLoggedIn) {
@@ -26,5 +26,5 @@ export const withSessionContext = (
         return handler(req, res, { currentUser: currentUser });
     };
 
-    return withSession(internalHandler);
+    return withApiSession(internalHandler);
 };

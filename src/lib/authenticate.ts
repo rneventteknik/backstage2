@@ -3,7 +3,7 @@ import { fetchUserAuth } from './db-access';
 import { UserAuthObjectionModel } from '../models/objection-models/UserObjectionModel';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { NextApiRequest } from 'next';
-import { Session } from 'next-iron-session';
+import { IronSession } from 'iron-session';
 import { fetchUserAuthById } from './db-access/userAuth';
 
 export const authenticate = async (username: string, password: string): Promise<UserAuthObjectionModel | null> => {
@@ -21,7 +21,7 @@ export const getHashedPassword = async (password: string): Promise<string> => {
 };
 
 export const setSessionCookie = async (
-    req: NextApiRequest & { session: Session },
+    req: NextApiRequest & { session: IronSession },
     authUser: UserAuthObjectionModel,
     userInfoOverride: Partial<CurrentUserInfo> = {},
 ): Promise<CurrentUserInfo> => {
@@ -34,18 +34,18 @@ export const setSessionCookie = async (
         ...userInfoOverride,
     };
 
-    req.session.set('user', user);
+    req.session.user = user;
     await req.session.save();
 
     return user;
 };
 
-export const destroySessionCookie = (req: NextApiRequest & { session: Session }): void => req.session.destroy();
+export const destroySessionCookie = (req: NextApiRequest & { session: IronSession }): void => req.session.destroy();
 
-export const getUserFromReq = (req: NextApiRequest & { session: Session }): CurrentUserInfo =>
-    req.session.get<CurrentUserInfo>('user') ?? { isLoggedIn: false };
+export const getUserFromReq = (req: NextApiRequest & { session: IronSession }): CurrentUserInfo =>
+    req.session.user ?? { isLoggedIn: false };
 
-export const getAndVerifyUser = async (req: NextApiRequest & { session: Session }): Promise<CurrentUserInfo> => {
+export const getAndVerifyUser = async (req: NextApiRequest & { session: IronSession }): Promise<CurrentUserInfo> => {
     const currentUser = getUserFromReq(req);
 
     // We only need to verify the user if we are logged in

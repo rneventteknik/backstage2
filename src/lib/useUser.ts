@@ -1,12 +1,12 @@
 import { GetServerSidePropsResult, NextApiRequest } from 'next';
-import { Session } from 'next-iron-session';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { Role } from '../models/enums/Role';
-import withSession from './session';
+import { withSsrSession } from './session';
 import { getAndVerifyUser } from './authenticate';
+import { IronSession } from 'iron-session';
 
 type inputDataType = {
-    req: NextApiRequest & { session: Session };
+    req: NextApiRequest & { session: IronSession };
 };
 
 type OutputType = () => Promise<unknown>;
@@ -20,7 +20,7 @@ const useUser = (
     redirectUrlIfLoggedIn?: string,
     requiredRole: Role = Role.READONLY,
 ): OutputType =>
-    withSession(
+    withSsrSession(
         async ({ req }: inputDataType): Promise<GetServerSidePropsResult<{ user: CurrentUserInfo }>> => {
             const user = await getAndVerifyUser(req);
 
