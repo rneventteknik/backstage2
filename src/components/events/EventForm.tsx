@@ -17,6 +17,7 @@ import { AccountKind } from '../../models/enums/AccountKind';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { SalaryStatus } from '../../models/enums/SalaryStatus';
 import { usersFetcher } from '../../lib/fetchers';
+import RequiredIndicator from '../utils/RequiredIndicator';
 
 type Props = {
     handleSubmitEvent: (event: Partial<IEventObjectionModel>) => void;
@@ -82,6 +83,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
             invoiceNumber: form.invoiceNumber?.value,
             salaryStatus: form.salaryStatus?.value,
             returnalNote: form.returnalNote?.value,
+            calendarEventId: form.calendarEventId?.value,
         };
 
         handleSubmitEvent(modifiedBooking);
@@ -91,7 +93,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
             <Row>
                 <Col lg="6">
                     <Form.Group controlId="formName">
-                        <Form.Label>Namn</Form.Label>
+                        <Form.Label>Namn<RequiredIndicator /></Form.Label>
                         <Form.Control
                             required
                             type="text"
@@ -103,7 +105,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
                 </Col>
                 <Col lg="3" md="6" sm="6">
                     <Form.Group controlId="formEventType">
-                        <Form.Label>Bokningstyp</Form.Label>
+                        <Form.Label>Bokningstyp<RequiredIndicator /></Form.Label>
                         <Form.Control as="select" name="bookingType" defaultValue={booking.eventType}>
                             {booking.eventType ? null : <option value="">Välj bokningstyp</option>}
                             <option value={EventType.GIG}>{getEventTypeName(EventType.GIG)}</option>
@@ -113,17 +115,21 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
                 </Col>
                 <Col lg="3" md="6" sm="6">
                     <Form.Group controlId="formStatus">
-                        <Form.Label>Bokningsstatus</Form.Label>
-                        <Form.Control as="select" name="status" defaultValue={booking.status}>
+                        <Form.Label>Bokningsstatus<RequiredIndicator /></Form.Label>
+                        <Form.Control as="select" name="status" defaultValue={booking.status} disabled={isNewBooking}>
                             <option value={Status.DRAFT}>{getStatusName(Status.DRAFT)}</option>
-                            <option value={Status.BOOKED}>{getStatusName(Status.BOOKED)}</option>
-                            <option value={Status.OUT}>{getStatusName(Status.OUT)}</option>
-                            <option value={Status.ONGOING}>{getStatusName(Status.ONGOING)}</option>
-                            <option value={Status.RETURNED}>{getStatusName(Status.RETURNED)}</option>
-                            <option value={Status.DONE}>{getStatusName(Status.DONE)}</option>
-                            <option value={Status.INVOICED}>{getStatusName(Status.INVOICED)}</option>
-                            <option value={Status.PAID}>{getStatusName(Status.PAID)}</option>
-                            <option value={Status.CANCELED}>{getStatusName(Status.CANCELED)}</option>
+                            {isNewBooking ? null : 
+                                <>
+                                    <option value={Status.BOOKED}>{getStatusName(Status.BOOKED)}</option>
+                                    <option value={Status.OUT}>{getStatusName(Status.OUT)}</option>
+                                    <option value={Status.ONGOING}>{getStatusName(Status.ONGOING)}</option>
+                                    <option value={Status.RETURNED}>{getStatusName(Status.RETURNED)}</option>
+                                    <option value={Status.DONE}>{getStatusName(Status.DONE)}</option>
+                                    <option value={Status.INVOICED}>{getStatusName(Status.INVOICED)}</option>
+                                    <option value={Status.PAID}>{getStatusName(Status.PAID)}</option>
+                                    <option value={Status.CANCELED}>{getStatusName(Status.CANCELED)}</option>
+                                </>
+                            }
                         </Form.Control>
                     </Form.Group>
                 </Col>
@@ -161,7 +167,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
             <Row>
                 <Col lg="6">
                     <Form.Group controlId="formAccountKind">
-                        <Form.Label>Kontotyp</Form.Label>
+                        <Form.Label>Kontotyp<RequiredIndicator /></Form.Label>
                         <Form.Control as="select" name="accountKind" defaultValue={booking.accountKind} required>
                             {booking.accountKind ? null : <option value="">Välj kontotyp</option>}
                             <option value={AccountKind.EXTERNAL}>{getAccountKindName(AccountKind.EXTERNAL)}</option>
@@ -171,7 +177,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
                 </Col>
                 <Col lg="6">
                     <Form.Group controlId="formPricePlan">
-                        <Form.Label>Prisplan</Form.Label>
+                        <Form.Label>Prisplan<RequiredIndicator /></Form.Label>
                         <Form.Control as="select" name="pricePlan" defaultValue={booking.pricePlan} required>
                             {booking.pricePlan ? null : <option value="">Välj prisplan</option>}
                             <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
@@ -193,7 +199,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
             <Row>
                 <Col lg="4" md="4">
                     <Form.Group controlId="formContactPersonName">
-                        <Form.Label>Namn</Form.Label>
+                        <Form.Label>Namn<RequiredIndicator /></Form.Label>
                         <Form.Control
                             required
                             type="text"
@@ -205,7 +211,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
                 </Col>
                 <Col lg="4" md="4">
                     <Form.Group controlId="formContactPersonEmail">
-                        <Form.Label>Email</Form.Label>
+                        <Form.Label>Email<RequiredIndicator /></Form.Label>
                         <Form.Control
                             required
                             type="text"
@@ -304,6 +310,12 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
                     </Row>
                 </>
             )}
+
+            <Form.Control
+                type="hidden"
+                name="calendarEventId"
+                defaultValue={booking?.calendarEventId}
+            />
         </Form>
     );
 };

@@ -41,6 +41,20 @@ export const formatDate = (date: Date): string => date.toLocaleString('sv-SE', d
 //
 export const validDate = (date: Date | undefined): boolean => !!date && date instanceof Date && !isNaN(date.getTime());
 
+export const convertToDateOrUndefined = (newDateString: string | undefined): Date | undefined => {
+    if (!newDateString) {
+        return undefined;
+    }
+
+    const date = new Date(newDateString);
+
+    if (isNaN(date.getTime())) {
+        return undefined;
+    }
+
+    return date;
+};
+
 // Get string from status code
 //
 export const getStatusName = (status: Status): string => {

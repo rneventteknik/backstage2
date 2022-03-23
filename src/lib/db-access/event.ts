@@ -40,6 +40,14 @@ export const fetchEvent = async (id: number): Promise<EventObjectionModel> => {
         .then((events) => events[0]);
 };
 
+export const fetchFirstEventByCalendarEventId = async (calendarEventId: string): Promise<EventObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    return EventObjectionModel.query()
+        .where('calendarEventId', calendarEventId)
+        .then((events) => events[0]);
+};
+
 export const updateEvent = async (id: number, event: EventObjectionModel): Promise<EventObjectionModel> => {
     ensureDatabaseIsInitialized();
 

@@ -32,4 +32,5 @@ export interface Event extends BaseEntityWithName {
     contactPersonName: string;
     contactPersonPhone: string;
     contactPersonEmail: string;
+    calendarEventId: string;
 }

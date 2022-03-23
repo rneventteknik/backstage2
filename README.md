@@ -32,6 +32,9 @@ DB_SSL={true or false (optional, only needed when using PostgreSQL)}
 NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS={json array with external links, where each link is an object with a title and an url attribute (optional, defaults to empty list)}
 
 MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay logged in. (optional, defaults to forever if not set)}
+
+CALENDAR_API_KEY={Google Calender API Key, with read-access to calendars}
+CALENDAR_ID={Google Calender ID to fetch events from}
 ```
 
 ### Version Control ###

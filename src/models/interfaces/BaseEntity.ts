@@ -10,3 +10,7 @@ export interface BaseEntity extends HasId {
 export interface HasId {
     id: number;
 }
+
+export interface HasStringId {
+    id: string;
+}

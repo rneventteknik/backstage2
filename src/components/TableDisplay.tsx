@@ -1,11 +1,11 @@
 import React, { ChangeEvent } from 'react';
 import { FormControl, FormGroup } from 'react-bootstrap';
 import Table from 'react-bootstrap/Table';
-import { BaseEntity } from '../models/interfaces/BaseEntity';
+import { HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import TableFooterWithViewCount from './utils/TableFooter';
 import styles from './TableDisplay.module.scss';
 
-export type TableConfiguration<T extends BaseEntity> = {
+export type TableConfiguration<T extends HasId | HasStringId> = {
     entityTypeDisplayName: string;
     defaultSortPropertyName: string;
     noResultsLabel?: string;
@@ -25,13 +25,13 @@ export type TableConfiguration<T extends BaseEntity> = {
     }[];
 };
 
-type ListProps<T extends BaseEntity> = {
+type ListProps<T extends HasId | HasStringId> = {
     entities: T[];
     configuration: TableConfiguration<T>;
     filterString?: string;
 };
 
-export function TableDisplay<T extends BaseEntity>({
+export function TableDisplay<T extends HasId | HasStringId>({
     entities,
     configuration,
     filterString: filterStringFromParent,
