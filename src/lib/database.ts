@@ -12,8 +12,8 @@ export const ensureDatabaseIsInitialized: () => void = () => {
         return;
     }
 
-    const knex = Knex(knexConfiguration.development); // TODO: Choose environment intelligently
-    Model.knex(knex as any); // TODO: Solve types
+    const knex = Knex<Record<string, unknown>[], Record<string, unknown>[]>(knexConfiguration.development); // TODO: Choose environment intelligently
+    Model.knex(knex);
     databaseIsInitialized = true;
 };
 

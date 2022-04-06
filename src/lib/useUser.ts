@@ -3,13 +3,8 @@ import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { Role } from '../models/enums/Role';
 import { withSsrSession } from './session';
 import { getAndVerifyUser } from './authenticate';
-import { IronSession } from 'iron-session';
+import { IncomingMessage } from 'http';
 
-type inputDataType = {
-    req: NextApiRequest & { session: IronSession };
-};
-
-type OutputType = () => Promise<unknown>;
 
 // This function returns the current user. Depending on if the user is logged in or not
 // and the user's privileges in relation to the specified required role, a redirect will
@@ -19,10 +14,11 @@ const useUser = (
     redirectUrlIfInsufficientAccess?: string,
     redirectUrlIfLoggedIn?: string,
     requiredRole: Role = Role.READONLY,
-): OutputType =>
+) =>
     withSsrSession(
-        async ({ req }: inputDataType): Promise<GetServerSidePropsResult<{ user: CurrentUserInfo }>> => {
-            const user = await getAndVerifyUser(req);
+        async ({ req }): Promise<GetServerSidePropsResult<{user: CurrentUserInfo}>> => {
+            // The typing of withSsrSession are incorrect, so we need to cast it to NextApiRequest & IncomingMessage
+            const user = await getAndVerifyUser(req as NextApiRequest & IncomingMessage);
 
             const insufficientAccess =
                 (requiredRole == Role.ADMIN && user?.role != Role.ADMIN) ||
@@ -45,10 +41,10 @@ const useUser = (
                     user: user,
                 },
             };
-        },
+        }
     );
 
-const useUserWithDefaultAccessControl = (requiredRole: Role = Role.READONLY): OutputType => {
+const useUserWithDefaultAccessControl = (requiredRole: Role = Role.READONLY) => {
     return useUser('/login', '/no-access', undefined, requiredRole);
 };
 

@@ -1,10 +1,8 @@
-import { NextApiRequest, NextApiResponse } from 'next';
-import { IronSession } from 'iron-session';
 import { setSessionCookie, authenticate } from '../../../lib/authenticate';
 import { withApiSession } from '../../../lib/session';
 
 const handler = withApiSession(
-    async (req: NextApiRequest & { session: IronSession }, res: NextApiResponse): Promise<void> => {
+    async (req, res) => {
         const requestBody: { username: string; password: string } = await req.body;
         const username = requestBody.username;
         const password = requestBody.password;

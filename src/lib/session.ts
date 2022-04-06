@@ -1,5 +1,5 @@
 import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next';
-import { NextApiHandler } from 'next';
+import { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandler } from 'next';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 
 declare module "iron-session" {
@@ -14,10 +14,12 @@ const options = {
     cookieOptions: { secure: false },
 }
 
-const withApiSession = (handler: NextApiHandler): NextApiHandler =>
-    withIronSessionApiRoute(handler, options);
+export function withApiSession(handler: NextApiHandler): NextApiHandler {
+    return withIronSessionApiRoute(handler, options);
+}
 
-const withSsrSession = (handler: any): any =>
-    withIronSessionSsr(handler, options)
+export function withSsrSession<T extends {[key: string]: unknown;}>(handler: (context: GetServerSidePropsContext) => GetServerSidePropsResult<T> | Promise<GetServerSidePropsResult<T>>) {
+    return withIronSessionSsr(handler, options)
+}
 
-export {withApiSession, withSsrSession};
+export {options}
