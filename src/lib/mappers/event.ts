@@ -67,10 +67,6 @@ export const toEquipmentListObjectionModel = (
     clientModel: EquipmentList,
     eventId: number,
 ): PartialDeep<IEquipmentListObjectionModel> => {
-    if (!clientModel.id) {
-        throw new Error('Invalid equipment list');
-    }
-
     return {
         ...clientModel,
         created: undefined,
@@ -90,10 +86,6 @@ export const toEquipmentListObjectionModel = (
 export const toEquipmentListEntryObjectionModel = (
     clientModel: EquipmentListEntry,
 ): Partial<IEquipmentListEntryObjectionModel> => {
-    if (!clientModel.id || !clientModel.equipment) {
-        throw new Error('Invalid equipment list entry');
-    }
-
     return {
         ...clientModel,
         created: undefined,

@@ -15,7 +15,7 @@ import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleto
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import EquipmentLists from '../../../components/events/equipmentLists/equipmentLists';
+import EquipmentLists from '../../../components/events/equipmentLists/EquipmentLists';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };

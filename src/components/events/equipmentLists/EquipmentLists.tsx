@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Col, Dropdown, DropdownButton, Modal, Row } from 'react-bootstrap';
+import { Button, Card, Col, Dropdown, DropdownButton, Form, InputGroup, Modal, Row } from 'react-bootstrap';
 import { Equipment, EquipmentPrice, Event } from '../../../models/interfaces';
 import useSwr from 'swr';
 import { equipmentListFetcher, equipmentListsFetcher } from '../../../lib/fetchers';
@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faExclamationCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
-import { getResponseContentOrError } from '../../../lib/utils';
+import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
 import {
     EquipmentListObjectionModel,
     IEquipmentListObjectionModel,
@@ -122,6 +122,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     const { showSaveSuccessNotification, showSaveFailedNotification, showErrorMessage } = useNotifications();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showListContent, setShowListContent] = useState(true);
+    const [equipmentListEntryToEditViewModel, setEquipmentListEntryToEditViewModel] = useState<Partial<EquipmentListEntry> | null>(null);
 
     // Error handling
     //
@@ -195,12 +196,14 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     // Helper functions to add equipment
     //
 
+    const getNextEquipmentListEntryId = () => Math.min(-1, ...(list?.equipmentListEntries ?? []).map((x) => x.id)) - 1;
+    
     const addEquipment = (equipment: Equipment, numberOfUnits?: number) => {
         addMultipleEquipment([{ equipment, numberOfUnits }]);
     };
 
     const addMultipleEquipment = (entries: { equipment: Equipment; numberOfUnits?: number }[]) => {
-        let nextId = Math.max(1, ...(list?.equipmentListEntries ?? []).map((x) => x.id)) + 1;
+        let nextId = getNextEquipmentListEntryId();
         const entriesToAdd = entries.map((x) => {
             // This id is only used in the client, it is striped before sending to the server
             return getDefaultListEntryFromEquipment(
@@ -293,6 +296,10 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         saveList({ ...list, equipmentListEntries: newEquipmentListEntries });
     };
 
+    // Helper functions
+    //
+    const priceDisplayFn = booking.pricePlan === PricePlan.EXTERNAL ? formatPrice : formatTHSPrice;
+
     // Table display functions
     //
 
@@ -340,7 +347,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             <DoubleClickToEdit
                 value={entry.numberOfUnits?.toString()}
                 onUpdate={(newValue) =>
-                    updateListEntry({ ...entry, numberOfUnits: isNaN(parseInt(newValue)) ? 0 : parseInt(newValue) })
+                    updateListEntry({ ...entry, numberOfUnits: toIntOrUndefined(newValue) ?? 0 })
                 }
                 size="sm"
             >
@@ -360,7 +367,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             <DoubleClickToEdit
                 value={entry.numberOfHours.toString()}
                 onUpdate={(newValue) =>
-                    updateListEntry({ ...entry, numberOfHours: isNaN(parseInt(newValue)) ? 0 : parseInt(newValue) })
+                    updateListEntry({ ...entry, numberOfHours: toIntOrUndefined(newValue) ?? 0 })
                 }
                 size="sm"
             >
@@ -370,7 +377,6 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     };
 
     const EquipmentListEntryPriceDisplayFn = (entry: EquipmentListEntry) => {
-        const priceDisplayFn = booking.pricePlan === PricePlan.EXTERNAL ? formatPrice : formatTHSPrice;
         return (
             entry.equipment ?
                 <>
@@ -402,9 +408,18 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     const EquipmentListEntryActionsDisplayFn = (entry: EquipmentListEntry) => {
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
-                <Dropdown.Item href={'/equipment/' + entry.equipmentId} target="_blank">
+                <Dropdown.Item 
+                href={'/equipment/' + entry.equipmentId}
+                target="_blank"
+                disabled={!entry.equipment}>
                     Öppna utrustning i ny flik
                 </Dropdown.Item>
+                <Dropdown.Item
+                    onClick={() => setEquipmentListEntryToEditViewModel(entry)}
+                >
+                    Avancerad redigering
+                </Dropdown.Item>
+                <Dropdown.Divider />
                 <Dropdown.Item
                     disabled={!entry.equipment}
                     onClick={() => entry.equipment ? updateListEntry(getDefaultListEntryFromEquipment(entry.equipment, entry.id)) : null}
@@ -501,6 +516,13 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             <FontAwesomeIcon icon={showListContent ? faAngleUp : faAngleDown} />
                         </Button>
                         <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                            <Dropdown.Item onClick={() => setEquipmentListEntryToEditViewModel({
+                                numberOfUnits: 1,
+                                numberOfHours: 0,
+                            })}>
+                                Lägg till egen rad
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
                             <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
                                 Töm utrustningslistan
                             </Dropdown.Item>
@@ -593,7 +615,167 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     </Button>
                 </Modal.Footer>
             </Modal>
-        </Card>
+
+            <Modal show={!!equipmentListEntryToEditViewModel} onHide={() => setEquipmentListEntryToEditViewModel(null)} size="lg">
+                {!!equipmentListEntryToEditViewModel ?
+                    <Modal.Body>
+                        <Row>
+                            <Col md={4}>
+                                <Form.Group>
+                                    <Form.Label>Namn</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        value={equipmentListEntryToEditViewModel?.name}
+                                        onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, name: e.target.value})}
+                                    />
+                                </Form.Group>
+                            </Col>
+                            <Col md={4} xs={6}>
+                                <Form.Group>
+                                    <Form.Label>Antal</Form.Label>
+                                    <InputGroup>
+                                        <Form.Control
+                                            type="text"
+                                            value={equipmentListEntryToEditViewModel?.numberOfUnits}
+                                            onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, numberOfUnits: toIntOrUndefined(e.target.value)})}
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>st</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+                            </Col>
+                            <Col md={4} xs={6}>
+                                <Form.Group>
+                                    <Form.Label>Timmar</Form.Label>
+                                    <InputGroup>
+                                        <Form.Control
+                                            type="text"
+                                            value={equipmentListEntryToEditViewModel.numberOfHours}
+                                            onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, numberOfHours: toIntOrUndefined(e.target.value)})}
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>h</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col md={4}>
+                                <Form.Group>
+                                    <Form.Label>Pris</Form.Label>
+
+                                    <Form.Control
+                                        as="select"
+                                        disabled={!equipmentListEntryToEditViewModel.equipment}
+                                        defaultValue={equipmentListEntryToEditViewModel.equipmentPrice?.id}
+                                        onChange={(e) => {
+                                            const newEquipmentPrice = equipmentListEntryToEditViewModel.equipment?.prices.filter(x => x.id == toIntOrUndefined(e.target.value))[0];
+                                            setEquipmentListEntryToEditViewModel({ ...equipmentListEntryToEditViewModel, ...(newEquipmentPrice ? getEquipmentListEntryPrices(newEquipmentPrice) : { equipmentPrice: undefined }) })
+                                        }}
+                                    >
+                                        {equipmentListEntryToEditViewModel.equipment?.prices?.map((x) => (
+                                            <option key={x.id.toString()} value={x.id.toString()}>
+                                                {x.name} {priceDisplayFn(x)}
+                                            </option>
+                                        ))}
+                                        <option value={undefined}>Eget pris</option>
+                                    </Form.Control>
+                                </Form.Group>
+                            </Col>
+                            <Col md={4} xs={6}>
+                                <Form.Group>
+                                    <Form.Label>Pris per styck</Form.Label>
+                                    <InputGroup>
+                                        <Form.Control
+                                            type="text"
+                                            disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
+                                            value={equipmentListEntryToEditViewModel?.pricePerUnit}
+                                            onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, pricePerUnit: toIntOrUndefined(e.target.value)})}
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>kr/st</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+                            </Col>
+                            <Col md={4} xs={6}>
+                                <Form.Group>
+                                    <Form.Label>Pris per timme</Form.Label>
+                                    <InputGroup>
+                                        <Form.Control
+                                            type="text"
+                                            disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
+                                            value={equipmentListEntryToEditViewModel?.pricePerHour}
+                                            onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, pricePerHour: toIntOrUndefined(e.target.value)})}
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>kr/h</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col>
+                                <Form.Group controlId="formPrices">
+                                    <Form.Label>Beskrivning</Form.Label>
+                                    <Form.Control
+                                        as="textarea"
+                                        value={equipmentListEntryToEditViewModel?.description}
+                                        onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, description: e.target.value})}
+                                        />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        {!!equipmentListEntryToEditViewModel.equipment ?
+                            <p className="text-muted">
+                                <span>Den här raden är länkad till utrustningen <em>{equipmentListEntryToEditViewModel.equipment.name}</em>. </span>
+                                <a href="#" className="text-danger" onClick={() => setEquipmentListEntryToEditViewModel({ ...equipmentListEntryToEditViewModel, equipment: undefined, equipmentId: undefined, equipmentPrice: undefined })}>Ta bort koppling</a>
+                            </p> 
+                            : null}
+                    </Modal.Body> : null}
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setEquipmentListEntryToEditViewModel(null)}>
+                        Avbryt
+                    </Button>
+                    <Button variant="primary" 
+                        disabled={!equipmentListEntryToEditViewModel?.name} 
+                        onClick={() => {
+                            if (!equipmentListEntryToEditViewModel) {
+                                throw new Error('Invalid equipmentListEntryToEditViewModel');
+                            }
+
+                            // Since we are editing a partial model we need to set default values to any properties without value before saving
+                            const entryToSave: EquipmentListEntry = {
+                                id: equipmentListEntryToEditViewModel.id ?? getNextEquipmentListEntryId(),
+                                equipment: equipmentListEntryToEditViewModel.equipment,
+                                equipmentId: equipmentListEntryToEditViewModel.equipmentId,
+                                name: equipmentListEntryToEditViewModel.name ?? '',
+                                nameEN: equipmentListEntryToEditViewModel.nameEN ?? '',
+                                description: equipmentListEntryToEditViewModel.description ?? '',
+                                descriptionEN: equipmentListEntryToEditViewModel.descriptionEN ?? '',
+                                numberOfUnits: equipmentListEntryToEditViewModel.numberOfUnits ?? 1,
+                                numberOfHours: equipmentListEntryToEditViewModel.numberOfHours ?? 0,
+                                pricePerUnit: equipmentListEntryToEditViewModel.pricePerUnit ?? 0,
+                                pricePerHour: equipmentListEntryToEditViewModel.pricePerHour ?? 0,
+                                equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
+                            }
+
+                            if (equipmentListEntryToEditViewModel.id) {
+                                updateListEntry(entryToSave);
+                            } else {
+                                saveList({ ...list, equipmentListEntries: [...list.equipmentListEntries, entryToSave] });
+                            }
+                            
+                            setEquipmentListEntryToEditViewModel(null);
+                        }}>
+                        Spara
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </Card >
     );
 };
 
