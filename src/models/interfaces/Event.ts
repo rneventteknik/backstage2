@@ -13,7 +13,7 @@ import { SalaryStatus } from '../enums/SalaryStatus';
 export interface Event extends BaseEntityWithName {
     ownerUser?: User;
     coOwnerUsers?: User[];
-    equipmenttLists?: EquipmentList[];
+    equipmentLists?: EquipmentList[];
     timeEstimates?: TimeEstimate[];
     timeReports?: TimeReport[];
     changelog?: EventChangelogEntry[];

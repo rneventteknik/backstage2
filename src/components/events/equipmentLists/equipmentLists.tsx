@@ -19,7 +19,7 @@ import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../..
 import { toEquipment } from '../../../lib/mappers/equipment';
 import Skeleton from 'react-loading-skeleton';
 import { DoubleClickToEditDate, DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
-import { formatNumberAsCurrency, formatPrice, formatTHSPrice, getPrice } from '../../../lib/pricingUtils';
+import { formatNumberAsCurrency, formatPrice, formatTHSPrice, getEquipmentListPrice, getNumberOfDays, getNumberOfEquipmentOutDays, getPrice } from '../../../lib/pricingUtils';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import { HasId } from '../../../models/interfaces/BaseEntity';
@@ -180,7 +180,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             id: id,
             equipment: equipment,
             equipmentId: equipment.id,
-            numberOfUnits: prices.pricePerUnit > 0 ? 1 : 0,
+            numberOfUnits: 1,
             numberOfHours: prices.pricePerHour > 0 ? 1 : 0,
             name: equipment.name,
             nameEN: equipment.nameEN,
@@ -332,7 +332,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     const EquipmentListEntryNumberOfUnitsDisplayFn = (entry: EquipmentListEntry) => {
         const valueIsRelevant = entry.pricePerUnit !== 0;
 
-        if (!valueIsRelevant && entry.numberOfUnits === 0) {
+        if (!valueIsRelevant && entry.numberOfUnits === 1) {
             return <></>;
         }
 
@@ -372,30 +372,31 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     const EquipmentListEntryPriceDisplayFn = (entry: EquipmentListEntry) => {
         const priceDisplayFn = booking.pricePlan === PricePlan.EXTERNAL ? formatPrice : formatTHSPrice;
         return (
-            <>
-                <DoubleClickToEditDropdown<EquipmentPrice>
-                    options={entry.equipment.prices}
-                    value={entry.equipmentPrice ?? entry.equipment.prices[0]}
-                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(x)}`}
-                    optionKeyFn={(x) => x.id.toString()}
-                    onChange={(newPrice) =>
-                        newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
-                    }
-                    onClose={(newPrice) =>
-                        newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
-                    }
-                >
-                    {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
-                    {entry.equipment.prices.length > 1 ? (
-                        <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
-                    ) : null}
-                </DoubleClickToEditDropdown>
-            </>
+            entry.equipment ?
+                <>
+                    <DoubleClickToEditDropdown<EquipmentPrice>
+                        options={entry.equipment.prices}
+                        value={entry.equipmentPrice ?? entry.equipment.prices[0]}
+                        optionLabelFn={(x) => `${x.name} ${priceDisplayFn(x)}`}
+                        optionKeyFn={(x) => x.id.toString()}
+                        onChange={(newPrice) =>
+                            newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
+                        }
+                        onClose={(newPrice) =>
+                            newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
+                        }
+                    >
+                        {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
+                        {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
+                            <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
+                        ) : null}
+                    </DoubleClickToEditDropdown>
+                </> : formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })
         );
     };
 
     const EquipmentListEntryTotalPriceDisplayFn = (entry: EquipmentListEntry) => {
-        return <em>{formatNumberAsCurrency(getPrice(entry))}</em>;
+        return <em>{formatNumberAsCurrency(getPrice(entry, getNumberOfDays(list)))}</em>;
     };
 
     const EquipmentListEntryActionsDisplayFn = (entry: EquipmentListEntry) => {
@@ -405,7 +406,8 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     Öppna utrustning i ny flik
                 </Dropdown.Item>
                 <Dropdown.Item
-                    onClick={() => updateListEntry(getDefaultListEntryFromEquipment(entry.equipment, entry.id))}
+                    disabled={!entry.equipment}
+                    onClick={() => entry.equipment ? updateListEntry(getDefaultListEntryFromEquipment(entry.equipment, entry.id)) : null}
                 >
                     Återställ rad
                 </Dropdown.Item>
@@ -429,7 +431,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             {
                 key: 'name',
                 displayName: 'Utrustning',
-                getValue: (entry: EquipmentListEntry) => entry.equipment.name + ' ' + entry.equipment.description,
+                getValue: (entry: EquipmentListEntry) => entry.name + ' ' + entry.description,
                 getContentOverride: EquipmentListEntryNameDisplayFn,
             },
             {
@@ -462,7 +464,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             {
                 key: 'sum',
                 displayName: 'Summa',
-                getValue: (entry: EquipmentListEntry) => getPrice(entry),
+                getValue: (entry: EquipmentListEntry) => getPrice(entry, getNumberOfDays(list)),
                 getContentOverride: EquipmentListEntryTotalPriceDisplayFn,
                 columnWidth: 90,
                 textAlignment: 'center',
@@ -510,19 +512,15 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 </div>
                 <p className="text-muted">
                     {list.equipmentListEntries.length} rader /{' '}
-                    {formatNumberAsCurrency(list.equipmentListEntries.reduce((sum, entry) => sum + getPrice(entry), 0))}
+                    {formatNumberAsCurrency(getEquipmentListPrice(list))}
                     {list.equipmentInDatetime &&
-                    list.equipmentOutDatetime &&
-                    list.usageStartDatetime &&
-                    list.usageEndDatetime ? (
+                        list.equipmentOutDatetime &&
+                        list.usageStartDatetime &&
+                        list.usageEndDatetime ? (
                         <>
                             {' '}
                             /{' '}
-                            {(list.equipmentInDatetime.getTime() - list.equipmentOutDatetime.getTime()) /
-                                (1000 * 3600 * 24)}{' '}
-                            dagar /{' '}
-                            {(list.usageEndDatetime.getTime() - list.usageStartDatetime.getTime()) / (1000 * 3600 * 24)}{' '}
-                            debiterade dagar
+                            {getNumberOfEquipmentOutDays(list)} dagar / {getNumberOfDays(list)} debiterade dagar
                         </>
                     ) : null}
                 </p>

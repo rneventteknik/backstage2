@@ -1,10 +1,11 @@
-import { View, Text, StyleSheet } from '@react-pdf/renderer';
-import React, { ReactNode } from 'react';
+import { View, StyleSheet } from '@react-pdf/renderer';
+import React from 'react';
 import { commonStyles } from '../../utils';
 import { Event } from '../../../models/interfaces';
 import { formatDate } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
 import { EventType } from '../../../models/enums/EventType';
+import { Col, InfoItem } from './utils';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -14,26 +15,6 @@ const styles = StyleSheet.create({
         borderBottom: '1px solid black',
     },
 });
-
-type ColProps = {
-    children?: ReactNode;
-};
-export const Col: React.FC<ColProps> = ({ children }: ColProps) => <View style={styles.col}>{children}</View>;
-
-type InfoItemProps = {
-    title?: string;
-    content?: string;
-};
-export const InfoItem: React.FC<InfoItemProps> = ({ title, content }: InfoItemProps) => (
-    <View style={[styles.marginBottom, { flexDirection: 'row' }]}>
-        <View style={[styles.flexGrow, { flex: '0 0 80' }]}>
-            <Text>{title}:</Text>
-        </View>
-        <View style={styles.flexGrow}>
-            <Text style={styles.bold}>{content}</Text>
-        </View>
-    </View>
-);
 
 type Props = {
     event: Event;

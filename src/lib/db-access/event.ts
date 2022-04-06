@@ -40,6 +40,16 @@ export const fetchEvent = async (id: number): Promise<EventObjectionModel> => {
         .then((events) => events[0]);
 };
 
+export const fetchEventWithEquipmentLists = async (id: number): Promise<EventObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    return EventObjectionModel.query()
+        .where('id', id)
+        .withGraphFetched('ownerUser')
+        .withGraphFetched('equipmentLists.equipmentListEntries')
+        .then((events) => events[0]);
+};
+
 export const fetchFirstEventByCalendarEventId = async (calendarEventId: string): Promise<EventObjectionModel> => {
     ensureDatabaseIsInitialized();
 

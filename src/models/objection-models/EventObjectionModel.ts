@@ -126,8 +126,8 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
     created?: string;
     updated?: string;
 
-    equipment: IEquipmentObjectionModel;
-    equipmentId: number;
+    equipment?: IEquipmentObjectionModel;
+    equipmentId?: number;
     name: string;
     nameEN: string;
     description: string;
@@ -138,8 +138,8 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
 
     pricePerUnit: number;
     pricePerHour: number;
-    equipmentPrice: IEquipmentPriceObjectionModel;
-    equipmentPriceId: number;
+    equipmentPrice?: IEquipmentPriceObjectionModel;
+    equipmentPriceId?: number;
 }
 
 export class EquipmentListEntryObjectionModel extends Model {

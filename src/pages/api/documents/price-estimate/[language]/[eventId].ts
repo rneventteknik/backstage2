@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { getPriceEstimateDocument, getPriceEstimateDocumentFileName } from '../../../../../document-templates';
 import { Language } from '../../../../../document-templates/useTextResources';
 import { respondWithEntityNotFoundResponse } from '../../../../../lib/apiResponses';
-import { fetchEvent } from '../../../../../lib/db-access';
+import { fetchEventWithEquipmentLists } from '../../../../../lib/db-access/event';
 import { toEvent } from '../../../../../lib/mappers/event';
 import { withSessionContext } from '../../../../../lib/sessionContext';
 
@@ -14,7 +14,7 @@ const handler = withSessionContext(
             return;
         }
 
-        return fetchEvent(Number(req.query.eventId))
+        return fetchEventWithEquipmentLists(Number(req.query.eventId))
             .then(async (result) => {
                 if (!result) {
                     respondWithEntityNotFoundResponse(res);

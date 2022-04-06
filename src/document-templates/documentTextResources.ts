@@ -12,20 +12,33 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.event-info.our-reference': 'Vår referens',
         'common.event-info.print-date': 'Utskriftsdatum',
 
+        // Equipment list
+        'common.equipment-list.table-header.specification': 'Specifikation',
+        'common.equipment-list.table-header.count': 'Antal',
+        'common.equipment-list.table-header.price': 'á pris',
+        'common.equipment-list.table-header.total-price': 'Belopp',
+        'common.equipment-list.total': 'Total',
+
+        // Event total sectopm
+        'common.total-price-section.heading': 'Totalt',
+        'common.total-price-section.total-sum': 'Att betala SEK',
+
         // Footer
         'common.footer.title': 'Backstage2',
         'common.footer.content': process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION ?? '',
-
+        
         // Price estimate
         'price-estimate.filename': 'Prisuppskattning',
         'price-estimate.title': 'Prisuppskattning',
-        'price-estimate.content': 'TODO: Lägg in innehåll här',
         'price-estimate.legal-note.title': 'Observera',
         'price-estimate.legal-note.content':
-            'Ovanstående är en prisuppskattning. Det är den faktiska tidsåtgången och använd utrustning som faktureras. Ni som arrangör ansvarar för att utrustningen inte blir stulen eller förstörd.',
-
+        'Ovanstående är en prisuppskattning. Det är den faktiska tidsåtgången och använd utrustning som faktureras. Ni som arrangör ansvarar för att utrustningen inte blir stulen eller förstörd.',
+        
         // Misc
         'common.pagenumber.label': 'Sida',
+        'common.misc.count-unit': 'st',
+        'common.misc.hours-unit': 'h',
+        'common.misc.days-unit': 'dagar',
     },
     EN: {
         // Event info
@@ -36,6 +49,17 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.event-info.our-reference': 'Our reference',
         'common.event-info.print-date': 'Print date',
 
+        // Equipment list
+        'common.equipment-list.table-header.specification': 'Item',
+        'common.equipment-list.table-header.count': 'Count',
+        'common.equipment-list.table-header.price': 'Price',
+        'common.equipment-list.table-header.total-price': 'Total price',
+        'common.equipment-list.total': 'Total',
+
+        // Event total sectopm
+        'common.total-price-section.heading': 'Total',
+        'common.total-price-section.total-sum': 'To pay SEK',
+
         // Footer
         'common.footer.title': 'Backstage2',
         'common.footer.content': process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION ?? '',
@@ -43,12 +67,14 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         // Price estimate
         'price-estimate.filename': 'Price Estimate',
         'price-estimate.title': 'Price estimate',
-        'price-estimate.content': 'TODO: Add price estimate content here',
         'price-estimate.legal-note.title': 'Please observe',
         'price-estimate.legal-note.content':
             'The above is a price estimate. It is the actual time required and used equipment that is invoiced. You as the organizer are responsible for ensuring that the equipment is not stolen or destroyed',
 
         // Misc
         'common.pagenumber.label': 'Page',
+        'common.misc.count-unit': 'pcs',
+        'common.misc.hours-unit': 'h',
+        'common.misc.days-unit': 'days',
     },
 };

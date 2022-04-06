@@ -11,8 +11,8 @@ export interface EquipmentList extends BaseEntityWithName {
 }
 
 export interface EquipmentListEntry extends BaseEntityWithName {
-    equipment: Equipment;
-    equipmentId: number;
+    equipment?: Equipment;
+    equipmentId?: number;
     name: string;
     nameEN: string;
     description: string;
@@ -23,5 +23,5 @@ export interface EquipmentListEntry extends BaseEntityWithName {
 
     pricePerUnit: number;
     pricePerHour: number;
-    equipmentPrice: EquipmentPrice;
+    equipmentPrice?: EquipmentPrice;
 }

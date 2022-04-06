@@ -21,6 +21,9 @@ export const toEvent = (objectionModel: IEventObjectionModel): Event => {
         ownerUser: objectionModel.ownerUser ? toUser(objectionModel.ownerUser) : undefined,
         updated: toDateOrUndefined(objectionModel.updated),
         created: toDateOrUndefined(objectionModel.created),
+        equipmentLists: objectionModel.equipmentLists
+            ? objectionModel.equipmentLists.map(toEquipmentList)
+            : undefined,
     };
 };
 
@@ -45,16 +48,16 @@ export const toEquipmentList = (objectionModel: IEquipmentListObjectionModel): E
 };
 
 export const toEquipmentListEntry = (objectionModel: IEquipmentListEntryObjectionModel): EquipmentListEntry => {
-    if (!objectionModel.id || !objectionModel.equipment) {
+    if (!objectionModel.id) {
         throw new Error('Invalid equipment list entry');
     }
 
     return {
         ...objectionModel,
         id: objectionModel.id,
-        equipment: toEquipment(objectionModel.equipment),
+        equipment: objectionModel.equipment ? toEquipment(objectionModel.equipment) : undefined,
         equipmentId: objectionModel.equipmentId,
-        equipmentPrice: toEquipmentPrice(objectionModel.equipmentPrice),
+        equipmentPrice: objectionModel.equipmentPrice ? toEquipmentPrice(objectionModel.equipmentPrice) : undefined,
         updated: toDateOrUndefined(objectionModel.updated),
         created: toDateOrUndefined(objectionModel.created),
     };
@@ -97,8 +100,8 @@ export const toEquipmentListEntryObjectionModel = (
         updated: undefined,
         id: clientModel.id,
         equipment: undefined,
-        equipmentId: clientModel.equipment.id,
+        equipmentId: clientModel.equipment?.id,
         equipmentPrice: undefined,
-        equipmentPriceId: clientModel.equipmentPrice.id,
+        equipmentPriceId: clientModel.equipmentPrice?.id,
     };
 };
