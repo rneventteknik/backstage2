@@ -49,9 +49,15 @@ const tableSettings: TableConfiguration<EventViewModel> = {
         {
             key: 'name',
             displayName: 'Bokning',
-            getValue: (event: EventViewModel) => event.name + '/' + event.name,
+            getValue: (event: EventViewModel) => event.name,
             textTruncation: true,
             getContentOverride: EventNameDisplayFn,
+        },
+        {
+            key: 'customerName',
+            displayName: 'Beställare',
+            getValue: (event: EventViewModel) => event.customerName ?? '-',
+            textTruncation: true,
         },
         {
             key: 'location',

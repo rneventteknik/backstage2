@@ -76,6 +76,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
             contactPersonName: form.contactPersonName.value,
             contactPersonPhone: form.contactPersonPhone.value,
             contactPersonEmail: form.contactPersonEmail.value,
+            customerName: form.customerName.value,
             note: form.note.value,
             invoiceHogiaId: form.invoiceHogiaId?.value,
             invoiceAddress: form.invoiceAddress?.value,
@@ -99,7 +100,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
                             type="text"
                             placeholder="BETAspexet"
                             name="bookingName"
-                            defaultValue={booking?.name}
+                            defaultValue={booking.name}
                         />
                     </Form.Group>
                 </Col>
@@ -137,12 +138,12 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
             <Row>
                 <Col lg="6">
                     <Form.Group controlId="formLocation">
-                        <Form.Label>Plats</Form.Label>
+                        <Form.Label>Beställare</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Nya Matsalen, Nymble"
-                            name="location"
-                            defaultValue={booking.location}
+                            placeholder="THS"
+                            name="customerName"
+                            defaultValue={booking.customerName}
                         />
                     </Form.Group>
                 </Col>
@@ -166,6 +167,17 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
             </Row>
             <Row>
                 <Col lg="6">
+                    <Form.Group controlId="formLocation">
+                        <Form.Label>Plats</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Nya Matsalen, Nymble"
+                            name="location"
+                            defaultValue={booking.location}
+                        />
+                    </Form.Group>
+                </Col>
+                <Col lg="3" md="6" sm="6">
                     <Form.Group controlId="formAccountKind">
                         <Form.Label>Kontotyp<RequiredIndicator /></Form.Label>
                         <Form.Control as="select" name="accountKind" defaultValue={booking.accountKind} required>
@@ -175,7 +187,7 @@ const EventForm: React.FC<Props> = ({ handleSubmitEvent, event: booking, formId,
                         </Form.Control>
                     </Form.Group>
                 </Col>
-                <Col lg="6">
+                <Col lg="3" md="6" sm="6">
                     <Form.Group controlId="formPricePlan">
                         <Form.Label>Prisplan<RequiredIndicator /></Form.Label>
                         <Form.Control as="select" name="pricePlan" defaultValue={booking.pricePlan} required>

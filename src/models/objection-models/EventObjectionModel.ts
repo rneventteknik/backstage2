@@ -32,6 +32,7 @@ export interface IEventObjectionModel extends BaseObjectionModelWithName {
     contactPersonPhone: string;
     contactPersonEmail: string;
     calendarEventId: string;
+    customerName: string;
 }
 
 export class EventObjectionModel extends Model {
@@ -78,6 +79,7 @@ export class EventObjectionModel extends Model {
     contactPersonPhone!: string;
     contactPersonEmail!: string;
     calendarEventId!: string;
+    customerName!: string;
 }
 
 export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName {

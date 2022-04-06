@@ -74,6 +74,7 @@ export async function seed(knex) {
             contactPersonName: 'Spex Kemistsson',
             contactPersonPhone: '070 000 00 00',
             contactPersonEmail: 'kemist@spex.se',
+            customerName: 'Eventföretaget Expo & Ljus AB',
         },
         {
             name: 'DATAspexet',
@@ -95,6 +96,7 @@ export async function seed(knex) {
             contactPersonName: 'Vanja och Pelle',
             contactPersonPhone: '070 000 00 01',
             contactPersonEmail: 'ljus@dataspexet.se',
+            customerName: 'Hatasektionen',
         },
         {
             name: 'Lunchföreläsning SPH',
@@ -116,6 +118,7 @@ export async function seed(knex) {
             contactPersonName: 'Veggo',
             contactPersonPhone: null,
             contactPersonEmail: 'veggo@sph.com',
+            customerName: 'SPH'
         },
     ]);
 

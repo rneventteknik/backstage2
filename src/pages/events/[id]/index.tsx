@@ -76,13 +76,17 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <Badge variant="dark" className="ml-1">
                                 {getStatusName(event.status)}
                             </Badge>
-                            <div className="text-muted mt-2">{event.location}</div>
+                            <div className="text-muted mt-2">{event.customerName}</div>
                         </Card.Header>
 
                         <ListGroup variant="flush">
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Namn</span>
                                 <span>{event.name}</span>
+                            </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
+                                <span className="flex-grow-1">Beställare</span>
+                                <span>{event.customerName}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Plats</span>
