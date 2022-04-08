@@ -10,11 +10,12 @@ import Link from 'next/link';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import EventTypeTag from '../../../components/utils/EventTypeTag';
 import { eventFetcher } from '../../../lib/fetchers';
+import TimeEstimateList from '../../../components/timeEstimate/TimeEstimateList';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faFileDownload } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import EquipmentLists from '../../../components/events/equipmentLists/EquipmentLists';
 
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -156,6 +157,7 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </Card>
                 </Col>
                 <Col xl={8}>
+                    <TimeEstimateList eventId={event.id} pricePlan={event.pricePlan} />
                     <EquipmentLists event={event} />
                 </Col>
             </Row>

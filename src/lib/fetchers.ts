@@ -2,6 +2,8 @@ import { toEquipment, toEquipmentPublicCategory, toEquipmentTag } from './mapper
 import { toEquipmentPackage } from './mappers/equipmentPackage';
 import { toEquipmentList, toEvent } from './mappers/event';
 import { toUser } from './mappers/user';
+import { toTimeEstimate } from './mappers/timeEstimate';
+
 import { getResponseContentOrError } from './utils';
 
 // Since all fetchers follow the same pattern we have these two helper functions to
@@ -41,3 +43,6 @@ export const eventsFetcher = generateListFetcher(toEvent);
 
 export const userFetcher = generateFetcher(toUser);
 export const usersFetcher = generateListFetcher(toUser);
+
+export const timeEstimateFetcher = generateFetcher(toTimeEstimate);
+export const timeEstimatesFetcher = generateListFetcher(toTimeEstimate);

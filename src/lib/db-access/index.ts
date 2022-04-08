@@ -44,3 +44,12 @@ export {
     deleteEquipmentList,
     validateEquipmentListObjectionModel,
 } from './equipmentList';
+export {
+    fetchTimeEstimate,
+    fetchTimeEstimates,
+    fetchTimeEstimatesByEventId,
+    updateTimeEstimate,
+    insertTimeEstimate,
+    deleteTimeEstimate,
+    validateTimeEstimateObjectionModel,
+} from './time-estimate';

@@ -10,6 +10,8 @@ export {
 } from './EquipmentObjectionModel';
 export { EquipmentPackageObjectionModel, EquipmentPackageEntryObjectionModel } from './EquipmentPackageObjectionModel';
 
+export { TimeEstimateObjectionModel } from './TimeEstimateObjectionModel';
+
 export type { IEventObjectionModel } from './EventObjectionModel';
 export type { IUserObjectionModel, IUserAuthObjectionModel } from './UserObjectionModel';
 export type {
@@ -18,6 +20,9 @@ export type {
     IEquipmentChangelogEntryObjectionModel,
     IEquipmentPriceObjectionModel,
 } from './EquipmentObjectionModel';
+
+export type { ITimeEstimateObjectionModel } from './TimeEstimateObjectionModel';
+
 export type {
     IEquipmentPackageObjectionModel,
     IEquipmentPackageEntryObjectionModel,
