@@ -9,6 +9,7 @@ import { toDateOrUndefined } from '../utils';
 import { toEquipment, toEquipmentPrice } from './equipment';
 import { toUser } from './user';
 import { PartialDeep } from 'type-fest';
+import { toTimeEstimate } from './timeEstimate';
 
 export const toEvent = (objectionModel: IEventObjectionModel): Event => {
     if (!objectionModel.id) {
@@ -23,6 +24,9 @@ export const toEvent = (objectionModel: IEventObjectionModel): Event => {
         created: toDateOrUndefined(objectionModel.created),
         equipmentLists: objectionModel.equipmentLists
             ? objectionModel.equipmentLists.map(toEquipmentList)
+            : undefined,
+        timeEstimates: objectionModel.timeEstimates
+            ? objectionModel.timeEstimates.map(toTimeEstimate)
             : undefined,
     };
 };
