@@ -10,6 +10,7 @@ import { Footer } from './shared/footer';
 import { useTextResources } from '../useTextResources';
 import { TotalPriceSection } from './shared/totalPriceSection';
 import { EquipmentListInfo } from './shared/equipmentListInfo';
+import { TimeEstimateListInfo } from './shared/timeEstimateListInfo';
 
 type Props = {
     event: Event;
@@ -33,6 +34,7 @@ export const PriceEstimateDocument: React.FC<Props> = ({ event }: Props) => {
                 <MainContent>
                     <View style={styles.flexGrow}>
                         {event.equipmentLists?.map(l => <EquipmentListInfo list={l} key={l.id}/>)}
+                        <TimeEstimateListInfo event={event}/>
                         <TotalPriceSection event={event}/>
                     </View>
 

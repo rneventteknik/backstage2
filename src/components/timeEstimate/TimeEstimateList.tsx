@@ -14,7 +14,7 @@ import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
-import { formatNumberAsCurrency } from '../../lib/pricingUtils';
+import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../lib/pricingUtils';
 
 type Props = {
     eventId: number;
@@ -169,7 +169,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
     );
 
     const TimeEstimateTotalPriceDisplayFn = (entry: TimeEstimate) => {
-        return <em>{formatNumberAsCurrency(entry.numberOfHours * entry.pricePerHour)}</em>;
+        return <em>{formatNumberAsCurrency(getTimeEstimatePrice(entry))}</em>;
     };
 
     const TimeEstimateEntryActionsDisplayFn = (entry: TimeEstimate) => {
@@ -194,7 +194,6 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
                 displayName: 'Beskrivning',
                 getValue: (timeEstimate: TimeEstimate) => timeEstimate.name,
                 getContentOverride: TimeEstimateNameDisplayFn,
-                columnWidth: 150,
             },
             {
                 key: 'count',
@@ -209,16 +208,15 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
                 displayName: 'A pris',
                 getValue: (timeEstimate: TimeEstimate) => timeEstimate.pricePerHour + ' kr/h',
                 getContentOverride: TimeEstimatePricePerHourDisplayFn,
-                columnWidth: 50,
+                columnWidth: 140,
                 textAlignment: 'right',
             },
             {
                 key: 'sum',
                 displayName: 'Summa',
-                getValue: (timeEstimate: TimeEstimate) =>
-                    timeEstimate.pricePerHour * timeEstimate.numberOfHours + ' kr',
+                getValue: (timeEstimate: TimeEstimate) => getTimeEstimatePrice(timeEstimate),
                 getContentOverride: TimeEstimateTotalPriceDisplayFn,
-                columnWidth: 50,
+                columnWidth: 90,
                 textAlignment: 'right',
             },
             {
@@ -228,7 +226,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
                 disableSort: true,
                 getContentOverride: TimeEstimateEntryActionsDisplayFn,
                 columnWidth: 75,
-                textAlignment: 'right',
+                textAlignment: 'center',
             },
         ],
     };
@@ -267,18 +265,13 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
                 </div>
                 <p className="text-muted">
                     {timeEstimates.reduce((sum: number, entry: TimeEstimate) => sum + entry.numberOfHours, 0)} h /{' '}
-                    {formatNumberAsCurrency(
-                        timeEstimates.reduce(
-                            (sum: number, entry: TimeEstimate) => sum + entry.pricePerHour * entry.numberOfHours,
-                            0,
-                        ),
-                    )}
+                    {formatNumberAsCurrency(getTotalTimeEstimatesPrice(timeEstimates))}
                 </p>
             </Card.Header>
             {showListContent ? (
                 <>
                     <TableDisplay entities={timeEstimates} configuration={tableSettings} />
-                    <Button className="ml-2 mr-2 mb-2 w-25" onClick={addEmptyTimeEstimate}>
+                    <Button className="ml-2 mr-2 mb-2" onClick={addEmptyTimeEstimate} variant="secondary" size="sm">
                         <FontAwesomeIcon icon={faPlusCircle} /> Ny rad
                     </Button>
                 </>

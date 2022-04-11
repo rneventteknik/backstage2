@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles } from '../../utils';
-import { formatNumberAsCurrency, getEquipmentListPrice, getEventPrice } from '../../../lib/pricingUtils';
+import { formatNumberAsCurrency, getEquipmentListPrice, getEventPrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { Event } from '../../../models/interfaces';
 import { useTextResources } from '../../useTextResources';
@@ -35,6 +35,14 @@ export const TotalPriceSection: React.FC<Props> = ({ event }: Props) => {
                         </TableCellFixedWidth>
                     </TableRow>
                 )}
+                    <TableRow>
+                        <TableCellAutoWidth>
+                            <Text>{t('common.total-price-section.time-estimate-sum')}</Text>
+                        </TableCellAutoWidth>
+                        <TableCellFixedWidth width={40} textAlign="right">
+                            <Text>{formatNumberAsCurrency(getTotalTimeEstimatesPrice(event.timeEstimates))}</Text>
+                        </TableCellFixedWidth>
+                    </TableRow>
             </View>
 
             <TableRow>

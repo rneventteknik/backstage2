@@ -1,4 +1,4 @@
-import { EquipmentPrice, Event } from '../models/interfaces';
+import { EquipmentPrice, Event, TimeEstimate } from '../models/interfaces';
 import { EquipmentList, EquipmentListEntry } from '../models/interfaces/EquipmentList';
 
 // Calculate total price
@@ -12,19 +12,34 @@ export const getEquipmentListPrice = (list: EquipmentList): number => {
     return list.equipmentListEntries.reduce((sum, e) => sum + getPrice(e, getNumberOfDays(list)), 0);
 };
 
+export const getTimeEstimatePrice = (timeEstimate: TimeEstimate): number => {
+    return (timeEstimate.numberOfHours ?? 0) * (timeEstimate.pricePerHour ?? 0);
+}
+
+export const getTotalTimeEstimatesPrice = (timeEstimates: TimeEstimate[] | undefined): number => {
+    if (!timeEstimates) {
+        return 0;
+    }
+
+    return timeEstimates?.reduce((sum, l) => sum + getTimeEstimatePrice(l), 0) ?? 0;
+}
+
 export const getEventPrice = (event: Event): number => {
-    return event.equipmentLists?.reduce((sum, l) => sum + getEquipmentListPrice(l), 0) ?? 0;
+    const equipmentPrice = event.equipmentLists?.reduce((sum, l) => sum + getEquipmentListPrice(l), 0) ?? 0;
+    const timeEstimatePrice = getTotalTimeEstimatesPrice(event.timeEstimates);
+
+    return equipmentPrice + timeEstimatePrice;
 };
 
 // Format price
 //
 export const formatPrice = (price: { pricePerHour: number; pricePerUnit: number }): string => {
     if (price.pricePerHour && !price.pricePerUnit) {
-        return `${price.pricePerHour}kr/h`;
+        return `${price.pricePerHour} kr/h`;
     } else if (!price.pricePerHour && price.pricePerUnit) {
-        return `${price.pricePerUnit}kr/st`;
+        return `${price.pricePerUnit} kr/st`;
     } else {
-        return `${price.pricePerUnit}kr + ${price.pricePerHour}kr/h`;
+        return `${price.pricePerUnit} kr + ${price.pricePerHour} kr/h`;
     }
 };
 

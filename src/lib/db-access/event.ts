@@ -47,6 +47,7 @@ export const fetchEventWithEquipmentLists = async (id: number): Promise<EventObj
         .where('id', id)
         .withGraphFetched('ownerUser')
         .withGraphFetched('equipmentLists.equipmentListEntries')
+        .withGraphFetched('timeEstimates')
         .then((events) => events[0]);
 };
 

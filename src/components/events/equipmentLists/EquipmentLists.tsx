@@ -454,7 +454,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 displayName: 'Antal',
                 getValue: (entry: EquipmentListEntry) => entry.numberOfUnits,
                 getContentOverride: EquipmentListEntryNumberOfUnitsDisplayFn,
-                textAlignment: 'center',
+                textAlignment: 'right',
                 columnWidth: 80,
             },
             {
@@ -462,7 +462,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 displayName: 'Timmar',
                 getValue: (entry: EquipmentListEntry) => entry.numberOfHours,
                 getContentOverride: EquipmentListEntryNumberOfHoursDisplayFn,
-                textAlignment: 'center',
+                textAlignment: 'right',
                 cellHideSize: 'md',
                 columnWidth: 100,
             },
@@ -473,7 +473,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 disableSort: true,
                 getContentOverride: EquipmentListEntryPriceDisplayFn,
                 columnWidth: 140,
-                textAlignment: 'center',
+                textAlignment: 'right',
                 cellHideSize: 'md',
             },
             {
@@ -482,7 +482,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 getValue: (entry: EquipmentListEntry) => getPrice(entry, getNumberOfDays(list)),
                 getContentOverride: EquipmentListEntryTotalPriceDisplayFn,
                 columnWidth: 90,
-                textAlignment: 'center',
+                textAlignment: 'right',
                 cellHideSize: 'md',
             },
             {

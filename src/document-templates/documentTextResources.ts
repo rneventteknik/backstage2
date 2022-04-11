@@ -19,8 +19,17 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.equipment-list.table-header.total-price': 'Belopp',
         'common.equipment-list.total': 'Total',
 
+        // Time Estimate list
+        'common.time-estimate-list.heading': 'Personalkostnader',
+        'common.time-estimate-list.table-header.description': 'Beskrivning',
+        'common.time-estimate-list.table-header.count': 'Antal',
+        'common.time-estimate-list.table-header.price': 'á pris',
+        'common.time-estimate-list.table-header.total-price': 'Belopp',
+        'common.time-estimate-list.total': 'Total',
+
         // Event total sectopm
         'common.total-price-section.heading': 'Totalt',
+        'common.total-price-section.time-estimate-sum': 'Personalkostnader',
         'common.total-price-section.total-sum': 'Att betala SEK',
 
         // Footer
@@ -56,8 +65,17 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.equipment-list.table-header.total-price': 'Total price',
         'common.equipment-list.total': 'Total',
 
+        // Time Estimate list
+        'common.time-estimate-list.heading': 'Personnel costs',
+        'common.time-estimate-list.table-header.description': 'Description',
+        'common.time-estimate-list.table-header.count': 'Count',
+        'common.time-estimate-list.table-header.price': 'Price',
+        'common.time-estimate-list.table-header.total-price': 'Total price',
+        'common.time-estimate-list.total': 'Total',
+
         // Event total sectopm
         'common.total-price-section.heading': 'Total',
+        'common.total-price-section.time-estimate-sum': 'Personnel costs',
         'common.total-price-section.total-sum': 'To pay SEK',
 
         // Footer

@@ -7,6 +7,8 @@ import {
     IEquipmentPriceObjectionModel,
     UserObjectionModel,
     IUserObjectionModel,
+    TimeEstimateObjectionModel,
+    ITimeEstimateObjectionModel,
 } from '.';
 
 export interface IEventObjectionModel extends BaseObjectionModelWithName {
@@ -15,6 +17,7 @@ export interface IEventObjectionModel extends BaseObjectionModelWithName {
     created: string;
     updated: string;
     equipmentLists: IEquipmentListObjectionModel[];
+    timeEstimates: ITimeEstimateObjectionModel[];
     ownerUser?: IUserObjectionModel;
     eventType: number;
     status: number;
@@ -55,6 +58,14 @@ export class EventObjectionModel extends Model {
                 to: 'EquipmentList.eventId',
             },
         },
+        timeEstimates: {
+            relation: Model.HasManyRelation,
+            modelClass: TimeEstimateObjectionModel,
+            join: {
+                from: 'Event.id',
+                to: 'TimeEstimate.eventId',
+            },
+        },
     });
 
     id!: number;
@@ -62,6 +73,7 @@ export class EventObjectionModel extends Model {
     created!: string;
     updated!: string;
     equipmentLists!: EquipmentListObjectionModel[];
+    timeEstimates!: TimeEstimateObjectionModel[];
     ownerUser!: UserObjectionModel;
     eventType!: number;
     status!: number;
