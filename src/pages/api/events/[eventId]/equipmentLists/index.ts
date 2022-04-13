@@ -24,13 +24,13 @@ const handler = withSessionContext(
 
         switch (req.method) {
             case 'POST':
-                if (!req.body.equipmentList) {
-                    throw Error('Missing equipmentList parameter');
-                }
-
                 if (context.currentUser.role == Role.READONLY) {
                     respondWithAccessDeniedResponse(res);
                     return;
+                }
+                
+                if (!req.body.equipmentList) {
+                    throw Error('Missing equipmentList parameter');
                 }
 
                 if (!validateEquipmentListObjectionModel(req.body.equipmentList)) {

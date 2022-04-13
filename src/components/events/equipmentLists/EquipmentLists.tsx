@@ -26,18 +26,20 @@ import { HasId } from '../../../models/interfaces/BaseEntity';
 
 type Props = {
     event: Partial<Event> & HasId;
+    readonly: boolean;
 };
 
 type EquipmentListDisplayProps = {
     event: Partial<Event> & HasId;
     list: Partial<EquipmentList>;
+    readonly: boolean;
     deleteListFn: (x: EquipmentList) => void;
 };
 
 // This component only contains logic to create and delete lists. Everything else
 // is handled by the EquipmentListDisplay component which manages it's list internally.
 //
-const EquipmentLists: React.FC<Props> = ({ event: booking }: Props) => {
+const EquipmentLists: React.FC<Props> = ({ event: booking, readonly }: Props) => {
     const { data: equipmentLists, mutate } = useSwr(
         '/api/events/' + booking.id + '/equipmentLists',
         equipmentListsFetcher,
@@ -99,13 +101,16 @@ const EquipmentLists: React.FC<Props> = ({ event: booking }: Props) => {
     return (
         <>
             {equipmentLists?.map((x) => (
-                <EquipmentListDisplay list={x} key={x.id} event={booking} deleteListFn={deleteList} />
+                <EquipmentListDisplay list={x} key={x.id} event={booking} deleteListFn={deleteList} readonly={readonly}/>
             ))}
-            <p className="text-center">
-                <Button className="mt-4" variant="secondary" size="sm" onClick={() => createNewList()}>
-                    <FontAwesomeIcon icon={faPlus} className="mr-1" /> Lägg till utrustningslista
-                </Button>
-            </p>
+            {
+                readonly ? null :
+                <p className="text-center">
+                    <Button className="mt-4" variant="secondary" size="sm" onClick={() => createNewList()}>
+                        <FontAwesomeIcon icon={faPlus} className="mr-1" /> Lägg till utrustningslista
+                    </Button>
+                </p>
+            }
         </>
     );
 };
@@ -114,6 +119,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     list: partialList,
     event: booking,
     deleteListFn: parentDeleteListFn,
+    readonly,
 }: EquipmentListDisplayProps) => {
     const { data: list, mutate, error } = useSwr(
         '/api/events/' + booking.id + '/equipmentLists/' + partialList.id,
@@ -312,6 +318,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         updateListEntry({ ...entry, name: newValue && newValue.length > 0 ? newValue : entry.name })
                     }
                     size="sm"
+                    readonly={readonly}
                 >
                     {entry.name}
                 </DoubleClickToEdit>
@@ -321,6 +328,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     value={entry.description}
                     onUpdate={(newValue) => updateListEntry({ ...entry, description: newValue })}
                     size="sm"
+                    readonly={readonly}
                 >
                     {entry.description && entry.description.length > 0 ? (
                         <span className="text-muted ">{entry.description}</span>
@@ -350,6 +358,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     updateListEntry({ ...entry, numberOfUnits: toIntOrUndefined(newValue) ?? 0 })
                 }
                 size="sm"
+                readonly={readonly}
             >
                 <span className={valueIsRelevant ? '' : 'text-muted'}>{entry.numberOfUnits} st</span>
             </DoubleClickToEdit>
@@ -370,6 +379,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     updateListEntry({ ...entry, numberOfHours: toIntOrUndefined(newValue) ?? 0 })
                 }
                 size="sm"
+                readonly={readonly}
             >
                 <span className={valueIsRelevant ? '' : 'text-muted'}>{entry.numberOfHours} h</span>
             </DoubleClickToEdit>
@@ -391,6 +401,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         onClose={(newPrice) =>
                             newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
                         }
+                        readonly={readonly}
                     >
                         {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
                         {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
@@ -414,21 +425,24 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 disabled={!entry.equipment}>
                     Öppna utrustning i ny flik
                 </Dropdown.Item>
-                <Dropdown.Item
-                    onClick={() => setEquipmentListEntryToEditViewModel(entry)}
-                >
-                    Avancerad redigering
-                </Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item
-                    disabled={!entry.equipment}
-                    onClick={() => entry.equipment ? updateListEntry(getDefaultListEntryFromEquipment(entry.equipment, entry.id)) : null}
-                >
-                    Återställ rad
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => deleteListEntry(entry)} className="text-danger">
-                    Ta bort rad
-                </Dropdown.Item>
+                {readonly ? null :
+                    <>
+                        <Dropdown.Item
+                            onClick={() => setEquipmentListEntryToEditViewModel(entry)}
+                        >
+                            Avancerad redigering
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item
+                            onClick={() => entry.equipment ? updateListEntry(getDefaultListEntryFromEquipment(entry.equipment, entry.id)) : null}
+                        >
+                            Återställ rad
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => deleteListEntry(entry)} className="text-danger">
+                            Ta bort rad
+                        </Dropdown.Item>
+                    </>
+                }
             </DropdownButton>
         );
     };
@@ -507,6 +521,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             onUpdate={(newValue: string) =>
                                 saveList({ ...list, name: newValue && newValue.length > 0 ? newValue : list.name })
                             }
+                            readonly={readonly}
                         >
                             {list.name}
                         </DoubleClickToEdit>
@@ -515,21 +530,23 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         <Button className="mr-2" variant="" onClick={() => setShowListContent(!showListContent)}>
                             <FontAwesomeIcon icon={showListContent ? faAngleUp : faAngleDown} />
                         </Button>
-                        <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
-                            <Dropdown.Item onClick={() => setEquipmentListEntryToEditViewModel({
-                                numberOfUnits: 1,
-                                numberOfHours: 0,
-                            })}>
-                                Lägg till egen rad
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                            <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
-                                Töm utrustningslistan
-                            </Dropdown.Item>
-                            <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                                Ta bort utrustningslistan
-                            </Dropdown.Item>
-                        </DropdownButton>
+                        {readonly ? null : 
+                            <>
+                                <Dropdown.Item onClick={() => setEquipmentListEntryToEditViewModel({
+                                    numberOfUnits: 1,
+                                    numberOfHours: 0,
+                                })}>
+                                    Lägg till egen rad
+                                </Dropdown.Item>
+                                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                                <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
+                                        Töm utrustningslistan
+                                    </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
+                                        Ta bort utrustningslistan
+                                    </Dropdown.Item>
+                                </DropdownButton>
+                            </> }
                     </div>
                 </div>
                 <p className="text-muted">
@@ -556,12 +573,14 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 <DoubleClickToEditDate
                                     value={list.usageStartDatetime}
                                     onUpdate={(newValue) => saveList({ ...list, usageStartDatetime: newValue })}
+                                    readonly={readonly}
                                 />
                             </Col>
                             <Col>
                                 <DoubleClickToEditDate
                                     value={list.usageEndDatetime}
                                     onUpdate={(newValue) => saveList({ ...list, usageEndDatetime: newValue })}
+                                    readonly={readonly}
                                 />
                             </Col>
                         </Row>
@@ -573,12 +592,14 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 <DoubleClickToEditDate
                                     value={list.equipmentOutDatetime}
                                     onUpdate={(newValue) => saveList({ ...list, equipmentOutDatetime: newValue })}
+                                    readonly={readonly}
                                 />
                             </Col>
                             <Col>
                                 <DoubleClickToEditDate
                                     value={list.equipmentInDatetime}
                                     onUpdate={(newValue) => saveList({ ...list, equipmentInDatetime: newValue })}
+                                    readonly={readonly}
                                 />
                             </Col>
                         </Row>
@@ -590,14 +611,16 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 <>
                     <TableDisplay entities={list.equipmentListEntries} configuration={tableSettings} />
 
-                    <div className="ml-2 mr-2 mb-2">
-                        <EquipmentSearch
-                            placeholder="Lägg till utrustning"
-                            includePackages={true}
-                            id="equipment-search"
-                            onSelect={(x) => addFromSearch(x)}
-                        />
-                    </div>
+                    {readonly ? null : 
+                        <div className="ml-2 mr-2 mb-2">
+                            <EquipmentSearch
+                                placeholder="Lägg till utrustning"
+                                includePackages={true}
+                                id="equipment-search"
+                                onSelect={(x) => addFromSearch(x)}
+                            />
+                        </div>
+                    }
                 </>
             ) : null}
 

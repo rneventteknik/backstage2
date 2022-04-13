@@ -17,6 +17,7 @@ import { equipmentTagsFetcher, equipmentsFetcher } from '../../lib/fetchers';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
 import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
+import { IfNotReadonly } from '../../components/utils/IfAdmin';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -153,14 +154,16 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     return (
         <Layout title={pageTitle} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
-                <Link href="/equipment/new">
-                    <Button variant="primary" as="span" className="mr-2">
-                        Lägg till utrustning
-                    </Button>
-                </Link>
+                <IfNotReadonly currentUser={currentUser}>
+                    <Link href="/equipment/new">
+                        <Button variant="primary" as="span" className="mr-2">
+                            Lägg till utrustning
+                        </Button>
+                    </Link>
+                </IfNotReadonly>
                 <Link href="/equipmentPackage">
                     <Button variant="dark" as="span">
-                        Redigera utrustningpaket
+                        Visa utrustningpaket
                     </Button>
                 </Link>
             </Header>

@@ -14,17 +14,20 @@ const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
         switch (req.method) {
             case 'POST':
-                if (!req.body.event) {
-                    throw Error('Missing event parameter');
-                }
                 if (context.currentUser.role == Role.READONLY) {
                     respondWithAccessDeniedResponse(res);
                     return;
                 }
+
+                if (!req.body.event) {
+                    throw Error('Missing event parameter');
+                }
+
                 if (!validateEventObjectionModel(req.body.event)) {
                     respondWithInvalidDataResponse(res);
                     return;
                 }
+                
                 await insertEvent(req.body.event)
                     .then((result) => res.status(200).json(result))
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));

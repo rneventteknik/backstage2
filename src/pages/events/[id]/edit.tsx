@@ -14,8 +14,9 @@ import { eventFetcher } from '../../../lib/fetchers';
 import Header from '../../../components/layout/Header';
 import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
+import { Role } from '../../../models/enums/Role';
 
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
 type Props = { user: CurrentUserInfo };
 
 const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {

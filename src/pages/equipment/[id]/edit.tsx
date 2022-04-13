@@ -15,8 +15,9 @@ import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton'
 import { equipmentFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { PartialDeep } from 'type-fest';
+import { Role } from '../../../models/enums/Role';
 
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
 type Props = { user: CurrentUserInfo };
 
 const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {

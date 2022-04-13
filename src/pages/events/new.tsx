@@ -15,8 +15,9 @@ import CalendarEventsList from '../../components/events/CalendarEventsList';
 import { CalendarResult } from '../../models/misc/CalendarResult';
 import { EquipmentListObjectionModel, IEquipmentListObjectionModel } from '../../models/objection-models/EventObjectionModel';
 import { useNotifications } from '../../lib/useNotifications';
+import { Role } from '../../models/enums/Role';
 
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
 type Props = { user: CurrentUserInfo };
 
 const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {

@@ -16,13 +16,13 @@ const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
         switch (req.method) {
             case 'POST':
-                if (!req.body.equipmentPackage) {
-                    throw Error('Missing equipmentPackage parameter');
-                }
-
                 if (context.currentUser.role == Role.READONLY) {
                     respondWithAccessDeniedResponse(res);
                     return;
+                }
+
+                if (!req.body.equipmentPackage) {
+                    throw Error('Missing equipmentPackage parameter');
                 }
 
                 if (!validateEquipmentPackageObjectionModel(req.body.equipmentPackage)) {

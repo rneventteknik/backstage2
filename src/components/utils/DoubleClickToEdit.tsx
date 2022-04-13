@@ -9,6 +9,7 @@ type DoubleClickToEditProps = {
     value?: string;
     size?: 'sm' | 'lg' | undefined;
     onUpdate: (x: string) => void;
+    readonly?: boolean;
 };
 
 export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
@@ -16,6 +17,7 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
     onUpdate,
     size,
     children,
+    readonly,
 }: DoubleClickToEditProps) => {
     const [trackedValue, setTrackedValue] = useState(value ?? '');
     const [isEditing, setIsEditing] = useState(false);
@@ -24,6 +26,14 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
         setIsEditing(false);
         onUpdate(trackedValue);
     };
+
+    if (readonly) {
+        return (
+            <span>
+                {children}
+            </span>
+        );
+    }
 
     if (!isEditing) {
         return (
@@ -52,18 +62,21 @@ type DoubleClickToEditDateProps = {
     value?: Date;
     onUpdate: (x: Date | undefined) => void;
     size?: 'sm' | 'lg' | undefined;
+    readonly?: boolean;
 };
 
 export const DoubleClickToEditDate: React.FC<DoubleClickToEditDateProps> = ({
     value,
     onUpdate,
     size,
+    readonly,
 }: DoubleClickToEditDateProps) => {
     return (
         <DoubleClickToEdit
             value={value ? formatDate(value) : ''}
             onUpdate={(newValue) => onUpdate(convertToDateOrUndefined(newValue))}
             size={size}
+            readonly={readonly}
         >
             <div className="mb-3">
                 {value ? (
@@ -87,6 +100,7 @@ type DoubleClickToEditDropdownProps<T> = {
     size?: 'sm' | 'lg' | undefined;
     onChange?: (x: T | undefined) => void;
     onClose?: (x: T | undefined) => void;
+    readonly?: boolean;
 };
 
 export function DoubleClickToEditDropdown<T>({
@@ -98,6 +112,7 @@ export function DoubleClickToEditDropdown<T>({
     onClose,
     size,
     children,
+    readonly,
 }: DoubleClickToEditDropdownProps<T>): React.ReactElement {
     const [selectedKey, setSelectedKey] = useState(optionKeyFn(value));
     const [isEditing, setIsEditing] = useState(false);
@@ -113,6 +128,14 @@ export function DoubleClickToEditDropdown<T>({
         setIsEditing(false);
         onClose ? onClose(getSelectedValue(selectedKey)) : null;
     };
+
+    if (readonly) {
+        return (
+            <span>
+                {children}
+            </span>
+        );
+    }
 
     if (!isEditing) {
         return (

@@ -19,9 +19,10 @@ import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPric
 type Props = {
     eventId: number;
     pricePlan: number;
+    readonly: boolean;
 };
 
-const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
+const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Props) => {
     const [showListContent, setShowListContent] = useState(false);
 
     const {
@@ -125,6 +126,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
                 })
             }
             size="sm"
+            readonly={readonly}
         >
             {timeEstimate && timeEstimate.name && timeEstimate.name.trim() && timeEstimate.name.trim().length > 0 ? (
                 timeEstimate.name
@@ -144,6 +146,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
                 })
             }
             size="sm"
+            readonly={readonly}
         >
             {timeEstimate.numberOfHours ? (
                 timeEstimate.numberOfHours + ' h'
@@ -163,6 +166,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
                 })
             }
             size="sm"
+            readonly={readonly}
         >
             {timeEstimate.pricePerHour} kr/h
         </DoubleClickToEdit>
@@ -174,7 +178,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
 
     const TimeEstimateEntryActionsDisplayFn = (entry: TimeEstimate) => {
         return (
-            <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
+            <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
                 <Dropdown.Item onClick={() => deleteTimeEstimate(entry)} className="text-danger">
                     Ta bort rad
                 </Dropdown.Item>
@@ -271,9 +275,11 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan }: Props) => {
             {showListContent ? (
                 <>
                     <TableDisplay entities={timeEstimates} configuration={tableSettings} />
-                    <Button className="ml-2 mr-2 mb-2" onClick={addEmptyTimeEstimate} variant="secondary" size="sm">
-                        <FontAwesomeIcon icon={faPlusCircle} /> Ny rad
-                    </Button>
+                    {readonly ? null :
+                        <Button className="ml-2 mr-2 mb-2" onClick={addEmptyTimeEstimate} variant="secondary" size="sm">
+                            <FontAwesomeIcon icon={faPlusCircle} /> Ny rad
+                        </Button>
+                    }
                 </>
             ) : null}
         </Card>
