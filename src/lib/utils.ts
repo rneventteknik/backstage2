@@ -216,3 +216,18 @@ export async function getResponseContentOrError<T>(res: Response): Promise<T> {
     }
     return res.json();
 }
+
+
+// Replace empty strings or strings with only whitespace with null
+//
+export const replaceEmptyStringWithNull = (s: string | undefined | null): string | null => {
+    if (!s) {
+        return null;
+    }
+
+    if (s.trim().length === 0) {
+        return null;
+    }
+
+    return s;
+}

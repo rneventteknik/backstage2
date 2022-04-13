@@ -19,6 +19,7 @@ export interface IEventObjectionModel extends BaseObjectionModelWithName {
     equipmentLists: IEquipmentListObjectionModel[];
     timeEstimates: ITimeEstimateObjectionModel[];
     ownerUser?: IUserObjectionModel;
+    ownerUserId?: number;
     eventType: number;
     status: number;
     salaryStatus: number;
