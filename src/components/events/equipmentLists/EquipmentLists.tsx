@@ -451,7 +451,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         const valueIsRelevant = entry.pricePerUnit !== 0;
 
         if (!valueIsRelevant && entry.numberOfUnits === 1) {
-            return <></>;
+            return <span className="text-muted">{entry.numberOfUnits} st</span>;
         }
 
         return (
