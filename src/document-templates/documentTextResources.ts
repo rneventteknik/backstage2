@@ -16,6 +16,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.equipment-list.table-header.specification': 'Specifikation',
         'common.equipment-list.table-header.count': 'Antal',
         'common.equipment-list.table-header.price': 'á pris',
+        'common.equipment-list.table-header.discount': 'Rabatt',
         'common.equipment-list.table-header.total-price': 'Belopp',
         'common.equipment-list.total': 'Total',
 
@@ -62,6 +63,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.equipment-list.table-header.specification': 'Item',
         'common.equipment-list.table-header.count': 'Count',
         'common.equipment-list.table-header.price': 'Price',
+        'common.equipment-list.table-header.discount': 'Discount',
         'common.equipment-list.table-header.total-price': 'Total price',
         'common.equipment-list.total': 'Total',
 

@@ -616,6 +616,7 @@ export async function seed(knex) {
             pricePerHour: 200,
             equipmentPriceId: equipmentPriceIds.largeMixer,
             equipmentListId: firstEquipmentListId,
+            discount: 400,
         },
         {
             name: 'Ljudbord litet',
@@ -631,6 +632,7 @@ export async function seed(knex) {
             pricePerHour: 200,
             equipmentPriceId: equipmentPriceIds.smallMixer,
             equipmentListId: firstEquipmentListId,
+            discount: 0,
         },
         {
             name: 'Projektor',
@@ -646,6 +648,7 @@ export async function seed(knex) {
             pricePerHour: 100,
             equipmentPriceId: equipmentPriceIds.projector2,
             equipmentListId: firstEquipmentListId + 1,
+            discount: 0,
         },
     ]);
 }

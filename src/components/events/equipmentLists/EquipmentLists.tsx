@@ -272,6 +272,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             description: equipment.description,
             descriptionEN: equipment.descriptionEN,
             ...prices,
+            discount: 0,
         };
 
         return { ...entry, ...(override ?? {}) };
@@ -512,7 +513,20 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     };
 
     const EquipmentListEntryTotalPriceDisplayFn = (entry: EquipmentListEntry) => {
-        return <em>{formatNumberAsCurrency(getPrice(entry, getNumberOfDays(list)))}</em>;
+        return (
+            <em
+                title={
+                    entry.discount > 0
+                        ? `${formatNumberAsCurrency(
+                              getPrice(entry, getNumberOfDays(list), false),
+                          )}\n-${formatNumberAsCurrency(entry.discount)} (rabatt)\n`
+                        : ''
+                }
+                className={entry.discount > 0 ? 'text-danger' : ''}
+            >
+                {formatNumberAsCurrency(getPrice(entry, getNumberOfDays(list)))}
+            </em>
+        );
     };
 
     const EquipmentListEntryActionsDisplayFn = (entry: EquipmentListEntry) => {
@@ -779,7 +793,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 {!!equipmentListEntryToEditViewModel ? (
                     <Modal.Body>
                         <Row>
-                            <Col md={4}>
+                            <Col lg={4}>
                                 <Form.Group>
                                     <Form.Label>Namn</Form.Label>
                                     <Form.Control
@@ -794,7 +808,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     />
                                 </Form.Group>
                             </Col>
-                            <Col md={4} xs={6}>
+                            <Col lg={4} xs={6}>
                                 <Form.Group>
                                     <Form.Label>Antal</Form.Label>
                                     <InputGroup>
@@ -814,7 +828,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     </InputGroup>
                                 </Form.Group>
                             </Col>
-                            <Col md={4} xs={6}>
+                            <Col lg={4} xs={6}>
                                 <Form.Group>
                                     <Form.Label>Timmar</Form.Label>
                                     <InputGroup>
@@ -836,7 +850,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             </Col>
                         </Row>
                         <Row>
-                            <Col md={4}>
+                            <Col lg={4}>
                                 <Form.Group>
                                     <Form.Label>Pris</Form.Label>
 
@@ -866,7 +880,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     </Form.Control>
                                 </Form.Group>
                             </Col>
-                            <Col md={4} xs={6}>
+                            <Col lg={4} xs={6}>
                                 <Form.Group>
                                     <Form.Label>Pris per styck</Form.Label>
                                     <InputGroup>
@@ -887,7 +901,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     </InputGroup>
                                 </Form.Group>
                             </Col>
-                            <Col md={4} xs={6}>
+                            <Col lg={4} xs={6}>
                                 <Form.Group>
                                     <Form.Label>Pris per timme</Form.Label>
                                     <InputGroup>
@@ -904,6 +918,28 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         />
                                         <InputGroup.Append>
                                             <InputGroup.Text>kr/h</InputGroup.Text>
+                                        </InputGroup.Append>
+                                    </InputGroup>
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col lg={4} xs={6}>
+                                <Form.Group>
+                                    <Form.Label>Rabatt</Form.Label>
+                                    <InputGroup>
+                                        <Form.Control
+                                            type="text"
+                                            value={equipmentListEntryToEditViewModel?.discount}
+                                            onChange={(e) =>
+                                                setEquipmentListEntryToEditViewModel({
+                                                    ...equipmentListEntryToEditViewModel,
+                                                    discount: toIntOrUndefined(e.target.value),
+                                                })
+                                            }
+                                        />
+                                        <InputGroup.Append>
+                                            <InputGroup.Text>kr</InputGroup.Text>
                                         </InputGroup.Append>
                                     </InputGroup>
                                 </Form.Group>
@@ -979,6 +1015,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 pricePerUnit: equipmentListEntryToEditViewModel.pricePerUnit ?? 0,
                                 pricePerHour: equipmentListEntryToEditViewModel.pricePerHour ?? 0,
                                 equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
+                                discount: equipmentListEntryToEditViewModel.discount ?? 0,
                             };
 
                             if (equipmentListEntryToEditViewModel.id) {

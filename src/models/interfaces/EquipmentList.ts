@@ -26,4 +26,5 @@ export interface EquipmentListEntry extends BaseEntityWithName {
     pricePerUnit: number;
     pricePerHour: number;
     equipmentPrice?: EquipmentPrice;
+    discount: number;
 }

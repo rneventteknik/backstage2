@@ -47,6 +47,9 @@ export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
                     <Text style={styles.italic}>{t('common.equipment-list.table-header.price')}</Text>
                 </TableCellFixedWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
+                    <Text style={styles.italic}>{t('common.equipment-list.table-header.discount')}</Text>
+                </TableCellFixedWidth>
+                <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.italic}>{t('common.equipment-list.table-header.total-price')}</Text>
                 </TableCellFixedWidth>
             </TableRow>
@@ -63,6 +66,9 @@ export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
                         </TableCellFixedWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
                             <Text>{formatPrice(entry)}</Text>
+                        </TableCellFixedWidth>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text>{entry.discount > 0 ? formatNumberAsCurrency(entry.discount) : ''}</Text>
                         </TableCellFixedWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
                             <Text>{formatNumberAsCurrency(getPrice(entry, getNumberOfDays(list)))}</Text>

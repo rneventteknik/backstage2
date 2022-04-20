@@ -34,7 +34,7 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ event }: Props) => {
                 <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.italic}>{t('common.time-estimate-list.table-header.price')}</Text>
                 </TableCellFixedWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
+                <TableCellFixedWidth width={180} textAlign="right">
                     <Text style={styles.italic}>{t('common.time-estimate-list.table-header.total-price')}</Text>
                 </TableCellFixedWidth>
             </TableRow>
@@ -53,7 +53,7 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ event }: Props) => {
                         <TableCellFixedWidth width={90} textAlign="right">
                             <Text>{formatNumberAsCurrency(timeEstimate.pricePerHour)}</Text>
                         </TableCellFixedWidth>
-                        <TableCellFixedWidth width={90} textAlign="right">
+                        <TableCellFixedWidth width={180} textAlign="right">
                             <Text>{formatNumberAsCurrency(getTimeEstimatePrice(timeEstimate))}</Text>
                         </TableCellFixedWidth>
                     </TableRow>

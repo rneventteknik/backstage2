@@ -157,6 +157,7 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
     pricePerHour: number;
     equipmentPrice?: IEquipmentPriceObjectionModel;
     equipmentPriceId?: number;
+    discount: number;
 }
 
 export class EquipmentListEntryObjectionModel extends Model {
@@ -200,4 +201,5 @@ export class EquipmentListEntryObjectionModel extends Model {
     pricePerHour!: number;
     equipmentPrice!: EquipmentPriceObjectionModel;
     equipmentPriceId!: number;
+    discount!: number;
 }

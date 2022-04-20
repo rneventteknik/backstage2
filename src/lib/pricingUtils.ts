@@ -3,9 +3,11 @@ import { EquipmentList, EquipmentListEntry } from '../models/interfaces/Equipmen
 
 // Calculate total price
 //
-export const getPrice = (entry: EquipmentListEntry, numberOfDays: number): number => {
+export const getPrice = (entry: EquipmentListEntry, numberOfDays: number, withDiscount = true): number => {
     const daysMultiplier = 1 + (numberOfDays - 1) * 0.25;
-    return entry.numberOfUnits * (entry.numberOfHours * entry.pricePerHour + entry.pricePerUnit * daysMultiplier);
+    const fullPrice =
+        entry.numberOfUnits * (entry.numberOfHours * entry.pricePerHour + entry.pricePerUnit * daysMultiplier);
+    return withDiscount ? fullPrice - entry.discount : fullPrice;
 };
 
 export const getEquipmentListPrice = (list: EquipmentList): number => {
