@@ -663,29 +663,29 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         </Button>
                         {readonly ? null : (
                             <>
-                                <Dropdown.Item
-                                    onClick={() => parentMoveListFn(list, 'UP')}
-                                    disabled={parentIsFirstFn(list)}
-                                >
-                                    Flytta upp
-                                </Dropdown.Item>
-                                <Dropdown.Item
-                                    onClick={() => parentMoveListFn(list, 'DOWN')}
-                                    disabled={parentIsLastFn(list)}
-                                >
-                                    Flytta ner
-                                </Dropdown.Item>
-                                <Dropdown.Item
-                                    onClick={() =>
-                                        setEquipmentListEntryToEditViewModel({
-                                            numberOfUnits: 1,
-                                            numberOfHours: 0,
-                                        })
-                                    }
-                                >
-                                    Lägg till egen rad
-                                </Dropdown.Item>
                                 <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                                    <Dropdown.Item
+                                        onClick={() => parentMoveListFn(list, 'UP')}
+                                        disabled={parentIsFirstFn(list)}
+                                    >
+                                        Flytta upp
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() => parentMoveListFn(list, 'DOWN')}
+                                        disabled={parentIsLastFn(list)}
+                                    >
+                                        Flytta ner
+                                    </Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() =>
+                                            setEquipmentListEntryToEditViewModel({
+                                                numberOfUnits: 1,
+                                                numberOfHours: 0,
+                                            })
+                                        }
+                                    >
+                                        Lägg till egen rad
+                                    </Dropdown.Item>
                                     <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
                                         Töm utrustningslistan
                                     </Dropdown.Item>
