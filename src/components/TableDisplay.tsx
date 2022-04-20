@@ -5,11 +5,18 @@ import { HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import TableFooterWithViewCount from './utils/TableFooter';
 import styles from './TableDisplay.module.scss';
 
+enum SortDirection {
+    Ascending,
+    Descending,
+    Custom,
+}
+
 export type TableConfiguration<T extends HasId | HasStringId> = {
     entityTypeDisplayName: string;
-    defaultSortPropertyName: string;
+    defaultSortPropertyName?: string;
+    customSortFn?: (a: T, b: T) => number;
     noResultsLabel?: string;
-    defaultSortAscending: boolean;
+    defaultSortAscending?: boolean;
     hideTableFilter?: boolean;
     hideTableCountControls?: boolean;
     columns: {
@@ -38,8 +45,16 @@ export function TableDisplay<T extends HasId | HasStringId>({
 }: ListProps<T>): React.ReactElement {
     // Store sort column and direction, and filter search text using state
     //
-    const [sortKey, setSortKey] = React.useState<string>(configuration.defaultSortPropertyName);
-    const [sortReverse, setSortReverse] = React.useState<boolean>(configuration.defaultSortAscending);
+    const [sortKey, setSortKey] = React.useState<string | null>(
+        configuration.defaultSortPropertyName ?? (configuration.customSortFn ? null : configuration.columns[0].key),
+    );
+    const [sortDirection, setSortDirection] = React.useState<SortDirection>(
+        configuration.customSortFn
+            ? SortDirection.Custom
+            : configuration.defaultSortAscending
+            ? SortDirection.Ascending
+            : SortDirection.Descending,
+    );
     const [storedFilterString, setFilterString] = React.useState<string>('');
     const [viewCount, setViewCount] = React.useState(25);
 
@@ -50,7 +65,11 @@ export function TableDisplay<T extends HasId | HasStringId>({
     // Set up sorting
     //
     const sortFn = (a: T, b: T) => {
-        const sortDirectionMultiplier = sortReverse ? 1 : -1;
+        if (sortDirection === SortDirection.Custom && configuration.customSortFn) {
+            return configuration.customSortFn(a, b);
+        }
+
+        const sortDirectionMultiplier = sortDirection == SortDirection.Ascending ? 1 : -1;
         const getValueFn = configuration.columns.find((c) => c.key === sortKey)?.getValue;
 
         if (!getValueFn) {
@@ -66,13 +85,29 @@ export function TableDisplay<T extends HasId | HasStringId>({
         return 0;
     };
 
+    const toggleNextSortDirection = () => {
+        switch (sortDirection) {
+            case SortDirection.Ascending:
+                setSortDirection(SortDirection.Descending);
+                return;
+
+            case SortDirection.Descending:
+                setSortDirection(configuration.customSortFn ? SortDirection.Custom : SortDirection.Ascending);
+                return;
+
+            default:
+                setSortDirection(SortDirection.Ascending);
+                return;
+        }
+    };
+
     const setSortConfiguration = (propertyName: string) => {
         setSortKey(propertyName);
 
         if (propertyName === sortKey) {
-            setSortReverse(!sortReverse);
+            toggleNextSortDirection();
         } else {
-            setSortReverse(true);
+            setSortDirection(SortDirection.Ascending);
         }
     };
 
@@ -122,7 +157,7 @@ export function TableDisplay<T extends HasId | HasStringId>({
                                     <span>{p.displayName}</span>
                                 ) : (
                                     <span style={{ cursor: 'pointer' }} onClick={() => setSortConfiguration(p.key)}>
-                                        {p.displayName} {p.key === sortKey ? getSortingArrow(sortReverse) : null}
+                                        {p.displayName} {p.key === sortKey ? getSortingArrow(sortDirection) : null}
                                     </span>
                                 )}
                             </th>
@@ -199,6 +234,13 @@ const getCellDisplayClassName = (screenSize: string | undefined) => {
     }
 };
 
-const getSortingArrow = (sortReverse: boolean) => {
-    return sortReverse ? <small>&#9660;</small> : <small>&#9650;</small>;
+const getSortingArrow = (sortDirection: SortDirection) => {
+    switch (sortDirection) {
+        case SortDirection.Ascending:
+            return <small>&#9660;</small>;
+        case SortDirection.Descending:
+            return <small>&#9650;</small>;
+        default:
+            return null;
+    }
 };

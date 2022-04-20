@@ -118,7 +118,7 @@ export class EquipmentPriceObjectionModel extends Model implements IEquipmentPri
 
 export interface IEquipmentPublicCategoryObjectionModel extends BaseObjectionModelWithName {
     description?: string;
-    sortIndex?: number;
+    sortIndex: number;
 }
 
 export class EquipmentPublicCategoryObjectionModel extends Model implements IEquipmentPublicCategoryObjectionModel {
@@ -130,7 +130,7 @@ export class EquipmentPublicCategoryObjectionModel extends Model implements IEqu
     updated?: string;
 
     description?: string;
-    sortIndex?: number;
+    sortIndex!: number;
 }
 
 export interface IEquipmentChangelogEntryObjectionModel

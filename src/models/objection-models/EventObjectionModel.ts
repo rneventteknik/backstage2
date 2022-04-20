@@ -73,6 +73,7 @@ export class EventObjectionModel extends Model {
     name!: string;
     created!: string;
     updated!: string;
+    sortIndex!: number;
     equipmentLists!: EquipmentListObjectionModel[];
     timeEstimates!: TimeEstimateObjectionModel[];
     ownerUser!: UserObjectionModel;
@@ -100,6 +101,7 @@ export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName
     name: string;
     created: string;
     updated: string;
+    sortIndex: number;
     equipmentListEntries: IEquipmentListEntryObjectionModel[];
     equipmentOutDatetime?: string;
     equipmentInDatetime?: string;
@@ -126,6 +128,7 @@ export class EquipmentListObjectionModel extends Model {
     name!: string;
     created!: string;
     updated!: string;
+    sortIndex!: number;
     equipmentListEntries!: EquipmentListEntryObjectionModel[];
     equipmentOutDatetime?: string;
     equipmentInDatetime?: string;
@@ -139,6 +142,7 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
     created?: string;
     updated?: string;
 
+    sortIndex: number;
     equipment?: IEquipmentObjectionModel;
     equipmentId?: number;
     name: string;
@@ -182,6 +186,7 @@ export class EquipmentListEntryObjectionModel extends Model {
     created!: string;
     updated!: string;
 
+    sortIndex!: number;
     equipment!: EquipmentObjectionModel;
     equipmentId!: number;
     nameEN!: string;

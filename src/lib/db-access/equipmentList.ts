@@ -91,7 +91,7 @@ export const deleteEquipmentList = async (id: number): Promise<boolean> => {
 export const validateEquipmentListObjectionModel = (equipmentList: EquipmentListObjectionModel): boolean => {
     if (!equipmentList) return false;
 
-    if (!equipmentList.name) return false;
+    if (equipmentList.name === null) return false;
 
     return true;
 };

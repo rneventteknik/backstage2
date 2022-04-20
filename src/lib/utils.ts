@@ -1,4 +1,4 @@
-import { BaseEntity } from '../models/interfaces/BaseEntity';
+import { BaseEntity, HasId } from '../models/interfaces/BaseEntity';
 import { MemberStatus } from '../models/enums/MemberStatus';
 import { Role } from '../models/enums/Role';
 import { Status } from '../models/enums/Status';
@@ -23,6 +23,10 @@ export function onlyUniqueById<T extends BaseEntity>(value: T, index: number, se
 
 export function notEmpty<T>(value: T | null | undefined): value is T {
     return value !== null && value !== undefined;
+}
+
+export function updateItemsInArrayById<T extends HasId>(list: T[], ...updatedItems: T[]): T[] {
+    return list.map((item) => updatedItems.find((x) => x.id === item.id) ?? item);
 }
 
 // Date formatter

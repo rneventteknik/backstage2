@@ -3,6 +3,7 @@ import { BaseEntityWithName } from './BaseEntity';
 import { Equipment } from './Equipment';
 
 export interface EquipmentList extends BaseEntityWithName {
+    sortIndex: number;
     equipmentListEntries: EquipmentListEntry[];
     equipmentOutDatetime?: Date;
     equipmentInDatetime?: Date;
@@ -11,6 +12,7 @@ export interface EquipmentList extends BaseEntityWithName {
 }
 
 export interface EquipmentListEntry extends BaseEntityWithName {
+    sortIndex: number;
     equipment?: Equipment;
     equipmentId?: number;
     name: string;

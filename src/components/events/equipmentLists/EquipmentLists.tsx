@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faExclamationCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
-import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
+import { getResponseContentOrError, updateItemsInArrayById, toIntOrUndefined } from '../../../lib/utils';
 import {
     EquipmentListObjectionModel,
     IEquipmentListObjectionModel,
@@ -31,6 +31,15 @@ import {
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import { HasId } from '../../../models/interfaces/BaseEntity';
+import {
+    getNextSortIndex,
+    getSortedList,
+    isFirst,
+    isLast,
+    moveItemDown,
+    moveItemUp,
+    sortIndexSortFn,
+} from '../../../lib/sortIndexUtils';
 
 type Props = {
     event: Partial<Event> & HasId;
@@ -42,19 +51,23 @@ type EquipmentListDisplayProps = {
     list: Partial<EquipmentList>;
     readonly: boolean;
     deleteListFn: (x: EquipmentList) => void;
+    moveListFn: (x: EquipmentList, direction: 'UP' | 'DOWN') => void;
+    isFirstFn: (x: EquipmentList) => boolean;
+    isLastFn: (x: EquipmentList) => boolean;
 };
 
 // This component only contains logic to create and delete lists. Everything else
 // is handled by the EquipmentListDisplay component which manages it's list internally.
 //
 const EquipmentLists: React.FC<Props> = ({ event: booking, readonly }: Props) => {
-    const { data: equipmentLists, mutate } = useSwr(
-        '/api/events/' + booking.id + '/equipmentLists',
-        equipmentListsFetcher,
+    const { data: equipmentLists, mutate } = useSwr('/api/events/' + booking.id + '/equipmentLists', (url) =>
+        equipmentListsFetcher(url).then((list) => getSortedList(list)),
     );
     const {
         showCreateSuccessNotification,
         showCreateFailedNotification,
+        showSaveSuccessNotification,
+        showSaveFailedNotification,
         showDeleteSuccessNotification,
         showDeleteFailedNotification,
     } = useNotifications();
@@ -62,6 +75,7 @@ const EquipmentLists: React.FC<Props> = ({ event: booking, readonly }: Props) =>
     const createNewList = async () => {
         const newEquipmentList: Partial<EquipmentListObjectionModel> = {
             name: 'Utrustning',
+            sortIndex: equipmentLists ? getNextSortIndex(equipmentLists) : 10,
         };
         const body = { equipmentList: newEquipmentList };
 
@@ -106,6 +120,43 @@ const EquipmentLists: React.FC<Props> = ({ event: booking, readonly }: Props) =>
             });
     };
 
+    const moveList = (list: EquipmentList, direction: 'UP' | 'DOWN') => {
+        if (!equipmentLists) {
+            throw new Error('Invalid list');
+        }
+
+        const modifiedLists =
+            direction === 'UP' ? moveItemUp(equipmentLists, list) : moveItemDown(equipmentLists, list);
+
+        mutate(getSortedList(updateItemsInArrayById(equipmentLists, ...modifiedLists)), false);
+
+        const requestsPromise = Promise.all(
+            modifiedLists.map((updatedList) => {
+                // Only update sortIndex
+                const body = { equipmentList: { id: updatedList.id, sortIndex: updatedList.sortIndex } };
+
+                const request = {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                };
+
+                return fetch('/api/events/' + booking.id + '/equipmentLists/' + updatedList.id, request).then(
+                    getResponseContentOrError,
+                );
+            }),
+        );
+
+        requestsPromise
+            .then(() => {
+                showSaveSuccessNotification('Bokningen');
+            })
+            .catch((error) => {
+                console.error(error);
+                showSaveFailedNotification('Bokningen');
+            });
+    };
+
     return (
         <>
             {equipmentLists?.map((x) => (
@@ -113,8 +164,11 @@ const EquipmentLists: React.FC<Props> = ({ event: booking, readonly }: Props) =>
                     list={x}
                     key={x.id}
                     event={booking}
-                    deleteListFn={deleteList}
                     readonly={readonly}
+                    deleteListFn={deleteList}
+                    moveListFn={moveList}
+                    isFirstFn={(list: EquipmentList) => isFirst(equipmentLists, list)}
+                    isLastFn={(list: EquipmentList) => isLast(equipmentLists, list)}
                 />
             ))}
             {readonly ? null : (
@@ -132,6 +186,9 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     list: partialList,
     event: booking,
     deleteListFn: parentDeleteListFn,
+    moveListFn: parentMoveListFn,
+    isFirstFn: parentIsFirstFn,
+    isLastFn: parentIsLastFn,
     readonly,
 }: EquipmentListDisplayProps) => {
     const {
@@ -191,7 +248,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
     // Getter to get the default list entry for a given equipment (i.e. initial number of hurs, units, price etc)
     //
-    const getDefaultListEntryFromEquipment = (equipment: Equipment, id = 0, override?: Partial<EquipmentListEntry>) => {
+    const getDefaultListEntryFromEquipment = (
+        equipment: Equipment,
+        id: number,
+        sortIndex: number,
+        override?: Partial<EquipmentListEntry>,
+    ) => {
         if (!equipment.id) {
             throw new Error('Invalid equipment');
         }
@@ -200,6 +262,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
         const entry: EquipmentListEntry = {
             id: id,
+            sortIndex: sortIndex,
             equipment: equipment,
             equipmentId: equipment.id,
             numberOfUnits: 1,
@@ -225,13 +288,21 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
     const addMultipleEquipment = (entries: { equipment: Equipment; numberOfUnits?: number }[]) => {
         let nextId = getNextEquipmentListEntryId();
+        let nextSortIndex = getNextSortIndex(list.equipmentListEntries);
+
         const entriesToAdd = entries.map((x) => {
             // This id is only used in the client, it is striped before sending to the server
-            return getDefaultListEntryFromEquipment(
+            const entity = getDefaultListEntryFromEquipment(
                 x.equipment,
-                nextId++,
+                nextId,
+                nextSortIndex,
                 x.numberOfUnits ? { numberOfUnits: x.numberOfUnits } : {},
             );
+
+            nextId += 1;
+            nextSortIndex += 10;
+
+            return entity;
         });
 
         if (list) {
@@ -308,12 +379,28 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     // List entry modification functions. Note: these will trigger a save of the whole list.
     //
     const updateListEntry = (listEntry: EquipmentListEntry) => {
-        const newEquipmentListEntries = list.equipmentListEntries.map((x) => (x.id === listEntry.id ? listEntry : x));
+        const newEquipmentListEntries = updateItemsInArrayById(list.equipmentListEntries, listEntry);
         saveList({ ...list, equipmentListEntries: newEquipmentListEntries });
     };
 
     const deleteListEntry = (listEntry: EquipmentListEntry) => {
         const newEquipmentListEntries = list.equipmentListEntries.filter((x) => x.id != listEntry.id);
+        saveList({ ...list, equipmentListEntries: newEquipmentListEntries });
+    };
+
+    const moveListEntryUp = (listEntry: EquipmentListEntry) => {
+        const newEquipmentListEntries = updateItemsInArrayById(
+            list.equipmentListEntries,
+            ...moveItemUp(list.equipmentListEntries, listEntry),
+        );
+        saveList({ ...list, equipmentListEntries: newEquipmentListEntries });
+    };
+
+    const moveListEntryDown = (listEntry: EquipmentListEntry) => {
+        const newEquipmentListEntries = updateItemsInArrayById(
+            list.equipmentListEntries,
+            ...moveItemDown(list.equipmentListEntries, listEntry),
+        );
         saveList({ ...list, equipmentListEntries: newEquipmentListEntries });
     };
 
@@ -431,6 +518,22 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     const EquipmentListEntryActionsDisplayFn = (entry: EquipmentListEntry) => {
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
+                {readonly ? null : (
+                    <>
+                        <Dropdown.Item
+                            onClick={() => moveListEntryUp(entry)}
+                            disabled={isFirst(list.equipmentListEntries, entry)}
+                        >
+                            Flytta upp
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            onClick={() => moveListEntryDown(entry)}
+                            disabled={isLast(list.equipmentListEntries, entry)}
+                        >
+                            Flytta ner
+                        </Dropdown.Item>
+                    </>
+                )}
                 <Dropdown.Item href={'/equipment/' + entry.equipmentId} target="_blank" disabled={!entry.equipment}>
                     Öppna utrustning i ny flik
                 </Dropdown.Item>
@@ -443,7 +546,9 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         <Dropdown.Item
                             onClick={() =>
                                 entry.equipment
-                                    ? updateListEntry(getDefaultListEntryFromEquipment(entry.equipment, entry.id))
+                                    ? updateListEntry(
+                                          getDefaultListEntryFromEquipment(entry.equipment, entry.id, entry.sortIndex),
+                                      )
                                     : null
                             }
                         >
@@ -458,12 +563,13 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         );
     };
 
+    const sortFn = (a: EquipmentListEntry, b: EquipmentListEntry) => sortIndexSortFn(a, b);
+
     // Table settings
     //
     const tableSettings: TableConfiguration<EquipmentListEntry> = {
         entityTypeDisplayName: '',
-        defaultSortPropertyName: 'name',
-        defaultSortAscending: true,
+        customSortFn: sortFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         noResultsLabel: 'Listan är tom',
@@ -543,6 +649,18 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         </Button>
                         {readonly ? null : (
                             <>
+                                <Dropdown.Item
+                                    onClick={() => parentMoveListFn(list, 'UP')}
+                                    disabled={parentIsFirstFn(list)}
+                                >
+                                    Flytta upp
+                                </Dropdown.Item>
+                                <Dropdown.Item
+                                    onClick={() => parentMoveListFn(list, 'DOWN')}
+                                    disabled={parentIsLastFn(list)}
+                                >
+                                    Flytta ner
+                                </Dropdown.Item>
                                 <Dropdown.Item
                                     onClick={() =>
                                         setEquipmentListEntryToEditViewModel({
@@ -847,6 +965,9 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             // Since we are editing a partial model we need to set default values to any properties without value before saving
                             const entryToSave: EquipmentListEntry = {
                                 id: equipmentListEntryToEditViewModel.id ?? getNextEquipmentListEntryId(),
+                                sortIndex:
+                                    equipmentListEntryToEditViewModel.sortIndex ??
+                                    getNextSortIndex(list.equipmentListEntries),
                                 equipment: equipmentListEntryToEditViewModel.equipment,
                                 equipmentId: equipmentListEntryToEditViewModel.equipmentId,
                                 name: equipmentListEntryToEditViewModel.name ?? '',
