@@ -44,14 +44,14 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </span>
                 ) : null}
             </IfAdmin>
-            <p className="text-muted mb-0">
+            <div className="text-muted mb-0">
                 <span className="d-lg-none">
                     {user?.emailAddress ?? 'N/A'}
                     <IfAdmin currentUser={currentUser}>, </IfAdmin>
                 </span>
                 <IfAdmin currentUser={currentUser}>{getRoleName(user?.role)}</IfAdmin>
-            </p>
-            <p className="text-muted mb-0 d-md-none">{getMemberStatusName(user?.memberStatus)}</p>
+            </div>
+            <div className="text-muted mb-0 d-md-none">{getMemberStatusName(user?.memberStatus)}</div>
         </>
     );
 

@@ -31,8 +31,8 @@ const EquipmentNameDisplayFn = (equipment: Equipment) => (
                 {x.name}
             </Badge>
         ))}
-        <p className="text-muted mb-0">{equipment.description}</p>
-        <p className="text-muted mb-0 d-md-none">{equipment.inventoryCount + ' st'}</p>
+        <div className="text-muted mb-0">{equipment.description}</div>
+        <div className="text-muted mb-0 d-md-none">{equipment.inventoryCount + ' st'}</div>
     </>
 );
 

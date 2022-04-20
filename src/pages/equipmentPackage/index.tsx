@@ -28,9 +28,9 @@ const EquipmentPackageNameDisplayFn = (equipmentPackage: EquipmentPackage) => (
                 {x.name}
             </Badge>
         ))}
-        <p className="text-muted mb-0 d-md-none">
+        <div className="text-muted mb-0 d-md-none">
             {equipmentPackage.equipmentEntries.length} delar, {equipmentPackage.estimatedHours} timmar
-        </p>
+        </div>
     </>
 );
 

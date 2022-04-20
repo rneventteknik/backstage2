@@ -414,7 +414,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
     const EquipmentListEntryNameDisplayFn = (entry: EquipmentListEntry) => (
         <>
-            <p className="mb-0">
+            <div className="mb-0">
                 <DoubleClickToEdit
                     value={entry.name}
                     onUpdate={(newValue) =>
@@ -425,8 +425,8 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 >
                     {entry.name}
                 </DoubleClickToEdit>
-            </p>
-            <p className="mb-0">
+            </div>
+            <div className="mb-0">
                 <DoubleClickToEdit
                     value={entry.description}
                     onUpdate={(newValue) => updateListEntry({ ...entry, description: newValue })}
@@ -439,11 +439,11 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         <span className="text-muted font-italic">Dubbelklicka för att lägga till en beskrivning</span>
                     )}
                 </DoubleClickToEdit>
-            </p>
+            </div>
 
-            <p className="mb-0 text-muted d-md-none">{EquipmentListEntryNumberOfHoursDisplayFn(entry)}</p>
-            <p className="mb-0 text-muted d-md-none">{EquipmentListEntryPriceDisplayFn(entry)}</p>
-            <p className="mb-0 text-muted d-md-none">{EquipmentListEntryTotalPriceDisplayFn(entry)}</p>
+            <div className="mb-0 text-muted d-md-none">{EquipmentListEntryNumberOfHoursDisplayFn(entry)}</div>
+            <div className="mb-0 text-muted d-md-none">{EquipmentListEntryPriceDisplayFn(entry)}</div>
+            <div className="mb-0 text-muted d-md-none">{EquipmentListEntryTotalPriceDisplayFn(entry)}</div>
         </>
     );
 

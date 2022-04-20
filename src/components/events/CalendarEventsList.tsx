@@ -67,11 +67,11 @@ const CalendarEventsList: React.FC<Props> = ({ onSelect: onSelect }: Props) => {
     const CalendarResultNameDisplayFn = (calendarResult: CalendarResultViewModel) => (
         <>
             <span>{calendarResult.name}</span>
-            <p className="text-muted mb-0">{calendarResult.creator ?? 'N/A'}</p>
-            <p className="text-muted mb-0 d-lg-none">
+            <div className="text-muted mb-0">{calendarResult.creator ?? 'N/A'}</div>
+            <div className="text-muted mb-0 d-lg-none">
                 {calendarResult?.displayStartDate + ' till ' + calendarResult?.displayEndDate}
-            </p>
-            <p className="text-muted mb-0">{calendarResult.description}</p>
+            </div>
+            <div className="text-muted mb-0">{calendarResult.description}</div>
         </>
     );
 
