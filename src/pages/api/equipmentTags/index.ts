@@ -3,22 +3,20 @@ import { respondWithCustomErrorMessage, respondWithEntityNotFoundResponse } from
 import { fetchEquipmentTags } from '../../../lib/db-access/equipmentTag';
 import { withSessionContext } from '../../../lib/sessionContext';
 
-const handler = withSessionContext(
-    async (req: NextApiRequest, res: NextApiResponse): Promise<Promise<void> | void> => {
-        switch (req.method) {
-            case 'GET':
-                await fetchEquipmentTags()
-                    .then((result) => res.status(200).json(result))
-                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
+const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<Promise<void> | void> => {
+    switch (req.method) {
+        case 'GET':
+            await fetchEquipmentTags()
+                .then((result) => res.status(200).json(result))
+                .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
-                return;
+            return;
 
-            default:
-                respondWithEntityNotFoundResponse(res);
-        }
+        default:
+            respondWithEntityNotFoundResponse(res);
+    }
 
-        return;
-    },
-);
+    return;
+});
 
 export default handler;

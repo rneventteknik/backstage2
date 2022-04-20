@@ -32,7 +32,7 @@ const Topbar: React.FC<Props> = ({ currentUser, toggleSidebar }: Props) => {
                     <FontAwesomeIcon icon={faBars} size="lg" />
                 </Button>
                 <div className={styles.branding}>
-                    <Link href="/">
+                    <Link href="/" passHref>
                         <Navbar.Brand as="a" href="/">
                             Backstage2
                         </Navbar.Brand>
@@ -50,7 +50,7 @@ const Topbar: React.FC<Props> = ({ currentUser, toggleSidebar }: Props) => {
                         <Dropdown.Item disabled={true}>
                             <UserDisplay user={currentUser} />
                         </Dropdown.Item>
-                        <Link href={'/users/' + currentUser.userId}>
+                        <Link href={'/users/' + currentUser.userId} passHref>
                             <Dropdown.Item href={'/users/' + currentUser.userId}>Profil</Dropdown.Item>
                         </Link>
                         <Dropdown.Item onClick={logOut}>Logga ut</Dropdown.Item>

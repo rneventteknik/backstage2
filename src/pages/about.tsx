@@ -4,6 +4,7 @@ import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../lib/useUser';
 import Header from '../components/layout/Header';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Hjälp';

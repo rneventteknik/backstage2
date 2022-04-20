@@ -13,6 +13,7 @@ import { equipmentFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 
@@ -42,7 +43,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/equipment/' + equipment.id + '/edit'}>
+                    <Link href={'/equipment/' + equipment.id + '/edit'} passHref>
                         <Button variant="primary" href={'/equipment/' + equipment.id + '/edit'}>
                             Redigera
                         </Button>

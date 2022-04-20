@@ -17,6 +17,7 @@ import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { PartialDeep } from 'type-fest';
 import { Role } from '../../../models/enums/Role';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
 type Props = { user: CurrentUserInfo };
 
@@ -28,10 +29,12 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit equipment
     //
     const router = useRouter();
-    const { data: equipment, error, isValidating, mutate } = useSwr(
-        '/api/equipment/' + router.query.id,
-        equipmentFetcher,
-    );
+    const {
+        data: equipment,
+        error,
+        isValidating,
+        mutate,
+    } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;

@@ -4,7 +4,7 @@ import { EquipmentList, EquipmentListEntry } from '../models/interfaces/Equipmen
 // Calculate total price
 //
 export const getPrice = (entry: EquipmentListEntry, numberOfDays: number): number => {
-    const daysMultiplier = 1 + ((numberOfDays - 1) * 0.25);
+    const daysMultiplier = 1 + (numberOfDays - 1) * 0.25;
     return entry.numberOfUnits * (entry.numberOfHours * entry.pricePerHour + entry.pricePerUnit * daysMultiplier);
 };
 
@@ -14,7 +14,7 @@ export const getEquipmentListPrice = (list: EquipmentList): number => {
 
 export const getTimeEstimatePrice = (timeEstimate: TimeEstimate): number => {
     return (timeEstimate.numberOfHours ?? 0) * (timeEstimate.pricePerHour ?? 0);
-}
+};
 
 export const getTotalTimeEstimatesPrice = (timeEstimates: TimeEstimate[] | undefined): number => {
     if (!timeEstimates) {
@@ -22,7 +22,7 @@ export const getTotalTimeEstimatesPrice = (timeEstimates: TimeEstimate[] | undef
     }
 
     return timeEstimates?.reduce((sum, l) => sum + getTimeEstimatePrice(l), 0) ?? 0;
-}
+};
 
 export const getEventPrice = (event: Event): number => {
     const equipmentPrice = event.equipmentLists?.reduce((sum, l) => sum + getEquipmentListPrice(l), 0) ?? 0;
@@ -57,13 +57,18 @@ export const getNumberOfDays = (equipmentList: EquipmentList): number => {
         return 1;
     }
 
-    return Math.ceil((equipmentList.usageEndDatetime.getTime() - equipmentList.usageStartDatetime.getTime()) / (1000 * 3600 * 24))
-}
+    return Math.ceil(
+        (equipmentList.usageEndDatetime.getTime() - equipmentList.usageStartDatetime.getTime()) / (1000 * 3600 * 24),
+    );
+};
 
 export const getNumberOfEquipmentOutDays = (equipmentList: EquipmentList): number | null => {
     if (!equipmentList.equipmentOutDatetime || !equipmentList.equipmentInDatetime) {
         return null;
     }
 
-    return Math.ceil((equipmentList.equipmentInDatetime.getTime() - equipmentList.equipmentOutDatetime.getTime()) / (1000 * 3600 * 24))
-}
+    return Math.ceil(
+        (equipmentList.equipmentInDatetime.getTime() - equipmentList.equipmentOutDatetime.getTime()) /
+            (1000 * 3600 * 24),
+    );
+};

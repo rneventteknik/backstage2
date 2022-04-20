@@ -16,6 +16,7 @@ import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton'
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { Role } from '../../../models/enums/Role';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
 type Props = { user: CurrentUserInfo };
 

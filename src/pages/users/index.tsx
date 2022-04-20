@@ -17,6 +17,7 @@ import { usersFetcher } from '../../lib/fetchers';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Användare';
@@ -93,13 +94,13 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfAdmin currentUser={currentUser}>
-                    <Link href="/users/new">
+                    <Link href="/users/new" passHref>
                         <Button variant="primary" as="span">
                             Skapa användare
                         </Button>
                     </Link>
                 </IfAdmin>
-                <Link href={'users/' + currentUser.userId}>
+                <Link href={'users/' + currentUser.userId} passHref>
                     <Button variant="secondary" as="span" className="ml-2">
                         Visa min profil
                     </Button>

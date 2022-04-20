@@ -1,16 +1,8 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-if ! yarn eslint '*/**/*.{js,ts,tsx}' > _precommit-hook 2> /dev/null; then
-    echo "The linter found the following error/s:";
-    echo
-    egrep -C 1 "[0-9]+:[0-9]+\s+error" _precommit-hook;
-    echo
-    echo "Please fix the errors and then commit again."
-    echo "Psst, this can be overridden by passing the --no-verify flag to git commit."
-    echo
-    rm _precommit-hook;
-    exit 1
-fi
-
-rm _precommit-hook;
+echo "Running pre-commit hook. Bypass with --no-verify."
+echo "The hook formats staged files, compiles the project with Typescript and lints it with eslint."
+yarn pretty-quick --staged --check
+yarn tsc
+yarn eslint .

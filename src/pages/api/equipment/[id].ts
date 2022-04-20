@@ -42,7 +42,7 @@ const handler = withSessionContext(
                     respondWithAccessDeniedResponse(res);
                     return;
                 }
-                
+
                 if (!validateEquipmentObjectionModel(req.body.equipment)) {
                     respondWithInvalidDataResponse(res);
                     return;

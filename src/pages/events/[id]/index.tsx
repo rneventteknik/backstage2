@@ -19,6 +19,7 @@ import { faFileDownload } from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
 import EquipmentLists from '../../../components/events/equipmentLists/EquipmentLists';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 
@@ -48,7 +49,7 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/events/' + event.id + '/edit'}>
+                    <Link href={'/events/' + event.id + '/edit'} passHref>
                         <Button variant="primary" href={'/events/' + event.id + '/edit'} className="mr-2">
                             Redigera
                         </Button>
@@ -158,8 +159,12 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </Card>
                 </Col>
                 <Col xl={8}>
-                    <TimeEstimateList eventId={event.id} pricePlan={event.pricePlan} readonly={currentUser.role === Role.READONLY} />
-                    <EquipmentLists event={event} readonly={currentUser.role === Role.READONLY}/>
+                    <TimeEstimateList
+                        eventId={event.id}
+                        pricePlan={event.pricePlan}
+                        readonly={currentUser.role === Role.READONLY}
+                    />
+                    <EquipmentLists event={event} readonly={currentUser.role === Role.READONLY} />
                 </Col>
             </Row>
         </Layout>

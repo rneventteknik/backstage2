@@ -1,4 +1,4 @@
-@import "../../style/variables";
+@import '../../style/variables';
 
 .notificationsContainer {
     position: fixed;
@@ -6,7 +6,7 @@
     left: 50%;
     display: flex;
     justify-content: center;
-    transform:  translate(-50%, 0);
+    transform: translate(-50%, 0);
     z-index: 100;
     max-height: 50vh;
     overflow: hidden;

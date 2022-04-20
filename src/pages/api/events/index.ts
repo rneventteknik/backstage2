@@ -27,7 +27,7 @@ const handler = withSessionContext(
                     respondWithInvalidDataResponse(res);
                     return;
                 }
-                
+
                 await insertEvent(req.body.event)
                     .then((result) => res.status(200).json(result))
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));

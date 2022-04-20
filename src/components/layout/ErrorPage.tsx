@@ -35,7 +35,7 @@ export const ErrorPageContent: React.FC<ErrorPageContentProps> = ({ errorMessage
             <h1 className={styles.title}>Ojdå!</h1>
             <p>Det gick inte att ladda innehållet just nu.</p>
             <p className="text-monospace text-muted">{errorMessage}</p>
-            <Link href="/">
+            <Link href="/" passHref>
                 <Button variant="dark" href="/">
                     Gå tillbaka till startsidan
                 </Button>

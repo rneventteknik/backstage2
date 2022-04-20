@@ -7,6 +7,7 @@ import SmallEventList from '../components/SmallEventList';
 import useSwr from 'swr';
 import { eventsFetcher } from '../lib/fetchers';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Bokningsarkiv';

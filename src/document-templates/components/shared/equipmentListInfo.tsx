@@ -2,7 +2,13 @@ import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles, formatEquipmentListEntryCountOrHours } from '../../utils';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
-import { formatNumberAsCurrency, getPrice, getNumberOfDays, getEquipmentListPrice, formatPrice } from '../../../lib/pricingUtils';
+import {
+    formatNumberAsCurrency,
+    getPrice,
+    getNumberOfDays,
+    getEquipmentListPrice,
+    formatPrice,
+} from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { formatDate } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
@@ -11,7 +17,7 @@ const styles = StyleSheet.create({
     ...commonStyles,
     equipmentListSection: {
         flexDirection: 'column',
-        marginBottom: 15
+        marginBottom: 15,
     },
 });
 
@@ -24,7 +30,11 @@ export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
     return (
         <View style={styles.equipmentListSection}>
             <Text style={styles.heading}>{list.name}</Text>
-            <Text style={styles.italic}>{list.usageStartDatetime ? formatDate(list.usageStartDatetime) : '-'} to {list.usageEndDatetime ? formatDate(list.usageEndDatetime) : '-'} ({getNumberOfDays(list)} {t('common.misc.days-unit')})</Text>
+            <Text style={styles.italic}>
+                {list.usageStartDatetime ? formatDate(list.usageStartDatetime) : '-'} to{' '}
+                {list.usageEndDatetime ? formatDate(list.usageEndDatetime) : '-'} ({getNumberOfDays(list)}{' '}
+                {t('common.misc.days-unit')})
+            </Text>
 
             <TableRow>
                 <TableCellAutoWidth>
@@ -42,7 +52,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
             </TableRow>
 
             <View>
-                {list.equipmentListEntries.map(entry =>
+                {list.equipmentListEntries.map((entry) => (
                     <TableRow key={entry.id}>
                         <TableCellAutoWidth>
                             <Text>{entry.name}</Text>
@@ -58,7 +68,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
                             <Text>{formatNumberAsCurrency(getPrice(entry, getNumberOfDays(list)))}</Text>
                         </TableCellFixedWidth>
                     </TableRow>
-                )}
+                ))}
             </View>
 
             <TableRow>

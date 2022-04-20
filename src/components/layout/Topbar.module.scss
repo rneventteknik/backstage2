@@ -1,4 +1,4 @@
-@import "../../style/variables";
+@import '../../style/variables';
 
 .container {
     z-index: 100;
@@ -9,7 +9,7 @@
 
 .search {
     margin: 0 auto;
-    max-width: 800px,;
+    max-width: 800px;
     width: 100%;
 }
 
@@ -19,7 +19,7 @@
         width: 200px;
     }
 
-    [data-search-active-status="true"] .branding {
+    [data-search-active-status='true'] .branding {
         width: 0px;
         opacity: 0;
     }

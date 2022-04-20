@@ -1,4 +1,4 @@
-import { Equipment, EquipmentPrice } from '../../models/interfaces';
+import { Equipment, EquipmentPrice, EquipmentTag } from '../../models/interfaces';
 import {
     IEquipmentObjectionModel,
     IEquipmentTagObjectionModel,
@@ -7,7 +7,6 @@ import {
     IEquipmentPublicCategoryObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { EquipmentChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
-import { EquipmentTag } from '../../models/interfaces';
 import { toDateOrUndefined } from '../utils';
 import { toUser } from './user';
 import { EquipmentPublicCategory } from '../../models/interfaces/EquipmentPublicCategory';

@@ -1,4 +1,4 @@
-@import "../../style/variables";
+@import '../../style/variables';
 
 $navbar-height-compensation: 56px;
 $sidebar-width: 260px;
@@ -52,11 +52,11 @@ $sidebar-transition-time: 0.1s;
 
 // Handle sidebar toggle and responsive design
 //
-[data-sidebar-toggle-status="true"] .sidebar {
+[data-sidebar-toggle-status='true'] .sidebar {
     left: -$sidebar-width;
 }
 
-[data-sidebar-toggle-status="true"] .mainContentContainer {
+[data-sidebar-toggle-status='true'] .mainContentContainer {
     margin-left: 0;
 }
 
@@ -68,7 +68,7 @@ $sidebar-transition-time: 0.1s;
         margin-left: 0;
     }
 
-    [data-sidebar-toggle-status="true"] {
+    [data-sidebar-toggle-status='true'] {
         .sidebar {
             left: 0;
         }
@@ -76,7 +76,7 @@ $sidebar-transition-time: 0.1s;
 }
 
 @media only screen and (max-width: 450px) {
-    [data-sidebar-toggle-status="true"] .sidebar {
+    [data-sidebar-toggle-status='true'] .sidebar {
         width: 100%;
     }
 }

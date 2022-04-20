@@ -28,7 +28,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         if (selectedEquipmentPackageEntries.length === 0) {
             setSelectedEquipmentPackageEntries(equipmentPackage?.equipmentEntries ?? []);
         }
-    }, [equipmentPackage]);
+    }, [equipmentPackage, selectedEquipmentPackageEntries.length]);
 
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
@@ -183,7 +183,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                             placeholder="Lägg till utrustning"
                             includePackages={false}
                             id="equipment-search"
-                            onSelect={(x) => addEquipment((x as unknown) as IEquipmentObjectionModel)}
+                            onSelect={(x) => addEquipment(x as unknown as IEquipmentObjectionModel)}
                         />
                     </div>
 

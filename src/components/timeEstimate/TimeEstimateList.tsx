@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Card, Button, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Card, Button, DropdownButton, Dropdown, Alert } from 'react-bootstrap';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { Alert } from 'react-bootstrap';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
 import { eventFetcher, timeEstimatesFetcher } from '../../lib/fetchers';
 import useSwr from 'swr';
@@ -25,21 +24,21 @@ type Props = {
 const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Props) => {
     const [showListContent, setShowListContent] = useState(false);
 
+    const { showCreateFailedNotification, showSaveFailedNotification, showDeleteFailedNotification } =
+        useNotifications();
+
     const {
-        showCreateFailedNotification,
-        showSaveFailedNotification,
-        showDeleteFailedNotification,
-    } = useNotifications();
+        data: timeEstimates,
+        error,
+        isValidating,
+        mutate,
+    } = useSwr('/api/events/' + eventId + '/timeEstimate', timeEstimatesFetcher);
 
-    const { data: timeEstimates, error, isValidating, mutate } = useSwr(
-        '/api/events/' + eventId + '/timeEstimate',
-        timeEstimatesFetcher,
-    );
-
-    const { data: eventData, error: eventError, isValidating: eventIsValidating } = useSwr(
-        '/api/events/' + eventId,
-        eventFetcher,
-    );
+    const {
+        data: eventData,
+        error: eventError,
+        isValidating: eventIsValidating,
+    } = useSwr('/api/events/' + eventId, eventFetcher);
 
     const addEmptyTimeEstimate = async () => {
         if (!process.env.NEXT_PUBLIC_SALARY_NORMAL)
@@ -275,11 +274,11 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Pro
             {showListContent ? (
                 <>
                     <TableDisplay entities={timeEstimates} configuration={tableSettings} />
-                    {readonly ? null :
+                    {readonly ? null : (
                         <Button className="ml-2 mr-2 mb-2" onClick={addEmptyTimeEstimate} variant="secondary" size="sm">
                             <FontAwesomeIcon icon={faPlusCircle} /> Ny rad
                         </Button>
-                    }
+                    )}
                 </>
             ) : null}
         </Card>

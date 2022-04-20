@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from 'react';
 import Layout from '../../components/layout/Layout';
-import { Equipment } from '../../models/interfaces';
+import { Equipment, EquipmentTag } from '../../models/interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import Link from 'next/link';
@@ -12,7 +12,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import Header from '../../components/layout/Header';
 import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
-import { EquipmentTag } from '../../models/interfaces';
 import { equipmentTagsFetcher, equipmentsFetcher } from '../../lib/fetchers';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
@@ -109,6 +108,7 @@ const tableSettings: TableConfiguration<Equipment> = {
     ],
 };
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Utrustning';
@@ -155,13 +155,13 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href="/equipment/new">
+                    <Link href="/equipment/new" passHref>
                         <Button variant="primary" as="span" className="mr-2">
                             Lägg till utrustning
                         </Button>
                     </Link>
                 </IfNotReadonly>
-                <Link href="/equipmentPackage">
+                <Link href="/equipmentPackage" passHref>
                     <Button variant="dark" as="span">
                         Visa utrustningpaket
                     </Button>

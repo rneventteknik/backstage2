@@ -12,6 +12,7 @@ import Header from '../../components/layout/Header';
 import { Role } from '../../models/enums/Role';
 import { useNotifications } from '../../lib/useNotifications';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.ADMIN);
 type Props = { user: CurrentUserInfo };
 

@@ -13,10 +13,14 @@ import Header from '../../components/layout/Header';
 import { SalaryStatus } from '../../models/enums/SalaryStatus';
 import CalendarEventsList from '../../components/events/CalendarEventsList';
 import { CalendarResult } from '../../models/misc/CalendarResult';
-import { EquipmentListObjectionModel, IEquipmentListObjectionModel } from '../../models/objection-models/EventObjectionModel';
+import {
+    EquipmentListObjectionModel,
+    IEquipmentListObjectionModel,
+} from '../../models/objection-models/EventObjectionModel';
 import { useNotifications } from '../../lib/useNotifications';
 import { Role } from '../../models/enums/Role';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
 type Props = { user: CurrentUserInfo };
 
@@ -27,10 +31,7 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
 
-    const {
-        showCreateSuccessNotification,
-        showCreateFailedNotification,
-    } = useNotifications();
+    const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
 
     const breadcrumbs = [
         { link: '/events', displayName: 'Bokningar' },
@@ -41,16 +42,16 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         setSelectedDefaultEvent(undefined);
         setStartDate(undefined);
         setEndDate(undefined);
-    }
+    };
 
     const createEventFrom = (calendarEvent: CalendarResult | null) => {
         setSelectedDefaultEvent({
             status: Status.DRAFT,
             salaryStatus: SalaryStatus.NOT_SENT,
-            name: calendarEvent?.name?.replace(/\s*\[[^[]*\]\s*/g, "") ?? '',
+            name: calendarEvent?.name?.replace(/\s*\[[^[]*\]\s*/g, '') ?? '',
             note: calendarEvent?.description,
             location: calendarEvent?.location,
-            calendarEventId: calendarEvent?.id
+            calendarEventId: calendarEvent?.id,
         });
 
         if (calendarEvent) {
@@ -58,7 +59,6 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             const dateWithoutTimeRegEx = /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/;
             if (calendarEvent.start && calendarEvent.start.match(dateWithoutTimeRegEx)) {
                 setStartDate(convertToDateOrUndefined(calendarEvent.start + 'T00:00')?.toISOString());
-
             } else {
                 setStartDate(convertToDateOrUndefined(calendarEvent.start)?.toISOString());
             }
@@ -69,7 +69,7 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 setEndDate(convertToDateOrUndefined(calendarEvent.end)?.toISOString());
             }
         }
-    }
+    };
 
     const handleSubmit = async (event: Partial<IEventObjectionModel>) => {
         const body = { event: event };
@@ -83,11 +83,10 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         fetch('/api/events', request)
             .then((apiResponse) => getResponseContentOrError<IEventObjectionModel>(apiResponse))
             .then((data) => {
-                createDefaultEquipmentList(data.id)
-                    .then(() => {
-                        showCreateSuccessNotification('Bokningen');
-                        router.push('/events/' + data.id);
-                    })
+                createDefaultEquipmentList(data.id).then(() => {
+                    showCreateSuccessNotification('Bokningen');
+                    router.push('/events/' + data.id);
+                });
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -111,8 +110,9 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             body: JSON.stringify(body),
         };
 
-        return fetch('/api/events/' + eventId + '/equipmentLists', request)
-            .then((apiResponse) => getResponseContentOrError<IEquipmentListObjectionModel>(apiResponse))
+        return fetch('/api/events/' + eventId + '/equipmentLists', request).then((apiResponse) =>
+            getResponseContentOrError<IEquipmentListObjectionModel>(apiResponse),
+        );
     };
 
     return (
@@ -126,10 +126,11 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
                                 <div className="d-flex">
-                                    <p className="text-muted flex-grow-1 mb-0"><strong>Steg 1 av 2</strong> Välj en bokning från kalendern nedan eller skapa en manuellt.</p>
-                                    <Button onClick={() => createEventFrom(null)}>
-                                        Skapa bokning manuellt
-                                    </Button>
+                                    <p className="text-muted flex-grow-1 mb-0">
+                                        <strong>Steg 1 av 2</strong> Välj en bokning från kalendern nedan eller skapa en
+                                        manuellt.
+                                    </p>
+                                    <Button onClick={() => createEventFrom(null)}>Skapa bokning manuellt</Button>
                                 </div>
                             </Card.Body>
                         </Card>
@@ -141,7 +142,9 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
                                 <div className="d-flex">
-                                    <p className="text-muted flex-grow-1 mb-0"><strong>Steg 2 av 2</strong> Fyll i bokningsdetaljerna nedan.</p>
+                                    <p className="text-muted flex-grow-1 mb-0">
+                                        <strong>Steg 2 av 2</strong> Fyll i bokningsdetaljerna nedan.
+                                    </p>
                                     <Button variant="secondary" onClick={() => resetSelectedEvent()} className="mr-2">
                                         Avbryt
                                     </Button>
@@ -151,13 +154,14 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                 </div>
                             </Card.Body>
                         </Card>
-                        {selectedDefaultEvent ?
+                        {selectedDefaultEvent ? (
                             <EventForm
                                 handleSubmitEvent={handleSubmit}
                                 formId="editEventForm"
                                 event={selectedDefaultEvent}
                                 isNewBooking={true}
-                            /> : null}
+                            />
+                        ) : null}
                         <Button variant="primary" form="editEventForm" type="submit" className="mb-3">
                             Lägg till bokning
                         </Button>

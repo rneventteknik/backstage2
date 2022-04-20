@@ -19,6 +19,7 @@ import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton'
 import { userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 

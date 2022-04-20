@@ -27,9 +27,17 @@ const CalendarEventsList: React.FC<Props> = ({ onSelect: onSelect }: Props) => {
             .then((calenderResults) =>
                 calenderResults.map((calenderResult) => ({
                     ...calenderResult,
-                    displayStartDate: calenderResult.start ? (calenderResult.start.match(dateWithoutTimeRegEx) ? calenderResult.start : formatDate(new Date(calenderResult.start))) : '-',
-                    displayEndDate: calenderResult.end ? (calenderResult.end.match(dateWithoutTimeRegEx) ? calenderResult.end : formatDate(new Date(calenderResult.end))) : '-',
-                }))
+                    displayStartDate: calenderResult.start
+                        ? calenderResult.start.match(dateWithoutTimeRegEx)
+                            ? calenderResult.start
+                            : formatDate(new Date(calenderResult.start))
+                        : '-',
+                    displayEndDate: calenderResult.end
+                        ? calenderResult.end.match(dateWithoutTimeRegEx)
+                            ? calenderResult.end
+                            : formatDate(new Date(calenderResult.end))
+                        : '-',
+                })),
             ),
     );
 
@@ -60,7 +68,9 @@ const CalendarEventsList: React.FC<Props> = ({ onSelect: onSelect }: Props) => {
         <>
             <span>{calendarResult.name}</span>
             <p className="text-muted mb-0">{calendarResult.creator ?? 'N/A'}</p>
-            <p className="text-muted mb-0 d-lg-none">{calendarResult?.displayStartDate + ' till ' + calendarResult?.displayEndDate}</p>
+            <p className="text-muted mb-0 d-lg-none">
+                {calendarResult?.displayStartDate + ' till ' + calendarResult?.displayEndDate}
+            </p>
             <p className="text-muted mb-0">{calendarResult.description}</p>
         </>
     );
@@ -68,7 +78,14 @@ const CalendarEventsList: React.FC<Props> = ({ onSelect: onSelect }: Props) => {
     const CalendarResultActionsDisplayFn = (calendarResult: CalendarResultViewModel) => {
         return (
             <>
-                <Button variant={calendarResult.existingEventId ? 'secondary' : 'primary'} title="Mer" size="sm" className="d-inline mr-2" onClick={() => onSelect(calendarResult)} disabled={!!calendarResult.existingEventId}>
+                <Button
+                    variant={calendarResult.existingEventId ? 'secondary' : 'primary'}
+                    title="Mer"
+                    size="sm"
+                    className="d-inline mr-2"
+                    onClick={() => onSelect(calendarResult)}
+                    disabled={!!calendarResult.existingEventId}
+                >
                     Skapa Bokning
                 </Button>
 
@@ -82,13 +99,13 @@ const CalendarEventsList: React.FC<Props> = ({ onSelect: onSelect }: Props) => {
                     <Dropdown.Item href={calendarResult.link} target="_blank">
                         Visa i Google Calender <FontAwesomeIcon icon={faExternalLinkAlt} />
                     </Dropdown.Item>
-                    {calendarResult.existingEventId ?
-                        <Link href={'/events/' + calendarResult.existingEventId}>
+                    {calendarResult.existingEventId ? (
+                        <Link href={'/events/' + calendarResult.existingEventId} passHref>
                             <Dropdown.Item href={'/events/' + calendarResult.existingEventId}>
                                 Öppna Event
                             </Dropdown.Item>
                         </Link>
-                        : null}
+                    ) : null}
                 </DropdownButton>
             </>
         );

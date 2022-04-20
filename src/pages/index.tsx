@@ -10,6 +10,7 @@ import { toEvent } from '../lib/mappers/event';
 import SmallEventList from '../components/SmallEventList';
 import useSwr from 'swr';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 

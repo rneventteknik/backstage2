@@ -1,6 +1,5 @@
-
 /* Breadcrumbs */
-$breadcrumb-bg: rgba(0,0,0,0);
+$breadcrumb-bg: rgba(0, 0, 0, 0);
 $breadcrumb-divider-color: $backstage-dark-text-color;
 $breadcrumb-active-color: $backstage-text-color;
 $breadcrumb-link-color: $backstage-text-color;
@@ -22,7 +21,7 @@ $table-bg: $backstage-color-1;
     thead th {
         font-weight: $font-weight-normal;
         background-color: $backstage-color-2;
-      }
+    }
 }
 
 /* Input */

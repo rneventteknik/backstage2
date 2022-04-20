@@ -9,4 +9,3 @@ export function down(knex) {
         table.dropColumn('customerName');
     });
 }
-

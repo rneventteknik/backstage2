@@ -28,7 +28,7 @@ const handler = withSessionContext(
                     respondWithAccessDeniedResponse(res);
                     return;
                 }
-                
+
                 if (!req.body.equipmentList) {
                     throw Error('Missing equipmentList parameter');
                 }

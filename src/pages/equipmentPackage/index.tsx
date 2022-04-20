@@ -68,6 +68,7 @@ const tableSettings: TableConfiguration<EquipmentPackage> = {
     ],
 };
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Utrustningspaket';
@@ -109,7 +110,7 @@ const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser }: Props)
         <Layout title={pageTitle} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href="/equipmentPackage/new">
+                    <Link href="/equipmentPackage/new" passHref>
                         <Button variant="primary" as="span">
                             Lägg till utrustningspaket
                         </Button>

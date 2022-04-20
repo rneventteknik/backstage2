@@ -69,7 +69,6 @@ export async function seed(knex) {
         },
     ]);
 
-    
     // Equipment
     //
     const firstEquipmentPublicCategoryId = await knex('EquipmentPublicCategory')
@@ -533,52 +532,51 @@ export async function seed(knex) {
         .returning('id')
         .then((ids) => ids[0].id);
 
-        await knex('EquipmentListEntry').insert([
-            {
-                name: 'Ljudbord',
-                created: '2022-04-11T21:36:42.934Z',
-                updated: '2022-04-11T21:36:42.934Z',
-                equipmentId: equipmentIds.largeMixer,
-                nameEN: 'Mixer',
-                description: 'Ljudbord för utljud',
-                descriptionEN: '',
-                numberOfUnits: 1,
-                numberOfHours: 10,
-                pricePerUnit: 0,
-                pricePerHour: 200,
-                equipmentPriceId: equipmentPriceIds.largeMixer,
-                equipmentListId: firstEquipmentListId
-            },
-            {
-                name: 'Ljudbord litet',
-                created: '2022-04-11T21:36:42.934Z',
-                updated: '2022-04-11T21:36:42.934Z',
-                equipmentId: equipmentIds.smallMixer,
-                nameEN: 'Mixer small',
-                description: 'Ljudbord för monitor',
-                descriptionEN: '',
-                numberOfUnits: 2,
-                numberOfHours: 10,
-                pricePerUnit: 0,
-                pricePerHour: 200,
-                equipmentPriceId: equipmentPriceIds.smallMixer,
-                equipmentListId: firstEquipmentListId
-            },
-            {
-                name: 'Projektor',
-                created: '2022-04-11T21:36:42.934Z',
-                updated: '2022-04-11T21:36:42.934Z',
-                equipmentId: equipmentIds.projector,
-                nameEN: 'Projector',
-                description: '',
-                descriptionEN: '',
-                numberOfUnits: 1,
-                numberOfHours: 10,
-                pricePerUnit: 1000,
-                pricePerHour: 100,
-                equipmentPriceId: equipmentPriceIds.projector2,
-                equipmentListId: firstEquipmentListId + 1
-            },
-        ]);
-
+    await knex('EquipmentListEntry').insert([
+        {
+            name: 'Ljudbord',
+            created: '2022-04-11T21:36:42.934Z',
+            updated: '2022-04-11T21:36:42.934Z',
+            equipmentId: equipmentIds.largeMixer,
+            nameEN: 'Mixer',
+            description: 'Ljudbord för utljud',
+            descriptionEN: '',
+            numberOfUnits: 1,
+            numberOfHours: 10,
+            pricePerUnit: 0,
+            pricePerHour: 200,
+            equipmentPriceId: equipmentPriceIds.largeMixer,
+            equipmentListId: firstEquipmentListId,
+        },
+        {
+            name: 'Ljudbord litet',
+            created: '2022-04-11T21:36:42.934Z',
+            updated: '2022-04-11T21:36:42.934Z',
+            equipmentId: equipmentIds.smallMixer,
+            nameEN: 'Mixer small',
+            description: 'Ljudbord för monitor',
+            descriptionEN: '',
+            numberOfUnits: 2,
+            numberOfHours: 10,
+            pricePerUnit: 0,
+            pricePerHour: 200,
+            equipmentPriceId: equipmentPriceIds.smallMixer,
+            equipmentListId: firstEquipmentListId,
+        },
+        {
+            name: 'Projektor',
+            created: '2022-04-11T21:36:42.934Z',
+            updated: '2022-04-11T21:36:42.934Z',
+            equipmentId: equipmentIds.projector,
+            nameEN: 'Projector',
+            description: '',
+            descriptionEN: '',
+            numberOfUnits: 1,
+            numberOfHours: 10,
+            pricePerUnit: 1000,
+            pricePerHour: 100,
+            equipmentPriceId: equipmentPriceIds.projector2,
+            equipmentListId: firstEquipmentListId + 1,
+        },
+    ]);
 }

@@ -28,11 +28,7 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
     };
 
     if (readonly) {
-        return (
-            <span>
-                {children}
-            </span>
-        );
+        return <span>{children}</span>;
     }
 
     if (!isEditing) {
@@ -130,11 +126,7 @@ export function DoubleClickToEditDropdown<T>({
     };
 
     if (readonly) {
-        return (
-            <span>
-                {children}
-            </span>
-        );
+        return <span>{children}</span>;
     }
 
     if (!isEditing) {

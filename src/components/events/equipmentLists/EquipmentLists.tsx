@@ -19,7 +19,15 @@ import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../..
 import { toEquipment } from '../../../lib/mappers/equipment';
 import Skeleton from 'react-loading-skeleton';
 import { DoubleClickToEditDate, DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
-import { formatNumberAsCurrency, formatPrice, formatTHSPrice, getEquipmentListPrice, getNumberOfDays, getNumberOfEquipmentOutDays, getPrice } from '../../../lib/pricingUtils';
+import {
+    formatNumberAsCurrency,
+    formatPrice,
+    formatTHSPrice,
+    getEquipmentListPrice,
+    getNumberOfDays,
+    getNumberOfEquipmentOutDays,
+    getPrice,
+} from '../../../lib/pricingUtils';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import { HasId } from '../../../models/interfaces/BaseEntity';
@@ -101,16 +109,21 @@ const EquipmentLists: React.FC<Props> = ({ event: booking, readonly }: Props) =>
     return (
         <>
             {equipmentLists?.map((x) => (
-                <EquipmentListDisplay list={x} key={x.id} event={booking} deleteListFn={deleteList} readonly={readonly}/>
+                <EquipmentListDisplay
+                    list={x}
+                    key={x.id}
+                    event={booking}
+                    deleteListFn={deleteList}
+                    readonly={readonly}
+                />
             ))}
-            {
-                readonly ? null :
+            {readonly ? null : (
                 <p className="text-center">
                     <Button className="mt-4" variant="secondary" size="sm" onClick={() => createNewList()}>
                         <FontAwesomeIcon icon={faPlus} className="mr-1" /> Lägg till utrustningslista
                     </Button>
                 </p>
-            }
+            )}
         </>
     );
 };
@@ -121,14 +134,16 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     deleteListFn: parentDeleteListFn,
     readonly,
 }: EquipmentListDisplayProps) => {
-    const { data: list, mutate, error } = useSwr(
-        '/api/events/' + booking.id + '/equipmentLists/' + partialList.id,
-        equipmentListFetcher,
-    );
+    const {
+        data: list,
+        mutate,
+        error,
+    } = useSwr('/api/events/' + booking.id + '/equipmentLists/' + partialList.id, equipmentListFetcher);
     const { showSaveSuccessNotification, showSaveFailedNotification, showErrorMessage } = useNotifications();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showListContent, setShowListContent] = useState(true);
-    const [equipmentListEntryToEditViewModel, setEquipmentListEntryToEditViewModel] = useState<Partial<EquipmentListEntry> | null>(null);
+    const [equipmentListEntryToEditViewModel, setEquipmentListEntryToEditViewModel] =
+        useState<Partial<EquipmentListEntry> | null>(null);
 
     // Error handling
     //
@@ -203,7 +218,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     //
 
     const getNextEquipmentListEntryId = () => Math.min(-1, ...(list?.equipmentListEntries ?? []).map((x) => x.id)) - 1;
-    
+
     const addEquipment = (equipment: Equipment, numberOfUnits?: number) => {
         addMultipleEquipment([{ equipment, numberOfUnits }]);
     };
@@ -354,9 +369,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         return (
             <DoubleClickToEdit
                 value={entry.numberOfUnits?.toString()}
-                onUpdate={(newValue) =>
-                    updateListEntry({ ...entry, numberOfUnits: toIntOrUndefined(newValue) ?? 0 })
-                }
+                onUpdate={(newValue) => updateListEntry({ ...entry, numberOfUnits: toIntOrUndefined(newValue) ?? 0 })}
                 size="sm"
                 readonly={readonly}
             >
@@ -375,9 +388,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         return (
             <DoubleClickToEdit
                 value={entry.numberOfHours.toString()}
-                onUpdate={(newValue) =>
-                    updateListEntry({ ...entry, numberOfHours: toIntOrUndefined(newValue) ?? 0 })
-                }
+                onUpdate={(newValue) => updateListEntry({ ...entry, numberOfHours: toIntOrUndefined(newValue) ?? 0 })}
                 size="sm"
                 readonly={readonly}
             >
@@ -387,28 +398,29 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     };
 
     const EquipmentListEntryPriceDisplayFn = (entry: EquipmentListEntry) => {
-        return (
-            entry.equipment ?
-                <>
-                    <DoubleClickToEditDropdown<EquipmentPrice>
-                        options={entry.equipment.prices}
-                        value={entry.equipmentPrice ?? entry.equipment.prices[0]}
-                        optionLabelFn={(x) => `${x.name} ${priceDisplayFn(x)}`}
-                        optionKeyFn={(x) => x.id.toString()}
-                        onChange={(newPrice) =>
-                            newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
-                        }
-                        onClose={(newPrice) =>
-                            newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
-                        }
-                        readonly={readonly}
-                    >
-                        {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
-                        {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
-                            <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
-                        ) : null}
-                    </DoubleClickToEditDropdown>
-                </> : formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })
+        return entry.equipment ? (
+            <>
+                <DoubleClickToEditDropdown<EquipmentPrice>
+                    options={entry.equipment.prices}
+                    value={entry.equipmentPrice ?? entry.equipment.prices[0]}
+                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(x)}`}
+                    optionKeyFn={(x) => x.id.toString()}
+                    onChange={(newPrice) =>
+                        newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
+                    }
+                    onClose={(newPrice) =>
+                        newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
+                    }
+                    readonly={readonly}
+                >
+                    {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
+                    {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
+                        <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
+                    ) : null}
+                </DoubleClickToEditDropdown>
+            </>
+        ) : (
+            formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })
         );
     };
 
@@ -419,22 +431,21 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     const EquipmentListEntryActionsDisplayFn = (entry: EquipmentListEntry) => {
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
-                <Dropdown.Item 
-                href={'/equipment/' + entry.equipmentId}
-                target="_blank"
-                disabled={!entry.equipment}>
+                <Dropdown.Item href={'/equipment/' + entry.equipmentId} target="_blank" disabled={!entry.equipment}>
                     Öppna utrustning i ny flik
                 </Dropdown.Item>
-                {readonly ? null :
+                {readonly ? null : (
                     <>
-                        <Dropdown.Item
-                            onClick={() => setEquipmentListEntryToEditViewModel(entry)}
-                        >
+                        <Dropdown.Item onClick={() => setEquipmentListEntryToEditViewModel(entry)}>
                             Avancerad redigering
                         </Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item
-                            onClick={() => entry.equipment ? updateListEntry(getDefaultListEntryFromEquipment(entry.equipment, entry.id)) : null}
+                            onClick={() =>
+                                entry.equipment
+                                    ? updateListEntry(getDefaultListEntryFromEquipment(entry.equipment, entry.id))
+                                    : null
+                            }
                         >
                             Återställ rad
                         </Dropdown.Item>
@@ -442,7 +453,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             Ta bort rad
                         </Dropdown.Item>
                     </>
-                }
+                )}
             </DropdownButton>
         );
     };
@@ -530,36 +541,39 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         <Button className="mr-2" variant="" onClick={() => setShowListContent(!showListContent)}>
                             <FontAwesomeIcon icon={showListContent ? faAngleUp : faAngleDown} />
                         </Button>
-                        {readonly ? null : 
+                        {readonly ? null : (
                             <>
-                                <Dropdown.Item onClick={() => setEquipmentListEntryToEditViewModel({
-                                    numberOfUnits: 1,
-                                    numberOfHours: 0,
-                                })}>
+                                <Dropdown.Item
+                                    onClick={() =>
+                                        setEquipmentListEntryToEditViewModel({
+                                            numberOfUnits: 1,
+                                            numberOfHours: 0,
+                                        })
+                                    }
+                                >
                                     Lägg till egen rad
                                 </Dropdown.Item>
                                 <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
-                                <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
+                                    <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
                                         Töm utrustningslistan
                                     </Dropdown.Item>
                                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
                                         Ta bort utrustningslistan
                                     </Dropdown.Item>
                                 </DropdownButton>
-                            </> }
+                            </>
+                        )}
                     </div>
                 </div>
                 <p className="text-muted">
-                    {list.equipmentListEntries.length} rader /{' '}
-                    {formatNumberAsCurrency(getEquipmentListPrice(list))}
+                    {list.equipmentListEntries.length} rader / {formatNumberAsCurrency(getEquipmentListPrice(list))}
                     {list.equipmentInDatetime &&
-                        list.equipmentOutDatetime &&
-                        list.usageStartDatetime &&
-                        list.usageEndDatetime ? (
+                    list.equipmentOutDatetime &&
+                    list.usageStartDatetime &&
+                    list.usageEndDatetime ? (
                         <>
                             {' '}
-                            /{' '}
-                            {getNumberOfEquipmentOutDays(list)} dagar / {getNumberOfDays(list)} debiterade dagar
+                            / {getNumberOfEquipmentOutDays(list)} dagar / {getNumberOfDays(list)} debiterade dagar
                         </>
                     ) : null}
                 </p>
@@ -611,7 +625,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 <>
                     <TableDisplay entities={list.equipmentListEntries} configuration={tableSettings} />
 
-                    {readonly ? null : 
+                    {readonly ? null : (
                         <div className="ml-2 mr-2 mb-2">
                             <EquipmentSearch
                                 placeholder="Lägg till utrustning"
@@ -620,7 +634,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 onSelect={(x) => addFromSearch(x)}
                             />
                         </div>
-                    }
+                    )}
                 </>
             ) : null}
 
@@ -639,8 +653,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 </Modal.Footer>
             </Modal>
 
-            <Modal show={!!equipmentListEntryToEditViewModel} onHide={() => setEquipmentListEntryToEditViewModel(null)} size="lg">
-                {!!equipmentListEntryToEditViewModel ?
+            <Modal
+                show={!!equipmentListEntryToEditViewModel}
+                onHide={() => setEquipmentListEntryToEditViewModel(null)}
+                size="lg"
+            >
+                {!!equipmentListEntryToEditViewModel ? (
                     <Modal.Body>
                         <Row>
                             <Col md={4}>
@@ -649,7 +667,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <Form.Control
                                         type="text"
                                         value={equipmentListEntryToEditViewModel?.name}
-                                        onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, name: e.target.value})}
+                                        onChange={(e) =>
+                                            setEquipmentListEntryToEditViewModel({
+                                                ...equipmentListEntryToEditViewModel,
+                                                name: e.target.value,
+                                            })
+                                        }
                                     />
                                 </Form.Group>
                             </Col>
@@ -660,7 +683,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         <Form.Control
                                             type="text"
                                             value={equipmentListEntryToEditViewModel?.numberOfUnits}
-                                            onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, numberOfUnits: toIntOrUndefined(e.target.value)})}
+                                            onChange={(e) =>
+                                                setEquipmentListEntryToEditViewModel({
+                                                    ...equipmentListEntryToEditViewModel,
+                                                    numberOfUnits: toIntOrUndefined(e.target.value),
+                                                })
+                                            }
                                         />
                                         <InputGroup.Append>
                                             <InputGroup.Text>st</InputGroup.Text>
@@ -675,7 +703,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         <Form.Control
                                             type="text"
                                             value={equipmentListEntryToEditViewModel.numberOfHours}
-                                            onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, numberOfHours: toIntOrUndefined(e.target.value)})}
+                                            onChange={(e) =>
+                                                setEquipmentListEntryToEditViewModel({
+                                                    ...equipmentListEntryToEditViewModel,
+                                                    numberOfHours: toIntOrUndefined(e.target.value),
+                                                })
+                                            }
                                         />
                                         <InputGroup.Append>
                                             <InputGroup.Text>h</InputGroup.Text>
@@ -694,8 +727,16 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         disabled={!equipmentListEntryToEditViewModel.equipment}
                                         defaultValue={equipmentListEntryToEditViewModel.equipmentPrice?.id}
                                         onChange={(e) => {
-                                            const newEquipmentPrice = equipmentListEntryToEditViewModel.equipment?.prices.filter(x => x.id == toIntOrUndefined(e.target.value))[0];
-                                            setEquipmentListEntryToEditViewModel({ ...equipmentListEntryToEditViewModel, ...(newEquipmentPrice ? getEquipmentListEntryPrices(newEquipmentPrice) : { equipmentPrice: undefined }) })
+                                            const newEquipmentPrice =
+                                                equipmentListEntryToEditViewModel.equipment?.prices.filter(
+                                                    (x) => x.id == toIntOrUndefined(e.target.value),
+                                                )[0];
+                                            setEquipmentListEntryToEditViewModel({
+                                                ...equipmentListEntryToEditViewModel,
+                                                ...(newEquipmentPrice
+                                                    ? getEquipmentListEntryPrices(newEquipmentPrice)
+                                                    : { equipmentPrice: undefined }),
+                                            });
                                         }}
                                     >
                                         {equipmentListEntryToEditViewModel.equipment?.prices?.map((x) => (
@@ -715,7 +756,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                             type="text"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
                                             value={equipmentListEntryToEditViewModel?.pricePerUnit}
-                                            onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, pricePerUnit: toIntOrUndefined(e.target.value)})}
+                                            onChange={(e) =>
+                                                setEquipmentListEntryToEditViewModel({
+                                                    ...equipmentListEntryToEditViewModel,
+                                                    pricePerUnit: toIntOrUndefined(e.target.value),
+                                                })
+                                            }
                                         />
                                         <InputGroup.Append>
                                             <InputGroup.Text>kr/st</InputGroup.Text>
@@ -731,7 +777,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                             type="text"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
                                             value={equipmentListEntryToEditViewModel?.pricePerHour}
-                                            onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, pricePerHour: toIntOrUndefined(e.target.value)})}
+                                            onChange={(e) =>
+                                                setEquipmentListEntryToEditViewModel({
+                                                    ...equipmentListEntryToEditViewModel,
+                                                    pricePerHour: toIntOrUndefined(e.target.value),
+                                                })
+                                            }
                                         />
                                         <InputGroup.Append>
                                             <InputGroup.Text>kr/h</InputGroup.Text>
@@ -747,24 +798,47 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <Form.Control
                                         as="textarea"
                                         value={equipmentListEntryToEditViewModel?.description}
-                                        onChange={(e) => setEquipmentListEntryToEditViewModel({...equipmentListEntryToEditViewModel, description: e.target.value})}
-                                        />
+                                        onChange={(e) =>
+                                            setEquipmentListEntryToEditViewModel({
+                                                ...equipmentListEntryToEditViewModel,
+                                                description: e.target.value,
+                                            })
+                                        }
+                                    />
                                 </Form.Group>
                             </Col>
                         </Row>
-                        {!!equipmentListEntryToEditViewModel.equipment ?
+                        {!!equipmentListEntryToEditViewModel.equipment ? (
                             <p className="text-muted">
-                                <span>Den här raden är länkad till utrustningen <em>{equipmentListEntryToEditViewModel.equipment.name}</em>. </span>
-                                <a href="#" className="text-danger" onClick={() => setEquipmentListEntryToEditViewModel({ ...equipmentListEntryToEditViewModel, equipment: undefined, equipmentId: undefined, equipmentPrice: undefined })}>Ta bort koppling</a>
-                            </p> 
-                            : null}
-                    </Modal.Body> : null}
+                                <span>
+                                    Den här raden är länkad till utrustningen{' '}
+                                    <em>{equipmentListEntryToEditViewModel.equipment.name}</em>.{' '}
+                                </span>
+                                <a
+                                    href="#"
+                                    className="text-danger"
+                                    onClick={() =>
+                                        setEquipmentListEntryToEditViewModel({
+                                            ...equipmentListEntryToEditViewModel,
+                                            equipment: undefined,
+                                            equipmentId: undefined,
+                                            equipmentPrice: undefined,
+                                        })
+                                    }
+                                >
+                                    Ta bort koppling
+                                </a>
+                            </p>
+                        ) : null}
+                    </Modal.Body>
+                ) : null}
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setEquipmentListEntryToEditViewModel(null)}>
                         Avbryt
                     </Button>
-                    <Button variant="primary" 
-                        disabled={!equipmentListEntryToEditViewModel?.name} 
+                    <Button
+                        variant="primary"
+                        disabled={!equipmentListEntryToEditViewModel?.name}
                         onClick={() => {
                             if (!equipmentListEntryToEditViewModel) {
                                 throw new Error('Invalid equipmentListEntryToEditViewModel');
@@ -784,21 +858,25 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 pricePerUnit: equipmentListEntryToEditViewModel.pricePerUnit ?? 0,
                                 pricePerHour: equipmentListEntryToEditViewModel.pricePerHour ?? 0,
                                 equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
-                            }
+                            };
 
                             if (equipmentListEntryToEditViewModel.id) {
                                 updateListEntry(entryToSave);
                             } else {
-                                saveList({ ...list, equipmentListEntries: [...list.equipmentListEntries, entryToSave] });
+                                saveList({
+                                    ...list,
+                                    equipmentListEntries: [...list.equipmentListEntries, entryToSave],
+                                });
                             }
-                            
+
                             setEquipmentListEntryToEditViewModel(null);
-                        }}>
+                        }}
+                    >
                         Spara
                     </Button>
                 </Modal.Footer>
             </Modal>
-        </Card >
+        </Card>
     );
 };
 

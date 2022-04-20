@@ -84,10 +84,11 @@ export const updateEquipment = async (
 
     // Prices.
     if (equipment.prices !== undefined) {
-        const { toAdd: pricesToAdd, toDelete: pricesToDelete, toUpdate: pricesToUpdate } = compareLists(
-            equipment.prices,
-            existingDatabaseModel?.prices,
-        );
+        const {
+            toAdd: pricesToAdd,
+            toDelete: pricesToDelete,
+            toUpdate: pricesToUpdate,
+        } = compareLists(equipment.prices, existingDatabaseModel?.prices);
 
         pricesToAdd.map(async (x) => {
             await EquipmentObjectionModel.relatedQuery('prices')

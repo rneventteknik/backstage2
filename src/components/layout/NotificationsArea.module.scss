@@ -1,15 +1,15 @@
-@import "../../style/variables";
+@import '../../style/variables';
 
-$danger-bg: #F44336;
-$warning-bg: #FF9800;
-$success-bg: #4CAF50;
-$info-bg: #2196F3;
+$danger-bg: #f44336;
+$warning-bg: #ff9800;
+$success-bg: #4caf50;
+$info-bg: #2196f3;
 
 .header {
     color: white;
     padding: 0.6em 1.1em;
     border-radius: 0;
-    border-width: 0
+    border-width: 0;
 }
 
 .success .header {
@@ -33,7 +33,7 @@ $info-bg: #2196F3;
 }
 
 .iconContainer .icon {
-    width:1em;
+    width: 1em;
 }
 
 .notification {

@@ -1,9 +1,8 @@
 import React, { FormEvent, useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Equipment } from '../../models/interfaces';
+import { Equipment, EquipmentTag } from '../../models/interfaces';
 import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../models/objection-models';
-import { EquipmentTag } from '../../models/interfaces';
 import useSwr from 'swr';
 import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';

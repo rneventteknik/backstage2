@@ -15,6 +15,7 @@ import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleto
 import { eventsFetcher, userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 
@@ -45,7 +46,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
-                    <Link href={'/users/' + user.id + '/edit'}>
+                    <Link href={'/users/' + user.id + '/edit'} passHref>
                         <Button variant="primary" href={'/users/' + user.id + '/edit'}>
                             Redigera
                         </Button>

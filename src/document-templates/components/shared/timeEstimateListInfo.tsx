@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
     ...commonStyles,
     equipmentListSection: {
         flexDirection: 'column',
-        marginBottom: 15
+        marginBottom: 15,
     },
 });
 
@@ -40,13 +40,15 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ event }: Props) => {
             </TableRow>
 
             <View>
-                {event.timeEstimates?.map(timeEstimate =>
+                {event.timeEstimates?.map((timeEstimate) => (
                     <TableRow key={timeEstimate.id}>
                         <TableCellAutoWidth>
                             <Text>{timeEstimate.name}</Text>
                         </TableCellAutoWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{timeEstimate.numberOfHours} {t('common.misc.hours-unit')}</Text>
+                            <Text>
+                                {timeEstimate.numberOfHours} {t('common.misc.hours-unit')}
+                            </Text>
                         </TableCellFixedWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
                             <Text>{formatNumberAsCurrency(timeEstimate.pricePerHour)}</Text>
@@ -55,7 +57,7 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ event }: Props) => {
                             <Text>{formatNumberAsCurrency(getTimeEstimatePrice(timeEstimate))}</Text>
                         </TableCellFixedWidth>
                     </TableRow>
-                )}
+                ))}
             </View>
 
             <TableRow>
@@ -63,7 +65,9 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ event }: Props) => {
                     <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={40} textAlign="right">
-                    <Text style={styles.bold}>{formatNumberAsCurrency(getTotalTimeEstimatesPrice(event.timeEstimates))}</Text>
+                    <Text style={styles.bold}>
+                        {formatNumberAsCurrency(getTotalTimeEstimatesPrice(event.timeEstimates))}
+                    </Text>
                 </TableCellFixedWidth>
             </TableRow>
         </View>

@@ -107,7 +107,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
         const getDescription = (entity: T, highlightText: string) => {
             switch (entity.type) {
                 case ResultType.USER:
-                    const user = (entity as unknown) as IUserObjectionModel;
+                    const user = entity as unknown as IUserObjectionModel;
                     return (
                         <small>
                             <Typeahead.Highlighter search={highlightText}>{user.nameTag}</Typeahead.Highlighter> /{' '}
@@ -116,7 +116,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     );
 
                 case ResultType.EQUIPMENT:
-                    const equipment = (entity as unknown) as IEquipmentObjectionModel;
+                    const equipment = entity as unknown as IEquipmentObjectionModel;
                     return (
                         <small>
                             <Typeahead.Highlighter search={highlightText}>{equipment.nameEN}</Typeahead.Highlighter>{' '}
@@ -131,7 +131,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     );
 
                 case ResultType.EVENT:
-                    const event = (entity as unknown) as IEventObjectionModel;
+                    const event = entity as unknown as IEventObjectionModel;
                     return (
                         <small>
                             <Typeahead.Highlighter search={highlightText}>

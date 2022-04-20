@@ -100,7 +100,7 @@ const EquipmentSearch: React.FC<Props> = ({
         entity,
         state,
     }: SearchListItemProps<T>): React.ReactElement {
-        const equipmentPackage = (entity as unknown) as IEquipmentObjectionModel | IEquipmentPackageObjectionModel;
+        const equipmentPackage = entity as unknown as IEquipmentObjectionModel | IEquipmentPackageObjectionModel;
         return (
             <>
                 <div>

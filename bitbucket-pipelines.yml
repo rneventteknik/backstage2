@@ -3,23 +3,23 @@
 image: atlassian/default-image:3
 
 pipelines:
-  branches:
-    dev:
-      - step:
-          name: 'Deployment to Staging'
-          deployment: staging
-          script:
-            - pipe: atlassian/ssh-run:0.4.0
-              variables:
-                SSH_USER: $DEPLOY_USER
-                SERVER: $DEPLOY_SERVER
-                COMMAND: 'cd $BITBUCKET_REPO_SLUG && git fetch && git checkout $BITBUCKET_COMMIT && yarnpkg && yarnpkg build && sudo systemctl restart $DEPLOY_SERVICE'
-                # MODE: 'script' // If we want to have the command in a separate file
-  pull-requests:
-    '**': #default
-      - step:
-          name: Build
-          image: node:16.13.1
-          script:
-            - yarn
-            - yarn build
+    branches:
+        dev:
+            - step:
+                  name: 'Deployment to Staging'
+                  deployment: staging
+                  script:
+                      - pipe: atlassian/ssh-run:0.4.0
+                        variables:
+                            SSH_USER: $DEPLOY_USER
+                            SERVER: $DEPLOY_SERVER
+                            COMMAND: 'cd $BITBUCKET_REPO_SLUG && git fetch && git checkout $BITBUCKET_COMMIT && yarnpkg && yarnpkg build && sudo systemctl restart $DEPLOY_SERVICE'
+                            # MODE: 'script' // If we want to have the command in a separate file
+    pull-requests:
+        '**': #default
+            - step:
+                  name: Build
+                  image: node:16.13.1
+                  script:
+                      - yarn
+                      - yarn build

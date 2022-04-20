@@ -33,9 +33,11 @@ export const PriceEstimateDocument: React.FC<Props> = ({ event }: Props) => {
 
                 <MainContent>
                     <View style={styles.flexGrow}>
-                        {event.equipmentLists?.map(l => <EquipmentListInfo list={l} key={l.id}/>)}
-                        <TimeEstimateListInfo event={event}/>
-                        <TotalPriceSection event={event}/>
+                        {event.equipmentLists?.map((l) => (
+                            <EquipmentListInfo list={l} key={l.id} />
+                        ))}
+                        <TimeEstimateListInfo event={event} />
+                        <TotalPriceSection event={event} />
                     </View>
 
                     <Text style={styles.bold}>{t('price-estimate.legal-note.title')}</Text>

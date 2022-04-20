@@ -35,14 +35,14 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         // Footer
         'common.footer.title': 'Backstage2',
         'common.footer.content': process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION ?? '',
-        
+
         // Price estimate
         'price-estimate.filename': 'Prisuppskattning',
         'price-estimate.title': 'Prisuppskattning',
         'price-estimate.legal-note.title': 'Observera',
         'price-estimate.legal-note.content':
-        'Ovanstående är en prisuppskattning. Det är den faktiska tidsåtgången och använd utrustning som faktureras. Ni som arrangör ansvarar för att utrustningen inte blir stulen eller förstörd.',
-        
+            'Ovanstående är en prisuppskattning. Det är den faktiska tidsåtgången och använd utrustning som faktureras. Ni som arrangör ansvarar för att utrustningen inte blir stulen eller förstörd.',
+
         // Misc
         'common.pagenumber.label': 'Sida',
         'common.misc.count-unit': 'st',

@@ -13,6 +13,7 @@ const containerStyle = {
 };
 
 // Redirect to '/' if the user is already logged in
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUser(undefined, undefined, '/');
 
 const LoginPage: React.FC = () => {

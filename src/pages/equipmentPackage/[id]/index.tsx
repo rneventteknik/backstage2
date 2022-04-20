@@ -12,6 +12,7 @@ import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleto
 import { equipmentPackageFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 
@@ -19,10 +20,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit user
     //
     const router = useRouter();
-    const { data: equipmentPackage, error, isValidating } = useSwr(
-        '/api/equipmentPackage/' + router.query.id,
-        equipmentPackageFetcher,
-    );
+    const {
+        data: equipmentPackage,
+        error,
+        isValidating,
+    } = useSwr('/api/equipmentPackage/' + router.query.id, equipmentPackageFetcher);
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
@@ -45,7 +47,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/equipmentPackage/' + equipmentPackage.id + '/edit'}>
+                    <Link href={'/equipmentPackage/' + equipmentPackage.id + '/edit'} passHref>
                         <Button variant="primary" href={'/equipmentPackage/' + equipmentPackage.id + '/edit'}>
                             Redigera
                         </Button>

@@ -35,7 +35,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ displayName, link, icon, exac
 
     return (
         <Nav.Item className={[isActive ? styles.activeNavItem : undefined, styles.link].join(' ')}>
-            <Link href={link}>
+            <Link href={link} passHref>
                 <Nav.Link as="a" href={link}>
                     <FontAwesomeIcon className="fa-fw" icon={icon} />
                     <span className="ml-3">{displayName}</span>
@@ -64,9 +64,11 @@ const SidebarLinkGroup: React.FC<SidebarLinkGroupProps> = ({ children, title }: 
 const getExternalLinksFromEnv = () => {
     try {
         type LinkObject = { title: string; url: string };
-        const links = (process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS
-            ? JSON.parse(process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS)
-            : []) as LinkObject[];
+        const links = (
+            process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS
+                ? JSON.parse(process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS)
+                : []
+        ) as LinkObject[];
 
         if (links.length === 0) {
             return null;

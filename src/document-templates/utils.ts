@@ -77,15 +77,16 @@ export const getEventDocumentId = (event: Event): string => {
     return `#${event.created?.getFullYear()}-${event.id}`;
 };
 
-
 export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, t: (t: string) => string) => {
     if (entry.numberOfUnits === 1 && entry.numberOfHours > 0) {
         return `${entry.numberOfHours} ${t('common.misc.hours-unit')}`;
     }
 
     if (entry.numberOfUnits > 1 && entry.numberOfHours > 0) {
-        return `${entry.numberOfUnits} ${t('common.misc.count-unit')} / ${entry.numberOfHours} ${t('common.misc.hours-unit')}`;
+        return `${entry.numberOfUnits} ${t('common.misc.count-unit')} / ${entry.numberOfHours} ${t(
+            'common.misc.hours-unit',
+        )}`;
     }
-    
+
     return `${entry.numberOfUnits} ${t('common.misc.count-unit')}`;
 };

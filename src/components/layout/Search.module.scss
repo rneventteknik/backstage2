@@ -1,7 +1,7 @@
-@import "../../style/variables";
+@import '../../style/variables';
 
 .dropdownItem:hover,
-.dropdownItem[aria-selected="true"] {
+.dropdownItem[aria-selected='true'] {
     background-color: $backstage-color-5;
     color: $backstage-text-color;
 }

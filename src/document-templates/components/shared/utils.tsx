@@ -7,9 +7,9 @@ const styles = StyleSheet.create({
     equipmentListSection: {
         padding: 5,
         flexDirection: 'column',
-        marginBottom: 20
+        marginBottom: 20,
     },
-    row: {flexDirection: 'row', width: '100%', borderBottom: '1px solid #DDDDDD', paddingBottom: 5, paddingTop: 5 },
+    row: { flexDirection: 'row', width: '100%', borderBottom: '1px solid #DDDDDD', paddingBottom: 5, paddingTop: 5 },
 });
 
 type ColProps = {
@@ -35,17 +35,26 @@ export const InfoItem: React.FC<InfoItemProps> = ({ title, content }: InfoItemPr
 type TableRowProps = {
     children?: ReactNode;
 };
-export const TableRow: React.FC<TableRowProps> = ({ children }: TableRowProps) => <View style={styles.row}>{children}</View>;
+export const TableRow: React.FC<TableRowProps> = ({ children }: TableRowProps) => (
+    <View style={styles.row}>{children}</View>
+);
 
 type TableCellFixedWidthProps = {
     children?: ReactNode;
     width: number;
     textAlign?: 'left' | 'right' | 'center' | 'justify' | undefined;
 };
-export const TableCellFixedWidth: React.FC<TableCellFixedWidthProps> = ({ children, width, textAlign = 'left' }: TableCellFixedWidthProps) => <View style={[{ flex: '0 0 ' + width, textAlign: textAlign }]}>{children}</View>;
+export const TableCellFixedWidth: React.FC<TableCellFixedWidthProps> = ({
+    children,
+    width,
+    textAlign = 'left',
+}: TableCellFixedWidthProps) => <View style={[{ flex: '0 0 ' + width, textAlign: textAlign }]}>{children}</View>;
 
 type TableCellAutoWidthProps = {
     children?: ReactNode;
     textAlign?: 'left' | 'right' | 'center' | 'justify' | undefined;
 };
-export const TableCellAutoWidth: React.FC<TableCellAutoWidthProps> = ({ children, textAlign = 'left' }: TableCellAutoWidthProps) => <View style={[styles.flexGrow, {textAlign: textAlign }]}>{children}</View>;
+export const TableCellAutoWidth: React.FC<TableCellAutoWidthProps> = ({
+    children,
+    textAlign = 'left',
+}: TableCellAutoWidthProps) => <View style={[styles.flexGrow, { textAlign: textAlign }]}>{children}</View>;

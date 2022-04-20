@@ -24,6 +24,7 @@ interface EventViewModel extends Event {
     displayDate: string;
 }
 
+// eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Bokningar';
@@ -143,7 +144,7 @@ const EventListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href="/events/new">
+                    <Link href="/events/new" passHref>
                         <Button variant="primary" as="span">
                             Lägg till bokning
                         </Button>

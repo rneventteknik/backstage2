@@ -22,12 +22,8 @@ export const toEvent = (objectionModel: IEventObjectionModel): Event => {
         ownerUser: objectionModel.ownerUser ? toUser(objectionModel.ownerUser) : undefined,
         updated: toDateOrUndefined(objectionModel.updated),
         created: toDateOrUndefined(objectionModel.created),
-        equipmentLists: objectionModel.equipmentLists
-            ? objectionModel.equipmentLists.map(toEquipmentList)
-            : undefined,
-        timeEstimates: objectionModel.timeEstimates
-            ? objectionModel.timeEstimates.map(toTimeEstimate)
-            : undefined,
+        equipmentLists: objectionModel.equipmentLists ? objectionModel.equipmentLists.map(toEquipmentList) : undefined,
+        timeEstimates: objectionModel.timeEstimates ? objectionModel.timeEstimates.map(toTimeEstimate) : undefined,
     };
 };
 
