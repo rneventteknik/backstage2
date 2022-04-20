@@ -23,10 +23,13 @@ export type {
 
 export type { ITimeEstimateObjectionModel } from './TimeEstimateObjectionModel';
 
+export type { ITimeReportObjectionModel } from './TimeReportObjectionModel';
+
 export type {
     IEquipmentPackageObjectionModel,
     IEquipmentPackageEntryObjectionModel,
 } from './EquipmentPackageObjectionModel';
+
 export interface BaseObjectionModelWithName extends BaseObjectionModel {
     name: string;
 }

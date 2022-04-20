@@ -36,6 +36,15 @@ export {
 } from './userAuth';
 export { fetchEquipmentPublicCategories, fetchEquipmentPublicCategoriesPublic } from './equipmentPublicCategories';
 export {
+    fetchTimeReport,
+    fetchTimeReports,
+    fetchTimeReportsByEventId,
+    updateTimeReport,
+    insertTimeReport,
+    deleteTimeReport,
+    validateTimeReportObjectionModel,
+} from './timeReport';
+export {
     fetchEquipmentLists,
     fetchEquipmentListsForEvent,
     fetchEquipmentList,

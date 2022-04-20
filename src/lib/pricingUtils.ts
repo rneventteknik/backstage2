@@ -1,4 +1,4 @@
-import { EquipmentPrice, Event, TimeEstimate } from '../models/interfaces';
+import { EquipmentPrice, Event, TimeEstimate, TimeReport } from '../models/interfaces';
 import { EquipmentList, EquipmentListEntry } from '../models/interfaces/EquipmentList';
 
 // Calculate total price
@@ -22,6 +22,18 @@ export const getTotalTimeEstimatesPrice = (timeEstimates: TimeEstimate[] | undef
     }
 
     return timeEstimates?.reduce((sum, l) => sum + getTimeEstimatePrice(l), 0) ?? 0;
+};
+
+export const getTimeReportPrice = (timeReport: TimeReport): number => {
+    return (timeReport.billableWorkingHours ?? 0) * (timeReport.pricePerHour ?? 0);
+};
+
+export const getTotalTimeReportsPrice = (timeReports: TimeReport[] | undefined): number => {
+    if (!timeReports) {
+        return 0;
+    }
+
+    return timeReports?.reduce((sum, l) => sum + getTimeReportPrice(l), 0) ?? 0;
 };
 
 export const getEventPrice = (event: Event): number => {
@@ -51,7 +63,6 @@ export const formatNumberAsCurrency = (number: number): string =>
     Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 0 }).format(number);
 
 // Number of days
-
 export const getNumberOfDays = (equipmentList: EquipmentList): number => {
     if (!equipmentList.usageStartDatetime || !equipmentList.usageEndDatetime) {
         return 1;

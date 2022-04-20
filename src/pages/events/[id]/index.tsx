@@ -11,6 +11,7 @@ import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import EventTypeTag from '../../../components/utils/EventTypeTag';
 import { eventFetcher } from '../../../lib/fetchers';
 import TimeEstimateList from '../../../components/timeEstimate/TimeEstimateList';
+import TimeReportList from '../../../components/timeReport/timeReportList';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
@@ -162,6 +163,12 @@ const EventPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     <TimeEstimateList
                         eventId={event.id}
                         pricePlan={event.pricePlan}
+                        readonly={currentUser.role === Role.READONLY}
+                    />
+                    <TimeReportList
+                        eventId={event.id}
+                        pricePlan={event.pricePlan}
+                        currentUser={currentUser}
                         readonly={currentUser.role === Role.READONLY}
                     />
                     <EquipmentLists event={event} readonly={currentUser.role === Role.READONLY} />

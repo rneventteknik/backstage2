@@ -234,3 +234,15 @@ export const replaceEmptyStringWithNull = (s: string | undefined | null): string
 
     return s;
 };
+
+export const getPricePerHour = (pricePlan: PricePlan): number | undefined => {
+    if (!process.env.NEXT_PUBLIC_SALARY_NORMAL)
+        throw new Error('Configuration missing salary for the Normal price plan');
+
+    if (!process.env.NEXT_PUBLIC_SALARY_THS) throw new Error('Configuration missing salary for the THS price plan');
+
+    const pricePerHour =
+        pricePlan == PricePlan.EXTERNAL ? process.env.NEXT_PUBLIC_SALARY_NORMAL : process.env.NEXT_PUBLIC_SALARY_THS;
+
+    return toIntOrUndefined(pricePerHour);
+};

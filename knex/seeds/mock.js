@@ -6,6 +6,7 @@ export async function seed(knex) {
     await knex('EquipmentTagEquipment').del();
     await knex('EquipmentTag').del();
     await knex('TimeEstimate').del();
+    await knex('TimeReport').del();
     await knex('EquipmentListEntry').del();
     await knex('EquipmentList').del();
     await knex('EquipmentPrice').del();
@@ -503,6 +504,74 @@ export async function seed(knex) {
             numberOfHours: 2,
             pricePerHour: 125,
             eventId: firstEventId + 1,
+        },
+    ]);
+
+    await knex('TimeReport').insert([
+        {
+            name: 'Rigg',
+            created: '2020-06-15 17:00',
+            updated: '2020-06-15 23:00',
+            eventId: firstEventId,
+            userId: firstUserId,
+            actualWorkingHours: 16,
+            billableWorkingHours: 16,
+            endDatetime: '2020-06-15 23:00',
+            startDatetime: '2020-06-15 23:00',
+            pricePerHour: 125,
+            accountKind: 1,
+        },
+        {
+            name: 'Rigg',
+            created: '2020-06-15 17:00',
+            updated: '2020-06-15 23:00',
+            eventId: firstEventId,
+            userId: firstUserId + 1,
+            actualWorkingHours: 16,
+            billableWorkingHours: 16,
+            endDatetime: '2020-06-15 23:00',
+            startDatetime: '2020-06-15 23:00',
+            pricePerHour: 500,
+            accountKind: 1,
+        },
+        {
+            name: 'Kör',
+            created: '2020-06-15 17:00',
+            updated: '2020-06-15 23:00',
+            eventId: firstEventId,
+            userId: firstUserId,
+            actualWorkingHours: 16,
+            billableWorkingHours: 16,
+            endDatetime: '2020-06-15 23:00',
+            startDatetime: '2020-06-15 23:00',
+            pricePerHour: 125,
+            accountKind: 1,
+        },
+        {
+            name: 'Riv',
+            created: '2020-06-15 17:00',
+            updated: '2020-06-15 23:00',
+            eventId: firstEventId,
+            userId: firstUserId,
+            actualWorkingHours: 16,
+            billableWorkingHours: 16,
+            endDatetime: '2020-06-15 23:00',
+            startDatetime: '2020-06-15 23:00',
+            pricePerHour: 125,
+            accountKind: 1,
+        },
+        {
+            name: 'Kör',
+            created: '2020-06-15 17:00',
+            updated: '2020-06-15 23:00',
+            eventId: firstEventId + 1,
+            userId: firstUserId,
+            actualWorkingHours: 16,
+            billableWorkingHours: 16,
+            endDatetime: '2020-06-15 23:00',
+            startDatetime: '2020-06-15 23:00',
+            pricePerHour: 125,
+            accountKind: 1,
         },
     ]);
 

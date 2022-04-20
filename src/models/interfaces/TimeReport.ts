@@ -3,11 +3,13 @@ import { AccountKind } from '../enums/AccountKind';
 import { User } from './User';
 
 export interface TimeReport extends BaseEntityWithName {
-    user: User;
+    userId: number;
+    user?: User;
     actualWorkingHours: number;
     billableWorkingHours: number;
-    StartDatetime: Date;
-    EndDatetime: Date;
-    PricePerHour: number;
-    AccountKind: AccountKind;
+    startDatetime?: Date;
+    endDatetime?: Date;
+    pricePerHour: number;
+    accountKind: AccountKind;
+    eventId: number;
 }
