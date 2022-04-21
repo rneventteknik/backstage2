@@ -88,3 +88,15 @@ export const toEquipmentPublicCategory = (
         created: toDateOrUndefined(objectionModel.created),
     };
 };
+
+export const toEquipmentPriceObjectionModel = (clientModel: EquipmentPrice): Partial<IEquipmentPriceObjectionModel> => {
+    if (!clientModel.id) {
+        throw new Error('Invalid equipment list entry');
+    }
+
+    return {
+        ...clientModel,
+        created: undefined,
+        updated: undefined,
+    };
+};

@@ -6,6 +6,8 @@ import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../m
 import useSwr from 'swr';
 import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';
+import PricesEditor from './PricesEditor';
+import { toEquipmentPriceObjectionModel } from '../../lib/mappers/equipment';
 
 type Props = {
     handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel>) => void;
@@ -16,6 +18,7 @@ type Props = {
 const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equipment, formId }: Props) => {
     const [validated, setValidated] = useState(false);
     const [selectedTags, setSelectedTags] = useState(equipment?.tags ?? []);
+    const [prices, setPrices] = useState(equipment?.prices ?? []);
 
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
@@ -75,7 +78,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                 created: x.created?.toString(),
                 updated: x.updated?.toString(),
             })),
-            prices: form.prices?.value ? JSON.parse(form.prices.value) : undefined,
+            prices: prices.map((x) => toEquipmentPriceObjectionModel(x)),
             equipmentPublicCategoryId: form.publicCategory?.value ? parseInt(form.publicCategory?.value) : undefined,
 
             inventoryCount: form.inventoryCount?.value ?? 1,
@@ -149,30 +152,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                     <Row>
                         <Col lg="12">
                             <Form.Group controlId="formPrices">
-                                <Form.Label>Priser som JSON</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    placeholder=""
-                                    name="prices"
-                                    rows={6}
-                                    style={{ fontFamily: 'Consolas', fontSize: '1em' }}
-                                    defaultValue={JSON.stringify(
-                                        equipment?.prices.map((x) => ({
-                                            name: x.name,
-                                            id: x.id,
-                                            pricePerUnit: x.pricePerUnit,
-                                            pricePerHour: x.pricePerHour,
-                                            pricePerUnitTHS: x.pricePerUnitTHS,
-                                            pricePerHourTHS: x.pricePerHourTHS,
-                                        })),
-                                    )}
-                                />
-                                <Form.Text className="text-muted">
-                                    Fyll i prissättningen i JSON-format. Exempel: [&#123;&quot;name&quot;:
-                                    &quot;Standardpris&quot;, &quot;pricePerUnit&quot;: 10, &quot;pricePerHour&quot;: 0,
-                                    &quot;pricePerUnitTHS&quot;: 5, &quot;pricePerHourTHS&quot;: 0 &#125;]. Namnet på
-                                    priset visas även på den externa prislistan.
-                                </Form.Text>
+                                <PricesEditor prices={prices} onChange={setPrices} />
                             </Form.Group>
                         </Col>
                     </Row>
