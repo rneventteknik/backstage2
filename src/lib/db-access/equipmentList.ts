@@ -1,8 +1,8 @@
 import {
     EquipmentListEntryObjectionModel,
     EquipmentListObjectionModel,
-    EventObjectionModel,
-} from '../../models/objection-models/EventObjectionModel';
+    BookingObjectionModel,
+} from '../../models/objection-models/BookingObjectionModel';
 import { ensureDatabaseIsInitialized } from '../database';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
@@ -24,9 +24,9 @@ export const fetchEquipmentLists = async (): Promise<EquipmentListObjectionModel
     return EquipmentListObjectionModel.query().withGraphFetched('equipmentListEntries.equipment');
 };
 
-export const fetchEquipmentListsForEvent = async (eventId: number): Promise<EquipmentListObjectionModel[]> => {
+export const fetchEquipmentListsForBooking = async (bookingId: number): Promise<EquipmentListObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return EquipmentListObjectionModel.query().where('eventId', eventId).orderBy('id');
+    return EquipmentListObjectionModel.query().where('bookingId', bookingId).orderBy('id');
 };
 
 export const updateEquipmentList = async (
@@ -71,12 +71,12 @@ export const updateEquipmentList = async (
 
 export const insertEquipmentList = async (
     equipmentList: EquipmentListObjectionModel,
-    eventId: number,
+    bookingId: number,
 ): Promise<EquipmentListObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    return EventObjectionModel.relatedQuery('equipmentLists')
-        .for(eventId)
+    return BookingObjectionModel.relatedQuery('equipmentLists')
+        .for(bookingId)
         .insert(withCreatedDate(removeIdAndDates(equipmentList)));
 };
 

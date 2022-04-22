@@ -1,6 +1,6 @@
 import { IUserObjectionModel } from './UserObjectionModel';
 
-export { EventObjectionModel } from './EventObjectionModel';
+export { BookingObjectionModel } from './BookingObjectionModel';
 export { UserObjectionModel } from './UserObjectionModel';
 export {
     EquipmentObjectionModel,
@@ -12,7 +12,7 @@ export { EquipmentPackageObjectionModel, EquipmentPackageEntryObjectionModel } f
 
 export { TimeEstimateObjectionModel } from './TimeEstimateObjectionModel';
 
-export type { IEventObjectionModel } from './EventObjectionModel';
+export type { IBookingObjectionModel } from './BookingObjectionModel';
 export type { IUserObjectionModel, IUserAuthObjectionModel } from './UserObjectionModel';
 export type {
     IEquipmentObjectionModel,

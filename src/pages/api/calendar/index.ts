@@ -2,7 +2,7 @@ import { calendar_v3, calendar } from '@googleapis/calendar';
 import { GaxiosResponse } from 'googleapis-common';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { respondWithCustomErrorMessage, respondWithInvalidMethodResponse } from '../../../lib/apiResponses';
-import { fetchFirstEventByCalendarEventId } from '../../../lib/db-access/event';
+import { fetchFirstBookingByCalendarBookingId } from '../../../lib/db-access/booking';
 import { withSessionContext } from '../../../lib/sessionContext';
 import { CalendarResult } from '../../../models/misc/CalendarResult';
 
@@ -28,7 +28,7 @@ const mapCalendarResponse = (res: GaxiosResponse<calendar_v3.Schema$Events>): Pr
                 creator: x.creator?.displayName ?? x.creator?.email ?? undefined,
                 start: x.start?.dateTime ?? x.start?.date ?? undefined,
                 end: x.end?.dateTime ?? x.start?.date ?? undefined,
-                existingEventId: (await fetchFirstEventByCalendarEventId(x.id as string))?.id,
+                existingBookingId: (await fetchFirstBookingByCalendarBookingId(x.id as string))?.id,
             })),
     );
 };

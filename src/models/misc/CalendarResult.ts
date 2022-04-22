@@ -7,5 +7,5 @@ export interface CalendarResult {
     creator?: string;
     start?: string;
     end?: string;
-    existingEventId?: number;
+    existingBookingId?: number;
 }

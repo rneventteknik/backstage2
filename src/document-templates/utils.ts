@@ -1,5 +1,5 @@
 import { Font, StyleSheet } from '@react-pdf/renderer';
-import { Event } from '../models/interfaces';
+import { Booking } from '../models/interfaces';
 import { EquipmentListEntry } from '../models/interfaces/EquipmentList';
 
 export const registerFonts = (): void => {
@@ -73,8 +73,8 @@ export const commonStyles = StyleSheet.create({
     },
 });
 
-export const getEventDocumentId = (event: Event): string => {
-    return `#${event.created?.getFullYear()}-${event.id}`;
+export const getBookingDocumentId = (booking: Booking): string => {
+    return `#${booking.created?.getFullYear()}-${booking.id}`;
 };
 
 export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, t: (t: string) => string) => {

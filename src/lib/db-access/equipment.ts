@@ -37,7 +37,7 @@ export const fetchEquipments = async (): Promise<EquipmentObjectionModel[]> => {
         .withGraphFetched('equipmentPublicCategory');
 };
 
-// This function fetches the events, but only with information that should be publicly available.
+// This function fetches the bookings, but only with information that should be publicly available.
 // It is used by the publicly exposed API for the public price list.
 export const fetchEquipmentsPublic = async (): Promise<EquipmentObjectionModel[]> => {
     ensureDatabaseIsInitialized();

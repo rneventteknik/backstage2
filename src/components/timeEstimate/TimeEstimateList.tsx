@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, Button, DropdownButton, Dropdown, Alert } from 'react-bootstrap';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
-import { eventFetcher, timeEstimatesFetcher } from '../../lib/fetchers';
+import { bookingFetcher, timeEstimatesFetcher } from '../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeEstimateObjectionModel } from '../../models/objection-models';
 import { getResponseContentOrError } from '../../lib/utils';
@@ -16,12 +16,12 @@ import { faAngleDown, faAngleUp, faPlusCircle } from '@fortawesome/free-solid-sv
 import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../lib/pricingUtils';
 
 type Props = {
-    eventId: number;
+    bookingId: number;
     pricePlan: number;
     readonly: boolean;
 };
 
-const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Props) => {
+const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: Props) => {
     const [showListContent, setShowListContent] = useState(false);
 
     const { showCreateFailedNotification, showSaveFailedNotification, showDeleteFailedNotification } =
@@ -32,13 +32,13 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Pro
         error,
         isValidating,
         mutate,
-    } = useSwr('/api/events/' + eventId + '/timeEstimate', timeEstimatesFetcher);
+    } = useSwr('/api/bookings/' + bookingId + '/timeEstimate', timeEstimatesFetcher);
 
     const {
-        data: eventData,
-        error: eventError,
-        isValidating: eventIsValidating,
-    } = useSwr('/api/events/' + eventId, eventFetcher);
+        data: bookingData,
+        error: bookingError,
+        isValidating: bookingIsValidating,
+    } = useSwr('/api/bookings/' + bookingId, bookingFetcher);
 
     const addEmptyTimeEstimate = async () => {
         if (!process.env.NEXT_PUBLIC_SALARY_NORMAL)
@@ -52,7 +52,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Pro
                 : process.env.NEXT_PUBLIC_SALARY_THS;
 
         const timeEstimate: ITimeEstimateObjectionModel = {
-            eventId: eventId,
+            bookingId: bookingId,
             numberOfHours: 0,
             pricePerHour: isNaN(parseInt(pricePerHour)) ? 0 : parseInt(pricePerHour),
             name: '',
@@ -66,7 +66,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Pro
             body: JSON.stringify(body),
         };
 
-        fetch('/api/events/' + eventId + '/timeEstimate', request)
+        fetch('/api/bookings/' + bookingId + '/timeEstimate', request)
             .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
             .then(toTimeEstimate)
             .then((data) => {
@@ -89,7 +89,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Pro
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
         };
-        fetch('/api/events/' + timeEstimate.eventId + '/timeEstimate/' + timeEstimate.id, request)
+        fetch('/api/bookings/' + timeEstimate.bookingId + '/timeEstimate/' + timeEstimate.id, request)
             .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
             .then(toTimeEstimate)
             .catch((error: Error) => {
@@ -107,7 +107,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Pro
             headers: { 'Content-Type': 'application/json' },
         };
 
-        fetch('/api/events/' + timeEstimate.eventId + '/timeEstimate/' + timeEstimate?.id, request)
+        fetch('/api/bookings/' + timeEstimate.bookingId + '/timeEstimate/' + timeEstimate?.id, request)
             .then(getResponseContentOrError)
             .catch((error) => {
                 console.error(error);
@@ -234,7 +234,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Pro
         ],
     };
 
-    if ((isValidating || eventIsValidating) && (!eventData || !timeEstimates)) {
+    if ((isValidating || bookingIsValidating) && (!bookingData || !timeEstimates)) {
         return (
             <Card className="mb-3">
                 <Card.Header>Tidsuppskattning</Card.Header>
@@ -242,7 +242,7 @@ const TimeEstimateList: React.FC<Props> = ({ eventId, pricePlan, readonly }: Pro
             </Card>
         );
     }
-    if (error || !timeEstimates || eventError || !eventData) {
+    if (error || !timeEstimates || bookingError || !bookingData) {
         return (
             <Card className="mb-3">
                 <Card.Header>Tidsuppskattning</Card.Header>

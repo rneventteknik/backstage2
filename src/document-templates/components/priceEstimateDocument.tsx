@@ -1,8 +1,8 @@
 import React from 'react';
-import { Event } from '../../models/interfaces';
+import { Booking } from '../../models/interfaces';
 import { Page, View, Text, Document } from '@react-pdf/renderer';
-import { commonStyles, getEventDocumentId } from '../utils';
-import { EventInfo } from './shared/eventInfo';
+import { commonStyles, getBookingDocumentId } from '../utils';
+import { BookingInfo } from './shared/bookingInfo';
 import { PageCount } from './shared/pageCount';
 import { Header } from './shared/header';
 import { MainContent } from './shared/mainContent';
@@ -13,14 +13,14 @@ import { EquipmentListInfo } from './shared/equipmentListInfo';
 import { TimeEstimateListInfo } from './shared/timeEstimateListInfo';
 
 type Props = {
-    event: Event;
+    booking: Booking;
 };
 
 const styles = {
     ...commonStyles,
 };
 
-export const PriceEstimateDocument: React.FC<Props> = ({ event }: Props) => {
+export const PriceEstimateDocument: React.FC<Props> = ({ booking }: Props) => {
     const { t } = useTextResources();
 
     return (
@@ -28,16 +28,16 @@ export const PriceEstimateDocument: React.FC<Props> = ({ event }: Props) => {
             <Page size="A4" style={styles.page}>
                 <PageCount />
 
-                <Header title={t('price-estimate.title')} documentId={getEventDocumentId(event)} />
-                <EventInfo event={event} />
+                <Header title={t('price-estimate.title')} documentId={getBookingDocumentId(booking)} />
+                <BookingInfo booking={booking} />
 
                 <MainContent>
                     <View style={styles.flexGrow}>
-                        {event.equipmentLists?.map((l) => (
+                        {booking.equipmentLists?.map((l) => (
                             <EquipmentListInfo list={l} key={l.id} />
                         ))}
-                        <TimeEstimateListInfo event={event} />
-                        <TotalPriceSection event={event} />
+                        <TimeEstimateListInfo booking={booking} />
+                        <TotalPriceSection booking={booking} />
                     </View>
 
                     <Text style={styles.bold}>{t('price-estimate.legal-note.title')}</Text>

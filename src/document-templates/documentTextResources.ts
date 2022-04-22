@@ -4,13 +4,13 @@ import { Language } from './useTextResources';
 
 export const documentTextResources: Record<Language, Record<string, string>> = {
     SV: {
-        // Event info
-        'common.event-info.event-gig': 'Arrangemang',
-        'common.event-info.event-rental': 'Hyra',
-        'common.event-info.contact-person': 'Kontaktperson',
-        'common.event-info.email-phone': 'Email / Telefon',
-        'common.event-info.our-reference': 'Vår referens',
-        'common.event-info.print-date': 'Utskriftsdatum',
+        // Booking info
+        'common.booking-info.booking-gig': 'Arrangemang',
+        'common.booking-info.booking-rental': 'Hyra',
+        'common.booking-info.contact-person': 'Kontaktperson',
+        'common.booking-info.email-phone': 'Email / Telefon',
+        'common.booking-info.our-reference': 'Vår referens',
+        'common.booking-info.print-date': 'Utskriftsdatum',
 
         // Equipment list
         'common.equipment-list.table-header.specification': 'Specifikation',
@@ -28,7 +28,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.time-estimate-list.table-header.total-price': 'Belopp',
         'common.time-estimate-list.total': 'Total',
 
-        // Event total sectopm
+        // Booking total sectopm
         'common.total-price-section.heading': 'Totalt',
         'common.total-price-section.time-estimate-sum': 'Personalkostnader',
         'common.total-price-section.total-sum': 'Att betala SEK',
@@ -51,13 +51,13 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.misc.days-unit': 'dagar',
     },
     EN: {
-        // Event info
-        'common.event-info.event-gig': 'Event',
-        'common.event-info.event-rental': 'Rental',
-        'common.event-info.contact-person': 'Contact person',
-        'common.event-info.email-phone': 'Email / Telephone',
-        'common.event-info.our-reference': 'Our reference',
-        'common.event-info.print-date': 'Print date',
+        // Booking info
+        'common.booking-info.booking-gig': 'Event',
+        'common.booking-info.booking-rental': 'Rental',
+        'common.booking-info.contact-person': 'Contact person',
+        'common.booking-info.email-phone': 'Email / Telephone',
+        'common.booking-info.our-reference': 'Our reference',
+        'common.booking-info.print-date': 'Print date',
 
         // Equipment list
         'common.equipment-list.table-header.specification': 'Item',
@@ -75,7 +75,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.time-estimate-list.table-header.total-price': 'Total price',
         'common.time-estimate-list.total': 'Total',
 
-        // Event total sectopm
+        // Booking total sectopm
         'common.total-price-section.heading': 'Total',
         'common.total-price-section.time-estimate-sum': 'Personnel costs',
         'common.total-price-section.total-sum': 'To pay SEK',

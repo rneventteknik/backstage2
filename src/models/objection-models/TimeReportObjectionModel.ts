@@ -6,7 +6,7 @@ import { IUserObjectionModel, UserObjectionModel } from './UserObjectionModel';
 
 export interface ITimeReportObjectionModel extends BaseObjectionModelWithName {
     userId: number;
-    eventId: number;
+    bookingId: number;
     user?: IUserObjectionModel;
     actualWorkingHours: number;
     billableWorkingHours: number;
@@ -34,7 +34,7 @@ export class TimeReportObjectionModel extends Model implements ITimeReportObject
     name!: string;
     created!: string;
     updated!: string;
-    eventId!: number;
+    bookingId!: number;
     userId!: number;
     user!: IUserObjectionModel;
     actualWorkingHours!: number;

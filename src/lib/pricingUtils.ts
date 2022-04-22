@@ -1,4 +1,4 @@
-import { EquipmentPrice, Event, TimeEstimate, TimeReport } from '../models/interfaces';
+import { EquipmentPrice, Booking, TimeEstimate, TimeReport } from '../models/interfaces';
 import { EquipmentList, EquipmentListEntry } from '../models/interfaces/EquipmentList';
 
 // Calculate total price
@@ -38,9 +38,9 @@ export const getTotalTimeReportsPrice = (timeReports: TimeReport[] | undefined):
     return timeReports?.reduce((sum, l) => sum + getTimeReportPrice(l), 0) ?? 0;
 };
 
-export const getEventPrice = (event: Event): number => {
-    const equipmentPrice = event.equipmentLists?.reduce((sum, l) => sum + getEquipmentListPrice(l), 0) ?? 0;
-    const timeEstimatePrice = getTotalTimeEstimatesPrice(event.timeEstimates);
+export const getBookingPrice = (booking: Booking): number => {
+    const equipmentPrice = booking.equipmentLists?.reduce((sum, l) => sum + getEquipmentListPrice(l), 0) ?? 0;
+    const timeEstimatePrice = getTotalTimeEstimatesPrice(booking.timeEstimates);
 
     return equipmentPrice + timeEstimatePrice;
 };

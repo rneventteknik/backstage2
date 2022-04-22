@@ -95,7 +95,7 @@ const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
     <div className={styles.container + ' pt-2'}>
         <SidebarLinkGroup>
             <SidebarLink displayName="Home" link="/" icon={faHome} exactMatch={true} />
-            <SidebarLink displayName="Bokningar" link="/events" icon={faCalendarDay} />
+            <SidebarLink displayName="Bokningar" link="/bookings" icon={faCalendarDay} />
             <SidebarLink displayName="Bokningsarkiv" link="/archive" icon={faArchive} />
             <SidebarLink displayName="Utrustning" link="/equipment" icon={faCube} />
             <SidebarLink displayName="Användare" link="/users" icon={faUsers} />

@@ -12,9 +12,9 @@ export const fetchTimeReports = async (): Promise<TimeReportObjectionModel[]> =>
     return TimeReportObjectionModel.query();
 };
 
-export const fetchTimeReportsByEventId = async (id: number): Promise<TimeReportObjectionModel[]> => {
+export const fetchTimeReportsByBookingId = async (id: number): Promise<TimeReportObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return TimeReportObjectionModel.query().where('eventId', id).withGraphFetched('user');
+    return TimeReportObjectionModel.query().where('bookingId', id).withGraphFetched('user');
 };
 
 export const updateTimeReport = async (

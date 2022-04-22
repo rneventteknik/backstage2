@@ -7,7 +7,7 @@ export interface ITimeEstimateObjectionModel extends BaseObjectionModelWithName 
     name: string;
     created?: string;
     updated?: string;
-    eventId: number;
+    bookingId: number;
     numberOfHours: number;
     pricePerHour: number;
 }
@@ -19,7 +19,7 @@ export class TimeEstimateObjectionModel extends Model implements ITimeEstimateOb
     name!: string;
     created!: string;
     updated!: string;
-    eventId!: number;
+    bookingId!: number;
     numberOfHours!: number;
     pricePerHour!: number;
 }

@@ -11,7 +11,7 @@ export async function seed(knex) {
     await knex('EquipmentList').del();
     await knex('EquipmentPrice').del();
     await knex('Equipment').del();
-    await knex('Event').del();
+    await knex('Booking').del();
     await knex('User').del();
 
     // Users and authentication
@@ -398,16 +398,16 @@ export async function seed(knex) {
         },
     ]);
 
-    // Events
+    // Bookings
     //
-    const firstEventId = await knex('Event')
+    const firstBookingId = await knex('Booking')
         .insert([
             {
                 name: 'Tjolahoppspexet',
                 created: '2020-06-15 19:00',
                 updated: '2020-06-15 19:00',
                 ownerUserId: firstUserId,
-                eventType: 1,
+                bookingType: 1,
                 status: 1,
                 salaryStatus: 1,
                 invoiceHogiaId: null,
@@ -429,7 +429,7 @@ export async function seed(knex) {
                 created: '2020-05-22 18:00',
                 updated: '2020-05-22 18:00',
                 ownerUserId: firstUserId + 1,
-                eventType: 0,
+                bookingType: 0,
                 status: 4,
                 salaryStatus: 0,
                 invoiceHogiaId: null,
@@ -451,7 +451,7 @@ export async function seed(knex) {
                 created: '2020-06-22 12:00',
                 updated: '2020-06-22 12:00',
                 ownerUserId: firstUserId + 1,
-                eventType: 1,
+                bookingType: 1,
                 status: 1,
                 salaryStatus: 0,
                 invoiceHogiaId: 1,
@@ -479,7 +479,7 @@ export async function seed(knex) {
             updated: '2020-06-15 19:00',
             numberOfHours: 18,
             pricePerHour: 125,
-            eventId: firstEventId,
+            bookingId: firstBookingId,
         },
         {
             name: 'Kör - 2pers',
@@ -487,7 +487,7 @@ export async function seed(knex) {
             updated: '2020-06-15 23:00',
             numberOfHours: 16,
             pricePerHour: 500,
-            eventId: firstEventId,
+            bookingId: firstBookingId,
         },
         {
             name: 'Riv - 2pers',
@@ -495,7 +495,7 @@ export async function seed(knex) {
             updated: '2020-06-15 23:00',
             numberOfHours: 8,
             pricePerHour: 125,
-            eventId: firstEventId,
+            bookingId: firstBookingId,
         },
         {
             name: 'Kör',
@@ -503,7 +503,7 @@ export async function seed(knex) {
             updated: '2020-06-15 23:00',
             numberOfHours: 2,
             pricePerHour: 125,
-            eventId: firstEventId + 1,
+            bookingId: firstBookingId + 1,
         },
     ]);
 
@@ -512,7 +512,7 @@ export async function seed(knex) {
             name: 'Rigg',
             created: '2020-06-15 17:00',
             updated: '2020-06-15 23:00',
-            eventId: firstEventId,
+            bookingId: firstBookingId,
             userId: firstUserId,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
@@ -525,7 +525,7 @@ export async function seed(knex) {
             name: 'Rigg',
             created: '2020-06-15 17:00',
             updated: '2020-06-15 23:00',
-            eventId: firstEventId,
+            bookingId: firstBookingId,
             userId: firstUserId + 1,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
@@ -538,7 +538,7 @@ export async function seed(knex) {
             name: 'Kör',
             created: '2020-06-15 17:00',
             updated: '2020-06-15 23:00',
-            eventId: firstEventId,
+            bookingId: firstBookingId,
             userId: firstUserId,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
@@ -551,7 +551,7 @@ export async function seed(knex) {
             name: 'Riv',
             created: '2020-06-15 17:00',
             updated: '2020-06-15 23:00',
-            eventId: firstEventId,
+            bookingId: firstBookingId,
             userId: firstUserId,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
@@ -564,7 +564,7 @@ export async function seed(knex) {
             name: 'Kör',
             created: '2020-06-15 17:00',
             updated: '2020-06-15 23:00',
-            eventId: firstEventId + 1,
+            bookingId: firstBookingId + 1,
             userId: firstUserId,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
@@ -585,7 +585,7 @@ export async function seed(knex) {
                 equipmentInDatetime: '2022-05-02T22:00:00.000Z',
                 usageStartDatetime: '2022-04-30T22:00:00.000Z',
                 usageEndDatetime: '2022-05-02T22:00:00.000Z',
-                eventId: firstEventId,
+                bookingId: firstBookingId,
             },
             {
                 name: 'Video',
@@ -595,7 +595,7 @@ export async function seed(knex) {
                 equipmentInDatetime: '2022-05-02T22:00:00.000Z',
                 usageStartDatetime: '2022-04-30T22:00:00.000Z',
                 usageEndDatetime: '2022-05-02T22:00:00.000Z',
-                eventId: firstEventId,
+                bookingId: firstBookingId,
             },
         ])
         .returning('id')

@@ -1,12 +1,12 @@
 import {
-    IEventObjectionModel,
+    IBookingObjectionModel,
     IEquipmentObjectionModel,
     IUserObjectionModel,
     IEquipmentPackageObjectionModel,
 } from '../objection-models';
 
 export interface SearchResult {
-    events: IEventObjectionModel[];
+    bookings: IBookingObjectionModel[];
     equipment: IEquipmentObjectionModel[];
     users: IUserObjectionModel[];
 }

@@ -64,7 +64,7 @@ const EquipmentSearch: React.FC<Props> = ({
             .finally(() => setIsLoading(false));
     };
 
-    // The search API returns the search result as an object with seperate lists for events, equipment and
+    // The search API returns the search result as an object with seperate lists for bookings, equipment and
     // users, but the dropdown component requires all values in a single list and the type as a parameter.
     const convertSearchResultsForDisplay = (results: EquipmentSearchResult): SearchResultViewModel[] => {
         return ([] as SearchResultViewModel[])

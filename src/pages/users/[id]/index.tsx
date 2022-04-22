@@ -7,12 +7,12 @@ import { getMemberStatusName, getRoleName } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
 import Link from 'next/link';
-import SmallEventList from '../../../components/SmallEventList';
+import SmallBookingList from '../../../components/SmallBookingList';
 import UserDisplay from '../../../components/utils/UserDisplay';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
-import { eventsFetcher, userFetcher } from '../../../lib/fetchers';
+import { bookingsFetcher, userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -24,7 +24,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     //
     const router = useRouter();
     const { data: user, error, isValidating } = useSwr('/api/users/' + router.query.id, userFetcher);
-    const { data: events } = useSwr('/api/users/' + router.query.id + '/events', eventsFetcher);
+    const { data: bookings } = useSwr('/api/users/' + router.query.id + '/bookings', bookingsFetcher);
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
@@ -154,7 +154,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 </Col>
 
                 <Col xl={8}>
-                    <SmallEventList title="Bokningar" events={events}></SmallEventList>
+                    <SmallBookingList title="Bokningar" bookings={bookings}></SmallBookingList>
                 </Col>
             </Row>
         </Layout>

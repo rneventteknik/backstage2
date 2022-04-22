@@ -1,7 +1,8 @@
 import { BaseEntityWithName } from './BaseEntity';
+import { Booking } from './Booking';
 import { User } from './User';
 
 export interface SalaryGroup extends BaseEntityWithName {
-    events: Event[];
+    bookings: Booking[];
     user: User;
 }

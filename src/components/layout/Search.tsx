@@ -6,16 +6,16 @@ import { groupBy, getResponseContentOrError } from '../../lib/utils';
 import styles from './Search.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCalendarDay, faCube, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { IEquipmentObjectionModel, IEventObjectionModel, IUserObjectionModel } from '../../models/objection-models';
+import { IEquipmentObjectionModel, IBookingObjectionModel, IUserObjectionModel } from '../../models/objection-models';
 import { useNotifications } from '../../lib/useNotifications';
 import { toUser } from '../../lib/mappers/user';
-import { toEvent } from '../../lib/mappers/event';
+import { toBooking } from '../../lib/mappers/booking';
 import { toEquipment } from '../../lib/mappers/equipment';
 import { Badge } from 'react-bootstrap';
 import { BaseEntityWithName } from '../../models/interfaces/BaseEntity';
 
 enum ResultType {
-    EVENT,
+    BOOKING,
     EQUIPMENT,
     USER,
 }
@@ -57,15 +57,15 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
             .finally(() => setIsLoading(false));
     };
 
-    // The search API returns the search result as an object with seperate lists for events, equipment and
+    // The search API returns the search result as an object with seperate lists for bookings, equipment and
     // users, but the dropdown component requires all values in a single list and the type as a parameter.
     const convertSearchResultsForDisplay = (results: SearchResult): SearchResultViewModel[] => {
         return ([] as SearchResultViewModel[])
             .concat(
-                results.events.map((event) => ({
-                    type: ResultType.EVENT,
-                    url: '/events/' + event.id,
-                    ...toEvent(event),
+                results.bookings.map((booking) => ({
+                    type: ResultType.BOOKING,
+                    url: '/bookings/' + booking.id,
+                    ...toBooking(booking),
                 })),
             )
             .concat(
@@ -130,12 +130,12 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                         </small>
                     );
 
-                case ResultType.EVENT:
-                    const event = entity as unknown as IEventObjectionModel;
+                case ResultType.BOOKING:
+                    const booking = entity as unknown as IBookingObjectionModel;
                     return (
                         <small>
                             <Typeahead.Highlighter search={highlightText}>
-                                {event.contactPersonName}
+                                {booking.contactPersonName}
                             </Typeahead.Highlighter>
                         </small>
                     );
@@ -187,7 +187,12 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
 
         return (
             <Typeahead.Menu {...menuProps} className={styles.menu}>
-                <ResultSection heading="Bokningar" icon={faCalendarDay} results={res[ResultType.EVENT]} state={state} />
+                <ResultSection
+                    heading="Bokningar"
+                    icon={faCalendarDay}
+                    results={res[ResultType.BOOKING]}
+                    state={state}
+                />
 
                 <Typeahead.Menu.Divider />
                 <ResultSection heading="Utrustning" icon={faCube} results={res[ResultType.EQUIPMENT]} state={state} />

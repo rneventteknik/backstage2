@@ -6,5 +6,5 @@ export interface ChangeLogEntry {
     timestamp: Date;
     description: string;
 }
-export interface EventChangelogEntry extends BaseEntityWithName, ChangeLogEntry {}
+export interface BookingChangelogEntry extends BaseEntityWithName, ChangeLogEntry {}
 export interface EquipmentChangelogEntry extends BaseEntityWithName, ChangeLogEntry {}

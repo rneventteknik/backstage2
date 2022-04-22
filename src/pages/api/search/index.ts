@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { SearchResult } from '../../../models/misc/SearchResult';
 import { respondWithCustomErrorMessage } from '../../../lib/apiResponses';
-import { searchEvents, searchUsers, searchEquipment } from '../../../lib/db-access';
+import { searchBookings, searchUsers, searchEquipment } from '../../../lib/db-access';
 import { withSessionContext } from '../../../lib/sessionContext';
 
 const numberOfEachType = 8;
@@ -11,7 +11,7 @@ const handler = withSessionContext(async (_req: NextApiRequest, res: NextApiResp
 
     try {
         const result: SearchResult = {
-            events: await searchEvents(searchString, numberOfEachType),
+            bookings: await searchBookings(searchString, numberOfEachType),
             equipment: await searchEquipment(searchString, numberOfEachType),
             users: await searchUsers(searchString, numberOfEachType),
         };

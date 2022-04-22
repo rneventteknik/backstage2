@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { Card, Button, DropdownButton, Dropdown, Modal, Row, Col, Form, InputGroup } from 'react-bootstrap';
+import { Card, Button, DropdownButton, Dropdown, Modal, Row, Col, Form, InputGroup, Alert } from 'react-bootstrap';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { Alert } from 'react-bootstrap';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
 // import TimeReportForm from './TimeReportForm';
-import { eventFetcher, timeReportsFetcher, usersFetcher } from '../../lib/fetchers';
+import { bookingFetcher, timeReportsFetcher, usersFetcher } from '../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeReportObjectionModel } from '../../models/objection-models';
 import {
@@ -13,6 +12,7 @@ import {
     getResponseContentOrError,
     toDateOrUndefined,
     toIntOrUndefined,
+    getPricePerHour,
 } from '../../lib/utils';
 import { toTimeReport } from '../../lib/mappers/timeReport';
 import { TimeReport } from '../../models/interfaces/TimeReport';
@@ -24,19 +24,18 @@ import { faAngleDown, faAngleUp, faPlusCircle } from '@fortawesome/free-solid-sv
 import { User } from '../../models/interfaces';
 import { AccountKind } from '../../models/enums/AccountKind';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { getPricePerHour } from '../../lib/utils';
 
 type Props = {
-    eventId: number;
+    bookingId: number;
     pricePlan: number;
     currentUser: CurrentUserInfo;
     readonly: boolean;
 };
 
-const TimeReportList: React.FC<Props> = ({ eventId, pricePlan, currentUser, readonly }: Props) => {
+const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, readonly }: Props) => {
     const [showListContent, setShowListContent] = useState(false);
     const [timeReportToEditViewModel, setTimeReportToEditViewModel] = useState<
-        (Partial<TimeReport> & Pick<TimeReport, 'id' | 'eventId'>) | null
+        (Partial<TimeReport> & Pick<TimeReport, 'id' | 'bookingId'>) | null
     >(null);
 
     const { showCreateFailedNotification, showSaveFailedNotification, showDeleteFailedNotification } =
@@ -47,13 +46,13 @@ const TimeReportList: React.FC<Props> = ({ eventId, pricePlan, currentUser, read
         error,
         isValidating,
         mutate,
-    } = useSwr('/api/events/' + eventId + '/timeReport', timeReportsFetcher);
+    } = useSwr('/api/bookings/' + bookingId + '/timeReport', timeReportsFetcher);
 
     const {
-        data: eventData,
-        error: eventError,
-        isValidating: eventIsValidating,
-    } = useSwr('/api/events/' + eventId, eventFetcher);
+        data: bookingData,
+        error: bookingError,
+        isValidating: bookingIsValidating,
+    } = useSwr('/api/bookings/' + bookingId, bookingFetcher);
 
     const { data: users, isValidating: usersIsValidating } = useSwr('/api/users', usersFetcher);
 
@@ -66,7 +65,7 @@ const TimeReportList: React.FC<Props> = ({ eventId, pricePlan, currentUser, read
         const pricePerHour = getPricePerHour(pricePlan);
 
         const timeReport: ITimeReportObjectionModel = {
-            eventId: eventId,
+            bookingId: bookingId,
             billableWorkingHours: 0,
             actualWorkingHours: 0,
             userId: currentUser.userId,
@@ -85,7 +84,7 @@ const TimeReportList: React.FC<Props> = ({ eventId, pricePlan, currentUser, read
             body: JSON.stringify(body),
         };
 
-        fetch('/api/events/' + eventId + '/timeReport', request)
+        fetch('/api/bookings/' + bookingId + '/timeReport', request)
             .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
             .then(toTimeReport)
             .then((data) => {
@@ -108,7 +107,7 @@ const TimeReportList: React.FC<Props> = ({ eventId, pricePlan, currentUser, read
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
         };
-        fetch('/api/events/' + timeReport.eventId + '/timeReport/' + timeReport.id, request)
+        fetch('/api/bookings/' + timeReport.bookingId + '/timeReport/' + timeReport.id, request)
             .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
             .then(toTimeReport)
             .catch((error: Error) => {
@@ -126,7 +125,7 @@ const TimeReportList: React.FC<Props> = ({ eventId, pricePlan, currentUser, read
             headers: { 'Content-Type': 'application/json' },
         };
 
-        fetch('/api/events/' + timeReport.eventId + '/timeReport/' + timeReport?.id, request)
+        fetch('/api/bookings/' + timeReport.bookingId + '/timeReport/' + timeReport?.id, request)
             .then(getResponseContentOrError)
             .catch((error) => {
                 console.error(error);
@@ -313,7 +312,7 @@ const TimeReportList: React.FC<Props> = ({ eventId, pricePlan, currentUser, read
         ],
     };
 
-    if ((isValidating || eventIsValidating || usersIsValidating) && (!eventData || !timeReports || !users)) {
+    if ((isValidating || bookingIsValidating || usersIsValidating) && (!bookingData || !timeReports || !users)) {
         return (
             <Card className="mb-3">
                 <Card.Header>Tidrapport</Card.Header>
@@ -321,7 +320,7 @@ const TimeReportList: React.FC<Props> = ({ eventId, pricePlan, currentUser, read
             </Card>
         );
     }
-    if (error || !timeReports || eventError || !eventData) {
+    if (error || !timeReports || bookingError || !bookingData) {
         return (
             <Card className="mb-3">
                 <Card.Header>Tidrapportering</Card.Header>

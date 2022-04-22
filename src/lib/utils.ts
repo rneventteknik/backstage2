@@ -4,7 +4,7 @@ import { Role } from '../models/enums/Role';
 import { Status } from '../models/enums/Status';
 import { PricePlan } from '../models/enums/PricePlan';
 import { AccountKind } from '../models/enums/AccountKind';
-import { EventType } from '../models/enums/EventType';
+import { BookingType } from '../models/enums/BookingType';
 import { SalaryStatus } from '../models/enums/SalaryStatus';
 
 // Helper functions for array operations
@@ -112,12 +112,12 @@ export const getAccountKindName = (accountKind: AccountKind): string => {
     }
 };
 
-export const getEventTypeName = (eventType: EventType): string => {
-    switch (eventType) {
-        case EventType.GIG:
+export const getBookingTypeName = (bookingType: BookingType): string => {
+    switch (bookingType) {
+        case BookingType.GIG:
             return 'Gigg';
 
-        case EventType.RENTAL:
+        case BookingType.RENTAL:
             return 'Hyra';
     }
 };

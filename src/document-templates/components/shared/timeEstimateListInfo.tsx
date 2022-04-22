@@ -4,7 +4,7 @@ import { commonStyles } from '../../utils';
 import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { useTextResources } from '../../useTextResources';
-import { Event } from '../../../models/interfaces';
+import { Booking } from '../../../models/interfaces';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -15,9 +15,9 @@ const styles = StyleSheet.create({
 });
 
 type Props = {
-    event: Event;
+    booking: Booking;
 };
-export const TimeEstimateListInfo: React.FC<Props> = ({ event }: Props) => {
+export const TimeEstimateListInfo: React.FC<Props> = ({ booking }: Props) => {
     const { t } = useTextResources();
 
     return (
@@ -40,7 +40,7 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ event }: Props) => {
             </TableRow>
 
             <View>
-                {event.timeEstimates?.map((timeEstimate) => (
+                {booking.timeEstimates?.map((timeEstimate) => (
                     <TableRow key={timeEstimate.id}>
                         <TableCellAutoWidth>
                             <Text>{timeEstimate.name}</Text>
@@ -66,7 +66,7 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ event }: Props) => {
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={40} textAlign="right">
                     <Text style={styles.bold}>
-                        {formatNumberAsCurrency(getTotalTimeEstimatesPrice(event.timeEstimates))}
+                        {formatNumberAsCurrency(getTotalTimeEstimatesPrice(booking.timeEstimates))}
                     </Text>
                 </TableCellFixedWidth>
             </TableRow>

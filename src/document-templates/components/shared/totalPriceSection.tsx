@@ -4,11 +4,11 @@ import { commonStyles } from '../../utils';
 import {
     formatNumberAsCurrency,
     getEquipmentListPrice,
-    getEventPrice,
+    getBookingPrice,
     getTotalTimeEstimatesPrice,
 } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
-import { Event } from '../../../models/interfaces';
+import { Booking } from '../../../models/interfaces';
 import { useTextResources } from '../../useTextResources';
 
 const styles = StyleSheet.create({
@@ -20,9 +20,9 @@ const styles = StyleSheet.create({
 });
 
 type Props = {
-    event: Event;
+    booking: Booking;
 };
-export const TotalPriceSection: React.FC<Props> = ({ event }: Props) => {
+export const TotalPriceSection: React.FC<Props> = ({ booking }: Props) => {
     const { t } = useTextResources();
 
     return (
@@ -30,7 +30,7 @@ export const TotalPriceSection: React.FC<Props> = ({ event }: Props) => {
             <Text style={styles.heading}>{t('common.total-price-section.heading')}</Text>
 
             <View>
-                {event.equipmentLists?.map((list) => (
+                {booking.equipmentLists?.map((list) => (
                     <TableRow key={list.id}>
                         <TableCellAutoWidth>
                             <Text>{list.name}</Text>
@@ -45,7 +45,7 @@ export const TotalPriceSection: React.FC<Props> = ({ event }: Props) => {
                         <Text>{t('common.total-price-section.time-estimate-sum')}</Text>
                     </TableCellAutoWidth>
                     <TableCellFixedWidth width={40} textAlign="right">
-                        <Text>{formatNumberAsCurrency(getTotalTimeEstimatesPrice(event.timeEstimates))}</Text>
+                        <Text>{formatNumberAsCurrency(getTotalTimeEstimatesPrice(booking.timeEstimates))}</Text>
                     </TableCellFixedWidth>
                 </TableRow>
             </View>
@@ -55,7 +55,7 @@ export const TotalPriceSection: React.FC<Props> = ({ event }: Props) => {
                     <Text style={styles.bold}>{t('common.total-price-section.total-sum')}</Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={40} textAlign="right">
-                    <Text style={styles.bold}>{formatNumberAsCurrency(getEventPrice(event))}</Text>
+                    <Text style={styles.bold}>{formatNumberAsCurrency(getBookingPrice(booking))}</Text>
                 </TableCellFixedWidth>
             </TableRow>
         </View>

@@ -131,10 +131,10 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
     }
 
-    // Handlers for changed events
+    // Handlers for changed bookings
     //
-    const handleChangeFilterString = (event: ChangeEvent<HTMLInputElement>) => {
-        setSearchText(event.target.value);
+    const handleChangeFilterString = (booking: ChangeEvent<HTMLInputElement>) => {
+        setSearchText(booking.target.value);
     };
 
     // Filter list. Note that the free text filter are handled by the table and not here.

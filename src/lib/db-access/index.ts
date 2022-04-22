@@ -1,4 +1,4 @@
-export { searchEvents, fetchEvents, fetchEvent, fetchEventsForUser } from './event';
+export { searchBookings, fetchBookings, fetchBooking, fetchBookingsForUser } from './booking';
 export {
     searchEquipment,
     fetchEquipments,
@@ -38,7 +38,7 @@ export { fetchEquipmentPublicCategories, fetchEquipmentPublicCategoriesPublic } 
 export {
     fetchTimeReport,
     fetchTimeReports,
-    fetchTimeReportsByEventId,
+    fetchTimeReportsByBookingId,
     updateTimeReport,
     insertTimeReport,
     deleteTimeReport,
@@ -46,7 +46,7 @@ export {
 } from './timeReport';
 export {
     fetchEquipmentLists,
-    fetchEquipmentListsForEvent,
+    fetchEquipmentListsForBooking,
     fetchEquipmentList,
     insertEquipmentList,
     updateEquipmentList,
@@ -56,9 +56,9 @@ export {
 export {
     fetchTimeEstimate,
     fetchTimeEstimates,
-    fetchTimeEstimatesByEventId,
+    fetchTimeEstimatesByBookingId,
     updateTimeEstimate,
     insertTimeEstimate,
     deleteTimeEstimate,
     validateTimeEstimateObjectionModel,
-} from './time-estimate';
+} from './timeEstimate';

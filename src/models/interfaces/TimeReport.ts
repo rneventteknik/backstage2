@@ -11,5 +11,5 @@ export interface TimeReport extends BaseEntityWithName {
     endDatetime?: Date;
     pricePerHour: number;
     accountKind: AccountKind;
-    eventId: number;
+    bookingId: number;
 }

@@ -1,6 +1,6 @@
 import { Model, RelationMappingsThunk } from 'objection';
-import { BaseObjectionModelWithName, EventObjectionModel } from '.';
-import { IEventObjectionModel } from './EventObjectionModel';
+import { BaseObjectionModelWithName, BookingObjectionModel } from '.';
+import { IBookingObjectionModel } from './BookingObjectionModel';
 
 export interface IUserObjectionModel extends BaseObjectionModelWithName {
     id?: number;
@@ -21,7 +21,7 @@ export interface IUserObjectionModel extends BaseObjectionModelWithName {
     homeAddress?: string;
     zipCode?: string;
 
-    events?: IEventObjectionModel[];
+    bookings?: IBookingObjectionModel[];
     userAuth?: IUserAuthObjectionModel;
 }
 
@@ -29,12 +29,12 @@ export class UserObjectionModel extends Model implements IUserObjectionModel {
     static tableName = 'User';
 
     static relationMappings: RelationMappingsThunk = () => ({
-        events: {
+        bookings: {
             relation: Model.HasManyRelation,
-            modelClass: EventObjectionModel,
+            modelClass: BookingObjectionModel,
             join: {
                 from: 'User.id',
-                to: 'Event.ownerUserId',
+                to: 'Booking.ownerUserId',
             },
         },
         userAuth: {
@@ -64,7 +64,7 @@ export class UserObjectionModel extends Model implements IUserObjectionModel {
     zipCode!: string;
     emailAddress!: string;
 
-    events?: EventObjectionModel[];
+    bookings?: BookingObjectionModel[];
     userAuth?: UserAuthObjectionModel;
 }
 
