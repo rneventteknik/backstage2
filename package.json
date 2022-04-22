@@ -11,6 +11,7 @@
         "tcl": "tsc && eslint .",
         "migrate": "knex --esm migrate:latest",
         "migrate:down": "knex --esm migrate:down",
+        "migrate:make": "knex --esm migrate:make --stub knex/migrations_stub.js",
         "seed": "knex --esm seed:run",
         "prepare": "husky install"
     },
