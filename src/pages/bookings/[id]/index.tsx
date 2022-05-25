@@ -2,12 +2,18 @@ import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Badge, Button, ButtonGroup, Card, Col, Dropdown, ListGroup, Row } from 'react-bootstrap';
-import { getAccountKindName, getPricePlanName, getStatusName } from '../../../lib/utils';
+import { Badge, Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, ListGroup, Row } from 'react-bootstrap';
+import {
+    getAccountKindName,
+    getPaymentStatusName,
+    getPricePlanName,
+    getResponseContentOrError,
+    getStatusName,
+} from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
 import Link from 'next/link';
-import { IfNotReadonly } from '../../../components/utils/IfAdmin';
+import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
 import BookingTypeTag from '../../../components/utils/BookingTypeTag';
 import { bookingFetcher } from '../../../lib/fetchers';
 import TimeEstimateList from '../../../components/timeEstimate/TimeEstimateList';
@@ -19,16 +25,24 @@ import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faFileDownload, faPen } from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
 import EquipmentLists from '../../../components/bookings/equipmentLists/EquipmentLists';
+import BookingStatusButton from '../../../components/bookings/BookingStatusButton';
+import { IBookingObjectionModel } from '../../../models/objection-models';
+import { toBooking } from '../../../lib/mappers/booking';
+import { useNotifications } from '../../../lib/useNotifications';
+import { Status } from '../../../models/enums/Status';
+import { PaymentStatus } from '../../../models/enums/PaymentStatus';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 
 const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+    const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
+
     // Edit booking
     //
     const router = useRouter();
-    const { data: booking, error } = useSwr('/api/bookings/' + router.query.id, bookingFetcher);
+    const { data: booking, error, mutate } = useSwr('/api/bookings/' + router.query.id, bookingFetcher);
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
@@ -37,6 +51,28 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     if (!booking) {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser}></TwoColLoadingPage>;
     }
+
+    const saveBooking = async (booking: Partial<IBookingObjectionModel>) => {
+        const body = { booking: { ...booking, id: router.query.id } };
+
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        fetch('/api/bookings/' + router.query.id, request)
+            .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
+            .then(toBooking)
+            .then((booking) => {
+                mutate(booking);
+                showSaveSuccessNotification('Bokningen');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Bokningen');
+            });
+    };
 
     // The page itself
     //
@@ -50,11 +86,15 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/bookings/' + booking.id + '/edit'} passHref>
-                        <Button variant="primary" href={'/bookings/' + booking.id + '/edit'} className="mr-2">
-                            <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
-                        </Button>
-                    </Link>
+                    <IfAdmin currentUser={currentUser} or={booking.status !== Status.DONE}>
+                        <Link href={'/bookings/' + booking.id + '/edit'} passHref>
+                            <Button variant="primary" href={'/bookings/' + booking.id + '/edit'} className="mr-2">
+                                <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
+                            </Button>
+                        </Link>
+                    </IfAdmin>
+
+                    <BookingStatusButton booking={booking} onChange={saveBooking} className="mr-2" />
                 </IfNotReadonly>
                 <Dropdown as={ButtonGroup}>
                     <Button variant="dark" href={'/api/documents/price-estimate/se/' + booking.id} target="_blank">
@@ -69,6 +109,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
+                <IfNotReadonly currentUser={currentUser}>
+                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block ml-2">
+                        <Dropdown.Item
+                            onClick={() => saveBooking({ paymentStatus: PaymentStatus.PAID })}
+                            disabled={booking.paymentStatus === PaymentStatus.PAID}
+                        >
+                            Markera som betald
+                        </Dropdown.Item>
+                    </DropdownButton>
+                </IfNotReadonly>
             </Header>
 
             <Row className="mb-3">
@@ -79,6 +129,9 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <BookingTypeTag booking={booking} />
                             <Badge variant="dark" className="ml-1">
                                 {getStatusName(booking.status)}
+                            </Badge>
+                            <Badge variant="dark" className="ml-1">
+                                {getPaymentStatusName(booking.paymentStatus)}
                             </Badge>
                             <div className="text-muted mt-2">{booking.customerName}</div>
                         </Card.Header>
@@ -163,15 +216,18 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     <TimeEstimateList
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
-                        readonly={currentUser.role === Role.READONLY}
+                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
                     />
                     <TimeReportList
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
                         currentUser={currentUser}
-                        readonly={currentUser.role === Role.READONLY}
+                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
                     />
-                    <EquipmentLists booking={booking} readonly={currentUser.role === Role.READONLY} />
+                    <EquipmentLists
+                        booking={booking}
+                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                    />
                 </Col>
             </Row>
         </Layout>

@@ -5,10 +5,17 @@ import {
     respondWithEntityNotFoundResponse,
     respondWithInvalidMethodResponse,
 } from '../../../../lib/apiResponses';
-import { fetchBooking } from '../../../../lib/db-access';
-import { deleteBooking, validateBookingObjectionModel, updateBooking } from '../../../../lib/db-access/booking';
+import {
+    deleteBooking,
+    validateBookingObjectionModel,
+    updateBooking,
+    fetchBookingWithUser,
+    fetchBooking,
+} from '../../../../lib/db-access/booking';
+import { toBooking } from '../../../../lib/mappers/booking';
 import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
 import { Role } from '../../../../models/enums/Role';
+import { Status } from '../../../../models/enums/Status';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -19,16 +26,21 @@ const handler = withSessionContext(
             return;
         }
 
+        const booking = await fetchBooking(bookingId).then(toBooking);
+
         switch (req.method) {
             case 'GET':
-                await fetchBooking(bookingId)
+                await fetchBookingWithUser(bookingId)
                     .then((result) => (result ? res.status(200).json(result) : respondWithEntityNotFoundResponse(res)))
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
                 break;
 
             case 'DELETE':
-                if (context.currentUser.role == Role.READONLY) {
+                if (
+                    context.currentUser.role == Role.READONLY ||
+                    (booking.status === Status.DONE && context.currentUser.role !== Role.ADMIN)
+                ) {
                     respondWithAccessDeniedResponse(res);
                     return;
                 }
@@ -40,7 +52,10 @@ const handler = withSessionContext(
                 break;
 
             case 'PUT':
-                if (context.currentUser.role == Role.READONLY) {
+                if (
+                    context.currentUser.role == Role.READONLY ||
+                    (booking.status === Status.DONE && context.currentUser.role !== Role.ADMIN)
+                ) {
                     respondWithAccessDeniedResponse(res);
                     return;
                 }

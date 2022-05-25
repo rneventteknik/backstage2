@@ -54,6 +54,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             note: calendarBooking?.description,
             location: calendarBooking?.location,
             calendarBookingId: calendarBooking?.id,
+            ownerUserId: currentUser.userId,
         });
 
         if (calendarBooking) {

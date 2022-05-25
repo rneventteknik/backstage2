@@ -9,9 +9,11 @@ import { TimeReport } from './TimeReport';
 import { User } from './User';
 import { Status } from '../enums/Status';
 import { SalaryStatus } from '../enums/SalaryStatus';
+import { PaymentStatus } from '../enums/PaymentStatus';
 
 export interface Booking extends BaseEntityWithName {
     ownerUser?: User;
+    ownerUserId?: number;
     coOwnerUsers?: User[];
     equipmentLists?: EquipmentList[];
     timeEstimates?: TimeEstimate[];
@@ -19,6 +21,7 @@ export interface Booking extends BaseEntityWithName {
     changelog?: BookingChangelogEntry[];
     bookingType: BookingType;
     status: Status;
+    paymentStatus: PaymentStatus;
     salaryStatus: SalaryStatus;
     invoiceHogiaId: number;
     invoiceAddress: string;

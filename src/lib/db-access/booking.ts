@@ -36,6 +36,14 @@ export const fetchBooking = async (id: number): Promise<BookingObjectionModel> =
 
     return BookingObjectionModel.query()
         .where('id', id)
+        .then((bookings) => bookings[0]);
+};
+
+export const fetchBookingWithUser = async (id: number): Promise<BookingObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .where('id', id)
         .withGraphFetched('ownerUser')
         .then((bookings) => bookings[0]);
 };
@@ -84,12 +92,10 @@ export const deleteBooking = async (id: number): Promise<boolean> => {
 export const validateBookingObjectionModel = (booking: BookingObjectionModel): boolean => {
     if (!booking) return false;
 
-    if (!booking.name) return false;
-
-    if (!isMemberOfEnum(booking.bookingType, BookingType)) return false;
-    if (!isMemberOfEnum(booking.status, Status)) return false;
-    if (!isMemberOfEnum(booking.pricePlan, PricePlan)) return false;
-    if (!isMemberOfEnum(booking.accountKind, AccountKind)) return false;
+    if (booking.bookingType !== undefined && !isMemberOfEnum(booking.bookingType, BookingType)) return false;
+    if (booking.status !== undefined && !isMemberOfEnum(booking.status, Status)) return false;
+    if (booking.pricePlan !== undefined && !isMemberOfEnum(booking.pricePlan, PricePlan)) return false;
+    if (booking.accountKind !== undefined && !isMemberOfEnum(booking.accountKind, AccountKind)) return false;
 
     return true;
 };

@@ -12,6 +12,9 @@ import {
     validateEquipmentListObjectionModel,
 } from '../../../../../lib/db-access/equipmentList';
 import { SessionContext, withSessionContext } from '../../../../../lib/sessionContext';
+import { fetchBooking } from '../../../../../lib/db-access';
+import { toBooking } from '../../../../../lib/mappers/booking';
+import { Status } from '../../../../../models/enums/Status';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -22,9 +25,14 @@ const handler = withSessionContext(
             return;
         }
 
+        const booking = await fetchBooking(bookingId).then(toBooking);
+
         switch (req.method) {
             case 'POST':
-                if (context.currentUser.role == Role.READONLY) {
+                if (
+                    context.currentUser.role == Role.READONLY ||
+                    (booking.status === Status.DONE && context.currentUser.role !== Role.ADMIN)
+                ) {
                     respondWithAccessDeniedResponse(res);
                     return;
                 }

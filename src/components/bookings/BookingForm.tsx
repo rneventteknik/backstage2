@@ -5,10 +5,12 @@ import { IBookingObjectionModel } from '../../models/objection-models';
 import {
     getAccountKindName,
     getBookingTypeName,
+    getPaymentStatusName,
     getPricePlanName,
     getSalaryStatusName,
     getStatusName,
     replaceEmptyStringWithNull,
+    toIntOrUndefined,
 } from '../../lib/utils';
 import useSwr from 'swr';
 import { BookingType } from '../../models/enums/BookingType';
@@ -19,16 +21,25 @@ import { PricePlan } from '../../models/enums/PricePlan';
 import { SalaryStatus } from '../../models/enums/SalaryStatus';
 import { usersFetcher } from '../../lib/fetchers';
 import RequiredIndicator from '../utils/RequiredIndicator';
+import { PaymentStatus } from '../../models/enums/PaymentStatus';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
     booking: Partial<Booking>;
     formId: string;
     isNewBooking?: boolean;
+    disableStatusField?: boolean;
 };
 
-const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, isNewBooking }: Props) => {
+const BookingForm: React.FC<Props> = ({
+    handleSubmitBooking,
+    booking,
+    formId,
+    isNewBooking,
+    disableStatusField,
+}: Props) => {
     const [validated, setValidated] = useState(false);
+    const [status, setStatus] = useState(booking.status);
 
     const { data: users } = useSwr('/api/users', usersFetcher);
 
@@ -37,61 +48,55 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
 
         const form = event.currentTarget;
 
-        // Check that the type, status, account type and price plan are valid
-        if (!form.bookingType?.value || form.bookingType?.value == '') {
-            form.bookingType.setCustomValidity('Inkorrekt prisplan');
-        } else {
-            form.bookingType.setCustomValidity('');
-        }
-        if (!form.status?.value || form.status?.value == '') {
-            form.status.setCustomValidity('Inkorrekt prisplan');
-        } else {
-            form.status.setCustomValidity('');
-        }
-        if (!form.accountKind?.value || form.accountKind?.value == '') {
-            form.accountKind.setCustomValidity('Inkorrekt prisplan');
-        } else {
-            form.accountKind.setCustomValidity('');
-        }
-        if (!form.pricePlan?.value || form.pricePlan?.value == '') {
-            form.pricePlan.setCustomValidity('Inkorrekt prisplan');
-        } else {
-            form.pricePlan.setCustomValidity('');
-        }
-
         if (form.checkValidity() === false) {
             event.stopPropagation();
             setValidated(true);
             return;
         }
 
+        const getValueFromForm = (key: string): string | undefined => form[key]?.value;
+
         const modifiedBooking: Partial<IBookingObjectionModel> = {
             id: booking.id,
-            name: form.bookingName.value,
-            bookingType: form.bookingType.value,
-            status: form.status.value,
-            location: form.location.value,
-            ownerUserId: form.ownerUser?.value,
-            pricePlan: form.pricePlan.value,
-            accountKind: form.accountKind.value,
-            contactPersonName: form.contactPersonName.value,
-            contactPersonPhone: form.contactPersonPhone.value,
-            contactPersonEmail: form.contactPersonEmail.value,
-            customerName: form.customerName.value,
-            note: form.note.value,
-            invoiceHogiaId: !!replaceEmptyStringWithNull(form.invoiceHogiaId?.value)
-                ? parseInt(replaceEmptyStringWithNull(form.invoiceHogiaId?.value) ?? '0')
+            name: getValueFromForm('bookingName'),
+            bookingType: toIntOrUndefined(getValueFromForm('bookingType')),
+            status: toIntOrUndefined(getValueFromForm('status')),
+            location: getValueFromForm('location'),
+            ownerUserId: toIntOrUndefined(getValueFromForm('ownerUser')),
+            pricePlan: toIntOrUndefined(getValueFromForm('pricePlan')),
+            accountKind: toIntOrUndefined(getValueFromForm('accountKind')),
+            contactPersonName: getValueFromForm('contactPersonName'),
+            contactPersonPhone: getValueFromForm('contactPersonPhone'),
+            contactPersonEmail: getValueFromForm('contactPersonEmail'),
+            customerName: getValueFromForm('customerName'),
+            note: getValueFromForm('note'),
+            invoiceHogiaId: !!replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId'))
+                ? parseInt(replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId')) ?? '0')
                 : undefined,
-            invoiceAddress: form.invoiceAddress?.value,
-            invoiceTag: form.invoiceTag?.value,
-            invoiceNumber: form.invoiceNumber?.value,
-            salaryStatus: form.salaryStatus?.value,
-            returnalNote: form.returnalNote?.value,
-            calendarBookingId: form.calendarBookingId?.value,
+            invoiceAddress: getValueFromForm('invoiceAddress'),
+            invoiceTag: getValueFromForm('invoiceTag'),
+            invoiceNumber: getValueFromForm('invoiceNumber'),
+            salaryStatus: toIntOrUndefined(getValueFromForm('salaryStatus')),
+            paymentStatus: toIntOrUndefined(getValueFromForm('paymentStatus')),
+            returnalNote: getValueFromForm('returnalNote'),
+            calendarBookingId: getValueFromForm('calendarBookingId'),
         };
 
         handleSubmitBooking(modifiedBooking);
     };
+
+    const isFieldRequired = (requiredFromStatus: Status.DRAFT | Status.BOOKED) => {
+        if (requiredFromStatus === Status.DRAFT) {
+            return true;
+        }
+
+        if (requiredFromStatus === Status.BOOKED && status !== Status.DRAFT) {
+            return true;
+        }
+
+        return false;
+    };
+
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
             <Row>
@@ -99,10 +104,10 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <Form.Group controlId="formName">
                         <Form.Label>
                             Namn
-                            <RequiredIndicator />
+                            <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
                         <Form.Control
-                            required
+                            required={isFieldRequired(Status.DRAFT)}
                             type="text"
                             placeholder="BETAspexet"
                             name="bookingName"
@@ -114,9 +119,14 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <Form.Group controlId="formBookingType">
                         <Form.Label>
                             Bokningstyp
-                            <RequiredIndicator />
+                            <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
-                        <Form.Control as="select" name="bookingType" defaultValue={booking.bookingType}>
+                        <Form.Control
+                            as="select"
+                            name="bookingType"
+                            defaultValue={booking.bookingType}
+                            required={isFieldRequired(Status.DRAFT)}
+                        >
                             {booking.bookingType ? null : <option value="">Välj bokningstyp</option>}
                             <option value={BookingType.GIG}>{getBookingTypeName(BookingType.GIG)}</option>
                             <option value={BookingType.RENTAL}>{getBookingTypeName(BookingType.RENTAL)}</option>
@@ -127,19 +137,21 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <Form.Group controlId="formStatus">
                         <Form.Label>
                             Bokningsstatus
-                            <RequiredIndicator />
+                            <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
-                        <Form.Control as="select" name="status" defaultValue={booking.status} disabled={isNewBooking}>
+                        <Form.Control
+                            as="select"
+                            name="status"
+                            defaultValue={booking.status}
+                            disabled={isNewBooking || disableStatusField}
+                            onChange={(e) => setStatus(toIntOrUndefined(e.target.value))}
+                            required={isFieldRequired(Status.DRAFT)}
+                        >
                             <option value={Status.DRAFT}>{getStatusName(Status.DRAFT)}</option>
                             {isNewBooking ? null : (
                                 <>
                                     <option value={Status.BOOKED}>{getStatusName(Status.BOOKED)}</option>
-                                    <option value={Status.OUT}>{getStatusName(Status.OUT)}</option>
-                                    <option value={Status.ONGOING}>{getStatusName(Status.ONGOING)}</option>
-                                    <option value={Status.RETURNED}>{getStatusName(Status.RETURNED)}</option>
                                     <option value={Status.DONE}>{getStatusName(Status.DONE)}</option>
-                                    <option value={Status.INVOICED}>{getStatusName(Status.INVOICED)}</option>
-                                    <option value={Status.PAID}>{getStatusName(Status.PAID)}</option>
                                     <option value={Status.CANCELED}>{getStatusName(Status.CANCELED)}</option>
                                 </>
                             )}
@@ -150,8 +162,12 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
             <Row>
                 <Col lg="6">
                     <Form.Group controlId="formLocation">
-                        <Form.Label>Beställare</Form.Label>
+                        <Form.Label>
+                            Beställare
+                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                        </Form.Label>
                         <Form.Control
+                            required={isFieldRequired(Status.BOOKED)}
                             type="text"
                             placeholder="THS"
                             name="customerName"
@@ -161,10 +177,17 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                 </Col>
                 <Col lg="6">
                     <Form.Group controlId="formOwnerUser">
-                        <Form.Label>Ansvarig medlem</Form.Label>
+                        <Form.Label>
+                            Ansvarig medlem
+                            <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
+                        </Form.Label>
                         {users ? (
-                            <Form.Control as="select" name="ownerUser" defaultValue={booking.ownerUser?.id}>
-                                <option value="">Inte tilldelat</option>
+                            <Form.Control
+                                as="select"
+                                name="ownerUser"
+                                defaultValue={booking.ownerUser?.id ?? booking.ownerUserId}
+                                required={isFieldRequired(Status.DRAFT)}
+                            >
                                 {users?.map((user) => (
                                     <option key={user.id} value={user.id}>
                                         {user.name}
@@ -180,8 +203,12 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
             <Row>
                 <Col lg="6">
                     <Form.Group controlId="formLocation">
-                        <Form.Label>Plats</Form.Label>
+                        <Form.Label>
+                            Plats
+                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                        </Form.Label>
                         <Form.Control
+                            required={isFieldRequired(Status.BOOKED)}
                             type="text"
                             placeholder="Nya Matsalen, Nymble"
                             name="location"
@@ -193,9 +220,14 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <Form.Group controlId="formAccountKind">
                         <Form.Label>
                             Kontotyp
-                            <RequiredIndicator />
+                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
                         </Form.Label>
-                        <Form.Control as="select" name="accountKind" defaultValue={booking.accountKind} required>
+                        <Form.Control
+                            as="select"
+                            name="accountKind"
+                            defaultValue={booking.accountKind}
+                            required={isFieldRequired(Status.BOOKED)}
+                        >
                             {booking.accountKind ? null : <option value="">Välj kontotyp</option>}
                             <option value={AccountKind.EXTERNAL}>{getAccountKindName(AccountKind.EXTERNAL)}</option>
                             <option value={AccountKind.INTERNAL}>{getAccountKindName(AccountKind.INTERNAL)}</option>
@@ -206,9 +238,14 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <Form.Group controlId="formPricePlan">
                         <Form.Label>
                             Prisplan
-                            <RequiredIndicator />
+                            <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
-                        <Form.Control as="select" name="pricePlan" defaultValue={booking.pricePlan} required>
+                        <Form.Control
+                            as="select"
+                            name="pricePlan"
+                            defaultValue={booking.pricePlan}
+                            required={isFieldRequired(Status.DRAFT)}
+                        >
                             {booking.pricePlan ? null : <option value="">Välj prisplan</option>}
                             <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
                             <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
@@ -220,7 +257,7 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                 <Col>
                     <Form.Group controlId="formNote">
                         <Form.Label>Anteckningar</Form.Label>
-                        <Form.Control as="textarea" name="note" rows={6} defaultValue={booking.note} />
+                        <Form.Control as="textarea" name="note" rows={2} defaultValue={booking.note} />
                     </Form.Group>
                 </Col>
             </Row>
@@ -231,10 +268,10 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <Form.Group controlId="formContactPersonName">
                         <Form.Label>
                             Namn
-                            <RequiredIndicator />
+                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
                         </Form.Label>
                         <Form.Control
-                            required
+                            required={isFieldRequired(Status.BOOKED)}
                             type="text"
                             placeholder="Mats Matsson"
                             name="contactPersonName"
@@ -246,10 +283,10 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <Form.Group controlId="formContactPersonEmail">
                         <Form.Label>
                             Email
-                            <RequiredIndicator />
+                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
                         </Form.Label>
                         <Form.Control
-                            required
+                            required={isFieldRequired(Status.BOOKED)}
                             type="text"
                             placeholder="mats.matsson@mats.se"
                             name="contactPersonEmail"
@@ -276,9 +313,13 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <Row>
                         <Col lg="4" md="4">
                             <Form.Group controlId="formInvoiceHogiaId">
-                                <Form.Label>Hogia ID</Form.Label>
+                                <Form.Label>
+                                    Hogia ID
+                                    <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                                </Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    required={isFieldRequired(Status.BOOKED)}
+                                    type="number"
                                     placeholder="1234"
                                     name="invoiceHogiaId"
                                     defaultValue={booking.invoiceHogiaId}
@@ -287,8 +328,16 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                         </Col>
                         <Col lg="4" md="4">
                             <Form.Group controlId="formInvoiceTag">
-                                <Form.Label>Fakturamärkning</Form.Label>
-                                <Form.Control type="text" name="invoiceTag" defaultValue={booking.invoiceTag} />
+                                <Form.Label>
+                                    Fakturamärkning
+                                    <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                                </Form.Label>
+                                <Form.Control
+                                    required={isFieldRequired(Status.BOOKED)}
+                                    type="text"
+                                    name="invoiceTag"
+                                    defaultValue={booking.invoiceTag}
+                                />
                             </Form.Group>
                         </Col>
                         <Col lg="4" md="4">
@@ -306,8 +355,12 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <Row>
                         <Col>
                             <Form.Group controlId="formInvoiceAddress">
-                                <Form.Label>Fakturaadress</Form.Label>
+                                <Form.Label>
+                                    Fakturaadress
+                                    <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                                </Form.Label>
                                 <Form.Control
+                                    required={isFieldRequired(Status.BOOKED)}
                                     as="textarea"
                                     name="invoiceAddress"
                                     rows={3}
@@ -319,6 +372,25 @@ const BookingForm: React.FC<Props> = ({ handleSubmitBooking, booking, formId, is
                     <h6>Övrigt</h6>
                     <hr />
                     <Row>
+                        <Col>
+                            <Form.Group controlId="formPaymentStatus">
+                                <Form.Label>Betalningsstatus</Form.Label>
+                                <Form.Control as="select" name="paymentStatus" defaultValue={booking.paymentStatus}>
+                                    <option value={PaymentStatus.NOT_PAID}>
+                                        {getPaymentStatusName(PaymentStatus.NOT_PAID)}
+                                    </option>
+                                    <option value={PaymentStatus.PAID}>
+                                        {getPaymentStatusName(PaymentStatus.PAID)}
+                                    </option>
+                                    <option value={PaymentStatus.INVOICED}>
+                                        {getPaymentStatusName(PaymentStatus.INVOICED)}
+                                    </option>
+                                    <option value={PaymentStatus.PAID_WITH_INVOICE}>
+                                        {getPaymentStatusName(PaymentStatus.PAID_WITH_INVOICE)}
+                                    </option>
+                                </Form.Control>
+                            </Form.Group>
+                        </Col>
                         <Col>
                             <Form.Group controlId="formSalaryStatus">
                                 <Form.Label>Lönestatus</Form.Label>

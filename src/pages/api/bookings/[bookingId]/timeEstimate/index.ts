@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { fetchTimeEstimatesByBookingId } from '../../../../../lib/db-access';
+import { fetchBooking, fetchTimeEstimatesByBookingId } from '../../../../../lib/db-access';
 import { insertTimeEstimate, validateTimeEstimateObjectionModel } from '../../../../../lib/db-access/timeEstimate';
 import {
     respondWithAccessDeniedResponse,
@@ -10,6 +10,8 @@ import {
 } from '../../../../../lib/apiResponses';
 import { SessionContext, withSessionContext } from '../../../../../lib/sessionContext';
 import { Role } from '../../../../../models/enums/Role';
+import { toBooking } from '../../../../../lib/mappers/booking';
+import { Status } from '../../../../../models/enums/Status';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -20,12 +22,17 @@ const handler = withSessionContext(
             return;
         }
 
+        const booking = await fetchBooking(bookingId).then(toBooking);
+
         switch (req.method) {
             case 'POST':
                 if (!req.body.timeEstimate) {
                     throw Error('Missing time estimate parameter');
                 }
-                if (context.currentUser.role == Role.READONLY) {
+                if (
+                    context.currentUser.role == Role.READONLY ||
+                    (booking.status === Status.DONE && context.currentUser.role !== Role.ADMIN)
+                ) {
                     respondWithAccessDeniedResponse(res);
                     return;
                 }

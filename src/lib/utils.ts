@@ -6,6 +6,8 @@ import { PricePlan } from '../models/enums/PricePlan';
 import { AccountKind } from '../models/enums/AccountKind';
 import { BookingType } from '../models/enums/BookingType';
 import { SalaryStatus } from '../models/enums/SalaryStatus';
+import { PaymentStatus } from '../models/enums/PaymentStatus';
+import { RentalStatus } from '../models/enums/RentalStatus';
 
 // Helper functions for array operations
 //
@@ -69,23 +71,8 @@ export const getStatusName = (status: Status): string => {
         case Status.BOOKED:
             return 'Bokad';
 
-        case Status.OUT:
-            return 'Utlämnad';
-
-        case Status.ONGOING:
-            return 'Pågående';
-
-        case Status.RETURNED:
-            return 'Återlämnad';
-
         case Status.DONE:
             return 'Klar';
-
-        case Status.INVOICED:
-            return 'Fakturerad';
-
-        case Status.PAID:
-            return 'Betald';
 
         case Status.CANCELED:
             return 'Inställd';
@@ -129,6 +116,35 @@ export const getSalaryStatusName = (salaryStatus: SalaryStatus): string => {
 
         case SalaryStatus.SENT:
             return 'Skickad';
+    }
+};
+
+export const getPaymentStatusName = (paymentStatus: PaymentStatus): string => {
+    switch (paymentStatus) {
+        case PaymentStatus.NOT_PAID:
+            return 'Obetald';
+
+        case PaymentStatus.PAID:
+            return 'Betald';
+
+        case PaymentStatus.INVOICED:
+            return 'Fakturerad';
+
+        case PaymentStatus.PAID_WITH_INVOICE:
+            return 'Betald med faktura';
+    }
+};
+
+export const getRentalStatusName = (rentalStatus?: RentalStatus | null): string => {
+    switch (rentalStatus) {
+        case RentalStatus.OUT:
+            return 'Utlämnad';
+
+        case RentalStatus.RETURNED:
+            return 'Återlämnad';
+
+        default:
+            return 'Inte utlämnad';
     }
 };
 
@@ -183,7 +199,7 @@ export const toDateOrUndefined = (dateString: string | undefined | null): Date |
 
 // Parse int woth check for undefined/null
 //
-export const toIntOrUndefined = (value: string): number | undefined => {
+export const toIntOrUndefined = (value: string | undefined | null): number | undefined => {
     if (value === undefined || value === null || value.length === 0) {
         return undefined;
     }

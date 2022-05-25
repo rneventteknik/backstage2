@@ -1,4 +1,5 @@
 import { EquipmentPrice } from '.';
+import { RentalStatus } from '../enums/RentalStatus';
 import { BaseEntityWithName } from './BaseEntity';
 import { Equipment } from './Equipment';
 
@@ -9,6 +10,7 @@ export interface EquipmentList extends BaseEntityWithName {
     equipmentInDatetime?: Date;
     usageStartDatetime?: Date;
     usageEndDatetime?: Date;
+    rentalStatus?: RentalStatus | null;
 }
 
 export interface EquipmentListEntry extends BaseEntityWithName {

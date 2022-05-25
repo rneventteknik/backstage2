@@ -8,6 +8,7 @@ import {
     faAngleDown,
     faAngleUp,
     faEraser,
+    faCheckSquare,
     faExclamationCircle,
     faExternalLink,
     faGears,
@@ -17,7 +18,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
-import { getResponseContentOrError, updateItemsInArrayById, toIntOrUndefined } from '../../../lib/utils';
+import {
+    getResponseContentOrError,
+    updateItemsInArrayById,
+    toIntOrUndefined,
+    getRentalStatusName,
+} from '../../../lib/utils';
 import {
     EquipmentListObjectionModel,
     IEquipmentListObjectionModel,
@@ -50,6 +56,8 @@ import {
     moveItemUp,
     sortIndexSortFn,
 } from '../../../lib/sortIndexUtils';
+import { RentalStatus } from '../../../models/enums/RentalStatus';
+import { BookingType } from '../../../models/enums/BookingType';
 
 type Props = {
     booking: Partial<Booking> & HasId;
@@ -673,6 +681,26 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         </Button>
                         {readonly ? null : (
                             <>
+                                {booking.bookingType === BookingType.RENTAL && list.rentalStatus == undefined ? (
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => saveList({ ...list, rentalStatus: RentalStatus.OUT })}
+                                        className="mr-2"
+                                    >
+                                        <FontAwesomeIcon icon={faCheckSquare} className="mr-1" /> Sätt till utlämnad
+                                    </Button>
+                                ) : null}
+
+                                {booking.bookingType === BookingType.RENTAL && list.rentalStatus == RentalStatus.OUT ? (
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => saveList({ ...list, rentalStatus: RentalStatus.RETURNED })}
+                                        className="mr-2"
+                                    >
+                                        <FontAwesomeIcon icon={faCheckSquare} className="mr-1" /> Sätt till återlämnad
+                                    </Button>
+                                ) : null}
+
                                 <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
                                     <Dropdown.Item
                                         onClick={() => parentMoveListFn(list, 'UP')}
@@ -697,6 +725,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" />
                                         Lägg till egen rad
                                     </Dropdown.Item>
+                                    <Dropdown.Item
+                                        onClick={() => saveList({ ...list, rentalStatus: null })}
+                                        disabled={list.rentalStatus == undefined}
+                                    >
+                                        Återställ utlämningsstatus
+                                    </Dropdown.Item>
                                     <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
                                         <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" /> Töm utrustningslistan
                                     </Dropdown.Item>
@@ -719,6 +753,9 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             {' '}
                             / {getNumberOfEquipmentOutDays(list)} dagar / {getNumberOfDays(list)} debiterade dagar
                         </>
+                    ) : null}
+                    {booking.bookingType === BookingType.RENTAL ? (
+                        <> / {getRentalStatusName(list.rentalStatus)}</>
                     ) : null}
                 </p>
                 <Row>

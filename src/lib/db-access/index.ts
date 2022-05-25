@@ -1,4 +1,4 @@
-export { searchBookings, fetchBookings, fetchBooking, fetchBookingsForUser } from './booking';
+export { searchBookings, fetchBookings, fetchBooking, fetchBookingWithUser, fetchBookingsForUser } from './booking';
 export {
     searchEquipment,
     fetchEquipments,

@@ -1,9 +1,18 @@
 import React from 'react';
 
-const RequiredIndicator: React.FC = () => (
-    <span className="text-danger" title="Obligatoriskt fält">
-        &nbsp;*
-    </span>
-);
+type Props = {
+    required?: boolean;
+};
+
+const RequiredIndicator: React.FC<Props> = ({ required = true }: Props) => {
+    if (!required) {
+        return null;
+    }
+    return (
+        <span className="text-danger" title="Obligatoriskt fält">
+            &nbsp;*
+        </span>
+    );
+};
 
 export default RequiredIndicator;

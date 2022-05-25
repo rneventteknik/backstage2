@@ -23,6 +23,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     bookingType: number;
     status: number;
     salaryStatus: number;
+    paymentStatus: number;
     invoiceHogiaId: number;
     invoiceAddress: string;
     invoiceTag: string;
@@ -80,6 +81,7 @@ export class BookingObjectionModel extends Model {
     bookingType!: number;
     status!: number;
     salaryStatus!: number;
+    paymentStatus!: number;
     invoiceHogiaId!: number;
     invoiceAddress!: string;
     invoiceTag!: string;
@@ -108,6 +110,7 @@ export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName
     usageStartDatetime?: string;
     usageEndDatetime?: string;
     bookingId: number;
+    rentalStatus?: number | null;
 }
 
 export class EquipmentListObjectionModel extends Model {
@@ -135,6 +138,7 @@ export class EquipmentListObjectionModel extends Model {
     usageStartDatetime?: string;
     usageEndDatetime?: string;
     bookingId!: number;
+    rentalStatus?: number | null;
 }
 
 export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWithName {
