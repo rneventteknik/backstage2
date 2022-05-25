@@ -863,7 +863,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <InputGroup>
                                         <Form.Control
                                             type="text"
-                                            value={equipmentListEntryToEditViewModel?.numberOfUnits}
+                                            value={equipmentListEntryToEditViewModel?.numberOfUnits ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
@@ -883,7 +883,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <InputGroup>
                                         <Form.Control
                                             type="text"
-                                            value={equipmentListEntryToEditViewModel.numberOfHours}
+                                            value={equipmentListEntryToEditViewModel.numberOfHours ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
@@ -936,7 +936,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         <Form.Control
                                             type="text"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
-                                            value={equipmentListEntryToEditViewModel?.pricePerUnit}
+                                            value={equipmentListEntryToEditViewModel?.pricePerUnit ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
@@ -957,7 +957,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         <Form.Control
                                             type="text"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
-                                            value={equipmentListEntryToEditViewModel?.pricePerHour}
+                                            value={equipmentListEntryToEditViewModel?.pricePerHour ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
@@ -979,7 +979,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <InputGroup>
                                         <Form.Control
                                             type="text"
-                                            value={equipmentListEntryToEditViewModel?.discount}
+                                            value={equipmentListEntryToEditViewModel?.discount ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,

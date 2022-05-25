@@ -13,6 +13,7 @@ import {
     toDateOrUndefined,
     toIntOrUndefined,
     getPricePerHour,
+    validDate,
 } from '../../lib/utils';
 import { toTimeReport } from '../../lib/mappers/timeReport';
 import { TimeReport } from '../../models/interfaces/TimeReport';
@@ -35,7 +36,12 @@ type Props = {
 const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, readonly }: Props) => {
     const [showListContent, setShowListContent] = useState(false);
     const [timeReportToEditViewModel, setTimeReportToEditViewModel] = useState<
-        (Partial<TimeReport> & Pick<TimeReport, 'id' | 'bookingId'>) | null
+        | (Partial<TimeReport> &
+              Pick<TimeReport, 'id' | 'bookingId'> & {
+                  editedStartDatetimeString?: string;
+                  editedEndDatetimeString?: string;
+              })
+        | null
     >(null);
 
     const { showCreateFailedNotification, showSaveFailedNotification, showDeleteFailedNotification } =
@@ -386,7 +392,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                                     <InputGroup>
                                         <Form.Control
                                             type="text"
-                                            value={timeReportToEditViewModel?.billableWorkingHours}
+                                            value={timeReportToEditViewModel?.billableWorkingHours ?? ''}
                                             onChange={(e) =>
                                                 setTimeReportToEditViewModel({
                                                     ...timeReportToEditViewModel,
@@ -406,7 +412,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                                     <InputGroup>
                                         <Form.Control
                                             type="text"
-                                            value={timeReportToEditViewModel.actualWorkingHours}
+                                            value={timeReportToEditViewModel.actualWorkingHours ?? ''}
                                             onChange={(e) =>
                                                 setTimeReportToEditViewModel({
                                                     ...timeReportToEditViewModel,
@@ -428,7 +434,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                                     <InputGroup>
                                         <Form.Control
                                             type="text"
-                                            value={timeReportToEditViewModel.pricePerHour}
+                                            value={timeReportToEditViewModel.pricePerHour ?? ''}
                                             onChange={(e) =>
                                                 setTimeReportToEditViewModel({
                                                     ...timeReportToEditViewModel,
@@ -499,14 +505,15 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                                     <Form.Control
                                         type="text"
                                         value={
-                                            timeReportToEditViewModel.startDatetime
+                                            timeReportToEditViewModel.editedStartDatetimeString ??
+                                            (timeReportToEditViewModel.startDatetime
                                                 ? formatDate(timeReportToEditViewModel.startDatetime)
-                                                : '-'
+                                                : '')
                                         }
                                         onChange={(e) =>
                                             setTimeReportToEditViewModel({
                                                 ...timeReportToEditViewModel,
-                                                startDatetime: toDateOrUndefined(e.target.value),
+                                                editedStartDatetimeString: e.target.value,
                                             })
                                         }
                                     />
@@ -518,14 +525,15 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                                     <Form.Control
                                         type="text"
                                         value={
-                                            timeReportToEditViewModel.endDatetime
+                                            timeReportToEditViewModel.editedEndDatetimeString ??
+                                            (timeReportToEditViewModel.endDatetime
                                                 ? formatDate(timeReportToEditViewModel.endDatetime)
-                                                : '-'
+                                                : '')
                                         }
                                         onChange={(e) =>
                                             setTimeReportToEditViewModel({
                                                 ...timeReportToEditViewModel,
-                                                endDatetime: toDateOrUndefined(e.target.value),
+                                                editedEndDatetimeString: e.target.value,
                                             })
                                         }
                                     />
@@ -547,13 +555,25 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
 
                             // Since we are editing a partial model we need to set default values to any properties without value before saving
                             const entryToSave: TimeReport = {
-                                ...timeReportToEditViewModel,
+                                bookingId: timeReportToEditViewModel.bookingId,
+                                id: timeReportToEditViewModel.id,
                                 userId: timeReportToEditViewModel.userId ?? 0,
+                                user: users?.find((x) => x.id === timeReportToEditViewModel.userId),
                                 accountKind: timeReportToEditViewModel.accountKind ?? AccountKind.INTERNAL,
                                 name: timeReportToEditViewModel.name ?? '',
                                 actualWorkingHours: timeReportToEditViewModel.actualWorkingHours ?? 0,
                                 billableWorkingHours: timeReportToEditViewModel.billableWorkingHours ?? 0,
                                 pricePerHour: timeReportToEditViewModel.pricePerHour ?? 0,
+                                startDatetime: timeReportToEditViewModel.editedStartDatetimeString
+                                    ? validDate(toDateOrUndefined(timeReportToEditViewModel.editedStartDatetimeString))
+                                        ? toDateOrUndefined(timeReportToEditViewModel.editedStartDatetimeString)
+                                        : undefined
+                                    : timeReportToEditViewModel.startDatetime,
+                                endDatetime: timeReportToEditViewModel.editedEndDatetimeString
+                                    ? validDate(toDateOrUndefined(timeReportToEditViewModel.editedEndDatetimeString))
+                                        ? toDateOrUndefined(timeReportToEditViewModel.editedEndDatetimeString)
+                                        : undefined
+                                    : timeReportToEditViewModel.endDatetime,
                             };
                             updateTimeReport(entryToSave);
                             setTimeReportToEditViewModel(null);
