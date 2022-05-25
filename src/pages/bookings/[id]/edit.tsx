@@ -15,6 +15,8 @@ import Header from '../../../components/layout/Header';
 import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { Role } from '../../../models/enums/Role';
+import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
@@ -93,7 +95,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editBookingForm" type="submit">
-                    Spara bokningen
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara bokning
                 </Button>
                 <DropdownButton
                     id="dropdown-basic-button"
@@ -102,7 +104,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     title="Mer"
                 >
                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                        Ta bort bokning
+                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort bokning
                     </Dropdown.Item>
                 </DropdownButton>
             </Header>

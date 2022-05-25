@@ -11,7 +11,7 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import { Button, Col, Collapse, Form } from 'react-bootstrap';
 import { Status } from '../../models/enums/Status';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faFilter } from '@fortawesome/free-solid-svg-icons';
 import Header from '../../components/layout/Header';
 import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
 import { bookingsFetcher } from '../../lib/fetchers';
@@ -151,7 +151,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/bookings/new" passHref>
                         <Button variant="primary" as="span">
-                            Lägg till bokning
+                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till bokning
                         </Button>
                     </Link>
                 </IfNotReadonly>

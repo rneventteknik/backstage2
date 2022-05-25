@@ -18,6 +18,8 @@ import Header from '../../../components/layout/Header';
 import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
+import { faKey, faLock, faSave, faTrashCan, faUserPen } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -148,7 +150,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editUserForm" type="submit">
-                    Spara användare
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara användare
                 </Button>
                 <DropdownButton
                     id="dropdown-basic-button"
@@ -159,12 +161,14 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     {user.username ? (
                         <>
                             <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
-                                Redigera inloggningsuppgifter
+                                <FontAwesomeIcon icon={faUserPen} className="mr-1 fa-fw" /> Redigera
+                                inloggningsuppgifter
                             </Dropdown.Item>
                             <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={() => setShowDeleteAuthModal(true)} className="text-danger">
-                                    Ta bort inloggningsuppgifter
+                                    <FontAwesomeIcon icon={faLock} className="mr-1 fa-fw" /> Ta bort
+                                    inloggningsuppgifter
                                 </Dropdown.Item>
                             </IfAdmin>
                         </>
@@ -172,7 +176,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         <>
                             <IfAdmin currentUser={currentUser}>
                                 <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
-                                    Skapa inloggningsuppgifter
+                                    <FontAwesomeIcon icon={faKey} className="mr-1 fa-fw" /> Skapa inloggningsuppgifter
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                             </IfAdmin>
@@ -180,7 +184,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     )}
                     <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
                         <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                            Ta bort användare
+                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort användare
                         </Dropdown.Item>
                     </IfAdmin>
                 </DropdownButton>

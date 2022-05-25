@@ -20,7 +20,7 @@ import { useNotifications } from '../../lib/useNotifications';
 import { DoubleClickToEdit, DoubleClickToEditDate, DoubleClickToEditDropdown } from '../utils/DoubleClickToEdit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatNumberAsCurrency, getTimeReportPrice, getTotalTimeReportsPrice } from '../../lib/pricingUtils';
-import { faAngleDown, faAngleUp, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faGears, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../../models/interfaces';
 import { AccountKind } from '../../models/enums/AccountKind';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
@@ -225,9 +225,11 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
     const TimeReportEntryActionsDisplayFn = (entry: TimeReport) => (
         <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
             <Dropdown.Item onClick={() => deleteTimeReport(entry)} className="text-danger">
-                Ta bort rad
+                <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
             </Dropdown.Item>
-            <Dropdown.Item onClick={() => setTimeReportToEditViewModel(entry)}>Avancerad redigering</Dropdown.Item>
+            <Dropdown.Item onClick={() => setTimeReportToEditViewModel(entry)}>
+                <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
+            </Dropdown.Item>
         </DropdownButton>
     );
 
@@ -354,7 +356,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                     <TableDisplay entities={timeReports} configuration={tableSettings} />
                     {readonly ? null : (
                         <Button className="ml-2 mr-2 mb-2" onClick={addEmptyTimeReport} variant="secondary" size="sm">
-                            <FontAwesomeIcon icon={faPlusCircle} /> Ny rad
+                            <FontAwesomeIcon icon={faPlus} className="mr-1" /> Ny rad
                         </Button>
                     )}
                 </>

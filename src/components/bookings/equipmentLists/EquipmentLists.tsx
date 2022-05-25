@@ -4,7 +4,17 @@ import { Equipment, EquipmentPrice, Booking } from '../../../models/interfaces';
 import useSwr from 'swr';
 import { equipmentListFetcher, equipmentListsFetcher } from '../../../lib/fetchers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faExclamationCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
+import {
+    faAngleDown,
+    faAngleUp,
+    faEraser,
+    faExclamationCircle,
+    faExternalLink,
+    faGears,
+    faLink,
+    faPlus,
+    faTrashCan,
+} from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
 import { getResponseContentOrError, updateItemsInArrayById, toIntOrUndefined } from '../../../lib/utils';
@@ -538,23 +548,23 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             onClick={() => moveListEntryUp(entry)}
                             disabled={isFirst(list.equipmentListEntries, entry)}
                         >
-                            Flytta upp
+                            <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
                         </Dropdown.Item>
                         <Dropdown.Item
                             onClick={() => moveListEntryDown(entry)}
                             disabled={isLast(list.equipmentListEntries, entry)}
                         >
-                            Flytta ner
+                            <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
                         </Dropdown.Item>
                     </>
                 )}
                 <Dropdown.Item href={'/equipment/' + entry.equipmentId} target="_blank" disabled={!entry.equipment}>
-                    Öppna utrustning i ny flik
+                    <FontAwesomeIcon icon={faExternalLink} className="mr-1 fa-fw" /> Öppna utrustning i ny flik
                 </Dropdown.Item>
                 {readonly ? null : (
                     <>
                         <Dropdown.Item onClick={() => setEquipmentListEntryToEditViewModel(entry)}>
-                            Avancerad redigering
+                            <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
                         </Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item
@@ -566,10 +576,10 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     : null
                             }
                         >
-                            Återställ rad
+                            <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" /> Återställ rad
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => deleteListEntry(entry)} className="text-danger">
-                            Ta bort rad
+                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
                         </Dropdown.Item>
                     </>
                 )}
@@ -668,13 +678,13 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         onClick={() => parentMoveListFn(list, 'UP')}
                                         disabled={parentIsFirstFn(list)}
                                     >
-                                        Flytta upp
+                                        <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
                                     </Dropdown.Item>
                                     <Dropdown.Item
                                         onClick={() => parentMoveListFn(list, 'DOWN')}
                                         disabled={parentIsLastFn(list)}
                                     >
-                                        Flytta ner
+                                        <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
                                     </Dropdown.Item>
                                     <Dropdown.Item
                                         onClick={() =>
@@ -684,13 +694,15 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                             })
                                         }
                                     >
+                                        <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" />
                                         Lägg till egen rad
                                     </Dropdown.Item>
                                     <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
-                                        Töm utrustningslistan
+                                        <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" /> Töm utrustningslistan
                                     </Dropdown.Item>
                                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                                        Ta bort utrustningslistan
+                                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort
+                                        utrustningslistan
                                     </Dropdown.Item>
                                 </DropdownButton>
                             </>
@@ -965,6 +977,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         {!!equipmentListEntryToEditViewModel.equipment ? (
                             <p className="text-muted">
                                 <span>
+                                    <FontAwesomeIcon icon={faLink} className="mr-1" size="sm" />
                                     Den här raden är länkad till utrustningen{' '}
                                     <em>{equipmentListEntryToEditViewModel.equipment.name}</em>.{' '}
                                 </span>

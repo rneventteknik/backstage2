@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { Badge, Button, Col, Collapse, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { faEyeSlash, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faCubes, faEyeSlash, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import Header from '../../components/layout/Header';
@@ -157,13 +157,13 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/equipment/new" passHref>
                         <Button variant="primary" as="span" className="mr-2">
-                            Lägg till utrustning
+                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till utrustning
                         </Button>
                     </Link>
                 </IfNotReadonly>
                 <Link href="/equipmentPackage" passHref>
                     <Button variant="dark" as="span">
-                        Visa utrustningpaket
+                        <FontAwesomeIcon icon={faCubes} className="mr-1" /> Visa utrustningpaket
                     </Button>
                 </Link>
             </Header>

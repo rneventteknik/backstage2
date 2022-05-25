@@ -16,7 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faFileDownload } from '@fortawesome/free-solid-svg-icons';
+import { faFileDownload, faPen } from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
 import EquipmentLists from '../../../components/bookings/equipmentLists/EquipmentLists';
 
@@ -52,7 +52,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href={'/bookings/' + booking.id + '/edit'} passHref>
                         <Button variant="primary" href={'/bookings/' + booking.id + '/edit'} className="mr-2">
-                            Redigera
+                            <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>
                     </Link>
                 </IfNotReadonly>

@@ -1,3 +1,5 @@
+import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
 import { updateItemsInArrayById } from '../../lib/utils';
@@ -109,7 +111,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
                 <Dropdown.Item onClick={() => deletePrice(price)} className="text-danger">
-                    Ta bort pris
+                    <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort pris
                 </Dropdown.Item>
             </DropdownButton>
         );
@@ -167,7 +169,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
 
             <div className="mb-4">
                 <Button size="sm" variant="secondary" onClick={() => savePrices([...prices, getDefaultPrice()])}>
-                    Lägg till pris
+                    <FontAwesomeIcon icon={faPlus} className="mr-1" /> Lägg till pris
                 </Button>
             </div>
         </>

@@ -9,7 +9,7 @@ import { Button } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { IfAdmin } from '../../components/utils/IfAdmin';
-import { faBan } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faBan, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../components/layout/Header';
 import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
@@ -96,13 +96,13 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <IfAdmin currentUser={currentUser}>
                     <Link href="/users/new" passHref>
                         <Button variant="primary" as="span">
-                            Skapa användare
+                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Skapa användare
                         </Button>
                     </Link>
                 </IfAdmin>
                 <Link href={'users/' + currentUser.userId} passHref>
                     <Button variant="secondary" as="span" className="ml-2">
-                        Visa min profil
+                        <FontAwesomeIcon icon={faUser} className="mr-1" /> Visa min profil
                     </Button>
                 </Link>
             </Header>

@@ -11,6 +11,8 @@ import { getResponseContentOrError } from '../../lib/utils';
 import Header from '../../components/layout/Header';
 import { PartialDeep } from 'type-fest';
 import { Role } from '../../models/enums/Role';
+import { faSave } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
@@ -47,7 +49,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentPackageForm" type="submit">
-                    Lägg till utrustningspaket
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till utrustningspaket
                 </Button>
             </Header>
 

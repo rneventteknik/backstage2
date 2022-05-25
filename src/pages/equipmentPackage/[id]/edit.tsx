@@ -16,6 +16,8 @@ import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton'
 import Header from '../../../components/layout/Header';
 import { PartialDeep } from 'type-fest';
 import { Role } from '../../../models/enums/Role';
+import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
@@ -100,7 +102,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentPackageForm" type="submit">
-                    Spara utrustningspaket
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara utrustningspaket
                 </Button>
                 <DropdownButton
                     id="dropdown-basic-button"
@@ -109,7 +111,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
                     title="Mer"
                 >
                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                        Ta bort utrustningspaket
+                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort utrustningspaket
                     </Dropdown.Item>
                 </DropdownButton>
             </Header>

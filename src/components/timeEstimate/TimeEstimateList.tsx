@@ -12,7 +12,7 @@ import { useNotifications } from '../../lib/useNotifications';
 import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../lib/pricingUtils';
 
 type Props = {
@@ -179,7 +179,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
                 <Dropdown.Item onClick={() => deleteTimeEstimate(entry)} className="text-danger">
-                    Ta bort rad
+                    <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
                 </Dropdown.Item>
             </DropdownButton>
         );
@@ -276,7 +276,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
                     <TableDisplay entities={timeEstimates} configuration={tableSettings} />
                     {readonly ? null : (
                         <Button className="ml-2 mr-2 mb-2" onClick={addEmptyTimeEstimate} variant="secondary" size="sm">
-                            <FontAwesomeIcon icon={faPlusCircle} /> Ny rad
+                            <FontAwesomeIcon icon={faPlus} className="mr-1" /> Ny rad
                         </Button>
                     )}
                 </>

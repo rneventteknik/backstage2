@@ -9,7 +9,7 @@ import { Badge, Button, Col, Collapse, Form } from 'react-bootstrap';
 import { EquipmentPackageObjectionModel, IEquipmentTagObjectionModel } from '../../models/objection-models';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
@@ -112,7 +112,7 @@ const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser }: Props)
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/equipmentPackage/new" passHref>
                         <Button variant="primary" as="span">
-                            Lägg till utrustningspaket
+                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till utrustningspaket
                         </Button>
                     </Link>
                 </IfNotReadonly>

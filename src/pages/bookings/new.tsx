@@ -19,6 +19,8 @@ import {
 } from '../../models/objection-models/BookingObjectionModel';
 import { useNotifications } from '../../lib/useNotifications';
 import { Role } from '../../models/enums/Role';
+import { faSave } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
@@ -149,7 +151,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                         Avbryt
                                     </Button>
                                     <Button variant="primary" form="editBookingForm" type="submit">
-                                        Lägg till bokning
+                                        <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till bokning
                                     </Button>
                                 </div>
                             </Card.Body>
@@ -163,7 +165,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             />
                         ) : null}
                         <Button variant="primary" form="editBookingForm" type="submit" className="mb-3">
-                            Lägg till bokning
+                            <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till bokning
                         </Button>
                     </Tab.Pane>
                 </Tab.Content>

@@ -14,6 +14,8 @@ import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { bookingsFetcher, userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -48,7 +50,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
                     <Link href={'/users/' + user.id + '/edit'} passHref>
                         <Button variant="primary" href={'/users/' + user.id + '/edit'}>
-                            Redigera
+                            <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>
                     </Link>
                 </IfAdmin>

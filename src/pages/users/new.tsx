@@ -11,6 +11,8 @@ import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import Header from '../../components/layout/Header';
 import { Role } from '../../models/enums/Role';
 import { useNotifications } from '../../lib/useNotifications';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSave } from '@fortawesome/free-solid-svg-icons';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.ADMIN);
@@ -51,7 +53,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editUserForm" type="submit">
-                    Lägg till användare
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till användare
                 </Button>
             </Header>
 

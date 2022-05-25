@@ -16,6 +16,8 @@ import { equipmentFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { PartialDeep } from 'type-fest';
 import { Role } from '../../../models/enums/Role';
+import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
@@ -99,7 +101,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentForm" type="submit">
-                    Spara utrustning
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara utrustning
                 </Button>
                 <DropdownButton
                     id="dropdown-basic-button"
@@ -108,7 +110,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     title="Mer"
                 >
                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                        Ta bort utrustning
+                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort utrustning
                     </Dropdown.Item>
                 </DropdownButton>
             </Header>

@@ -12,6 +12,8 @@ import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleto
 import { equipmentFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -45,7 +47,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href={'/equipment/' + equipment.id + '/edit'} passHref>
                         <Button variant="primary" href={'/equipment/' + equipment.id + '/edit'}>
-                            Redigera
+                            <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>
                     </Link>
                 </IfNotReadonly>
