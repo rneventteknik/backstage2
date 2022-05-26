@@ -88,5 +88,19 @@ export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, 
         )}`;
     }
 
+    if (entry.numberOfUnits === 1) {
+        return `${entry.numberOfUnits} ${t('common.misc.count-unit-single')}`;
+    }
+
     return `${entry.numberOfUnits} ${t('common.misc.count-unit')}`;
+};
+
+export const formatEquipmentListEntryPrice = (entry: EquipmentListEntry, t: (t: string) => string) => {
+    if (entry.pricePerHour && !entry.pricePerUnit) {
+        return `${entry.pricePerHour} kr/${t('common.misc.hours-unit')}`;
+    } else if (!entry.pricePerHour && entry.pricePerUnit) {
+        return `${entry.pricePerUnit} kr/${t('common.misc.count-unit-single')}`;
+    } else {
+        return `${entry.pricePerUnit} kr + ${entry.pricePerHour} kr/h`;
+    }
 };

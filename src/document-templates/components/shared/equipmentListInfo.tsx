@@ -1,14 +1,8 @@
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
-import { commonStyles, formatEquipmentListEntryCountOrHours } from '../../utils';
+import { commonStyles, formatEquipmentListEntryCountOrHours, formatEquipmentListEntryPrice } from '../../utils';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
-import {
-    formatNumberAsCurrency,
-    getPrice,
-    getNumberOfDays,
-    getEquipmentListPrice,
-    formatPrice,
-} from '../../../lib/pricingUtils';
+import { formatNumberAsCurrency, getPrice, getNumberOfDays, getEquipmentListPrice } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { formatDate } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
@@ -65,7 +59,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
                             <Text>{formatEquipmentListEntryCountOrHours(entry, t)}</Text>
                         </TableCellFixedWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{formatPrice(entry)}</Text>
+                            <Text>{formatEquipmentListEntryPrice(entry, t)}</Text>
                         </TableCellFixedWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
                             <Text>{entry.discount > 0 ? formatNumberAsCurrency(entry.discount) : ''}</Text>

@@ -47,6 +47,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         // Misc
         'common.pagenumber.label': 'Sida',
         'common.misc.count-unit': 'st',
+        'common.misc.count-unit-single': 'st',
         'common.misc.hours-unit': 'h',
         'common.misc.days-unit': 'dagar',
     },
@@ -94,6 +95,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         // Misc
         'common.pagenumber.label': 'Page',
         'common.misc.count-unit': 'pcs',
+        'common.misc.count-unit-single': 'pc',
         'common.misc.hours-unit': 'h',
         'common.misc.days-unit': 'days',
     },
