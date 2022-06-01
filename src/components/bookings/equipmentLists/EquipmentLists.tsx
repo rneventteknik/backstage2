@@ -15,6 +15,7 @@ import {
     faLink,
     faPlus,
     faTrashCan,
+    faBackward,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
@@ -729,6 +730,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         onClick={() => saveList({ ...list, rentalStatus: null })}
                                         disabled={list.rentalStatus == undefined}
                                     >
+                                        <FontAwesomeIcon icon={faBackward} className="mr-1 fa-fw" />
                                         Återställ utlämningsstatus
                                     </Dropdown.Item>
                                     <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>

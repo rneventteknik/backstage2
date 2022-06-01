@@ -7,6 +7,9 @@ import BookingForm from './BookingForm';
 import { BookingType } from '../../models/enums/BookingType';
 import { timeReportsFetcher } from '../../lib/fetchers';
 import useSwr from 'swr';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCircleCheck as faCircleCheckRegular, faTimesCircle, faDotCircle } from '@fortawesome/free-regular-svg-icons';
+import { faCircleCheck as faCircleCheckSolid } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
     booking: Partial<Booking>;
@@ -25,7 +28,7 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
                 <>
                     <Dropdown as={ButtonGroup} className={className}>
                         <Button variant="dark" onClick={() => setShowStatusChangeModal(true)}>
-                            Sätt till bokad
+                            <FontAwesomeIcon icon={faCircleCheckRegular} className="mr-1" /> Sätt till bokad
                         </Button>
 
                         <Dropdown.Toggle split variant="dark" id="booking-status-dropdown" />
@@ -48,13 +51,15 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
                 <>
                     <Dropdown as={ButtonGroup} className={className}>
                         <Button variant="dark" onClick={() => setShowStatusChangeModal(true)}>
-                            Klarmarkera
+                            <FontAwesomeIcon icon={faCircleCheckSolid} className="mr-1" /> Klarmarkera
                         </Button>
 
                         <Dropdown.Toggle split variant="dark" id="booking-status-dropdown" />
 
                         <Dropdown.Menu>
-                            <Dropdown.Item onClick={() => changeStatusTo(Status.DRAFT)}>Gör till utkast</Dropdown.Item>
+                            <Dropdown.Item onClick={() => changeStatusTo(Status.DRAFT)}>
+                                <FontAwesomeIcon icon={faDotCircle} className="mr-1" /> Gör till utkast
+                            </Dropdown.Item>
                             <BookingStatusCancelButton onClick={() => changeStatusTo(Status.CANCELED)} />
                         </Dropdown.Menu>
                     </Dropdown>
@@ -71,7 +76,7 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
             return (
                 <Dropdown as={ButtonGroup} className={className}>
                     <Button variant="dark" onClick={() => changeStatusTo(Status.DRAFT)}>
-                        Gör till utkast
+                        <FontAwesomeIcon icon={faDotCircle} className="mr-1" /> Gör till utkast
                     </Button>
                 </Dropdown>
             );
@@ -90,7 +95,9 @@ const BookingStatusCancelButton: React.FC<BookingStatusCancelButtonProps> = ({
     return (
         <>
             <Dropdown.Item onClick={onClick}>
-                <span className="text-danger">Ställ in bokningen</span>
+                <span className="text-danger">
+                    <FontAwesomeIcon icon={faTimesCircle} className="mr-1" /> Ställ in bokningen
+                </span>
             </Dropdown.Item>
         </>
     );

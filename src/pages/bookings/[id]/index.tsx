@@ -22,7 +22,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faFileDownload, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faCoins, faFileDownload, faPen } from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
 import EquipmentLists from '../../../components/bookings/equipmentLists/EquipmentLists';
 import BookingStatusButton from '../../../components/bookings/BookingStatusButton';
@@ -105,7 +105,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
                     <Dropdown.Menu>
                         <Dropdown.Item href={'/api/documents/price-estimate/en/' + booking.id} target="_blank">
-                            <FontAwesomeIcon icon={faFileDownload} className="m-1" /> Prisuppskattning (engelska)
+                            <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning (engelska)
                         </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
@@ -115,7 +115,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             onClick={() => saveBooking({ paymentStatus: PaymentStatus.PAID })}
                             disabled={booking.paymentStatus === PaymentStatus.PAID}
                         >
-                            Markera som betald
+                            <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som betald
                         </Dropdown.Item>
                     </DropdownButton>
                 </IfNotReadonly>
