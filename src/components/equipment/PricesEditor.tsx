@@ -2,7 +2,7 @@ import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
-import { updateItemsInArrayById } from '../../lib/utils';
+import { toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
 import { EquipmentPrice } from '../../models/interfaces';
 import { HasId } from '../../models/interfaces/BaseEntity';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
@@ -61,9 +61,9 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
         <>
             <InputGroup className="mb-1">
                 <Form.Control
-                    type="text"
+                    type="number"
                     defaultValue={price?.pricePerUnit ? price?.pricePerUnit?.toString() : ''}
-                    onChange={(e) => updatePrice({ ...price, pricePerUnit: parseInt(e.target.value) })}
+                    onChange={(e) => updatePrice({ ...price, pricePerUnit: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
                 <InputGroup.Append>
                     <InputGroup.Text>kr/st</InputGroup.Text>
@@ -71,9 +71,9 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
             </InputGroup>
             <InputGroup>
                 <Form.Control
-                    type="text"
+                    type="number"
                     defaultValue={price?.pricePerHour ? price?.pricePerHour?.toString() : ''}
-                    onChange={(e) => updatePrice({ ...price, pricePerHour: parseInt(e.target.value) })}
+                    onChange={(e) => updatePrice({ ...price, pricePerHour: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
                 <InputGroup.Append>
                     <InputGroup.Text>kr/h</InputGroup.Text>
@@ -86,9 +86,9 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
         <>
             <InputGroup className="mb-1">
                 <Form.Control
-                    type="text"
+                    type="number"
                     defaultValue={price?.pricePerUnitTHS ? price?.pricePerUnitTHS?.toString() : ''}
-                    onChange={(e) => updatePrice({ ...price, pricePerUnitTHS: parseInt(e.target.value) })}
+                    onChange={(e) => updatePrice({ ...price, pricePerUnitTHS: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
                 <InputGroup.Append>
                     <InputGroup.Text>kr/st</InputGroup.Text>
@@ -96,9 +96,9 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
             </InputGroup>
             <InputGroup>
                 <Form.Control
-                    type="text"
+                    type="number"
                     defaultValue={price?.pricePerHourTHS ? price?.pricePerHourTHS?.toString() : ''}
-                    onChange={(e) => updatePrice({ ...price, pricePerHourTHS: parseInt(e.target.value) })}
+                    onChange={(e) => updatePrice({ ...price, pricePerHourTHS: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
                 <InputGroup.Append>
                     <InputGroup.Text>kr/h</InputGroup.Text>
@@ -140,7 +140,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                 getValue: (entry: EquipmentPrice) => entry.pricePerUnit + ' ' + entry.pricePerHour,
                 getContentOverride: PriceEntryPriceDisplayFn,
                 textAlignment: 'center',
-                columnWidth: 150,
+                columnWidth: 170,
             },
             {
                 key: 'ThsPrice',
@@ -149,7 +149,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                 getValue: (entry: EquipmentPrice) => entry.pricePerUnitTHS + ' ' + entry.pricePerHourTHS,
                 getContentOverride: PriceEntryThsPriceDisplayFn,
                 textAlignment: 'center',
-                columnWidth: 150,
+                columnWidth: 170,
             },
             {
                 key: 'actions',
