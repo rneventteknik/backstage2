@@ -51,7 +51,7 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
         default:
             return (
                 <OverlayTrigger
-                    placement="right"
+                    placement="left"
                     overlay={
                         <Tooltip id="1">
                             <small>
