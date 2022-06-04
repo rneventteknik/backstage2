@@ -90,7 +90,7 @@ const BookingForm: React.FC<Props> = ({
             return true;
         }
 
-        if (requiredFromStatus === Status.BOOKED && status !== Status.DRAFT) {
+        if (requiredFromStatus === Status.BOOKED && status !== Status.DRAFT && status !== Status.CANCELED) {
             return true;
         }
 
