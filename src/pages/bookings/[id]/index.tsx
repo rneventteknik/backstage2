@@ -113,7 +113,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block ml-2">
                         <Dropdown.Item
                             onClick={() => saveBooking({ paymentStatus: PaymentStatus.PAID })}
-                            disabled={booking.paymentStatus === PaymentStatus.PAID}
+                            disabled={
+                                booking.paymentStatus === PaymentStatus.PAID ||
+                                booking.paymentStatus === PaymentStatus.PAID_WITH_INVOICE
+                            }
                         >
                             <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som betald
                         </Dropdown.Item>

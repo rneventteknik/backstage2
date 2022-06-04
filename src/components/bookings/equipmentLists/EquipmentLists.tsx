@@ -726,13 +726,15 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" />
                                         Lägg till egen rad
                                     </Dropdown.Item>
-                                    <Dropdown.Item
-                                        onClick={() => saveList({ ...list, rentalStatus: null })}
-                                        disabled={list.rentalStatus == undefined}
-                                    >
-                                        <FontAwesomeIcon icon={faBackward} className="mr-1 fa-fw" />
-                                        Återställ utlämningsstatus
-                                    </Dropdown.Item>
+                                    {booking.bookingType === BookingType.RENTAL ? (
+                                        <Dropdown.Item
+                                            onClick={() => saveList({ ...list, rentalStatus: null })}
+                                            disabled={list.rentalStatus == undefined}
+                                        >
+                                            <FontAwesomeIcon icon={faBackward} className="mr-1 fa-fw" />
+                                            Återställ utlämningsstatus
+                                        </Dropdown.Item>
+                                    ) : null}
                                     <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
                                         <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" /> Töm utrustningslistan
                                     </Dropdown.Item>
