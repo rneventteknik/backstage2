@@ -72,6 +72,7 @@ const UserAuthForm: React.FC<Props> = ({
             <Form.Group controlId="formPassword">
                 <Form.Label>Lösenord</Form.Label>
                 <Form.Control type="password" name="password" />
+                <Form.Text className="text-muted">Lämnas fältet tomt kommer inte lösenordet att bytas.</Form.Text>
             </Form.Group>
             <Form.Group controlId="formConfirmPassword">
                 <Form.Label>Bekräfta lösenordet</Form.Label>
