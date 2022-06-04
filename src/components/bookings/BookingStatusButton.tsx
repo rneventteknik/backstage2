@@ -14,7 +14,7 @@ import { faCircleCheck as faCircleCheckSolid } from '@fortawesome/free-solid-svg
 type Props = {
     booking: Partial<Booking>;
     onChange: (booking: Partial<IBookingObjectionModel>) => void;
-    className: string;
+    className?: string;
 };
 
 const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: Props) => {

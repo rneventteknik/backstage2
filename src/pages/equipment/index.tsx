@@ -156,7 +156,7 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/equipment/new" passHref>
-                        <Button variant="primary" as="span" className="mr-2">
+                        <Button variant="primary" as="span">
                             <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till utrustning
                         </Button>
                     </Link>

@@ -97,12 +97,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <Button variant="primary" form="editBookingForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara bokning
                 </Button>
-                <DropdownButton
-                    id="dropdown-basic-button"
-                    className="d-inline-block ml-2"
-                    variant="secondary"
-                    title="Mer"
-                >
+                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
                         <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort bokning
                     </Dropdown.Item>

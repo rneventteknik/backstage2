@@ -88,13 +88,13 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <IfNotReadonly currentUser={currentUser}>
                     <IfAdmin currentUser={currentUser} or={booking.status !== Status.DONE}>
                         <Link href={'/bookings/' + booking.id + '/edit'} passHref>
-                            <Button variant="primary" href={'/bookings/' + booking.id + '/edit'} className="mr-2">
+                            <Button variant="primary" href={'/bookings/' + booking.id + '/edit'}>
                                 <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                             </Button>
                         </Link>
                     </IfAdmin>
 
-                    <BookingStatusButton booking={booking} onChange={saveBooking} className="mr-2" />
+                    <BookingStatusButton booking={booking} onChange={saveBooking} />
                 </IfNotReadonly>
                 <Dropdown as={ButtonGroup}>
                     <Button variant="dark" href={'/api/documents/price-estimate/se/' + booking.id} target="_blank">
@@ -110,7 +110,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </Dropdown.Menu>
                 </Dropdown>
                 <IfNotReadonly currentUser={currentUser}>
-                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block ml-2">
+                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer">
                         <Dropdown.Item
                             onClick={() => saveBooking({ paymentStatus: PaymentStatus.PAID })}
                             disabled={

@@ -15,7 +15,7 @@ const Header: React.FC<Props> = ({ title, children, loading, breadcrumbs = [] }:
         <Breadcrumbs breadcrumbs={breadcrumbs} loading={loading} />
 
         <h1 className={styles.pageTitle}> {loading ? <Skeleton width={280} /> : title} </h1>
-        {loading ? <Skeleton width={140} height={30} /> : children}
+        {loading ? <Skeleton width={140} height={30} /> : <div className={styles.buttonContainer}>{children}</div>}
         <hr />
     </div>
 );

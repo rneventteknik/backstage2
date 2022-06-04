@@ -152,12 +152,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <Button variant="primary" form="editUserForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara användare
                 </Button>
-                <DropdownButton
-                    id="dropdown-basic-button"
-                    className="d-inline-block ml-2"
-                    variant="secondary"
-                    title="Mer"
-                >
+                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
                     {user.username ? (
                         <>
                             <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
