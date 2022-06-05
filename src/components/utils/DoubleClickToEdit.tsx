@@ -24,7 +24,9 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
 
     const editingComplete = () => {
         setIsEditing(false);
-        onUpdate(trackedValue);
+        if (trackedValue !== value) {
+            onUpdate(trackedValue);
+        }
     };
 
     if (readonly) {
@@ -122,7 +124,9 @@ export function DoubleClickToEditDropdown<T>({
 
     const editingComplete = () => {
         setIsEditing(false);
-        onClose ? onClose(getSelectedValue(selectedKey)) : null;
+        if (selectedKey !== optionKeyFn(value)) {
+            onClose ? onClose(getSelectedValue(selectedKey)) : null;
+        }
     };
 
     if (readonly) {
