@@ -23,7 +23,7 @@ export interface Booking extends BaseEntityWithName {
     status: Status;
     paymentStatus: PaymentStatus;
     salaryStatus: SalaryStatus;
-    invoiceHogiaId: number;
+    invoiceHogiaId: number | null;
     invoiceAddress: string;
     invoiceTag: string;
     invoiceNumber: string;

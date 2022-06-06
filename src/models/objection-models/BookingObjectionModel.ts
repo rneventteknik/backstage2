@@ -24,7 +24,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     status: number;
     salaryStatus: number;
     paymentStatus: number;
-    invoiceHogiaId: number;
+    invoiceHogiaId: number | null;
     invoiceAddress: string;
     invoiceTag: string;
     invoiceNumber: string;

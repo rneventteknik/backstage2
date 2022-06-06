@@ -40,6 +40,8 @@ const BookingForm: React.FC<Props> = ({
 }: Props) => {
     const [validated, setValidated] = useState(false);
     const [status, setStatus] = useState(booking.status);
+    const [hoogiaIdIsRequired, setHogiaIdIsRequired] = useState((booking.invoiceAddress?.length ?? 0) === 0);
+    const [invoceAddressIsRequired, setInvoceAddressIsRequired] = useState(!booking.invoiceHogiaId);
 
     const { data: users } = useSwr('/api/users', usersFetcher);
 
@@ -47,14 +49,24 @@ const BookingForm: React.FC<Props> = ({
         event.preventDefault();
 
         const form = event.currentTarget;
+        const getValueFromForm = (key: string): string | undefined => form[key]?.value;
+
+        if (
+            !replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId')) &&
+            !replaceEmptyStringWithNull(getValueFromForm('invoiceAddress'))
+        ) {
+            form.invoiceHogiaId.setCustomValidity('Felaktig fakturainformation');
+            form.invoiceAddress.setCustomValidity('Felaktig fakturainformation');
+        } else {
+            form.invoiceHogiaId.setCustomValidity('');
+            form.invoiceAddress.setCustomValidity('');
+        }
 
         if (form.checkValidity() === false) {
             event.stopPropagation();
             setValidated(true);
             return;
         }
-
-        const getValueFromForm = (key: string): string | undefined => form[key]?.value;
 
         const modifiedBooking: Partial<IBookingObjectionModel> = {
             id: booking.id,
@@ -72,7 +84,9 @@ const BookingForm: React.FC<Props> = ({
             note: getValueFromForm('note'),
             invoiceHogiaId: !!replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId'))
                 ? parseInt(replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId')) ?? '0')
-                : undefined,
+                : isNewBooking
+                ? undefined
+                : null,
             invoiceAddress: getValueFromForm('invoiceAddress'),
             invoiceTag: getValueFromForm('invoiceTag'),
             invoiceNumber: getValueFromForm('invoiceNumber'),
@@ -315,14 +329,16 @@ const BookingForm: React.FC<Props> = ({
                             <Form.Group controlId="formInvoiceHogiaId">
                                 <Form.Label>
                                     Hogia ID
-                                    <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                                    <RequiredIndicator
+                                        required={isFieldRequired(Status.BOOKED) && hoogiaIdIsRequired}
+                                    />
                                 </Form.Label>
                                 <Form.Control
-                                    required={isFieldRequired(Status.BOOKED)}
                                     type="number"
                                     placeholder="1234"
                                     name="invoiceHogiaId"
-                                    defaultValue={booking.invoiceHogiaId}
+                                    onChange={(e) => setInvoceAddressIsRequired(e.target.value.length === 0)}
+                                    defaultValue={booking.invoiceHogiaId ?? undefined}
                                 />
                             </Form.Group>
                         </Col>
@@ -357,13 +373,15 @@ const BookingForm: React.FC<Props> = ({
                             <Form.Group controlId="formInvoiceAddress">
                                 <Form.Label>
                                     Fakturaadress
-                                    <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                                    <RequiredIndicator
+                                        required={isFieldRequired(Status.BOOKED) && invoceAddressIsRequired}
+                                    />
                                 </Form.Label>
                                 <Form.Control
-                                    required={isFieldRequired(Status.BOOKED)}
                                     as="textarea"
                                     name="invoiceAddress"
                                     rows={3}
+                                    onChange={(e) => setHogiaIdIsRequired(e.target.value.length === 0)}
                                     defaultValue={booking.invoiceAddress}
                                 />
                             </Form.Group>
