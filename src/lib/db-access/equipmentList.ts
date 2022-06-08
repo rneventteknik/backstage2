@@ -93,5 +93,26 @@ export const validateEquipmentListObjectionModel = (equipmentList: EquipmentList
 
     if (equipmentList.name === null) return false;
 
+    if (
+        equipmentList.equipmentListEntries &&
+        equipmentList.equipmentListEntries.some((x) => !validateEquipmentListEntriesObjectionModel(x))
+    )
+        return false;
+
+    return true;
+};
+
+export const validateEquipmentListEntriesObjectionModel = (
+    equipmentListEntry: EquipmentListEntryObjectionModel,
+): boolean => {
+    if (!equipmentListEntry) return false;
+
+    if (equipmentListEntry.name === null) return false;
+
+    if (isNaN(equipmentListEntry.pricePerHour) || equipmentListEntry.pricePerHour < 0) return false;
+    if (isNaN(equipmentListEntry.pricePerUnit) || equipmentListEntry.pricePerUnit < 0) return false;
+    if (isNaN(equipmentListEntry.numberOfHours) || equipmentListEntry.numberOfHours < 0) return false;
+    if (isNaN(equipmentListEntry.numberOfUnits) || equipmentListEntry.numberOfUnits < 0) return false;
+
     return true;
 };

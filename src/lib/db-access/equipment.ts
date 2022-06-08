@@ -143,10 +143,10 @@ export const validateEquipmentPriceObjectionModel = (equipmentPrice: EquipmentPr
 
     if (!equipmentPrice.name) return false;
 
-    if (isNaN(equipmentPrice.pricePerHour)) return false;
-    if (isNaN(equipmentPrice.pricePerUnit)) return false;
-    if (isNaN(equipmentPrice.pricePerHourTHS)) return false;
-    if (isNaN(equipmentPrice.pricePerUnitTHS)) return false;
+    if (isNaN(equipmentPrice.pricePerHour) || equipmentPrice.pricePerHour < 0) return false;
+    if (isNaN(equipmentPrice.pricePerUnit) || equipmentPrice.pricePerUnit < 0) return false;
+    if (isNaN(equipmentPrice.pricePerHourTHS) || equipmentPrice.pricePerHourTHS < 0) return false;
+    if (isNaN(equipmentPrice.pricePerUnitTHS) || equipmentPrice.pricePerUnitTHS < 0) return false;
 
     return true;
 };

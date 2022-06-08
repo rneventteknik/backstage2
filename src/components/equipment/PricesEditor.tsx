@@ -62,6 +62,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
             <InputGroup className="mb-1">
                 <Form.Control
                     type="number"
+                    min="0"
                     defaultValue={price?.pricePerUnit ? price?.pricePerUnit?.toString() : ''}
                     onChange={(e) => updatePrice({ ...price, pricePerUnit: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
@@ -72,6 +73,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
             <InputGroup>
                 <Form.Control
                     type="number"
+                    min="0"
                     defaultValue={price?.pricePerHour ? price?.pricePerHour?.toString() : ''}
                     onChange={(e) => updatePrice({ ...price, pricePerHour: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
@@ -87,6 +89,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
             <InputGroup className="mb-1">
                 <Form.Control
                     type="number"
+                    min="0"
                     defaultValue={price?.pricePerUnitTHS ? price?.pricePerUnitTHS?.toString() : ''}
                     onChange={(e) => updatePrice({ ...price, pricePerUnitTHS: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
@@ -97,6 +100,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
             <InputGroup>
                 <Form.Control
                     type="number"
+                    min="0"
                     defaultValue={price?.pricePerHourTHS ? price?.pricePerHourTHS?.toString() : ''}
                     onChange={(e) => updatePrice({ ...price, pricePerHourTHS: toIntOrUndefined(e.target.value) ?? 0 })}
                 />

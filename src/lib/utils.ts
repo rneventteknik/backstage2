@@ -199,7 +199,7 @@ export const toDateOrUndefined = (dateString: string | undefined | null): Date |
 
 // Parse int woth check for undefined/null
 //
-export const toIntOrUndefined = (value: string | undefined | null): number | undefined => {
+export const toIntOrUndefined = (value: string | undefined | null, forceAbsoluteValue = false): number | undefined => {
     if (value === undefined || value === null || value.length === 0) {
         return undefined;
     }
@@ -208,6 +208,10 @@ export const toIntOrUndefined = (value: string | undefined | null): number | und
 
     if (isNaN(numberValue)) {
         return undefined;
+    }
+
+    if (forceAbsoluteValue) {
+        return Math.abs(numberValue);
     }
 
     return numberValue;

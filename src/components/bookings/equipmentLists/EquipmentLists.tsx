@@ -476,7 +476,9 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         return (
             <DoubleClickToEdit
                 value={entry.numberOfUnits?.toString()}
-                onUpdate={(newValue) => updateListEntry({ ...entry, numberOfUnits: toIntOrUndefined(newValue) ?? 0 })}
+                onUpdate={(newValue) =>
+                    updateListEntry({ ...entry, numberOfUnits: toIntOrUndefined(newValue, true) ?? 0 })
+                }
                 size="sm"
                 readonly={readonly}
             >
@@ -495,7 +497,9 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         return (
             <DoubleClickToEdit
                 value={entry.numberOfHours.toString()}
-                onUpdate={(newValue) => updateListEntry({ ...entry, numberOfHours: toIntOrUndefined(newValue) ?? 0 })}
+                onUpdate={(newValue) =>
+                    updateListEntry({ ...entry, numberOfHours: toIntOrUndefined(newValue, true) ?? 0 })
+                }
                 size="sm"
                 readonly={readonly}
             >
@@ -866,7 +870,8 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <Form.Label>Antal</Form.Label>
                                     <InputGroup>
                                         <Form.Control
-                                            type="text"
+                                            type="number"
+                                            min="0"
                                             value={equipmentListEntryToEditViewModel?.numberOfUnits ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
@@ -886,7 +891,8 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <Form.Label>Timmar</Form.Label>
                                     <InputGroup>
                                         <Form.Control
-                                            type="text"
+                                            type="number"
+                                            min="0"
                                             value={equipmentListEntryToEditViewModel.numberOfHours ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
@@ -938,13 +944,14 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <Form.Label>Pris per styck</Form.Label>
                                     <InputGroup>
                                         <Form.Control
-                                            type="text"
+                                            type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
+                                            min="0"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
                                             value={equipmentListEntryToEditViewModel?.pricePerUnit ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
-                                                    pricePerUnit: toIntOrUndefined(e.target.value),
+                                                    pricePerUnit: toIntOrUndefined(e.target.value, true),
                                                 })
                                             }
                                         />
@@ -959,13 +966,14 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <Form.Label>Pris per timme</Form.Label>
                                     <InputGroup>
                                         <Form.Control
-                                            type="text"
+                                            type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
+                                            min="0"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
                                             value={equipmentListEntryToEditViewModel?.pricePerHour ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
-                                                    pricePerHour: toIntOrUndefined(e.target.value),
+                                                    pricePerHour: toIntOrUndefined(e.target.value, true),
                                                 })
                                             }
                                         />
@@ -982,12 +990,13 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                     <Form.Label>Rabatt</Form.Label>
                                     <InputGroup>
                                         <Form.Control
-                                            type="text"
+                                            type="number"
+                                            min="0"
                                             value={equipmentListEntryToEditViewModel?.discount ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
-                                                    discount: toIntOrUndefined(e.target.value),
+                                                    discount: toIntOrUndefined(e.target.value, true),
                                                 })
                                             }
                                         />
@@ -1064,12 +1073,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 nameEN: equipmentListEntryToEditViewModel.nameEN ?? '',
                                 description: equipmentListEntryToEditViewModel.description ?? '',
                                 descriptionEN: equipmentListEntryToEditViewModel.descriptionEN ?? '',
-                                numberOfUnits: equipmentListEntryToEditViewModel.numberOfUnits ?? 1,
-                                numberOfHours: equipmentListEntryToEditViewModel.numberOfHours ?? 0,
-                                pricePerUnit: equipmentListEntryToEditViewModel.pricePerUnit ?? 0,
-                                pricePerHour: equipmentListEntryToEditViewModel.pricePerHour ?? 0,
+                                numberOfUnits: Math.abs(equipmentListEntryToEditViewModel.numberOfUnits ?? 1),
+                                numberOfHours: Math.abs(equipmentListEntryToEditViewModel.numberOfHours ?? 0),
+                                pricePerUnit: Math.abs(equipmentListEntryToEditViewModel.pricePerUnit ?? 0),
+                                pricePerHour: Math.abs(equipmentListEntryToEditViewModel.pricePerHour ?? 0),
                                 equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
-                                discount: equipmentListEntryToEditViewModel.discount ?? 0,
+                                discount: Math.abs(equipmentListEntryToEditViewModel.discount ?? 0),
                             };
 
                             if (equipmentListEntryToEditViewModel.id) {
