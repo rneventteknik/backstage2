@@ -71,10 +71,25 @@ export const commonStyles = StyleSheet.create({
         fontSize: 10,
         fontFamily: 'Open Sans',
     },
+    heading2: {
+        marginTop: 12,
+        marginBottom: 2,
+        fontSize: 8,
+        fontWeight: 700,
+        fontFamily: 'Open Sans',
+    },
 });
 
 export const getBookingDocumentId = (booking: Booking): string => {
     return `#${booking.created?.getFullYear()}-${booking.id}`;
+};
+
+export const formatEquipmentListEntryCount = (entry: EquipmentListEntry, t: (t: string) => string) => {
+    if (entry.numberOfUnits === 1) {
+        return `${entry.numberOfUnits} ${t('common.misc.count-unit-single')}`;
+    }
+
+    return `${entry.numberOfUnits} ${t('common.misc.count-unit')}`;
 };
 
 export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, t: (t: string) => string) => {
@@ -88,11 +103,7 @@ export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, 
         )}`;
     }
 
-    if (entry.numberOfUnits === 1) {
-        return `${entry.numberOfUnits} ${t('common.misc.count-unit-single')}`;
-    }
-
-    return `${entry.numberOfUnits} ${t('common.misc.count-unit')}`;
+    return formatEquipmentListEntryCount(entry, t);
 };
 
 export const formatEquipmentListEntryPrice = (entry: EquipmentListEntry, t: (t: string) => string) => {

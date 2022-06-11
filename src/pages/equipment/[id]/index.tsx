@@ -81,6 +81,10 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                 <span>{equipment.inventoryCount}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
+                                <span className="flex-grow-1">Plats</span>
+                                <span>{equipment.equipmentLocation?.name ?? 'Okänd plats'}</span>
+                            </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Synlig i publika prislistan</span>
                                 <span>{equipment.publiclyHidden ? 'Nej' : 'Ja'}</span>
                             </ListGroup.Item>

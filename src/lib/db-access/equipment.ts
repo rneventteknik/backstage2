@@ -25,6 +25,7 @@ export const fetchEquipment = async (id: number): Promise<EquipmentObjectionMode
         .findById(id)
         .withGraphFetched('tags')
         .withGraphFetched('equipmentPublicCategory')
+        .withGraphFetched('equipmentLocation')
         .withGraphFetched('prices')
         .withGraphFetched('changeLog');
 };
@@ -34,7 +35,8 @@ export const fetchEquipments = async (): Promise<EquipmentObjectionModel[]> => {
     return EquipmentObjectionModel.query()
         .withGraphFetched('prices')
         .withGraphFetched('tags')
-        .withGraphFetched('equipmentPublicCategory');
+        .withGraphFetched('equipmentPublicCategory')
+        .withGraphFetched('equipmentLocation');
 };
 
 // This function fetches the bookings, but only with information that should be publicly available.

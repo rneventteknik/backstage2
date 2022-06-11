@@ -114,7 +114,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
                     <Dropdown.Menu>
                         <Dropdown.Item href={'/api/documents/price-estimate/en/' + booking.id} target="_blank">
-                            <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning (engelska)
+                            <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Prisuppskattning (engelska)
+                        </Dropdown.Item>
+                        <Dropdown.Item href={'/api/documents/packing-list/se/' + booking.id} target="_blank">
+                            <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Packlista
                         </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>

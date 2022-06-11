@@ -13,6 +13,7 @@ export const fetchEquipmentList = async (id: number): Promise<EquipmentListObjec
         .findById(id)
         .orderBy('id')
         .withGraphFetched('equipmentListEntries.equipment.prices')
+        .withGraphFetched('equipmentListEntries.equipment.equipmentLocation')
         .withGraphFetched('equipmentListEntries.equipmentPrice')
         .modifyGraph('equipmentListEntries', (builder) => {
             builder.orderBy('id');

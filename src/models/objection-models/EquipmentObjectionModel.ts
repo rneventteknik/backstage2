@@ -15,8 +15,10 @@ export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     note: string;
     image: unknown; // TODO Add images
     publiclyHidden: boolean;
-    equipmentPublicCategoryId?: number;
+    equipmentPublicCategoryId?: number | null;
     equipmentPublicCategory?: IEquipmentPublicCategoryObjectionModel;
+    equipmentLocationId?: number | null;
+    equipmentLocation?: IEquipmentLocationObjectionModel;
     tags?: IEquipmentTagObjectionModel[];
     prices?: IEquipmentPriceObjectionModel[];
     changeLog?: IEquipmentChangelogEntryObjectionModel[];
@@ -60,6 +62,14 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
             join: {
                 from: 'Equipment.equipmentPublicCategoryId',
                 to: 'EquipmentPublicCategory.id',
+            },
+        },
+        equipmentLocation: {
+            relation: Model.HasOneRelation,
+            modelClass: EquipmentLocationObjectionModel,
+            join: {
+                from: 'Equipment.equipmentLocationId',
+                to: 'EquipmentLocation.id',
             },
         },
     });
@@ -123,6 +133,22 @@ export interface IEquipmentPublicCategoryObjectionModel extends BaseObjectionMod
 
 export class EquipmentPublicCategoryObjectionModel extends Model implements IEquipmentPublicCategoryObjectionModel {
     static tableName = 'EquipmentPublicCategory';
+
+    id!: number;
+    name!: string;
+    created?: string;
+    updated?: string;
+
+    description?: string;
+    sortIndex!: number;
+}
+export interface IEquipmentLocationObjectionModel extends BaseObjectionModelWithName {
+    description?: string;
+    sortIndex: number;
+}
+
+export class EquipmentLocationObjectionModel extends Model implements IEquipmentPublicCategoryObjectionModel {
+    static tableName = 'EquipmentLocation';
 
     id!: number;
     name!: string;

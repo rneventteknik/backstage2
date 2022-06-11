@@ -5,11 +5,13 @@ import {
     IEquipmentChangelogEntryObjectionModel,
     IEquipmentPriceObjectionModel,
     IEquipmentPublicCategoryObjectionModel,
+    IEquipmentLocationObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { EquipmentChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 import { toDateOrUndefined } from '../utils';
 import { toUser } from './user';
 import { EquipmentPublicCategory } from '../../models/interfaces/EquipmentPublicCategory';
+import { EquipmentLocation } from '../../models/interfaces/EquipmentLocation';
 
 export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment => {
     if (!objectionModel.id) {
@@ -25,6 +27,9 @@ export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment
         changeLog: objectionModel.changeLog ? objectionModel.changeLog.map((x) => toEquipmentChangelogEntry(x)) : [],
         equipmentPublicCategory: objectionModel.equipmentPublicCategory
             ? toEquipmentPublicCategory(objectionModel.equipmentPublicCategory)
+            : undefined,
+        equipmentLocation: objectionModel.equipmentLocation
+            ? toEquipmentLocation(objectionModel.equipmentLocation)
             : undefined,
         updated: toDateOrUndefined(objectionModel.updated),
         created: toDateOrUndefined(objectionModel.created),
@@ -79,6 +84,19 @@ export const toEquipmentPublicCategory = (
 ): EquipmentPublicCategory => {
     if (!objectionModel.id) {
         throw new Error('Invalid equipment public category');
+    }
+
+    return {
+        ...objectionModel,
+        id: objectionModel.id,
+        updated: toDateOrUndefined(objectionModel.updated),
+        created: toDateOrUndefined(objectionModel.created),
+    };
+};
+
+export const toEquipmentLocation = (objectionModel: IEquipmentLocationObjectionModel): EquipmentLocation => {
+    if (!objectionModel.id) {
+        throw new Error('Invalid equipment location');
     }
 
     return {

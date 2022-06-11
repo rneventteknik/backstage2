@@ -11,6 +11,8 @@ export async function seed(knex) {
     await knex('EquipmentList').del();
     await knex('EquipmentPrice').del();
     await knex('Equipment').del();
+    await knex('EquipmentPublicCategory').del();
+    await knex('EquipmentLocation').del();
     await knex('Booking').del();
     await knex('User').del();
 
@@ -97,6 +99,37 @@ export async function seed(knex) {
         video: firstEquipmentPublicCategoryId + 1,
     };
 
+    const firstEquipmentLocationId = await knex('EquipmentLocation')
+        .insert([
+            {
+                name: 'Plan -1',
+                sortIndex: 1,
+                created: '2022-05-29 00:00',
+                updated: '2022-05-29 00:00',
+            },
+            {
+                name: 'Plan 2',
+                sortIndex: 2,
+                created: '2022-05-29 00:00',
+                updated: '2022-05-29 00:00',
+            },
+            {
+                name: 'Plan 3',
+                sortIndex: 3,
+                created: '2022-05-29 00:00',
+                updated: '2022-05-29 00:00',
+            },
+        ])
+        .returning('id')
+        .then((ids) => ids[0].id);
+
+    // This list is just here to make the assignments below easier to follow
+    const equipmentLocationIds = {
+        basement: firstEquipmentLocationId,
+        floor2: firstEquipmentLocationId + 1,
+        floor3: firstEquipmentLocationId + 2,
+    };
+
     const firstEquipmentId = await knex('Equipment')
         .insert([
             {
@@ -109,6 +142,7 @@ export async function seed(knex) {
                 descriptionEN: 'Perfect for large events',
                 note: '',
                 publiclyHidden: true,
+                equipmentLocationId: equipmentLocationIds.basement,
             },
             {
                 name: 'Lilla Ljudbordet',
@@ -120,6 +154,7 @@ export async function seed(knex) {
                 descriptionEN: 'Suitable for smaller lectures',
                 note: '',
                 publiclyHidden: false,
+                equipmentLocationId: equipmentLocationIds.basement,
             },
             {
                 name: 'Ljusbord',
@@ -143,6 +178,7 @@ export async function seed(knex) {
                 note: '',
                 publiclyHidden: false,
                 equipmentPublicCategoryId: equipmentPublicCategoryIds.microphone,
+                equipmentLocationId: equipmentLocationIds.floor3,
             },
             {
                 name: 'Kondensatormikrofon',
@@ -155,6 +191,7 @@ export async function seed(knex) {
                 note: '',
                 publiclyHidden: false,
                 equipmentPublicCategoryId: equipmentPublicCategoryIds.microphone,
+                equipmentLocationId: equipmentLocationIds.floor3,
             },
             {
                 name: 'Trådlös Mikrofon (WL)',
@@ -167,6 +204,7 @@ export async function seed(knex) {
                 note: '',
                 publiclyHidden: true,
                 equipmentPublicCategoryId: equipmentPublicCategoryIds.microphone,
+                equipmentLocationId: equipmentLocationIds.floor3,
             },
             {
                 name: 'Projektor',
@@ -179,6 +217,7 @@ export async function seed(knex) {
                 note: '',
                 publiclyHidden: false,
                 equipmentPublicCategoryId: equipmentPublicCategoryIds.video,
+                equipmentLocationId: equipmentLocationIds.floor2,
             },
         ])
         .returning('id')

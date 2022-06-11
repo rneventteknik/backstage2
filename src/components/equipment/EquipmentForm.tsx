@@ -8,6 +8,7 @@ import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher } from '../../li
 import { PartialDeep } from 'type-fest';
 import PricesEditor from './PricesEditor';
 import { toEquipmentPriceObjectionModel } from '../../lib/mappers/equipment';
+import { toIntOrUndefined } from '../../lib/utils';
 
 type Props = {
     handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel>) => void;
@@ -26,6 +27,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
         '/api/equipmentPublicCategories',
         equipmentPublicCategoriesFetcher,
     );
+
+    const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentPublicCategoriesFetcher);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -61,17 +64,17 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
             return;
         }
 
+        const getValueFromForm = (key: string): string | undefined => form[key]?.value;
+
         const modifiedEquipment: PartialDeep<IEquipmentObjectionModel> = {
             id: equipment?.id,
-            created: equipment?.created?.toString(),
-            updated: equipment?.updated?.toString(),
 
             image: equipment?.image,
 
-            name: form.equipmentName.value,
-            description: form.description.value,
-            nameEN: form.equipmentNameEN.value,
-            descriptionEN: form.descriptionEN.value,
+            name: getValueFromForm('equipmentName'),
+            description: getValueFromForm('description'),
+            nameEN: getValueFromForm('equipmentNameEN'),
+            descriptionEN: getValueFromForm('descriptionEN'),
 
             tags: selectedTags.map((x) => ({
                 ...x,
@@ -79,11 +82,12 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                 updated: x.updated?.toString(),
             })),
             prices: prices.map((x) => toEquipmentPriceObjectionModel(x)),
-            equipmentPublicCategoryId: form.publicCategory?.value ? parseInt(form.publicCategory?.value) : undefined,
+            equipmentPublicCategoryId: toIntOrUndefined(getValueFromForm('publicCategory')) ?? null,
+            equipmentLocationId: toIntOrUndefined(getValueFromForm('equipmentLocation')) ?? null,
 
-            inventoryCount: form.inventoryCount?.value ?? 1,
-            publiclyHidden: form.publiclyHidden?.value === 'true',
-            note: form.note?.value,
+            inventoryCount: toIntOrUndefined(getValueFromForm('inventoryCount')) ?? 1,
+            publiclyHidden: getValueFromForm('publiclyHidden') === 'true',
+            note: getValueFromForm('note'),
         };
 
         handleSubmitEquipment(modifiedEquipment);
@@ -220,6 +224,26 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 </Form.Control>
                                 <Form.Text className="text-muted">
                                     I den publika prislistan grupperas utrustningen baserat på denna kategori.
+                                </Form.Text>
+                            </Form.Group>
+                        </Col>
+                        <Col lg="3">
+                            <Form.Group>
+                                <Form.Label>Plats</Form.Label>
+                                <Form.Control as="select" name="equipmentLocation">
+                                    <option value={undefined}>Okänd plats</option>
+                                    {equipmentLocations?.map((x) => (
+                                        <option
+                                            key={x.id}
+                                            value={x.id}
+                                            selected={x.id === equipment.equipmentLocation?.id}
+                                        >
+                                            {x.name}
+                                        </option>
+                                    ))}
+                                </Form.Control>
+                                <Form.Text className="text-muted">
+                                    I packlistan grupperas utrustningen baserat på denna kategori.
                                 </Form.Text>
                             </Form.Group>
                         </Col>

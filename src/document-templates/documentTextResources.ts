@@ -44,6 +44,10 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'price-estimate.legal-note.content':
             'Ovanstående är en prisuppskattning. Det är den faktiska tidsåtgången och använd utrustning som faktureras. Ni som arrangör ansvarar för att utrustningen inte blir stulen eller förstörd.',
 
+        // Packing list
+        'packing-list.filename': 'Packlista',
+        'packing-list.title': 'Packlista',
+
         // Misc
         'common.pagenumber.label': 'Sida',
         'common.misc.count-unit': 'st',
@@ -91,6 +95,10 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'price-estimate.legal-note.title': 'Please observe',
         'price-estimate.legal-note.content':
             'The above is a price estimate. It is the actual time required and used equipment that is invoiced. You as the organizer are responsible for ensuring that the equipment is not stolen or destroyed',
+
+        // Packing list
+        'packing-list.filename': 'Packing List',
+        'packing-list.title': 'Packing list',
 
         // Misc
         'common.pagenumber.label': 'Page',
