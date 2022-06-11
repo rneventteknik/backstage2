@@ -4,7 +4,7 @@ import useSwr from 'swr';
 import { faExclamationCircle, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Skeleton from 'react-loading-skeleton';
-import { formatDate, getResponseContentOrError } from '../../lib/utils';
+import { formatDatetime, getResponseContentOrError } from '../../lib/utils';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import { CalendarResult } from '../../models/misc/CalendarResult';
 import Link from 'next/link';
@@ -30,12 +30,12 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
                     displayStartDate: calenderResult.start
                         ? calenderResult.start.match(dateWithoutTimeRegEx)
                             ? calenderResult.start
-                            : formatDate(new Date(calenderResult.start))
+                            : formatDatetime(new Date(calenderResult.start))
                         : '-',
                     displayEndDate: calenderResult.end
                         ? calenderResult.end.match(dateWithoutTimeRegEx)
                             ? calenderResult.end
-                            : formatDate(new Date(calenderResult.end))
+                            : formatDatetime(new Date(calenderResult.end))
                         : '-',
                 })),
             ),

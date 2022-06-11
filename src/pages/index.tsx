@@ -4,7 +4,7 @@ import { useUserWithDefaultAccessControl } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import Header from '../components/layout/Header';
 import { Card, Col, ListGroup, Row } from 'react-bootstrap';
-import { formatDate, getResponseContentOrError, getRoleName } from '../lib/utils';
+import { formatDatetime, getResponseContentOrError, getRoleName } from '../lib/utils';
 import { IBookingObjectionModel } from '../models/objection-models';
 import { toBooking } from '../lib/mappers/booking';
 import SmallBookingList from '../components/SmallBookingList';
@@ -40,7 +40,9 @@ const IndexPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Session startad</span>
-                                <span>{currentUser.loginDate ? formatDate(new Date(currentUser.loginDate)) : '-'}</span>
+                                <span>
+                                    {currentUser.loginDate ? formatDatetime(new Date(currentUser.loginDate)) : '-'}
+                                </span>
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>

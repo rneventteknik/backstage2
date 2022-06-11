@@ -14,6 +14,7 @@ import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
+import EquipmentCalendar from '../../../components/equipment/EquipmentCalendar';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -122,6 +123,9 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             ) : null}
                         </ListGroup>
                     </Card>
+                </Col>
+                <Col xl={8}>
+                    <EquipmentCalendar equipment={equipment} />
                 </Col>
             </Row>
         </Layout>

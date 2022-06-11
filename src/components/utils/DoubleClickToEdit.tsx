@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { convertToDateOrUndefined, formatDate } from '../../lib/utils';
+import { convertToDateOrUndefined, formatDatetime } from '../../lib/utils';
 
 const doubleClickToEditHelpText = 'Dubbelklicka för att redigera';
 
@@ -71,14 +71,14 @@ export const DoubleClickToEditDate: React.FC<DoubleClickToEditDateProps> = ({
 }: DoubleClickToEditDateProps) => {
     return (
         <DoubleClickToEdit
-            value={value ? formatDate(value) : ''}
+            value={value ? formatDatetime(value) : ''}
             onUpdate={(newValue) => onUpdate(convertToDateOrUndefined(newValue))}
             size={size}
             readonly={readonly}
         >
             <div className="mb-3">
                 {value ? (
-                    formatDate(value)
+                    formatDatetime(value)
                 ) : (
                     <span className="text-muted" title="Dubbelklicka för att konfigurera">
                         N/A

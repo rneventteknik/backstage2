@@ -6,7 +6,7 @@ import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import BookingTypeTag from '../../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { validDate, formatDate, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../../lib/utils';
+import { validDate, formatDatetime, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Button, Col, Collapse, Form } from 'react-bootstrap';
 import { Status } from '../../models/enums/Status';
@@ -225,7 +225,7 @@ const fetcher = (url: string) =>
     bookingsFetcher(url).then((bookings) =>
         bookings.map((booking) => ({
             ...booking,
-            displayDate: booking.created ? formatDate(new Date(booking.created)) : '-',
+            displayDate: booking.created ? formatDatetime(new Date(booking.created)) : '-',
         })),
     );
 

@@ -122,3 +122,28 @@ export const validateBookingObjectionModel = (booking: BookingObjectionModel): b
 
     return true;
 };
+
+export const fetchBookingsWithEquipmentInInterval = async (
+    equipmentId: number,
+    startDatetime?: Date,
+    endDatetime?: Date,
+    ignoreEquipmentListId?: number,
+): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    let query = BookingObjectionModel.query()
+        .withGraphJoined('equipmentLists.equipmentListEntries')
+        .where('equipmentLists:equipmentListEntries.equipmentId', equipmentId);
+
+    if (endDatetime && startDatetime) {
+        query = query
+            .where('equipmentLists.equipmentOutDatetime', '<=', endDatetime.toISOString())
+            .where('equipmentLists.equipmentInDatetime', '>=', startDatetime.toISOString());
+    }
+
+    if (ignoreEquipmentListId) {
+        query = query.whereNot('equipmentLists.id', ignoreEquipmentListId);
+    }
+
+    return query.select();
+};

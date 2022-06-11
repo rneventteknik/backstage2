@@ -4,7 +4,7 @@ import { commonStyles, formatEquipmentListEntryCountOrHours, formatEquipmentList
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 import { formatNumberAsCurrency, getPrice, getNumberOfDays, getEquipmentListPrice } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
-import { formatDate } from '../../../lib/utils';
+import { formatDatetime } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
 
 const styles = StyleSheet.create({
@@ -25,8 +25,8 @@ export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
         <View style={styles.equipmentListSection}>
             <Text style={styles.heading}>{list.name}</Text>
             <Text style={styles.italic}>
-                {list.usageStartDatetime ? formatDate(list.usageStartDatetime) : '-'} to{' '}
-                {list.usageEndDatetime ? formatDate(list.usageEndDatetime) : '-'} ({getNumberOfDays(list)}{' '}
+                {list.usageStartDatetime ? formatDatetime(list.usageStartDatetime) : '-'} to{' '}
+                {list.usageEndDatetime ? formatDatetime(list.usageEndDatetime) : '-'} ({getNumberOfDays(list)}{' '}
                 {t('common.misc.days-unit')})
             </Text>
 

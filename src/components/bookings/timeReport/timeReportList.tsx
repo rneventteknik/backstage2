@@ -5,7 +5,7 @@ import { bookingFetcher, usersFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
 import {
-    formatDate,
+    formatDatetime,
     getAccountKindName,
     getResponseContentOrError,
     toDateOrUndefined,
@@ -108,8 +108,8 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
             billableWorkingHours: 0,
             actualWorkingHours: 0,
             userId: currentUser.userId,
-            startDatetime: formatDate(new Date()),
-            endDatetime: formatDate(new Date()),
+            startDatetime: formatDatetime(new Date()),
+            endDatetime: formatDatetime(new Date()),
             pricePerHour: pricePerHour ?? 0,
             name: '',
             accountKind: 0,
@@ -313,7 +313,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                 key: 'startDatetime',
                 displayName: 'Start',
                 getValue: (timeReport: TimeReport) =>
-                    timeReport.startDatetime ? formatDate(timeReport.startDatetime) : '-',
+                    timeReport.startDatetime ? formatDatetime(timeReport.startDatetime) : '-',
                 getContentOverride: TimeReportStartDatetimeDisplayFn,
                 columnWidth: 150,
             },
@@ -321,7 +321,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                 key: 'endDatetime',
                 displayName: 'Slut',
                 getValue: (timeReport: TimeReport) =>
-                    timeReport.endDatetime ? formatDate(timeReport.endDatetime) : '-',
+                    timeReport.endDatetime ? formatDatetime(timeReport.endDatetime) : '-',
                 getContentOverride: TimeReportEndDatetimeDisplayFn,
                 columnWidth: 150,
             },
@@ -521,7 +521,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                                         value={
                                             timeReportToEditViewModel.editedStartDatetimeString ??
                                             (timeReportToEditViewModel.startDatetime
-                                                ? formatDate(timeReportToEditViewModel.startDatetime)
+                                                ? formatDatetime(timeReportToEditViewModel.startDatetime)
                                                 : '')
                                         }
                                         onChange={(e) =>
@@ -541,7 +541,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                                         value={
                                             timeReportToEditViewModel.editedEndDatetimeString ??
                                             (timeReportToEditViewModel.endDatetime
-                                                ? formatDate(timeReportToEditViewModel.endDatetime)
+                                                ? formatDatetime(timeReportToEditViewModel.endDatetime)
                                                 : '')
                                         }
                                         onChange={(e) =>

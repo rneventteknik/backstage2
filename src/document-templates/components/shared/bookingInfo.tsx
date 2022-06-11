@@ -2,7 +2,7 @@ import { View, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles } from '../../utils';
 import { Booking } from '../../../models/interfaces';
-import { formatDate } from '../../../lib/utils';
+import { formatDatetime } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
 import { BookingType } from '../../../models/enums/BookingType';
 import { Col, InfoItem } from './utils';
@@ -42,7 +42,7 @@ export const BookingInfo: React.FC<Props> = ({ booking }: Props) => {
             </Col>
             <Col>
                 <InfoItem title={t('common.booking-info.our-reference')} content={booking.ownerUser?.name}></InfoItem>
-                <InfoItem title={t('common.booking-info.print-date')} content={formatDate(new Date())}></InfoItem>
+                <InfoItem title={t('common.booking-info.print-date')} content={formatDatetime(new Date())}></InfoItem>
             </Col>
         </View>
     );

@@ -1,0 +1,20 @@
+.allAvailable {
+    background-color: rgb(27, 116, 47);
+}
+
+.someAvailable {
+    background-color: rgb(255, 193, 7);
+}
+
+.noneAvailable {
+    background-color: rgb(255, 139, 7);
+}
+
+.overbooked {
+    background-color: rgb(172, 0, 0);
+}
+
+.statusContainer {
+    display: flex;
+    flex: 1;
+}

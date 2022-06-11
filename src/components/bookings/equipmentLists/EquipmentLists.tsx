@@ -58,6 +58,7 @@ import {
 } from '../../../lib/sortIndexUtils';
 import { RentalStatus } from '../../../models/enums/RentalStatus';
 import { BookingType } from '../../../models/enums/BookingType';
+import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus';
 
 type Props = {
     bookingId: number;
@@ -486,6 +487,16 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 >
                     {entry.name}
                 </DoubleClickToEdit>
+                {entry.equipment && list.equipmentOutDatetime && list.equipmentInDatetime ? (
+                    <span className="ml-1">
+                        <EquipmentListEntryConflictStatus
+                            equipment={entry.equipment}
+                            equipmentList={list}
+                            startDatetime={list.equipmentOutDatetime}
+                            endDatetime={list.equipmentInDatetime}
+                        />
+                    </span>
+                ) : null}
             </div>
             <div className="mb-0">
                 <DoubleClickToEdit
