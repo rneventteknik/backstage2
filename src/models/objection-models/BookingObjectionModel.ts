@@ -9,7 +9,9 @@ import {
     IUserObjectionModel,
     TimeEstimateObjectionModel,
     ITimeEstimateObjectionModel,
+    ITimeReportObjectionModel,
 } from '.';
+import { TimeReportObjectionModel } from './TimeReportObjectionModel';
 
 export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     id: number;
@@ -18,6 +20,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     updated: string;
     equipmentLists: IEquipmentListObjectionModel[];
     timeEstimates: ITimeEstimateObjectionModel[];
+    timeReports: ITimeReportObjectionModel[];
     ownerUser?: IUserObjectionModel;
     ownerUserId?: number;
     bookingType: number;
@@ -68,6 +71,14 @@ export class BookingObjectionModel extends Model {
                 to: 'TimeEstimate.bookingId',
             },
         },
+        timeReports: {
+            relation: Model.HasManyRelation,
+            modelClass: TimeReportObjectionModel,
+            join: {
+                from: 'Booking.id',
+                to: 'TimeReport.bookingId',
+            },
+        },
     });
 
     id!: number;
@@ -77,6 +88,7 @@ export class BookingObjectionModel extends Model {
     sortIndex!: number;
     equipmentLists!: EquipmentListObjectionModel[];
     timeEstimates!: TimeEstimateObjectionModel[];
+    timeReports!: TimeReportObjectionModel[];
     ownerUser!: UserObjectionModel;
     bookingType!: number;
     status!: number;

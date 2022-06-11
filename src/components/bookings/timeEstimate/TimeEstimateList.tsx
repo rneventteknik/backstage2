@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
-import { Card, Button, DropdownButton, Dropdown, Alert } from 'react-bootstrap';
-import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import ActivityIndicator from '../../components/utils/ActivityIndicator';
-import { bookingFetcher, timeEstimatesFetcher } from '../../lib/fetchers';
+import { Card, Button, DropdownButton, Dropdown } from 'react-bootstrap';
+import { TableDisplay, TableConfiguration } from '../../TableDisplay';
+import { bookingFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
-import { ITimeEstimateObjectionModel } from '../../models/objection-models';
-import { getResponseContentOrError } from '../../lib/utils';
-import { toTimeEstimate } from '../../lib/mappers/timeEstimate';
-import { TimeEstimate } from '../../models/interfaces/TimeEstimate';
-import { useNotifications } from '../../lib/useNotifications';
-import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
-import { PricePlan } from '../../models/enums/PricePlan';
+import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
+import { getResponseContentOrError } from '../../../lib/utils';
+import { toTimeEstimate } from '../../../lib/mappers/timeEstimate';
+import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
+import { useNotifications } from '../../../lib/useNotifications';
+import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
+import { PricePlan } from '../../../models/enums/PricePlan';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../lib/pricingUtils';
+import { faAngleDown, faAngleUp, faExclamationCircle, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
+import Skeleton from 'react-loading-skeleton';
 
 type Props = {
     bookingId: number;
@@ -22,23 +22,51 @@ type Props = {
 };
 
 const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: Props) => {
+    const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
+
     const [showListContent, setShowListContent] = useState(false);
 
     const { showCreateFailedNotification, showSaveFailedNotification, showDeleteFailedNotification } =
         useNotifications();
 
-    const {
-        data: timeEstimates,
-        error,
-        isValidating,
-        mutate,
-    } = useSwr('/api/bookings/' + bookingId + '/timeEstimate', timeEstimatesFetcher);
+    // Extract the lists
+    //
+    const timeEstimates = booking?.timeEstimates;
 
-    const {
-        data: bookingData,
-        error: bookingError,
-        isValidating: bookingIsValidating,
-    } = useSwr('/api/bookings/' + bookingId, bookingFetcher);
+    const mutateTimeEstimates = (updatedTimeEstimates: TimeEstimate[]) => {
+        if (!booking) {
+            throw new Error('Invalid booking');
+        }
+        mutate({ ...booking, timeEstimates: updatedTimeEstimates }, false);
+    };
+
+    // Error handling
+    //
+    if (error || (booking && !timeEstimates)) {
+        return (
+            <Card className="mb-3">
+                <Card.Header>
+                    <div className="d-flex">
+                        <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
+                            Utrustning
+                        </div>
+                    </div>
+                </Card.Header>
+                <Card.Body>
+                    <p className="text-danger">
+                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsrapporterna.
+                    </p>
+                    <p className="text-monospace text-muted mb-0">{error?.message}</p>
+                </Card.Body>
+            </Card>
+        );
+    }
+
+    // Loading skeleton
+    //
+    if (!booking || !timeEstimates) {
+        return <Skeleton height={200} className="mb-3" />;
+    }
 
     const addEmptyTimeEstimate = async () => {
         if (!process.env.NEXT_PUBLIC_SALARY_NORMAL)
@@ -70,7 +98,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
             .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
             .then(toTimeEstimate)
             .then((data) => {
-                mutate([...(timeEstimates ?? []), data]);
+                mutateTimeEstimates([...(timeEstimates ?? []), data]);
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -81,7 +109,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
     const updateTimeEstimate = (timeEstimate: TimeEstimate) => {
         const filteredtimeEstimates = timeEstimates?.map((x) => (x.id !== timeEstimate.id ? x : timeEstimate));
 
-        mutate(filteredtimeEstimates, false);
+        mutateTimeEstimates(filteredtimeEstimates);
 
         const body = { timeEstimate: timeEstimate };
         const request = {
@@ -100,7 +128,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
 
     const deleteTimeEstimate = (timeEstimate: TimeEstimate) => {
         const filteredtimeEstimates = timeEstimates?.filter((x) => x.id !== timeEstimate.id);
-        mutate(filteredtimeEstimates, false);
+        mutateTimeEstimates(filteredtimeEstimates);
 
         const request = {
             method: 'DELETE',
@@ -233,25 +261,6 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
             },
         ],
     };
-
-    if ((isValidating || bookingIsValidating) && (!bookingData || !timeEstimates)) {
-        return (
-            <Card className="mb-3">
-                <Card.Header>Tidsuppskattning</Card.Header>
-                <ActivityIndicator />
-            </Card>
-        );
-    }
-    if (error || !timeEstimates || bookingError || !bookingData) {
-        return (
-            <Card className="mb-3">
-                <Card.Header>Tidsuppskattning</Card.Header>
-                <Alert variant="danger">
-                    <strong> Fel </strong> Tidsuppskattningar kunde inte hämtas
-                </Alert>
-            </Card>
-        );
-    }
 
     return (
         <Card className="mb-3">

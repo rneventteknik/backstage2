@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
-import { Card, Button, DropdownButton, Dropdown, Modal, Row, Col, Form, InputGroup, Alert } from 'react-bootstrap';
-import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import ActivityIndicator from '../../components/utils/ActivityIndicator';
-// import TimeReportForm from './TimeReportForm';
-import { bookingFetcher, timeReportsFetcher, usersFetcher } from '../../lib/fetchers';
+import { Card, Button, DropdownButton, Dropdown, Modal, Row, Col, Form, InputGroup } from 'react-bootstrap';
+import { TableDisplay, TableConfiguration } from '../../TableDisplay';
+import { bookingFetcher, usersFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
-import { ITimeReportObjectionModel } from '../../models/objection-models';
+import { ITimeReportObjectionModel } from '../../../models/objection-models';
 import {
     formatDate,
     getAccountKindName,
@@ -14,17 +12,25 @@ import {
     toIntOrUndefined,
     getPricePerHour,
     validDate,
-} from '../../lib/utils';
-import { toTimeReport } from '../../lib/mappers/timeReport';
-import { TimeReport } from '../../models/interfaces/TimeReport';
-import { useNotifications } from '../../lib/useNotifications';
-import { DoubleClickToEdit, DoubleClickToEditDate, DoubleClickToEditDropdown } from '../utils/DoubleClickToEdit';
+} from '../../../lib/utils';
+import { toTimeReport } from '../../../lib/mappers/timeReport';
+import { TimeReport } from '../../../models/interfaces/TimeReport';
+import { useNotifications } from '../../../lib/useNotifications';
+import { DoubleClickToEdit, DoubleClickToEditDate, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { formatNumberAsCurrency, getTimeReportPrice, getTotalTimeReportsPrice } from '../../lib/pricingUtils';
-import { faAngleDown, faAngleUp, faGears, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
-import { User } from '../../models/interfaces';
-import { AccountKind } from '../../models/enums/AccountKind';
-import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
+import { formatNumberAsCurrency, getTimeReportPrice, getTotalTimeReportsPrice } from '../../../lib/pricingUtils';
+import {
+    faAngleDown,
+    faAngleUp,
+    faExclamationCircle,
+    faGears,
+    faPlus,
+    faTrashCan,
+} from '@fortawesome/free-solid-svg-icons';
+import { User } from '../../../models/interfaces';
+import { AccountKind } from '../../../models/enums/AccountKind';
+import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
+import Skeleton from 'react-loading-skeleton';
 
 type Props = {
     bookingId: number;
@@ -34,6 +40,9 @@ type Props = {
 };
 
 const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, readonly }: Props) => {
+    const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
+    const { data: users } = useSwr('/api/users', usersFetcher);
+
     const [showListContent, setShowListContent] = useState(false);
     const [timeReportToEditViewModel, setTimeReportToEditViewModel] = useState<
         | (Partial<TimeReport> &
@@ -47,20 +56,44 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
     const { showCreateFailedNotification, showSaveFailedNotification, showDeleteFailedNotification } =
         useNotifications();
 
-    const {
-        data: timeReports,
-        error,
-        isValidating,
-        mutate,
-    } = useSwr('/api/bookings/' + bookingId + '/timeReport', timeReportsFetcher);
+    // Extract the lists
+    //
+    const timeReports = booking?.timeReports;
 
-    const {
-        data: bookingData,
-        error: bookingError,
-        isValidating: bookingIsValidating,
-    } = useSwr('/api/bookings/' + bookingId, bookingFetcher);
+    const mutateTimeReports = (updatedTimeReports: TimeReport[]) => {
+        if (!booking) {
+            throw new Error('Invalid booking');
+        }
+        mutate({ ...booking, timeReports: updatedTimeReports }, false);
+    };
 
-    const { data: users, isValidating: usersIsValidating } = useSwr('/api/users', usersFetcher);
+    // Error handling
+    //
+    if (error || (booking && !timeReports)) {
+        return (
+            <Card className="mb-3">
+                <Card.Header>
+                    <div className="d-flex">
+                        <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
+                            Utrustning
+                        </div>
+                    </div>
+                </Card.Header>
+                <Card.Body>
+                    <p className="text-danger">
+                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsrapporterna.
+                    </p>
+                    <p className="text-monospace text-muted mb-0">{error?.message}</p>
+                </Card.Body>
+            </Card>
+        );
+    }
+
+    // Loading skeleton
+    //
+    if (!booking || !timeReports) {
+        return <Skeleton height={200} className="mb-3" />;
+    }
 
     const addEmptyTimeReport = async () => {
         if (!currentUser.userId) {
@@ -94,7 +127,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
             .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
             .then(toTimeReport)
             .then((data) => {
-                mutate([...(timeReports ?? []), data]);
+                mutateTimeReports([...(timeReports ?? []), data]);
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -105,7 +138,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
     const updateTimeReport = (timeReport: TimeReport) => {
         const filteredtimeReports = timeReports?.map((x) => (x.id !== timeReport.id ? x : timeReport));
 
-        mutate(filteredtimeReports, false);
+        mutateTimeReports(filteredtimeReports);
 
         const body = { timeReport: timeReport };
         const request = {
@@ -124,7 +157,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
 
     const deleteTimeReport = (timeReport: TimeReport) => {
         const filteredtimeReports = timeReports?.filter((x) => x.id !== timeReport.id);
-        mutate(filteredtimeReports, false);
+        mutateTimeReports(filteredtimeReports);
 
         const request = {
             method: 'DELETE',
@@ -319,25 +352,6 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
             },
         ],
     };
-
-    if ((isValidating || bookingIsValidating || usersIsValidating) && (!bookingData || !timeReports || !users)) {
-        return (
-            <Card className="mb-3">
-                <Card.Header>Tidrapport</Card.Header>
-                <ActivityIndicator />
-            </Card>
-        );
-    }
-    if (error || !timeReports || bookingError || !bookingData) {
-        return (
-            <Card className="mb-3">
-                <Card.Header>Tidrapportering</Card.Header>
-                <Alert variant="danger">
-                    <strong> Fel </strong> Tidrapporter kunde inte hämtas
-                </Alert>
-            </Card>
-        );
-    }
 
     return (
         <Card className="mb-3">

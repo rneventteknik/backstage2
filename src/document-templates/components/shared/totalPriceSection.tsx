@@ -55,7 +55,7 @@ export const TotalPriceSection: React.FC<Props> = ({ booking }: Props) => {
                     <Text style={styles.bold}>{t('common.total-price-section.total-sum')}</Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={40} textAlign="right">
-                    <Text style={styles.bold}>{formatNumberAsCurrency(getBookingPrice(booking))}</Text>
+                    <Text style={styles.bold}>{formatNumberAsCurrency(getBookingPrice(booking, true))}</Text>
                 </TableCellFixedWidth>
             </TableRow>
         </View>

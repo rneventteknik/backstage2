@@ -43,6 +43,9 @@ const dateFormatOptions: Intl.DateTimeFormatOptions = {
 
 export const formatDate = (date: Date): string => date.toLocaleString('sv-SE', dateFormatOptions);
 
+export const formatNullableDate = (date: Date | null, defaultValue = '-'): string =>
+    date ? date.toLocaleString('sv-SE', dateFormatOptions) : defaultValue;
+
 // Check if value is a valid date
 //
 export const validDate = (date: Date | undefined): boolean => !!date && date instanceof Date && !isNaN(date.getTime());

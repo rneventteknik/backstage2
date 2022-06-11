@@ -38,9 +38,14 @@ export const getTotalTimeReportsPrice = (timeReports: TimeReport[] | undefined):
     return timeReports?.reduce((sum, l) => sum + getTimeReportPrice(l), 0) ?? 0;
 };
 
-export const getBookingPrice = (booking: Booking): number => {
+export const getBookingPrice = (booking: Booking, forceEstimatedTime = false): number => {
     const equipmentPrice = booking.equipmentLists?.reduce((sum, l) => sum + getEquipmentListPrice(l), 0) ?? 0;
     const timeEstimatePrice = getTotalTimeEstimatesPrice(booking.timeEstimates);
+    const timeReportsPrice = getTotalTimeReportsPrice(booking.timeReports);
+
+    if (!forceEstimatedTime && booking.timeReports && booking.timeReports.length > 0) {
+        return equipmentPrice + timeReportsPrice;
+    }
 
     return equipmentPrice + timeEstimatePrice;
 };
@@ -65,6 +70,7 @@ export const formatNumberAsCurrency = (number: number): string =>
     Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 0 }).format(number);
 
 // Number of days
+//
 export const getNumberOfDays = (equipmentList: EquipmentList): number => {
     if (!equipmentList.usageStartDatetime || !equipmentList.usageEndDatetime) {
         return 1;
@@ -84,4 +90,51 @@ export const getNumberOfEquipmentOutDays = (equipmentList: EquipmentList): numbe
         (equipmentList.equipmentInDatetime.getTime() - equipmentList.equipmentOutDatetime.getTime()) /
             (1000 * 3600 * 24),
     );
+};
+
+// Start and end date
+//
+export const getUsageStartDatetime = (booking: Booking): Date | null => {
+    if (!booking.equipmentLists || booking.equipmentLists.filter((x) => x.usageStartDatetime).length === 0) {
+        return null;
+    }
+
+    return new Date(
+        Math.min(
+            ...booking.equipmentLists
+                .filter((x) => x.usageStartDatetime)
+                .map((x) => x.usageStartDatetime?.getTime() ?? 0),
+        ),
+    );
+};
+
+export const getUsageEndDatetime = (booking: Booking): Date | null => {
+    if (!booking.equipmentLists || booking.equipmentLists.filter((x) => x.usageEndDatetime).length === 0) {
+        return null;
+    }
+
+    return new Date(
+        Math.max(
+            ...booking.equipmentLists.filter((x) => x.usageEndDatetime).map((x) => x.usageEndDatetime?.getTime() ?? 0),
+        ),
+    );
+};
+
+export const getNumberOfBookingDays = (booking: Booking): number | null => {
+    const usageStartDatetime = getUsageStartDatetime(booking);
+    const usageEndDatetime = getUsageEndDatetime(booking);
+
+    if (!usageStartDatetime || !usageEndDatetime) {
+        return null;
+    }
+
+    return Math.ceil((usageEndDatetime.getTime() - usageStartDatetime.getTime()) / (1000 * 3600 * 24));
+};
+
+export const getNumberOfEventHours = (booking: Booking): number | null => {
+    if (booking.timeReports && booking.timeReports.length > 0) {
+        return booking.timeReports.map((x) => x.billableWorkingHours).reduce((a, b) => a + b, 0);
+    }
+
+    return booking.timeEstimates?.map((x) => x.numberOfHours).reduce((a, b) => a + b, 0) ?? 0;
 };

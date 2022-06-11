@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Button, Card, Col, Dropdown, DropdownButton, Form, InputGroup, Modal, Row } from 'react-bootstrap';
-import { Equipment, EquipmentPrice, Booking } from '../../../models/interfaces';
+import { Equipment, EquipmentPrice } from '../../../models/interfaces';
 import useSwr from 'swr';
-import { equipmentListFetcher, equipmentListsFetcher } from '../../../lib/fetchers';
+import { bookingFetcher } from '../../../lib/fetchers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faAngleDown,
@@ -47,7 +47,6 @@ import {
 } from '../../../lib/pricingUtils';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 import { PricePlan } from '../../../models/enums/PricePlan';
-import { HasId } from '../../../models/interfaces/BaseEntity';
 import {
     getNextSortIndex,
     getSortedList,
@@ -61,12 +60,12 @@ import { RentalStatus } from '../../../models/enums/RentalStatus';
 import { BookingType } from '../../../models/enums/BookingType';
 
 type Props = {
-    booking: Partial<Booking> & HasId;
+    bookingId: number;
     readonly: boolean;
 };
 
 type EquipmentListDisplayProps = {
-    booking: Partial<Booking> & HasId;
+    bookingId: number;
     list: Partial<EquipmentList>;
     readonly: boolean;
     deleteListFn: (x: EquipmentList) => void;
@@ -78,10 +77,9 @@ type EquipmentListDisplayProps = {
 // This component only contains logic to create and delete lists. Everything else
 // is handled by the EquipmentListDisplay component which manages it's list internally.
 //
-const EquipmentLists: React.FC<Props> = ({ booking, readonly }: Props) => {
-    const { data: equipmentLists, mutate } = useSwr('/api/bookings/' + booking.id + '/equipmentLists', (url) =>
-        equipmentListsFetcher(url).then((list) => getSortedList(list)),
-    );
+const EquipmentLists: React.FC<Props> = ({ bookingId, readonly }: Props) => {
+    const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
+
     const {
         showCreateSuccessNotification,
         showCreateFailedNotification,
@@ -90,6 +88,45 @@ const EquipmentLists: React.FC<Props> = ({ booking, readonly }: Props) => {
         showDeleteSuccessNotification,
         showDeleteFailedNotification,
     } = useNotifications();
+
+    // Extract the lists
+    //
+    const equipmentLists = booking?.equipmentLists;
+
+    const mutateLists = (updatedLists: EquipmentList[]) => {
+        if (!booking) {
+            throw new Error('Invalid booking');
+        }
+        mutate({ ...booking, equipmentLists: updatedLists }, false);
+    };
+
+    // Error handling
+    //
+    if (error || (booking && !equipmentLists)) {
+        return (
+            <Card className="mb-3">
+                <Card.Header>
+                    <div className="d-flex">
+                        <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
+                            Utrustning
+                        </div>
+                    </div>
+                </Card.Header>
+                <Card.Body>
+                    <p className="text-danger">
+                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda utrustningslistorna.
+                    </p>
+                    <p className="text-monospace text-muted mb-0">{error?.message}</p>
+                </Card.Body>
+            </Card>
+        );
+    }
+
+    // Loading skeleton
+    //
+    if (!booking || !equipmentLists) {
+        return <Skeleton height={200} className="mb-3" />;
+    }
 
     const createNewList = async () => {
         const newEquipmentList: Partial<EquipmentListObjectionModel> = {
@@ -108,7 +145,7 @@ const EquipmentLists: React.FC<Props> = ({ booking, readonly }: Props) => {
             .then((apiResponse) => getResponseContentOrError<IEquipmentListObjectionModel>(apiResponse))
             .then(toEquipmentList)
             .then((data) => {
-                mutate([...(equipmentLists ?? []), data]);
+                mutateLists([...(equipmentLists ?? []), data]);
                 showCreateSuccessNotification('Listan');
             })
             .catch((error: Error) => {
@@ -118,10 +155,7 @@ const EquipmentLists: React.FC<Props> = ({ booking, readonly }: Props) => {
     };
 
     const deleteList = (list: EquipmentList) => {
-        mutate(
-            equipmentLists?.filter((x) => x.id != list.id),
-            false,
-        );
+        mutateLists(equipmentLists?.filter((x) => x.id != list.id));
 
         const request = {
             method: 'DELETE',
@@ -147,7 +181,7 @@ const EquipmentLists: React.FC<Props> = ({ booking, readonly }: Props) => {
         const modifiedLists =
             direction === 'UP' ? moveItemUp(equipmentLists, list) : moveItemDown(equipmentLists, list);
 
-        mutate(getSortedList(updateItemsInArrayById(equipmentLists, ...modifiedLists)), false);
+        mutateLists(getSortedList(updateItemsInArrayById(equipmentLists, ...modifiedLists)));
 
         const requestsPromise = Promise.all(
             modifiedLists.map((updatedList) => {
@@ -182,7 +216,7 @@ const EquipmentLists: React.FC<Props> = ({ booking, readonly }: Props) => {
                 <EquipmentListDisplay
                     list={x}
                     key={x.id}
-                    booking={booking}
+                    bookingId={bookingId}
                     readonly={readonly}
                     deleteListFn={deleteList}
                     moveListFn={moveList}
@@ -203,27 +237,35 @@ const EquipmentLists: React.FC<Props> = ({ booking, readonly }: Props) => {
 
 const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     list: partialList,
-    booking: booking,
+    bookingId,
     deleteListFn: parentDeleteListFn,
     moveListFn: parentMoveListFn,
     isFirstFn: parentIsFirstFn,
     isLastFn: parentIsLastFn,
     readonly,
 }: EquipmentListDisplayProps) => {
-    const {
-        data: list,
-        mutate,
-        error,
-    } = useSwr('/api/bookings/' + booking.id + '/equipmentLists/' + partialList.id, equipmentListFetcher);
+    const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
+
     const { showSaveSuccessNotification, showSaveFailedNotification, showErrorMessage } = useNotifications();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showListContent, setShowListContent] = useState(true);
     const [equipmentListEntryToEditViewModel, setEquipmentListEntryToEditViewModel] =
         useState<Partial<EquipmentListEntry> | null>(null);
 
+    // Extract this list
+    //
+    const list = booking?.equipmentLists?.find((list) => list.id === partialList.id);
+
+    const mutateList = (updatedList: EquipmentList) => {
+        if (!booking || !booking.equipmentLists) {
+            throw new Error('Invalid booking');
+        }
+        mutate({ ...booking, equipmentLists: updateItemsInArrayById(booking.equipmentLists, updatedList) }, false);
+    };
+
     // Error handling
     //
-    if (error) {
+    if (error || (booking && !list)) {
         return (
             <Card className="mb-3">
                 <Card.Header>
@@ -237,7 +279,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     <p className="text-danger">
                         <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda utrustningslistan.
                     </p>
-                    <p className="text-monospace text-muted mb-0">{error.message}</p>
+                    <p className="text-monospace text-muted mb-0">{error?.message}</p>
                 </Card.Body>
             </Card>
         );
@@ -245,7 +287,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
     // Loading skeleton
     //
-    if (!list) {
+    if (!booking || !list) {
         return <Skeleton height={200} className="mb-3" />;
     }
 
@@ -369,7 +411,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     // We may want to add some deboucing or a delay to reduce the numbe rof requests to the server.
     //
     const saveList = (updatedList: EquipmentList) => {
-        mutate(updatedList, false);
+        mutateList(updatedList);
 
         const body = { equipmentList: toEquipmentListObjectionModel(updatedList, booking.id) };
 

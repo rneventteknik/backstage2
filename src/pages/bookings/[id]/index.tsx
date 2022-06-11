@@ -4,6 +4,7 @@ import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Badge, Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, ListGroup, Row } from 'react-bootstrap';
 import {
+    formatNullableDate,
     getAccountKindName,
     getPaymentStatusName,
     getPricePlanName,
@@ -16,8 +17,8 @@ import Link from 'next/link';
 import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
 import BookingTypeTag from '../../../components/utils/BookingTypeTag';
 import { bookingFetcher } from '../../../lib/fetchers';
-import TimeEstimateList from '../../../components/timeEstimate/TimeEstimateList';
-import TimeReportList from '../../../components/timeReport/timeReportList';
+import TimeEstimateList from '../../../components/bookings/timeEstimate/TimeEstimateList';
+import TimeReportList from '../../../components/bookings/timeReport/timeReportList';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
@@ -31,6 +32,14 @@ import { toBooking } from '../../../lib/mappers/booking';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Status } from '../../../models/enums/Status';
 import { PaymentStatus } from '../../../models/enums/PaymentStatus';
+import {
+    formatNumberAsCurrency,
+    getBookingPrice,
+    getNumberOfBookingDays,
+    getNumberOfEventHours,
+    getUsageEndDatetime,
+    getUsageStartDatetime,
+} from '../../../lib/pricingUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -136,25 +145,27 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <Badge variant="dark" className="ml-1">
                                 {getPaymentStatusName(booking.paymentStatus)}
                             </Badge>
-                            <div className="text-muted mt-2">{booking.customerName}</div>
+                            <div className="text-muted mt-2"> {booking.customerName}</div>
+                            <div className="text-muted">
+                                {getNumberOfBookingDays(booking) ?? 0} dagar / {getNumberOfEventHours(booking)} h /{' '}
+                                {formatNumberAsCurrency(getBookingPrice(booking))}
+                            </div>
+                            {getUsageStartDatetime(booking) || getUsageEndDatetime(booking) ? (
+                                <div className="text-muted">
+                                    {formatNullableDate(getUsageStartDatetime(booking), 'N/A')} -{' '}
+                                    {formatNullableDate(getUsageEndDatetime(booking), 'N/A')}
+                                </div>
+                            ) : null}
                         </Card.Header>
 
                         <ListGroup variant="flush">
                             <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Namn</span>
-                                <span>{booking.name}</span>
-                            </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Beställare</span>
-                                <span>{booking.customerName}</span>
+                                <span className="flex-grow-1">Ansvarig</span>
+                                <span>{booking.ownerUser?.name ?? '-'}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Plats</span>
                                 <span>{booking.location}</span>
-                            </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Ansvarig</span>
-                                <span>{booking.ownerUser?.name ?? '-'}</span>
                             </ListGroup.Item>
                             {/* <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">coOwnerUsers</span>
@@ -228,7 +239,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
                     />
                     <EquipmentLists
-                        booking={booking}
+                        bookingId={booking.id}
                         readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
                     />
                 </Col>
