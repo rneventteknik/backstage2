@@ -4,10 +4,10 @@ import { Equipment, EquipmentTag } from '../../models/interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import Link from 'next/link';
-import { Badge, Button, Col, Collapse, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Badge, Button, Col, Collapse, Dropdown, DropdownButton, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { faAdd, faCubes, faEyeSlash, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faCubes, faEyeSlash, faFileImport, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import Header from '../../components/layout/Header';
@@ -16,7 +16,7 @@ import { equipmentTagsFetcher, equipmentsFetcher } from '../../lib/fetchers';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
 import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
-import { IfNotReadonly } from '../../components/utils/IfAdmin';
+import { IfAdmin, IfNotReadonly } from '../../components/utils/IfAdmin';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -166,6 +166,16 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         <FontAwesomeIcon icon={faCubes} className="mr-1" /> Visa utrustningpaket
                     </Button>
                 </Link>
+                <IfAdmin currentUser={currentUser}>
+                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block ml-2">
+                        <Link href="/equipment/json-import" passHref>
+                            <Dropdown.Item href={'/equipment/json-import'}>
+                                <FontAwesomeIcon icon={faFileImport} className="mr-1 fa-fw" /> Importera utrustning från
+                                JSON
+                            </Dropdown.Item>
+                        </Link>
+                    </DropdownButton>
+                </IfAdmin>
             </Header>
 
             <Form.Row>
