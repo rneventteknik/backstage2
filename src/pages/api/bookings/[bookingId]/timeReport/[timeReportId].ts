@@ -15,6 +15,7 @@ import {
 } from '../../../../../lib/apiResponses';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
+import { logChangeToBooking, BookingChangelogEntryType } from '../../../../../lib/changelogUtils';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -61,10 +62,12 @@ const handler = withSessionContext(
                     return;
                 }
 
-                // TODO Write to changelog here when it is implemented??
-
                 await updateTimeReport(timeReportId, req.body.timeReport)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.TIMEREPORT).then(
+                            () => res.status(200).json(result),
+                        );
+                    })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;
 

@@ -21,6 +21,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     equipmentLists: IEquipmentListObjectionModel[];
     timeEstimates: ITimeEstimateObjectionModel[];
     timeReports: ITimeReportObjectionModel[];
+    changelog: IBookingChangelogEntryObjectionModel[];
     ownerUser?: IUserObjectionModel;
     ownerUserId?: number;
     bookingType: number;
@@ -79,6 +80,14 @@ export class BookingObjectionModel extends Model {
                 to: 'TimeReport.bookingId',
             },
         },
+        changelog: {
+            relation: Model.HasManyRelation,
+            modelClass: BookingChangelogEntryObjectionModel,
+            join: {
+                from: 'Booking.id',
+                to: 'BookingChangelogEntry.bookingId',
+            },
+        },
     });
 
     id!: number;
@@ -90,6 +99,7 @@ export class BookingObjectionModel extends Model {
     timeEstimates!: TimeEstimateObjectionModel[];
     timeReports!: TimeReportObjectionModel[];
     ownerUser!: UserObjectionModel;
+    changelog!: BookingChangelogEntryObjectionModel[];
     bookingType!: number;
     status!: number;
     salaryStatus!: number;
@@ -218,4 +228,22 @@ export class EquipmentListEntryObjectionModel extends Model {
     equipmentPrice!: EquipmentPriceObjectionModel;
     equipmentPriceId!: number;
     discount!: number;
+}
+
+export interface IBookingChangelogEntryObjectionModel extends BaseObjectionModelWithName {
+    id: number;
+    name: string;
+    created: string;
+    updated: string;
+    bookingId: number;
+}
+
+export class BookingChangelogEntryObjectionModel extends Model {
+    static tableName = 'BookingChangelogEntry';
+
+    id!: number;
+    name!: string;
+    created!: string;
+    updated!: string;
+    bookingId!: number;
 }

@@ -9,7 +9,6 @@ import {
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { EquipmentChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 import { toDateOrUndefined } from '../utils';
-import { toUser } from './user';
 import { EquipmentPublicCategory } from '../../models/interfaces/EquipmentPublicCategory';
 import { EquipmentLocation } from '../../models/interfaces/EquipmentLocation';
 
@@ -72,8 +71,6 @@ export const toEquipmentChangelogEntry = (
     return {
         ...objectionModel,
         id: objectionModel.id,
-        timestamp: new Date(objectionModel.timestamp),
-        user: objectionModel.user ? toUser(objectionModel.user) : undefined,
         updated: toDateOrUndefined(objectionModel.updated),
         created: toDateOrUndefined(objectionModel.created),
     };

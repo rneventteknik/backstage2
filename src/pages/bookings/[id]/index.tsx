@@ -32,6 +32,7 @@ import { toBooking } from '../../../lib/mappers/booking';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Status } from '../../../models/enums/Status';
 import { PaymentStatus } from '../../../models/enums/PaymentStatus';
+import BookingChangelogCard from '../../../components/bookings/BookingChangelogCard';
 import {
     formatNumberAsCurrency,
     getBookingPrice,
@@ -228,6 +229,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
+
+                    <BookingChangelogCard changelog={booking.changelog ?? []} />
                 </Col>
                 <Col xl={8}>
                     <TimeEstimateList

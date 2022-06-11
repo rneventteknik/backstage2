@@ -15,6 +15,7 @@ import { SessionContext, withSessionContext } from '../../../../../lib/sessionCo
 import { fetchBooking } from '../../../../../lib/db-access';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
+import { logChangeToBooking, BookingChangelogEntryType } from '../../../../../lib/changelogUtils';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -47,7 +48,13 @@ const handler = withSessionContext(
                 }
 
                 await insertEquipmentList(req.body.equipmentList, bookingId)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        logChangeToBooking(
+                            context.currentUser,
+                            bookingId,
+                            BookingChangelogEntryType.EQUIPMENTLIST,
+                        ).then(() => res.status(200).json(result));
+                    })
                     .catch((err) => res.status(500).json({ statusCode: 500, message: err.message }));
 
                 break;

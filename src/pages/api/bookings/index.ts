@@ -5,6 +5,7 @@ import {
     respondWithInvalidDataResponse,
     respondWithInvalidMethodResponse,
 } from '../../../lib/apiResponses';
+import { BookingChangelogEntryType, logChangeToBooking } from '../../../lib/changelogUtils';
 import { fetchBookings } from '../../../lib/db-access';
 import { insertBooking, validateBookingObjectionModel } from '../../../lib/db-access/booking';
 import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
@@ -29,7 +30,11 @@ const handler = withSessionContext(
                 }
 
                 await insertBooking(req.body.booking)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        logChangeToBooking(context.currentUser, result.id, BookingChangelogEntryType.CREATE).then(() =>
+                            res.status(200).json(result),
+                        );
+                    })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;
 

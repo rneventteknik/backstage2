@@ -4,12 +4,14 @@ import { IBookingObjectionModel } from '../../models/objection-models';
 import {
     IEquipmentListObjectionModel,
     IEquipmentListEntryObjectionModel,
+    IBookingChangelogEntryObjectionModel,
 } from '../../models/objection-models/BookingObjectionModel';
 import { toDateOrUndefined } from '../utils';
 import { toEquipment, toEquipmentPrice } from './equipment';
 import { toUser } from './user';
 import { PartialDeep } from 'type-fest';
 import { toTimeEstimate } from './timeEstimate';
+import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 import { toTimeReport } from './timeReport';
 
 export const toBooking = (objectionModel: IBookingObjectionModel): Booking => {
@@ -25,6 +27,7 @@ export const toBooking = (objectionModel: IBookingObjectionModel): Booking => {
         created: toDateOrUndefined(objectionModel.created),
         equipmentLists: objectionModel.equipmentLists ? objectionModel.equipmentLists.map(toEquipmentList) : undefined,
         timeEstimates: objectionModel.timeEstimates ? objectionModel.timeEstimates.map(toTimeEstimate) : undefined,
+        changelog: objectionModel.changelog ? objectionModel.changelog.map(toBookingChangelogEntry) : undefined,
         timeReports: objectionModel.timeReports ? objectionModel.timeReports.map(toTimeReport) : undefined,
     };
 };
@@ -60,6 +63,21 @@ export const toEquipmentListEntry = (objectionModel: IEquipmentListEntryObjectio
         equipment: objectionModel.equipment ? toEquipment(objectionModel.equipment) : undefined,
         equipmentId: objectionModel.equipmentId,
         equipmentPrice: objectionModel.equipmentPrice ? toEquipmentPrice(objectionModel.equipmentPrice) : undefined,
+        updated: toDateOrUndefined(objectionModel.updated),
+        created: toDateOrUndefined(objectionModel.created),
+    };
+};
+
+export const toBookingChangelogEntry = (
+    objectionModel: IBookingChangelogEntryObjectionModel,
+): BookingChangelogEntry => {
+    if (!objectionModel.id) {
+        throw new Error('Invalid changelog entry');
+    }
+
+    return {
+        ...objectionModel,
+        id: objectionModel.id,
         updated: toDateOrUndefined(objectionModel.updated),
         created: toDateOrUndefined(objectionModel.created),
     };

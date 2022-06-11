@@ -12,6 +12,7 @@ import { SessionContext, withSessionContext } from '../../../../../lib/sessionCo
 import { Role } from '../../../../../models/enums/Role';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
+import { logChangeToBooking, BookingChangelogEntryType } from '../../../../../lib/changelogUtils';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -41,7 +42,11 @@ const handler = withSessionContext(
                     return;
                 }
                 await insertTimeEstimate(req.body.timeEstimate)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.TIMEESTIMATE).then(
+                            () => res.status(200).json(result),
+                        );
+                    })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;
 

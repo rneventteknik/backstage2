@@ -5,6 +5,7 @@ import {
     respondWithEntityNotFoundResponse,
     respondWithInvalidMethodResponse,
 } from '../../../../lib/apiResponses';
+import { BookingChangelogEntryType, logChangeToBooking } from '../../../../lib/changelogUtils';
 import {
     deleteBooking,
     validateBookingObjectionModel,
@@ -66,7 +67,18 @@ const handler = withSessionContext(
                 }
 
                 await updateBooking(bookingId, req.body.booking)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        const newStatus =
+                            booking.status !== req.body.booking.status ? req.body.booking.status : undefined;
+                        logChangeToBooking(
+                            context.currentUser,
+                            bookingId,
+                            newStatus !== undefined
+                                ? BookingChangelogEntryType.STATUS
+                                : BookingChangelogEntryType.BOOKING,
+                            newStatus,
+                        ).then(() => res.status(200).json(result));
+                    })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
                 break;

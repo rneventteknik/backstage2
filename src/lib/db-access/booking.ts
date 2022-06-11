@@ -50,6 +50,12 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
         .withGraphFetched('equipmentLists.equipmentListEntries.equipmentPrice')
         .withGraphFetched('timeEstimates')
         .withGraphFetched('timeReports')
+        .withGraphFetched('changelog(changelogInfo)')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(50);
+            },
+        })
         .modifyGraph('equipmentLists', (builder) => {
             builder.orderBy('sortIndex');
         })
@@ -67,6 +73,12 @@ export const fetchBookingWithEquipmentLists = async (id: number): Promise<Bookin
         .withGraphFetched('ownerUser')
         .withGraphFetched('equipmentLists.equipmentListEntries.equipment.equipmentLocation')
         .withGraphFetched('timeEstimates')
+        .withGraphFetched('changelog(changelogInfo)')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(50);
+            },
+        })
         .then((bookings) => bookings[0]);
 };
 
