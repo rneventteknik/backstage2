@@ -38,3 +38,9 @@ export interface Booking extends BaseEntityWithName {
     calendarBookingId: string;
     customerName: string;
 }
+
+export interface BookingViewModel extends Booking {
+    displayStartDate: string;
+    startDate?: Date;
+    endDate?: Date;
+}

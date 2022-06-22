@@ -7,7 +7,6 @@ import { getMemberStatusName, getRoleName } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
 import Link from 'next/link';
-import SmallBookingList from '../../../components/SmallBookingList';
 import UserDisplay from '../../../components/utils/UserDisplay';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
 import Header from '../../../components/layout/Header';
@@ -16,6 +15,7 @@ import { bookingsFetcher, userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import SmallBookingTable from '../../../components/SmallBookingTable';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -156,7 +156,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 </Col>
 
                 <Col xl={8}>
-                    <SmallBookingList title="Bokningar" bookings={bookings}></SmallBookingList>
+                    <SmallBookingTable title="Bokningar" bookings={bookings}></SmallBookingTable>
                 </Col>
             </Row>
         </Layout>

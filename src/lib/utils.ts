@@ -8,8 +8,8 @@ import { BookingType } from '../models/enums/BookingType';
 import { SalaryStatus } from '../models/enums/SalaryStatus';
 import { PaymentStatus } from '../models/enums/PaymentStatus';
 import { RentalStatus } from '../models/enums/RentalStatus';
+import { Booking, BookingViewModel, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
-import { Equipment } from '../models/interfaces';
 
 // Helper functions for array operations
 //
@@ -58,7 +58,8 @@ export const formatNullableDate = (date: Date | null, defaultValue = '-'): strin
 
 // Check if value is a valid date
 //
-export const validDate = (date: Date | undefined): boolean => !!date && date instanceof Date && !isNaN(date.getTime());
+export const validDate = (date: Date | undefined): date is Date =>
+    !!date && date instanceof Date && !isNaN(date.getTime());
 
 export const convertToDateOrUndefined = (newDateString: string | undefined): Date | undefined => {
     if (!newDateString) {
@@ -278,6 +279,29 @@ export const getPricePerHour = (pricePlan: PricePlan): number | undefined => {
         pricePlan == PricePlan.EXTERNAL ? process.env.NEXT_PUBLIC_SALARY_NORMAL : process.env.NEXT_PUBLIC_SALARY_THS;
 
     return toIntOrUndefined(pricePerHour);
+};
+
+export const getBookingDates = (booking: Booking) => {
+    const dates = booking.equipmentLists?.flatMap((x) => [x.usageStartDatetime, x.usageEndDatetime]).filter(validDate);
+
+    if (!dates || (dates && dates.length === 0)) {
+        return { start: undefined, end: undefined };
+    }
+
+    const start = dates.reduce((a, b) => (a < b ? a : b));
+    const end = dates.reduce((a, b) => (a > b ? a : b));
+
+    return { start, end };
+};
+
+export const toBookingViewModel = (booking: Booking): BookingViewModel => {
+    const { start, end } = getBookingDates(booking);
+
+    return { ...booking, displayStartDate: start ? formatDate(start) : '-', startDate: start, endDate: end };
+};
+
+export const showActiveBookings = (booking: BookingViewModel) => {
+    return booking.status === Status.BOOKED || (booking.status === Status.DRAFT && booking.startDate);
 };
 
 // Calculate the max number of equipment used at the same time. To do this, we look

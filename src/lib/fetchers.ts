@@ -1,11 +1,10 @@
 import { toEquipment, toEquipmentPublicCategory, toEquipmentTag } from './mappers/equipment';
 import { toEquipmentPackage } from './mappers/equipmentPackage';
-import { toEquipmentList, toBooking } from './mappers/booking';
 import { toUser } from './mappers/user';
 import { toTimeReport } from './mappers/timeReport';
 import { toTimeEstimate } from './mappers/timeEstimate';
-
 import { getResponseContentOrError } from './utils';
+import { toBooking, toEquipmentList } from './mappers/booking';
 
 // Since all fetchers follow the same pattern we have these two helper functions to
 // generate a fetcher for a specified mapper.

@@ -94,9 +94,9 @@ type Props = {
 const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
     <div className={styles.container + ' pt-2'}>
         <SidebarLinkGroup>
-            <SidebarLink displayName="Home" link="/" icon={faHome} exactMatch={true} />
-            <SidebarLink displayName="Bokningar" link="/bookings" icon={faCalendarDay} />
-            <SidebarLink displayName="Bokningsarkiv" link="/archive" icon={faArchive} />
+            <SidebarLink displayName="Hem" link="/" icon={faHome} exactMatch={true} />
+            <SidebarLink displayName="Aktiva bokningar" link="/bookings" icon={faCalendarDay} />
+            <SidebarLink displayName="Alla bokingar" link="/archive" icon={faArchive} />
             <SidebarLink displayName="Utrustning" link="/equipment" icon={faCube} />
             <SidebarLink displayName="Användare" link="/users" icon={faUsers} />
             <SidebarLink displayName="Hjälp" link="/about" icon={faInfoCircle} />
