@@ -562,7 +562,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     };
 
     const EquipmentListEntryPriceDisplayFn = (entry: EquipmentListEntry) => {
-        return entry.equipment ? (
+        return entry.equipment && entry.equipment.prices.length ? (
             <>
                 <DoubleClickToEditDropdown<EquipmentPrice>
                     options={entry.equipment.prices}
