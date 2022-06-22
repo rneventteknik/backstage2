@@ -114,6 +114,6 @@ export const toEquipmentListEntryObjectionModel = (
         equipment: undefined,
         equipmentId: clientModel.equipment?.id,
         equipmentPrice: undefined,
-        equipmentPriceId: clientModel.equipmentPrice?.id,
+        equipmentPriceId: clientModel.equipmentPrice?.id ?? null,
     };
 };

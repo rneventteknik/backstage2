@@ -182,7 +182,7 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
     pricePerUnit: number;
     pricePerHour: number;
     equipmentPrice?: IEquipmentPriceObjectionModel;
-    equipmentPriceId?: number;
+    equipmentPriceId?: number | null;
     discount: number;
 }
 

@@ -15,3 +15,7 @@ export interface EquipmentSearchResult {
     equipment: IEquipmentObjectionModel[];
     equipmentPackages: IEquipmentPackageObjectionModel[];
 }
+
+export interface BookingsSearchResult {
+    bookings: IBookingObjectionModel[];
+}

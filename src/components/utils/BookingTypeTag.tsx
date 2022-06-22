@@ -1,11 +1,9 @@
 import React from 'react';
 import { Badge } from 'react-bootstrap';
-
-import { Booking } from '../../models/interfaces';
 import { BookingType } from '../../models/enums/BookingType';
 
 type Props = {
-    booking: Booking;
+    booking: { bookingType: BookingType };
     className?: string;
 };
 

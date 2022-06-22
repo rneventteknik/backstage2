@@ -16,6 +16,7 @@ import {
     faPlus,
     faTrashCan,
     faBackward,
+    faClone,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
@@ -58,6 +59,7 @@ import {
 } from '../../../lib/sortIndexUtils';
 import { RentalStatus } from '../../../models/enums/RentalStatus';
 import { BookingType } from '../../../models/enums/BookingType';
+import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus';
 
 type Props = {
@@ -248,6 +250,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
     const { showSaveSuccessNotification, showSaveFailedNotification, showErrorMessage } = useNotifications();
+    const [showImportModal, setShowImportModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showListContent, setShowListContent] = useState(true);
     const [equipmentListEntryToEditViewModel, setEquipmentListEntryToEditViewModel] =
@@ -406,6 +409,42 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     });
                 break;
         }
+    };
+
+    const importEquipmentEntries = (
+        equipmentListEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[],
+    ) => {
+        let nextId = getNextEquipmentListEntryId();
+        let nextSortIndex = getNextSortIndex(list.equipmentListEntries);
+
+        const equipmentListEntriesToImport: EquipmentListEntry[] = equipmentListEntries.map((x) => {
+            const entity = {
+                id: nextId,
+                sortIndex: nextSortIndex,
+
+                equipmentId: x.equipmentId,
+                equipment: x.equipment,
+                equipmentPrice: x.equipmentPrice,
+                numberOfUnits: x.numberOfUnits,
+                numberOfHours: x.numberOfHours,
+                discount: x.discount,
+
+                name: x.name,
+                description: x.description,
+                nameEN: x.nameEN,
+                descriptionEN: x.descriptionEN,
+
+                pricePerUnit: x.pricePerUnit,
+                pricePerHour: x.pricePerHour,
+            };
+
+            nextId += 1;
+            nextSortIndex += 10;
+
+            return entity;
+        });
+
+        saveList({ ...list, equipmentListEntries: [...list.equipmentListEntries, ...equipmentListEntriesToImport] });
     };
 
     // Function to save list. Note: this function instantly calls the API to save on the server.
@@ -792,6 +831,10 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                             Återställ utlämningsstatus
                                         </Dropdown.Item>
                                     ) : null}
+                                    <Dropdown.Item onClick={() => setShowImportModal(true)}>
+                                        <FontAwesomeIcon icon={faClone} className="mr-1 fa-fw" /> Hämta utrustning från
+                                        bokning
+                                    </Dropdown.Item>
                                     <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
                                         <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" /> Töm utrustningslistan
                                     </Dropdown.Item>
@@ -983,12 +1026,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                             });
                                         }}
                                     >
+                                        <option value={undefined}>Anpassat pris</option>
                                         {equipmentListEntryToEditViewModel.equipment?.prices?.map((x) => (
                                             <option key={x.id.toString()} value={x.id.toString()}>
                                                 {x.name} {priceDisplayFn(x)}
                                             </option>
                                         ))}
-                                        <option value={undefined}>Eget pris</option>
                                     </Form.Control>
                                 </Form.Group>
                             </Col>
@@ -1150,6 +1193,13 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     </Button>
                 </Modal.Footer>
             </Modal>
+
+            <CopyEquipmentListEntriesModal
+                show={showImportModal}
+                onHide={() => setShowImportModal(false)}
+                onImport={importEquipmentEntries}
+                pricePlan={booking.pricePlan}
+            />
         </Card>
     );
 };
