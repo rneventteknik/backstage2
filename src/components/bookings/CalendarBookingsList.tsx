@@ -21,7 +21,7 @@ interface CalendarResultViewModel extends CalendarResult {
 const dateWithoutTimeRegEx = /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/;
 
 const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) => {
-    const { data: list, error } = useSwr('/api/calendar/', (url) =>
+    const { data: list, error } = useSwr('/api/calendar', (url) =>
         fetch(url)
             .then((response) => getResponseContentOrError<CalendarResult[]>(response))
             .then((calenderResults) =>

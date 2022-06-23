@@ -14,8 +14,8 @@ export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 
 const IndexPage: React.FC<Props> = ({ user: currentUser }: Props) => {
-    const { data: bookings } = useSwr('/api/bookings/', bookingsFetcher);
-    const { data: myBookings } = useSwr('/api/users/' + currentUser.userId + '/bookings/', bookingsFetcher);
+    const { data: bookings } = useSwr('/api/bookings', bookingsFetcher);
+    const { data: myBookings } = useSwr('/api/users/' + currentUser.userId + '/bookings', bookingsFetcher);
 
     const activeBookings = bookings?.map(toBookingViewModel).filter(showActiveBookings);
 
