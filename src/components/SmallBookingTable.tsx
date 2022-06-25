@@ -35,20 +35,21 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             getValue: (booking: BookingViewModel) => booking.name,
             textTruncation: true,
             getContentOverride: BookingNameDisplayFn,
+            columnWidth: 300,
         },
         {
             key: 'customerName',
             displayName: 'Beställare',
             getValue: (booking: BookingViewModel) => booking.customerName ?? '-',
             textTruncation: true,
+            columnWidth: 300,
         },
         {
             key: 'date',
             displayName: 'Datum',
             getValue: (booking: BookingViewModel) => booking.displayStartDate,
-            columnWidth: 180,
-            textAlignment: 'center',
             cellHideSize: 'sm',
+            columnWidth: 100,
         },
     ],
 };
