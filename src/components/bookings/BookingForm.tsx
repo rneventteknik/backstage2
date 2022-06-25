@@ -54,13 +54,14 @@ const BookingForm: React.FC<Props> = ({
 
         if (
             !replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId')) &&
-            !replaceEmptyStringWithNull(getValueFromForm('invoiceAddress'))
+            !replaceEmptyStringWithNull(getValueFromForm('invoiceAddress')) &&
+            isFieldRequired(Status.BOOKED)
         ) {
-            form.invoiceHogiaId.setCustomValidity('Felaktig fakturainformation');
-            form.invoiceAddress.setCustomValidity('Felaktig fakturainformation');
+            form.invoiceHogiaId?.setCustomValidity('Felaktig fakturainformation');
+            form.invoiceAddress?.setCustomValidity('Felaktig fakturainformation');
         } else {
-            form.invoiceHogiaId.setCustomValidity('');
-            form.invoiceAddress.setCustomValidity('');
+            form.invoiceHogiaId?.setCustomValidity('');
+            form.invoiceAddress?.setCustomValidity('');
         }
 
         if (form.checkValidity() === false) {
