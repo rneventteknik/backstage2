@@ -20,6 +20,13 @@ pipelines:
             - step:
                   name: Build
                   image: node:16.13.1
+                  caches:
+                      - node
+                      - nextcache
                   script:
                       - yarn
                       - yarn build
+
+definitions:
+    caches:
+        nextcache: .next/cache
