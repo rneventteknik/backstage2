@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, ListGroup, Modal } from 'react-bootstrap';
-import { formatDate } from '../../lib/utils';
+import { formatDatetime } from '../../lib/utils';
 import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 
 type Props = {
@@ -26,7 +26,7 @@ const BookingChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
                         <ListGroup.Item key={changelogEntry.id}>
                             <div className="mb-1">{changelogEntry.name}</div>
                             <div className="text-muted">
-                                {changelogEntry.updated ? formatDate(changelogEntry.updated) : 'N/A'}
+                                {changelogEntry.updated ? formatDatetime(changelogEntry.updated) : 'N/A'}
                             </div>
                         </ListGroup.Item>
                     ))}
@@ -41,7 +41,7 @@ const BookingChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
                         <ListGroup.Item key={changelogEntry.id}>
                             <div className="mb-1">{changelogEntry.name}</div>
                             <div className="text-muted">
-                                {changelogEntry.updated ? formatDate(changelogEntry.updated) : 'N/A'}
+                                {changelogEntry.updated ? formatDatetime(changelogEntry.updated) : 'N/A'}
                             </div>
                         </ListGroup.Item>
                     ))}
