@@ -36,7 +36,10 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         error,
         isValidating,
         mutate,
-    } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
+    } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher, {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+    });
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;

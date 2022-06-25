@@ -30,7 +30,15 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit booking
     //
     const router = useRouter();
-    const { data: booking, error, isValidating, mutate } = useSwr('/api/bookings/' + router.query.id, bookingFetcher);
+    const {
+        data: booking,
+        error,
+        isValidating,
+        mutate,
+    } = useSwr('/api/bookings/' + router.query.id, bookingFetcher, {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+    });
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;

@@ -40,7 +40,15 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit user
     //
     const router = useRouter();
-    const { data: user, error, isValidating, mutate } = useSwr('/api/users/' + router.query.id, userFetcher);
+    const {
+        data: user,
+        error,
+        isValidating,
+        mutate,
+    } = useSwr('/api/users/' + router.query.id, userFetcher, {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+    });
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
