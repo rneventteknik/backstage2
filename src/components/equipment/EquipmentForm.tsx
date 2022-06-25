@@ -9,6 +9,7 @@ import { PartialDeep } from 'type-fest';
 import PricesEditor from './PricesEditor';
 import { toEquipmentPriceObjectionModel } from '../../lib/mappers/equipment';
 import { toIntOrUndefined } from '../../lib/utils';
+import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
 
 type Props = {
     handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel>) => void;
@@ -167,7 +168,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Col lg="3">
                             <Form.Group controlId="formInventoryCount">
                                 <Form.Label>Antal i inventarie</Form.Label>
-                                <Form.Control
+                                <FormNumberFieldWithoutScroll
                                     required
                                     type="number"
                                     placeholder="15"

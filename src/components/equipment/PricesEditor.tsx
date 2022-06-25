@@ -6,6 +6,7 @@ import { toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
 import { EquipmentPrice } from '../../models/interfaces';
 import { HasId } from '../../models/interfaces/BaseEntity';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
+import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
 
 type Props = {
     prices: EquipmentPrice[];
@@ -60,7 +61,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
     const PriceEntryPriceDisplayFn = (price: EquipmentPrice) => (
         <>
             <InputGroup className="mb-1">
-                <Form.Control
+                <FormNumberFieldWithoutScroll
                     type="number"
                     min="0"
                     defaultValue={price?.pricePerUnit ? price?.pricePerUnit?.toString() : ''}
@@ -71,7 +72,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                 </InputGroup.Append>
             </InputGroup>
             <InputGroup>
-                <Form.Control
+                <FormNumberFieldWithoutScroll
                     type="number"
                     min="0"
                     defaultValue={price?.pricePerHour ? price?.pricePerHour?.toString() : ''}
@@ -87,7 +88,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
     const PriceEntryThsPriceDisplayFn = (price: EquipmentPrice) => (
         <>
             <InputGroup className="mb-1">
-                <Form.Control
+                <FormNumberFieldWithoutScroll
                     type="number"
                     min="0"
                     defaultValue={price?.pricePerUnitTHS ? price?.pricePerUnitTHS?.toString() : ''}
@@ -98,7 +99,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                 </InputGroup.Append>
             </InputGroup>
             <InputGroup>
-                <Form.Control
+                <FormNumberFieldWithoutScroll
                     type="number"
                     min="0"
                     defaultValue={price?.pricePerHourTHS ? price?.pricePerHourTHS?.toString() : ''}

@@ -10,6 +10,7 @@ import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import EquipmentSearch from '../EquipmentSearch';
 import { equipmentTagsFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';
+import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
 
 type Props = {
     handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => void;
@@ -193,7 +194,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                         <Col lg="3">
                             <Form.Group controlId="formInventoryCount">
                                 <Form.Label>Estimerade arbetstimmar</Form.Label>
-                                <Form.Control
+                                <FormNumberFieldWithoutScroll
                                     required
                                     type="number"
                                     placeholder="0"

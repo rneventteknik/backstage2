@@ -22,6 +22,7 @@ import { SalaryStatus } from '../../models/enums/SalaryStatus';
 import { usersFetcher } from '../../lib/fetchers';
 import RequiredIndicator from '../utils/RequiredIndicator';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
+import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
@@ -333,7 +334,7 @@ const BookingForm: React.FC<Props> = ({
                                         required={isFieldRequired(Status.BOOKED) && hoogiaIdIsRequired}
                                     />
                                 </Form.Label>
-                                <Form.Control
+                                <FormNumberFieldWithoutScroll
                                     type="number"
                                     placeholder="1234"
                                     name="invoiceHogiaId"

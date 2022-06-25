@@ -61,6 +61,7 @@ import { RentalStatus } from '../../../models/enums/RentalStatus';
 import { BookingType } from '../../../models/enums/BookingType';
 import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus';
+import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
 
 type Props = {
     bookingId: number;
@@ -965,7 +966,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 <Form.Group>
                                     <Form.Label>Antal</Form.Label>
                                     <InputGroup>
-                                        <Form.Control
+                                        <FormNumberFieldWithoutScroll
                                             type="number"
                                             min="0"
                                             value={equipmentListEntryToEditViewModel?.numberOfUnits ?? ''}
@@ -986,7 +987,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 <Form.Group>
                                     <Form.Label>Timmar</Form.Label>
                                     <InputGroup>
-                                        <Form.Control
+                                        <FormNumberFieldWithoutScroll
                                             type="number"
                                             min="0"
                                             value={equipmentListEntryToEditViewModel.numberOfHours ?? ''}
@@ -1085,7 +1086,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 <Form.Group>
                                     <Form.Label>Rabatt</Form.Label>
                                     <InputGroup>
-                                        <Form.Control
+                                        <FormNumberFieldWithoutScroll
                                             type="number"
                                             min="0"
                                             value={equipmentListEntryToEditViewModel?.discount ?? ''}
