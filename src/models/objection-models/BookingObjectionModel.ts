@@ -51,6 +51,18 @@ export class BookingObjectionModel extends Model {
         ownerUser: {
             relation: Model.BelongsToOneRelation,
             modelClass: UserObjectionModel,
+            filter: (query) =>
+                query.select(
+                    'id',
+                    'name',
+                    'created',
+                    'updated',
+                    'memberStatus',
+                    'nameTag',
+                    'phoneNumber',
+                    'slackId',
+                    'emailAddress',
+                ),
             join: {
                 from: 'Booking.ownerUserId',
                 to: 'User.id',

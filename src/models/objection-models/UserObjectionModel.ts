@@ -84,6 +84,18 @@ export class UserAuthObjectionModel extends Model implements IUserAuthObjectionM
         user: {
             relation: Model.BelongsToOneRelation,
             modelClass: UserObjectionModel,
+            filter: (query) =>
+                query.select(
+                    'id',
+                    'name',
+                    'created',
+                    'updated',
+                    'memberStatus',
+                    'nameTag',
+                    'phoneNumber',
+                    'slackId',
+                    'emailAddress',
+                ),
             join: {
                 from: 'User.id',
                 to: 'UserAuth.userId',

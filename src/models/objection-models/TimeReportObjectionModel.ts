@@ -23,6 +23,18 @@ export class TimeReportObjectionModel extends Model implements ITimeReportObject
         user: {
             relation: Model.HasOneRelation,
             modelClass: UserObjectionModel,
+            filter: (query) =>
+                query.select(
+                    'id',
+                    'name',
+                    'created',
+                    'updated',
+                    'memberStatus',
+                    'nameTag',
+                    'phoneNumber',
+                    'slackId',
+                    'emailAddress',
+                ),
             join: {
                 from: 'User.id',
                 to: 'TimeReport.userId',

@@ -170,6 +170,18 @@ export class EquipmentChangelogEntryObjectionModel extends Model implements IEqu
         user: {
             relation: Model.HasOneRelation,
             modelClass: UserObjectionModel,
+            filter: (query) =>
+                query.select(
+                    'id',
+                    'name',
+                    'created',
+                    'updated',
+                    'memberStatus',
+                    'nameTag',
+                    'phoneNumber',
+                    'slackId',
+                    'emailAddress',
+                ),
             join: {
                 from: 'EquipmentChangelogEntry.userId',
                 to: 'User.id',
