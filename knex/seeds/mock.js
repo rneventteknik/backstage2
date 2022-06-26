@@ -1,3 +1,21 @@
+Date.prototype.addDays = function (days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+};
+
+Date.prototype.addHours = function (hours) {
+    var date = new Date(this.valueOf());
+    date.setHours(date.getHours() + hours);
+    return date;
+};
+
+const getVarianceDateString = function (maxDayVariance) {
+    var date = new Date();
+    date.setMinutes(date.getMinutes() + Math.random() * maxDayVariance * 24 * 60);
+    return date.toISOString();
+};
+
 export async function seed(knex) {
     await knex('UserAuth').del();
     await knex('EquipmentTagEquipmentPackage').del();
@@ -13,6 +31,8 @@ export async function seed(knex) {
     await knex('Equipment').del();
     await knex('EquipmentPublicCategory').del();
     await knex('EquipmentLocation').del();
+    await knex('BookingChangelogEntry').del();
+    await knex('EquipmentChangelogEntry').del();
     await knex('Booking').del();
     await knex('User').del();
 
@@ -22,8 +42,8 @@ export async function seed(knex) {
         .insert([
             {
                 name: 'Albert Medlem',
-                created: '2019-01-01 15:30',
-                updated: '2019-01-01 15:30',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 memberStatus: 0,
                 nameTag: 'AM',
                 phoneNumber: '08 000 123 45',
@@ -31,8 +51,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Markus Medlem',
-                created: '2019-01-01 15:30',
-                updated: '2019-01-01 15:30',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 memberStatus: 3,
                 nameTag: 'MM',
                 phoneNumber: '072 000 00 00',
@@ -40,8 +60,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Gabriel Medlem',
-                created: '2022-04-11 23:20',
-                updated: '2022-04-11 23:20',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 memberStatus: 2,
                 nameTag: 'GM',
                 phoneNumber: '123 456 78',
@@ -80,14 +100,14 @@ export async function seed(knex) {
                 name: 'Mikrofon',
                 description: 'Vi har mikrofoner för alla tillfällen!',
                 sortIndex: 1,
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
             {
                 name: 'Video',
                 sortIndex: 2,
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
         ])
         .returning('id')
@@ -104,20 +124,20 @@ export async function seed(knex) {
             {
                 name: 'Plan -1',
                 sortIndex: 1,
-                created: '2022-05-29 00:00',
-                updated: '2022-05-29 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
             {
                 name: 'Plan 2',
                 sortIndex: 2,
-                created: '2022-05-29 00:00',
-                updated: '2022-05-29 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
             {
                 name: 'Plan 3',
                 sortIndex: 3,
-                created: '2022-05-29 00:00',
-                updated: '2022-05-29 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
         ])
         .returning('id')
@@ -134,8 +154,8 @@ export async function seed(knex) {
         .insert([
             {
                 name: 'Stora Ljudbordet',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 inventoryCount: 1,
                 nameEN: 'Large Sound Mixer',
                 description: 'Perfekt för att ljudsätta det stora eventet',
@@ -146,8 +166,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Lilla Ljudbordet',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 inventoryCount: 1,
                 nameEN: 'Small Sound Mixer',
                 description: 'Passar för mindre föredrag',
@@ -158,8 +178,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Ljusbord',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 inventoryCount: 1,
                 nameEN: '12-ch lighting desk',
                 description: '',
@@ -169,8 +189,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Dynamisk Mikrofon',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 inventoryCount: 20,
                 nameEN: 'Dynamic Microphone',
                 description: 'T.ex.  Beta 58',
@@ -182,8 +202,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Kondensatormikrofon',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 inventoryCount: 10,
                 nameEN: 'Condenser Microphone',
                 description: '',
@@ -195,8 +215,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Trådlös Mikrofon (WL)',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 inventoryCount: 8,
                 nameEN: 'Wireless Microphone',
                 description: 'Antingen handhållen eller mygga',
@@ -208,8 +228,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Projektor',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 inventoryCount: 1,
                 nameEN: 'Projector',
                 description: 'HD-projektor för större event.',
@@ -239,8 +259,8 @@ export async function seed(knex) {
             {
                 equipmentId: equipmentIds.largeMixer,
                 name: 'Standardpris',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 pricePerUnit: 0,
                 pricePerHour: 200,
                 pricePerUnitTHS: 0,
@@ -249,8 +269,8 @@ export async function seed(knex) {
             {
                 equipmentId: equipmentIds.smallMixer,
                 name: 'Standardpris',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 pricePerUnit: 0,
                 pricePerHour: 100,
                 pricePerUnitTHS: 0,
@@ -259,8 +279,8 @@ export async function seed(knex) {
             {
                 equipmentId: equipmentIds.lightingDesk,
                 name: 'Standardpris',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 pricePerUnit: 0,
                 pricePerHour: 100,
                 pricePerUnitTHS: 0,
@@ -269,8 +289,8 @@ export async function seed(knex) {
             {
                 equipmentId: equipmentIds.dynamicMicrophone,
                 name: 'Standardpris',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 pricePerUnit: 100,
                 pricePerHour: 0,
                 pricePerUnitTHS: 50,
@@ -279,8 +299,8 @@ export async function seed(knex) {
             {
                 equipmentId: equipmentIds.condenserMicrophone,
                 name: 'Standardpris',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 pricePerUnit: 100,
                 pricePerHour: 0,
                 pricePerUnitTHS: 50,
@@ -289,8 +309,8 @@ export async function seed(knex) {
             {
                 equipmentId: equipmentIds.wirelessMicrophone,
                 name: 'Innuti Huset',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 pricePerUnit: 500,
                 pricePerHour: 0,
                 pricePerUnitTHS: 250,
@@ -299,8 +319,8 @@ export async function seed(knex) {
             {
                 equipmentId: equipmentIds.wirelessMicrophone,
                 name: 'Utanför Huset',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 pricePerUnit: 1000,
                 pricePerHour: 0,
                 pricePerUnitTHS: 500,
@@ -309,8 +329,8 @@ export async function seed(knex) {
             {
                 equipmentId: equipmentIds.projector,
                 name: 'Innuti Huset',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 pricePerUnit: 500,
                 pricePerHour: 150,
                 pricePerUnitTHS: 300,
@@ -319,8 +339,8 @@ export async function seed(knex) {
             {
                 equipmentId: equipmentIds.projector,
                 name: 'Utanför Huset',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 pricePerUnit: 2000,
                 pricePerHour: 150,
                 pricePerUnitTHS: 1000,
@@ -346,28 +366,28 @@ export async function seed(knex) {
         .insert([
             {
                 name: 'Ljud',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
             {
                 name: 'Ljus',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
             {
                 name: 'Video',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
             {
                 name: 'Fast monterat',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
             {
                 name: 'Mikrofon',
-                created: '2021-07-08 00:00',
-                updated: '2021-07-08 00:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
             },
         ])
         .returning('id')
@@ -443,8 +463,8 @@ export async function seed(knex) {
         .insert([
             {
                 name: 'Tjolahoppspexet',
-                created: '2020-06-15 19:00',
-                updated: '2020-06-15 19:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 ownerUserId: firstUserId,
                 bookingType: 1,
                 status: 0,
@@ -466,8 +486,8 @@ export async function seed(knex) {
             },
             {
                 name: 'DATAspexet',
-                created: '2020-05-22 18:00',
-                updated: '2020-05-22 18:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 ownerUserId: firstUserId + 1,
                 bookingType: 0,
                 status: 1,
@@ -489,8 +509,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Lunchföreläsning SPH',
-                created: '2020-06-22 12:00',
-                updated: '2020-06-22 12:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 ownerUserId: firstUserId + 1,
                 bookingType: 1,
                 status: 2,
@@ -512,8 +532,8 @@ export async function seed(knex) {
             },
             {
                 name: 'Hoppborg i Nya',
-                created: '2022-03-22 12:00',
-                updated: '2022-03-22 12:00',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
                 ownerUserId: firstUserId + 2,
                 bookingType: 1,
                 status: 3,
@@ -533,155 +553,416 @@ export async function seed(knex) {
                 contactPersonEmail: null,
                 customerName: 'Hoppborgsnämnden',
             },
+            {
+                name: 'Ut kastet',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                ownerUserId: firstUserId + 2,
+                bookingType: 1,
+                status: 0,
+                salaryStatus: 0,
+                paymentStatus: 0,
+                invoiceHogiaId: 1,
+                invoiceAddress: null,
+                invoiceTag: null,
+                invoiceNumber: null,
+                note: null,
+                returnalNote: null,
+                pricePlan: 0,
+                accountKind: 1,
+                location: 'Vattenfallkullen',
+                contactPersonName: null,
+                contactPersonPhone: null,
+                contactPersonEmail: null,
+                customerName: 'Sågverket AB',
+            },
+            {
+                name: 'Konferens',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                ownerUserId: firstUserId,
+                bookingType: 1,
+                status: 1,
+                salaryStatus: 0,
+                paymentStatus: 0,
+                invoiceHogiaId: 1,
+                invoiceAddress: null,
+                invoiceTag: null,
+                invoiceNumber: null,
+                note: null,
+                returnalNote: null,
+                pricePlan: 0,
+                accountKind: 0,
+                location: 'Nya Matsalen',
+                contactPersonName: 'Nils Nilsson',
+                contactPersonPhone: null,
+                contactPersonEmail: 'Nils@nils.nils',
+                customerName: 'Trädkramarna AB',
+            },
+            {
+                name: 'Lunchföreläsning i Gamla',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                ownerUserId: firstUserId,
+                bookingType: 0,
+                status: 1,
+                salaryStatus: 0,
+                paymentStatus: 0,
+                invoiceHogiaId: 1,
+                invoiceAddress: null,
+                invoiceTag: null,
+                invoiceNumber: null,
+                note: null,
+                returnalNote: null,
+                pricePlan: 1,
+                accountKind: 0,
+                location: 'Gamla',
+                contactPersonName: null,
+                contactPersonPhone: null,
+                contactPersonEmail: null,
+                customerName: 'Någon text',
+            },
+            {
+                name: 'Det stora skuttet',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                ownerUserId: firstUserId,
+                bookingType: 0,
+                status: 1,
+                salaryStatus: 0,
+                paymentStatus: 0,
+                invoiceHogiaId: 1,
+                invoiceAddress: null,
+                invoiceTag: null,
+                invoiceNumber: null,
+                note: null,
+                returnalNote: null,
+                pricePlan: 1,
+                accountKind: 0,
+                location: 'Hela campus',
+                contactPersonName: 'Fest Festare',
+                contactPersonPhone: null,
+                contactPersonEmail: null,
+                customerName: 'Nullsträng',
+            },
         ])
         .returning('id')
         .then((ids) => ids[0].id);
 
     await knex('TimeEstimate').insert([
+        // Tjolahoppspexet
         {
             name: 'Rigg - 6pers',
-            created: '2020-06-15 19:00',
-            updated: '2020-06-15 19:00',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             numberOfHours: 18,
             pricePerHour: 125,
             bookingId: firstBookingId,
         },
         {
             name: 'Kör - 2pers',
-            created: '2020-06-15 17:00',
-            updated: '2020-06-15 23:00',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             numberOfHours: 16,
             pricePerHour: 500,
             bookingId: firstBookingId,
         },
         {
             name: 'Riv - 2pers',
-            created: '2020-06-15 17:00',
-            updated: '2020-06-15 23:00',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             numberOfHours: 8,
             pricePerHour: 125,
             bookingId: firstBookingId,
         },
+
+        // DATAspexet
         {
             name: 'Kör',
-            created: '2020-06-15 17:00',
-            updated: '2020-06-15 23:00',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             numberOfHours: 2,
             pricePerHour: 125,
             bookingId: firstBookingId + 1,
         },
+
+        // Ut kastet
+        {
+            name: 'Rigga',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            numberOfHours: 20,
+            pricePerHour: 500,
+            bookingId: firstBookingId + 4,
+        },
+        {
+            name: 'Kör',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            numberOfHours: 2,
+            pricePerHour: 125,
+            bookingId: firstBookingId + 4,
+        },
+
+        // Konferens - Trädkramarna AB
+        {
+            name: 'Rigga',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            numberOfHours: 4,
+            pricePerHour: 1000,
+            bookingId: firstBookingId + 5,
+        },
+        {
+            name: 'Köra',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            numberOfHours: 100,
+            pricePerHour: 250,
+            bookingId: firstBookingId + 5,
+        },
+        {
+            name: 'Redigera video',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            numberOfHours: 8,
+            pricePerHour: 125,
+            bookingId: firstBookingId + 5,
+        },
     ]);
 
     await knex('TimeReport').insert([
+        // Tjolahoppspexet
         {
             name: 'Rigg',
-            created: '2020-06-15 17:00',
-            updated: '2020-06-15 23:00',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             bookingId: firstBookingId,
             userId: firstUserId,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
-            endDatetime: '2020-06-15 23:00',
             startDatetime: '2020-06-15 23:00',
+            endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
             accountKind: 1,
         },
         {
             name: 'Rigg',
-            created: '2020-06-15 17:00',
-            updated: '2020-06-15 23:00',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             bookingId: firstBookingId,
             userId: firstUserId + 1,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
-            endDatetime: '2020-06-15 23:00',
             startDatetime: '2020-06-15 23:00',
+            endDatetime: '2020-06-15 23:00',
             pricePerHour: 500,
             accountKind: 1,
         },
         {
             name: 'Kör',
-            created: '2020-06-15 17:00',
-            updated: '2020-06-15 23:00',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             bookingId: firstBookingId,
             userId: firstUserId,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
-            endDatetime: '2020-06-15 23:00',
             startDatetime: '2020-06-15 23:00',
+            endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
             accountKind: 1,
         },
         {
             name: 'Riv',
-            created: '2020-06-15 17:00',
-            updated: '2020-06-15 23:00',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             bookingId: firstBookingId,
             userId: firstUserId,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
-            endDatetime: '2020-06-15 23:00',
             startDatetime: '2020-06-15 23:00',
+            endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
             accountKind: 1,
         },
+
+        // DATAspexet
         {
             name: 'Kör',
-            created: '2020-06-15 17:00',
-            updated: '2020-06-15 23:00',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             bookingId: firstBookingId + 1,
             userId: firstUserId,
             actualWorkingHours: 16,
             billableWorkingHours: 16,
-            endDatetime: '2020-06-15 23:00',
             startDatetime: '2020-06-15 23:00',
+            endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
+            accountKind: 1,
+        },
+
+        // Lunchföreläsning SPH
+        {
+            name: 'Kör',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            bookingId: firstBookingId + 2,
+            userId: firstUserId,
+            actualWorkingHours: 16,
+            billableWorkingHours: 16,
+            startDatetime: new Date().addHours(-1).toISOString(),
+            endDatetime: new Date().addHours(1).toISOString(),
+            pricePerHour: 250,
+            accountKind: 1,
+        },
+        {
+            name: 'Kör',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            bookingId: firstBookingId + 2,
+            userId: firstUserId + 1,
+            actualWorkingHours: 2,
+            billableWorkingHours: 2,
+            startDatetime: new Date().addHours(-1).toISOString(),
+            endDatetime: new Date().addHours(1).toISOString(),
+            pricePerHour: 250,
+            accountKind: 1,
+        },
+        {
+            name: 'Kör',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            bookingId: firstBookingId + 2,
+            userId: firstUserId + 2,
+            actualWorkingHours: 2,
+            billableWorkingHours: 2,
+            startDatetime: new Date().addHours(-1).toISOString(),
+            endDatetime: new Date().addHours(1).toISOString(),
+            pricePerHour: 250,
             accountKind: 1,
         },
     ]);
 
     const firstEquipmentListId = await knex('EquipmentList')
         .insert([
+            // Tjolahoppspexet
             {
                 name: 'Ljud',
-                created: '2022-04-11T21:32:29.303Z',
-                updated: '2022-04-11T21:33:10.818Z',
-                equipmentOutDatetime: '2022-04-30T22:00:00.000Z',
-                equipmentInDatetime: '2022-05-02T22:00:00.000Z',
-                usageStartDatetime: '2022-04-30T22:00:00.000Z',
-                usageEndDatetime: '2022-05-02T22:00:00.000Z',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                equipmentOutDatetime: new Date().addDays(5).toISOString(),
+                equipmentInDatetime: new Date().addDays(6).toISOString(),
+                usageStartDatetime: new Date().addDays(5).toISOString(),
+                usageEndDatetime: new Date().addDays(6).toISOString(),
                 bookingId: firstBookingId,
             },
             {
                 name: 'Video',
-                created: '2022-04-11T21:32:29.303Z',
-                updated: '2022-04-11T21:33:10.818Z',
-                equipmentOutDatetime: '2022-04-30T22:00:00.000Z',
-                equipmentInDatetime: '2022-05-02T22:00:00.000Z',
-                usageStartDatetime: '2022-04-30T22:00:00.000Z',
-                usageEndDatetime: '2022-05-02T22:00:00.000Z',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                equipmentOutDatetime: new Date().addDays(1).toISOString(),
+                equipmentInDatetime: new Date().addDays(8).toISOString(),
+                usageStartDatetime: new Date().addDays(6).toISOString(),
+                usageEndDatetime: new Date().addDays(7).toISOString(),
                 bookingId: firstBookingId,
             },
+
+            // DATAspexet
             {
                 name: 'Utrustning',
-                created: '2022-04-11T21:32:29.303Z',
-                updated: '2022-04-11T21:33:10.818Z',
-                equipmentOutDatetime: '2022-04-30T22:00:00.000Z',
-                equipmentInDatetime: '2022-05-02T22:00:00.000Z',
-                usageStartDatetime: '2022-04-30T22:00:00.000Z',
-                usageEndDatetime: '2022-05-02T22:00:00.000Z',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                equipmentOutDatetime: new Date().addDays(10).toISOString(),
+                equipmentInDatetime: new Date().addDays(20).toISOString(),
+                usageStartDatetime: new Date().addDays(15).toISOString(),
+                usageEndDatetime: new Date().addDays(18).toISOString(),
                 bookingId: firstBookingId + 1,
+                rentalStatus: null,
+            },
+
+            // Hoppborg i Nya
+            {
+                name: 'Krasch',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                equipmentOutDatetime: new Date().addDays(10).toISOString(),
+                equipmentInDatetime: new Date().addDays(20).toISOString(),
+                usageStartDatetime: new Date().addDays(15).toISOString(),
+                usageEndDatetime: new Date().addDays(18).toISOString(),
+                bookingId: firstBookingId + 3,
+                rentalStatus: null,
+            },
+
+            // Ut kastet
+            {
+                name: 'Kasta ut saker',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                equipmentOutDatetime: new Date().addDays(100).toISOString(),
+                equipmentInDatetime: new Date().addDays(108).toISOString(),
+                usageStartDatetime: new Date().addDays(106).toISOString(),
+                usageEndDatetime: new Date().addDays(107).toISOString(),
+                bookingId: firstBookingId + 4,
+            },
+
+            //Konferens - Trädkramarna AB
+            {
+                name: 'Ljud',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                equipmentOutDatetime: new Date().addDays(30).toISOString(),
+                equipmentInDatetime: new Date().addDays(32).toISOString(),
+                usageStartDatetime: new Date().addDays(30).toISOString(),
+                usageEndDatetime: new Date().addDays(32).toISOString(),
+                bookingId: firstBookingId + 5,
+            },
+            {
+                name: 'Video',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                equipmentOutDatetime: new Date().addDays(30).toISOString(),
+                equipmentInDatetime: new Date().addDays(32).toISOString(),
+                usageStartDatetime: new Date().addDays(30).toISOString(),
+                usageEndDatetime: new Date().addDays(32).toISOString(),
+                bookingId: firstBookingId + 5,
+                rentalStatus: null,
+            },
+
+            //Lunchföreläsning i Gamla
+            {
+                name: 'Ljud',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                equipmentOutDatetime: new Date().addDays(-32).toISOString(),
+                equipmentInDatetime: new Date().addDays(-30).toISOString(),
+                usageStartDatetime: new Date().addDays(-32).toISOString(),
+                usageEndDatetime: new Date().addDays(-30).toISOString(),
+                bookingId: firstBookingId + 6,
                 rentalStatus: 1,
+            },
+
+            // Det stora skuttet
+            {
+                name: 'Utrustning',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                equipmentOutDatetime: new Date().addDays(-3).toISOString(),
+                equipmentInDatetime: new Date().addDays(3).toISOString(),
+                usageStartDatetime: new Date().addDays(-1).toISOString(),
+                usageEndDatetime: new Date().addDays(1).toISOString(),
+                bookingId: firstBookingId + 7,
+                rentalStatus: 0,
             },
         ])
         .returning('id')
         .then((ids) => ids[0].id);
 
     await knex('EquipmentListEntry').insert([
+        // Tjolahoppspexet
         {
             name: 'Ljudbord',
-            created: '2022-04-11T21:36:42.934Z',
-            updated: '2022-04-11T21:36:42.934Z',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             equipmentId: equipmentIds.largeMixer,
             nameEN: 'Mixer',
             description: 'Ljudbord för utljud',
@@ -696,8 +977,8 @@ export async function seed(knex) {
         },
         {
             name: 'Ljudbord litet',
-            created: '2022-04-11T21:36:42.934Z',
-            updated: '2022-04-11T21:36:42.934Z',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             equipmentId: equipmentIds.smallMixer,
             nameEN: 'Mixer small',
             description: 'Ljudbord för monitor',
@@ -712,8 +993,8 @@ export async function seed(knex) {
         },
         {
             name: 'Projektor',
-            created: '2022-04-11T21:36:42.934Z',
-            updated: '2022-04-11T21:36:42.934Z',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             equipmentId: equipmentIds.projector,
             nameEN: 'Projector',
             description: '',
@@ -726,10 +1007,12 @@ export async function seed(knex) {
             equipmentListId: firstEquipmentListId + 1,
             discount: 0,
         },
+
+        // DATAspexet
         {
             name: 'Ljudbord litet',
-            created: '2022-04-11T21:36:42.934Z',
-            updated: '2022-04-11T21:36:42.934Z',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
             equipmentId: equipmentIds.smallMixer,
             nameEN: 'Mixer small',
             description: 'Ljudbord för monitor',
@@ -740,6 +1023,130 @@ export async function seed(knex) {
             pricePerHour: 200,
             equipmentPriceId: equipmentPriceIds.smallMixer,
             equipmentListId: firstEquipmentListId + 2,
+        },
+
+        // Hoppborg i Nya
+        {
+            name: 'Trådlös Mikrofon (WL)',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.wirelessMicrophone,
+            nameEN: 'Wireless Microphone',
+            description: 'Antingen handhållen eller mygga',
+            descriptionEN: 'Either handheld or lavalier microphone',
+            numberOfUnits: 1,
+            numberOfHours: 0,
+            pricePerUnit: 100,
+            pricePerHour: 0,
+            equipmentPriceId: equipmentPriceIds.wirelessMicrophone,
+            equipmentListId: firstEquipmentListId + 3,
+            discount: 400,
+        },
+
+        // Hoppborg i Nya
+        {
+            name: 'Trådlös Mikrofon (WL)',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.wirelessMicrophone,
+            nameEN: 'Wireless Microphone',
+            description: 'Antingen handhållen eller mygga',
+            descriptionEN: 'Either handheld or lavalier microphone',
+            numberOfUnits: 8,
+            numberOfHours: 0,
+            pricePerUnit: 100,
+            pricePerHour: 0,
+            equipmentPriceId: equipmentPriceIds.wirelessMicrophone,
+            equipmentListId: firstEquipmentListId + 4,
+            discount: 0,
+        },
+
+        //Konferens - Trädkramarna AB
+        {
+            name: 'Trådlös Mikrofon (WL)',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.wirelessMicrophone,
+            nameEN: 'Wireless Microphone',
+            description: 'Antingen handhållen eller mygga',
+            descriptionEN: 'Either handheld or lavalier microphone',
+            numberOfUnits: 8,
+            numberOfHours: 0,
+            pricePerUnit: 250,
+            pricePerHour: 0,
+            equipmentPriceId: equipmentPriceIds.wirelessMicrophone,
+            equipmentListId: firstEquipmentListId + 5,
+            discount: 0,
+        },
+
+        // Ut kastet
+        {
+            name: 'Projektor',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.projector,
+            nameEN: 'Projector',
+            description: '',
+            descriptionEN: '',
+            numberOfUnits: 1,
+            numberOfHours: 30,
+            pricePerUnit: 500,
+            pricePerHour: 150,
+            equipmentPriceId: equipmentPriceIds.projector2,
+            equipmentListId: firstEquipmentListId + 6,
+            discount: 0,
+        },
+
+        //Lunchföreläsning i Gamla
+        {
+            name: 'Trådlös Mikrofon (WL)',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.wirelessMicrophone,
+            nameEN: 'Wireless Microphone',
+            description: 'Antingen handhållen eller mygga',
+            descriptionEN: 'Either handheld or lavalier microphone',
+            numberOfUnits: 1,
+            numberOfHours: 0,
+            pricePerUnit: 125,
+            pricePerHour: 0,
+            equipmentPriceId: equipmentPriceIds.wirelessMicrophone,
+            equipmentListId: firstEquipmentListId + 7,
+            discount: 0,
+        },
+
+        // Det stora skuttet
+        {
+            name: 'Ljudbord',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.largeMixer,
+            nameEN: 'Mixer',
+            description: 'Ljudbord för utljud',
+            descriptionEN: '',
+            numberOfUnits: 1,
+            numberOfHours: 10,
+            pricePerUnit: 0,
+            pricePerHour: 200,
+            equipmentPriceId: equipmentPriceIds.largeMixer,
+            equipmentListId: firstEquipmentListId + 8,
+            discount: 400,
+        },
+        {
+            name: 'Ljudbord litet',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.smallMixer,
+            nameEN: 'Mixer small',
+            description: 'Ljudbord för monitor',
+            descriptionEN: '',
+            numberOfUnits: 2,
+            numberOfHours: 10,
+            pricePerUnit: 0,
+            pricePerHour: 200,
+            equipmentPriceId: equipmentPriceIds.smallMixer,
+            equipmentListId: firstEquipmentListId + 8,
+            discount: 0,
         },
     ]);
 }
