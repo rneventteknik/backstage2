@@ -107,7 +107,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     <BookingStatusButton booking={booking} onChange={saveBooking} />
                 </IfNotReadonly>
                 <Dropdown as={ButtonGroup}>
-                    <Button variant="dark" href={'/api/documents/price-estimate/se/' + booking.id} target="_blank">
+                    <Button variant="dark" href={'/api/documents/price-estimate/sv/' + booking.id} target="_blank">
                         <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning
                     </Button>
 
@@ -117,7 +117,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         <Dropdown.Item href={'/api/documents/price-estimate/en/' + booking.id} target="_blank">
                             <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Prisuppskattning (engelska)
                         </Dropdown.Item>
-                        <Dropdown.Item href={'/api/documents/packing-list/se/' + booking.id} target="_blank">
+                        <Dropdown.Item href={'/api/documents/packing-list/sv/' + booking.id} target="_blank">
                             <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Packlista
                         </Dropdown.Item>
                     </Dropdown.Menu>
