@@ -9,12 +9,14 @@ import { Status } from '../models/enums/Status';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from '../components/utils/TableStyleLink';
+import RentalStatusTag from './utils/RentalStatusTag';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
         <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
 
         <BookingTypeTag booking={booking} className="ml-1" />
+        <RentalStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{getStatusName(booking.status)}</p>
         <p className="text-muted mb-0 d-lg-none">{booking.ownerUser?.name ?? '-'}</p>
         <p className="text-muted mb-0 d-sm-none">{booking.displayStartDate}</p>

@@ -41,6 +41,7 @@ import {
     getUsageEndDatetime,
     getUsageStartDatetime,
 } from '../../../lib/pricingUtils';
+import RentalStatusTag from '../../../components/utils/RentalStatusTag';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -146,6 +147,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <Badge variant="dark" className="ml-1">
                                 {getStatusName(booking.status)}
                             </Badge>
+                            <RentalStatusTag booking={booking} className="ml-1" />
                             <Badge variant="dark" className="ml-1">
                                 {getPaymentStatusName(booking.paymentStatus)}
                             </Badge>

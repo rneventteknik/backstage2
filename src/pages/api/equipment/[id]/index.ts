@@ -4,15 +4,15 @@ import {
     respondWithCustomErrorMessage,
     respondWithEntityNotFoundResponse,
     respondWithInvalidDataResponse,
-} from '../../../lib/apiResponses';
+} from '../../../../lib/apiResponses';
 import {
     deleteEquipment,
     fetchEquipment,
     updateEquipment,
     validateEquipmentObjectionModel,
-} from '../../../lib/db-access';
-import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
-import { Role } from '../../../models/enums/Role';
+} from '../../../../lib/db-access';
+import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
+import { Role } from '../../../../models/enums/Role';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<Promise<void> | void> => {

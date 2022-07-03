@@ -42,7 +42,7 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
 
     return (
         <>
-            <Card>
+            <Card className="mb-3">
                 <Card.Header>
                     <div className="d-flex">
                         <div className="flex-grow-1">

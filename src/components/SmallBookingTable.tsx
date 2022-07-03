@@ -6,10 +6,12 @@ import { getStatusName, toBookingViewModel } from '../lib/utils';
 import { Card } from 'react-bootstrap';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
+import RentalStatusTag from './utils/RentalStatusTag';
 
 type Props = {
     title: string;
     bookings: Booking[] | undefined;
+    tableSettingsOverride?: Partial<TableConfiguration<BookingViewModel>>;
 };
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
@@ -17,6 +19,7 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
         <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
 
         <BookingTypeTag booking={booking} className="ml-1" />
+        <RentalStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{getStatusName(booking.status)}</p>
         <p className="text-muted mb-0 d-sm-none">{booking.displayStartDate}</p>
     </>
@@ -54,7 +57,7 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
     ],
 };
 
-const SmallBookingTable: React.FC<Props> = ({ title, bookings }: Props) => {
+const SmallBookingTable: React.FC<Props> = ({ title, bookings, tableSettingsOverride = {} }: Props) => {
     if (!bookings) {
         return <Skeleton height={150} className="mb-3" />;
     }
@@ -62,7 +65,10 @@ const SmallBookingTable: React.FC<Props> = ({ title, bookings }: Props) => {
     return (
         <Card className="mb-3">
             <Card.Header>{title}</Card.Header>
-            <TableDisplay entities={bookings.map(toBookingViewModel)} configuration={tableSettings} />
+            <TableDisplay
+                entities={bookings.map(toBookingViewModel)}
+                configuration={{ ...tableSettings, ...tableSettingsOverride }}
+            />
         </Card>
     );
 };

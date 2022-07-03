@@ -31,6 +31,20 @@ export const fetchBookingsForUser = async (userId: number): Promise<BookingObjec
     return BookingObjectionModel.query().where('ownerUserId', userId).withGraphFetched('equipmentLists');
 };
 
+export const fetchBookingsForEquipment = async (equipmentId: number): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .whereIn(
+            'id',
+            BookingObjectionModel.query()
+                .joinRelated('equipmentLists.equipmentListEntries')
+                .where('equipmentLists:equipmentListEntries.equipmentId', equipmentId)
+                .select('booking.id'),
+        )
+        .withGraphFetched('equipmentLists');
+};
+
 export const fetchBooking = async (id: number): Promise<BookingObjectionModel> => {
     ensureDatabaseIsInitialized();
 
