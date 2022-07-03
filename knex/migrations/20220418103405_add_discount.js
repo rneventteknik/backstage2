@@ -1,6 +1,6 @@
 export function up(knex) {
     return knex.schema.alterTable('EquipmentListEntry', (table) => {
-        table.int('discount');
+        table.integer('discount');
     });
 }
 
