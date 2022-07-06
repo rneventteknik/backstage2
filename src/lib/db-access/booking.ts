@@ -63,7 +63,7 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
         .withGraphFetched('equipmentLists.equipmentListEntries.equipment.prices')
         .withGraphFetched('equipmentLists.equipmentListEntries.equipmentPrice')
         .withGraphFetched('timeEstimates')
-        .withGraphFetched('timeReports')
+        .withGraphFetched('timeReports.user')
         .withGraphFetched('changelog(changelogInfo)')
         .modifiers({
             changelogInfo: (builder) => {

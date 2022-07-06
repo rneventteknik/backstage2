@@ -658,6 +658,7 @@ export async function seed(knex) {
             numberOfHours: 18,
             pricePerHour: 125,
             bookingId: firstBookingId,
+            sortIndex: 10,
         },
         {
             name: 'Kör - 2pers',
@@ -666,6 +667,7 @@ export async function seed(knex) {
             numberOfHours: 16,
             pricePerHour: 500,
             bookingId: firstBookingId,
+            sortIndex: 20,
         },
         {
             name: 'Riv - 2pers',
@@ -674,6 +676,7 @@ export async function seed(knex) {
             numberOfHours: 8,
             pricePerHour: 125,
             bookingId: firstBookingId,
+            sortIndex: 30,
         },
 
         // DATAspexet
@@ -684,6 +687,7 @@ export async function seed(knex) {
             numberOfHours: 2,
             pricePerHour: 125,
             bookingId: firstBookingId + 1,
+            sortIndex: 10,
         },
 
         // Ut kastet
@@ -745,6 +749,7 @@ export async function seed(knex) {
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
             accountKind: 1,
+            sortIndex: 10,
         },
         {
             name: 'Rigg',
@@ -758,6 +763,7 @@ export async function seed(knex) {
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 500,
             accountKind: 1,
+            sortIndex: 20,
         },
         {
             name: 'Kör',
@@ -771,6 +777,7 @@ export async function seed(knex) {
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
             accountKind: 1,
+            sortIndex: 30,
         },
         {
             name: 'Riv',
@@ -784,6 +791,7 @@ export async function seed(knex) {
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
             accountKind: 1,
+            sortIndex: 40,
         },
 
         // DATAspexet
@@ -799,6 +807,7 @@ export async function seed(knex) {
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
             accountKind: 1,
+            sortIndex: 10,
         },
 
         // Lunchföreläsning SPH

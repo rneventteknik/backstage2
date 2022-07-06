@@ -14,6 +14,7 @@ export interface ITimeReportObjectionModel extends BaseObjectionModelWithName {
     endDatetime?: string;
     pricePerHour: number;
     accountKind: number;
+    sortIndex: number;
 }
 
 export class TimeReportObjectionModel extends Model implements ITimeReportObjectionModel {
@@ -55,4 +56,5 @@ export class TimeReportObjectionModel extends Model implements ITimeReportObject
     startDatetime!: string;
     pricePerHour!: number;
     accountKind!: number;
+    sortIndex!: number;
 }

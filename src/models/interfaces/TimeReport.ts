@@ -12,4 +12,5 @@ export interface TimeReport extends BaseEntityWithName {
     pricePerHour: number;
     accountKind: AccountKind;
     bookingId: number;
+    sortIndex: number;
 }

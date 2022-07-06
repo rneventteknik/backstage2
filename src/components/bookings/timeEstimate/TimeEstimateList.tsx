@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, Button, DropdownButton, Dropdown } from 'react-bootstrap';
 import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher } from '../../../lib/fetchers';
@@ -9,25 +9,32 @@ import { toTimeEstimate } from '../../../lib/mappers/timeEstimate';
 import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';
 import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
-import { PricePlan } from '../../../models/enums/PricePlan';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAngleDown, faAngleUp, faExclamationCircle, faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import {
+    faAngleDown,
+    faAngleUp,
+    faExclamationCircle,
+    faTrashCan,
+    faClock,
+    faPlus,
+} from '@fortawesome/free-solid-svg-icons';
 import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
 import Skeleton from 'react-loading-skeleton';
+import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import TimeEstimateAddButton from './timeEstimateAddButton';
 
 type Props = {
     bookingId: number;
     pricePlan: number;
     readonly: boolean;
+    showContent: boolean;
+    setShowContent: (bool: boolean) => void;
 };
 
-const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: Props) => {
+const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, setShowContent }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
-    const [showListContent, setShowListContent] = useState(false);
-
-    const { showCreateFailedNotification, showSaveFailedNotification, showDeleteFailedNotification } =
-        useNotifications();
+    const { showSaveFailedNotification, showDeleteFailedNotification } = useNotifications();
 
     // Extract the lists
     //
@@ -67,44 +74,6 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
     if (!booking || !timeEstimates) {
         return <Skeleton height={200} className="mb-3" />;
     }
-
-    const addEmptyTimeEstimate = async () => {
-        if (!process.env.NEXT_PUBLIC_SALARY_NORMAL)
-            throw new Error('Configuration missing salary for the Normal price plan');
-
-        if (!process.env.NEXT_PUBLIC_SALARY_THS) throw new Error('Configuration missing salary for the THS price plan');
-
-        const pricePerHour =
-            pricePlan == PricePlan.EXTERNAL
-                ? process.env.NEXT_PUBLIC_SALARY_NORMAL
-                : process.env.NEXT_PUBLIC_SALARY_THS;
-
-        const timeEstimate: ITimeEstimateObjectionModel = {
-            bookingId: bookingId,
-            numberOfHours: 0,
-            pricePerHour: isNaN(parseInt(pricePerHour)) ? 0 : parseInt(pricePerHour),
-            name: '',
-        };
-
-        const body = { timeEstimate: timeEstimate };
-
-        const request = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-
-        fetch('/api/bookings/' + bookingId + '/timeEstimate', request)
-            .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
-            .then(toTimeEstimate)
-            .then((data) => {
-                mutateTimeEstimates([...(timeEstimates ?? []), data]);
-            })
-            .catch((error: Error) => {
-                console.error(error);
-                showCreateFailedNotification('Tidsestimatet');
-            });
-    };
 
     const updateTimeEstimate = (timeEstimate: TimeEstimate) => {
         const filteredtimeEstimates = timeEstimates?.map((x) => (x.id !== timeEstimate.id ? x : timeEstimate));
@@ -213,10 +182,12 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
         );
     };
 
+    const sortFn = (a: TimeEstimate, b: TimeEstimate) => sortIndexSortFn(a, b);
+
     const tableSettings: TableConfiguration<TimeEstimate> = {
         entityTypeDisplayName: '',
-        defaultSortPropertyName: 'price',
         defaultSortAscending: true,
+        customSortFn: sortFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         columns: [
@@ -262,16 +233,26 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
         ],
     };
 
+    if (!timeEstimates.length) {
+        return null;
+    }
+
+    const onAdd = async (data: TimeEstimate) => {
+        setShowContent(true);
+        mutateTimeEstimates([...(timeEstimates ?? []), data]);
+    };
+
     return (
         <Card className="mb-3">
             <Card.Header>
                 <div className="d-flex">
                     <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
+                        <FontAwesomeIcon className="mr-2" icon={faClock} />
                         Tidsuppskattning
                     </div>
                     <div className="d-flex">
-                        <Button className="mr-2" variant="" onClick={() => setShowListContent(!showListContent)}>
-                            <FontAwesomeIcon icon={showListContent ? faAngleUp : faAngleDown} />
+                        <Button className="mr-2" variant="" onClick={() => setShowContent(!showContent)}>
+                            <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                         </Button>
                     </div>
                 </div>
@@ -280,14 +261,21 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, pricePlan, readonly }: P
                     {formatNumberAsCurrency(getTotalTimeEstimatesPrice(timeEstimates))}
                 </p>
             </Card.Header>
-            {showListContent ? (
+            {showContent ? (
                 <>
                     <TableDisplay entities={timeEstimates} configuration={tableSettings} />
-                    {readonly ? null : (
-                        <Button className="ml-2 mr-2 mb-2" onClick={addEmptyTimeEstimate} variant="secondary" size="sm">
-                            <FontAwesomeIcon icon={faPlus} className="mr-1" /> Ny rad
-                        </Button>
-                    )}
+                    <TimeEstimateAddButton
+                        booking={booking}
+                        disabled={readonly}
+                        sortIndex={getNextSortIndex(timeEstimates)}
+                        onAdd={onAdd}
+                        variant="secondary"
+                        size="sm"
+                        buttonType="button"
+                    >
+                        <FontAwesomeIcon icon={faPlus} className="mr-1" />
+                        Ny rad
+                    </TimeEstimateAddButton>
                 </>
             ) : null}
         </Card>

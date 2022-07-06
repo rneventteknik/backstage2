@@ -24,26 +24,37 @@ import {
     faAngleUp,
     faExclamationCircle,
     faGears,
-    faPlus,
     faTrashCan,
+    faStopwatch,
+    faAdd,
 } from '@fortawesome/free-solid-svg-icons';
 import { User } from '../../../models/interfaces';
 import { AccountKind } from '../../../models/enums/AccountKind';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import Skeleton from 'react-loading-skeleton';
+import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import TimeReportAddButton from './timeReportAddButton';
 
 type Props = {
     bookingId: number;
     pricePlan: number;
     currentUser: CurrentUserInfo;
     readonly: boolean;
+    showContent: boolean;
+    setShowContent: (bol: boolean) => void;
 };
 
-const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, readonly }: Props) => {
+const TimeReportList: React.FC<Props> = ({
+    bookingId,
+    pricePlan,
+    currentUser,
+    readonly,
+    showContent,
+    setShowContent,
+}: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
     const { data: users } = useSwr('/api/users', usersFetcher);
 
-    const [showListContent, setShowListContent] = useState(false);
     const [timeReportToEditViewModel, setTimeReportToEditViewModel] = useState<
         | (Partial<TimeReport> &
               Pick<TimeReport, 'id' | 'bookingId'> & {
@@ -53,8 +64,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
         | null
     >(null);
 
-    const { showCreateFailedNotification, showSaveFailedNotification, showDeleteFailedNotification } =
-        useNotifications();
+    const { showSaveFailedNotification, showDeleteFailedNotification } = useNotifications();
 
     // Extract the lists
     //
@@ -94,46 +104,6 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
     if (!booking || !timeReports) {
         return <Skeleton height={200} className="mb-3" />;
     }
-
-    const addEmptyTimeReport = async () => {
-        if (!currentUser.userId) {
-            showCreateFailedNotification('Tidrapporten');
-            return;
-        }
-
-        const pricePerHour = getPricePerHour(pricePlan);
-
-        const timeReport: ITimeReportObjectionModel = {
-            bookingId: bookingId,
-            billableWorkingHours: 0,
-            actualWorkingHours: 0,
-            userId: currentUser.userId,
-            startDatetime: formatDatetime(new Date()),
-            endDatetime: formatDatetime(new Date()),
-            pricePerHour: pricePerHour ?? 0,
-            name: '',
-            accountKind: 0,
-        };
-
-        const body = { timeReport: timeReport };
-
-        const request = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-
-        fetch('/api/bookings/' + bookingId + '/timeReport', request)
-            .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
-            .then(toTimeReport)
-            .then((data) => {
-                mutateTimeReports([...(timeReports ?? []), data]);
-            })
-            .catch((error: Error) => {
-                console.error(error);
-                showCreateFailedNotification('Tidrapporten');
-            });
-    };
 
     const updateTimeReport = (timeReport: TimeReport) => {
         const filteredtimeReports = timeReports?.map((x) => (x.id !== timeReport.id ? x : timeReport));
@@ -288,10 +258,12 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
         );
     };
 
+    const sortFn = (a: TimeReport, b: TimeReport) => sortIndexSortFn(a, b);
+
     const tableSettings: TableConfiguration<TimeReport> = {
         entityTypeDisplayName: '',
-        defaultSortPropertyName: 'name',
         defaultSortAscending: true,
+        customSortFn: sortFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         columns: [
@@ -353,16 +325,26 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
         ],
     };
 
+    if (!timeReports.length) {
+        return null;
+    }
+
+    const onAdd = async (data: TimeReport) => {
+        setShowContent(true);
+        mutateTimeReports([...(timeReports ?? []), data]);
+    };
+
     return (
         <Card className="mb-3">
             <Card.Header>
                 <div className="d-flex">
                     <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
+                        <FontAwesomeIcon className="mr-2" icon={faStopwatch} />
                         Tidrapportering
                     </div>
                     <div className="d-flex">
-                        <Button className="mr-2" variant="" onClick={() => setShowListContent(!showListContent)}>
-                            <FontAwesomeIcon icon={showListContent ? faAngleUp : faAngleDown} />
+                        <Button className="mr-2" variant="" onClick={() => setShowContent(!showContent)}>
+                            <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                         </Button>
                     </div>
                 </div>
@@ -371,14 +353,22 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                     {formatNumberAsCurrency(getTotalTimeReportsPrice(timeReports))}
                 </p>
             </Card.Header>
-            {showListContent ? (
+            {showContent ? (
                 <>
                     <TableDisplay entities={timeReports} configuration={tableSettings} />
-                    {readonly ? null : (
-                        <Button className="ml-2 mr-2 mb-2" onClick={addEmptyTimeReport} variant="secondary" size="sm">
-                            <FontAwesomeIcon icon={faPlus} className="mr-1" /> Ny rad
-                        </Button>
-                    )}
+                    <TimeReportAddButton
+                        currentUser={currentUser}
+                        disabled={readonly}
+                        booking={booking}
+                        sortIndex={getNextSortIndex(booking.timeReports ?? [])}
+                        onAdd={onAdd}
+                        className="ml-2 mr-2 mb-2"
+                        variant="secondary"
+                        size="sm"
+                        icon={faAdd}
+                    >
+                        Ny rad
+                    </TimeReportAddButton>
                 </>
             ) : null}
             <Modal show={!!timeReportToEditViewModel} onHide={() => setTimeReportToEditViewModel(null)} size="lg">
@@ -588,6 +578,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, pricePlan, currentUser, re
                                         ? toDateOrUndefined(timeReportToEditViewModel.editedEndDatetimeString)
                                         : undefined
                                     : timeReportToEditViewModel.endDatetime,
+                                sortIndex: timeReportToEditViewModel.sortIndex ?? 0,
                             };
                             updateTimeReport(entryToSave);
                             setTimeReportToEditViewModel(null);

@@ -10,6 +10,7 @@ export interface ITimeEstimateObjectionModel extends BaseObjectionModelWithName 
     bookingId: number;
     numberOfHours: number;
     pricePerHour: number;
+    sortIndex: number;
 }
 
 export class TimeEstimateObjectionModel extends Model implements ITimeEstimateObjectionModel {
@@ -22,4 +23,5 @@ export class TimeEstimateObjectionModel extends Model implements ITimeEstimateOb
     bookingId!: number;
     numberOfHours!: number;
     pricePerHour!: number;
+    sortIndex!: number;
 }

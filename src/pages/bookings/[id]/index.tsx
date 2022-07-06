@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
@@ -23,7 +23,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faCoins, faFileDownload, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faCoins, faFileDownload, faPen, faStopwatch } from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
 import EquipmentLists from '../../../components/bookings/equipmentLists/EquipmentLists';
 import BookingStatusButton from '../../../components/bookings/BookingStatusButton';
@@ -41,6 +41,10 @@ import {
     getUsageEndDatetime,
     getUsageStartDatetime,
 } from '../../../lib/pricingUtils';
+import { TimeEstimate, TimeReport } from '../../../models/interfaces';
+import { getNextSortIndex } from '../../../lib/sortIndexUtils';
+import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/timeEstimateAddButton';
+import TimeReportAddButton from '../../../components/bookings/timeReport/timeReportAddButton';
 import RentalStatusTag from '../../../components/utils/RentalStatusTag';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -49,6 +53,8 @@ type Props = { user: CurrentUserInfo };
 
 const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
+    const [showTimeEstimateContent, setShowTimeEstimateContent] = useState(false);
+    const [showTimeReportContent, setShowTimeReportContent] = useState(false);
 
     // Edit booking
     //
@@ -93,6 +99,30 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         { link: '/bookings/' + booking.id, displayName: pageTitle },
     ];
 
+    const mutateTimeEstimates = (updatedTimeEstimates: TimeEstimate[]) => {
+        if (!booking) {
+            throw new Error('Invalid booking');
+        }
+        mutate({ ...booking, timeEstimates: updatedTimeEstimates }, false);
+    };
+
+    const mutateTimeReports = (updatedTimeReports: TimeReport[]) => {
+        if (!booking) {
+            throw new Error('Invalid booking');
+        }
+        mutate({ ...booking, timeReports: updatedTimeReports }, false);
+    };
+
+    const onAddTimeEstimate = async (timeEstimate: TimeEstimate) => {
+        setShowTimeEstimateContent(true);
+        mutateTimeEstimates([...(booking.timeEstimates ?? []), timeEstimate]);
+    };
+
+    const onAddTimeReport = async (timeReport: TimeReport) => {
+        setShowTimeReportContent(true);
+        mutateTimeReports([...(booking.timeReports ?? []), timeReport]);
+    };
+
     return (
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
@@ -124,6 +154,19 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </Dropdown.Menu>
                 </Dropdown>
                 <IfNotReadonly currentUser={currentUser}>
+                    <TimeReportAddButton
+                        booking={booking}
+                        disabled={booking.status === Status.DONE}
+                        sortIndex={getNextSortIndex(booking.timeEstimates ?? [])}
+                        onAdd={onAddTimeReport}
+                        currentUser={currentUser}
+                        variant="dark"
+                    >
+                        <FontAwesomeIcon icon={faStopwatch} className="mr-1" />
+                        Rapportera tid
+                    </TimeReportAddButton>
+                </IfNotReadonly>
+                <IfNotReadonly currentUser={currentUser}>
                     <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer">
                         <Dropdown.Item
                             onClick={() => saveBooking({ paymentStatus: PaymentStatus.PAID })}
@@ -134,6 +177,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         >
                             <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som betald
                         </Dropdown.Item>
+                        <TimeEstimateAddButton
+                            booking={booking}
+                            disabled={booking.status === Status.DONE}
+                            sortIndex={getNextSortIndex(booking.timeEstimates ?? [])}
+                            onAdd={onAddTimeEstimate}
+                            buttonType="dropdown"
+                        >
+                            <FontAwesomeIcon icon={faClock} className="mr-1 fw" />
+                            Lägg till tidsuppskattning
+                        </TimeEstimateAddButton>
                     </DropdownButton>
                 </IfNotReadonly>
             </Header>
@@ -236,11 +289,15 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 </Col>
                 <Col xl={8}>
                     <TimeEstimateList
+                        showContent={showTimeEstimateContent}
+                        setShowContent={setShowTimeEstimateContent}
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
                         readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
                     />
                     <TimeReportList
+                        showContent={showTimeReportContent}
+                        setShowContent={setShowTimeReportContent}
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
                         currentUser={currentUser}
