@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import { convertToDateOrUndefined, formatDatetime } from '../../lib/utils';
 
@@ -114,6 +114,10 @@ export const DoubleClickToEditDropdown = <T,>({
 }: DoubleClickToEditDropdownProps<T>): React.ReactElement => {
     const [selectedKey, setSelectedKey] = useState(optionKeyFn(value));
     const [isEditing, setIsEditing] = useState(false);
+
+    useEffect(() => {
+        setSelectedKey(optionKeyFn(value));
+    }, [value, optionKeyFn]);
 
     const getSelectedValue = (key: string) => options.find((x) => optionKeyFn(x) == key);
 

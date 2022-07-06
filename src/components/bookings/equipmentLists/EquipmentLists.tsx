@@ -629,18 +629,34 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     };
 
     const EquipmentListEntryPriceDisplayFn = (entry: EquipmentListEntry) => {
+        const customPriceDropdownValue: EquipmentPrice = {
+            id: -1,
+            name: 'Anpassat pris',
+            pricePerUnit: entry.pricePerUnit,
+            pricePerHour: entry.pricePerHour,
+            pricePerUnitTHS: entry.pricePerUnit,
+            pricePerHourTHS: entry.pricePerHour,
+        };
         return entry.equipment && entry.equipment.prices.length ? (
             <>
                 <DoubleClickToEditDropdown<EquipmentPrice>
-                    options={entry.equipment.prices}
-                    value={entry.equipmentPrice ?? entry.equipment.prices[0]}
+                    options={
+                        entry.equipmentPrice
+                            ? entry.equipment.prices
+                            : [customPriceDropdownValue, ...entry.equipment.prices]
+                    }
+                    value={entry.equipmentPrice ?? customPriceDropdownValue}
                     optionLabelFn={(x) => `${x.name} ${priceDisplayFn(x)}`}
                     optionKeyFn={(x) => x.id.toString()}
                     onChange={(newPrice) =>
-                        newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
+                        newPrice && newPrice.id != -1
+                            ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) })
+                            : null
                     }
                     onClose={(newPrice) =>
-                        newPrice ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) }) : null
+                        newPrice && newPrice.id != -1
+                            ? updateListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice) })
+                            : null
                     }
                     readonly={readonly}
                 >
