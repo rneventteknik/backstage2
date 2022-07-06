@@ -65,49 +65,57 @@ export const updateEquipment = async (
 ): Promise<EquipmentObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    const existingDatabaseModel = await EquipmentObjectionModel.query()
-        .findById(id)
-        .orderBy('id')
-        .withGraphFetched('tags')
-        .withGraphFetched('prices');
+    return EquipmentObjectionModel.transaction(async (trx) => {
+        const existingDatabaseModel = await EquipmentObjectionModel.query(trx)
+            .findById(id)
+            .orderBy('id')
+            .withGraphFetched('tags')
+            .withGraphFetched('prices');
 
-    // Tags.
-    if (equipment.tags) {
-        const { toAdd: tagsToAdd, toDelete: tagsToDelete } = compareLists(equipment.tags, existingDatabaseModel?.tags);
+        // Tags.
+        if (equipment.tags) {
+            const { toAdd: tagsToAdd, toDelete: tagsToDelete } = compareLists(
+                equipment.tags,
+                existingDatabaseModel?.tags,
+            );
 
-        tagsToAdd.map(async (x) => {
-            await EquipmentObjectionModel.relatedQuery('tags').for(id).relate(x.id);
-        });
+            tagsToAdd.map(async (x) => {
+                await EquipmentObjectionModel.relatedQuery('tags', trx).for(id).relate(x.id);
+            });
 
-        tagsToDelete.map(async (x) => {
-            await EquipmentObjectionModel.relatedQuery('tags').for(id).findById(x.id).unrelate();
-        });
-    }
+            tagsToDelete.map(async (x) => {
+                await EquipmentObjectionModel.relatedQuery('tags', trx).for(id).findById(x.id).unrelate();
+            });
+        }
 
-    // Prices.
-    if (equipment.prices !== undefined) {
-        const {
-            toAdd: pricesToAdd,
-            toDelete: pricesToDelete,
-            toUpdate: pricesToUpdate,
-        } = compareLists(equipment.prices, existingDatabaseModel?.prices);
+        // Prices.
+        if (equipment.prices !== undefined) {
+            const {
+                toAdd: pricesToAdd,
+                toDelete: pricesToDelete,
+                toUpdate: pricesToUpdate,
+            } = compareLists(equipment.prices, existingDatabaseModel?.prices);
 
-        pricesToAdd.map(async (x) => {
-            await EquipmentObjectionModel.relatedQuery('prices')
-                .for(id)
-                .insert(withCreatedDate(removeIdAndDates(x)));
-        });
+            pricesToAdd.map(async (x) => {
+                await EquipmentObjectionModel.relatedQuery('prices', trx)
+                    .for(id)
+                    .insert(withCreatedDate(removeIdAndDates(x)));
+            });
 
-        pricesToDelete.map(async (x) => {
-            await EquipmentPriceObjectionModel.query().deleteById(x.id);
-        });
+            pricesToDelete.map(async (x) => {
+                await EquipmentPriceObjectionModel.query(trx).deleteById(x.id);
+            });
 
-        pricesToUpdate.map(async (x) => {
-            await EquipmentPriceObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
-        });
-    }
+            pricesToUpdate.map(async (x) => {
+                await EquipmentPriceObjectionModel.query(trx).patchAndFetchById(
+                    x.id,
+                    withUpdatedDate(removeIdAndDates(x)),
+                );
+            });
+        }
 
-    return EquipmentObjectionModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(equipment)));
+        return EquipmentObjectionModel.query(trx).patchAndFetchById(id, withUpdatedDate(removeIdAndDates(equipment)));
+    });
 };
 
 export const insertEquipment = async (equipment: EquipmentObjectionModel): Promise<EquipmentObjectionModel> => {
@@ -119,15 +127,17 @@ export const insertEquipment = async (equipment: EquipmentObjectionModel): Promi
 export const deleteEquipment = async (id: number): Promise<boolean> => {
     ensureDatabaseIsInitialized();
 
-    // Tags
-    await EquipmentObjectionModel.relatedQuery('tags').for(id).unrelate();
+    return EquipmentObjectionModel.transaction(async (trx) => {
+        // Tags
+        await EquipmentObjectionModel.relatedQuery('tags', trx).for(id).unrelate();
 
-    // Prices
-    await EquipmentObjectionModel.relatedQuery('prices').for(id).delete();
+        // Prices
+        await EquipmentObjectionModel.relatedQuery('prices', trx).for(id).delete();
 
-    return EquipmentObjectionModel.query()
-        .deleteById(id)
-        .then((res) => res > 0);
+        return EquipmentObjectionModel.query(trx)
+            .deleteById(id)
+            .then((res) => res > 0);
+    });
 };
 
 export const validateEquipmentObjectionModel = (equipment: EquipmentObjectionModel): boolean => {

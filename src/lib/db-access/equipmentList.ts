@@ -36,38 +36,43 @@ export const updateEquipmentList = async (
 ): Promise<EquipmentListObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    const existingDatabaseModel = await EquipmentListObjectionModel.query()
-        .findById(id)
-        .orderBy('id')
-        .withGraphFetched('equipmentListEntries.equipment');
+    return EquipmentListObjectionModel.transaction(async (trx) => {
+        const existingDatabaseModel = await EquipmentListObjectionModel.query(trx)
+            .findById(id)
+            .orderBy('id')
+            .withGraphFetched('equipmentListEntries.equipment');
 
-    // List entries.
-    if (equipmentList.equipmentListEntries !== undefined) {
-        const {
-            toAdd: listEntriesToAdd,
-            toDelete: listEntriesToDelete,
-            toUpdate: listEntriesToUpdate,
-        } = compareLists(equipmentList.equipmentListEntries, existingDatabaseModel?.equipmentListEntries);
+        // List entries.
+        if (equipmentList.equipmentListEntries !== undefined) {
+            const {
+                toAdd: listEntriesToAdd,
+                toDelete: listEntriesToDelete,
+                toUpdate: listEntriesToUpdate,
+            } = compareLists(equipmentList.equipmentListEntries, existingDatabaseModel?.equipmentListEntries);
 
-        listEntriesToAdd.map(async (x) => {
-            await EquipmentListObjectionModel.relatedQuery('equipmentListEntries')
-                .for(id)
-                .insert(withCreatedDate(removeIdAndDates(x)));
-        });
+            listEntriesToAdd.map(async (x) => {
+                await EquipmentListObjectionModel.relatedQuery('equipmentListEntries', trx)
+                    .for(id)
+                    .insert(withCreatedDate(removeIdAndDates(x)));
+            });
 
-        listEntriesToDelete.map(async (x) => {
-            await EquipmentListEntryObjectionModel.query().deleteById(x.id);
-        });
+            listEntriesToDelete.map(async (x) => {
+                await EquipmentListEntryObjectionModel.query(trx).deleteById(x.id);
+            });
 
-        listEntriesToUpdate.map(async (x) => {
-            await EquipmentListEntryObjectionModel.query().patchAndFetchById(
-                x.id,
-                withCreatedDate(removeIdAndDates(x)),
-            );
-        });
-    }
+            listEntriesToUpdate.map(async (x) => {
+                await EquipmentListEntryObjectionModel.query(trx).patchAndFetchById(
+                    x.id,
+                    withCreatedDate(removeIdAndDates(x)),
+                );
+            });
+        }
 
-    return EquipmentListObjectionModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(equipmentList)));
+        return EquipmentListObjectionModel.query(trx).patchAndFetchById(
+            id,
+            withUpdatedDate(removeIdAndDates(equipmentList)),
+        );
+    });
 };
 
 export const insertEquipmentList = async (
