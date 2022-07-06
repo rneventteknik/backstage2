@@ -706,6 +706,7 @@ export async function seed(knex) {
             numberOfHours: 20,
             pricePerHour: 500,
             bookingId: firstBookingId + 4,
+            sortIndex: 10,
         },
         {
             name: 'Kör',
@@ -714,6 +715,7 @@ export async function seed(knex) {
             numberOfHours: 2,
             pricePerHour: 125,
             bookingId: firstBookingId + 4,
+            sortIndex: 20,
         },
 
         // Konferens - Trädkramarna AB
@@ -724,6 +726,7 @@ export async function seed(knex) {
             numberOfHours: 4,
             pricePerHour: 1000,
             bookingId: firstBookingId + 5,
+            sortIndex: 10,
         },
         {
             name: 'Köra',
@@ -732,6 +735,7 @@ export async function seed(knex) {
             numberOfHours: 100,
             pricePerHour: 250,
             bookingId: firstBookingId + 5,
+            sortIndex: 20,
         },
         {
             name: 'Redigera video',
@@ -740,6 +744,7 @@ export async function seed(knex) {
             numberOfHours: 8,
             pricePerHour: 125,
             bookingId: firstBookingId + 5,
+            sortIndex: 20,
         },
     ]);
 
@@ -831,6 +836,7 @@ export async function seed(knex) {
             endDatetime: new Date().addHours(1).toISOString(),
             pricePerHour: 250,
             accountKind: 1,
+            sortIndex: 10,
         },
         {
             name: 'Kör',
@@ -844,6 +850,7 @@ export async function seed(knex) {
             endDatetime: new Date().addHours(1).toISOString(),
             pricePerHour: 250,
             accountKind: 1,
+            sortIndex: 20,
         },
         {
             name: 'Kör',
@@ -857,6 +864,7 @@ export async function seed(knex) {
             endDatetime: new Date().addHours(1).toISOString(),
             pricePerHour: 250,
             accountKind: 1,
+            sortIndex: 30,
         },
     ]);
 
