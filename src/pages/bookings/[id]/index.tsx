@@ -41,6 +41,8 @@ import {
     getUsageEndDatetime,
     getUsageStartDatetime,
 } from '../../../lib/pricingUtils';
+import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
+import { PartialDeep } from 'type-fest';
 import { TimeEstimate, TimeReport } from '../../../models/interfaces';
 import { getNextSortIndex } from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/timeEstimateAddButton';
@@ -69,7 +71,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser}></TwoColLoadingPage>;
     }
 
-    const saveBooking = async (booking: Partial<IBookingObjectionModel>) => {
+    const saveBooking = async (booking: PartialDeep<IBookingObjectionModel>) => {
         const body = { booking: { ...booking, id: router.query.id } };
 
         const request = {
@@ -136,6 +138,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </IfAdmin>
 
                     <BookingStatusButton booking={booking} onChange={saveBooking} />
+                    <BookingRentalStatusButton booking={booking} onChange={saveBooking} />
                 </IfNotReadonly>
                 <Dropdown as={ButtonGroup}>
                     <Button variant="dark" href={'/api/documents/price-estimate/sv/' + booking.id} target="_blank">

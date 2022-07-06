@@ -70,6 +70,7 @@ const handler = withSessionContext(
                     .then((result) => {
                         const newStatus =
                             booking.status !== req.body.booking.status ? req.body.booking.status : undefined;
+
                         logChangeToBooking(
                             context.currentUser,
                             bookingId,
@@ -77,7 +78,17 @@ const handler = withSessionContext(
                                 ? BookingChangelogEntryType.STATUS
                                 : BookingChangelogEntryType.BOOKING,
                             newStatus,
-                        ).then(() => res.status(200).json(result));
+                        )
+                            .then(() =>
+                                req.body.booking.equipmentLists // Special case: If the equipment lists are modified as a child to the booking, log that as well
+                                    ? logChangeToBooking(
+                                          context.currentUser,
+                                          bookingId,
+                                          BookingChangelogEntryType.EQUIPMENTLIST,
+                                      )
+                                    : null,
+                            )
+                            .then(() => res.status(200).json(result));
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 

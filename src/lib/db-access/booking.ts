@@ -3,9 +3,10 @@ import { BookingType } from '../../models/enums/BookingType';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { Status } from '../../models/enums/Status';
 import { BookingObjectionModel } from '../../models/objection-models';
+import { EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 import { isMemberOfEnum } from '../utils';
-import { removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
+import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchBookings = async (searchString: string, count: number): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
@@ -109,7 +110,37 @@ export const fetchFirstBookingByCalendarBookingId = async (
 export const updateBooking = async (id: number, booking: BookingObjectionModel): Promise<BookingObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(booking)));
+    const existingDatabaseModel = await BookingObjectionModel.query()
+        .findById(id)
+        .orderBy('id')
+        .withGraphFetched('equipmentLists.equipmentListEntries');
+
+    // EquipmentLists.
+    if (booking.equipmentLists !== undefined) {
+        const {
+            toAdd: equipmentListsToAdd,
+            toDelete: equipmentListsToDelete,
+            toUpdate: equipmentListsToUpdate,
+        } = compareLists(booking.equipmentLists, existingDatabaseModel?.equipmentLists);
+
+        equipmentListsToAdd.map(async (x) => {
+            await BookingObjectionModel.relatedQuery('equipmentLists')
+                .for(id)
+                .insert(withCreatedDate(removeIdAndDates(x)));
+        });
+
+        equipmentListsToDelete.map(async (x) => {
+            await EquipmentListObjectionModel.query().deleteById(x.id);
+        });
+
+        equipmentListsToUpdate.map(async (x) => {
+            await EquipmentListObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
+        });
+    }
+
+    await BookingObjectionModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(booking)));
+
+    return fetchBookingWithUser(id);
 };
 
 export const insertBooking = async (booking: BookingObjectionModel): Promise<BookingObjectionModel> => {

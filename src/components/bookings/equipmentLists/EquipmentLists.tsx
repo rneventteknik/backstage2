@@ -8,7 +8,6 @@ import {
     faAngleDown,
     faAngleUp,
     faEraser,
-    faCheckSquare,
     faExclamationCircle,
     faExternalLink,
     faGears,
@@ -17,6 +16,8 @@ import {
     faTrashCan,
     faBackward,
     faClone,
+    faRightFromBracket,
+    faRightToBracket,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
@@ -28,9 +29,10 @@ import {
 } from '../../../lib/utils';
 import {
     EquipmentListObjectionModel,
+    IBookingObjectionModel,
     IEquipmentListObjectionModel,
 } from '../../../models/objection-models/BookingObjectionModel';
-import { toEquipmentList, toEquipmentListObjectionModel } from '../../../lib/mappers/booking';
+import { toBooking, toEquipmentList, toEquipmentListObjectionModel } from '../../../lib/mappers/booking';
 import { useNotifications } from '../../../lib/useNotifications';
 import EquipmentSearch, { ResultType, SearchResultViewModel } from '../../EquipmentSearch';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../../models/objection-models';
@@ -61,6 +63,7 @@ import { RentalStatus } from '../../../models/enums/RentalStatus';
 import { BookingType } from '../../../models/enums/BookingType';
 import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus';
+import BookingReturnalNoteModal from '../BookingReturnalNoteModal';
 import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
 
 type Props = {
@@ -254,6 +257,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     const [showImportModal, setShowImportModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showListContent, setShowListContent] = useState(true);
+    const [showReturnalNoteModal, setShowReturnalNoteModal] = useState(false);
     const [equipmentListEntryToEditViewModel, setEquipmentListEntryToEditViewModel] =
         useState<Partial<EquipmentListEntry> | null>(null);
 
@@ -477,6 +481,29 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     const deleteList = () => {
         setShowDeleteModal(false);
         parentDeleteListFn(list);
+    };
+
+    // Note: This function modifies the booking, not the list
+    const saveReturnalNote = (returnalNote: string) => {
+        const body = { booking: { id: booking.id, returnalNote } };
+
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        fetch('/api/bookings/' + booking.id, request)
+            .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
+            .then(toBooking)
+            .then(() => {
+                mutate({ ...booking, returnalNote: returnalNote });
+                showSaveSuccessNotification('Återlämningsanmärkningen');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Återlämningsanmärkningen');
+            });
     };
 
     // List entry modification functions. Note: these will trigger a save of the whole list.
@@ -785,18 +812,29 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         onClick={() => saveList({ ...list, rentalStatus: RentalStatus.OUT })}
                                         className="mr-2"
                                     >
-                                        <FontAwesomeIcon icon={faCheckSquare} className="mr-1" /> Sätt till utlämnad
+                                        <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
                                     </Button>
                                 ) : null}
 
                                 {booking.bookingType === BookingType.RENTAL && list.rentalStatus == RentalStatus.OUT ? (
-                                    <Button
-                                        variant="secondary"
-                                        onClick={() => saveList({ ...list, rentalStatus: RentalStatus.RETURNED })}
-                                        className="mr-2"
-                                    >
-                                        <FontAwesomeIcon icon={faCheckSquare} className="mr-1" /> Sätt till återlämnad
-                                    </Button>
+                                    <>
+                                        <Button
+                                            variant="secondary"
+                                            onClick={() => setShowReturnalNoteModal(true)}
+                                            className="mr-2"
+                                        >
+                                            <FontAwesomeIcon icon={faRightToBracket} className="mr-1" /> Ta emot
+                                        </Button>
+                                        <BookingReturnalNoteModal
+                                            booking={booking}
+                                            onSubmit={(returnalNote) => {
+                                                saveReturnalNote(returnalNote);
+                                                saveList({ ...list, rentalStatus: RentalStatus.RETURNED });
+                                            }}
+                                            hide={() => setShowReturnalNoteModal(false)}
+                                            show={showReturnalNoteModal}
+                                        />
+                                    </>
                                 ) : null}
 
                                 <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
