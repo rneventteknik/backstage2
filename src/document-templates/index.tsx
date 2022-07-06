@@ -2,8 +2,9 @@ import React, { ReactElement } from 'react';
 import { PriceEstimateDocument } from './components/priceEstimateDocument';
 import { Booking } from '../models/interfaces';
 import { getBookingDocumentId, registerFonts } from './utils';
-import { getTextResource, Language, TextResourcesLanguageContext } from './useTextResources';
+import { getTextResource, TextResourcesLanguageContext } from './useTextResources';
 import { PackingListDocument } from './components/packingListDocument';
+import { Language } from '../models/enums/Language';
 
 registerFonts();
 

@@ -5,6 +5,7 @@ import { IBookingObjectionModel } from '../../models/objection-models';
 import {
     getAccountKindName,
     getBookingTypeName,
+    getLanguageName,
     getPaymentStatusName,
     getPricePlanName,
     getSalaryStatusName,
@@ -23,6 +24,7 @@ import { usersFetcher } from '../../lib/fetchers';
 import RequiredIndicator from '../utils/RequiredIndicator';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
+import { Language } from '../../models/enums/Language';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
@@ -96,6 +98,7 @@ const BookingForm: React.FC<Props> = ({
             paymentStatus: toIntOrUndefined(getValueFromForm('paymentStatus')),
             returnalNote: getValueFromForm('returnalNote'),
             calendarBookingId: getValueFromForm('calendarBookingId'),
+            language: getValueFromForm('language') as Language | undefined,
         };
 
         handleSubmitBooking(modifiedBooking);
@@ -191,7 +194,7 @@ const BookingForm: React.FC<Props> = ({
                         />
                     </Form.Group>
                 </Col>
-                <Col lg="6">
+                <Col lg="3">
                     <Form.Group controlId="formOwnerUser">
                         <Form.Label>
                             Ansvarig medlem
@@ -213,6 +216,23 @@ const BookingForm: React.FC<Props> = ({
                         ) : (
                             <ActivityIndicator />
                         )}
+                    </Form.Group>
+                </Col>
+                <Col lg="3">
+                    <Form.Group controlId="formLanguage">
+                        <Form.Label>
+                            Språk
+                            <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
+                        </Form.Label>
+                        <Form.Control
+                            as="select"
+                            name="language"
+                            defaultValue={booking.language ?? Language.SV}
+                            required={isFieldRequired(Status.DRAFT)}
+                        >
+                            <option value={Language.SV}>{getLanguageName(Language.SV)}</option>
+                            <option value={Language.EN}>{getLanguageName(Language.EN)}</option>
+                        </Form.Control>
                     </Form.Group>
                 </Col>
             </Row>

@@ -10,6 +10,7 @@ import { User } from './User';
 import { Status } from '../enums/Status';
 import { SalaryStatus } from '../enums/SalaryStatus';
 import { PaymentStatus } from '../enums/PaymentStatus';
+import { Language } from '../enums/Language';
 
 export interface Booking extends BaseEntityWithName {
     ownerUser?: User;
@@ -37,6 +38,7 @@ export interface Booking extends BaseEntityWithName {
     contactPersonEmail: string;
     calendarBookingId: string;
     customerName: string;
+    language: Language;
 }
 
 export interface BookingViewModel extends Booking {

@@ -18,9 +18,7 @@ export interface EquipmentListEntry extends BaseEntityWithName {
     equipment?: Equipment;
     equipmentId?: number;
     name: string;
-    nameEN: string;
     description: string;
-    descriptionEN: string;
 
     numberOfUnits: number;
     numberOfHours: number;

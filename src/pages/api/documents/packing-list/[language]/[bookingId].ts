@@ -1,11 +1,11 @@
 import { renderToStream } from '@react-pdf/renderer';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getPackingListDocument, getPackingListDocumentFileName } from '../../../../../document-templates';
-import { Language } from '../../../../../document-templates/useTextResources';
 import { respondWithEntityNotFoundResponse } from '../../../../../lib/apiResponses';
 import { fetchBookingWithEquipmentLists } from '../../../../../lib/db-access/booking';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { withSessionContext } from '../../../../../lib/sessionContext';
+import { Language } from '../../../../../models/enums/Language';
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     if (isNaN(Number(req.query.bookingId))) {

@@ -11,6 +11,7 @@ import {
     ITimeEstimateObjectionModel,
     ITimeReportObjectionModel,
 } from '.';
+import { Language } from '../enums/Language';
 import { TimeReportObjectionModel } from './TimeReportObjectionModel';
 
 export interface IBookingObjectionModel extends BaseObjectionModelWithName {
@@ -42,6 +43,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     contactPersonEmail: string;
     calendarBookingId: string;
     customerName: string;
+    language: Language;
 }
 
 export class BookingObjectionModel extends Model {
@@ -130,6 +132,7 @@ export class BookingObjectionModel extends Model {
     contactPersonEmail!: string;
     calendarBookingId!: string;
     customerName!: string;
+    language!: Language;
 }
 
 export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName {
@@ -184,9 +187,7 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
     equipment?: IEquipmentObjectionModel;
     equipmentId?: number;
     name: string;
-    nameEN: string;
     description: string;
-    descriptionEN: string;
 
     numberOfUnits: number;
     numberOfHours: number;
@@ -228,9 +229,7 @@ export class EquipmentListEntryObjectionModel extends Model {
     sortIndex!: number;
     equipment!: EquipmentObjectionModel;
     equipmentId!: number;
-    nameEN!: string;
     description!: string;
-    descriptionEN!: string;
 
     numberOfUnits!: number;
     numberOfHours!: number;

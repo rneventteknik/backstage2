@@ -1,9 +1,9 @@
-import { Language } from './useTextResources';
+import { Language } from '../models/enums/Language';
 
 // This file contains all text resources for the document exports.
 
 export const documentTextResources: Record<Language, Record<string, string>> = {
-    SV: {
+    sv: {
         // Booking info
         'common.booking-info.booking-gig': 'Arrangemang',
         'common.booking-info.booking-rental': 'Hyra',
@@ -55,7 +55,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.misc.hours-unit': 'h',
         'common.misc.days-unit': 'dagar',
     },
-    EN: {
+    en: {
         // Booking info
         'common.booking-info.booking-gig': 'Event',
         'common.booking-info.booking-rental': 'Rental',

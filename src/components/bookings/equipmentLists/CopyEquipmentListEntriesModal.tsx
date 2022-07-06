@@ -10,18 +10,20 @@ import { toBooking } from '../../../lib/mappers/booking';
 import { IBookingObjectionModel } from '../../../models/objection-models';
 import { getSortedList, sortIndexSortFn } from '../../../lib/sortIndexUtils';
 import { formatNumberAsCurrency, formatPrice } from '../../../lib/pricingUtils';
-import { Booking, EquipmentPrice } from '../../../models/interfaces';
+import { Booking, Equipment, EquipmentPrice } from '../../../models/interfaces';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
+import { Language } from '../../../models/enums/Language';
 
 type Props = {
     show: boolean;
     onHide: () => void;
     onImport: (EquipmentListEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[]) => void;
     pricePlan: PricePlan | undefined;
+    language: Language | undefined;
 };
 
-const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport, pricePlan }: Props) => {
+const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport, pricePlan, language }: Props) => {
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
     const [selectedEquipmentList, setSelectedEquipmentList] = useState<EquipmentList | null>(null);
     const [selectedEquipmentListEntryIds, setSelectedEquipmentListEntryIds] = useState<number[]>([]);
@@ -79,19 +81,15 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                     discount: x.discount,
 
                     name: x.name,
-                    nameEN: x.nameEN,
                     description: x.description,
-                    descriptionEN: x.descriptionEN,
 
                     pricePerHour: x.pricePerHour,
                     pricePerUnit: x.pricePerUnit,
                 };
 
                 if (resetNames && x.equipment) {
-                    entry.name = x.equipment.name;
-                    entry.nameEN = x.equipment.nameEN;
-                    entry.description = x.equipment.description;
-                    entry.descriptionEN = x.equipment.descriptionEN;
+                    entry.name = getEquipmentName(x.equipment) ?? '';
+                    entry.description = getEquipmentDescription(x.equipment) ?? '';
                 }
 
                 if (resetPrices) {
@@ -135,6 +133,12 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
         };
     };
 
+    const getEquipmentName = (equipment: Equipment | undefined) =>
+        language === Language.SV ? equipment?.name : equipment?.nameEN;
+
+    const getEquipmentDescription = (equipment: Equipment | undefined) =>
+        language === Language.SV ? equipment?.description : equipment?.descriptionEN;
+
     // Table display functions
     //
     const EquipmentListEntrySelectionDisplayFn = (entry: EquipmentListEntry) => (
@@ -151,12 +155,12 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
         <div onClick={() => toggleEquipmentListEntrySelection(entry)}>
             <div className="mb-0">
                 {entry.name}
-                {resetNames && entry.name != entry.equipment?.name ? (
+                {resetNames && entry.name != getEquipmentName(entry.equipment) ? (
                     <OverlayTrigger
                         placement="right"
                         overlay={
                             <Tooltip id="1">
-                                Namnet kommer att återställas till <em>{entry.equipment?.name}</em>
+                                Namnet kommer att återställas till <em>{getEquipmentName(entry.equipment)}</em>
                             </Tooltip>
                         }
                     >
@@ -167,12 +171,13 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
             <div className="mb-0">
                 <span className="text-muted">
                     {entry.description}
-                    {resetNames && entry.description != entry.equipment?.description ? (
+                    {resetNames && entry.description != getEquipmentDescription(entry.equipment) ? (
                         <OverlayTrigger
                             placement="right"
                             overlay={
                                 <Tooltip id="1">
-                                    Beskrivningen kommer återställas till <em>{entry.equipment?.description}</em>
+                                    Beskrivningen kommer återställas till{' '}
+                                    <em>{getEquipmentDescription(entry.equipment)}</em>
                                 </Tooltip>
                             }
                         >

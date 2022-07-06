@@ -11,6 +11,7 @@ import { useNotifications } from '../lib/useNotifications';
 import { toEquipment } from '../lib/mappers/equipment';
 import { BaseEntityWithName } from '../models/interfaces/BaseEntity';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../models/objection-models';
+import { Language } from '../models/enums/Language';
 
 export enum ResultType {
     EQUIPMENT,
@@ -28,6 +29,7 @@ type Props = {
     id: string;
     placeholder?: string;
     includePackages?: boolean;
+    language?: Language;
     onSelect?: (selected: SearchResultViewModel) => unknown;
     onFocus?: () => unknown;
     onBlur?: () => unknown;
@@ -37,6 +39,7 @@ const EquipmentSearch: React.FC<Props> = ({
     id,
     placeholder = '',
     includePackages = true,
+    language = Language.SV,
     onSelect,
     onFocus,
     onBlur,
@@ -100,16 +103,18 @@ const EquipmentSearch: React.FC<Props> = ({
         entity,
         state,
     }: SearchListItemProps<T>): React.ReactElement => {
-        const equipmentPackage = entity as unknown as IEquipmentObjectionModel | IEquipmentPackageObjectionModel;
+        const typedEntity = entity as unknown as IEquipmentObjectionModel | IEquipmentPackageObjectionModel;
+        const englishName: string | undefined = (entity as unknown as IEquipmentObjectionModel).nameEN;
+        const displayName = language === Language.EN && englishName ? `${englishName} (${entity.name})` : entity.name;
         return (
             <>
                 <div>
-                    <Typeahead.Highlighter search={state.text}>{entity.name}</Typeahead.Highlighter>{' '}
+                    <Typeahead.Highlighter search={state.text}>{displayName}</Typeahead.Highlighter>{' '}
                     {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
                 </div>
                 <div>
                     <small>
-                        {equipmentPackage.tags?.map((x) => (
+                        {typedEntity.tags?.map((x) => (
                             <Badge variant="dark" key={x.id} className="mr-2">
                                 {x.name}
                             </Badge>

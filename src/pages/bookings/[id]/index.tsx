@@ -6,6 +6,7 @@ import { Badge, Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, ListGr
 import {
     formatNullableDate,
     getAccountKindName,
+    getLanguageName,
     getPaymentStatusName,
     getPricePlanName,
     getResponseContentOrError,
@@ -41,6 +42,7 @@ import {
     getUsageEndDatetime,
     getUsageStartDatetime,
 } from '../../../lib/pricingUtils';
+import { Language } from '../../../models/enums/Language';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
 import { TimeEstimate, TimeReport } from '../../../models/interfaces';
@@ -141,16 +143,17 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     <BookingRentalStatusButton booking={booking} onChange={saveBooking} />
                 </IfNotReadonly>
                 <Dropdown as={ButtonGroup}>
-                    <Button variant="dark" href={'/api/documents/price-estimate/sv/' + booking.id} target="_blank">
+                    <Button
+                        variant="dark"
+                        href={`/api/documents/price-estimate/${booking.language}/${booking.id}`}
+                        target="_blank"
+                    >
                         <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning
                     </Button>
 
                     <Dropdown.Toggle split variant="dark" id="dropdown-split-basic" />
 
                     <Dropdown.Menu>
-                        <Dropdown.Item href={'/api/documents/price-estimate/en/' + booking.id} target="_blank">
-                            <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Prisuppskattning (engelska)
-                        </Dropdown.Item>
                         <Dropdown.Item href={'/api/documents/packing-list/sv/' + booking.id} target="_blank">
                             <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Packlista
                         </Dropdown.Item>
@@ -207,6 +210,11 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <Badge variant="dark" className="ml-1">
                                 {getPaymentStatusName(booking.paymentStatus)}
                             </Badge>
+                            {booking.language !== Language.SV ? (
+                                <Badge variant="dark" className="ml-1">
+                                    {getLanguageName(booking.language)}
+                                </Badge>
+                            ) : null}
                             <div className="text-muted mt-2"> {booking.customerName}</div>
                             <div className="text-muted">
                                 {getNumberOfBookingDays(booking) ?? 0} dagar / {getNumberOfEventHours(booking)} h /{' '}

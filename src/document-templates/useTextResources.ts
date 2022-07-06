@@ -1,10 +1,6 @@
 import React, { useContext } from 'react';
+import { Language } from '../models/enums/Language';
 import { documentTextResources } from './documentTextResources';
-
-export enum Language {
-    SV = 'SV',
-    EN = 'EN',
-}
 
 export const TextResourcesLanguageContext = React.createContext(Language.SV);
 

@@ -65,6 +65,7 @@ import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus';
 import BookingReturnalNoteModal from '../BookingReturnalNoteModal';
 import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
+import { Language } from '../../../models/enums/Language';
 
 type Props = {
     bookingId: number;
@@ -337,10 +338,8 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             equipmentId: equipment.id,
             numberOfUnits: 1,
             numberOfHours: prices.pricePerHour > 0 ? 1 : 0,
-            name: equipment.name,
-            nameEN: equipment.nameEN,
-            description: equipment.description,
-            descriptionEN: equipment.descriptionEN,
+            name: booking.language === Language.SV ? equipment.name : equipment.nameEN,
+            description: booking.language === Language.SV ? equipment.description : equipment.descriptionEN,
             ...prices,
             discount: 0,
         };
@@ -436,8 +435,6 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
                 name: x.name,
                 description: x.description,
-                nameEN: x.nameEN,
-                descriptionEN: x.descriptionEN,
 
                 pricePerUnit: x.pricePerUnit,
                 pricePerHour: x.pricePerHour,
@@ -970,6 +967,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             <EquipmentSearch
                                 placeholder="Lägg till utrustning"
                                 includePackages={true}
+                                language={booking.language}
                                 id="equipment-search"
                                 onSelect={(x) => addFromSearch(x)}
                             />
@@ -1221,9 +1219,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 equipment: equipmentListEntryToEditViewModel.equipment,
                                 equipmentId: equipmentListEntryToEditViewModel.equipmentId,
                                 name: equipmentListEntryToEditViewModel.name ?? '',
-                                nameEN: equipmentListEntryToEditViewModel.nameEN ?? '',
                                 description: equipmentListEntryToEditViewModel.description ?? '',
-                                descriptionEN: equipmentListEntryToEditViewModel.descriptionEN ?? '',
                                 numberOfUnits: Math.abs(equipmentListEntryToEditViewModel.numberOfUnits ?? 1),
                                 numberOfHours: Math.abs(equipmentListEntryToEditViewModel.numberOfHours ?? 0),
                                 pricePerUnit: Math.abs(equipmentListEntryToEditViewModel.pricePerUnit ?? 0),
@@ -1254,6 +1250,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 onHide={() => setShowImportModal(false)}
                 onImport={importEquipmentEntries}
                 pricePlan={booking.pricePlan}
+                language={booking.language}
             />
         </Card>
     );

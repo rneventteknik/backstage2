@@ -10,6 +10,7 @@ import { PaymentStatus } from '../models/enums/PaymentStatus';
 import { RentalStatus } from '../models/enums/RentalStatus';
 import { Booking, BookingViewModel, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
+import { Language } from '../models/enums/Language';
 
 // Helper functions for array operations
 //
@@ -193,6 +194,16 @@ export const getRoleName = (role: Role | undefined): string => {
 
         default:
             return '';
+    }
+};
+
+export const getLanguageName = (language: Language): string => {
+    switch (language) {
+        case Language.SV:
+            return 'Svenska';
+
+        case Language.EN:
+            return 'Engelska';
     }
 };
 
