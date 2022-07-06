@@ -1,3 +1,4 @@
+import Objection from 'objection';
 import {
     EquipmentPackageEntryObjectionModel,
     EquipmentPackageObjectionModel,
@@ -20,10 +21,13 @@ export const searchEquipmentPackage = async (
         .limit(count);
 };
 
-export const fetchEquipmentPackage = async (id: number): Promise<EquipmentPackageObjectionModel | undefined> => {
+export const fetchEquipmentPackage = async (
+    id: number,
+    trx?: Objection.Transaction,
+): Promise<EquipmentPackageObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
-    return EquipmentPackageObjectionModel.query()
+    return EquipmentPackageObjectionModel.query(trx)
         .findById(id)
         .withGraphFetched('equipmentEntries.equipment.prices')
         .withGraphFetched('tags');
@@ -91,10 +95,18 @@ export const updateEquipmentPackage = async (
             });
         }
 
-        return EquipmentPackageObjectionModel.query(trx).patchAndFetchById(
+        EquipmentPackageObjectionModel.query(trx).patchAndFetchById(
             id,
             withUpdatedDate(removeIdAndDates(equipmentPackage)),
         );
+
+        const updatedEquipmentPackage = await fetchEquipmentPackage(id, trx);
+
+        if (!updatedEquipmentPackage) {
+            throw new Error('Invalid DB state');
+        }
+
+        return updatedEquipmentPackage;
     });
 };
 
