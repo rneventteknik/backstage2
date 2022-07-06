@@ -96,10 +96,10 @@ const EquipmentSearch: React.FC<Props> = ({
         state: Typeahead.TypeaheadState<SearchResultViewModel>;
     };
 
-    function SearchListItem<T extends SearchResultViewModel & HasIndex>({
+    const SearchListItem = <T extends SearchResultViewModel & HasIndex>({
         entity,
         state,
-    }: SearchListItemProps<T>): React.ReactElement {
+    }: SearchListItemProps<T>): React.ReactElement => {
         const equipmentPackage = entity as unknown as IEquipmentObjectionModel | IEquipmentPackageObjectionModel;
         return (
             <>
@@ -118,7 +118,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 </div>
             </>
         );
-    }
+    };
 
     const renderMenu = (
         results: Typeahead.TypeaheadResult<SearchResultViewModel>[],
@@ -132,7 +132,7 @@ const EquipmentSearch: React.FC<Props> = ({
         state: Typeahead.TypeaheadState<SearchResultViewModel>;
     };
 
-    function Menu({ results, menuProps, state }: MenuProps): React.ReactElement {
+    const Menu = ({ results, menuProps, state }: MenuProps): React.ReactElement => {
         const resultWithIndex = results.map((res, index) => ({ index: index, ...res }));
         return (
             <Typeahead.Menu {...menuProps} className={styles.menu}>
@@ -154,7 +154,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 )}
             </Typeahead.Menu>
         );
-    }
+    };
 
     return (
         <Typeahead.AsyncTypeahead

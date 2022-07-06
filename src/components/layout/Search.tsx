@@ -98,12 +98,12 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
         state: Typeahead.TypeaheadState<SearchResultViewModel>;
     };
 
-    function ResultSection<T extends SearchResultViewModel & HasIndex>({
+    const ResultSection = <T extends SearchResultViewModel & HasIndex>({
         results,
         heading,
         icon,
         state,
-    }: ResultSectionProps<T>): React.ReactElement {
+    }: ResultSectionProps<T>): React.ReactElement => {
         const getDescription = (entity: T, highlightText: string) => {
             switch (entity.type) {
                 case ResultType.USER:
@@ -167,7 +167,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                 )}
             </>
         );
-    }
+    };
 
     const renderMenu = (
         results: Typeahead.TypeaheadResult<SearchResultViewModel>[],
@@ -181,7 +181,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
         state: Typeahead.TypeaheadState<SearchResultViewModel>;
     };
 
-    function Menu({ results, menuProps, state }: MenuProps): React.ReactElement {
+    const Menu = ({ results, menuProps, state }: MenuProps): React.ReactElement => {
         const resultWithIndex = results.map((res, index) => ({ index: index, ...res }));
         const res = groupBy(resultWithIndex, (x) => x.type);
 
@@ -201,7 +201,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                 <ResultSection heading="Användare" icon={faUser} results={res[ResultType.USER]} state={state} />
             </Typeahead.Menu>
         );
-    }
+    };
 
     return (
         <Typeahead.AsyncTypeahead

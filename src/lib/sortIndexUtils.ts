@@ -5,7 +5,7 @@ export interface HasSortIndex extends HasId {
     sortIndex: number;
 }
 
-export function sortIndexSortFn(a: HasSortIndex, b: HasSortIndex) {
+export const sortIndexSortFn = (a: HasSortIndex, b: HasSortIndex) => {
     if ((a.sortIndex ?? 0) < (b.sortIndex ?? 0)) {
         return -1;
     }
@@ -22,13 +22,11 @@ export function sortIndexSortFn(a: HasSortIndex, b: HasSortIndex) {
     }
 
     return 0;
-}
+};
 
-export function getSortedList<T extends HasSortIndex>(list: T[]) {
-    return [...list].sort(sortIndexSortFn);
-}
+export const getSortedList = <T extends HasSortIndex>(list: T[]) => [...list].sort(sortIndexSortFn);
 
-export function getPreviousItem<T extends HasSortIndex>(list: T[], item: T): T | null {
+export const getPreviousItem = <T extends HasSortIndex>(list: T[], item: T): T | null => {
     const sortedList = getSortedList(list);
 
     const index = sortedList.findIndex((x) => x.id === item.id);
@@ -38,9 +36,9 @@ export function getPreviousItem<T extends HasSortIndex>(list: T[], item: T): T |
     }
 
     return sortedList[index - 1];
-}
+};
 
-export function getNextItem<T extends HasSortIndex>(list: T[], item: T): T | null {
+export const getNextItem = <T extends HasSortIndex>(list: T[], item: T): T | null => {
     const sortedList = getSortedList(list);
 
     const index = sortedList.findIndex((x) => x.id === item.id);
@@ -50,18 +48,14 @@ export function getNextItem<T extends HasSortIndex>(list: T[], item: T): T | nul
     }
 
     return sortedList[index + 1];
-}
+};
 
-export function isFirst<T extends HasSortIndex>(list: T[], item: T): boolean {
-    return getPreviousItem(list, item) === null;
-}
+export const isFirst = <T extends HasSortIndex>(list: T[], item: T): boolean => getPreviousItem(list, item) === null;
 
-export function isLast<T extends HasSortIndex>(list: T[], item: T): boolean {
-    return getNextItem(list, item) === null;
-}
+export const isLast = <T extends HasSortIndex>(list: T[], item: T): boolean => getNextItem(list, item) === null;
 
 // Note: This function only returns the modified items, not the whole list
-export function moveItemUp<T extends HasSortIndex>(list: T[], item: T): T[] {
+export const moveItemUp = <T extends HasSortIndex>(list: T[], item: T): T[] => {
     if (!list || !item || !list.some((x) => x.id === item.id)) {
         throw new Error('Invalid parameters');
     }
@@ -83,10 +77,10 @@ export function moveItemUp<T extends HasSortIndex>(list: T[], item: T): T[] {
         { ...item, sortIndex: previous.sortIndex },
         { ...previous, sortIndex: item.sortIndex },
     ];
-}
+};
 
 // Note: This function only returns the modified items, not the whole list
-export function moveItemDown<T extends HasSortIndex>(list: T[], item: T): T[] {
+export const moveItemDown = <T extends HasSortIndex>(list: T[], item: T): T[] => {
     if (!list || !item || !list.some((x) => x.id === item.id)) {
         throw new Error('Invalid parameters');
     }
@@ -108,9 +102,9 @@ export function moveItemDown<T extends HasSortIndex>(list: T[], item: T): T[] {
         { ...item, sortIndex: next.sortIndex },
         { ...next, sortIndex: item.sortIndex },
     ];
-}
+};
 
-export function getNextSortIndex<T extends HasSortIndex>(list: T[]): number {
+export const getNextSortIndex = <T extends HasSortIndex>(list: T[]): number => {
     if (!list) {
         throw new Error('Invalid list');
     }
@@ -120,13 +114,12 @@ export function getNextSortIndex<T extends HasSortIndex>(list: T[]): number {
     }
 
     return (getSortedList(list)[list.length - 1].sortIndex ?? 0) + 10;
-}
+};
 
-export function checkSortIndexUniqueness<T extends HasSortIndex>(list: T[]): boolean {
-    return !list.some((entity) => list.some((x) => x.sortIndex === entity.sortIndex && x.id !== entity.id));
-}
+export const checkSortIndexUniqueness = <T extends HasSortIndex>(list: T[]): boolean =>
+    !list.some((entity) => list.some((x) => x.sortIndex === entity.sortIndex && x.id !== entity.id));
 
-export function fixSortIndexUniqueness<T extends HasSortIndex>(list: T[]): T[] {
+export const fixSortIndexUniqueness = <T extends HasSortIndex>(list: T[]): T[] => {
     let sortIndex = 0;
     return getSortedList(list).map((x) => ({ ...x, sortIndex: (sortIndex += 10) }));
-}
+};

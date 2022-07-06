@@ -14,14 +14,14 @@ const options = {
     cookieOptions: { secure: false },
 };
 
-export function withApiSession(handler: NextApiHandler): NextApiHandler {
+export const withApiSession = (handler: NextApiHandler): NextApiHandler => {
     return withIronSessionApiRoute(handler, options);
-}
+};
 
-export function withSsrSession<T extends { [key: string]: unknown }>(
+export const withSsrSession = <T extends { [key: string]: unknown }>(
     handler: (context: GetServerSidePropsContext) => GetServerSidePropsResult<T> | Promise<GetServerSidePropsResult<T>>,
-) {
+) => {
     return withIronSessionSsr(handler, options);
-}
+};
 
 export { options };

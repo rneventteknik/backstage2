@@ -38,11 +38,11 @@ type ListProps<T extends HasId | HasStringId> = {
     filterString?: string;
 };
 
-export function TableDisplay<T extends HasId | HasStringId>({
+export const TableDisplay = <T extends HasId | HasStringId>({
     entities,
     configuration,
     filterString: filterStringFromParent,
-}: ListProps<T>): React.ReactElement {
+}: ListProps<T>): React.ReactElement => {
     // Store sort column and direction, and filter search text using state
     //
     const [sortKey, setSortKey] = React.useState<string | null>(
@@ -204,7 +204,7 @@ export function TableDisplay<T extends HasId | HasStringId>({
             ) : null}
         </div>
     );
-}
+};
 
 const getTextAlignmentClassName = (textAlignment: string | undefined) => {
     switch (textAlignment) {

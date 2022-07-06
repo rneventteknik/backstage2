@@ -101,7 +101,7 @@ type DoubleClickToEditDropdownProps<T> = {
     readonly?: boolean;
 };
 
-export function DoubleClickToEditDropdown<T>({
+export const DoubleClickToEditDropdown = <T,>({
     value,
     options,
     optionLabelFn,
@@ -111,7 +111,7 @@ export function DoubleClickToEditDropdown<T>({
     size,
     children,
     readonly,
-}: DoubleClickToEditDropdownProps<T>): React.ReactElement {
+}: DoubleClickToEditDropdownProps<T>): React.ReactElement => {
     const [selectedKey, setSelectedKey] = useState(optionKeyFn(value));
     const [isEditing, setIsEditing] = useState(false);
 
@@ -158,4 +158,4 @@ export function DoubleClickToEditDropdown<T>({
             ))}
         </Form.Control>
     );
-}
+};
