@@ -44,7 +44,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </Link>
                 </IfNotReadonly>
             </Header>
-            <LargeBookingTable bookings={bookingsToShow} />
+            <LargeBookingTable bookings={bookingsToShow} tableSettingsOverride={{ defaultSortAscending: true }} />
         </Layout>
     );
 };

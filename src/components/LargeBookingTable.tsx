@@ -18,8 +18,8 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
         <BookingTypeTag booking={booking} className="ml-1" />
         <RentalStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{getStatusName(booking.status)}</p>
+        <p className="text-muted mb-0 d-lg-none">{booking.customerName ?? '-'}</p>
         <p className="text-muted mb-0 d-lg-none">{booking.ownerUser?.name ?? '-'}</p>
-        <p className="text-muted mb-0 d-sm-none">{booking.displayStartDate}</p>
     </>
 );
 
@@ -41,6 +41,7 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             displayName: 'Beställare',
             getValue: (booking: BookingViewModel) => booking.customerName ?? '-',
             textTruncation: true,
+            cellHideSize: 'lg',
         },
         {
             key: 'location',
@@ -64,16 +65,16 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             getValue: (booking: BookingViewModel) => booking.displayStartDate,
             columnWidth: 180,
             textAlignment: 'center',
-            cellHideSize: 'sm',
         },
     ],
 };
 
 type Props = {
     bookings: BookingViewModel[];
+    tableSettingsOverride?: Partial<TableConfiguration<BookingViewModel>>;
 };
 
-const LargeBookingTable: React.FC<Props> = ({ bookings }: Props) => {
+const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }: Props) => {
     const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
     const [searchText, setSearchText] = useState('');
     const [userIds, setUserIds] = useState<(number | undefined)[]>([]);
@@ -183,7 +184,11 @@ const LargeBookingTable: React.FC<Props> = ({ bookings }: Props) => {
                 </Form.Row>
             </Collapse>
 
-            <TableDisplay entities={bookingsToShow} configuration={tableSettings} filterString={searchText} />
+            <TableDisplay
+                entities={bookingsToShow}
+                configuration={{ ...tableSettings, ...tableSettingsOverride }}
+                filterString={searchText}
+            />
         </>
     );
 };

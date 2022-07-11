@@ -21,7 +21,7 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
         <BookingTypeTag booking={booking} className="ml-1" />
         <RentalStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{getStatusName(booking.status)}</p>
-        <p className="text-muted mb-0 d-sm-none">{booking.displayStartDate}</p>
+        <p className="text-muted mb-0 d-sm-none">{booking.customerName ?? '-'}</p>
     </>
 );
 
@@ -46,12 +46,12 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             getValue: (booking: BookingViewModel) => booking.customerName ?? '-',
             textTruncation: true,
             columnWidth: 300,
+            cellHideSize: 'sm',
         },
         {
             key: 'date',
             displayName: 'Datum',
             getValue: (booking: BookingViewModel) => booking.displayStartDate,
-            cellHideSize: 'sm',
             columnWidth: 100,
         },
     ],
