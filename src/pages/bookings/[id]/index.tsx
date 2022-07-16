@@ -19,7 +19,7 @@ import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
 import BookingTypeTag from '../../../components/utils/BookingTypeTag';
 import { bookingFetcher } from '../../../lib/fetchers';
 import TimeEstimateList from '../../../components/bookings/timeEstimate/TimeEstimateList';
-import TimeReportList from '../../../components/bookings/timeReport/timeReportList';
+import TimeReportList from '../../../components/bookings/timeReport/TimeReportList';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
@@ -47,8 +47,8 @@ import BookingRentalStatusButton from '../../../components/bookings/BookingRenta
 import { PartialDeep } from 'type-fest';
 import { TimeEstimate, TimeReport } from '../../../models/interfaces';
 import { getNextSortIndex } from '../../../lib/sortIndexUtils';
-import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/timeEstimateAddButton';
-import TimeReportAddButton from '../../../components/bookings/timeReport/timeReportAddButton';
+import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/TimeEstimateAddButton';
+import TimeReportAddButton from '../../../components/bookings/timeReport/TimeReportAddButton';
 import RentalStatusTag from '../../../components/utils/RentalStatusTag';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks

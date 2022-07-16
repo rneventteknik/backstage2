@@ -33,7 +33,7 @@ import { AccountKind } from '../../../models/enums/AccountKind';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import Skeleton from 'react-loading-skeleton';
 import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
-import TimeReportAddButton from './timeReportAddButton';
+import TimeReportAddButton from './TimeReportAddButton';
 
 type Props = {
     bookingId: number;
@@ -106,9 +106,9 @@ const TimeReportList: React.FC<Props> = ({
     }
 
     const updateTimeReport = (timeReport: TimeReport) => {
-        const filteredtimeReports = timeReports?.map((x) => (x.id !== timeReport.id ? x : timeReport));
+        const filteredTimeReports = timeReports?.map((x) => (x.id !== timeReport.id ? x : timeReport));
 
-        mutateTimeReports(filteredtimeReports);
+        mutateTimeReports(filteredTimeReports);
 
         const body = { timeReport: timeReport };
         const request = {
@@ -126,8 +126,8 @@ const TimeReportList: React.FC<Props> = ({
     };
 
     const deleteTimeReport = (timeReport: TimeReport) => {
-        const filteredtimeReports = timeReports?.filter((x) => x.id !== timeReport.id);
-        mutateTimeReports(filteredtimeReports);
+        const filteredTimeReports = timeReports?.filter((x) => x.id !== timeReport.id);
+        mutateTimeReports(filteredTimeReports);
 
         const request = {
             method: 'DELETE',
@@ -469,7 +469,6 @@ const TimeReportList: React.FC<Props> = ({
                                         {timeReportToEditViewModel.accountKind ? null : (
                                             <option value="">Välj kontotyp</option>
                                         )}
-                                        )
                                         <option value={AccountKind.EXTERNAL}>
                                             {getAccountKindName(AccountKind.EXTERNAL)}
                                         </option>

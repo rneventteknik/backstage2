@@ -21,7 +21,7 @@ import {
 import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
 import Skeleton from 'react-loading-skeleton';
 import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
-import TimeEstimateAddButton from './timeEstimateAddButton';
+import TimeEstimateAddButton from './TimeEstimateAddButton';
 
 type Props = {
     bookingId: number;
@@ -76,9 +76,9 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
     }
 
     const updateTimeEstimate = (timeEstimate: TimeEstimate) => {
-        const filteredtimeEstimates = timeEstimates?.map((x) => (x.id !== timeEstimate.id ? x : timeEstimate));
+        const filteredTimeEstimates = timeEstimates?.map((x) => (x.id !== timeEstimate.id ? x : timeEstimate));
 
-        mutateTimeEstimates(filteredtimeEstimates);
+        mutateTimeEstimates(filteredTimeEstimates);
 
         const body = { timeEstimate: timeEstimate };
         const request = {
@@ -96,8 +96,8 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
     };
 
     const deleteTimeEstimate = (timeEstimate: TimeEstimate) => {
-        const filteredtimeEstimates = timeEstimates?.filter((x) => x.id !== timeEstimate.id);
-        mutateTimeEstimates(filteredtimeEstimates);
+        const filteredTimeEstimates = timeEstimates?.filter((x) => x.id !== timeEstimate.id);
+        mutateTimeEstimates(filteredTimeEstimates);
 
         const request = {
             method: 'DELETE',
