@@ -98,7 +98,7 @@ const PublicPricePage: React.FC = () => {
         <div style={containerStyle}>
             <h1>{pageTitle}</h1>
             {equipmentGroups.map((x) => (
-                <div key={x.category.id} className="mb-5">
+                <div key={`category-${x.category.id}`} className="mb-5">
                     {x.category.name ? <h5>{x.category.name}</h5> : null}
                     {x.category.description ? <div className="text-muted mb-3">{x.category.description}</div> : null}
                     <Table style={{ width: '100%' }}>
@@ -109,7 +109,7 @@ const PublicPricePage: React.FC = () => {
                         </colgroup>
                         <tbody>
                             {x.equipment.map((equipment) => (
-                                <React.Fragment key={equipment.id}>
+                                <React.Fragment key={`equipment-${equipment.id}`}>
                                     <tr>
                                         <td rowSpan={equipment.prices.length > 0 ? equipment.prices.length : 1}>
                                             <div>{equipment.name}</div>
@@ -121,7 +121,7 @@ const PublicPricePage: React.FC = () => {
                                         ></PriceCells>
                                     </tr>
                                     {equipment.prices.slice(1).map((price) => (
-                                        <tr key={equipment.id + '-price-' + price.id}>
+                                        <tr key={`equipment-${equipment.id}-price-${price.id}`}>
                                             <PriceCells price={price}></PriceCells>
                                         </tr>
                                     ))}

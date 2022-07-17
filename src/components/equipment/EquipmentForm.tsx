@@ -197,7 +197,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 <Form.Control
                                     as="select"
                                     name="publiclyHidden"
-                                    defaultValue={equipment?.publiclyHidden.toString()}
+                                    defaultValue={equipment?.publiclyHidden ? 'true' : 'false'}
                                 >
                                     <option value={'false'}>Synlig i publika prislistan</option>
                                     <option value={'true'}>Gömd (visas endast internt)</option>
@@ -210,7 +210,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 <Form.Control
                                     as="select"
                                     name="publicCategory"
-                                    defaultValue={equipment?.publiclyHidden.toString()}
+                                    defaultValue={equipment?.equipmentPublicCategory?.id}
                                 >
                                     <option value={undefined}>Ingen kategori</option>
                                     {equipmentPublicCategories?.map((x) => (
