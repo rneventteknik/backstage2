@@ -3,6 +3,8 @@ import { Form, FormControl, Button, FormGroup, Alert, Spinner } from 'react-boot
 import Router from 'next/router';
 import { useUser } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
+import LoginTokenButton from '../components/LoginTokenButton';
+import LineWithContent from '../components/utils/LineWithContent';
 
 const containerStyle = {
     margin: 'auto',
@@ -108,6 +110,10 @@ const LoginPage: React.FC = () => {
                     </Button>
                 )}
             </Form>
+            <LineWithContent>
+                <span className="text-muted">eller</span>
+            </LineWithContent>
+            <LoginTokenButton variant="outline-primary" />
         </div>
     );
 };

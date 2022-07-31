@@ -49,3 +49,5 @@ export const timeReportsFetcher = generateListFetcher(toTimeReport);
 
 export const timeEstimateFetcher = generateFetcher(toTimeEstimate);
 export const timeEstimatesFetcher = generateListFetcher(toTimeEstimate);
+
+export const genericFetcher = generateFetcher((x) => x);

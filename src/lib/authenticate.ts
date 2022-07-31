@@ -3,8 +3,10 @@ import { fetchUserAuth } from './db-access';
 import { UserAuthObjectionModel } from '../models/objection-models/UserObjectionModel';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { NextApiRequest } from 'next';
-import { fetchUserAuthById } from './db-access/userAuth';
+import { fetchUserAuthByLoginToken, fetchUserAuthById, updateUserAuth } from './db-access/userAuth';
 import { IncomingMessage } from 'http';
+import { sealData, unsealData } from 'iron-session';
+import { LoginToken } from '../models/misc/LoginToken';
 
 export const authenticate = async (username: string, password: string): Promise<UserAuthObjectionModel | null> => {
     const user = await fetchUserAuth(username);
@@ -78,4 +80,45 @@ export const getAndVerifyUser = async (req: NextApiRequest & IncomingMessage): P
 
     // User from cookie is ok, return it and do not change any cookies
     return currentUser;
+};
+
+export const sealLoginToken = async (loginToken: LoginToken) => {
+    return await sealData(loginToken, { password: process.env.SECRET_COOKIE_PASSWORD ?? '' });
+};
+
+export const unsealLoginToken = async (sealedLoginToken: string) => {
+    return (await unsealData(sealedLoginToken, { password: process.env.SECRET_COOKIE_PASSWORD ?? '' })) as LoginToken;
+};
+
+export const authenticateWithLoginToken = async (
+    sealedToken: string,
+    ip: string,
+): Promise<UserAuthObjectionModel | null> => {
+    const token = await unsealLoginToken(sealedToken);
+
+    // First verify that there is user with this token
+    const userAuth = await fetchUserAuthByLoginToken(token.tokenId);
+
+    if (!userAuth) {
+        return null;
+    }
+
+    // Second, verify time
+    if (!userAuth.loginTokenExpirationDate || new Date(userAuth.loginTokenExpirationDate) < new Date()) {
+        return null;
+    }
+
+    // Third, verify ip adress
+    if (ip !== userAuth.loginTokenIp) {
+        return null;
+    }
+
+    // Login successfull, remove token from DB
+    await updateUserAuth(userAuth.userId, {
+        loginToken: null,
+        loginTokenIp: null,
+        loginTokenExpirationDate: null,
+    });
+
+    return userAuth;
 };

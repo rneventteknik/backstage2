@@ -11,6 +11,7 @@ import { RentalStatus } from '../models/enums/RentalStatus';
 import { Booking, BookingViewModel, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
+import { LoginToken } from '../models/misc/LoginToken';
 
 // Helper functions for array operations
 //
@@ -339,3 +340,8 @@ export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equi
                     ),
             ),
     );
+
+export const getTokenLabel = (loginToken: LoginToken) => {
+    const token = loginToken.tokenId;
+    return `${token.substr(0, 2)}-${token.substr(2, 2)}-${token.substr(4, 2)}-${token.substr(6, 2)}`;
+};
