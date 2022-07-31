@@ -111,8 +111,8 @@ const LoginTokenModal: React.FC<LoginTokenModalProps> = ({ hide, show, token }: 
                             {getTokenLabel(token.token)}
                         </p>
                         <p className="text-muted">
-                            Skanna QR-koden med en enhet du är inloggad, godkänn inloggningen, och klicka sedan på Logga
-                            in nedan.
+                            Skanna QR-koden med en enhet där du är inloggad, godkänn inloggningen, och klicka sedan på
+                            Logga in nedan.
                         </p>
                     </>
                 ) : (
