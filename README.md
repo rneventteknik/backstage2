@@ -36,6 +36,8 @@ DB_NAME={database name (optional, only needed when using PostgreSQL)}
 DB_SSL={true or false (optional, only needed when using PostgreSQL)}
 
 NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS={json array with external links, where each link is an object with a title and an url attribute (optional, defaults to empty list)}
+NEXT_PUBLIC_BACKSTAGE2_BASE_URL={Base url of backstage 2, for example http://192.168.1.100:3000}
+
 NEXT_PUBLIC_SALARY_NORMAL= Salary price on the normal price list. [kr/h]
 NEXT_PUBLIC_SALARY_THS= Salary price on the discounted THS price list. [kr/h]
 
