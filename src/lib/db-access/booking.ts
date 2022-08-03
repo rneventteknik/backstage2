@@ -23,7 +23,10 @@ export const searchBookings = async (searchString: string, count: number): Promi
 export const fetchBookings = async (): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query().withGraphFetched('ownerUser').withGraphFetched('equipmentLists');
+    return BookingObjectionModel.query()
+        .withGraphFetched('ownerUser')
+        .withGraphFetched('timeReports.user')
+        .withGraphFetched('equipmentLists.equipmentListEntries.equipment');
 };
 
 export const fetchBookingsForUser = async (userId: number): Promise<BookingObjectionModel[]> => {

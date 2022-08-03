@@ -8,6 +8,7 @@ import styles from './Sidebar.module.scss';
 import {
     faArchive,
     faCalendarDay,
+    faChartPie,
     faCube,
     faExternalLinkAlt,
     faFileInvoiceDollar,
@@ -99,6 +100,7 @@ const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
             <SidebarLink displayName="Alla bokingar" link="/archive" icon={faArchive} />
             <SidebarLink displayName="Utrustning" link="/equipment" icon={faCube} />
             <SidebarLink displayName="Användare" link="/users" icon={faUsers} />
+            <SidebarLink displayName="Statistik" link="/statistics" icon={faChartPie} />
             <SidebarLink displayName="Hjälp" link="/about" icon={faInfoCircle} />
         </SidebarLinkGroup>
 

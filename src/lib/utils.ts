@@ -260,6 +260,9 @@ export const getResponseContentOrError = async <T>(res: Response): Promise<T> =>
     return res.json();
 };
 
+// Sum function
+export const reduceSumFn = (a: number | undefined | null, b: number | undefined | null) => (a ?? 0) + (b ?? 0);
+
 // Replace empty strings or strings with only whitespace with null
 //
 export const replaceEmptyStringWithNull = (s: string | undefined | null): string | null => {
