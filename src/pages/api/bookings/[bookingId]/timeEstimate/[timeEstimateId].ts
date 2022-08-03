@@ -13,9 +13,9 @@ import {
     respondWithEntityNotFoundResponse,
     respondWithAccessDeniedResponse,
 } from '../../../../../lib/apiResponses';
-import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
-import { logChangeToBooking, BookingChangelogEntryType } from '../../../../../lib/changelogUtils';
+import { logChangeToBooking, BookingChangelogEntryType, hasChanges } from '../../../../../lib/changelogUtils';
+import { TimeEstimateObjectionModel } from '../../../../../models/objection-models';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -27,7 +27,7 @@ const handler = withSessionContext(
             return;
         }
 
-        const booking = await fetchBooking(bookingId).then(toBooking);
+        const booking = await fetchBooking(bookingId);
 
         switch (req.method) {
             case 'GET':
@@ -45,7 +45,11 @@ const handler = withSessionContext(
                     return;
                 }
                 await deleteTimeEstimate(timeEstimateId)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.TIMEESTIMATE).then(
+                            () => res.status(200).json(result),
+                        );
+                    })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;
 
@@ -63,10 +67,19 @@ const handler = withSessionContext(
                 }
 
                 await updateTimeEstimate(timeEstimateId, req.body.timeEstimate)
-                    .then((result) => {
-                        logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.TIMEESTIMATE).then(
-                            () => res.status(200).json(result),
-                        );
+                    .then(async (result) => {
+                        const newTimeEstimate = req.body.equipmentList as TimeEstimateObjectionModel;
+                        const existingTimeEstimate = booking.timeEstimates?.find((l) => l.id === newTimeEstimate.id);
+
+                        if (!existingTimeEstimate || hasChanges(existingTimeEstimate, newTimeEstimate)) {
+                            await logChangeToBooking(
+                                context.currentUser,
+                                bookingId,
+                                BookingChangelogEntryType.TIMEESTIMATE,
+                            );
+                        }
+
+                        res.status(200).json(result);
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;

@@ -68,7 +68,7 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
         .withGraphFetched('changelog(changelogInfo)')
         .modifiers({
             changelogInfo: (builder) => {
-                builder.orderBy('updated', 'desc').limit(50);
+                builder.orderBy('updated', 'desc').limit(250);
             },
         })
         .modifyGraph('equipmentLists', (builder) => {
@@ -91,7 +91,7 @@ export const fetchBookingWithEquipmentLists = async (id: number): Promise<Bookin
         .withGraphFetched('changelog(changelogInfo)')
         .modifiers({
             changelogInfo: (builder) => {
-                builder.orderBy('updated', 'desc').limit(50);
+                builder.orderBy('updated', 'desc').limit(250);
             },
         })
         .then((bookings) => bookings[0]);
