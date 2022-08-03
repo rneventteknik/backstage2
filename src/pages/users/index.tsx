@@ -96,12 +96,12 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <IfAdmin currentUser={currentUser}>
                     <Link href="/users/new" passHref>
                         <Button variant="primary" as="span">
-                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Skapa användare
+                            <FontAwesomeIcon icon={faAdd} /> Skapa användare
                         </Button>
                     </Link>
                 </IfAdmin>
                 <Link href={'users/' + currentUser.userId} passHref>
-                    <Button variant="secondary" as="span" className="ml-2">
+                    <Button variant="secondary" as="span">
                         <FontAwesomeIcon icon={faUser} className="mr-1" /> Visa min profil
                     </Button>
                 </Link>

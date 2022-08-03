@@ -167,7 +167,7 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </Button>
                 </Link>
                 <IfAdmin currentUser={currentUser}>
-                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block ml-2">
+                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block">
                         <Link href="/equipment/json-import" passHref>
                             <Dropdown.Item href={'/equipment/json-import'}>
                                 <FontAwesomeIcon icon={faFileImport} className="mr-1 fa-fw" /> Importera utrustning från
