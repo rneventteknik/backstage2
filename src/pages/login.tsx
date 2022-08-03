@@ -3,6 +3,7 @@ import { Form, FormControl, Button, FormGroup, Alert, Spinner } from 'react-boot
 import Router from 'next/router';
 import { useUser } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
+import { getValueOrFirst } from '../lib/utils';
 
 const containerStyle = {
     margin: 'auto',
@@ -55,11 +56,12 @@ const LoginPage: React.FC = () => {
             })
             .then((data) => data as CurrentUserInfo)
             .then((user) => {
-                if (!user.isLoggedIn) {
+                if (user.isLoggedIn) {
+                    Router.push(getValueOrFirst(Router.query.redirectUrl) ?? '/');
+                } else {
                     setShowWrongPasswordError(true);
                 }
                 setWaitingForResponse(false);
-                Router.push('/');
             })
             .catch((error) => {
                 console.error('An unexpected error happened:', error);

@@ -12,26 +12,42 @@ const useUser = (
     redirectUrlIfNotLoggedIn?: string,
     redirectUrlIfInsufficientAccess?: string,
     redirectUrlIfLoggedIn?: string,
+    attachRequestedUrlAsParameter = false,
     requiredRole: Role = Role.READONLY,
 ) =>
     withSsrSession(async ({ req }): Promise<GetServerSidePropsResult<{ user: CurrentUserInfo }>> => {
         // The typing of withSsrSession are incorrect, so we need to cast it to NextApiRequest & IncomingMessage
         const user = await getAndVerifyUser(req as NextApiRequest & IncomingMessage);
+        const getRedirectUrlParams = () => {
+            if (!attachRequestedUrlAsParameter) {
+                return '';
+            }
+
+            if (req.url === '/') {
+                return '';
+            }
+
+            return `?redirectUrl=${req.url}`;
+        };
 
         const insufficientAccess =
             (requiredRole == Role.ADMIN && user?.role != Role.ADMIN) ||
             (requiredRole == Role.USER && user?.role != Role.ADMIN && user?.role != Role.USER);
 
         if (!user.isLoggedIn && redirectUrlIfNotLoggedIn) {
-            return { redirect: { destination: redirectUrlIfNotLoggedIn, permanent: false } };
+            return {
+                redirect: { destination: redirectUrlIfNotLoggedIn + getRedirectUrlParams(), permanent: false },
+            };
         }
 
         if (user.isLoggedIn && redirectUrlIfLoggedIn) {
-            return { redirect: { destination: redirectUrlIfLoggedIn, permanent: false } };
+            return { redirect: { destination: redirectUrlIfLoggedIn + getRedirectUrlParams(), permanent: false } };
         }
 
         if (insufficientAccess && redirectUrlIfInsufficientAccess) {
-            return { redirect: { destination: redirectUrlIfInsufficientAccess, permanent: false } };
+            return {
+                redirect: { destination: redirectUrlIfInsufficientAccess + getRedirectUrlParams(), permanent: false },
+            };
         }
 
         return {
@@ -42,7 +58,7 @@ const useUser = (
     });
 
 const useUserWithDefaultAccessControl = (requiredRole: Role = Role.READONLY) => {
-    return useUser('/login', '/no-access', undefined, requiredRole);
+    return useUser('/login', '/no-access', undefined, true, requiredRole);
 };
 
 export { useUser, useUserWithDefaultAccessControl };

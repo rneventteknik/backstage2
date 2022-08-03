@@ -274,6 +274,10 @@ export const replaceEmptyStringWithNull = (s: string | undefined | null): string
     return s;
 };
 
+// Get value or if the input is an array, the first value (useful for parsing url query params)
+//
+export const getValueOrFirst = <T>(data: T | T[]) => (Array.isArray(data) ? data[0] : data);
+
 export const getPricePerHour = (pricePlan: PricePlan): number | undefined => {
     if (!process.env.NEXT_PUBLIC_SALARY_NORMAL)
         throw new Error('Configuration missing salary for the Normal price plan');
