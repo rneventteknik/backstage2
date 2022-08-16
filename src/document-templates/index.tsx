@@ -29,3 +29,6 @@ export const getPackingListDocumentFileName = (booking: Booking, documentLanguag
     `${getTextResource('packing-list.filename', documentLanguage)} ${booking.name} (${getBookingDocumentId(
         booking,
     )}).pdf`;
+
+export const getHogiaInvoiceFileName = (booking: Booking): string =>
+    `${booking.invoiceNumber ?? ''} ${booking.name}.txt`;

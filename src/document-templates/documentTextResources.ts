@@ -54,6 +54,14 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.misc.count-unit-single': 'st',
         'common.misc.hours-unit': 'h',
         'common.misc.days-unit': 'dagar',
+
+        // Hogia invoice
+        'hogia-invoice.general-information': 'Vid frågor om innehållet kontakta RN Eventteknik på rn@ths.kth.se, ange',
+        'hogia-invoice.start-cost': 'Utrustningskostnad',
+        'hogia-invoice.hourly-cost': 'Timkostnad',
+        'hogia-invoice.staff-cost': 'Personalkostnad',
+        'hogia-invoice.day-cost': 'extra dagar',
+        'hogia-invoice.day-cost-single': 'extra dag',
     },
     en: {
         // Booking info
@@ -106,5 +114,14 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.misc.count-unit-single': 'pc',
         'common.misc.hours-unit': 'h',
         'common.misc.days-unit': 'days',
+
+        // Hogia invoice
+        'hogia-invoice.general-information':
+            'If you have any questions regarding the content please contact RN Eventteknik on rn@ths.kth.se, state',
+        'hogia-invoice.start-cost': 'Equipment cost',
+        'hogia-invoice.hourly-cost': 'Hourly rate',
+        'hogia-invoice.staff-cost': 'Staff cost',
+        'hogia-invoice.day-cost': 'extra days',
+        'hogia-invoice.day-cost-single': 'extra day',
     },
 };

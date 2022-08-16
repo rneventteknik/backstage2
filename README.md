@@ -36,13 +36,18 @@ DB_NAME={database name (optional, only needed when using PostgreSQL)}
 DB_SSL={true or false (optional, only needed when using PostgreSQL)}
 
 NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS={json array with external links, where each link is an object with a title and an url attribute (optional, defaults to empty list)}
-NEXT_PUBLIC_SALARY_NORMAL= Salary price on the normal price list. [kr/h]
-NEXT_PUBLIC_SALARY_THS= Salary price on the discounted THS price list. [kr/h]
+NEXT_PUBLIC_SALARY_NORMAL={Salary price on the normal price list. [kr/h]}
+NEXT_PUBLIC_SALARY_THS={Salary price on the discounted THS price list. [kr/h]}
 
 MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay logged in. (optional, defaults to forever if not set)}
 
 CALENDAR_API_KEY={Google Calender API Key, with read-access to calendars}
 CALENDAR_ID={Google Calender ID to fetch events from}
+INVOICE_OUR_REFERENCE={Our reference on invoice exports, test suite expects value Person Personsson}
+INVOICE_DIMENSION_1={'Resultatställe' on invoice exports, test suite expects value 81}
+INVOICE_DEFAULT_EQUPEMENT_ACCOUNT={Equpment account on invoice exports, test suite expects value 3550}
+INVOICE_SALARY_ACCOUNT_EXTERNAL={Salary account for THS on invoice exports, test suite expects value 3620}
+INVOICE_SALARY_ACCOUNT_INTERNAL={Salary account for other customers on invoice exports, test suite expects value 7900}
 ```
 
 ### Version Control

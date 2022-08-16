@@ -109,6 +109,16 @@ export const getAccountKindName = (accountKind: AccountKind): string => {
     }
 };
 
+export const getAccountKindInvoiceAccount = (accountKind: AccountKind): string => {
+    switch (accountKind) {
+        case AccountKind.EXTERNAL:
+            return process.env.INVOICE_SALARY_ACCOUNT_EXTERNAL ?? '';
+
+        case AccountKind.INTERNAL:
+            return process.env.INVOICE_SALARY_ACCOUNT_INTERNAL ?? '';
+    }
+};
+
 export const getBookingTypeName = (bookingType: BookingType): string => {
     switch (bookingType) {
         case BookingType.GIG:
@@ -346,3 +356,7 @@ export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equi
                     ),
             ),
     );
+
+export const range = (start: number, end: number): number[] => {
+    return [...Array(end - start).keys()].map((i) => i + start);
+};
