@@ -5,6 +5,7 @@ import { toTimeReport } from './mappers/timeReport';
 import { toTimeEstimate } from './mappers/timeEstimate';
 import { getResponseContentOrError } from './utils';
 import { toBooking, toEquipmentList } from './mappers/booking';
+import { toInvoiceGroup } from './mappers/invoiceGroup';
 
 // Since all fetchers follow the same pattern we have these two helper functions to
 // generate a fetcher for a specified mapper.
@@ -49,3 +50,6 @@ export const timeReportsFetcher = generateListFetcher(toTimeReport);
 
 export const timeEstimateFetcher = generateFetcher(toTimeEstimate);
 export const timeEstimatesFetcher = generateListFetcher(toTimeEstimate);
+
+export const invoiceGroupFetcher = generateFetcher(toInvoiceGroup);
+export const invoiceGroupsFetcher = generateListFetcher(toInvoiceGroup);

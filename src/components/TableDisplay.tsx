@@ -24,6 +24,7 @@ export type TableConfiguration<T extends HasId | HasStringId> = {
         displayName: string;
         getValue: (entity: T) => string | number | Date;
         getContentOverride?: null | ((entity: T) => React.ReactElement | string);
+        getHeaderOverride?: null | ((entityList: T[]) => React.ReactElement | string);
         disableSort?: boolean;
         columnWidth?: number;
         textAlignment?: 'left' | 'center' | 'right';
@@ -154,10 +155,13 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                                 }
                             >
                                 {p.disableSort ? (
-                                    <span>{p.displayName}</span>
+                                    <span>
+                                        {p.getHeaderOverride ? p.getHeaderOverride(entitiesToShow) : p.displayName}
+                                    </span>
                                 ) : (
                                     <span style={{ cursor: 'pointer' }} onClick={() => setSortConfiguration(p.key)}>
-                                        {p.displayName} {p.key === sortKey ? getSortingArrow(sortDirection) : null}
+                                        {p.getHeaderOverride ? p.getHeaderOverride(entitiesToShow) : p.displayName}{' '}
+                                        {p.key === sortKey ? getSortingArrow(sortDirection) : null}
                                     </span>
                                 )}
                             </th>

@@ -69,3 +69,11 @@ export {
     deleteTimeEstimate,
     validateTimeEstimateObjectionModel,
 } from './timeEstimate';
+export {
+    fetchInvoiceGroup,
+    fetchInvoiceGroups,
+    updateInvoiceGroup,
+    deleteInvoiceGroup,
+    insertInvoiceGroup,
+    validateInvoiceGroupObjectionModel,
+} from './invoiceGroup';

@@ -14,6 +14,7 @@ import {
     faFileInvoiceDollar,
     faHome,
     faInfoCircle,
+    faListCheck,
     faMoneyBillWave,
     faUsers,
     IconDefinition,
@@ -106,8 +107,9 @@ const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
 
         <IfAdmin currentUser={currentUser}>
             <SidebarLinkGroup title="Administration">
-                <SidebarLink displayName="Löner" link="/salary" icon={faMoneyBillWave} />
-                <SidebarLink displayName="Fakturor" link="/invoices" icon={faFileInvoiceDollar} />
+                <SidebarLink displayName="Översikt" link="/admin-overview" icon={faListCheck} />
+                <SidebarLink displayName="Löneunderlag" link="/salary" icon={faMoneyBillWave} />
+                <SidebarLink displayName="Fakturaunderlag" link="/invoices" icon={faFileInvoiceDollar} />
             </SidebarLinkGroup>
         </IfAdmin>
 
