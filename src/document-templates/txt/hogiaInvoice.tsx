@@ -1,11 +1,6 @@
 import iconv from 'iconv-lite';
-import {
-    getExtraDaysPrice,
-    getHourlyPrice,
-    getNumberOfDays,
-    getTotalTimeReportsPrice,
-    getUnitPrice,
-} from '../../lib/pricingUtils';
+import { getNumberOfDays } from '../../lib/datetimeUtils';
+import { getExtraDaysPrice, getHourlyPrice, getTotalTimeReportsPrice, getUnitPrice } from '../../lib/pricingUtils';
 import { getAccountKindInvoiceAccount, range } from '../../lib/utils';
 import { AccountKind } from '../../models/enums/AccountKind';
 import { BookingType } from '../../models/enums/BookingType';
@@ -155,7 +150,7 @@ const formatHeader = (booking: BookingViewModel, t: (t: string) => string): stri
         ': ' +
         booking.name +
         ' ' +
-        booking.displayStartDate +
+        booking.displayUsageStartString +
         '<CR>' +
         t('hogia-invoice.general-information') +
         ' ' +

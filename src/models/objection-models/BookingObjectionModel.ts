@@ -142,10 +142,11 @@ export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName
     updated: string;
     sortIndex: number;
     equipmentListEntries: IEquipmentListEntryObjectionModel[];
-    equipmentOutDatetime?: string;
-    equipmentInDatetime?: string;
-    usageStartDatetime?: string;
-    usageEndDatetime?: string;
+    equipmentOutDatetime?: string | null;
+    equipmentInDatetime?: string | null;
+    usageStartDatetime?: string | null;
+    usageEndDatetime?: string | null;
+    numberOfDays?: number | null;
     bookingId: number;
     rentalStatus?: number | null;
 }
@@ -170,10 +171,11 @@ export class EquipmentListObjectionModel extends Model {
     updated!: string;
     sortIndex!: number;
     equipmentListEntries!: EquipmentListEntryObjectionModel[];
-    equipmentOutDatetime?: string;
-    equipmentInDatetime?: string;
-    usageStartDatetime?: string;
-    usageEndDatetime?: string;
+    equipmentOutDatetime?: string | null;
+    equipmentInDatetime?: string | null;
+    usageStartDatetime?: string | null;
+    usageEndDatetime?: string | null;
+    numberOfDays?: number | null;
     bookingId!: number;
     rentalStatus?: number | null;
 }

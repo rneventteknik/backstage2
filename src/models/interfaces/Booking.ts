@@ -42,7 +42,14 @@ export interface Booking extends BaseEntityWithName {
 }
 
 export interface BookingViewModel extends Booking {
-    displayStartDate: string;
-    startDate?: Date;
-    endDate?: Date;
+    equipmentOutDatetime?: Date;
+    equipmentInDatetime?: Date;
+    usageStartDatetime?: Date;
+    usageEndDatetime?: Date;
+    displayEquipmentOutString: string;
+    displayEquipmentInString: string;
+    displayUsageStartString: string;
+    displayUsageEndString: string;
+    displayUsageInterval: string;
+    displayEquipmentOutInterval: string;
 }

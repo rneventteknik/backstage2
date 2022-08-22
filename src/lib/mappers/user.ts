@@ -1,6 +1,6 @@
 import { User } from '../../models/interfaces';
 import { IUserObjectionModel } from '../../models/objection-models';
-import { toDateOrUndefined } from '../utils';
+import { toDatetimeOrUndefined } from '../datetimeUtils';
 
 export const toUser = (objectionModel: IUserObjectionModel): User => {
     if (!objectionModel.id) {
@@ -12,7 +12,7 @@ export const toUser = (objectionModel: IUserObjectionModel): User => {
         id: objectionModel.id,
         username: objectionModel?.userAuth?.username,
         role: objectionModel?.userAuth?.role,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };

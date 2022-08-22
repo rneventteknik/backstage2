@@ -7,7 +7,7 @@ import { withSessionContext } from '../../../../../lib/sessionContext';
 import { getTextResource } from '../../../../../document-templates/useTextResources';
 import { getHogiaInvoiceFileName } from '../../../../../document-templates';
 import { Language } from '../../../../../models/enums/Language';
-import { toBookingViewModel } from '../../../../../lib/utils';
+import { toBookingViewModel } from '../../../../../lib/datetimeUtils';
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     if (isNaN(Number(req.query.bookingId))) {

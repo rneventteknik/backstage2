@@ -34,7 +34,7 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking }: Props) => {
                 <MainContent>
                     <View style={styles.flexGrow}>
                         {booking.equipmentLists?.map((l) => (
-                            <EquipmentListInfo list={l} key={l.id} />
+                            <EquipmentListInfo list={l} booking={booking} key={l.id} />
                         ))}
                         <TimeEstimateListInfo booking={booking} />
                         <TotalPriceSection booking={booking} />

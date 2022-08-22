@@ -4,10 +4,11 @@ import { useUserWithDefaultAccessControl } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import Header from '../components/layout/Header';
 import { Card, Col, ListGroup, Row } from 'react-bootstrap';
-import { showActiveBookings, toBookingViewModel, getRoleName, formatDatetime } from '../lib/utils';
 import useSwr from 'swr';
 import SmallBookingTable from '../components/SmallBookingTable';
 import { bookingsFetcher } from '../lib/fetchers';
+import { showActiveBookings, getRoleName } from '../lib/utils';
+import { formatDatetime, toBookingViewModel } from '../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();

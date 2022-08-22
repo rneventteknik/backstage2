@@ -2,8 +2,8 @@ import router from 'next/router';
 import React from 'react';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
+import { toBookingViewModel } from '../../lib/datetimeUtils';
 import { bookingsFetcher } from '../../lib/fetchers';
-import { toBookingViewModel } from '../../lib/utils';
 import { Equipment } from '../../models/interfaces';
 import SmallBookingTable from '../SmallBookingTable';
 
@@ -17,14 +17,26 @@ const EquipmentBookings: React.FC<Props> = ({ equipment }: Props) => {
     const bookingViewModels = bookings?.map(toBookingViewModel) ?? [];
 
     const currentBookings = bookingViewModels.filter(
-        (x) => x.startDate && x.endDate && x.startDate.getTime() < Date.now() && x.endDate.getTime() > Date.now(),
+        (x) =>
+            x.usageStartDatetime &&
+            x.usageEndDatetime &&
+            x.usageStartDatetime.getTime() < Date.now() &&
+            x.usageEndDatetime.getTime() > Date.now(),
     );
     const futureBookings = bookingViewModels.filter(
-        (x) => x.startDate && x.endDate && x.startDate.getTime() > Date.now() && x.endDate.getTime() > Date.now(),
+        (x) =>
+            x.usageStartDatetime &&
+            x.usageEndDatetime &&
+            x.usageStartDatetime.getTime() > Date.now() &&
+            x.usageEndDatetime.getTime() > Date.now(),
     );
     const pastBookings = bookingViewModels
         .filter(
-            (x) => x.startDate && x.endDate && x.startDate.getTime() < Date.now() && x.endDate.getTime() < Date.now(),
+            (x) =>
+                x.usageStartDatetime &&
+                x.usageEndDatetime &&
+                x.usageStartDatetime.getTime() < Date.now() &&
+                x.usageEndDatetime.getTime() < Date.now(),
         )
         .slice(0, 10);
 

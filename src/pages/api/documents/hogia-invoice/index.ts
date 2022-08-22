@@ -7,7 +7,7 @@ import { getTextResource } from '../../../../document-templates/useTextResources
 import archiver from 'archiver';
 import { respondWithCustomErrorMessage, respondWithEntityNotFoundResponse } from '../../../../lib/apiResponses';
 import { getHogiaInvoiceFileName } from '../../../../document-templates';
-import { toBookingViewModel } from '../../../../lib/utils';
+import { toBookingViewModel } from '../../../../lib/datetimeUtils';
 
 const getEncodedHogiaInvoice = async (id: number) => {
     return fetchBookingWithUser(id).then(async (result) => {

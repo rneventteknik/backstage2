@@ -4,10 +4,11 @@ import useSwr from 'swr';
 import { faExclamationCircle, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Skeleton from 'react-loading-skeleton';
-import { formatDatetime, getResponseContentOrError } from '../../lib/utils';
+import { getResponseContentOrError } from '../../lib/utils';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import { CalendarResult } from '../../models/misc/CalendarResult';
 import Link from 'next/link';
+import { formatDatetime } from '../../lib/datetimeUtils';
 
 type Props = {
     onSelect: (x: CalendarResult) => void;

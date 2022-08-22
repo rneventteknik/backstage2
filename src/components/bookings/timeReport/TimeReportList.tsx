@@ -4,21 +4,7 @@ import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher, usersFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
-import {
-    formatDatetime,
-    getAccountKindName,
-    getResponseContentOrError,
-    toDateOrUndefined,
-    toIntOrUndefined,
-    getPricePerHour,
-    validDate,
-} from '../../../lib/utils';
-import { toTimeReport } from '../../../lib/mappers/timeReport';
-import { TimeReport } from '../../../models/interfaces/TimeReport';
-import { useNotifications } from '../../../lib/useNotifications';
-import { DoubleClickToEdit, DoubleClickToEditDate, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { formatNumberAsCurrency, getTimeReportPrice, getTotalTimeReportsPrice } from '../../../lib/pricingUtils';
+import { getAccountKindName, getPricePerHour, getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
 import {
     faAngleDown,
     faAngleUp,
@@ -28,11 +14,17 @@ import {
     faStopwatch,
     faAdd,
 } from '@fortawesome/free-solid-svg-icons';
-import { User } from '../../../models/interfaces';
+import { TimeReport, User } from '../../../models/interfaces';
 import { AccountKind } from '../../../models/enums/AccountKind';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import Skeleton from 'react-loading-skeleton';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { toTimeReport } from '../../../lib/mappers/timeReport';
+import { formatNumberAsCurrency, getTimeReportPrice, getTotalTimeReportsPrice } from '../../../lib/pricingUtils';
+import { useNotifications } from '../../../lib/useNotifications';
+import { DoubleClickToEdit, DoubleClickToEditDatetime, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
 import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import { formatDatetime, validDate, toDatetimeOrUndefined } from '../../../lib/datetimeUtils';
 import TimeReportAddButton from './TimeReportAddButton';
 
 type Props = {
@@ -206,7 +198,7 @@ const TimeReportList: React.FC<Props> = ({
     );
 
     const TimeReportStartDatetimeDisplayFn = (timeReport: TimeReport) => (
-        <DoubleClickToEditDate
+        <DoubleClickToEditDatetime
             value={timeReport.startDatetime}
             onUpdate={(newValue) =>
                 updateTimeReport({
@@ -219,7 +211,7 @@ const TimeReportList: React.FC<Props> = ({
     );
 
     const TimeReportEndDatetimeDisplayFn = (timeReport: TimeReport) => (
-        <DoubleClickToEditDate
+        <DoubleClickToEditDatetime
             value={timeReport.endDatetime}
             onUpdate={(newValue) =>
                 updateTimeReport({
@@ -511,7 +503,7 @@ const TimeReportList: React.FC<Props> = ({
                                             timeReportToEditViewModel.editedStartDatetimeString ??
                                             (timeReportToEditViewModel.startDatetime
                                                 ? formatDatetime(timeReportToEditViewModel.startDatetime)
-                                                : '')
+                                                : '-')
                                         }
                                         onChange={(e) =>
                                             setTimeReportToEditViewModel({
@@ -531,7 +523,7 @@ const TimeReportList: React.FC<Props> = ({
                                             timeReportToEditViewModel.editedEndDatetimeString ??
                                             (timeReportToEditViewModel.endDatetime
                                                 ? formatDatetime(timeReportToEditViewModel.endDatetime)
-                                                : '')
+                                                : '-')
                                         }
                                         onChange={(e) =>
                                             setTimeReportToEditViewModel({
@@ -568,13 +560,17 @@ const TimeReportList: React.FC<Props> = ({
                                 billableWorkingHours: timeReportToEditViewModel.billableWorkingHours ?? 0,
                                 pricePerHour: timeReportToEditViewModel.pricePerHour ?? 0,
                                 startDatetime: timeReportToEditViewModel.editedStartDatetimeString
-                                    ? validDate(toDateOrUndefined(timeReportToEditViewModel.editedStartDatetimeString))
-                                        ? toDateOrUndefined(timeReportToEditViewModel.editedStartDatetimeString)
+                                    ? validDate(
+                                          toDatetimeOrUndefined(timeReportToEditViewModel.editedStartDatetimeString),
+                                      )
+                                        ? toDatetimeOrUndefined(timeReportToEditViewModel.editedStartDatetimeString)
                                         : undefined
                                     : timeReportToEditViewModel.startDatetime,
                                 endDatetime: timeReportToEditViewModel.editedEndDatetimeString
-                                    ? validDate(toDateOrUndefined(timeReportToEditViewModel.editedEndDatetimeString))
-                                        ? toDateOrUndefined(timeReportToEditViewModel.editedEndDatetimeString)
+                                    ? validDate(
+                                          toDatetimeOrUndefined(timeReportToEditViewModel.editedEndDatetimeString),
+                                      )
+                                        ? toDatetimeOrUndefined(timeReportToEditViewModel.editedEndDatetimeString)
                                         : undefined
                                     : timeReportToEditViewModel.endDatetime,
                                 sortIndex: timeReportToEditViewModel.sortIndex ?? 0,

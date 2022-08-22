@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, ListGroup, Modal } from 'react-bootstrap';
-import { formatDatetime } from '../../lib/utils';
+import { formatDatetime } from '../../lib/datetimeUtils';
 import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 
 type Props = {

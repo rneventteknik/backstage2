@@ -6,7 +6,7 @@ import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import BookingForm from '../../components/bookings/BookingForm';
-import { convertToDateOrUndefined, getResponseContentOrError } from '../../lib/utils';
+import { getResponseContentOrError } from '../../lib/utils';
 import { Booking } from '../../models/interfaces';
 import { Status } from '../../models/enums/Status';
 import Header from '../../components/layout/Header';
@@ -21,6 +21,7 @@ import { useNotifications } from '../../lib/useNotifications';
 import { Role } from '../../models/enums/Role';
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { addDays, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
@@ -61,15 +62,15 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             // Some bookings have time, some only have dates. This code tries to detect the ones with only date and sets default times.
             const dateWithoutTimeRegEx = /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/;
             if (calendarBooking.start && calendarBooking.start.match(dateWithoutTimeRegEx)) {
-                setStartDate(convertToDateOrUndefined(calendarBooking.start + 'T00:00')?.toISOString());
+                setStartDate(toDatetimeOrUndefined(calendarBooking.start + 'T00:00')?.toISOString());
             } else {
-                setStartDate(convertToDateOrUndefined(calendarBooking.start)?.toISOString());
+                setStartDate(toDatetimeOrUndefined(calendarBooking.start)?.toISOString());
             }
 
             if (calendarBooking.end && calendarBooking.end.length <= 10) {
-                setEndDate(convertToDateOrUndefined(calendarBooking.end + 'T23:59')?.toISOString());
+                setEndDate(addDays(toDatetimeOrUndefined(calendarBooking.end + 'T00:00'), 1)?.toISOString());
             } else {
-                setEndDate(convertToDateOrUndefined(calendarBooking.end)?.toISOString());
+                setEndDate(toDatetimeOrUndefined(calendarBooking.end)?.toISOString());
             }
         }
     };
@@ -102,8 +103,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             name: 'Utrustning',
             usageStartDatetime: startDate,
             usageEndDatetime: endDate,
-            equipmentOutDatetime: startDate,
-            equipmentInDatetime: endDate,
+            numberOfDays: !startDate && !endDate ? 1 : undefined,
         };
         const body = { equipmentList: newEquipmentList };
 

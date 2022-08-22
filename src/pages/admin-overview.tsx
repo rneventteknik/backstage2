@@ -5,12 +5,12 @@ import Layout from '../components/layout/Layout';
 import { TableLoadingPage } from '../components/layout/LoadingPageSkeleton';
 import { bookingsFetcher } from '../lib/fetchers';
 import { useUserWithDefaultAccessControl } from '../lib/useUser';
-import { toBookingViewModel } from '../lib/utils';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import useSwr from 'swr';
 import { Role } from '../models/enums/Role';
 import { Status } from '../models/enums/Status';
 import AdminBookingList from '../components/admin/AdminBookingList';
+import { toBookingViewModel } from '../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.ADMIN);
@@ -32,7 +32,7 @@ const AdminOverviewPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const bookingsToShow = bookings
         ?.map(toBookingViewModel)
         ?.filter((b) => b.status === Status.DONE || b.status === Status.BOOKED)
-        ?.filter((b) => b.startDate && b.startDate?.getTime() < Date.now());
+        ?.filter((b) => b.usageStartDatetime && b.usageStartDatetime?.getTime() < Date.now());
     return (
         <Layout title={pageTitle} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>

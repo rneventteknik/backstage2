@@ -8,9 +8,10 @@ import { BookingType } from '../models/enums/BookingType';
 import { SalaryStatus } from '../models/enums/SalaryStatus';
 import { PaymentStatus } from '../models/enums/PaymentStatus';
 import { RentalStatus } from '../models/enums/RentalStatus';
-import { Booking, BookingViewModel, Equipment } from '../models/interfaces';
+import { BookingViewModel, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
+import { getEquipmentOutDatetime, getEquipmentInDatetime } from './datetimeUtils';
 
 // Helper functions for array operations
 //
@@ -28,48 +29,6 @@ export const notEmpty = <T>(value: T | null | undefined): value is T => value !=
 
 export const updateItemsInArrayById = <T extends HasId>(list: T[], ...updatedItems: T[]): T[] =>
     list.map((item) => updatedItems.find((x) => x.id === item.id) ?? item);
-
-// Date formatter
-//
-const datetimeFormatOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-};
-
-export const formatDatetime = (date: Date): string => date.toLocaleString('sv-SE', datetimeFormatOptions);
-
-const dateFormatOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-};
-
-export const formatDate = (date: Date): string => date.toLocaleString('sv-SE', dateFormatOptions);
-
-export const formatNullableDate = (date: Date | null, defaultValue = '-'): string =>
-    date ? date.toLocaleString('sv-SE', dateFormatOptions) : defaultValue;
-
-// Check if value is a valid date
-//
-export const validDate = (date: Date | undefined): date is Date =>
-    !!date && date instanceof Date && !isNaN(date.getTime());
-
-export const convertToDateOrUndefined = (newDateString: string | undefined): Date | undefined => {
-    if (!newDateString) {
-        return undefined;
-    }
-
-    const date = new Date(newDateString);
-
-    if (isNaN(date.getTime())) {
-        return undefined;
-    }
-
-    return date;
-};
 
 // Get string from status code
 //
@@ -222,11 +181,6 @@ export const getLanguageName = (language: Language): string => {
 export const isMemberOfEnum = (value: number, enumObject: Record<string, unknown>): boolean =>
     !isNaN(Number(value)) && Object.keys(enumObject).indexOf(value.toString()) >= 0;
 
-// To date or undefined
-//
-export const toDateOrUndefined = (dateString: string | undefined | null): Date | undefined =>
-    dateString ? new Date(dateString) : undefined;
-
 // Parse int woth check for undefined/null
 //
 export const toIntOrUndefined = (value: string | undefined | null, forceAbsoluteValue = false): number | undefined => {
@@ -303,27 +257,8 @@ export const getPricePerHour = (pricePlan: PricePlan): number | undefined => {
     return toIntOrUndefined(pricePerHour);
 };
 
-export const getBookingDates = (booking: Booking) => {
-    const dates = booking.equipmentLists?.flatMap((x) => [x.usageStartDatetime, x.usageEndDatetime]).filter(validDate);
-
-    if (!dates || (dates && dates.length === 0)) {
-        return { start: undefined, end: undefined };
-    }
-
-    const start = dates.reduce((a, b) => (a < b ? a : b));
-    const end = dates.reduce((a, b) => (a > b ? a : b));
-
-    return { start, end };
-};
-
-export const toBookingViewModel = (booking: Booking): BookingViewModel => {
-    const { start, end } = getBookingDates(booking);
-
-    return { ...booking, displayStartDate: start ? formatDate(start) : '-', startDate: start, endDate: end };
-};
-
 export const showActiveBookings = (booking: BookingViewModel) => {
-    return booking.status === Status.BOOKED || (booking.status === Status.DRAFT && booking.startDate);
+    return booking.status === Status.BOOKED || (booking.status === Status.DRAFT && booking.usageStartDatetime);
 };
 
 // Calculate the max number of equipment used at the same time. To do this, we look
@@ -334,16 +269,16 @@ export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equi
     Math.max(
         0,
         ...equipmentLists
-            .map((x) => x.equipmentOutDatetime ?? new Date(0)) // Calculate datetimes to check
+            .map((x) => getEquipmentOutDatetime(x) ?? new Date(0)) // Calculate datetimes to check
             .map((datetime) =>
                 equipmentLists
                     .filter(
                         // Find the lists which overlap the datetime
                         (list) =>
-                            list.equipmentOutDatetime &&
-                            list.equipmentOutDatetime <= datetime &&
-                            list.equipmentInDatetime &&
-                            list.equipmentInDatetime >= datetime,
+                            getEquipmentOutDatetime(list) &&
+                            (getEquipmentOutDatetime(list) ?? new Date()) <= datetime &&
+                            getEquipmentInDatetime(list) &&
+                            (getEquipmentInDatetime(list) ?? new Date()) >= datetime,
                     )
                     .reduce(
                         // Sum the equipment, first over all lists and within the lists over all entries

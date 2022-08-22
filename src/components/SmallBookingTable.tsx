@@ -2,11 +2,12 @@ import React from 'react';
 import { Booking, BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
-import { getStatusName, toBookingViewModel } from '../lib/utils';
+import { getStatusName } from '../lib/utils';
 import { Card } from 'react-bootstrap';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import RentalStatusTag from './utils/RentalStatusTag';
+import { toBookingViewModel } from '../lib/datetimeUtils';
 
 type Props = {
     title: string;
@@ -22,6 +23,15 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
         <RentalStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{getStatusName(booking.status)}</p>
         <p className="text-muted mb-0 d-sm-none">{booking.customerName ?? '-'}</p>
+    </>
+);
+
+const BookingUsageIntervalDisplayFn = (booking: BookingViewModel) => (
+    <>
+        <p className="mb-0">{booking.displayUsageInterval}</p>
+        {booking.displayUsageInterval !== booking.displayEquipmentOutInterval ? (
+            <p className="text-muted mb-0">{booking.displayEquipmentOutInterval}</p>
+        ) : null}
     </>
 );
 
@@ -51,8 +61,9 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
         {
             key: 'date',
             displayName: 'Datum',
-            getValue: (booking: BookingViewModel) => booking.displayStartDate,
-            columnWidth: 100,
+            getValue: (booking: BookingViewModel) => booking.displayUsageInterval,
+            getContentOverride: BookingUsageIntervalDisplayFn,
+            columnWidth: 180,
         },
     ],
 };

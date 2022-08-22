@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { convertToDateOrUndefined, formatDatetime } from '../../lib/utils';
+import { formatDatetime, formatDatetimeForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 
 const doubleClickToEditHelpText = 'Dubbelklicka för att redigera';
 
@@ -10,6 +10,10 @@ type DoubleClickToEditProps = {
     size?: 'sm' | 'lg' | undefined;
     onUpdate: (x: string) => void;
     readonly?: boolean;
+    inputType?: string;
+    className?: string;
+    min?: string;
+    max?: string;
 };
 
 export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
@@ -18,6 +22,10 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
     size,
     children,
     readonly,
+    inputType,
+    className,
+    min,
+    max,
 }: DoubleClickToEditProps) => {
     const [trackedValue, setTrackedValue] = useState(value ?? '');
     const [isEditing, setIsEditing] = useState(false);
@@ -35,7 +43,14 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
 
     if (!isEditing) {
         return (
-            <span role="button" title={doubleClickToEditHelpText} onDoubleClick={() => setIsEditing(true)}>
+            <span
+                role="button"
+                className={className}
+                title={doubleClickToEditHelpText}
+                tabIndex={0}
+                onDoubleClick={() => setIsEditing(true)}
+                onFocus={() => setIsEditing(true)}
+            >
                 {children}
             </span>
         );
@@ -43,10 +58,13 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
 
     return (
         <Form.Control
-            type="text"
+            type={inputType ?? 'text'}
             placeholder={value}
             size={size}
+            className={className}
             defaultValue={value}
+            min={min}
+            max={max}
             onChange={(e) => setTrackedValue(e.target.value)}
             onBlur={editingComplete}
             onKeyDown={(e: React.KeyboardEvent) => (e.key === 'Enter' ? editingComplete() : null)}
@@ -56,32 +74,44 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
     );
 };
 
-type DoubleClickToEditDateProps = {
-    value?: Date;
+type DoubleClickToEditDatetimeProps = {
+    value?: Date | null;
     onUpdate: (x: Date | undefined) => void;
     size?: 'sm' | 'lg' | undefined;
     readonly?: boolean;
+    className?: string;
+    placeholder?: string;
+    min?: string;
+    max?: string;
 };
 
-export const DoubleClickToEditDate: React.FC<DoubleClickToEditDateProps> = ({
+export const DoubleClickToEditDatetime: React.FC<DoubleClickToEditDatetimeProps> = ({
     value,
     onUpdate,
     size,
     readonly,
-}: DoubleClickToEditDateProps) => {
+    className,
+    placeholder = 'N/A',
+    min,
+    max,
+}: DoubleClickToEditDatetimeProps) => {
     return (
         <DoubleClickToEdit
-            value={value ? formatDatetime(value) : ''}
-            onUpdate={(newValue) => onUpdate(convertToDateOrUndefined(newValue))}
+            inputType="datetime-local"
+            value={value ? formatDatetimeForForm(value) : ''}
+            onUpdate={(newValue) => onUpdate(toDatetimeOrUndefined(newValue))}
             size={size}
             readonly={readonly}
+            className={className}
+            min={min}
+            max={max}
         >
             <div className="mb-3">
                 {value ? (
                     formatDatetime(value)
                 ) : (
                     <span className="text-muted" title="Dubbelklicka för att konfigurera">
-                        N/A
+                        {placeholder}
                     </span>
                 )}
             </div>

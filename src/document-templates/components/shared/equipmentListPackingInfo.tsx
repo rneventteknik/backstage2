@@ -2,12 +2,13 @@ import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles, formatEquipmentListEntryCount } from '../../utils';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
-import { getNumberOfDays } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
-import { formatDate, groupBy, onlyUniqueById } from '../../../lib/utils';
+import { groupBy, onlyUniqueById } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
 import { EquipmentLocation } from '../../../models/interfaces/EquipmentLocation';
 import { getSortedList } from '../../../lib/sortIndexUtils';
+import { Booking } from '../../../models/interfaces';
+import { EquipmentListDateInfo } from './equipmentListDateInfo';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -19,8 +20,9 @@ const styles = StyleSheet.create({
 
 type Props = {
     list: EquipmentList;
+    booking: Booking;
 };
-export const EquipmentListPackingInfo: React.FC<Props> = ({ list }: Props) => {
+export const EquipmentListPackingInfo: React.FC<Props> = ({ list, booking }: Props) => {
     const { t } = useTextResources();
 
     const defaultEquipmentLocation: EquipmentLocation = { id: 0, name: 'Okänd plats', sortIndex: Infinity };
@@ -37,11 +39,7 @@ export const EquipmentListPackingInfo: React.FC<Props> = ({ list }: Props) => {
     return (
         <View style={styles.equipmentListSection}>
             <Text style={styles.heading}>{list.name}</Text>
-            <Text style={styles.italic}>
-                {list.usageStartDatetime ? formatDate(list.usageStartDatetime) : '-'} to{' '}
-                {list.usageEndDatetime ? formatDate(list.usageEndDatetime) : '-'} ({getNumberOfDays(list)}{' '}
-                {t('common.misc.days-unit')})
-            </Text>
+            <EquipmentListDateInfo list={list} booking={booking} />
 
             {uniqueEquipmentLocations.map((location) => (
                 <>

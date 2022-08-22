@@ -17,10 +17,11 @@ import CreateInvoiceGroupModal from '../components/invoices/CreateInvoiceGroupMo
 import { IInvoiceGroupObjectionModel } from '../models/objection-models/InvoiceGroupObjectionModel';
 import { PartialDeep } from 'type-fest';
 import { useNotifications } from '../lib/useNotifications';
-import { formatDatetime, getResponseContentOrError } from '../lib/utils';
+import { getResponseContentOrError } from '../lib/utils';
 import ViewInvoiceGroupModal from '../components/invoices/ViewInvoiceGroupModal';
 import { PaymentStatus } from '../models/enums/PaymentStatus';
 import DoneIcon from '../components/utils/DoneIcon';
+import { formatDatetime } from '../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.ADMIN);

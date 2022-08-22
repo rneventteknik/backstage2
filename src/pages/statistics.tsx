@@ -6,15 +6,16 @@ import { useUserWithDefaultAccessControl } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { Card, Nav, Tab } from 'react-bootstrap';
 import { bookingsFetcher } from '../lib/fetchers';
-import { groupBy, onlyUniqueById, reduceSumFn, toBookingViewModel } from '../lib/utils';
+import { groupBy, onlyUniqueById, reduceSumFn } from '../lib/utils';
 import { TableLoadingPage } from '../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../components/layout/ErrorPage';
 import { TableConfiguration, TableDisplay } from '../components/TableDisplay';
 import { BookingViewModel } from '../models/interfaces';
-import { getPrice, getNumberOfDays, formatNumberAsCurrency, getBookingPrice } from '../lib/pricingUtils';
+import { getPrice, formatNumberAsCurrency, getBookingPrice } from '../lib/pricingUtils';
 import { PricePlan } from '../models/enums/PricePlan';
 import { getSortedList } from '../lib/sortIndexUtils';
 import { Status } from '../models/enums/Status';
+import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -52,7 +53,7 @@ const getStatisticalYear = (date?: Date) => {
 // calculate the different types of statistics per year (and a all-time total).
 const getStatistics = (bookings: BookingViewModel[]) => {
     // First add statistics by year
-    const bookingsByYear = groupBy(bookings, (booking) => getStatisticalYear(booking.startDate));
+    const bookingsByYear = groupBy(bookings, (booking) => getStatisticalYear(booking.usageStartDatetime));
     const yearlyStatistics: YearlyStatistics[] = [];
     for (const statisticalYear in bookingsByYear) {
         const bookingsForYear = bookingsByYear[statisticalYear];
@@ -60,7 +61,7 @@ const getStatistics = (bookings: BookingViewModel[]) => {
         yearlyStatistics.push({
             label: statisticalYear,
             id: yearlyStatistics.length + 1,
-            sortIndex: -(bookingsForYear[0].startDate?.getTime() ?? 0), // User the time of one of the bookings for sorting
+            sortIndex: -(bookingsForYear[0].usageStartDatetime?.getTime() ?? 0), // User the time of one of the bookings for sorting
             equipment: getEquipmentStatistics(bookingsForYear),
             customer: getCustomerStatistics(bookingsForYear),
             user: getUserStatistics(bookingsForYear),
@@ -210,7 +211,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
     const bookingsViewModels = bookings
         ?.map(toBookingViewModel)
-        ?.filter((b) => b.startDate && b.status === Status.DONE);
+        ?.filter((b) => b.usageStartDatetime && b.status === Status.DONE);
 
     // Table display functions
     //

@@ -8,12 +8,12 @@ import { useUserWithDefaultAccessControl } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { Button } from 'react-bootstrap';
 import { bookingsFetcher } from '../lib/fetchers';
-import { toBookingViewModel } from '../lib/utils';
 import { TableLoadingPage } from '../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../components/layout/ErrorPage';
 import { IfNotReadonly } from '../components/utils/IfAdmin';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
+import { toBookingViewModel } from '../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();

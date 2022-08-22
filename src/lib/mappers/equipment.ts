@@ -8,9 +8,9 @@ import {
     IEquipmentLocationObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { EquipmentChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
-import { toDateOrUndefined } from '../utils';
 import { EquipmentPublicCategory } from '../../models/interfaces/EquipmentPublicCategory';
 import { EquipmentLocation } from '../../models/interfaces/EquipmentLocation';
+import { toDatetimeOrUndefined } from '../datetimeUtils';
 
 export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment => {
     if (!objectionModel.id) {
@@ -30,8 +30,8 @@ export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment
         equipmentLocation: objectionModel.equipmentLocation
             ? toEquipmentLocation(objectionModel.equipmentLocation)
             : undefined,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
 
@@ -43,8 +43,8 @@ export const toEquipmentTag = (objectionModel: IEquipmentTagObjectionModel): Equ
     return {
         ...objectionModel,
         id: objectionModel.id,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
 
@@ -56,8 +56,8 @@ export const toEquipmentPrice = (objectionModel: IEquipmentPriceObjectionModel):
     return {
         ...objectionModel,
         id: objectionModel.id,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
 
@@ -71,8 +71,8 @@ export const toEquipmentChangelogEntry = (
     return {
         ...objectionModel,
         id: objectionModel.id,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
 
@@ -86,8 +86,8 @@ export const toEquipmentPublicCategory = (
     return {
         ...objectionModel,
         id: objectionModel.id,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
 
@@ -99,8 +99,8 @@ export const toEquipmentLocation = (objectionModel: IEquipmentLocationObjectionM
     return {
         ...objectionModel,
         id: objectionModel.id,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
 

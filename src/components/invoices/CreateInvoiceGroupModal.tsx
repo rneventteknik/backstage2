@@ -3,7 +3,6 @@ import { Booking } from '../../models/interfaces';
 import { IInvoiceGroupObjectionModel } from '../../models/objection-models/InvoiceGroupObjectionModel';
 import useSwr from 'swr';
 import { bookingsFetcher } from '../../lib/fetchers';
-import { formatDatetime, toBookingViewModel } from '../../lib/utils';
 import { Button, Form, Modal } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import { Status } from '../../models/enums/Status';
@@ -12,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PartialDeep } from 'type-fest';
 import AdminBookingList from '../admin/AdminBookingList';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
+import { formatDatetime, toBookingViewModel } from '../../lib/datetimeUtils';
 
 type Props = {
     show: boolean;
@@ -38,7 +38,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
             bookings
                 ?.map(toBookingViewModel)
                 ?.filter((x) => !isDisabled(x))
-                ?.filter((x) => x.startDate && x.startDate.getMonth() === lastMonth)
+                ?.filter((x) => x.usageStartDatetime && x.usageStartDatetime.getMonth() === lastMonth)
                 .map((x) => x.id) ?? [],
         );
     };

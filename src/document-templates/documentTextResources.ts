@@ -54,6 +54,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.misc.count-unit-single': 'st',
         'common.misc.hours-unit': 'h',
         'common.misc.days-unit': 'dagar',
+        'common.misc.days-unit-single': 'dag',
 
         // Hogia invoice
         'hogia-invoice.general-information': 'Vid frågor om innehållet kontakta RN Eventteknik på rn@ths.kth.se, ange',
@@ -114,6 +115,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.misc.count-unit-single': 'pc',
         'common.misc.hours-unit': 'h',
         'common.misc.days-unit': 'days',
+        'common.misc.days-unit-single': 'day',
 
         // Hogia invoice
         'hogia-invoice.general-information':

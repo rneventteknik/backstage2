@@ -32,7 +32,7 @@ export const PackingListDocument: React.FC<Props> = ({ booking }: Props) => {
                 <MainContent>
                     <View style={styles.flexGrow}>
                         {booking.equipmentLists?.map((l) => (
-                            <EquipmentListPackingInfo list={l} key={l.id} />
+                            <EquipmentListPackingInfo list={l} booking={booking} key={l.id} />
                         ))}
                     </View>
                 </MainContent>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Booking } from '../../models/interfaces';
-import { getResponseContentOrError, toBookingViewModel } from '../../lib/utils';
+import { getResponseContentOrError } from '../../lib/utils';
 import { Button, Modal } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import AdminBookingList from '../admin/AdminBookingList';
@@ -11,6 +11,7 @@ import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { toBooking } from '../../lib/mappers/booking';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import { useNotifications } from '../../lib/useNotifications';
+import { toBookingViewModel } from '../../lib/datetimeUtils';
 
 type Props = {
     show: boolean;

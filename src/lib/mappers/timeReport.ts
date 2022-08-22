@@ -1,6 +1,6 @@
 import { TimeReport } from '../../models/interfaces';
 import { ITimeReportObjectionModel } from '../../models/objection-models/TimeReportObjectionModel';
-import { toDateOrUndefined } from '../utils';
+import { toDatetimeOrUndefined } from '../datetimeUtils';
 import { toUser } from './user';
 
 export const toTimeReport = (objectionModel: ITimeReportObjectionModel): TimeReport => {
@@ -11,10 +11,10 @@ export const toTimeReport = (objectionModel: ITimeReportObjectionModel): TimeRep
     return {
         ...objectionModel,
         id: objectionModel.id,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
-        startDatetime: toDateOrUndefined(objectionModel.startDatetime),
-        endDatetime: toDateOrUndefined(objectionModel.endDatetime),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
+        startDatetime: toDatetimeOrUndefined(objectionModel.startDatetime),
+        endDatetime: toDatetimeOrUndefined(objectionModel.endDatetime),
         user: objectionModel.user ? toUser(objectionModel.user) : undefined,
     };
 };

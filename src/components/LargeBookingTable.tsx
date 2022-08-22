@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
-import { validDate, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
+import { getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Button, Col, Collapse, Form } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
+import { validDate } from '../lib/datetimeUtils';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
@@ -20,6 +21,15 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
         <p className="text-muted mb-0">{getStatusName(booking.status)}</p>
         <p className="text-muted mb-0 d-lg-none">{booking.customerName ?? '-'}</p>
         <p className="text-muted mb-0 d-lg-none">{booking.ownerUser?.name ?? '-'}</p>
+    </>
+);
+
+const BookingUsageIntervalDisplayFn = (booking: BookingViewModel) => (
+    <>
+        <p className="mb-0">{booking.displayUsageInterval}</p>
+        {booking.displayUsageInterval !== booking.displayEquipmentOutInterval ? (
+            <p className="text-muted mb-0">{booking.displayEquipmentOutInterval}</p>
+        ) : null}
     </>
 );
 
@@ -47,7 +57,6 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             key: 'location',
             displayName: 'Plats',
             getValue: (booking: BookingViewModel) => booking.location ?? '-',
-            textAlignment: 'center',
             cellHideSize: 'xl',
             columnWidth: 180,
         },
@@ -55,16 +64,15 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             key: 'ownerUser',
             displayName: 'Ansvarig',
             getValue: (booking: BookingViewModel) => booking.ownerUser?.name ?? '-',
-            textAlignment: 'center',
             cellHideSize: 'lg',
             columnWidth: 180,
         },
         {
             key: 'date',
             displayName: 'Datum',
-            getValue: (booking: BookingViewModel) => booking.displayStartDate,
-            columnWidth: 180,
-            textAlignment: 'center',
+            getValue: (booking: BookingViewModel) => booking.displayUsageInterval,
+            getContentOverride: BookingUsageIntervalDisplayFn,
+            columnWidth: 200,
         },
     ],
 };
@@ -117,11 +125,13 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
         .filter((booking: BookingViewModel) => statuses.length === 0 || statuses.indexOf(booking.status) >= 0)
         .filter(
             (booking: BookingViewModel) =>
-                !startDate || !validDate(startDate) || (booking.startDate && booking.startDate > startDate),
+                !startDate ||
+                !validDate(startDate) ||
+                (booking.usageStartDatetime && booking.usageStartDatetime > startDate),
         )
         .filter(
             (booking: BookingViewModel) =>
-                !endDate || !validDate(endDate) || (booking.endDate && booking.endDate < endDate),
+                !endDate || !validDate(endDate) || (booking.usageEndDatetime && booking.usageEndDatetime < endDate),
         );
 
     return (

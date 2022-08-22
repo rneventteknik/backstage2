@@ -185,8 +185,24 @@ export const fetchBookingsWithEquipmentInInterval = async (
 
     if (endDatetime && startDatetime) {
         query = query
-            .where('equipmentLists.equipmentOutDatetime', '<=', endDatetime.toISOString())
-            .where('equipmentLists.equipmentInDatetime', '>=', startDatetime.toISOString());
+            .andWhere((builder) =>
+                builder
+                    .where('equipmentLists.equipmentOutDatetime', '<=', endDatetime.toISOString())
+                    .orWhere((builder) =>
+                        builder
+                            .whereNull('equipmentLists.equipmentOutDatetime')
+                            .andWhere('equipmentLists.usageStartDatetime', '<=', endDatetime.toISOString()),
+                    ),
+            )
+            .andWhere((builder) =>
+                builder
+                    .where('equipmentLists.equipmentInDatetime', '>=', startDatetime.toISOString())
+                    .orWhere((builder) =>
+                        builder
+                            .whereNull('equipmentLists.equipmentInDatetime')
+                            .andWhere('equipmentLists.usageEndDatetime', '>=', startDatetime.toISOString()),
+                    ),
+            );
     }
 
     if (ignoreEquipmentListId) {

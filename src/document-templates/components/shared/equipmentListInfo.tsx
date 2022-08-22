@@ -2,10 +2,12 @@ import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles, formatEquipmentListEntryCountOrHours, formatEquipmentListEntryPrice } from '../../utils';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
-import { formatNumberAsCurrency, getPrice, getNumberOfDays, getEquipmentListPrice } from '../../../lib/pricingUtils';
+import { formatNumberAsCurrency, getPrice, getEquipmentListPrice } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
-import { formatDatetime } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
+import { getNumberOfDays } from '../../../lib/datetimeUtils';
+import { Booking } from '../../../models/interfaces';
+import { EquipmentListDateInfo } from './equipmentListDateInfo';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -17,18 +19,15 @@ const styles = StyleSheet.create({
 
 type Props = {
     list: EquipmentList;
+    booking: Booking;
 };
-export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
+export const EquipmentListInfo: React.FC<Props> = ({ list, booking }: Props) => {
     const { t } = useTextResources();
 
     return (
         <View style={styles.equipmentListSection}>
             <Text style={styles.heading}>{list.name}</Text>
-            <Text style={styles.italic}>
-                {list.usageStartDatetime ? formatDatetime(list.usageStartDatetime) : '-'} to{' '}
-                {list.usageEndDatetime ? formatDatetime(list.usageEndDatetime) : '-'} ({getNumberOfDays(list)}{' '}
-                {t('common.misc.days-unit')})
-            </Text>
+            <EquipmentListDateInfo list={list} booking={booking} />
 
             <TableRow>
                 <TableCellAutoWidth>

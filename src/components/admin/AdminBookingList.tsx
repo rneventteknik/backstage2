@@ -63,7 +63,7 @@ const AdminBookingList: React.FC<Props> = ({
             <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
             <p className="text-muted mb-0">{booking.ownerUser?.name ?? '-'}</p>
             <p className="text-muted mb-0 d-lg-none">{replaceEmptyStringWithNull(booking.invoiceNumber) ?? '-'}</p>
-            <p className="text-muted mb-0 d-lg-none">{booking.displayStartDate ?? '-'}</p>
+            <p className="text-muted mb-0 d-lg-none">{booking.displayUsageStartString ?? '-'}</p>
         </>
     );
 
@@ -180,7 +180,7 @@ const AdminBookingList: React.FC<Props> = ({
             {
                 key: 'date',
                 displayName: 'Datum',
-                getValue: (booking: BookingViewModel) => booking.displayStartDate,
+                getValue: (booking: BookingViewModel) => booking.displayUsageStartString,
                 cellHideSize: 'lg',
                 columnWidth: 90,
                 textAlignment: 'left',

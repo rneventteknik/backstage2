@@ -1,6 +1,6 @@
 import { TimeEstimate } from '../../models/interfaces';
 import { ITimeEstimateObjectionModel } from '../../models/objection-models/TimeEstimateObjectionModel';
-import { toDateOrUndefined } from '../utils';
+import { toDatetimeOrUndefined } from '../datetimeUtils';
 
 export const toTimeEstimate = (objectionModel: ITimeEstimateObjectionModel): TimeEstimate => {
     if (!objectionModel.id) {
@@ -10,7 +10,7 @@ export const toTimeEstimate = (objectionModel: ITimeEstimateObjectionModel): Tim
     return {
         ...objectionModel,
         id: objectionModel.id,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };

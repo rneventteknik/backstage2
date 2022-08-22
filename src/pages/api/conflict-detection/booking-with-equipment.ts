@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { respondWithCustomErrorMessage, respondWithInvalidDataResponse } from '../../../lib/apiResponses';
+import { toDatetimeOrUndefined } from '../../../lib/datetimeUtils';
 import { fetchBookingsWithEquipmentInInterval } from '../../../lib/db-access/booking';
 import { withSessionContext } from '../../../lib/sessionContext';
-import { getValueOrFirst, toDateOrUndefined, toIntOrUndefined } from '../../../lib/utils';
+import { getValueOrFirst, toIntOrUndefined } from '../../../lib/utils';
 
 const handler = withSessionContext(async (_req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     const startDatetimeString = getValueOrFirst(_req.query.startDatetime);
@@ -11,8 +12,8 @@ const handler = withSessionContext(async (_req: NextApiRequest, res: NextApiResp
     const ignoreEquipmentListIdString = getValueOrFirst(_req.query.ignoreEquipmentListId);
 
     const equipmentId = toIntOrUndefined(equipmentIdString);
-    const startDatetime = toDateOrUndefined(startDatetimeString);
-    const endDatetime = toDateOrUndefined(endDatetimeString);
+    const startDatetime = toDatetimeOrUndefined(startDatetimeString);
+    const endDatetime = toDatetimeOrUndefined(endDatetimeString);
     const ignoreEquipmentListId = toIntOrUndefined(ignoreEquipmentListIdString);
 
     if (!equipmentId) {

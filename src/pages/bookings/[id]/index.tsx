@@ -4,7 +4,6 @@ import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Badge, Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, ListGroup, Row } from 'react-bootstrap';
 import {
-    formatNullableDate,
     getAccountKindName,
     getLanguageName,
     getPaymentStatusName,
@@ -34,14 +33,7 @@ import { useNotifications } from '../../../lib/useNotifications';
 import { Status } from '../../../models/enums/Status';
 import { PaymentStatus } from '../../../models/enums/PaymentStatus';
 import BookingChangelogCard from '../../../components/bookings/BookingChangelogCard';
-import {
-    formatNumberAsCurrency,
-    getBookingPrice,
-    getNumberOfBookingDays,
-    getNumberOfEventHours,
-    getUsageEndDatetime,
-    getUsageStartDatetime,
-} from '../../../lib/pricingUtils';
+import { formatNumberAsCurrency, getBookingPrice } from '../../../lib/pricingUtils';
 import { Language } from '../../../models/enums/Language';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
@@ -50,6 +42,7 @@ import { getNextSortIndex } from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/TimeEstimateAddButton';
 import TimeReportAddButton from '../../../components/bookings/timeReport/TimeReportAddButton';
 import RentalStatusTag from '../../../components/utils/RentalStatusTag';
+import { getNumberOfBookingDays, getNumberOfEventHours, toBookingViewModel } from '../../../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -63,15 +56,17 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     // Edit booking
     //
     const router = useRouter();
-    const { data: booking, error, mutate } = useSwr('/api/bookings/' + router.query.id, bookingFetcher);
+    const { data, error, mutate } = useSwr('/api/bookings/' + router.query.id, bookingFetcher);
 
     if (error) {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (!booking) {
+    if (!data) {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser}></TwoColLoadingPage>;
     }
+
+    const booking = toBookingViewModel(data);
 
     const saveBooking = async (booking: PartialDeep<IBookingObjectionModel>) => {
         const body = { booking: { ...booking, id: router.query.id } };
@@ -217,15 +212,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             ) : null}
                             <div className="text-muted mt-2"> {booking.customerName}</div>
                             <div className="text-muted">
-                                {getNumberOfBookingDays(booking) ?? 0} dagar / {getNumberOfEventHours(booking)} h /{' '}
-                                {formatNumberAsCurrency(getBookingPrice(booking))}
+                                {getNumberOfBookingDays(booking) ? `${getNumberOfBookingDays(booking)} dagar / ` : null}
+                                {getNumberOfEventHours(booking)} h / {formatNumberAsCurrency(getBookingPrice(booking))}
                             </div>
-                            {getUsageStartDatetime(booking) || getUsageEndDatetime(booking) ? (
-                                <div className="text-muted">
-                                    {formatNullableDate(getUsageStartDatetime(booking), 'N/A')} -{' '}
-                                    {formatNullableDate(getUsageEndDatetime(booking), 'N/A')}
-                                </div>
-                            ) : null}
+                            <div className="text-muted">{booking.displayUsageInterval}</div>
                         </Card.Header>
 
                         <ListGroup variant="flush">

@@ -22,12 +22,19 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
 
     const changeStatusTo = (status: Status) => onChange({ status: status });
 
+    const allEquipmentListsHaveDates =
+        booking.equipmentLists?.every((list) => list.usageStartDatetime && list.usageEndDatetime) ?? false;
+
     switch (booking.status) {
         case Status.DRAFT:
             return (
                 <>
                     <Dropdown as={ButtonGroup} className={className}>
-                        <Button variant="dark" onClick={() => setShowStatusChangeModal(true)}>
+                        <Button
+                            variant="dark"
+                            onClick={() => setShowStatusChangeModal(true)}
+                            disabled={!allEquipmentListsHaveDates}
+                        >
                             <FontAwesomeIcon icon={faCircleCheckRegular} className="mr-1" /> Sätt till bokad
                         </Button>
 

@@ -2,10 +2,10 @@ import { View, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles } from '../../utils';
 import { Booking } from '../../../models/interfaces';
-import { formatDatetime } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
 import { BookingType } from '../../../models/enums/BookingType';
 import { Col, InfoItem } from './utils';
+import { formatDatetime } from '../../../lib/datetimeUtils';
 
 const styles = StyleSheet.create({
     ...commonStyles,

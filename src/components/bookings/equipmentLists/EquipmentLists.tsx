@@ -16,6 +16,8 @@ import {
     faTrashCan,
     faBackward,
     faClone,
+    faBarsStaggered,
+    faCalendarDays,
     faRightFromBracket,
     faRightToBracket,
 } from '@fortawesome/free-solid-svg-icons';
@@ -38,14 +40,12 @@ import EquipmentSearch, { ResultType, SearchResultViewModel } from '../../Equipm
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../../models/objection-models';
 import { toEquipment } from '../../../lib/mappers/equipment';
 import Skeleton from 'react-loading-skeleton';
-import { DoubleClickToEditDate, DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
+import { DoubleClickToEdit, DoubleClickToEditDropdown, DoubleClickToEditDatetime } from '../../utils/DoubleClickToEdit';
 import {
     formatNumberAsCurrency,
     formatPrice,
     formatTHSPrice,
     getEquipmentListPrice,
-    getNumberOfDays,
-    getNumberOfEquipmentOutDays,
     getPrice,
 } from '../../../lib/pricingUtils';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
@@ -63,9 +63,18 @@ import { RentalStatus } from '../../../models/enums/RentalStatus';
 import { BookingType } from '../../../models/enums/BookingType';
 import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus';
+import { Status } from '../../../models/enums/Status';
 import BookingReturnalNoteModal from '../BookingReturnalNoteModal';
 import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
 import { Language } from '../../../models/enums/Language';
+import {
+    formatDatetime,
+    getEquipmentInDatetime,
+    getEquipmentOutDatetime,
+    getNumberOfDays,
+    getNumberOfEquipmentOutDays,
+} from '../../../lib/datetimeUtils';
+import ConfirmModal from '../../utils/ConfirmModal';
 
 type Props = {
     bookingId: number;
@@ -137,9 +146,16 @@ const EquipmentLists: React.FC<Props> = ({ bookingId, readonly }: Props) => {
     }
 
     const createNewList = async () => {
+        const listToCopyDatesFrom = equipmentLists.find((list) => isLast(equipmentLists, list));
+
         const newEquipmentList: Partial<EquipmentListObjectionModel> = {
             name: 'Utrustning',
             sortIndex: equipmentLists ? getNextSortIndex(equipmentLists) : 10,
+            equipmentInDatetime: listToCopyDatesFrom?.equipmentInDatetime?.toISOString(),
+            equipmentOutDatetime: listToCopyDatesFrom?.equipmentOutDatetime?.toISOString(),
+            usageStartDatetime: listToCopyDatesFrom?.usageStartDatetime?.toISOString(),
+            usageEndDatetime: listToCopyDatesFrom?.usageEndDatetime?.toISOString(),
+            numberOfDays: listToCopyDatesFrom?.numberOfDays,
         };
         const body = { equipmentList: newEquipmentList };
 
@@ -256,9 +272,11 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
     const { showSaveSuccessNotification, showSaveFailedNotification, showErrorMessage } = useNotifications();
     const [showImportModal, setShowImportModal] = useState(false);
+    const [showEmptyListModal, setShowEmptyListModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showListContent, setShowListContent] = useState(true);
     const [showReturnalNoteModal, setShowReturnalNoteModal] = useState(false);
+    const [showResetDatesModal, setShowResetDatesModal] = useState(false);
     const [equipmentListEntryToEditViewModel, setEquipmentListEntryToEditViewModel] =
         useState<Partial<EquipmentListEntry> | null>(null);
 
@@ -317,7 +335,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         };
     };
 
-    // Getter to get the default list entry for a given equipment (i.e. initial number of hurs, units, price etc)
+    // Getter to get the default list entry for a given equipment (i.e. initial number of hours, units, price etc)
     //
     const getDefaultListEntryFromEquipment = (
         equipment: Equipment,
@@ -450,7 +468,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     };
 
     // Function to save list. Note: this function instantly calls the API to save on the server.
-    // We may want to add some deboucing or a delay to reduce the numbe rof requests to the server.
+    // We may want to add some debouncing or a delay to reduce the number rof requests to the server.
     //
     const saveList = (updatedList: EquipmentList) => {
         mutateList(updatedList);
@@ -551,13 +569,13 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 >
                     {entry.name}
                 </DoubleClickToEdit>
-                {entry.equipment && list.equipmentOutDatetime && list.equipmentInDatetime ? (
+                {entry.equipment && getEquipmentOutDatetime(list) && getEquipmentInDatetime(list) ? (
                     <span className="ml-1">
                         <EquipmentListEntryConflictStatus
                             equipment={entry.equipment}
                             equipmentList={list}
-                            startDatetime={list.equipmentOutDatetime}
-                            endDatetime={list.equipmentInDatetime}
+                            startDatetime={getEquipmentOutDatetime(list) ?? new Date()}
+                            endDatetime={getEquipmentInDatetime(list) ?? new Date()}
                         />
                     </span>
                 ) : null}
@@ -798,6 +816,42 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         ],
     };
 
+    // Consts to control which date edit components are shown (i.e. interval, dates or both). Note that
+    // the logic for usage dates and in/out dates are seperated.
+    const showIntervalControls = list.numberOfDays !== null && list.numberOfDays !== undefined;
+    const showDateControls =
+        list.numberOfDays === null ||
+        list.numberOfDays === undefined ||
+        list.usageStartDatetime ||
+        list.usageEndDatetime ||
+        list.equipmentOutDatetime ||
+        list.equipmentInDatetime;
+
+    // Verify that start dates are before end dates, and if ok, then save the list. Otherwise show an eror and return.
+    const verifyTimesAndSaveList = (updatedList: EquipmentList) => {
+        if (
+            updatedList.usageStartDatetime &&
+            updatedList.usageEndDatetime &&
+            updatedList.usageStartDatetime.getTime() >= updatedList.usageEndDatetime.getTime()
+        ) {
+            showErrorMessage('Starttid måste vara innan sluttid');
+            return;
+        }
+
+        const equipmentInDatetime = getEquipmentInDatetime(updatedList);
+        const equipmentOutDatetime = getEquipmentOutDatetime(updatedList);
+
+        if (
+            equipmentOutDatetime &&
+            equipmentInDatetime &&
+            equipmentOutDatetime.getTime() >= equipmentInDatetime.getTime()
+        ) {
+            showErrorMessage('Utlämning måste vara innan återlämning');
+            return;
+        }
+        saveList(updatedList);
+    };
+
     return (
         <Card className="mb-3">
             <Card.Header>
@@ -874,6 +928,50 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" />
                                         Lägg till egen rad
                                     </Dropdown.Item>
+                                    {list.numberOfDays === null ? (
+                                        booking.status === Status.DRAFT ? (
+                                            <>
+                                                <Dropdown.Item onClick={() => setShowResetDatesModal(true)}>
+                                                    <FontAwesomeIcon icon={faBarsStaggered} className="mr-1 fa-fw" />
+                                                    Ange endast antal dagar
+                                                </Dropdown.Item>
+                                                <ConfirmModal
+                                                    show={showResetDatesModal}
+                                                    onHide={() => setShowResetDatesModal(false)}
+                                                    onConfirm={() => {
+                                                        setShowResetDatesModal(false);
+                                                        saveList({
+                                                            ...list,
+                                                            numberOfDays: getNumberOfDays(list) ?? 1,
+                                                            usageStartDatetime: null,
+                                                            usageEndDatetime: null,
+                                                            equipmentInDatetime: null,
+                                                            equipmentOutDatetime: null,
+                                                        });
+                                                    }}
+                                                    title="Bekräfta"
+                                                >
+                                                    Vill du verkligen ta bort datumen från listan {list.name}?
+                                                </ConfirmModal>
+                                            </>
+                                        ) : null
+                                    ) : (
+                                        <Dropdown.Item
+                                            onClick={() =>
+                                                saveList({
+                                                    ...list,
+                                                    numberOfDays: null,
+                                                    usageStartDatetime: null,
+                                                    usageEndDatetime: null,
+                                                    equipmentInDatetime: null,
+                                                    equipmentOutDatetime: null,
+                                                })
+                                            }
+                                        >
+                                            <FontAwesomeIcon icon={faCalendarDays} className="mr-1 fa-fw" />
+                                            Sätt datum
+                                        </Dropdown.Item>
+                                    )}
                                     {booking.bookingType === BookingType.RENTAL ? (
                                         <Dropdown.Item
                                             onClick={() => saveList({ ...list, rentalStatus: null })}
@@ -887,13 +985,37 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         <FontAwesomeIcon icon={faClone} className="mr-1 fa-fw" /> Hämta utrustning från
                                         bokning
                                     </Dropdown.Item>
-                                    <Dropdown.Item onClick={() => saveList({ ...list, equipmentListEntries: [] })}>
+                                    <Dropdown.Item onClick={() => setShowEmptyListModal(true)}>
                                         <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" /> Töm utrustningslistan
                                     </Dropdown.Item>
+                                    <ConfirmModal
+                                        show={showEmptyListModal}
+                                        onHide={() => setShowEmptyListModal(false)}
+                                        confirmLabel="Töm listan"
+                                        onConfirm={() => {
+                                            setShowEmptyListModal(false);
+                                            saveList({ ...list, equipmentListEntries: [] });
+                                        }}
+                                        title="Bekräfta"
+                                    >
+                                        Vill du verkligen tömma listan {list.name}?
+                                    </ConfirmModal>
                                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
                                         <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort
                                         utrustningslistan
                                     </Dropdown.Item>
+                                    <ConfirmModal
+                                        show={showDeleteModal}
+                                        onHide={() => setShowDeleteModal(false)}
+                                        confirmLabel="Ta bort"
+                                        onConfirm={() => {
+                                            setShowDeleteModal(false);
+                                            deleteList();
+                                        }}
+                                        title="Bekräfta"
+                                    >
+                                        Vill du verkligen ta bort listan {list.name}?
+                                    </ConfirmModal>
                                 </DropdownButton>
                             </>
                         )}
@@ -901,10 +1023,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 </div>
                 <p className="text-muted">
                     {list.equipmentListEntries.length} rader / {formatNumberAsCurrency(getEquipmentListPrice(list))}
-                    {list.equipmentInDatetime &&
-                    list.equipmentOutDatetime &&
-                    list.usageStartDatetime &&
-                    list.usageEndDatetime ? (
+                    {getNumberOfDays(list) && getNumberOfEquipmentOutDays(list) ? (
                         <>
                             {' '}
                             / {getNumberOfEquipmentOutDays(list)} dagar / {getNumberOfDays(list)} debiterade dagar
@@ -914,48 +1033,124 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                         <> / {getRentalStatusName(list.rentalStatus)}</>
                     ) : null}
                 </p>
-                <Row>
-                    <Col md={6}>
-                        <div>
-                            <small>Debiterade dagar</small>
+                {showIntervalControls ? (
+                    <>
+                        <small>Antal dagar</small>
+                        <div className="d-flex">
+                            <div className="flex-grow-1">
+                                <div className="mb-3" style={{ fontSize: '1.2em' }}>
+                                    <DoubleClickToEdit
+                                        value={list.numberOfDays?.toString()}
+                                        inputType="number"
+                                        onUpdate={(newValue) =>
+                                            saveList({
+                                                ...list,
+                                                numberOfDays: toIntOrUndefined(newValue) ?? 1,
+                                            })
+                                        }
+                                        readonly={readonly}
+                                        className="mb-3 d-block"
+                                    >
+                                        {list.numberOfDays} {list.numberOfDays != 1 ? 'dagar' : 'dag'}
+                                    </DoubleClickToEdit>
+                                </div>
+                            </div>
+                            <div>
+                                <Button
+                                    variant="secondary"
+                                    onClick={() =>
+                                        saveList({
+                                            ...list,
+                                            numberOfDays: null,
+                                            usageStartDatetime: null,
+                                            usageEndDatetime: null,
+                                            equipmentInDatetime: null,
+                                            equipmentOutDatetime: null,
+                                        })
+                                    }
+                                    className="mr-2"
+                                >
+                                    <FontAwesomeIcon icon={faCalendarDays} className="mr-1 fa-fw" />
+                                    Sätt datum
+                                </Button>
+                            </div>
                         </div>
-                        <Row style={{ fontSize: '1.2em' }}>
-                            <Col>
-                                <DoubleClickToEditDate
+                    </>
+                ) : null}
+                {showDateControls ? (
+                    <Row>
+                        <Col md={3} xs={6}>
+                            <small>Debiterad starttid</small>
+                            <div style={{ fontSize: '1.2em' }}>
+                                <DoubleClickToEditDatetime
                                     value={list.usageStartDatetime}
-                                    onUpdate={(newValue) => saveList({ ...list, usageStartDatetime: newValue })}
+                                    onUpdate={(newValue) =>
+                                        verifyTimesAndSaveList({ ...list, usageStartDatetime: newValue ?? null })
+                                    }
+                                    max={list.usageEndDatetime
+                                        ?.toISOString()
+                                        .substring(0, list.usageEndDatetime?.toISOString().indexOf('T') + 6)}
                                     readonly={readonly}
+                                    className="d-block"
                                 />
-                            </Col>
-                            <Col>
-                                <DoubleClickToEditDate
+                            </div>
+                        </Col>
+                        <Col md={3} xs={6}>
+                            <small>Debiterad sluttid</small>
+                            <div style={{ fontSize: '1.2em' }}>
+                                <DoubleClickToEditDatetime
                                     value={list.usageEndDatetime}
-                                    onUpdate={(newValue) => saveList({ ...list, usageEndDatetime: newValue })}
+                                    onUpdate={(newValue) =>
+                                        verifyTimesAndSaveList({ ...list, usageEndDatetime: newValue ?? null })
+                                    }
+                                    min={list.usageStartDatetime
+                                        ?.toISOString()
+                                        .substring(0, list.usageStartDatetime?.toISOString().indexOf('T') + 6)}
                                     readonly={readonly}
+                                    className="d-block"
                                 />
-                            </Col>
-                        </Row>
-                    </Col>
-                    <Col md={6}>
-                        <small>Utlämnade dagar</small>
-                        <Row style={{ fontSize: '1.2em' }}>
-                            <Col>
-                                <DoubleClickToEditDate
+                            </div>
+                        </Col>
+                        <Col md={3} xs={6}>
+                            <small>Utlämning</small>
+                            <div style={{ fontSize: '1.2em' }}>
+                                <DoubleClickToEditDatetime
                                     value={list.equipmentOutDatetime}
-                                    onUpdate={(newValue) => saveList({ ...list, equipmentOutDatetime: newValue })}
+                                    onUpdate={(newValue) =>
+                                        verifyTimesAndSaveList({ ...list, equipmentOutDatetime: newValue ?? null })
+                                    }
+                                    max={getEquipmentInDatetime(list)
+                                        ?.toISOString()
+                                        .substring(
+                                            0,
+                                            (getEquipmentInDatetime(list)?.toISOString()?.indexOf('T') ?? 0) + 6,
+                                        )}
                                     readonly={readonly}
+                                    placeholder={formatDatetime(list.usageStartDatetime, 'N/A')}
                                 />
-                            </Col>
-                            <Col>
-                                <DoubleClickToEditDate
+                            </div>
+                        </Col>
+                        <Col md={3} xs={6}>
+                            <small>Återlämning</small>
+                            <div style={{ fontSize: '1.2em' }}>
+                                <DoubleClickToEditDatetime
                                     value={list.equipmentInDatetime}
-                                    onUpdate={(newValue) => saveList({ ...list, equipmentInDatetime: newValue })}
+                                    onUpdate={(newValue) =>
+                                        verifyTimesAndSaveList({ ...list, equipmentInDatetime: newValue ?? null })
+                                    }
+                                    min={getEquipmentOutDatetime(list)
+                                        ?.toISOString()
+                                        .substring(
+                                            0,
+                                            (getEquipmentOutDatetime(list)?.toISOString()?.indexOf('T') ?? 0) + 6,
+                                        )}
                                     readonly={readonly}
+                                    placeholder={formatDatetime(list.usageEndDatetime, 'N/A')}
                                 />
-                            </Col>
-                        </Row>
-                    </Col>
-                </Row>
+                            </div>
+                        </Col>
+                    </Row>
+                ) : null}
             </Card.Header>
 
             {showListContent ? (
@@ -975,21 +1170,6 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     )}
                 </>
             ) : null}
-
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Bekräfta</Modal.Title>
-                </Modal.Header>
-                <Modal.Body> Vill du verkligen ta bort listan {list.name}?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={() => setShowDeleteModal(false)}>
-                        Avbryt
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteList()}>
-                        Ta bort
-                    </Button>
-                </Modal.Footer>
-            </Modal>
 
             <Modal
                 show={!!equipmentListEntryToEditViewModel}

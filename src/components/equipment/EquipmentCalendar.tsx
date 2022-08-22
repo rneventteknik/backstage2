@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
+import { addDays, formatDate } from '../../lib/datetimeUtils';
 import { bookingsFetcher } from '../../lib/fetchers';
-import { formatDate, getMaximumNumberOfUnitUsed } from '../../lib/utils';
+import { getMaximumNumberOfUnitUsed } from '../../lib/utils';
 import { Status } from '../../models/enums/Status';
 import { Equipment } from '../../models/interfaces';
 import styles from './EquipmentCalendar.module.scss';
@@ -193,12 +194,6 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
             </div>
         </div>
     );
-};
-
-const addDays = (date: Date, days: number) => {
-    const dateCopy = new Date(date);
-    dateCopy.setDate(dateCopy.getDate() + days);
-    return dateCopy;
 };
 
 export default EquipmentCalendar;

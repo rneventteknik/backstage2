@@ -6,10 +6,11 @@ import { Equipment } from './Equipment';
 export interface EquipmentList extends BaseEntityWithName {
     sortIndex: number;
     equipmentListEntries: EquipmentListEntry[];
-    equipmentOutDatetime?: Date;
-    equipmentInDatetime?: Date;
-    usageStartDatetime?: Date;
-    usageEndDatetime?: Date;
+    equipmentOutDatetime?: Date | null;
+    equipmentInDatetime?: Date | null;
+    usageStartDatetime?: Date | null;
+    usageEndDatetime?: Date | null;
+    numberOfDays?: number | null;
     rentalStatus?: RentalStatus | null;
 }
 
