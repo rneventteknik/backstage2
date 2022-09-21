@@ -6,7 +6,7 @@ import { getNumberOfDays } from './datetimeUtils';
 //
 export const getPrice = (entry: EquipmentListEntry, numberOfDays: number, withDiscount = true): number => {
     const fullPrice = entry.numberOfUnits * getUnitPrice(entry, numberOfDays);
-    return withDiscount ? fullPrice - entry.discount : fullPrice;
+    return Math.max(0, withDiscount ? fullPrice - entry.discount : fullPrice);
 };
 
 export const getUnitPrice = (entry: EquipmentListEntry, numberOfDays: number): number => {
