@@ -95,7 +95,7 @@ export const updateEquipmentPackage = async (
             });
         }
 
-        EquipmentPackageObjectionModel.query(trx).patchAndFetchById(
+        await EquipmentPackageObjectionModel.query(trx).patchAndFetchById(
             id,
             withUpdatedDate(removeIdAndDates(equipmentPackage)),
         );

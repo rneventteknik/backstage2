@@ -46,7 +46,10 @@ export const updateInvoiceGroup = async (
             });
         }
 
-        InvoiceGroupObjectionModel.query(trx).patchAndFetchById(id, withUpdatedDate(removeIdAndDates(invoiceGroup)));
+        await InvoiceGroupObjectionModel.query(trx).patchAndFetchById(
+            id,
+            withUpdatedDate(removeIdAndDates(invoiceGroup)),
+        );
 
         const updatedInvoiceGroup = await fetchInvoiceGroup(id, trx);
 
