@@ -20,7 +20,7 @@ type Props = {
     booking: Booking;
 };
 export const BookingInfo: React.FC<Props> = ({ booking }: Props) => {
-    const { t } = useTextResources();
+    const { t, locale } = useTextResources();
 
     const bookingTypeTextResourceKey =
         booking.bookingType === BookingType.GIG
@@ -42,7 +42,10 @@ export const BookingInfo: React.FC<Props> = ({ booking }: Props) => {
             </Col>
             <Col>
                 <InfoItem title={t('common.booking-info.our-reference')} content={booking.ownerUser?.name}></InfoItem>
-                <InfoItem title={t('common.booking-info.print-date')} content={formatDatetime(new Date())}></InfoItem>
+                <InfoItem
+                    title={t('common.booking-info.print-date')}
+                    content={formatDatetime(new Date(), '-', locale)}
+                ></InfoItem>
             </Col>
         </View>
     );

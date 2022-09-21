@@ -11,6 +11,7 @@ import { useTextResources } from '../useTextResources';
 import { TotalPriceSection } from './shared/totalPriceSection';
 import { EquipmentListInfo } from './shared/equipmentListInfo';
 import { TimeEstimateListInfo } from './shared/timeEstimateListInfo';
+import { getSortedList } from '../../lib/sortIndexUtils';
 
 type Props = {
     booking: Booking;
@@ -33,7 +34,7 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking }: Props) => {
 
                 <MainContent>
                     <View style={styles.flexGrow}>
-                        {booking.equipmentLists?.map((l) => (
+                        {getSortedList(booking.equipmentLists ?? []).map((l) => (
                             <EquipmentListInfo list={l} booking={booking} key={l.id} />
                         ))}
                         <TimeEstimateListInfo booking={booking} />

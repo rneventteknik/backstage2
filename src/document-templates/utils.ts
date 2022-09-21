@@ -111,6 +111,8 @@ export const formatEquipmentListEntryPrice = (entry: EquipmentListEntry, t: (t: 
         return `${entry.pricePerHour} kr/${t('common.misc.hours-unit')}`;
     } else if (!entry.pricePerHour && entry.pricePerUnit) {
         return `${entry.pricePerUnit} kr/${t('common.misc.count-unit-single')}`;
+    } else if (entry.pricePerHour == 0 && entry.pricePerUnit == 0) {
+        return '-';
     } else {
         return `${entry.pricePerUnit} kr + ${entry.pricePerHour} kr/h`;
     }

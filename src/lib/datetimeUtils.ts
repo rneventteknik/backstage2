@@ -30,17 +30,29 @@ const datetimeFormFormatOptions: Intl.DateTimeFormatOptions = {
     minute: 'numeric',
 };
 
-export const formatDatetime = (date: Date | null | undefined, defaultValue = '-'): string =>
-    date ? date.toLocaleString('sv-SE', datetimeFormatOptions) : defaultValue;
+export const formatDatetime = (
+    date: Date | null | undefined,
+    defaultValue = '-',
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+): string => (date ? date.toLocaleString(locale, datetimeFormatOptions) : defaultValue);
 
-export const formatDate = (date: Date | null | undefined, defaultValue = '-'): string =>
-    date ? date.toLocaleString('sv-SE', dateFormatOptions) : defaultValue;
+export const formatDate = (
+    date: Date | null | undefined,
+    defaultValue = '-',
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+): string => (date ? date.toLocaleString(locale, dateFormatOptions) : defaultValue);
 
-export const formatTime = (date: Date | null | undefined, defaultValue = '-'): string =>
-    date ? date.toLocaleTimeString('sv-SE', timeFormatOptions) : defaultValue;
+export const formatTime = (
+    date: Date | null | undefined,
+    defaultValue = '-',
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+): string => (date ? date.toLocaleTimeString(locale, timeFormatOptions) : defaultValue);
 
-export const formatDatetimeForForm = (date: Date | null | undefined, defaultValue = '-'): string =>
-    date ? date.toLocaleString('sv-SE', datetimeFormFormatOptions) : defaultValue;
+export const formatDatetimeForForm = (
+    date: Date | null | undefined,
+    defaultValue = '-',
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+): string => (date ? date.toLocaleString(locale, datetimeFormFormatOptions) : defaultValue);
 
 // Check if value is a valid date
 //
@@ -207,13 +219,18 @@ export const getDisplayEndDatetime = (endDatetime: Date | null | undefined, hasT
     return addDays(endDatetime, -1);
 };
 
-const getFormattedInterval = (start: Date | null | undefined, end: Date | null | undefined, hasTimeValues: boolean) => {
+const getFormattedInterval = (
+    start: Date | null | undefined,
+    end: Date | null | undefined,
+    hasTimeValues: boolean,
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+) => {
     // We want the interval to break in the proper places when it has to span multiple lines, so we change the spaces within dates to nbsp.
     const nonBreakingSpace = '\xa0';
 
     if (!hasTimeValues) {
-        const formattedStartDate = formatDate(start).replaceAll(' ', nonBreakingSpace);
-        const formattedEndDate = formatDate(getDisplayEndDatetime(end, hasTimeValues)).replaceAll(
+        const formattedStartDate = formatDate(start, '-', locale).replaceAll(' ', nonBreakingSpace);
+        const formattedEndDate = formatDate(getDisplayEndDatetime(end, hasTimeValues), '-', locale).replaceAll(
             ' ',
             nonBreakingSpace,
         );
@@ -225,39 +242,57 @@ const getFormattedInterval = (start: Date | null | undefined, end: Date | null |
         return `${formattedStartDate} - ${formattedEndDate}`;
     }
 
-    if (formatDate(start) === formatDate(end)) {
-        return `${formatDate(start).replaceAll(' ', nonBreakingSpace)} ${formatTime(start)} - ${formatTime(end)}`;
+    if (formatDate(start, '-', locale) === formatDate(end, '-', locale)) {
+        return `${formatDate(start, '-', locale).replaceAll(' ', nonBreakingSpace)} ${formatTime(
+            start,
+            '-',
+            locale,
+        )} - ${formatTime(end, '-', locale)}`;
     }
 
-    return `${formatDatetime(start).replaceAll(' ', nonBreakingSpace)} - ${formatDatetime(end).replaceAll(
-        ' ',
-        nonBreakingSpace,
-    )}`;
+    return `${formatDatetime(start, '-', locale).replaceAll(' ', nonBreakingSpace)} - ${formatDatetime(
+        end,
+        '-',
+        locale,
+    ).replaceAll(' ', nonBreakingSpace)}`;
 };
 
-const getDateDisplayValues = (entity: HasDatetimes, hasTimeValues: boolean) => {
+const getDateDisplayValues = (entity: HasDatetimes, hasTimeValues: boolean, locale: 'sv-SE' | 'en-SE' = 'sv-SE') => {
     return {
         displayEquipmentOutString: hasTimeValues
-            ? formatDatetime(getEquipmentOutDatetime(entity))
-            : formatDate(getEquipmentOutDatetime(entity)),
-        displayEquipmentInString: formatDate(getDisplayEndDatetime(entity.equipmentInDatetime, hasTimeValues)),
+            ? formatDatetime(getEquipmentOutDatetime(entity), '-', locale)
+            : formatDate(getEquipmentOutDatetime(entity), '-', locale),
+        displayEquipmentInString: formatDate(
+            getDisplayEndDatetime(entity.equipmentInDatetime, hasTimeValues),
+            '-',
+            locale,
+        ),
         displayUsageStartString: hasTimeValues
-            ? formatDatetime(entity.usageStartDatetime)
-            : formatDate(entity.usageStartDatetime),
-        displayUsageEndString: formatDate(getDisplayEndDatetime(entity.usageEndDatetime, hasTimeValues)),
-        displayUsageInterval: getFormattedInterval(entity.usageStartDatetime, entity.usageEndDatetime, hasTimeValues),
+            ? formatDatetime(entity.usageStartDatetime, '-', locale)
+            : formatDate(entity.usageStartDatetime, '-', locale),
+        displayUsageEndString: formatDate(getDisplayEndDatetime(entity.usageEndDatetime, hasTimeValues), '-', locale),
+        displayUsageInterval: getFormattedInterval(
+            entity.usageStartDatetime,
+            entity.usageEndDatetime,
+            hasTimeValues,
+            locale,
+        ),
         displayEquipmentOutInterval: getFormattedInterval(
             getEquipmentOutDatetime(entity),
             getEquipmentInDatetime(entity),
             hasTimeValues,
+            locale,
         ),
     };
 };
 
-export const getBookingDateDisplayValues = (booking: Booking) =>
-    getDateDisplayValues(getBookingDates(booking), hasTimeValues(booking));
-export const getEquipmentListDateDisplayValues = (equipmentList: EquipmentList, booking: Booking) =>
-    getDateDisplayValues(equipmentList, hasTimeValues(booking));
+export const getBookingDateDisplayValues = (booking: Booking, locale: 'sv-SE' | 'en-SE' = 'sv-SE') =>
+    getDateDisplayValues(getBookingDates(booking), hasTimeValues(booking), locale);
+export const getEquipmentListDateDisplayValues = (
+    equipmentList: EquipmentList,
+    booking: Booking,
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+) => getDateDisplayValues(equipmentList, hasTimeValues(booking), locale);
 
 export const toBookingViewModel = (booking: Booking): BookingViewModel => {
     return {

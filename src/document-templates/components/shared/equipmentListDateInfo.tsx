@@ -15,11 +15,11 @@ type Props = {
     booking: Booking;
 };
 export const EquipmentListDateInfo: React.FC<Props> = ({ list, booking }: Props) => {
-    const { t } = useTextResources();
+    const { t, locale } = useTextResources();
 
     return list.usageStartDatetime && list.usageEndDatetime ? (
         <Text style={styles.italic}>
-            {getEquipmentListDateDisplayValues(list, booking).displayUsageInterval} ({getNumberOfDays(list)}{' '}
+            {getEquipmentListDateDisplayValues(list, booking, locale).displayUsageInterval} ({getNumberOfDays(list)}{' '}
             {t(getNumberOfDays(list) === 1 ? 'common.misc.days-unit-single' : 'common.misc.days-unit')})
         </Text>
     ) : (
