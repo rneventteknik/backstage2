@@ -1,4 +1,4 @@
-import { toEquipment, toEquipmentPublicCategory, toEquipmentTag } from './mappers/equipment';
+import { toEquipment, toEquipmentLocation, toEquipmentPublicCategory, toEquipmentTag } from './mappers/equipment';
 import { toEquipmentPackage } from './mappers/equipmentPackage';
 import { toUser } from './mappers/user';
 import { toTimeReport } from './mappers/timeReport';
@@ -35,6 +35,9 @@ export const equipmentTagsFetcher = generateListFetcher(toEquipmentTag);
 
 export const equipmentPublicCategoryFetcher = generateFetcher(toEquipmentPublicCategory);
 export const equipmentPublicCategoriesFetcher = generateListFetcher(toEquipmentPublicCategory);
+
+export const equipmentLocationFetcher = generateFetcher(toEquipmentLocation);
+export const equipmentLocationsFetcher = generateListFetcher(toEquipmentLocation);
 
 export const equipmentListFetcher = generateFetcher(toEquipmentList);
 export const equipmentListsFetcher = generateListFetcher(toEquipmentList);

@@ -4,7 +4,7 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import { Equipment, EquipmentTag } from '../../models/interfaces';
 import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../models/objection-models';
 import useSwr from 'swr';
-import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
+import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher, equipmentLocationsFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';
 import PricesEditor from './PricesEditor';
 import { toEquipmentPriceObjectionModel } from '../../lib/mappers/equipment';
@@ -29,7 +29,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
         equipmentPublicCategoriesFetcher,
     );
 
-    const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentPublicCategoriesFetcher);
+    const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentLocationsFetcher);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
