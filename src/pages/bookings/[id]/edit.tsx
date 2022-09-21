@@ -81,7 +81,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             headers: { 'Content-Type': 'application/json' },
         };
 
-        fetch('/api/booking/' + booking?.id, request)
+        fetch('/api/bookings/' + booking?.id, request)
             .then(getResponseContentOrError)
             .then(() => router.push('/bookings/'))
             .catch((error) => {
