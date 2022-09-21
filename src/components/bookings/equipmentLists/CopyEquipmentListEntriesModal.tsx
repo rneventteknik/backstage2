@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Form, Modal, OverlayTrigger, Tab, Tooltip } from 'react-bootstrap';
+import { Badge, Button, Card, Form, Modal, OverlayTrigger, Tab, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClone, faSync } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
@@ -59,6 +59,10 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
     };
 
     const toggleEquipmentListEntrySelection = (entry: EquipmentListEntry) => {
+        if (entry.equipment?.isArchived) {
+            return;
+        }
+
         const checked = selectedEquipmentListEntryIds.some((x) => x === entry.id);
 
         setSelectedEquipmentListEntryIds(
@@ -139,6 +143,8 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
     const getEquipmentDescription = (equipment: Equipment | undefined) =>
         language === Language.SV ? equipment?.description : equipment?.descriptionEN;
 
+    const isDisabled = (entry: EquipmentListEntry) => entry.equipment?.isArchived;
+
     // Table display functions
     //
     const EquipmentListEntrySelectionDisplayFn = (entry: EquipmentListEntry) => (
@@ -146,6 +152,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
             <input
                 type="checkbox"
                 checked={selectedEquipmentListEntryIds.some((x) => x === entry.id)}
+                disabled={isDisabled(entry)}
                 onChange={() => toggleEquipmentListEntrySelection(entry)}
             />
         </div>
@@ -155,7 +162,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
         <div onClick={() => toggleEquipmentListEntrySelection(entry)}>
             <div className="mb-0">
                 {entry.name}
-                {resetNames && entry.name != getEquipmentName(entry.equipment) ? (
+                {resetNames && entry.name != getEquipmentName(entry.equipment) && !isDisabled(entry) ? (
                     <OverlayTrigger
                         placement="right"
                         overlay={
@@ -167,11 +174,18 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                         <FontAwesomeIcon icon={faSync} className="ml-1" />
                     </OverlayTrigger>
                 ) : null}
+                {entry.equipment?.isArchived ? (
+                    <Badge variant="warning" className="ml-2">
+                        Arkiverad
+                    </Badge>
+                ) : null}
             </div>
             <div className="mb-0">
                 <span className="text-muted">
                     {entry.description}
-                    {resetNames && entry.description != getEquipmentDescription(entry.equipment) ? (
+                    {resetNames &&
+                    entry.description != getEquipmentDescription(entry.equipment) &&
+                    !isDisabled(entry) ? (
                         <OverlayTrigger
                             placement="right"
                             overlay={
@@ -206,7 +220,8 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
             entry.equipment &&
             entry.equipmentPrice &&
             (entry.pricePerHour != getEquipmentListEntryPrices(entry.equipmentPrice).pricePerHour ||
-                entry.pricePerUnit != getEquipmentListEntryPrices(entry.equipmentPrice).pricePerUnit) ? (
+                entry.pricePerUnit != getEquipmentListEntryPrices(entry.equipmentPrice).pricePerUnit) &&
+            !isDisabled(entry) ? (
                 <OverlayTrigger
                     placement="right"
                     overlay={

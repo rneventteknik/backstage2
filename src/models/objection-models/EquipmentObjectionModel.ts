@@ -15,6 +15,7 @@ export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     note: string;
     image: unknown; // TODO Add images
     publiclyHidden: boolean;
+    isArchived: boolean;
     equipmentPublicCategoryId?: number | null;
     equipmentPublicCategory?: IEquipmentPublicCategoryObjectionModel;
     equipmentLocationId?: number | null;
@@ -85,6 +86,7 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
     note!: string;
     image!: unknown; // TODO Add images
     publiclyHidden!: boolean;
+    isArchived!: boolean;
 
     equipmentPublicCategoryId?: number;
     equipmentPublicCategory?: EquipmentPublicCategoryObjectionModel;

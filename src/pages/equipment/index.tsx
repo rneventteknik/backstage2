@@ -7,7 +7,15 @@ import Link from 'next/link';
 import { Badge, Button, Col, Collapse, Dropdown, DropdownButton, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { faAdd, faCubes, faEyeSlash, faFileImport, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
+import {
+    faAdd,
+    faArchive,
+    faCubes,
+    faEyeSlash,
+    faFileImport,
+    faFilter,
+    faTags,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import Header from '../../components/layout/Header';
@@ -163,11 +171,16 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 </IfNotReadonly>
                 <Link href="/equipmentPackage" passHref>
                     <Button variant="dark" as="span">
-                        <FontAwesomeIcon icon={faCubes} className="mr-1" /> Visa utrustningpaket
+                        <FontAwesomeIcon icon={faCubes} className="mr-1" /> Visa utrustningspaket
                     </Button>
                 </Link>
                 <IfAdmin currentUser={currentUser}>
                     <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block">
+                        <Link href="/equipment/archived" passHref>
+                            <Dropdown.Item href={'/equipment/archived'}>
+                                <FontAwesomeIcon icon={faArchive} className="mr-1 fa-fw" /> Visa arkiverad utrustning
+                            </Dropdown.Item>
+                        </Link>
                         <Link href="/equipment/json-import" passHref>
                             <Dropdown.Item href={'/equipment/json-import'}>
                                 <FontAwesomeIcon icon={faFileImport} className="mr-1 fa-fw" /> Importera utrustning från

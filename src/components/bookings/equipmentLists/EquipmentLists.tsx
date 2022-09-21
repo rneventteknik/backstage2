@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Card, Col, Dropdown, DropdownButton, Form, InputGroup, Modal, Row } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Dropdown, DropdownButton, Form, InputGroup, Modal, Row } from 'react-bootstrap';
 import { Equipment, EquipmentPrice } from '../../../models/interfaces';
 import useSwr from 'swr';
 import { bookingFetcher } from '../../../lib/fetchers';
@@ -569,6 +569,11 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 >
                     {entry.name}
                 </DoubleClickToEdit>
+                {entry.equipment?.isArchived ? (
+                    <Badge variant="warning" className="ml-1">
+                        Arkiverad
+                    </Badge>
+                ) : null}
                 {entry.equipment && getEquipmentOutDatetime(list) && getEquipmentInDatetime(list) ? (
                     <span className="ml-1">
                         <EquipmentListEntryConflictStatus

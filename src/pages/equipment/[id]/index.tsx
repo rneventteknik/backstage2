@@ -59,7 +59,14 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <Col xl={4}>
                     <Card className="mb-3">
                         <Card.Header>
-                            <div style={{ fontSize: '1.6em' }}>{equipment.name}</div>
+                            <div style={{ fontSize: '1.6em' }}>
+                                {equipment.name}
+                                {equipment.isArchived ? (
+                                    <Badge variant="warning" className="ml-2">
+                                        Arkiverad
+                                    </Badge>
+                                ) : null}
+                            </div>
                             <div>
                                 {equipment.tags.map((x) => (
                                     <Badge variant="dark" key={x.id} className="mr-1">

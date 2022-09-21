@@ -95,7 +95,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     //
     const pageTitle = equipmentPackage?.name;
     const breadcrumbs = [
-        { link: '/equipmentPackage', displayName: 'Utrustning' },
+        { link: '/equipment', displayName: 'Utrustning' },
         { link: '/equipmentPackage', displayName: 'Utrustningspaket' },
         { link: '/equipmentPackage/' + equipmentPackage.id, displayName: pageTitle },
         { link: '/equipmentPackage/' + equipmentPackage.id + '/edit', displayName: 'Redigera' },

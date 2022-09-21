@@ -11,9 +11,13 @@ export const searchEquipment = async (searchString: string, count: number): Prom
     const modifiedSearchString = '%' + searchString + '%';
 
     return EquipmentObjectionModel.query()
-        .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
-        .orWhere('nameEN', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
-        .orderBy('updated', 'desc')
+        .where('isArchived', '<>', 1)
+        .andWhere((builder) =>
+            builder
+                .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+                .orWhere('nameEN', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+                .orderBy('updated', 'desc'),
+        )
         .withGraphFetched('tags')
         .limit(count);
 };
@@ -30,9 +34,17 @@ export const fetchEquipment = async (id: number): Promise<EquipmentObjectionMode
         .withGraphFetched('changeLog');
 };
 
-export const fetchEquipments = async (): Promise<EquipmentObjectionModel[]> => {
+export const fetchEquipments = async (fetchArchived = false): Promise<EquipmentObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return EquipmentObjectionModel.query()
+    let query = EquipmentObjectionModel.query();
+
+    if (fetchArchived) {
+        query = query.where('isArchived', '<>', 0);
+    } else {
+        query = query.where('isArchived', '<>', 1);
+    }
+
+    return query
         .withGraphFetched('prices')
         .withGraphFetched('tags')
         .withGraphFetched('equipmentPublicCategory')
@@ -45,6 +57,7 @@ export const fetchEquipmentsPublic = async (): Promise<EquipmentObjectionModel[]
     ensureDatabaseIsInitialized();
     return EquipmentObjectionModel.query()
         .where('publiclyHidden', '<>', 1)
+        .where('isArchived', '<>', 1)
         .select('id', 'name', 'nameEN', 'description', 'descriptionEN')
         .withGraphFetched('prices(publicPriceInfo)')
         .withGraphFetched('equipmentPublicCategory(equipmentPublicCategoryInfo)')
