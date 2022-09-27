@@ -1,6 +1,12 @@
 import iconv from 'iconv-lite';
 import { getNumberOfDays } from '../../lib/datetimeUtils';
-import { getExtraDaysPrice, getHourlyPrice, getTotalTimeReportsPrice, getUnitPrice } from '../../lib/pricingUtils';
+import {
+    getCalculatedDiscount,
+    getExtraDaysPrice,
+    getHourlyPrice,
+    getTotalTimeReportsPrice,
+    getUnitPrice,
+} from '../../lib/pricingUtils';
 import { getAccountKindInvoiceAccount, range } from '../../lib/utils';
 import { AccountKind } from '../../models/enums/AccountKind';
 import { BookingType } from '../../models/enums/BookingType';
@@ -51,11 +57,11 @@ const formatInvoiceRow = (
 ): string => {
     const rowFormat = new Map([
         [1, 'Fakturarad'],
-        [2, rowType.toString() ?? ''],
+        [2, rowType.toString()],
         [4, numberOfUnits?.toString() ?? ''],
         [5, pricePerUnit?.toString().replace('.', ',') ?? ''],
         [6, discount?.toString().replace('.', ',') ?? ''],
-        [7, name ?? ''],
+        [7, name],
         [8, account ?? ''],
         [12, unit ?? ''],
     ]);
@@ -80,7 +86,7 @@ const formatEquipmentListEntry = (
             entry.name,
             entry.numberOfUnits,
             getUnitPrice(entry, numberOfDays),
-            0,
+            getCalculatedDiscount(entry, numberOfDays),
             process.env.INVOICE_DEFAULT_EQUPEMENT_ACCOUNT ?? '',
             t(unitTextResourceKey),
         ) +
@@ -130,7 +136,7 @@ const formatTimeReports = (
         t('hogia-invoice.staff-cost'),
         1,
         price,
-        0,
+        undefined,
         getAccountKindInvoiceAccount(accountKind),
         t('common.misc.count-unit'),
     );

@@ -21,6 +21,12 @@ export const getExtraDaysPrice = (entry: EquipmentListEntry, numberOfTotalDays: 
     return entry.pricePerUnit * (numberOfTotalDays - 1) * 0.25;
 };
 
+// The database can contain a discount value larger than the linetotal
+export const getCalculatedDiscount = (entry: EquipmentListEntry, numberOfDays: number): number => {
+    const priceWithoutDiscount = getPrice(entry, numberOfDays, false);
+    return Math.min(priceWithoutDiscount, entry.discount);
+};
+
 export const getEquipmentListPrice = (list: EquipmentList): number => {
     return list.equipmentListEntries.reduce((sum, e) => sum + getPrice(e, getNumberOfDays(list)), 0);
 };

@@ -2,7 +2,12 @@ import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles, formatEquipmentListEntryCountOrHours, formatEquipmentListEntryPrice } from '../../utils';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
-import { formatNumberAsCurrency, getPrice, getEquipmentListPrice } from '../../../lib/pricingUtils';
+import {
+    formatNumberAsCurrency,
+    getPrice,
+    getEquipmentListPrice,
+    getCalculatedDiscount,
+} from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { useTextResources } from '../../useTextResources';
 import { getNumberOfDays } from '../../../lib/datetimeUtils';
@@ -61,7 +66,11 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking }: Props) => 
                             <Text>{formatEquipmentListEntryPrice(entry, t)}</Text>
                         </TableCellFixedWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{entry.discount > 0 ? formatNumberAsCurrency(entry.discount) : ''}</Text>
+                            <Text>
+                                {getCalculatedDiscount(entry, getNumberOfDays(list)) > 0
+                                    ? formatNumberAsCurrency(getCalculatedDiscount(entry, getNumberOfDays(list)))
+                                    : ''}
+                            </Text>
                         </TableCellFixedWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
                             <Text>{formatNumberAsCurrency(getPrice(entry, getNumberOfDays(list)))}</Text>

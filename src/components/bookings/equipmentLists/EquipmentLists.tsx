@@ -45,6 +45,7 @@ import {
     formatNumberAsCurrency,
     formatPrice,
     formatTHSPrice,
+    getCalculatedDiscount,
     getEquipmentListPrice,
     getPrice,
 } from '../../../lib/pricingUtils';
@@ -698,7 +699,9 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     entry.discount > 0
                         ? `${formatNumberAsCurrency(
                               getPrice(entry, getNumberOfDays(list), false),
-                          )}\n-${formatNumberAsCurrency(entry.discount)} (rabatt)\n`
+                          )}\n-${formatNumberAsCurrency(
+                              getCalculatedDiscount(entry, getNumberOfDays(list)),
+                          )} (rabatt)\n`
                         : ''
                 }
                 className={entry.discount > 0 ? 'text-danger' : ''}
