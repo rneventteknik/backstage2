@@ -4,7 +4,7 @@ import { Equipment, EquipmentTag } from '../../models/interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import Link from 'next/link';
-import { Badge, Button, Col, Collapse, Dropdown, DropdownButton, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button, Col, Collapse, Dropdown, DropdownButton, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import {
@@ -25,6 +25,7 @@ import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
 import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { IfAdmin, IfNotReadonly } from '../../components/utils/IfAdmin';
+import EquipmentTagDisplay from '../../components/utils/EquipmentTagDisplay';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -35,9 +36,7 @@ const EquipmentNameDisplayFn = (equipment: Equipment) => (
             </span>
         ) : null}
         {equipment.tags.map((x) => (
-            <Badge variant="dark" key={x.id} className="ml-1">
-                {x.name}
-            </Badge>
+            <EquipmentTagDisplay tag={x} key={x.id} className="ml-1" />
         ))}
         <div className="text-muted mb-0">{equipment.description}</div>
         <div className="text-muted mb-0 d-md-none">{equipment.inventoryCount + ' st'}</div>

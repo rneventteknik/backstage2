@@ -16,6 +16,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import EquipmentCalendar from '../../../components/equipment/EquipmentCalendar';
 import EquipmentBookings from '../../../components/equipment/EquipmentBookings';
+import EquipmentTagDisplay from '../../../components/utils/EquipmentTagDisplay';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -69,9 +70,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </div>
                             <div>
                                 {equipment.tags.map((x) => (
-                                    <Badge variant="dark" key={x.id} className="mr-1">
-                                        {x.name}
-                                    </Badge>
+                                    <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
                                 ))}
                             </div>
                             <div className="text-muted mt-2">{equipment.description}</div>

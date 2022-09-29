@@ -376,16 +376,19 @@ export async function seed(knex) {
                 name: 'Ljud',
                 created: getVarianceDateString(-100),
                 updated: getVarianceDateString(100),
+                color: '#11539E',
             },
             {
                 name: 'Ljus',
                 created: getVarianceDateString(-100),
                 updated: getVarianceDateString(100),
+                color: '#539E11',
             },
             {
                 name: 'Video',
                 created: getVarianceDateString(-100),
                 updated: getVarianceDateString(100),
+                color: '#9E1153',
             },
             {
                 name: 'Fast monterat',

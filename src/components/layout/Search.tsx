@@ -11,8 +11,8 @@ import { useNotifications } from '../../lib/useNotifications';
 import { toUser } from '../../lib/mappers/user';
 import { toBooking } from '../../lib/mappers/booking';
 import { toEquipment } from '../../lib/mappers/equipment';
-import { Badge } from 'react-bootstrap';
 import { BaseEntityWithName } from '../../models/interfaces/BaseEntity';
+import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
 
 enum ResultType {
     BOOKING,
@@ -121,11 +121,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                         <small>
                             <Typeahead.Highlighter search={highlightText}>{equipment.nameEN}</Typeahead.Highlighter>{' '}
                             {equipment.tags?.map((x) => (
-                                <>
-                                    <Badge key={x.id} variant="dark">
-                                        {x.name}
-                                    </Badge>{' '}
-                                </>
+                                <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
                             ))}
                         </small>
                     );

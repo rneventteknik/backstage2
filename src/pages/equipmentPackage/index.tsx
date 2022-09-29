@@ -5,7 +5,7 @@ import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import { getResponseContentOrError } from '../../lib/utils';
 import Link from 'next/link';
-import { Badge, Button, Col, Collapse, Form } from 'react-bootstrap';
+import { Button, Col, Collapse, Form } from 'react-bootstrap';
 import { EquipmentPackageObjectionModel, IEquipmentTagObjectionModel } from '../../models/objection-models';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
@@ -19,14 +19,13 @@ import Header from '../../components/layout/Header';
 import { ErrorPage } from '../../components/layout/ErrorPage';
 import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
 import TableStyleLink from '../../components/utils/TableStyleLink';
+import EquipmentTagDisplay from '../../components/utils/EquipmentTagDisplay';
 
 const EquipmentPackageNameDisplayFn = (equipmentPackage: EquipmentPackage) => (
     <>
         <TableStyleLink href={'equipmentPackage/' + equipmentPackage.id}>{equipmentPackage.name}</TableStyleLink>
         {equipmentPackage.tags.map((x) => (
-            <Badge variant="dark" key={x.id} className="ml-1">
-                {x.name}
-            </Badge>
+            <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
         ))}
         <div className="text-muted mb-0 d-md-none">
             {equipmentPackage.equipmentEntries.length} delar, {equipmentPackage.estimatedHours} timmar

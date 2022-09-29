@@ -96,7 +96,9 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
     changeLog?: EquipmentChangelogEntryObjectionModel[];
 }
 
-export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName {}
+export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName {
+    color?: string;
+}
 
 export class EquipmentTagObjectionModel extends Model implements IEquipmentTagObjectionModel {
     static tableName = 'EquipmentTag';
@@ -105,6 +107,8 @@ export class EquipmentTagObjectionModel extends Model implements IEquipmentTagOb
     name!: string;
     created?: string;
     updated?: string;
+
+    color?: string;
 }
 
 export interface IEquipmentPriceObjectionModel extends BaseObjectionModelWithName {

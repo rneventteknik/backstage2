@@ -1,3 +1,5 @@
 import { BaseEntityWithName } from './BaseEntity';
 
-export type EquipmentTag = BaseEntityWithName;
+export interface EquipmentTag extends BaseEntityWithName {
+    color?: string;
+}

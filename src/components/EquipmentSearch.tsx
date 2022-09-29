@@ -3,7 +3,6 @@ import * as Typeahead from 'react-bootstrap-typeahead';
 import styles from './EquipmentSearch.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCubes } from '@fortawesome/free-solid-svg-icons';
-import { Badge } from 'react-bootstrap';
 import { toEquipmentPackage } from '../lib/mappers/equipmentPackage';
 import { EquipmentSearchResult } from '../models/misc/SearchResult';
 import { getResponseContentOrError } from '../lib/utils';
@@ -12,6 +11,7 @@ import { toEquipment } from '../lib/mappers/equipment';
 import { BaseEntityWithName } from '../models/interfaces/BaseEntity';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../models/objection-models';
 import { Language } from '../models/enums/Language';
+import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 
 export enum ResultType {
     EQUIPMENT,
@@ -115,9 +115,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 <div>
                     <small>
                         {typedEntity.tags?.map((x) => (
-                            <Badge variant="dark" key={x.id} className="mr-2">
-                                {x.name}
-                            </Badge>
+                            <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
                         ))}
                     </small>
                 </div>
