@@ -20,6 +20,7 @@ import { userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faKey, faLock, faSave, faTrashCan, faUserPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ConfirmModal from '../../../components/utils/ConfirmModal';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -196,35 +197,26 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             <UserForm user={user} handleSubmitUser={handleSubmit} formId="editUserForm" />
 
             {/* Here comes the three modals used on this page */}
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Bekräfta</Modal.Title>
-                </Modal.Header>
-                <Modal.Body> Vill du verkligen ta bort användaren {user.name}?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={() => setShowDeleteModal(false)}>
-                        Avbryt
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteUser()}>
-                        Ta bort
-                    </Button>
-                </Modal.Footer>
-            </Modal>
 
-            <Modal show={showDeleteAuthModal} onHide={() => setShowDeleteAuthModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Bekräfta</Modal.Title>
-                </Modal.Header>
-                <Modal.Body> Vill du verkligen ta bort inloggningsuppgifterna för användaren {user.name}?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={() => setShowDeleteAuthModal(false)}>
-                        Avbryt
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteUserAuth()}>
-                        Ta bort
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <ConfirmModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                title="Bekräfta"
+                confirmLabel="Ta bort"
+                onConfirm={deleteUser}
+            >
+                Vill du verkligen ta bort användaren {user.name}?
+            </ConfirmModal>
+
+            <ConfirmModal
+                show={showDeleteAuthModal}
+                onHide={() => setShowDeleteAuthModal(false)}
+                title="Bekräfta"
+                confirmLabel="Ta bort"
+                onConfirm={deleteUserAuth}
+            >
+                Vill du verkligen ta bort inloggningsuppgifterna för användaren {user.name}?
+            </ConfirmModal>
 
             <Modal show={showEditAuthModal} onHide={() => setShowEditAuthModal(false)}>
                 <Modal.Header closeButton>

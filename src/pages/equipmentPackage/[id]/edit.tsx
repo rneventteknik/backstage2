@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
@@ -18,6 +18,7 @@ import { PartialDeep } from 'type-fest';
 import { Role } from '../../../models/enums/Role';
 import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ConfirmModal from '../../../components/utils/ConfirmModal';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
@@ -120,20 +121,15 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
                 formId="editEquipmentPackageForm"
             />
 
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Bekräfta</Modal.Title>
-                </Modal.Header>
-                <Modal.Body> Vill du verkligen ta bort utrustningspaketet {equipmentPackage.name}?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={() => setShowDeleteModal(false)}>
-                        Avbryt
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteEquipmentPackage()}>
-                        Ta bort
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <ConfirmModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                title="Bekräfta"
+                confirmLabel="Ta bort"
+                onConfirm={deleteEquipmentPackage}
+            >
+                Vill du verkligen ta bort utrustningspaketet {equipmentPackage.name}?
+            </ConfirmModal>
         </Layout>
     );
 };
