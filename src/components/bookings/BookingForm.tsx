@@ -366,16 +366,8 @@ const BookingForm: React.FC<Props> = ({
                         </Col>
                         <Col lg="4" md="4">
                             <Form.Group controlId="formInvoiceTag">
-                                <Form.Label>
-                                    Fakturamärkning
-                                    <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
-                                </Form.Label>
-                                <Form.Control
-                                    required={isFieldRequired(Status.BOOKED)}
-                                    type="text"
-                                    name="invoiceTag"
-                                    defaultValue={booking.invoiceTag}
-                                />
+                                <Form.Label>Fakturamärkning</Form.Label>
+                                <Form.Control type="text" name="invoiceTag" defaultValue={booking.invoiceTag} />
                             </Form.Group>
                         </Col>
                         <Col lg="4" md="4">
