@@ -3,20 +3,28 @@ import {
     EquipmentPriceObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
+import { getPartialSearchStrings } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchEquipment = async (searchString: string, count: number): Promise<EquipmentObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    const modifiedSearchString = '%' + searchString + '%';
+    const searchStrings = getPartialSearchStrings(searchString);
 
     return EquipmentObjectionModel.query()
         .where('isArchived', '<>', 1)
         .andWhere((builder) =>
             builder
-                .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
-                .orWhere('nameEN', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
-                .orderBy('updated', 'desc'),
+                .where((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere('name', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+                    });
+                })
+                .orWhere((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere('nameEN', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+                    });
+                }),
         )
         .withGraphFetched('tags')
         .limit(count);

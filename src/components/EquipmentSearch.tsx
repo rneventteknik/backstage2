@@ -11,6 +11,7 @@ import { toEquipment } from '../lib/mappers/equipment';
 import { BaseEntityWithName } from '../models/interfaces/BaseEntity';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../models/objection-models';
 import { Language } from '../models/enums/Language';
+import { SplitHighlighter } from './utils/Highlight';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 
 export enum ResultType {
@@ -109,7 +110,7 @@ const EquipmentSearch: React.FC<Props> = ({
         return (
             <>
                 <div>
-                    <Typeahead.Highlighter search={state.text}>{displayName}</Typeahead.Highlighter>{' '}
+                    <SplitHighlighter search={state.text} textToHighlight={displayName} />{' '}
                     {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
                 </div>
                 <div>

@@ -5,17 +5,25 @@ import { Status } from '../../models/enums/Status';
 import { BookingObjectionModel } from '../../models/objection-models';
 import { EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
-import { isMemberOfEnum } from '../utils';
+import { getPartialSearchStrings, isMemberOfEnum } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchBookings = async (searchString: string, count: number): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    const modifiedSearchString = '%' + searchString + '%';
+    const searchStrings = getPartialSearchStrings(searchString);
 
     return BookingObjectionModel.query()
-        .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
-        .orWhere('contactPersonName', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+        .where((builder) => {
+            searchStrings.forEach((partialSearchString) => {
+                builder.andWhere('name', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+            });
+        })
+        .orWhere((builder) => {
+            searchStrings.forEach((partialSearchString) => {
+                builder.andWhere('contactPersonName', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+            });
+        })
         .orderBy('updated', 'desc')
         .limit(count);
 };

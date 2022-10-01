@@ -295,3 +295,9 @@ export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equi
 export const range = (start: number, end: number): number[] => {
     return [...Array(end - start).keys()].map((i) => i + start);
 };
+
+export const getPartialSearchStrings = (searchString: string) =>
+    searchString
+        .trim()
+        .split(/\s+/)
+        .map((x) => '%' + x + '%');

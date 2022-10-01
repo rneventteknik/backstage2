@@ -4,6 +4,7 @@ import {
     EquipmentPackageObjectionModel,
 } from '../../models/objection-models/EquipmentPackageObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
+import { getPartialSearchStrings } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchEquipmentPackage = async (
@@ -12,10 +13,14 @@ export const searchEquipmentPackage = async (
 ): Promise<EquipmentPackageObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    const modifiedSearchString = '%' + searchString + '%';
+    const searchStrings = getPartialSearchStrings(searchString);
 
     return EquipmentPackageObjectionModel.query()
-        .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+        .where((builder) => {
+            searchStrings.forEach((partialSearchString) => {
+                builder.andWhere('name', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+            });
+        })
         .orderBy('updated', 'desc')
         .withGraphFetched('tags')
         .limit(count);

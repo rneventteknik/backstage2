@@ -10,6 +10,7 @@ import { IBookingObjectionModel } from '../models/objection-models';
 import { toBooking } from '../lib/mappers/booking';
 import BookingTypeTag from './utils/BookingTypeTag';
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
+import { SplitHighlighter } from './utils/Highlight';
 
 export interface SearchResultViewModel extends BaseEntityWithName {
     url: string;
@@ -85,7 +86,7 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
         return (
             <>
                 <div>
-                    <Typeahead.Highlighter search={state.text}>{entity.name}</Typeahead.Highlighter>
+                    <SplitHighlighter search={state.text} textToHighlight={entity.name} />
                 </div>
                 <div>
                     <small>

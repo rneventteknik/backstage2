@@ -12,6 +12,7 @@ import { toUser } from '../../lib/mappers/user';
 import { toBooking } from '../../lib/mappers/booking';
 import { toEquipment } from '../../lib/mappers/equipment';
 import { BaseEntityWithName } from '../../models/interfaces/BaseEntity';
+import { SplitHighlighter } from '../utils/Highlight';
 import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
 
 enum ResultType {
@@ -110,8 +111,8 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     const user = entity as unknown as IUserObjectionModel;
                     return (
                         <small>
-                            <Typeahead.Highlighter search={highlightText}>{user.nameTag}</Typeahead.Highlighter> /{' '}
-                            <Typeahead.Highlighter search={highlightText}>{user.emailAddress}</Typeahead.Highlighter>
+                            <SplitHighlighter search={highlightText} textToHighlight={user.nameTag} /> /{' '}
+                            <SplitHighlighter search={highlightText} textToHighlight={user.emailAddress} />
                         </small>
                     );
 
@@ -119,7 +120,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     const equipment = entity as unknown as IEquipmentObjectionModel;
                     return (
                         <small>
-                            <Typeahead.Highlighter search={highlightText}>{equipment.nameEN}</Typeahead.Highlighter>{' '}
+                            <SplitHighlighter search={highlightText} textToHighlight={equipment.nameEN} />{' '}
                             {equipment.tags?.map((x) => (
                                 <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
                             ))}
@@ -130,9 +131,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     const booking = entity as unknown as IBookingObjectionModel;
                     return (
                         <small>
-                            <Typeahead.Highlighter search={highlightText}>
-                                {booking.contactPersonName}
-                            </Typeahead.Highlighter>
+                            <SplitHighlighter search={highlightText} textToHighlight={booking.contactPersonName} />
                         </small>
                     );
                 default:
@@ -152,7 +151,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                             position={entity.index}
                             className={styles.dropdownItem}
                         >
-                            <Typeahead.Highlighter search={state.text}>{entity.name}</Typeahead.Highlighter>
+                            <SplitHighlighter search={state.text} textToHighlight={entity.name} />
                             <div>{getDescription(entity, state.text)}</div>
                         </Typeahead.MenuItem>
                     ))
