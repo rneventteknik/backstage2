@@ -5,7 +5,8 @@ import { Equipment } from './Equipment';
 
 export interface EquipmentList extends BaseEntityWithName {
     sortIndex: number;
-    equipmentListEntries: EquipmentListEntry[];
+    listEntries: EquipmentListEntry[];
+    listHeadings: EquipmentListHeading[];
     equipmentOutDatetime?: Date | null;
     equipmentInDatetime?: Date | null;
     usageStartDatetime?: Date | null;
@@ -14,6 +15,15 @@ export interface EquipmentList extends BaseEntityWithName {
     rentalStatus?: RentalStatus | null;
 }
 
+export interface EquipmentListHeading extends BaseEntityWithName {
+    sortIndex: number;
+    name: string;
+    description: string;
+
+    listEntries: EquipmentListEntry[];
+
+    equipmentListId?: number;
+}
 export interface EquipmentListEntry extends BaseEntityWithName {
     sortIndex: number;
     equipment?: Equipment;
@@ -28,4 +38,8 @@ export interface EquipmentListEntry extends BaseEntityWithName {
     pricePerHour: number;
     equipmentPrice?: EquipmentPrice;
     discount: number;
+    isHidden: boolean;
+
+    equipmentListId?: number;
+    equipmentListHeadingId?: number;
 }

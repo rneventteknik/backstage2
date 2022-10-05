@@ -53,8 +53,10 @@ export const TableCellFixedWidth: React.FC<TableCellFixedWidthProps> = ({
 type TableCellAutoWidthProps = {
     children?: ReactNode;
     textAlign?: 'left' | 'right' | 'center' | 'justify' | undefined;
+    paddingLeft?: string;
 };
 export const TableCellAutoWidth: React.FC<TableCellAutoWidthProps> = ({
     children,
     textAlign = 'left',
-}: TableCellAutoWidthProps) => <View style={[styles.flexGrow, { textAlign: textAlign }]}>{children}</View>;
+    paddingLeft = '0px',
+}: TableCellAutoWidthProps) => <View style={[styles.flexGrow, { textAlign, paddingLeft }]}>{children}</View>;

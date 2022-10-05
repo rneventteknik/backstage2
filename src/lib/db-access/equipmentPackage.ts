@@ -16,11 +16,19 @@ export const searchEquipmentPackage = async (
     const searchStrings = getPartialSearchStrings(searchString);
 
     return EquipmentPackageObjectionModel.query()
-        .where((builder) => {
-            searchStrings.forEach((partialSearchString) => {
-                builder.andWhere('name', getCaseInsensitiveComparisonKeyword(), partialSearchString);
-            });
-        })
+        .andWhere((builder) =>
+            builder
+                .where((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere('name', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+                    });
+                })
+                .orWhere((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere('nameEN', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+                    });
+                }),
+        )
         .orderBy('updated', 'desc')
         .withGraphFetched('tags')
         .limit(count);

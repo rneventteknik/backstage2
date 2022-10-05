@@ -63,6 +63,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'hogia-invoice.staff-cost': 'Personalkostnad',
         'hogia-invoice.day-cost': 'extra dagar',
         'hogia-invoice.day-cost-single': 'extra dag',
+        'hogia-invoice.package-price': 'Paketpris',
     },
     en: {
         // Booking info
@@ -125,5 +126,6 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'hogia-invoice.staff-cost': 'Staff cost',
         'hogia-invoice.day-cost': 'extra days',
         'hogia-invoice.day-cost-single': 'extra day',
+        'hogia-invoice.package-price': 'Package price',
     },
 };

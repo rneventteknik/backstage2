@@ -9,10 +9,14 @@ import {
 export interface IEquipmentPackageObjectionModel extends BaseObjectionModelWithName {
     id: number;
     name: string;
+    nameEN?: string;
+    description?: string;
+    descriptionEN?: string;
     created?: string;
     updated?: string;
     note: string;
     image: unknown; // TODO Add images
+    addAsHeading: boolean;
     estimatedHours: number;
     tags?: IEquipmentTagObjectionModel[];
     equipmentEntries?: IEquipmentPackageEntryObjectionModel[];
@@ -46,10 +50,14 @@ export class EquipmentPackageObjectionModel extends Model implements IEquipmentP
 
     id!: number;
     name!: string;
+    nameEN?: string;
+    description?: string;
+    descriptionEN?: string;
     created?: string;
     updated?: string;
     note!: string;
     image!: unknown; // TODO Add images
+    addAsHeading!: boolean;
     estimatedHours!: number;
 
     tags?: EquipmentTagObjectionModel[];
@@ -65,6 +73,8 @@ export interface IEquipmentPackageEntryObjectionModel extends BaseObjectionModel
 
     equipment?: IEquipmentObjectionModel;
     numberOfUnits: number;
+    isHidden: boolean;
+    isFree: boolean;
 }
 
 export class EquipmentPackageEntryObjectionModel extends Model implements IEquipmentPackageEntryObjectionModel {
@@ -88,4 +98,6 @@ export class EquipmentPackageEntryObjectionModel extends Model implements IEquip
 
     equipment?: EquipmentObjectionModel;
     numberOfUnits!: number;
+    isHidden!: boolean;
+    isFree!: boolean;
 }

@@ -1,10 +1,11 @@
 import { Booking } from '../../models/interfaces';
-import { EquipmentList, EquipmentListEntry } from '../../models/interfaces/EquipmentList';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../models/interfaces/EquipmentList';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import {
     IEquipmentListObjectionModel,
     IEquipmentListEntryObjectionModel,
     IBookingChangelogEntryObjectionModel,
+    IEquipmentListHeadingEntryObjectionModel,
 } from '../../models/objection-models/BookingObjectionModel';
 import { toEquipment, toEquipmentPrice } from './equipment';
 import { toUser } from './user';
@@ -46,9 +47,26 @@ export const toEquipmentList = (objectionModel: IEquipmentListObjectionModel): E
         equipmentOutDatetime: toDatetimeOrUndefined(objectionModel.equipmentOutDatetime),
         usageStartDatetime: toDatetimeOrUndefined(objectionModel.usageStartDatetime),
         usageEndDatetime: toDatetimeOrUndefined(objectionModel.usageEndDatetime),
-        equipmentListEntries: objectionModel.equipmentListEntries
-            ? objectionModel.equipmentListEntries.map((x) => toEquipmentListEntry(x))
+        listEntries: objectionModel.listEntries ? objectionModel.listEntries.map((x) => toEquipmentListEntry(x)) : [],
+        listHeadings: objectionModel.listHeadings
+            ? objectionModel.listHeadings.map((x) => toEquipmentListHeadingEntry(x))
             : [],
+    };
+};
+
+export const toEquipmentListHeadingEntry = (
+    objectionModel: IEquipmentListHeadingEntryObjectionModel,
+): EquipmentListHeading => {
+    if (!objectionModel.id) {
+        throw new Error('Invalid equipment list entry');
+    }
+
+    return {
+        ...objectionModel,
+        id: objectionModel.id,
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
+        listEntries: objectionModel.listEntries ? objectionModel.listEntries.map((x) => toEquipmentListEntry(x)) : [],
     };
 };
 
@@ -105,8 +123,25 @@ export const toEquipmentListObjectionModel = (
         usageEndDatetime: clientModel.usageEndDatetime
             ? clientModel.usageEndDatetime.toISOString()
             : clientModel.usageEndDatetime,
-        equipmentListEntries: clientModel.equipmentListEntries
-            ? clientModel.equipmentListEntries.map((x) => toEquipmentListEntryObjectionModel(x))
+        listEntries: clientModel.listEntries
+            ? clientModel.listEntries.map((x) => toEquipmentListEntryObjectionModel(x))
+            : [],
+        listHeadings: clientModel.listHeadings
+            ? clientModel.listHeadings.map((x) => toEquipmentListHeadingEntryObjectionModel(x))
+            : [],
+    };
+};
+
+export const toEquipmentListHeadingEntryObjectionModel = (
+    clientModel: EquipmentListHeading,
+): PartialDeep<IEquipmentListHeadingEntryObjectionModel> => {
+    return {
+        ...clientModel,
+        created: undefined,
+        updated: undefined,
+        id: clientModel.id,
+        listEntries: clientModel.listEntries
+            ? clientModel.listEntries.map((x) => toEquipmentListEntryObjectionModel(x))
             : [],
     };
 };

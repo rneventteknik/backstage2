@@ -43,6 +43,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         const equipmentPackageEntry: EquipmentPackageEntry = {
             id: nextId, // This id is only used in the client, it is striped before sending to the server
             numberOfUnits: 1,
+            isFree: false,
+            isHidden: false,
             equipment: toEquipment(equipment),
             equipmentId: equipment.id,
         };
@@ -65,6 +67,22 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             onChange={(e) => {
                 equipmentPackageEntry.numberOfUnits = parseInt(e.target.value);
             }}
+        />
+    );
+
+    const EquipmentPackageIsFreeDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
+        <Form.Check
+            type="checkbox"
+            defaultChecked={equipmentPackageEntry.isFree}
+            onChange={(e) => (equipmentPackageEntry.isFree = e.target.checked)}
+        />
+    );
+
+    const EquipmentPackageIsHiddenDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
+        <Form.Check
+            type="checkbox"
+            defaultChecked={equipmentPackageEntry.isHidden}
+            onChange={(e) => (equipmentPackageEntry.isHidden = e.target.checked)}
         />
     );
 
@@ -92,6 +110,24 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                 key: 'name',
                 displayName: 'Utrustning',
                 getValue: (equipmentPackageEntry: EquipmentPackageEntry) => equipmentPackageEntry.equipment?.name ?? '',
+            },
+            {
+                key: 'isFree',
+                displayName: 'Utan pris',
+                getValue: (equipmentPackageEntry: EquipmentPackageEntry) =>
+                    equipmentPackageEntry.isFree ? 'true' : 'false',
+                getContentOverride: EquipmentPackageIsFreeDisplayFn,
+                columnWidth: 100,
+                textAlignment: 'center',
+            },
+            {
+                key: 'isHidden',
+                displayName: 'Göm för kund',
+                getValue: (equipmentPackageEntry: EquipmentPackageEntry) =>
+                    equipmentPackageEntry.isHidden ? 'true' : 'false',
+                getContentOverride: EquipmentPackageIsHiddenDisplayFn,
+                columnWidth: 140,
+                textAlignment: 'center',
             },
             {
                 key: 'number',
@@ -131,6 +167,10 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             image: equipmentPackage?.image,
 
             name: form.equipmentPackageName.value,
+            nameEN: form.equipmentPackageNameEN.value,
+            description: form.description.value,
+            descriptionEN: form.descriptionEN.value,
+            addAsHeading: form.addAsHeading?.value === 'true' ?? false,
 
             tags: selectedTags.map((x) => ({
                 ...x,
@@ -168,6 +208,44 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                         />
                     </Form.Group>
                 </Col>
+                <Col lg="6">
+                    <Form.Group controlId="formDescription">
+                        <Form.Label>Beskrivning</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            placeholder=""
+                            name="description"
+                            defaultValue={equipmentPackage?.description}
+                        />
+                    </Form.Group>
+                </Col>
+            </Row>
+
+            <h6>Översättningar</h6>
+            <hr />
+            <Row>
+                <Col lg="6">
+                    <Form.Group controlId="formNameEN">
+                        <Form.Label>Namn (engelska)</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Large Audio package"
+                            name="equipmentPackageNameEN"
+                            defaultValue={equipmentPackage?.nameEN}
+                        />
+                    </Form.Group>
+                </Col>
+                <Col lg="6">
+                    <Form.Group controlId="formDescriptionEN">
+                        <Form.Label>Beskrivning (engelska)</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            placeholder=""
+                            name="descriptionEN"
+                            defaultValue={equipmentPackage?.descriptionEN}
+                        />
+                    </Form.Group>
+                </Col>
             </Row>
 
             {!equipmentPackage ? null : (
@@ -191,6 +269,19 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                     <h6>Övriga inställningar</h6>
                     <hr />
                     <Row>
+                        <Col lg="3">
+                            <Form.Group controlId="formAddAsHeading">
+                                <Form.Label>Pakettyp</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    name="addAsHeading"
+                                    defaultValue={equipmentPackage?.addAsHeading ? 'true' : 'false'}
+                                >
+                                    <option value={'false'}>Lägg till rader individuellt</option>
+                                    <option value={'true'}>Lägg till rader med paketet som rubrik</option>
+                                </Form.Control>
+                            </Form.Group>
+                        </Col>
                         <Col lg="3">
                             <Form.Group controlId="formInventoryCount">
                                 <Form.Label>Estimerade arbetstimmar</Form.Label>

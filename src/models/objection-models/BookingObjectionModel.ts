@@ -141,7 +141,8 @@ export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName
     created: string;
     updated: string;
     sortIndex: number;
-    equipmentListEntries: IEquipmentListEntryObjectionModel[];
+    listEntries: IEquipmentListEntryObjectionModel[];
+    listHeadings: IEquipmentListHeadingEntryObjectionModel[];
     equipmentOutDatetime?: string | null;
     equipmentInDatetime?: string | null;
     usageStartDatetime?: string | null;
@@ -155,12 +156,20 @@ export class EquipmentListObjectionModel extends Model {
     static tableName = 'EquipmentList';
 
     static relationMappings: RelationMappingsThunk = () => ({
-        equipmentListEntries: {
+        listEntries: {
             relation: Model.HasManyRelation,
             modelClass: EquipmentListEntryObjectionModel,
             join: {
                 from: 'EquipmentList.id',
                 to: 'EquipmentListEntry.equipmentListId',
+            },
+        },
+        listHeadings: {
+            relation: Model.HasManyRelation,
+            modelClass: EquipmentListHeadingObjectionModel,
+            join: {
+                from: 'EquipmentList.id',
+                to: 'EquipmentListHeading.equipmentListId',
             },
         },
     });
@@ -170,7 +179,8 @@ export class EquipmentListObjectionModel extends Model {
     created!: string;
     updated!: string;
     sortIndex!: number;
-    equipmentListEntries!: EquipmentListEntryObjectionModel[];
+    listEntries!: EquipmentListEntryObjectionModel[];
+    listHeadings!: EquipmentListHeadingObjectionModel[];
     equipmentOutDatetime?: string | null;
     equipmentInDatetime?: string | null;
     usageStartDatetime?: string | null;
@@ -178,6 +188,45 @@ export class EquipmentListObjectionModel extends Model {
     numberOfDays?: number | null;
     bookingId!: number;
     rentalStatus?: number | null;
+}
+
+export interface IEquipmentListHeadingEntryObjectionModel extends BaseObjectionModelWithName {
+    id?: number;
+    created?: string;
+    updated?: string;
+
+    sortIndex: number;
+    listEntries: IEquipmentListEntryObjectionModel[];
+    name: string;
+    description: string;
+
+    equipmentListId?: number;
+}
+
+export class EquipmentListHeadingObjectionModel extends Model implements IEquipmentListHeadingEntryObjectionModel {
+    static tableName = 'EquipmentListHeading';
+
+    static relationMappings: RelationMappingsThunk = () => ({
+        listEntries: {
+            relation: Model.HasManyRelation,
+            modelClass: EquipmentListEntryObjectionModel,
+            join: {
+                from: 'EquipmentListHeading.id',
+                to: 'EquipmentListEntry.equipmentListHeadingId',
+            },
+        },
+    });
+
+    id!: number;
+    name!: string;
+    created!: string;
+    updated!: string;
+
+    sortIndex!: number;
+    listEntries!: EquipmentListEntryObjectionModel[];
+    description!: string;
+
+    equipmentListId?: number;
 }
 
 export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWithName {
@@ -199,9 +248,13 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
     equipmentPrice?: IEquipmentPriceObjectionModel;
     equipmentPriceId?: number | null;
     discount: number;
+    isHidden: boolean;
+
+    equipmentListId?: number;
+    equipmentListHeadingId?: number;
 }
 
-export class EquipmentListEntryObjectionModel extends Model {
+export class EquipmentListEntryObjectionModel extends Model implements IEquipmentListEntryObjectionModel {
     static tableName = 'EquipmentListEntry';
 
     static relationMappings: RelationMappingsThunk = () => ({
@@ -241,6 +294,10 @@ export class EquipmentListEntryObjectionModel extends Model {
     equipmentPrice!: EquipmentPriceObjectionModel;
     equipmentPriceId!: number;
     discount!: number;
+    isHidden!: boolean;
+
+    equipmentListId?: number;
+    equipmentListHeadingId?: number;
 }
 
 export interface IBookingChangelogEntryObjectionModel extends BaseObjectionModelWithName {

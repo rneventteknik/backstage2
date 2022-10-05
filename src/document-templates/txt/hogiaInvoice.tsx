@@ -1,17 +1,19 @@
 import iconv from 'iconv-lite';
 import { getNumberOfDays } from '../../lib/datetimeUtils';
 import {
-    getCalculatedDiscount,
+    getEquipmentListHeadingPrice,
     getExtraDaysPrice,
     getHourlyPrice,
     getTotalTimeReportsPrice,
     getUnitPrice,
+    getCalculatedDiscount,
 } from '../../lib/pricingUtils';
+import { getSortedList } from '../../lib/sortIndexUtils';
 import { getAccountKindInvoiceAccount, range } from '../../lib/utils';
 import { AccountKind } from '../../models/enums/AccountKind';
 import { BookingType } from '../../models/enums/BookingType';
 import { BookingViewModel, TimeReport } from '../../models/interfaces';
-import { EquipmentList, EquipmentListEntry } from '../../models/interfaces/EquipmentList';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../models/interfaces/EquipmentList';
 
 enum RowType {
     ITEM = 1,
@@ -23,10 +25,31 @@ enum RowType {
 
 export const getHogiaTxtInvoice = (booking: BookingViewModel, t: (t: string) => string): Buffer => {
     const lists = booking.equipmentLists ?? [];
-    const equipmentLines = lists.flatMap((list) => [
-        formatEquipmentList(list),
-        ...list.equipmentListEntries.flatMap((entry) => formatEquipmentListEntry(entry, getNumberOfDays(list), t)),
-    ]);
+
+    // This wrapping is used to merge and sort the list entries and headings
+    const wrapEntity = (entity: EquipmentListEntry | EquipmentListHeading, typeIdentifier: 'E' | 'H') => ({
+        typeIdentifier,
+        entity,
+        id: typeIdentifier + entity.id,
+        sortIndex: entity.sortIndex,
+    });
+
+    const equipmentLines = lists.flatMap((list) => {
+        const sortedListEntriesAndHeadings = getSortedList([
+            ...list.listEntries.filter((x) => !x.isHidden).map((x) => wrapEntity(x, 'E')),
+            ...list.listHeadings.map((x) => wrapEntity(x, 'H')),
+        ]);
+
+        return [
+            formatEquipmentList(list),
+            ...sortedListEntriesAndHeadings.flatMap((wrappedEntity) => {
+                const isHeading = wrappedEntity.typeIdentifier === 'H';
+                return isHeading
+                    ? formatEquipmentListHeading(wrappedEntity.entity as EquipmentListHeading, getNumberOfDays(list), t)
+                    : formatEquipmentListEntry(wrappedEntity.entity as EquipmentListEntry, getNumberOfDays(list), t);
+            }),
+        ];
+    });
     const timeReportLines = [
         formatTimeReports(
             booking.timeReports?.filter((x) => x.accountKind == AccountKind.EXTERNAL),
@@ -93,6 +116,30 @@ const formatEquipmentListEntry = (
         ((numberOfDays > 1 || entry.numberOfHours) && entry.pricePerUnit ? formatUnitPrices(entry, t) : '') +
         (numberOfDays > 1 && entry.pricePerUnit ? formatExtraDayPrice(entry, numberOfDays, t) : '') +
         (entry.numberOfHours ? formatHourlyPrice(entry, t) : '')
+    );
+};
+
+const formatEquipmentListHeading = (
+    heading: EquipmentListHeading,
+    numberOfDays: number,
+    t: (t: string) => string,
+): string => {
+    return (
+        formatInvoiceRow(
+            RowType.TEMPORARY,
+            heading.name,
+            1,
+            getEquipmentListHeadingPrice(heading, numberOfDays),
+            0,
+            process.env.INVOICE_DEFAULT_EQUPEMENT_ACCOUNT ?? '',
+            t('common.misc.count-unit-single'),
+        ) +
+        formatInvoiceRow(
+            RowType.TEXT,
+            `  ${t('hogia-invoice.package-price')}`,
+            undefined,
+            getEquipmentListHeadingPrice(heading, numberOfDays),
+        )
     );
 };
 

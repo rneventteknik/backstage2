@@ -1,5 +1,6 @@
 import { Font, StyleSheet } from '@react-pdf/renderer';
 import { Booking } from '../models/interfaces';
+import { PricedEntity } from '../models/interfaces/BaseEntity';
 import { EquipmentListEntry } from '../models/interfaces/EquipmentList';
 
 export const registerFonts = (): void => {
@@ -106,7 +107,7 @@ export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, 
     return formatEquipmentListEntryCount(entry, t);
 };
 
-export const formatEquipmentListEntryPrice = (entry: EquipmentListEntry, t: (t: string) => string) => {
+export const formatEquipmentListEntryPrice = (entry: PricedEntity, t: (t: string) => string) => {
     if (entry.pricePerHour && !entry.pricePerUnit) {
         return `${entry.pricePerHour} kr/${t('common.misc.hours-unit')}`;
     } else if (!entry.pricePerHour && entry.pricePerUnit) {

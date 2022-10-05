@@ -14,3 +14,8 @@ export interface HasId {
 export interface HasStringId {
     id: string;
 }
+
+export interface PricedEntity {
+    pricePerHour: number;
+    pricePerUnit: number;
+}

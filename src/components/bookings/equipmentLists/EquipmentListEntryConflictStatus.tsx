@@ -67,9 +67,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
     const bookings = data?.filter((x) => x.status !== Status.CANCELED) ?? [];
 
     // Sum the number of units used locally
-    const numberOfUnitsUsedByThisList = equipmentList.equipmentListEntries
-        .filter((x) => x.equipmentId === equipment.id)
-        .reduce((sum, x) => sum + x.numberOfUnits, 0);
+    const numberOfUnitsUsedByThisList = getMaximumNumberOfUnitUsed([equipmentList], equipment);
 
     // Calculate the max number of units used at the same time.
     const overlappingEquipmentLists = bookings.flatMap((x) => x.equipmentLists ?? []);
@@ -126,9 +124,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                                     {booking.equipmentLists
                                         ?.map(
                                             (list) =>
-                                                `${list.name} (${list.equipmentListEntries
-                                                    .filter((x) => x.equipmentId === equipment.id)
-                                                    .reduce((sum, x) => sum + x.numberOfUnits, 0)} st)`,
+                                                `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`,
                                         )
                                         ?.join(', ')}
                                 </div>
@@ -156,10 +152,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                             <div className="text-small font-italic">
                                 {booking.equipmentLists
                                     ?.map(
-                                        (list) =>
-                                            `${list.name} (${list.equipmentListEntries
-                                                .filter((x) => x.equipmentId === equipment.id)
-                                                .reduce((sum, x) => sum + x.numberOfUnits, 0)} st)`,
+                                        (list) => `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`,
                                     )
                                     ?.join(', ')}
                             </div>

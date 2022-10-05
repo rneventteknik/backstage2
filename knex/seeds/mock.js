@@ -247,6 +247,42 @@ export async function seed(knex) {
                 equipmentPublicCategoryId: equipmentPublicCategoryIds.video,
                 equipmentLocationId: equipmentLocationIds.floor2,
             },
+            {
+                name: 'Bashögtalare',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                inventoryCount: 12,
+                nameEN: 'Base Speaker',
+                description: '',
+                descriptionEN: '',
+                note: '',
+                publiclyHidden: false,
+                equipmentLocationId: equipmentLocationIds.basement,
+            },
+            {
+                name: 'Topphögtalare',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                inventoryCount: 8,
+                nameEN: 'Top Speaker',
+                description: '',
+                descriptionEN: '',
+                note: '',
+                publiclyHidden: false,
+                equipmentLocationId: equipmentLocationIds.basement,
+            },
+            {
+                name: 'Slutsteg',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                inventoryCount: 2,
+                nameEN: 'Amplifier',
+                description: '',
+                descriptionEN: '',
+                note: '',
+                publiclyHidden: false,
+                equipmentLocationId: equipmentLocationIds.basement,
+            },
         ])
         .returning('id')
         .then((ids) => ids[0].id);
@@ -260,6 +296,9 @@ export async function seed(knex) {
         condenserMicrophone: firstEquipmentId + 4,
         wirelessMicrophone: firstEquipmentId + 5,
         projector: firstEquipmentId + 6,
+        baseSpeaker: firstEquipmentId + 7,
+        topSpeaker: firstEquipmentId + 8,
+        amplifier: firstEquipmentId + 9,
     };
 
     const firstEquipmentPriceId = await knex('EquipmentPrice')
@@ -354,6 +393,36 @@ export async function seed(knex) {
                 pricePerUnitTHS: 1000,
                 pricePerHourTHS: 100,
             },
+            {
+                equipmentId: equipmentIds.baseSpeaker,
+                name: 'Standardpris',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                pricePerUnit: 1000,
+                pricePerHour: 0,
+                pricePerUnitTHS: 500,
+                pricePerHourTHS: 0,
+            },
+            {
+                equipmentId: equipmentIds.topSpeaker,
+                name: 'Standardpris',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                pricePerUnit: 750,
+                pricePerHour: 0,
+                pricePerUnitTHS: 450,
+                pricePerHourTHS: 0,
+            },
+            {
+                equipmentId: equipmentIds.amplifier,
+                name: 'Standardpris',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                pricePerUnit: 400,
+                pricePerHour: 0,
+                pricePerUnitTHS: 200,
+                pricePerHourTHS: 0,
+            },
         ])
         .returning('id')
         .then((ids) => ids[0].id);
@@ -368,6 +437,9 @@ export async function seed(knex) {
         wirelessMicrophone2: firstEquipmentPriceId + 6,
         projector: firstEquipmentPriceId + 7,
         projector2: firstEquipmentPriceId + 8,
+        baseSpeaker: firstEquipmentPriceId + 9,
+        topSpeaker: firstEquipmentPriceId + 10,
+        amplifier: firstEquipmentPriceId + 11,
     };
 
     const firstEquipmentTagId = await knex('EquipmentTag')
@@ -465,6 +537,62 @@ export async function seed(knex) {
         {
             equipmentId: equipmentIds.projector,
             equipmentTagId: equipmentTagIds.permanentlyMounted,
+        },
+        {
+            equipmentId: equipmentIds.baseSpeaker,
+            equipmentTagId: equipmentTagIds.sound,
+        },
+        {
+            equipmentId: equipmentIds.topSpeaker,
+            equipmentTagId: equipmentTagIds.sound,
+        },
+        {
+            equipmentId: equipmentIds.amplifier,
+            equipmentTagId: equipmentTagIds.sound,
+        },
+    ]);
+
+    const firstEquipmentPackageId = await knex('EquipmentPackage')
+        .insert([
+            {
+                name: 'Mellan-PA',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                note: '',
+                estimatedHours: 0,
+                nameEN: 'Medium PA',
+                description: '',
+                descriptionEN: '',
+                addAsHeading: 1,
+            },
+        ])
+        .returning('id')
+        .then((ids) => ids[0].id);
+
+    await knex('EquipmentPackageEntry').insert([
+        {
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.baseSpeaker,
+            equipmentPackageId: firstEquipmentPackageId,
+            numberOfUnits: 4,
+            isHidden: 0,
+        },
+        {
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.topSpeaker,
+            equipmentPackageId: firstEquipmentPackageId,
+            numberOfUnits: 2,
+            isHidden: 0,
+        },
+        {
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.amplifier,
+            equipmentPackageId: firstEquipmentPackageId,
+            numberOfUnits: 1,
+            isHidden: 1,
         },
     ]);
 

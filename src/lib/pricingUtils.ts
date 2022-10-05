@@ -1,23 +1,40 @@
 import { EquipmentPrice, Booking, TimeEstimate, TimeReport } from '../models/interfaces';
-import { EquipmentList, EquipmentListEntry } from '../models/interfaces/EquipmentList';
+import { PricedEntity } from '../models/interfaces/BaseEntity';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../models/interfaces/EquipmentList';
 import { getNumberOfDays } from './datetimeUtils';
 
 // Calculate total price
 //
 export const getPrice = (entry: EquipmentListEntry, numberOfDays: number, withDiscount = true): number => {
+    if (entry.isHidden) {
+        return 0;
+    }
+
     const fullPrice = entry.numberOfUnits * getUnitPrice(entry, numberOfDays);
     return Math.max(0, withDiscount ? fullPrice - entry.discount : fullPrice);
 };
 
 export const getUnitPrice = (entry: EquipmentListEntry, numberOfDays: number): number => {
+    if (entry.isHidden) {
+        return 0;
+    }
+
     return getHourlyPrice(entry) + entry.pricePerUnit + getExtraDaysPrice(entry, numberOfDays);
 };
 
 export const getHourlyPrice = (entry: EquipmentListEntry): number => {
+    if (entry.isHidden) {
+        return 0;
+    }
+
     return entry.numberOfHours * entry.pricePerHour;
 };
 
 export const getExtraDaysPrice = (entry: EquipmentListEntry, numberOfTotalDays: number): number => {
+    if (entry.isHidden) {
+        return 0;
+    }
+
     return entry.pricePerUnit * (numberOfTotalDays - 1) * 0.25;
 };
 
@@ -27,8 +44,15 @@ export const getCalculatedDiscount = (entry: EquipmentListEntry, numberOfDays: n
     return Math.min(priceWithoutDiscount, entry.discount);
 };
 
+export const getEquipmentListHeadingPrice = (heading: EquipmentListHeading, numberOfDays: number): number => {
+    return heading.listEntries.reduce((sum, e) => sum + getPrice(e, numberOfDays), 0);
+};
+
 export const getEquipmentListPrice = (list: EquipmentList): number => {
-    return list.equipmentListEntries.reduce((sum, e) => sum + getPrice(e, getNumberOfDays(list)), 0);
+    return (
+        list.listEntries.reduce((sum, e) => sum + getPrice(e, getNumberOfDays(list)), 0) +
+        list.listHeadings.reduce((sum, h) => sum + getEquipmentListHeadingPrice(h, getNumberOfDays(list)), 0)
+    );
 };
 
 export const getTimeEstimatePrice = (timeEstimate: TimeEstimate): number => {
@@ -69,7 +93,7 @@ export const getBookingPrice = (booking: Booking, forceEstimatedTime = false): n
 
 // Format price
 //
-export const formatPrice = (price: { pricePerHour: number; pricePerUnit: number }): string => {
+export const formatPrice = (price: PricedEntity): string => {
     if (price.pricePerHour && !price.pricePerUnit) {
         return `${price.pricePerHour} kr/h`;
     } else if (!price.pricePerHour && price.pricePerUnit) {

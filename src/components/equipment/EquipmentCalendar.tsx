@@ -175,9 +175,10 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
                                             {booking.equipmentLists
                                                 ?.map(
                                                     (list) =>
-                                                        `${list.name} (${list.equipmentListEntries
-                                                            .filter((x) => x.equipmentId === equipment.id)
-                                                            .reduce((sum, x) => sum + x.numberOfUnits, 0)} st)`,
+                                                        `${list.name} (${getMaximumNumberOfUnitUsed(
+                                                            [list],
+                                                            equipment,
+                                                        )} st)`,
                                                 )
                                                 ?.join(', ')}
                                         </div>

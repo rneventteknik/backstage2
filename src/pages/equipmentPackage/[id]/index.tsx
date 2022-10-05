@@ -11,7 +11,7 @@ import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { equipmentPackageFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faCoins, faEyeSlash, faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -76,12 +76,31 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                 <span>{equipmentPackage.name}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
+                                <span className="flex-grow-1">Engelskt namn</span>
+                                <span>{equipmentPackage.nameEN}</span>
+                            </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Estimerade timmar</span>
                                 <span>{equipmentPackage.estimatedHours} timmar</span>
                             </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
+                                <span className="flex-grow-1">Pakettyp</span>
+                                <span>
+                                    {equipmentPackage.addAsHeading ? 'Rubrik med rader' : 'Individuellta rader'}
+                                </span>
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                <div className="mb-1">Beskrivning</div>
+                                <div className="text-muted">{equipmentPackage.description}</div>
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                <div className="mb-1">Engelsk beskrivning</div>
+                                <div className="text-muted">{equipmentPackage.descriptionEN}</div>
+                            </ListGroup.Item>
                         </ListGroup>
                     </Card>
-
+                </Col>
+                <Col xl={8}>
                     <Card className="mb-3">
                         <Card.Header>Utrustning</Card.Header>
                         <ListGroup variant="flush">
@@ -92,7 +111,15 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                         <br />
                                         <span className="text-muted">{e.equipment?.description}</span>
                                     </span>
-                                    <span>{e.numberOfUnits} st</span>
+                                    <span>
+                                        {e.isHidden ? (
+                                            <FontAwesomeIcon icon={faEyeSlash} className="mr-1" title="Gömd för kund" />
+                                        ) : null}
+                                        {e.isFree ? (
+                                            <FontAwesomeIcon icon={faCoins} className="mr-1" title="Utan pris" />
+                                        ) : null}
+                                        {e.numberOfUnits} st
+                                    </span>
                                 </ListGroup.Item>
                             ))}
 

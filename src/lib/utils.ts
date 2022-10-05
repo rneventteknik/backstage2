@@ -1,4 +1,4 @@
-import { BaseEntity, HasId } from '../models/interfaces/BaseEntity';
+import { BaseEntity, HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import { MemberStatus } from '../models/enums/MemberStatus';
 import { Role } from '../models/enums/Role';
 import { Status } from '../models/enums/Status';
@@ -27,7 +27,7 @@ export const onlyUniqueById = <T extends BaseEntity>(value: T, index: number, se
 
 export const notEmpty = <T>(value: T | null | undefined): value is T => value !== null && value !== undefined;
 
-export const updateItemsInArrayById = <T extends HasId>(list: T[], ...updatedItems: T[]): T[] =>
+export const updateItemsInArrayById = <T extends HasId | HasStringId>(list: T[], ...updatedItems: T[]): T[] =>
     list.map((item) => updatedItems.find((x) => x.id === item.id) ?? item);
 
 // Get string from status code
@@ -284,9 +284,17 @@ export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equi
                         // Sum the equipment, first over all lists and within the lists over all entries
                         (sum, list) =>
                             sum +
-                            list.equipmentListEntries
+                            list.listEntries
                                 .filter((x) => x.equipmentId === equipment.id)
-                                .reduce((sum, x) => sum + x.numberOfUnits, 0),
+                                .reduce((sum, x) => sum + x.numberOfUnits, 0) +
+                            list.listHeadings.reduce(
+                                (sum, headingList) =>
+                                    sum +
+                                    headingList.listEntries
+                                        .filter((x) => x.equipmentId === equipment.id)
+                                        .reduce((sum, x) => sum + x.numberOfUnits, 0),
+                                0,
+                            ),
                         0,
                     ),
             ),

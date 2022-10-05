@@ -18,7 +18,7 @@ import { Language } from '../../../models/enums/Language';
 type Props = {
     show: boolean;
     onHide: () => void;
-    onImport: (EquipmentListEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[]) => void;
+    onImport: (listEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[]) => void;
     pricePlan: PricePlan | undefined;
     language: Language | undefined;
 };
@@ -73,7 +73,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
     };
 
     const importEquipment = () => {
-        const equipmentListEntries = getSortedList(selectedEquipmentList?.equipmentListEntries ?? [])
+        const listEntries = getSortedList(selectedEquipmentList?.listEntries ?? [])
             .filter((x) => selectedEquipmentListEntryIds.some((id) => x.id === id))
             .map((x) => {
                 const entry: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'> = {
@@ -89,6 +89,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
 
                     pricePerHour: x.pricePerHour,
                     pricePerUnit: x.pricePerUnit,
+                    isHidden: x.isHidden,
                 };
 
                 if (resetNames && x.equipment) {
@@ -109,7 +110,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                 return entry;
             });
 
-        onImport(equipmentListEntries);
+        onImport(listEntries);
 
         resetAndHide();
     };
@@ -404,7 +405,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                     <div className="table-responsive">
                                         <TableDisplay
                                             configuration={tableSettings}
-                                            entities={selectedEquipmentList.equipmentListEntries}
+                                            entities={selectedEquipmentList.listEntries}
                                         />
                                     </div>
 

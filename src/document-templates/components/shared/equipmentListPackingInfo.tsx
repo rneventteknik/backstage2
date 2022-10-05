@@ -25,16 +25,12 @@ type Props = {
 export const EquipmentListPackingInfo: React.FC<Props> = ({ list, booking }: Props) => {
     const { t } = useTextResources();
 
+    const allListEntries = [...list.listEntries, ...list.listHeadings.flatMap((x) => x.listEntries ?? [])];
     const defaultEquipmentLocation: EquipmentLocation = { id: 0, name: 'Okänd plats', sortIndex: Infinity };
     const uniqueEquipmentLocations = getSortedList(
-        list.equipmentListEntries
-            .map((x) => x.equipment?.equipmentLocation ?? defaultEquipmentLocation)
-            .filter(onlyUniqueById),
+        allListEntries.map((x) => x.equipment?.equipmentLocation ?? defaultEquipmentLocation).filter(onlyUniqueById),
     );
-    const equipmentListEntriesByLocationId = groupBy(
-        list.equipmentListEntries,
-        (x) => x.equipment?.equipmentLocation?.id ?? 0,
-    );
+    const equipmentListEntriesByLocationId = groupBy(allListEntries, (x) => x.equipment?.equipmentLocation?.id ?? 0);
 
     return (
         <View style={styles.equipmentListSection}>

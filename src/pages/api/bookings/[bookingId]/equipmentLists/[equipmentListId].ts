@@ -79,10 +79,20 @@ const handler = withSessionContext(
                         const newList = req.body.equipmentList as EquipmentListObjectionModel;
                         const existingList = booking.equipmentLists?.find((l) => l.id === newList.id);
 
+                        const hasChangesInListHeadings =
+                            !existingList ||
+                            hasListChanges(existingList.listHeadings, newList.listHeadings) ||
+                            existingList.listHeadings.some((existingHeading) => {
+                                const newHeading = newList.listHeadings.find((x) => x.id === existingHeading.id);
+
+                                return hasListChanges(existingHeading.listEntries, newHeading?.listEntries);
+                            });
+
                         if (
                             !existingList ||
                             hasChanges(existingList, newList, ['rentalStatus']) ||
-                            hasListChanges(existingList.equipmentListEntries, newList.equipmentListEntries)
+                            hasListChanges(existingList.listEntries, newList.listEntries) ||
+                            hasChangesInListHeadings
                         ) {
                             await logChangeToBooking(
                                 context.currentUser,

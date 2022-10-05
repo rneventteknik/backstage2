@@ -20,14 +20,19 @@ import {
     faCalendarDays,
     faRightFromBracket,
     faRightToBracket,
+    faAngleRight,
+    faAngleLeft,
+    faEyeSlash,
+    faEye,
 } from '@fortawesome/free-solid-svg-icons';
-import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
 import {
     getResponseContentOrError,
     updateItemsInArrayById,
     toIntOrUndefined,
     getRentalStatusName,
+    reduceSumFn,
 } from '../../../lib/utils';
 import {
     EquipmentListObjectionModel,
@@ -76,6 +81,7 @@ import {
     getNumberOfEquipmentOutDays,
 } from '../../../lib/datetimeUtils';
 import ConfirmModal from '../../utils/ConfirmModal';
+import { Merge } from 'type-fest';
 
 type Props = {
     bookingId: number;
@@ -260,6 +266,8 @@ const EquipmentLists: React.FC<Props> = ({ bookingId, readonly }: Props) => {
     );
 };
 
+type TableEntryViewModel = Merge<EquipmentListEntry | EquipmentListHeading, { id: string }>;
+
 const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     list: partialList,
     bookingId,
@@ -342,13 +350,14 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         equipment: Equipment,
         id: number,
         sortIndex: number,
+        isFree = false,
         override?: Partial<EquipmentListEntry>,
     ) => {
         if (!equipment.id) {
             throw new Error('Invalid equipment');
         }
 
-        const prices = getEquipmentListEntryPrices(equipment.prices[0]);
+        const prices = isFree ? { pricePerHour: 0, pricePerUnit: 0 } : getEquipmentListEntryPrices(equipment.prices[0]);
 
         const entry: EquipmentListEntry = {
             id: id,
@@ -359,8 +368,9 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             numberOfHours: prices.pricePerHour > 0 ? 1 : 0,
             name: booking.language === Language.SV ? equipment.name : equipment.nameEN,
             description: booking.language === Language.SV ? equipment.description : equipment.descriptionEN,
-            ...prices,
             discount: 0,
+            isHidden: false,
+            ...prices,
         };
 
         return { ...entry, ...(override ?? {}) };
@@ -369,33 +379,47 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     // Helper functions to add equipment
     //
 
-    const getNextEquipmentListEntryId = () => Math.min(-1, ...(list?.equipmentListEntries ?? []).map((x) => x.id)) - 1;
+    const getNextEquipmentListEntryId = () =>
+        Math.min(
+            -1,
+            ...(list?.listEntries ?? []).map((x) => x.id),
+            ...(list?.listHeadings.flatMap((x) => x.listEntries ?? []) ?? []).map((x) => x.id),
+        ) - 1;
+
+    const getNextEquipmentListHeadingEntryId = () => Math.min(-1, ...(list?.listHeadings ?? []).map((x) => x.id)) - 1;
 
     const addEquipment = (equipment: Equipment, numberOfUnits?: number) => {
         addMultipleEquipment([{ equipment, numberOfUnits }]);
     };
 
-    const addMultipleEquipment = (entries: { equipment: Equipment; numberOfUnits?: number }[]) => {
+    const addMultipleEquipment = (
+        entries: { equipment: Equipment; numberOfUnits?: number; isFree?: boolean; isHidden?: boolean }[],
+    ) => {
         let nextId = getNextEquipmentListEntryId();
-        let nextSortIndex = getNextSortIndex(list.equipmentListEntries);
+        let nextSortIndex = getNextSortIndex(listEntries);
 
         const entriesToAdd = entries.map((x) => {
-            // This id is only used in the client, it is striped before sending to the server
-            const entity = getDefaultListEntryFromEquipment(
-                x.equipment,
-                nextId,
-                nextSortIndex,
-                x.numberOfUnits ? { numberOfUnits: x.numberOfUnits } : {},
-            );
+            const overrides: Partial<EquipmentListEntry> = {};
 
-            nextId += 1;
+            if (x.numberOfUnits !== undefined) {
+                overrides.numberOfUnits = x.numberOfUnits;
+            }
+
+            if (x.isHidden !== undefined) {
+                overrides.isHidden = x.isHidden;
+            }
+
+            // This id is only used in the client, it is striped before sending to the server
+            const entity = getDefaultListEntryFromEquipment(x.equipment, nextId, nextSortIndex, x.isFree, overrides);
+
+            nextId -= 1;
             nextSortIndex += 10;
 
             return entity;
         });
 
         if (list) {
-            saveList({ ...list, equipmentListEntries: [...list.equipmentListEntries, ...entriesToAdd] });
+            saveList({ ...list, listEntries: [...list.listEntries, ...entriesToAdd] });
         }
     };
 
@@ -419,10 +443,29 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     .then((apiResponse) => getResponseContentOrError<IEquipmentPackageObjectionModel>(apiResponse))
                     .then(toEquipmentPackage)
                     .then((equipmentPackage) => {
+                        if (equipmentPackage.addAsHeading) {
+                            addHeadingEntry(
+                                booking.language === Language.SV
+                                    ? equipmentPackage.name
+                                    : equipmentPackage.nameEN ?? equipmentPackage.name,
+                                booking.language === Language.SV
+                                    ? equipmentPackage.description
+                                    : equipmentPackage.descriptionEN,
+                                equipmentPackage.equipmentEntries.filter((x) => x.equipment) as {
+                                    equipment: Equipment;
+                                    numberOfUnits?: number;
+                                    isFree: boolean;
+                                    isHidden: boolean;
+                                }[],
+                            );
+                            return;
+                        }
                         addMultipleEquipment(
                             equipmentPackage.equipmentEntries.filter((x) => x.equipment) as {
                                 equipment: Equipment;
                                 numberOfUnits?: number;
+                                isFree: boolean;
+                                isHidden: boolean;
                             }[],
                         );
                     })
@@ -434,14 +477,59 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         }
     };
 
+    const addHeadingEntry = (
+        headingName: string,
+        headingDescription = '',
+        entries: { equipment: Equipment; numberOfUnits?: number; isFree?: boolean; isHidden?: boolean }[] = [],
+    ) => {
+        const nextHeadingId = getNextEquipmentListHeadingEntryId();
+        const nextHeadingSortIndex = getNextSortIndex(listEntries);
+
+        let nextId = getNextEquipmentListEntryId();
+        let nextSortIndex = 10;
+
+        const entriesToAdd = entries.map((x) => {
+            const overrides: Partial<EquipmentListEntry> = {};
+
+            if (x.numberOfUnits !== undefined) {
+                overrides.numberOfUnits = x.numberOfUnits;
+            }
+
+            if (x.isHidden !== undefined) {
+                overrides.isHidden = x.isHidden;
+            }
+
+            // This id is only used in the client, it is striped before sending to the server
+            const entity = getDefaultListEntryFromEquipment(x.equipment, nextId, nextSortIndex, x.isFree, overrides);
+
+            nextId -= 1;
+            nextSortIndex += 10;
+
+            return entity;
+        });
+
+        // This id is only used in the client, it is striped before sending to the server
+        const entity: EquipmentListHeading = {
+            id: nextHeadingId,
+            sortIndex: nextHeadingSortIndex,
+            name: headingName,
+            description: headingDescription,
+            listEntries: entriesToAdd,
+        };
+
+        if (list) {
+            saveList({ ...list, listHeadings: [...list.listHeadings, entity] });
+        }
+    };
+
     const importEquipmentEntries = (
         equipmentListEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[],
     ) => {
         let nextId = getNextEquipmentListEntryId();
-        let nextSortIndex = getNextSortIndex(list.equipmentListEntries);
+        let nextSortIndex = getNextSortIndex(listEntries);
 
         const equipmentListEntriesToImport: EquipmentListEntry[] = equipmentListEntries.map((x) => {
-            const entity = {
+            const entity: EquipmentListEntry = {
                 id: nextId,
                 sortIndex: nextSortIndex,
 
@@ -457,6 +545,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
                 pricePerUnit: x.pricePerUnit,
                 pricePerHour: x.pricePerHour,
+                isHidden: x.isHidden,
             };
 
             nextId += 1;
@@ -465,7 +554,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             return entity;
         });
 
-        saveList({ ...list, equipmentListEntries: [...list.equipmentListEntries, ...equipmentListEntriesToImport] });
+        saveList({ ...list, listEntries: [...list.listEntries, ...equipmentListEntriesToImport] });
     };
 
     // Function to save list. Note: this function instantly calls the API to save on the server.
@@ -525,29 +614,138 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     // List entry modification functions. Note: these will trigger a save of the whole list.
     //
     const updateListEntry = (listEntry: EquipmentListEntry) => {
-        const newEquipmentListEntries = updateItemsInArrayById(list.equipmentListEntries, listEntry);
-        saveList({ ...list, equipmentListEntries: newEquipmentListEntries });
+        const newEquipmentListEntries = updateItemsInArrayById(list.listEntries, listEntry);
+        const newEquipmentListHeadingEntries = list.listHeadings.map(
+            (x): EquipmentListHeading => ({
+                ...x,
+                listEntries: updateItemsInArrayById(x.listEntries, listEntry),
+            }),
+        );
+
+        saveList({
+            ...list,
+            listEntries: newEquipmentListEntries,
+            listHeadings: newEquipmentListHeadingEntries,
+        });
     };
 
     const deleteListEntry = (listEntry: EquipmentListEntry) => {
-        const newEquipmentListEntries = list.equipmentListEntries.filter((x) => x.id != listEntry.id);
-        saveList({ ...list, equipmentListEntries: newEquipmentListEntries });
+        const newEquipmentListEntries = list.listEntries.filter((x) => x.id != listEntry.id);
+        const newEquipmentListHeadingEntries = list.listHeadings.map(
+            (x): EquipmentListHeading => ({
+                ...x,
+                listEntries: x.listEntries.filter((x) => x.id != listEntry.id),
+            }),
+        );
+
+        saveList({
+            ...list,
+            listEntries: newEquipmentListEntries,
+            listHeadings: newEquipmentListHeadingEntries,
+        });
     };
 
-    const moveListEntryUp = (listEntry: EquipmentListEntry) => {
-        const newEquipmentListEntries = updateItemsInArrayById(
-            list.equipmentListEntries,
-            ...moveItemUp(list.equipmentListEntries, listEntry),
-        );
-        saveList({ ...list, equipmentListEntries: newEquipmentListEntries });
+    const updateListHeadingEntry = (listHeaderEntry: EquipmentListHeading) => {
+        const newEquipmentListHeadingEntries = updateItemsInArrayById(list.listHeadings, listHeaderEntry);
+        saveList({ ...list, listHeadings: newEquipmentListHeadingEntries });
     };
 
-    const moveListEntryDown = (listEntry: EquipmentListEntry) => {
+    const deleteListHeadingEntry = (listHeaderEntry: EquipmentListHeading) => {
+        const newEquipmentListHeadingEntries = list.listHeadings.filter((x) => x.id != listHeaderEntry.id);
+        saveList({ ...list, listHeadings: newEquipmentListHeadingEntries });
+    };
+
+    const moveListEntryUp = (viewModel: TableEntryViewModel) => {
+        const movedItems = moveItemUp(listEntries, viewModel);
         const newEquipmentListEntries = updateItemsInArrayById(
-            list.equipmentListEntries,
-            ...moveItemDown(list.equipmentListEntries, listEntry),
+            list.listEntries,
+            ...movedItems.filter((x) => !tableViewModelIsHeading(x)).map((x) => getEntryFromTableEntryViewModel(x)),
         );
-        saveList({ ...list, equipmentListEntries: newEquipmentListEntries });
+        const newEquipmentListHeadingEntries = updateItemsInArrayById(
+            list.listHeadings,
+            ...movedItems
+                .filter((x) => tableViewModelIsHeading(x))
+                .map((x) => getHeadingEntryFromTableEntryViewModel(x)),
+        );
+        saveList({
+            ...list,
+            listEntries: newEquipmentListEntries,
+            listHeadings: newEquipmentListHeadingEntries,
+        });
+    };
+
+    const moveListEntryDown = (viewModel: TableEntryViewModel) => {
+        const movedItems = moveItemDown(listEntries, viewModel);
+        const newEquipmentListEntries = updateItemsInArrayById(
+            list.listEntries,
+            ...movedItems.filter((x) => !tableViewModelIsHeading(x)).map((x) => getEntryFromTableEntryViewModel(x)),
+        );
+        const newEquipmentListHeadingEntries = updateItemsInArrayById(
+            list.listHeadings,
+            ...movedItems
+                .filter((x) => tableViewModelIsHeading(x))
+                .map((x) => getHeadingEntryFromTableEntryViewModel(x)),
+        );
+        saveList({
+            ...list,
+            listEntries: newEquipmentListEntries,
+            listHeadings: newEquipmentListHeadingEntries,
+        });
+    };
+
+    const moveListEntryIntoHeading = (listEntry: EquipmentListEntry, listHeadingEntryId: number | null) => {
+        // Special case: move out of heading into equipment list
+        if (!listHeadingEntryId) {
+            saveList({
+                ...list,
+                listEntries: [
+                    ...list.listEntries,
+                    {
+                        ...listEntry,
+                        sortIndex: getNextSortIndex(listEntries),
+                        equipmentListHeadingId: undefined,
+                        equipmentListId: undefined,
+                    },
+                ],
+                listHeadings: list.listHeadings.map(
+                    (heading): EquipmentListHeading => ({
+                        ...heading,
+                        listEntries: heading.listEntries.filter((x) => x.id !== listEntry.id),
+                    }),
+                ),
+            });
+            return;
+        }
+
+        const listHeadingEntryToUpdate = list.listHeadings.find((x) => x.id === listHeadingEntryId);
+
+        if (!listHeadingEntryToUpdate) {
+            throw new Error('Invalid List Heading Entry');
+        }
+
+        const updatedListHeadingEntry: EquipmentListHeading = {
+            ...listHeadingEntryToUpdate,
+            listEntries: [
+                ...listHeadingEntryToUpdate.listEntries,
+                {
+                    ...listEntry,
+                    sortIndex: getNextSortIndex(listHeadingEntryToUpdate.listEntries),
+                    equipmentListHeadingId: undefined,
+                    equipmentListId: undefined,
+                },
+            ],
+        };
+        const updatedEquipmentListHeadingEntries = updateItemsInArrayById(list.listHeadings, updatedListHeadingEntry);
+
+        saveList({
+            ...list,
+            listEntries: list.listEntries.filter((x) => x.id !== listEntry.id),
+            listHeadings: updatedEquipmentListHeadingEntries,
+        });
+    };
+
+    const toggleHideListEntry = (entry: EquipmentListEntry) => {
+        updateListEntry({ ...entry, isHidden: !entry.isHidden });
     };
 
     // Helper functions
@@ -557,57 +755,118 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
     // Table display functions
     //
 
-    const EquipmentListEntryNameDisplayFn = (entry: EquipmentListEntry) => (
-        <>
-            <div className="mb-0">
-                <DoubleClickToEdit
-                    value={entry.name}
-                    onUpdate={(newValue) =>
-                        updateListEntry({ ...entry, name: newValue && newValue.length > 0 ? newValue : entry.name })
-                    }
-                    size="sm"
-                    readonly={readonly}
-                >
-                    {entry.name}
-                </DoubleClickToEdit>
-                {entry.equipment?.isArchived ? (
-                    <Badge variant="warning" className="ml-1">
-                        Arkiverad
-                    </Badge>
-                ) : null}
-                {entry.equipment && getEquipmentOutDatetime(list) && getEquipmentInDatetime(list) ? (
-                    <span className="ml-1">
-                        <EquipmentListEntryConflictStatus
-                            equipment={entry.equipment}
-                            equipmentList={list}
-                            startDatetime={getEquipmentOutDatetime(list) ?? new Date()}
-                            endDatetime={getEquipmentInDatetime(list) ?? new Date()}
-                        />
-                    </span>
-                ) : null}
-            </div>
-            <div className="mb-0">
-                <DoubleClickToEdit
-                    value={entry.description}
-                    onUpdate={(newValue) => updateListEntry({ ...entry, description: newValue })}
-                    size="sm"
-                    readonly={readonly}
-                >
-                    {entry.description && entry.description.length > 0 ? (
-                        <span className="text-muted ">{entry.description}</span>
-                    ) : (
-                        <span className="text-muted font-italic">Dubbelklicka för att lägga till en beskrivning</span>
-                    )}
-                </DoubleClickToEdit>
-            </div>
+    const EquipmentListEntryNameDisplayFn = (viewModel: TableEntryViewModel) => {
+        if (tableViewModelIsHeading(viewModel)) {
+            const heading = getHeadingEntryFromTableEntryViewModel(viewModel);
 
-            <div className="mb-0 text-muted d-md-none">{EquipmentListEntryNumberOfHoursDisplayFn(entry)}</div>
-            <div className="mb-0 text-muted d-md-none">{EquipmentListEntryPriceDisplayFn(entry)}</div>
-            <div className="mb-0 text-muted d-md-none">{EquipmentListEntryTotalPriceDisplayFn(entry)}</div>
-        </>
-    );
+            return (
+                <>
+                    <div className="mb-0">
+                        <DoubleClickToEdit
+                            value={heading.name}
+                            onUpdate={(newValue) =>
+                                updateListHeadingEntry({
+                                    ...heading,
+                                    name: newValue && newValue.length > 0 ? newValue : heading.name,
+                                })
+                            }
+                            size="sm"
+                            readonly={readonly}
+                        >
+                            {heading.name}
+                            <span className="text-muted ml-2">
+                                ({heading.listEntries.length} {heading.listEntries.length === 1 ? 'del' : 'delar'})
+                            </span>
+                        </DoubleClickToEdit>
+                    </div>
+                    <div className="mb-0 text-muted">
+                        <DoubleClickToEdit
+                            value={heading.description}
+                            onUpdate={(newValue) =>
+                                updateListHeadingEntry({
+                                    ...heading,
+                                    description: newValue && newValue.length > 0 ? newValue : heading.description,
+                                })
+                            }
+                            size="sm"
+                            readonly={readonly}
+                        >
+                            {heading.description && heading.description.length > 0 ? (
+                                <span className="text-muted ">{heading.description}</span>
+                            ) : (
+                                <span className="text-muted font-italic">
+                                    Dubbelklicka för att lägga till en beskrivning
+                                </span>
+                            )}{' '}
+                        </DoubleClickToEdit>
+                    </div>
+                </>
+            );
+        }
 
-    const EquipmentListEntryNumberOfUnitsDisplayFn = (entry: EquipmentListEntry) => {
+        const entry = getEntryFromTableEntryViewModel(viewModel);
+
+        return (
+            <>
+                <div className={'mb-0' + (entry.isHidden ? ' text-muted' : '')}>
+                    <DoubleClickToEdit
+                        value={entry.name}
+                        onUpdate={(newValue) =>
+                            updateListEntry({ ...entry, name: newValue && newValue.length > 0 ? newValue : entry.name })
+                        }
+                        size="sm"
+                        readonly={readonly}
+                    >
+                        {entry.name}
+                        {entry.equipment?.isArchived ? (
+                            <Badge variant="warning" className="ml-1">
+                                Arkiverad
+                            </Badge>
+                        ) : null}
+                        {entry.equipment && getEquipmentOutDatetime(list) && getEquipmentInDatetime(list) ? (
+                            <span className="ml-1">
+                                <EquipmentListEntryConflictStatus
+                                    equipment={entry.equipment}
+                                    equipmentList={list}
+                                    startDatetime={getEquipmentOutDatetime(list) ?? new Date()}
+                                    endDatetime={getEquipmentInDatetime(list) ?? new Date()}
+                                />
+                            </span>
+                        ) : null}
+                        {entry.isHidden ? <FontAwesomeIcon icon={faEyeSlash} className="ml-1" /> : null}
+                    </DoubleClickToEdit>
+                </div>
+                <div className="mb-0">
+                    <DoubleClickToEdit
+                        value={entry.description}
+                        onUpdate={(newValue) => updateListEntry({ ...entry, description: newValue })}
+                        size="sm"
+                        readonly={readonly}
+                    >
+                        {entry.description && entry.description.length > 0 ? (
+                            <span className="text-muted ">{entry.description}</span>
+                        ) : (
+                            <span className="text-muted font-italic">
+                                Dubbelklicka för att lägga till en beskrivning
+                            </span>
+                        )}
+                    </DoubleClickToEdit>
+                </div>
+
+                <div className="mb-0 text-muted d-md-none">{EquipmentListEntryNumberOfHoursDisplayFn(viewModel)}</div>
+                <div className="mb-0 text-muted d-md-none">{EquipmentListEntryPriceDisplayFn(viewModel)}</div>
+                <div className="mb-0 text-muted d-md-none">{EquipmentListEntryTotalPriceDisplayFn(viewModel)}</div>
+            </>
+        );
+    };
+
+    const EquipmentListEntryNumberOfUnitsDisplayFn = (viewModel: TableEntryViewModel) => {
+        if (tableViewModelIsHeading(viewModel)) {
+            return '';
+        }
+
+        const entry = getEntryFromTableEntryViewModel(viewModel);
+
         const valueIsRelevant = entry.pricePerUnit !== 0;
 
         if (!valueIsRelevant && entry.numberOfUnits === 1) {
@@ -628,7 +887,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         );
     };
 
-    const EquipmentListEntryNumberOfHoursDisplayFn = (entry: EquipmentListEntry) => {
+    const EquipmentListEntryNumberOfHoursDisplayFn = (viewModel: TableEntryViewModel) => {
+        if (tableViewModelIsHeading(viewModel)) {
+            return '';
+        }
+
+        const entry = getEntryFromTableEntryViewModel(viewModel);
         const valueIsRelevant = entry.pricePerHour !== 0;
 
         if (!valueIsRelevant && entry.numberOfHours === 0) {
@@ -649,7 +913,17 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         );
     };
 
-    const EquipmentListEntryPriceDisplayFn = (entry: EquipmentListEntry) => {
+    const EquipmentListEntryPriceDisplayFn = (viewModel: TableEntryViewModel) => {
+        if (tableViewModelIsHeading(viewModel)) {
+            return '';
+        }
+
+        const entry = getEntryFromTableEntryViewModel(viewModel);
+
+        if (entry.isHidden) {
+            return <span className="text-muted">-</span>;
+        }
+
         const customPriceDropdownValue: EquipmentPrice = {
             id: -1,
             name: 'Anpassat pris',
@@ -692,7 +966,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         );
     };
 
-    const EquipmentListEntryTotalPriceDisplayFn = (entry: EquipmentListEntry) => {
+    const EquipmentListEntryTotalPriceDisplayFn = (viewModel: TableEntryViewModel) => {
+        if (tableViewModelIsHeading(viewModel)) {
+            return '';
+        }
+
+        const entry = getEntryFromTableEntryViewModel(viewModel);
         return (
             <em
                 title={
@@ -711,23 +990,72 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         );
     };
 
-    const EquipmentListEntryActionsDisplayFn = (entry: EquipmentListEntry) => {
+    const EquipmentListEntryActionsDisplayFn = (viewModel: TableEntryViewModel) => {
+        if (tableViewModelIsHeading(viewModel)) {
+            const heading = getHeadingEntryFromTableEntryViewModel(viewModel);
+
+            return (
+                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
+                    {readonly ? null : (
+                        <>
+                            <Dropdown.Item
+                                onClick={() => moveListEntryUp(viewModel)}
+                                disabled={isFirst(listEntries, viewModel)}
+                            >
+                                <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+                            </Dropdown.Item>
+                            <Dropdown.Item
+                                onClick={() => moveListEntryDown(viewModel)}
+                                disabled={isLast(listEntries, viewModel)}
+                            >
+                                <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Dropdown.Item onClick={() => deleteListHeadingEntry(heading)} className="text-danger">
+                                <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                            </Dropdown.Item>
+                        </>
+                    )}
+                </DropdownButton>
+            );
+        }
+
+        const entry = getEntryFromTableEntryViewModel(viewModel);
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
                 {readonly ? null : (
                     <>
                         <Dropdown.Item
-                            onClick={() => moveListEntryUp(entry)}
-                            disabled={isFirst(list.equipmentListEntries, entry)}
+                            onClick={() => moveListEntryUp(viewModel)}
+                            disabled={isFirst(listEntries, viewModel)}
                         >
                             <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
                         </Dropdown.Item>
                         <Dropdown.Item
-                            onClick={() => moveListEntryDown(entry)}
-                            disabled={isLast(list.equipmentListEntries, entry)}
+                            onClick={() => moveListEntryDown(viewModel)}
+                            disabled={isLast(listEntries, viewModel)}
                         >
                             <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
                         </Dropdown.Item>
+                        <Dropdown.Divider />
+                        {getHeaderOfEntity(entry) ? (
+                            <Dropdown.Item onClick={() => moveListEntryIntoHeading(entry, null)}>
+                                <FontAwesomeIcon icon={faAngleLeft} className="mr-1 fa-fw" /> Flytta ut ur{' '}
+                                {getHeaderOfEntity(entry)?.name}
+                            </Dropdown.Item>
+                        ) : (
+                            getSortedList(list.listHeadings).map((heading) => (
+                                <Dropdown.Item
+                                    key={heading.id}
+                                    onClick={() => moveListEntryIntoHeading(entry, heading.id)}
+                                >
+                                    <FontAwesomeIcon icon={faAngleRight} className="mr-1 fa-fw" /> Flytta in i{' '}
+                                    {heading.name}
+                                </Dropdown.Item>
+                            ))
+                        )}
+
+                        <Dropdown.Divider />
                     </>
                 )}
                 <Dropdown.Item href={'/equipment/' + entry.equipmentId} target="_blank" disabled={!entry.equipment}>
@@ -735,6 +1063,10 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 </Dropdown.Item>
                 {readonly ? null : (
                     <>
+                        <Dropdown.Item onClick={() => toggleHideListEntry(entry)}>
+                            <FontAwesomeIcon icon={entry.isHidden ? faEye : faEyeSlash} className="mr-1 fa-fw" />{' '}
+                            {entry.isHidden ? 'Sluta dölja rad för kund' : 'Dölj rad för kund'}
+                        </Dropdown.Item>
                         <Dropdown.Item onClick={() => setEquipmentListEntryToEditViewModel(entry)}>
                             <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
                         </Dropdown.Item>
@@ -759,11 +1091,11 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         );
     };
 
-    const sortFn = (a: EquipmentListEntry, b: EquipmentListEntry) => sortIndexSortFn(a, b);
+    const sortFn = (a: TableEntryViewModel, b: TableEntryViewModel) => sortIndexSortFn(a, b);
 
     // Table settings
     //
-    const tableSettings: TableConfiguration<EquipmentListEntry> = {
+    const tableSettings: TableConfiguration<TableEntryViewModel> = {
         entityTypeDisplayName: '',
         customSortFn: sortFn,
         hideTableFilter: true,
@@ -773,13 +1105,19 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             {
                 key: 'name',
                 displayName: 'Utrustning',
-                getValue: (entry: EquipmentListEntry) => entry.name + ' ' + entry.description,
+                indentSubItems: true,
+                getValue: (viewModel: TableEntryViewModel) => viewModel.name + ' ' + viewModel.description,
                 getContentOverride: EquipmentListEntryNameDisplayFn,
             },
             {
                 key: 'count',
                 displayName: 'Antal',
-                getValue: (entry: EquipmentListEntry) => entry.numberOfUnits,
+                getValue: (viewModel: TableEntryViewModel) =>
+                    tableViewModelIsHeading(viewModel)
+                        ? getHeadingEntryFromTableEntryViewModel(viewModel)
+                              .listEntries.map((x) => x.numberOfUnits)
+                              .reduce(reduceSumFn, 0)
+                        : getEntryFromTableEntryViewModel(viewModel).numberOfUnits,
                 getContentOverride: EquipmentListEntryNumberOfUnitsDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 80,
@@ -787,7 +1125,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             {
                 key: 'hours',
                 displayName: 'Timmar',
-                getValue: (entry: EquipmentListEntry) => entry.numberOfHours,
+                getValue: (viewModel: TableEntryViewModel) =>
+                    tableViewModelIsHeading(viewModel)
+                        ? getHeadingEntryFromTableEntryViewModel(viewModel)
+                              .listEntries.map((x) => x.numberOfHours)
+                              .reduce(reduceSumFn, 0)
+                        : getEntryFromTableEntryViewModel(viewModel).numberOfHours,
                 getContentOverride: EquipmentListEntryNumberOfHoursDisplayFn,
                 textAlignment: 'right',
                 cellHideSize: 'md',
@@ -806,7 +1149,12 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
             {
                 key: 'sum',
                 displayName: 'Summa',
-                getValue: (entry: EquipmentListEntry) => getPrice(entry, getNumberOfDays(list)),
+                getValue: (viewModel: TableEntryViewModel) =>
+                    tableViewModelIsHeading(viewModel)
+                        ? getHeadingEntryFromTableEntryViewModel(viewModel)
+                              .listEntries.map((x) => getPrice(x, getNumberOfDays(list)))
+                              .reduce(reduceSumFn, 0)
+                        : getPrice(getEntryFromTableEntryViewModel(viewModel), getNumberOfDays(list)),
                 getContentOverride: EquipmentListEntryTotalPriceDisplayFn,
                 columnWidth: 90,
                 textAlignment: 'right',
@@ -860,6 +1208,58 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
         saveList(updatedList);
     };
 
+    // Viewmodel hepers
+    //
+    const prependIdWithCharacter = (
+        entity: EquipmentListEntry | EquipmentListHeading,
+        character: 'E' | 'H',
+    ): TableEntryViewModel => ({ ...entity, id: character + entity.id });
+
+    const tableViewModelIsHeading = (viewModel: TableEntryViewModel) => {
+        switch (viewModel.id.charAt(0)) {
+            case 'E':
+                return false;
+            case 'H':
+                return true;
+            default:
+                throw new Error('Invalid view model');
+        }
+    };
+
+    const getEntryFromTableEntryViewModel = (viewModel: TableEntryViewModel): EquipmentListEntry => {
+        if (viewModel.id.charAt(0) !== 'E') {
+            throw new Error('Invalid view model');
+        }
+
+        const numericId = parseInt(viewModel.id.substring(1));
+        return { ...viewModel, id: numericId } as EquipmentListEntry;
+    };
+
+    const getHeadingEntryFromTableEntryViewModel = (viewModel: TableEntryViewModel): EquipmentListHeading => {
+        if (viewModel.id.charAt(0) !== 'H') {
+            throw new Error('Invalid view model');
+        }
+
+        const numericId = parseInt(viewModel.id.substring(1));
+        return { ...viewModel, id: numericId } as EquipmentListHeading;
+    };
+
+    const getHeaderOfEntity = (entity: EquipmentListEntry) =>
+        list.listHeadings.find((heading) => heading.listEntries.some((x) => x.id === entity.id));
+
+    // Lists of entities for table
+    //
+    const listEntries = [
+        ...list.listEntries.map((e) => prependIdWithCharacter(e, 'E')),
+        ...list.listHeadings.map((h) => prependIdWithCharacter(h, 'H')),
+    ];
+    const subListEntries = list.listHeadings.map((x) => ({
+        parentId: prependIdWithCharacter(x, 'H').id,
+        entities: x.listEntries.map((e) => prependIdWithCharacter(e, 'E')),
+    }));
+
+    // HTML template
+    //
     return (
         <Card className="mb-3">
             <Card.Header>
@@ -936,6 +1336,10 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" />
                                         Lägg till egen rad
                                     </Dropdown.Item>
+                                    <Dropdown.Item onClick={() => addHeadingEntry('Ny rubrikrad')}>
+                                        <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" />
+                                        Lägg till rubrikrad
+                                    </Dropdown.Item>
                                     {list.numberOfDays === null ? (
                                         booking.status === Status.DRAFT ? (
                                             <>
@@ -1002,7 +1406,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         confirmLabel="Töm listan"
                                         onConfirm={() => {
                                             setShowEmptyListModal(false);
-                                            saveList({ ...list, equipmentListEntries: [] });
+                                            saveList({ ...list, listEntries: [] });
                                         }}
                                         title="Bekräfta"
                                     >
@@ -1030,7 +1434,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                     </div>
                 </div>
                 <p className="text-muted">
-                    {list.equipmentListEntries.length} rader / {formatNumberAsCurrency(getEquipmentListPrice(list))}
+                    {list.listEntries.length} rader / {formatNumberAsCurrency(getEquipmentListPrice(list))}
                     {getNumberOfDays(list) && getNumberOfEquipmentOutDays(list) ? (
                         <>
                             {' '}
@@ -1163,7 +1567,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
             {showListContent ? (
                 <>
-                    <TableDisplay entities={list.equipmentListEntries} configuration={tableSettings} />
+                    <TableDisplay entities={listEntries} subEntities={subListEntries} configuration={tableSettings} />
 
                     {readonly ? null : (
                         <div className="ml-2 mr-2 mb-2">
@@ -1245,82 +1649,92 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 </Form.Group>
                             </Col>
                         </Row>
-                        <Row>
-                            <Col lg={4}>
-                                <Form.Group>
-                                    <Form.Label>Pris</Form.Label>
+                        {equipmentListEntryToEditViewModel.isHidden ? null : (
+                            <Row>
+                                <Col lg={4}>
+                                    <Form.Group>
+                                        <Form.Label>Pris</Form.Label>
 
-                                    <Form.Control
-                                        as="select"
-                                        disabled={!equipmentListEntryToEditViewModel.equipment}
-                                        defaultValue={equipmentListEntryToEditViewModel.equipmentPrice?.id}
-                                        onChange={(e) => {
-                                            const newEquipmentPrice =
-                                                equipmentListEntryToEditViewModel.equipment?.prices.filter(
-                                                    (x) => x.id == toIntOrUndefined(e.target.value),
-                                                )[0];
-                                            setEquipmentListEntryToEditViewModel({
-                                                ...equipmentListEntryToEditViewModel,
-                                                ...(newEquipmentPrice
-                                                    ? getEquipmentListEntryPrices(newEquipmentPrice)
-                                                    : { equipmentPrice: undefined }),
-                                            });
-                                        }}
-                                    >
-                                        <option value={undefined}>Anpassat pris</option>
-                                        {equipmentListEntryToEditViewModel.equipment?.prices?.map((x) => (
-                                            <option key={x.id.toString()} value={x.id.toString()}>
-                                                {x.name} {priceDisplayFn(x)}
-                                            </option>
-                                        ))}
-                                    </Form.Control>
-                                </Form.Group>
-                            </Col>
-                            <Col lg={4} xs={6}>
-                                <Form.Group>
-                                    <Form.Label>Pris per styck</Form.Label>
-                                    <InputGroup>
                                         <Form.Control
-                                            type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
-                                            min="0"
-                                            disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
-                                            value={equipmentListEntryToEditViewModel?.pricePerUnit ?? ''}
-                                            onChange={(e) =>
+                                            as="select"
+                                            disabled={!equipmentListEntryToEditViewModel.equipment}
+                                            defaultValue={equipmentListEntryToEditViewModel.equipmentPrice?.id}
+                                            onChange={(e) => {
+                                                const newEquipmentPrice =
+                                                    equipmentListEntryToEditViewModel.equipment?.prices.filter(
+                                                        (x) => x.id == toIntOrUndefined(e.target.value),
+                                                    )[0];
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
-                                                    pricePerUnit: toIntOrUndefined(e.target.value, true),
-                                                })
-                                            }
-                                        />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>kr/st</InputGroup.Text>
-                                        </InputGroup.Append>
-                                    </InputGroup>
-                                </Form.Group>
-                            </Col>
-                            <Col lg={4} xs={6}>
-                                <Form.Group>
-                                    <Form.Label>Pris per timme</Form.Label>
-                                    <InputGroup>
-                                        <Form.Control
-                                            type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
-                                            min="0"
-                                            disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
-                                            value={equipmentListEntryToEditViewModel?.pricePerHour ?? ''}
-                                            onChange={(e) =>
-                                                setEquipmentListEntryToEditViewModel({
-                                                    ...equipmentListEntryToEditViewModel,
-                                                    pricePerHour: toIntOrUndefined(e.target.value, true),
-                                                })
-                                            }
-                                        />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>kr/h</InputGroup.Text>
-                                        </InputGroup.Append>
-                                    </InputGroup>
-                                </Form.Group>
-                            </Col>
-                        </Row>
+                                                    ...(newEquipmentPrice
+                                                        ? getEquipmentListEntryPrices(newEquipmentPrice)
+                                                        : { equipmentPrice: undefined }),
+                                                });
+                                            }}
+                                        >
+                                            <option value={undefined}>Anpassat pris</option>
+                                            {equipmentListEntryToEditViewModel.equipment?.prices?.map((x) => (
+                                                <option key={x.id.toString()} value={x.id.toString()}>
+                                                    {x.name} {priceDisplayFn(x)}
+                                                </option>
+                                            ))}
+                                        </Form.Control>
+                                    </Form.Group>
+                                </Col>
+                                <Col lg={4} xs={6}>
+                                    <Form.Group>
+                                        <Form.Label>Pris per styck</Form.Label>
+                                        <InputGroup>
+                                            <Form.Control
+                                                type={
+                                                    !equipmentListEntryToEditViewModel.equipmentPrice
+                                                        ? 'number'
+                                                        : 'text'
+                                                }
+                                                min="0"
+                                                disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
+                                                value={equipmentListEntryToEditViewModel?.pricePerUnit ?? ''}
+                                                onChange={(e) =>
+                                                    setEquipmentListEntryToEditViewModel({
+                                                        ...equipmentListEntryToEditViewModel,
+                                                        pricePerUnit: toIntOrUndefined(e.target.value, true),
+                                                    })
+                                                }
+                                            />
+                                            <InputGroup.Append>
+                                                <InputGroup.Text>kr/st</InputGroup.Text>
+                                            </InputGroup.Append>
+                                        </InputGroup>
+                                    </Form.Group>
+                                </Col>
+                                <Col lg={4} xs={6}>
+                                    <Form.Group>
+                                        <Form.Label>Pris per timme</Form.Label>
+                                        <InputGroup>
+                                            <Form.Control
+                                                type={
+                                                    !equipmentListEntryToEditViewModel.equipmentPrice
+                                                        ? 'number'
+                                                        : 'text'
+                                                }
+                                                min="0"
+                                                disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
+                                                value={equipmentListEntryToEditViewModel?.pricePerHour ?? ''}
+                                                onChange={(e) =>
+                                                    setEquipmentListEntryToEditViewModel({
+                                                        ...equipmentListEntryToEditViewModel,
+                                                        pricePerHour: toIntOrUndefined(e.target.value, true),
+                                                    })
+                                                }
+                                            />
+                                            <InputGroup.Append>
+                                                <InputGroup.Text>kr/h</InputGroup.Text>
+                                            </InputGroup.Append>
+                                        </InputGroup>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+                        )}
                         <Row>
                             <Col lg={4} xs={6}>
                                 <Form.Group>
@@ -1401,9 +1815,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             // Since we are editing a partial model we need to set default values to any properties without value before saving
                             const entryToSave: EquipmentListEntry = {
                                 id: equipmentListEntryToEditViewModel.id ?? getNextEquipmentListEntryId(),
-                                sortIndex:
-                                    equipmentListEntryToEditViewModel.sortIndex ??
-                                    getNextSortIndex(list.equipmentListEntries),
+                                sortIndex: equipmentListEntryToEditViewModel.sortIndex ?? getNextSortIndex(listEntries),
                                 equipment: equipmentListEntryToEditViewModel.equipment,
                                 equipmentId: equipmentListEntryToEditViewModel.equipmentId,
                                 name: equipmentListEntryToEditViewModel.name ?? '',
@@ -1414,6 +1826,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                 pricePerHour: Math.abs(equipmentListEntryToEditViewModel.pricePerHour ?? 0),
                                 equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
                                 discount: Math.abs(equipmentListEntryToEditViewModel.discount ?? 0),
+                                isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
                             };
 
                             if (equipmentListEntryToEditViewModel.id) {
@@ -1421,7 +1834,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                             } else {
                                 saveList({
                                     ...list,
-                                    equipmentListEntries: [...list.equipmentListEntries, entryToSave],
+                                    listEntries: [...list.listEntries, entryToSave],
                                 });
                             }
 

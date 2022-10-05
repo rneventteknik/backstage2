@@ -97,7 +97,13 @@ type EquipmentStatisticViewModel = {
 
 const getEquipmentStatistics = (bookings: BookingViewModel[]): EquipmentStatisticViewModel[] => {
     const allEquipmentEntries = bookings.flatMap((b) =>
-        (b.equipmentLists ?? []).flatMap((l) => l.equipmentListEntries.map((x) => ({ ...x, list: l, booking: b }))),
+        (b.equipmentLists ?? []).flatMap((l) =>
+            [...l.listEntries, ...l.listHeadings.flatMap((x) => x.listEntries ?? [])].map((x) => ({
+                ...x,
+                list: l,
+                booking: b,
+            })),
+        ),
     );
     const equipmentEntriesByEquipmentId = groupBy(allEquipmentEntries, (entry) => entry?.equipment?.id ?? 0);
 

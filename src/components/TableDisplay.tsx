@@ -29,18 +29,21 @@ export type TableConfiguration<T extends HasId | HasStringId> = {
         columnWidth?: number;
         textAlignment?: 'left' | 'center' | 'right';
         cellHideSize?: 'sm' | 'md' | 'lg' | 'xl';
+        indentSubItems?: boolean;
         textTruncation?: boolean;
     }[];
 };
 
 type ListProps<T extends HasId | HasStringId> = {
     entities: T[];
+    subEntities?: { parentId: number | string; entities: T[] }[];
     configuration: TableConfiguration<T>;
     filterString?: string;
 };
 
 export const TableDisplay = <T extends HasId | HasStringId>({
     entities,
+    subEntities = [],
     configuration,
     filterString: filterStringFromParent,
 }: ListProps<T>): React.ReactElement => {
@@ -128,7 +131,20 @@ export const TableDisplay = <T extends HasId | HasStringId>({
 
     // Sort and filter the entities before we generate the table
     //
-    const sortedEntities = entities.sort(sortFn).filter(filterFn);
+    const sortedEntities = [...entities].sort(sortFn).filter(filterFn);
+    const sortedSubEntities = subEntities.map((list) => ({
+        parentId: list.parentId,
+        entities: list.entities.sort(sortFn).filter(filterFn),
+    }));
+
+    // Insert sub entities into table
+    //
+    sortedSubEntities.forEach((subList) => {
+        const index = sortedEntities.findIndex((x) => x.id === subList.parentId);
+        sortedEntities.splice(index + 1, 0, ...subList.entities);
+    });
+
+    const isSubItem = (item: T) => subEntities.some((list) => list.entities.some((x) => x.id === item.id));
 
     const entitiesToShow = configuration.hideTableCountControls ? sortedEntities : sortedEntities.slice(0, viewCount);
 
@@ -179,6 +195,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                                         ' ' +
                                         getCellDisplayClassName(p.cellHideSize) +
                                         ' ' +
+                                        (p.indentSubItems && isSubItem(entity) ? 'pl-4' : '') +
                                         (p.textTruncation ? styles.truncated : '') +
                                         ' align-middle'
                                     }

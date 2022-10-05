@@ -34,7 +34,8 @@ export const fetchBookings = async (): Promise<BookingObjectionModel[]> => {
     return BookingObjectionModel.query()
         .withGraphFetched('ownerUser')
         .withGraphFetched('timeReports.user')
-        .withGraphFetched('equipmentLists.equipmentListEntries.equipment');
+        .withGraphFetched('equipmentLists.listEntries.equipment')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment');
 };
 
 export const fetchBookingsForUser = async (userId: number): Promise<BookingObjectionModel[]> => {
@@ -50,9 +51,16 @@ export const fetchBookingsForEquipment = async (equipmentId: number): Promise<Bo
         .whereIn(
             'id',
             BookingObjectionModel.query()
-                .joinRelated('equipmentLists.equipmentListEntries')
-                .where('equipmentLists:equipmentListEntries.equipmentId', equipmentId)
-                .select('booking.id'),
+                .joinRelated('equipmentLists.listEntries')
+                .where('equipmentLists:listEntries.equipmentId', equipmentId)
+                .select('Booking.id'),
+        )
+        .orWhereIn(
+            'id',
+            BookingObjectionModel.query()
+                .joinRelated('equipmentLists.listHeadings.listEntries')
+                .where('equipmentLists:listHeadings:listEntries.equipmentId', equipmentId)
+                .select('Booking.id'),
         )
         .withGraphFetched('equipmentLists');
 };
@@ -71,9 +79,12 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
     return BookingObjectionModel.query()
         .where('id', id)
         .withGraphFetched('ownerUser')
-        .withGraphFetched('equipmentLists.equipmentListEntries')
-        .withGraphFetched('equipmentLists.equipmentListEntries.equipment.prices')
-        .withGraphFetched('equipmentLists.equipmentListEntries.equipmentPrice')
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('equipmentLists.listEntries.equipment.prices')
+        .withGraphFetched('equipmentLists.listEntries.equipmentPrice')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.prices')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipmentPrice')
         .withGraphFetched('timeEstimates')
         .withGraphFetched('timeReports.user')
         .withGraphFetched('changelog(changelogInfo)')
@@ -85,7 +96,7 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
         .modifyGraph('equipmentLists', (builder) => {
             builder.orderBy('sortIndex');
         })
-        .modifyGraph('equipmentLists.equipmentListEntries', (builder) => {
+        .modifyGraph('equipmentLists.listEntries', (builder) => {
             builder.orderBy('sortIndex');
         })
         .then((bookings) => bookings[0]);
@@ -97,7 +108,8 @@ export const fetchBookingWithEquipmentLists = async (id: number): Promise<Bookin
     return BookingObjectionModel.query()
         .where('id', id)
         .withGraphFetched('ownerUser')
-        .withGraphFetched('equipmentLists.equipmentListEntries.equipment.equipmentLocation')
+        .withGraphFetched('equipmentLists.listEntries.equipment.equipmentLocation')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.equipmentLocation')
         .withGraphFetched('timeEstimates')
         .withGraphFetched('changelog(changelogInfo)')
         .modifiers({
@@ -124,7 +136,7 @@ export const updateBooking = async (id: number, booking: BookingObjectionModel):
     const existingDatabaseModel = await BookingObjectionModel.query()
         .findById(id)
         .orderBy('id')
-        .withGraphFetched('equipmentLists.equipmentListEntries');
+        .withGraphFetched('equipmentLists.listEntries');
 
     // EquipmentLists.
     if (booking.equipmentLists !== undefined) {
@@ -188,8 +200,13 @@ export const fetchBookingsWithEquipmentInInterval = async (
     ensureDatabaseIsInitialized();
 
     let query = BookingObjectionModel.query()
-        .withGraphJoined('equipmentLists.equipmentListEntries')
-        .where('equipmentLists:equipmentListEntries.equipmentId', equipmentId);
+        .withGraphJoined('equipmentLists.listEntries')
+        .withGraphJoined('equipmentLists.listHeadings.listEntries')
+        .where((builder) =>
+            builder
+                .where('equipmentLists:listEntries.equipmentId', equipmentId)
+                .orWhere('equipmentLists:listHeadings:listEntries.equipmentId', equipmentId),
+        );
 
     if (endDatetime && startDatetime) {
         query = query
