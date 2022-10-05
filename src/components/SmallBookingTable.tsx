@@ -61,7 +61,7 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
         {
             key: 'date',
             displayName: 'Datum',
-            getValue: (booking: BookingViewModel) => booking.displayUsageInterval,
+            getValue: (booking: BookingViewModel) => booking.isoFormattedUsageStartString,
             getContentOverride: BookingUsageIntervalDisplayFn,
             columnWidth: 180,
         },

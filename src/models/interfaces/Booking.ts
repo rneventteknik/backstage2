@@ -52,4 +52,5 @@ export interface BookingViewModel extends Booking {
     displayUsageEndString: string;
     displayUsageInterval: string;
     displayEquipmentOutInterval: string;
+    isoFormattedUsageStartString: string;
 }

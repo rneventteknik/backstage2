@@ -283,6 +283,7 @@ const getDateDisplayValues = (entity: HasDatetimes, hasTimeValues: boolean, loca
             hasTimeValues,
             locale,
         ),
+        isoFormattedUsageStartString: formatDatetimeForForm(entity.usageStartDatetime),
     };
 };
 
