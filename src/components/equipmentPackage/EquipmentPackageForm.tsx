@@ -176,6 +176,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                 ...x,
                 created: x.created?.toString(),
                 updated: x.updated?.toString(),
+                equipment: undefined,
             })),
 
             equipmentEntries: selectedEquipmentPackageEntries.map((x) => ({

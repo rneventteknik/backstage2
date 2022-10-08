@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
 import styles from './EquipmentSearch.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCubes } from '@fortawesome/free-solid-svg-icons';
+import { faCubes, faTag } from '@fortawesome/free-solid-svg-icons';
 import { toEquipmentPackage } from '../lib/mappers/equipmentPackage';
 import { EquipmentSearchResult } from '../models/misc/SearchResult';
 import { getResponseContentOrError } from '../lib/utils';
 import { useNotifications } from '../lib/useNotifications';
-import { toEquipment } from '../lib/mappers/equipment';
+import { toEquipment, toEquipmentTag } from '../lib/mappers/equipment';
 import { BaseEntityWithName } from '../models/interfaces/BaseEntity';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../models/objection-models';
 import { Language } from '../models/enums/Language';
@@ -17,6 +17,7 @@ import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 export enum ResultType {
     EQUIPMENT,
     EQUIPMENTPACKAGE,
+    EQUIPMENTTAG,
 }
 export interface SearchResultViewModel extends BaseEntityWithName {
     type: ResultType;
@@ -30,6 +31,7 @@ type Props = {
     id: string;
     placeholder?: string;
     includePackages?: boolean;
+    includeTags?: boolean;
     language?: Language;
     onSelect?: (selected: SearchResultViewModel) => unknown;
     onFocus?: () => unknown;
@@ -40,6 +42,7 @@ const EquipmentSearch: React.FC<Props> = ({
     id,
     placeholder = '',
     includePackages = true,
+    includeTags = false,
     language = Language.SV,
     onSelect,
     onFocus,
@@ -56,7 +59,10 @@ const EquipmentSearch: React.FC<Props> = ({
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
         };
-        fetch('/api/search/equipment?s=' + searchString + '&includePackages=' + includePackages, request)
+        fetch(
+            `/api/search/equipment?s=${searchString}&includePackages=${includePackages}&includeTags=${includeTags}`,
+            request,
+        )
             .then(getResponseContentOrError)
             .then((data) => data as EquipmentSearchResult)
             .then(convertSearchResultsForDisplay)
@@ -85,6 +91,13 @@ const EquipmentSearch: React.FC<Props> = ({
                     url: '/equipment/' + equipment.id,
                     ...toEquipment(equipment),
                 })),
+            )
+            .concat(
+                results.equipmentTags.map((tag) => ({
+                    type: ResultType.EQUIPMENTTAG,
+                    url: '/equipment/' + tag.id,
+                    ...toEquipmentTag(tag),
+                })),
             );
     };
 
@@ -112,6 +125,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 <div>
                     <SplitHighlighter search={state.text} textToHighlight={displayName} />{' '}
                     {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
+                    {entity.type === ResultType.EQUIPMENTTAG ? <FontAwesomeIcon icon={faTag} /> : null}
                 </div>
                 <div>
                     <small>

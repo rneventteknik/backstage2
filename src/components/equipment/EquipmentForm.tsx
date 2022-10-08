@@ -81,6 +81,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                 ...x,
                 created: x.created?.toString(),
                 updated: x.updated?.toString(),
+                equipment: undefined,
             })),
             prices: prices.map((x) => toEquipmentPriceObjectionModel(x)),
             equipmentPublicCategoryId: toIntOrUndefined(getValueFromForm('publicCategory')) ?? null,

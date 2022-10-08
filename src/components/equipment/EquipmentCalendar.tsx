@@ -1,10 +1,10 @@
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
+import React, { ReactNode, useState } from 'react';
 import { Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
-import { addDays, formatDate } from '../../lib/datetimeUtils';
+import { addDays, formatDate, formatWeekDay } from '../../lib/datetimeUtils';
 import { bookingsFetcher } from '../../lib/fetchers';
 import { getMaximumNumberOfUnitUsed } from '../../lib/utils';
 import { Status } from '../../models/enums/Status';
@@ -16,9 +16,6 @@ type Props = {
 };
 
 const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
-    const dayOffsets = [0, 1, 2, 3, 4, 5, 6];
-    const dayLabels = ['Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör', 'Sön'];
-
     const thisWeek = new Date();
     thisWeek.setHours(0, 0, 0, 0); // Reset time part
     thisWeek.setDate(thisWeek.getDate() - ((thisWeek.getDay() + 6) % 7)); // Go to last Monday
@@ -28,14 +25,6 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
     const moreWeeks = [2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => addDays(thisWeek, 7 * x));
 
     const [startDate, setStartDate] = useState(thisWeek);
-
-    // Based on the selected start date, calculate the dates to show in the view
-    const days = dayOffsets.map((x) => ({
-        startDatetime: addDays(startDate, x),
-        endDatetime: addDays(startDate, x + 1),
-        label: dayLabels[x],
-        secondaryLabel: formatDate(addDays(startDate, x)),
-    }));
 
     if (!equipment) {
         return <Skeleton height={120}></Skeleton>;
@@ -68,21 +57,57 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                         </div>
                     </div>
                 </Card.Header>
-                <div className="d-flex">
-                    {days.map((d) => (
-                        <div className={styles.statusContainer} key={d.label}>
-                            <EquipmentCalendarDay
-                                equipment={equipment}
-                                label={d.label}
-                                secondaryLabel={d.secondaryLabel}
-                                startDatetime={d.startDatetime}
-                                endDatetime={d.endDatetime}
-                            />
-                        </div>
-                    ))}
-                </div>
+                <EquipmentCalendarRow equipment={equipment} startDate={startDate} numberOfDays={7} />
             </Card>
         </>
+    );
+};
+
+type EquipmentCalendarRowProps = {
+    equipment: Equipment;
+    startDate: Date;
+    numberOfDays: number;
+    highlightCriteria?: (date: Date) => boolean;
+    children?: ReactNode;
+};
+
+export const EquipmentCalendarRow: React.FC<EquipmentCalendarRowProps> = ({
+    equipment,
+    children,
+    startDate,
+    numberOfDays,
+    highlightCriteria,
+}: EquipmentCalendarRowProps) => {
+    const dayOffsets = [...Array(numberOfDays).keys()];
+
+    // Based on the selected start date, calculate the dates to show in the view
+    const days = dayOffsets.map((x) => ({
+        startDatetime: addDays(startDate, x),
+        endDatetime: addDays(startDate, x + 1),
+        label: formatWeekDay(addDays(startDate, x)),
+        secondaryLabel: formatDate(addDays(startDate, x)),
+    }));
+
+    if (!equipment) {
+        return null;
+    }
+
+    return (
+        <div className="d-flex">
+            {children ? <div className={styles.labelContainer + ' p-2 align-middle'}>{children}</div> : null}
+            {days.map((d) => (
+                <div className={styles.statusContainer} key={d.startDatetime.getTime() + '-' + equipment.id}>
+                    <EquipmentCalendarDay
+                        equipment={equipment}
+                        label={d.label}
+                        secondaryLabel={d.secondaryLabel}
+                        startDatetime={d.startDatetime}
+                        endDatetime={d.endDatetime}
+                        highlightCriteria={highlightCriteria}
+                    />
+                </div>
+            ))}
+        </div>
     );
 };
 
@@ -92,6 +117,7 @@ type EquipmentCalendarDayProps = {
     secondaryLabel: string;
     startDatetime: Date;
     endDatetime: Date;
+    highlightCriteria?: (date: Date) => boolean;
 };
 
 const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
@@ -100,6 +126,7 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
     endDatetime,
     label,
     secondaryLabel,
+    highlightCriteria,
 }: EquipmentCalendarDayProps) => {
     const { data, error, isValidating } = useSwr(
         '/api/conflict-detection/booking-with-equipment?equipmentId=' +
@@ -111,12 +138,23 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
         bookingsFetcher,
     );
 
-    if (isValidating && !equipment) {
-        return <Skeleton height={80} />;
+    if (isValidating && !data) {
+        return (
+            <div className="flex-grow-1">
+                <Skeleton height={78.4} />
+            </div>
+        );
     }
 
-    if (error) {
-        return <span className="text-danger">Fel!</span>;
+    if (error && !data) {
+        return (
+            <div className="p-2 flex-grow-1 text-danger">
+                <div className="text-center mb-2">Fel</div>
+                <div className="text-center py-2">
+                    <FontAwesomeIcon icon={faExclamationTriangle} size="lg" />
+                </div>
+            </div>
+        );
     }
 
     // Filter bookings
@@ -146,8 +184,16 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
         return null;
     };
 
+    const getHightlightClassName = () => {
+        if (highlightCriteria && highlightCriteria(startDatetime)) {
+            return styles.highlighted;
+        }
+
+        return '';
+    };
+
     return (
-        <div className={'p-2 flex-grow-1 ' + getClassName()}>
+        <div className={'p-2 flex-grow-1 ' + getClassName() + ' ' + getHightlightClassName()}>
             <div
                 className={
                     'text-center mb-2' +

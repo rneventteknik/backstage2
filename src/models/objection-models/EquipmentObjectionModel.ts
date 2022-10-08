@@ -98,10 +98,26 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
 
 export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName {
     color?: string;
+    equipment?: IEquipmentObjectionModel[];
 }
 
 export class EquipmentTagObjectionModel extends Model implements IEquipmentTagObjectionModel {
     static tableName = 'EquipmentTag';
+
+    static relationMappings: RelationMappingsThunk = () => ({
+        equipment: {
+            relation: Model.ManyToManyRelation,
+            modelClass: EquipmentObjectionModel,
+            join: {
+                from: 'EquipmentTag.id',
+                through: {
+                    from: 'EquipmentTagEquipment.equipmentTagId',
+                    to: 'EquipmentTagEquipment.equipmentId',
+                },
+                to: 'Equipment.id',
+            },
+        },
+    });
 
     id!: number;
     name!: string;
@@ -109,6 +125,7 @@ export class EquipmentTagObjectionModel extends Model implements IEquipmentTagOb
     updated?: string;
 
     color?: string;
+    equipment?: EquipmentObjectionModel[];
 }
 
 export interface IEquipmentPriceObjectionModel extends BaseObjectionModelWithName {

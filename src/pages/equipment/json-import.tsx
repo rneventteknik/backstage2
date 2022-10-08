@@ -286,6 +286,7 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser }: Props) 
                           ...x,
                           created: x.created?.toString(),
                           updated: x.updated?.toString(),
+                          equipment: undefined,
                       }))
                 : [],
             equipmentLocationId: equipment.equipmentLocationName

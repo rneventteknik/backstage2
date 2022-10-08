@@ -10,6 +10,7 @@ import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import {
     faAdd,
     faArchive,
+    faCalendarXmark,
     faCubes,
     faEyeSlash,
     faFileImport,
@@ -173,8 +174,13 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         <FontAwesomeIcon icon={faCubes} className="mr-1" /> Visa utrustningspaket
                     </Button>
                 </Link>
-                <IfAdmin currentUser={currentUser}>
-                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block">
+                <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block">
+                    <Link href="/equipment/compare-availability" passHref>
+                        <Dropdown.Item href={'/equipment/compare-availability'}>
+                            <FontAwesomeIcon icon={faCalendarXmark} className="mr-1 fa-fw" /> Jämför tillgänglighet
+                        </Dropdown.Item>
+                    </Link>
+                    <IfAdmin currentUser={currentUser}>
                         <Link href="/equipment/archived" passHref>
                             <Dropdown.Item href={'/equipment/archived'}>
                                 <FontAwesomeIcon icon={faArchive} className="mr-1 fa-fw" /> Visa arkiverad utrustning
@@ -186,8 +192,8 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                 JSON
                             </Dropdown.Item>
                         </Link>
-                    </DropdownButton>
-                </IfAdmin>
+                    </IfAdmin>
+                </DropdownButton>
             </Header>
 
             <Form.Row>

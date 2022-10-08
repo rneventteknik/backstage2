@@ -3,6 +3,7 @@ import {
     IEquipmentObjectionModel,
     IUserObjectionModel,
     IEquipmentPackageObjectionModel,
+    IEquipmentTagObjectionModel,
 } from '../objection-models';
 
 export interface SearchResult {
@@ -14,6 +15,7 @@ export interface SearchResult {
 export interface EquipmentSearchResult {
     equipment: IEquipmentObjectionModel[];
     equipmentPackages: IEquipmentPackageObjectionModel[];
+    equipmentTags: IEquipmentTagObjectionModel[];
 }
 
 export interface BookingsSearchResult {

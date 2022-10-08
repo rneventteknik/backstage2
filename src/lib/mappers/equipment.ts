@@ -45,6 +45,7 @@ export const toEquipmentTag = (objectionModel: IEquipmentTagObjectionModel): Equ
         id: objectionModel.id,
         updated: toDatetimeOrUndefined(objectionModel.updated),
         created: toDatetimeOrUndefined(objectionModel.created),
+        equipment: objectionModel.equipment ? objectionModel.equipment.map((x) => toEquipment(x)) : [],
     };
 };
 

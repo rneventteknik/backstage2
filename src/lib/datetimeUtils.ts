@@ -17,6 +17,10 @@ const dateFormatOptions: Intl.DateTimeFormatOptions = {
     day: 'numeric',
 };
 
+const weekdayFormatOptions: Intl.DateTimeFormatOptions = {
+    weekday: 'short',
+};
+
 const timeFormatOptions: Intl.DateTimeFormatOptions = {
     hour: 'numeric',
     minute: 'numeric',
@@ -28,6 +32,12 @@ const datetimeFormFormatOptions: Intl.DateTimeFormatOptions = {
     day: 'numeric',
     hour: 'numeric',
     minute: 'numeric',
+};
+
+const dateFormFormatOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
 };
 
 export const formatDatetime = (
@@ -42,6 +52,12 @@ export const formatDate = (
     locale: 'sv-SE' | 'en-SE' = 'sv-SE',
 ): string => (date ? date.toLocaleString(locale, dateFormatOptions) : defaultValue);
 
+export const formatWeekDay = (
+    date: Date | null | undefined,
+    defaultValue = '-',
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+): string => (date ? date.toLocaleString(locale, weekdayFormatOptions) : defaultValue);
+
 export const formatTime = (
     date: Date | null | undefined,
     defaultValue = '-',
@@ -53,6 +69,12 @@ export const formatDatetimeForForm = (
     defaultValue = '-',
     locale: 'sv-SE' | 'en-SE' = 'sv-SE',
 ): string => (date ? date.toLocaleString(locale, datetimeFormFormatOptions) : defaultValue);
+
+export const formatDateForForm = (
+    date: Date | null | undefined,
+    defaultValue = '-',
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+): string => (date ? date.toLocaleString(locale, dateFormFormatOptions) : defaultValue);
 
 // Check if value is a valid date
 //
