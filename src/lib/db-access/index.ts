@@ -77,3 +77,11 @@ export {
     insertInvoiceGroup,
     validateInvoiceGroupObjectionModel,
 } from './invoiceGroup';
+export {
+    fetchSalaryGroup,
+    fetchSalaryGroups,
+    updateSalaryGroup,
+    deleteSalaryGroup,
+    insertSalaryGroup,
+    validateSalaryGroupObjectionModel,
+} from './salaryGroup';
