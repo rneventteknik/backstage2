@@ -1,5 +1,5 @@
-import React from 'react';
-import { Alert, Table } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Alert, Button, ButtonGroup, Table } from 'react-bootstrap';
 import useSwr from 'swr';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
 import { equipmentsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
@@ -17,18 +17,27 @@ const containerStyle = {
 
 const pageTitle = 'Prislista';
 
+const addVatToPrice = (price: EquipmentPrice): EquipmentPrice => ({
+    ...price,
+    pricePerUnit: price.pricePerUnit * 1.25,
+    pricePerHour: price.pricePerHour * 1.25,
+    pricePerUnitTHS: price.pricePerUnitTHS * 1.25,
+    pricePerHourTHS: price.pricePerHourTHS * 1.25,
+});
+
 type PriceCellsProps = {
     price: EquipmentPrice;
+    showWithVat: boolean;
     hidePriceType?: boolean;
 };
 
-const PriceCells: React.FC<PriceCellsProps> = ({ price, hidePriceType }: PriceCellsProps) =>
+const PriceCells: React.FC<PriceCellsProps> = ({ price, hidePriceType, showWithVat }: PriceCellsProps) =>
     price ? (
         <>
             <td>{hidePriceType ? null : price.name}</td>
             <td>
-                <div>{formatPrice(price)}</div>
-                <div className="text-muted">{formatTHSPrice(price)}</div>
+                <div>{formatPrice(showWithVat ? addVatToPrice(price) : price)}</div>
+                <div className="text-muted">{formatTHSPrice(showWithVat ? addVatToPrice(price) : price)}</div>
             </td>
         </>
     ) : (
@@ -44,6 +53,9 @@ const PublicPricePage: React.FC = () => {
         '/api/public/equipmentPublicCategories',
         equipmentPublicCategoriesFetcher,
     );
+
+    const [language, setLanguage] = useState<'sv' | 'en'>('sv');
+    const [includeVat, setIncludeVAT] = useState(true);
 
     if (!equipment && !error && isValidating) {
         return (
@@ -97,6 +109,24 @@ const PublicPricePage: React.FC = () => {
     return (
         <div style={containerStyle}>
             <h1>{pageTitle}</h1>
+
+            <ButtonGroup className="mb-3 mr-2">
+                <Button variant={language === 'sv' ? 'primary' : 'secondary'} onClick={() => setLanguage('sv')}>
+                    Svenska
+                </Button>
+                <Button variant={language === 'en' ? 'primary' : 'secondary'} onClick={() => setLanguage('en')}>
+                    English
+                </Button>
+            </ButtonGroup>
+            <ButtonGroup className="mb-3">
+                <Button variant={includeVat ? 'primary' : 'secondary'} onClick={() => setIncludeVAT(true)}>
+                    Inklusive moms
+                </Button>
+                <Button variant={!includeVat ? 'primary' : 'secondary'} onClick={() => setIncludeVAT(false)}>
+                    Exklusive moms
+                </Button>
+            </ButtonGroup>
+
             {equipmentGroups.map((x) => (
                 <div key={`category-${x.category.id}`} className="mb-5">
                     {x.category.name ? <h5>{x.category.name}</h5> : null}
@@ -112,17 +142,20 @@ const PublicPricePage: React.FC = () => {
                                 <React.Fragment key={`equipment-${equipment.id}`}>
                                     <tr>
                                         <td rowSpan={equipment.prices.length > 0 ? equipment.prices.length : 1}>
-                                            <div>{equipment.name}</div>
-                                            <div className="text-muted">{equipment.description}</div>
+                                            <div>{language === 'sv' ? equipment.name : equipment.nameEN}</div>
+                                            <div className="text-muted">
+                                                {language === 'sv' ? equipment.description : equipment.descriptionEN}
+                                            </div>
                                         </td>
                                         <PriceCells
                                             price={equipment.prices[0]}
                                             hidePriceType={equipment.prices.length === 1}
+                                            showWithVat={includeVat}
                                         ></PriceCells>
                                     </tr>
                                     {equipment.prices.slice(1).map((price) => (
                                         <tr key={`equipment-${equipment.id}-price-${price.id}`}>
-                                            <PriceCells price={price}></PriceCells>
+                                            <PriceCells price={price} showWithVat={includeVat}></PriceCells>
                                         </tr>
                                     ))}
                                 </React.Fragment>
