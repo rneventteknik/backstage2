@@ -1406,7 +1406,7 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                                         confirmLabel="Töm listan"
                                         onConfirm={() => {
                                             setShowEmptyListModal(false);
-                                            saveList({ ...list, listEntries: [] });
+                                            saveList({ ...list, listEntries: [], listHeadings: [] });
                                         }}
                                         title="Bekräfta"
                                     >
