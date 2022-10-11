@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, Row } from 'react-bootstrap';
 import { Booking } from '../../models/interfaces';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import {
@@ -45,6 +45,7 @@ const BookingForm: React.FC<Props> = ({
     const [status, setStatus] = useState(booking.status);
     const [hoogiaIdIsRequired, setHogiaIdIsRequired] = useState((booking.invoiceAddress?.length ?? 0) === 0);
     const [invoceAddressIsRequired, setInvoceAddressIsRequired] = useState(!booking.invoiceHogiaId);
+    const [showAdvancedFields, setShowAdvancedFields] = useState(false);
 
     const { data: users } = useSwr('/api/users', usersFetcher);
 
@@ -194,6 +195,59 @@ const BookingForm: React.FC<Props> = ({
                         />
                     </Form.Group>
                 </Col>
+                <Col lg="3" md="6">
+                    <Form.Group controlId="formPricePlan">
+                        <Form.Label>
+                            Prisplan
+                            <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
+                        </Form.Label>
+                        <Form.Control
+                            as="select"
+                            name="pricePlan"
+                            defaultValue={booking.pricePlan}
+                            required={isFieldRequired(Status.DRAFT)}
+                        >
+                            {booking.pricePlan ? null : <option value="">Välj prisplan</option>}
+                            <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
+                            <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
+                <Col lg="3" md="6">
+                    <Form.Group controlId="formAccountKind">
+                        <Form.Label>
+                            Kontotyp
+                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                        </Form.Label>
+                        <Form.Control
+                            as="select"
+                            name="accountKind"
+                            defaultValue={booking.accountKind}
+                            required={isFieldRequired(Status.BOOKED)}
+                        >
+                            {booking.accountKind ? null : <option value="">Välj kontotyp</option>}
+                            <option value={AccountKind.EXTERNAL}>{getAccountKindName(AccountKind.EXTERNAL)}</option>
+                            <option value={AccountKind.INTERNAL}>{getAccountKindName(AccountKind.INTERNAL)}</option>
+                        </Form.Control>
+                    </Form.Group>
+                </Col>
+            </Row>
+            <Row>
+                <Col lg="6">
+                    <Form.Group controlId="formLocation">
+                        <Form.Label>
+                            Plats
+                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                        </Form.Label>
+                        <Form.Control
+                            required={isFieldRequired(Status.BOOKED)}
+                            type="text"
+                            placeholder="Nya Matsalen, Nymble"
+                            name="location"
+                            defaultValue={booking.location}
+                        />
+                    </Form.Group>
+                </Col>
                 <Col lg="3">
                     <Form.Group controlId="formOwnerUser">
                         <Form.Label>
@@ -232,59 +286,6 @@ const BookingForm: React.FC<Props> = ({
                         >
                             <option value={Language.SV}>{getLanguageName(Language.SV)}</option>
                             <option value={Language.EN}>{getLanguageName(Language.EN)}</option>
-                        </Form.Control>
-                    </Form.Group>
-                </Col>
-            </Row>
-            <Row>
-                <Col lg="6">
-                    <Form.Group controlId="formLocation">
-                        <Form.Label>
-                            Plats
-                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
-                        </Form.Label>
-                        <Form.Control
-                            required={isFieldRequired(Status.BOOKED)}
-                            type="text"
-                            placeholder="Nya Matsalen, Nymble"
-                            name="location"
-                            defaultValue={booking.location}
-                        />
-                    </Form.Group>
-                </Col>
-                <Col lg="3" md="6" sm="6">
-                    <Form.Group controlId="formAccountKind">
-                        <Form.Label>
-                            Kontotyp
-                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
-                        </Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="accountKind"
-                            defaultValue={booking.accountKind}
-                            required={isFieldRequired(Status.BOOKED)}
-                        >
-                            {booking.accountKind ? null : <option value="">Välj kontotyp</option>}
-                            <option value={AccountKind.EXTERNAL}>{getAccountKindName(AccountKind.EXTERNAL)}</option>
-                            <option value={AccountKind.INTERNAL}>{getAccountKindName(AccountKind.INTERNAL)}</option>
-                        </Form.Control>
-                    </Form.Group>
-                </Col>
-                <Col lg="3" md="6" sm="6">
-                    <Form.Group controlId="formPricePlan">
-                        <Form.Label>
-                            Prisplan
-                            <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
-                        </Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="pricePlan"
-                            defaultValue={booking.pricePlan}
-                            required={isFieldRequired(Status.DRAFT)}
-                        >
-                            {booking.pricePlan ? null : <option value="">Välj prisplan</option>}
-                            <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
-                            <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
                         </Form.Control>
                     </Form.Group>
                 </Col>
@@ -347,7 +348,7 @@ const BookingForm: React.FC<Props> = ({
                     <h6>Fakturainformation</h6>
                     <hr />
                     <Row>
-                        <Col lg="4" md="4">
+                        <Col lg="6" md="6">
                             <Form.Group controlId="formInvoiceHogiaId">
                                 <Form.Label>
                                     Hogia ID
@@ -364,21 +365,10 @@ const BookingForm: React.FC<Props> = ({
                                 />
                             </Form.Group>
                         </Col>
-                        <Col lg="4" md="4">
+                        <Col lg="6" md="6">
                             <Form.Group controlId="formInvoiceTag">
                                 <Form.Label>Fakturamärkning</Form.Label>
                                 <Form.Control type="text" name="invoiceTag" defaultValue={booking.invoiceTag} />
-                            </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4">
-                            <Form.Group controlId="formInvoiceNumber">
-                                <Form.Label>Fakturanummer</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder="22001"
-                                    name="invoiceNumber"
-                                    defaultValue={booking.invoiceNumber}
-                                />
                             </Form.Group>
                         </Col>
                     </Row>
@@ -405,6 +395,39 @@ const BookingForm: React.FC<Props> = ({
                     <hr />
                     <Row>
                         <Col>
+                            <Form.Group controlId="formReturnalNote">
+                                <Form.Label>Återlämningsanmärkning</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    name="returnalNote"
+                                    rows={6}
+                                    defaultValue={booking.returnalNote}
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Row>
+                </>
+            )}
+            {!showAdvancedFields ? (
+                <div className="d-flex">
+                    <div className="flex-grow-1"></div>
+                    <div>
+                        <Button
+                            className="mb-3"
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => setShowAdvancedFields(true)}
+                        >
+                            Visa avancerade fält
+                        </Button>
+                    </div>
+                </div>
+            ) : (
+                <>
+                    <h6>Avancerat</h6>
+                    <hr />
+                    <Row>
+                        <Col lg="4" md="4">
                             <Form.Group controlId="formPaymentStatus">
                                 <Form.Label>Betalningsstatus</Form.Label>
                                 <Form.Control as="select" name="paymentStatus" defaultValue={booking.paymentStatus}>
@@ -423,7 +446,7 @@ const BookingForm: React.FC<Props> = ({
                                 </Form.Control>
                             </Form.Group>
                         </Col>
-                        <Col>
+                        <Col lg="4" md="4">
                             <Form.Group controlId="formSalaryStatus">
                                 <Form.Label>Lönestatus</Form.Label>
                                 <Form.Control as="select" name="salaryStatus" defaultValue={booking.salaryStatus}>
@@ -434,24 +457,31 @@ const BookingForm: React.FC<Props> = ({
                                 </Form.Control>
                             </Form.Group>
                         </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <Form.Group controlId="formReturnalNote">
-                                <Form.Label>Återlämningsanmärkning</Form.Label>
+                        <Col lg="4" md="4">
+                            <Form.Group controlId="formInvoiceNumber">
+                                <Form.Label>Fakturanummer</Form.Label>
                                 <Form.Control
-                                    as="textarea"
-                                    name="returnalNote"
-                                    rows={6}
-                                    defaultValue={booking.returnalNote}
+                                    type="text"
+                                    placeholder="22001"
+                                    name="invoiceNumber"
+                                    defaultValue={booking.invoiceNumber}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col lg="4" md="4">
+                            <Form.Group controlId="calendarBookingId">
+                                <Form.Label>Kalender-id</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder=""
+                                    name="calendarBookingId"
+                                    defaultValue={booking?.calendarBookingId}
                                 />
                             </Form.Group>
                         </Col>
                     </Row>
                 </>
             )}
-
-            <Form.Control type="hidden" name="calendarBookingId" defaultValue={booking?.calendarBookingId} />
         </Form>
     );
 };
