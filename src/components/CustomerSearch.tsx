@@ -92,6 +92,16 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
                                 {getAccountKindName(entity.accountKind)}
                             </Badge>
                         ) : null}
+                        {entity.invoiceHogiaId != null ? (
+                            <Badge variant="dark" className="ml-1">
+                                Hogia-id
+                            </Badge>
+                        ) : null}
+                        {entity.invoiceAddress != null ? (
+                            <Badge variant="dark" className="ml-1">
+                                Fakturaadress
+                            </Badge>
+                        ) : null}
                         {entity.language === Language.EN ? (
                             <Badge variant="dark" className="ml-1">
                                 {getLanguageName(entity.language)}

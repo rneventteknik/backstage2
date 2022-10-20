@@ -79,8 +79,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             }
 
             // Try to detect rentals based on calendar event name
-            const rentalRegex = /\b[Hh]yra\b/;
-            if (calendarBooking.name?.search(rentalRegex) !== -1) {
+            if (calendarBooking.name?.toLowerCase()?.includes('[hyra]')) {
                 setSelectedDefaultBooking((booking) => ({ ...booking, bookingType: BookingType.RENTAL }));
             } else {
                 setSelectedDefaultBooking((booking) => ({ ...booking, bookingType: BookingType.GIG }));

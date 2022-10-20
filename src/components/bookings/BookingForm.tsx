@@ -207,7 +207,7 @@ const BookingForm: React.FC<Props> = ({
                             defaultValue={booking.pricePlan}
                             required={isFieldRequired(Status.DRAFT)}
                         >
-                            <option value="">Välj prisplan</option>
+                            {booking.pricePlan ? null : <option value="">Välj prisplan</option>}
                             <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
                             <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
                         </Form.Control>
