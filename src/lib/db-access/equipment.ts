@@ -30,16 +30,22 @@ export const searchEquipment = async (searchString: string, count: number): Prom
         .limit(count);
 };
 
-export const fetchEquipment = async (id: number): Promise<EquipmentObjectionModel | undefined> => {
+export const fetchEquipment = async (id: number): Promise<EquipmentObjectionModel> => {
     ensureDatabaseIsInitialized();
 
     return EquipmentObjectionModel.query()
-        .findById(id)
+        .where('id', id)
         .withGraphFetched('tags')
         .withGraphFetched('equipmentPublicCategory')
         .withGraphFetched('equipmentLocation')
         .withGraphFetched('prices')
-        .withGraphFetched('changeLog');
+        .withGraphFetched('changelog(changelogInfo)')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(250);
+            },
+        })
+        .then((equipment) => equipment[0]);
 };
 
 export const fetchEquipments = async (fetchArchived = false): Promise<EquipmentObjectionModel[]> => {

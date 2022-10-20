@@ -23,7 +23,7 @@ export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment
         image: undefined,
         tags: objectionModel.tags ? objectionModel.tags.map((x) => toEquipmentTag(x)) : [],
         prices: objectionModel.prices ? objectionModel.prices.map((x) => toEquipmentPrice(x)) : [],
-        changeLog: objectionModel.changeLog ? objectionModel.changeLog.map((x) => toEquipmentChangelogEntry(x)) : [],
+        changelog: objectionModel.changelog ? objectionModel.changelog.map((x) => toEquipmentChangelogEntry(x)) : [],
         equipmentPublicCategory: objectionModel.equipmentPublicCategory
             ? toEquipmentPublicCategory(objectionModel.equipmentPublicCategory)
             : undefined,

@@ -32,7 +32,7 @@ import { toBooking } from '../../../lib/mappers/booking';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Status } from '../../../models/enums/Status';
 import { PaymentStatus } from '../../../models/enums/PaymentStatus';
-import BookingChangelogCard from '../../../components/bookings/BookingChangelogCard';
+import ChangelogCard from '../../../components/ChangelogCard';
 import { formatNumberAsCurrency, getBookingPrice } from '../../../lib/pricingUtils';
 import { Language } from '../../../models/enums/Language';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
@@ -286,7 +286,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         </ListGroup>
                     </Card>
 
-                    <BookingChangelogCard changelog={booking.changelog ?? []} />
+                    <ChangelogCard changelog={booking.changelog ?? []} />
                 </Col>
                 <Col xl={8}>
                     <TimeEstimateList

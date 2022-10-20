@@ -17,7 +17,7 @@ export interface Equipment extends BaseEntityWithName {
     isArchived: boolean;
     equipmentPublicCategory?: EquipmentPublicCategory;
     equipmentLocation?: EquipmentLocation;
-    changeLog: EquipmentChangelogEntry[];
+    changelog: EquipmentChangelogEntry[];
     tags: EquipmentTag[];
     prices: EquipmentPrice[];
 }

@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import { Card, ListGroup, Modal } from 'react-bootstrap';
-import { formatDatetime } from '../../lib/datetimeUtils';
-import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
+import { formatDatetime } from '../lib/datetimeUtils';
+import { BookingChangelogEntry, EquipmentChangelogEntry } from '../models/interfaces/ChangeLogEntry';
 
 type Props = {
-    changelog: BookingChangelogEntry[];
+    changelog: BookingChangelogEntry[] | EquipmentChangelogEntry[];
 };
 
 const defaultListLength = 3;
 
-const BookingChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
+const ChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
     const [showAllModal, setShowAllModal] = useState(false);
 
     return (
@@ -51,4 +51,4 @@ const BookingChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
     );
 };
 
-export default BookingChangelogCard;
+export default ChangelogCard;

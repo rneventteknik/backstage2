@@ -17,6 +17,7 @@ import { faPen } from '@fortawesome/free-solid-svg-icons';
 import EquipmentCalendar from '../../../components/equipment/EquipmentCalendar';
 import EquipmentBookings from '../../../components/equipment/EquipmentBookings';
 import EquipmentTagDisplay from '../../../components/utils/EquipmentTagDisplay';
+import ChangelogCard from '../../../components/ChangelogCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -130,6 +131,8 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             ) : null}
                         </ListGroup>
                     </Card>
+
+                    <ChangelogCard changelog={equipment.changelog ?? []} />
                 </Col>
                 <Col xl={8}>
                     <EquipmentCalendar equipment={equipment} />

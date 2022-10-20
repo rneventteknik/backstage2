@@ -5,6 +5,7 @@ import {
     respondWithEntityNotFoundResponse,
     respondWithInvalidDataResponse,
 } from '../../../lib/apiResponses';
+import { EquipmentChangelogEntryType, logChangeToEquipment } from '../../../lib/changelogUtils';
 import { fetchEquipments } from '../../../lib/db-access';
 import { insertEquipment, validateEquipmentObjectionModel } from '../../../lib/db-access/equipment';
 import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
@@ -29,7 +30,11 @@ const handler = withSessionContext(
                 }
 
                 await insertEquipment(req.body.equipment)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        logChangeToEquipment(context.currentUser, result.id, EquipmentChangelogEntryType.CREATE).then(
+                            () => res.status(200).json(result),
+                        );
+                    })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
                 return;

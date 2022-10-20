@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { Model, RelationMappingsThunk } from 'objection';
-import { BaseObjectionModelWithName, BaseChangeLogObjectionModel } from '.';
-import { IUserObjectionModel, UserObjectionModel } from './UserObjectionModel';
+import { BaseObjectionModelWithName } from '.';
 
 export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     id: number;
@@ -22,7 +21,7 @@ export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     equipmentLocation?: IEquipmentLocationObjectionModel;
     tags?: IEquipmentTagObjectionModel[];
     prices?: IEquipmentPriceObjectionModel[];
-    changeLog?: IEquipmentChangelogEntryObjectionModel[];
+    changelog?: IEquipmentChangelogEntryObjectionModel[];
 }
 
 export class EquipmentObjectionModel extends Model implements IEquipmentObjectionModel {
@@ -49,7 +48,7 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
                 to: 'EquipmentPrice.equipmentId',
             },
         },
-        changeLog: {
+        changelog: {
             relation: Model.HasManyRelation,
             modelClass: EquipmentChangelogEntryObjectionModel,
             join: {
@@ -93,7 +92,7 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
 
     tags?: EquipmentTagObjectionModel[];
     prices?: EquipmentPriceObjectionModel[];
-    changeLog?: EquipmentChangelogEntryObjectionModel[];
+    changelog?: EquipmentChangelogEntryObjectionModel[];
 }
 
 export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName {
@@ -182,42 +181,20 @@ export class EquipmentLocationObjectionModel extends Model implements IEquipment
     sortIndex!: number;
 }
 
-export interface IEquipmentChangelogEntryObjectionModel
-    extends BaseChangeLogObjectionModel,
-        BaseObjectionModelWithName {}
+export interface IEquipmentChangelogEntryObjectionModel extends BaseObjectionModelWithName {
+    id: number;
+    name: string;
+    created: string;
+    updated: string;
+    equipmentId: number;
+}
 
 export class EquipmentChangelogEntryObjectionModel extends Model implements IEquipmentChangelogEntryObjectionModel {
     static tableName = 'EquipmentChangelogEntry';
 
-    static relationMappings: RelationMappingsThunk = () => ({
-        user: {
-            relation: Model.HasOneRelation,
-            modelClass: UserObjectionModel,
-            filter: (query) =>
-                query.select(
-                    'id',
-                    'name',
-                    'created',
-                    'updated',
-                    'memberStatus',
-                    'nameTag',
-                    'phoneNumber',
-                    'slackId',
-                    'emailAddress',
-                ),
-            join: {
-                from: 'EquipmentChangelogEntry.userId',
-                to: 'User.id',
-            },
-        },
-    });
-
     id!: number;
     name!: string;
-    created?: string;
-    updated?: string;
-    timestamp!: string;
-    description!: string;
-
-    user?: IUserObjectionModel;
+    created!: string;
+    updated!: string;
+    equipmentId!: number;
 }

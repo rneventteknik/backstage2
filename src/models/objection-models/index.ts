@@ -1,5 +1,3 @@
-import { IUserObjectionModel } from './UserObjectionModel';
-
 export { BookingObjectionModel } from './BookingObjectionModel';
 export { UserObjectionModel } from './UserObjectionModel';
 export {
@@ -38,10 +36,4 @@ export interface BaseObjectionModel {
     id?: number;
     created?: string;
     updated?: string;
-}
-
-export interface BaseChangeLogObjectionModel {
-    timestamp: string;
-    description: string;
-    user?: IUserObjectionModel;
 }

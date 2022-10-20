@@ -2,11 +2,21 @@ import { RentalStatus } from '../models/enums/RentalStatus';
 import { Status } from '../models/enums/Status';
 import { HasId } from '../models/interfaces/BaseEntity';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
+import { EquipmentChangelogEntryObjectionModel } from '../models/objection-models';
+import { BookingChangelogEntryObjectionModel } from '../models/objection-models/BookingObjectionModel';
 import {
     fetchBookingChangelogEntrysByBookingId,
     insertBookingChangelogEntry,
     updateBookingChangelogEntry,
 } from './db-access/bookingChangelogEntry';
+import {
+    fetchEquipmentChangelogEntrysByEquipmentId,
+    updateEquipmentChangelogEntry,
+    insertEquipmentChangelogEntry,
+} from './db-access/equipmentChangelogEntry';
+
+// Bookings
+//
 
 export enum BookingChangelogEntryType {
     CREATE,
@@ -58,9 +68,7 @@ const getRentalStatusActionString = (type: RentalStatus | null) => {
 // The deDuplicateTimeout is how far back (in seconds) we should look for a log entry to update instead of creating a new (duplicate one). Default is fifteen minutes (900 seconds).
 const addChangelogToBooking = async (message: string, bookingId: number, deDuplicateTimeout = 900) => {
     const logEntries = await fetchBookingChangelogEntrysByBookingId(bookingId);
-    const existingLogEntryToUpdate = logEntries.find(
-        (entry) => entry.name === message && new Date(entry.updated).getTime() > Date.now() - deDuplicateTimeout * 1000,
-    );
+    const existingLogEntryToUpdate = getExistingLogEntryToUpdate(logEntries, message, deDuplicateTimeout);
 
     if (existingLogEntryToUpdate) {
         updateBookingChangelogEntry(existingLogEntryToUpdate.id, existingLogEntryToUpdate);
@@ -99,6 +107,87 @@ export const logRentalStatusChangeToBooking = (
         0,
     );
 };
+
+// Equipment
+//
+
+export enum EquipmentChangelogEntryType {
+    CREATE,
+    EQUIPMENT,
+    PRICES,
+}
+
+const getEquipmentEditActionString = (type: EquipmentChangelogEntryType) => {
+    switch (type) {
+        case EquipmentChangelogEntryType.CREATE:
+            return 'skapade utrustningen';
+        case EquipmentChangelogEntryType.EQUIPMENT:
+            return 'redigerade utrustningen';
+        case EquipmentChangelogEntryType.PRICES:
+            return 'redigerade utrustningens priser';
+    }
+};
+
+const getEquipmentArchivalStatusActionString = (newArchivalStatus: boolean) => {
+    switch (newArchivalStatus) {
+        case true:
+            return 'arkiverade utrustningen';
+        case false:
+            return 'avarkiverade utrustningen';
+    }
+};
+
+// The deDuplicateTimeout is how far back (in seconds) we should look for a log entry to update instead of creating a new (duplicate one). Default is fifteen minutes (900 seconds).
+const addChangelogToEquipment = async (message: string, equipmentId: number, deDuplicateTimeout = 900) => {
+    const logEntries = await fetchEquipmentChangelogEntrysByEquipmentId(equipmentId);
+    const existingLogEntryToUpdate = getExistingLogEntryToUpdate(logEntries, message, deDuplicateTimeout);
+
+    if (existingLogEntryToUpdate) {
+        updateEquipmentChangelogEntry(existingLogEntryToUpdate.id, existingLogEntryToUpdate);
+        return message;
+    }
+
+    insertEquipmentChangelogEntry({
+        name: message,
+        equipmentId: equipmentId,
+    });
+
+    return message;
+};
+
+export const logChangeToEquipment = (
+    user: CurrentUserInfo,
+    equipmentId: number,
+    type = EquipmentChangelogEntryType.EQUIPMENT,
+) => {
+    return addChangelogToEquipment(`${user.name} ${getEquipmentEditActionString(type)}.`, equipmentId);
+};
+
+export const logArchivalStatusChangeToEquipment = (
+    user: CurrentUserInfo,
+    equipmentId: number,
+    newArchivalStatus: boolean,
+) => {
+    return addChangelogToEquipment(
+        `${user.name} ${getEquipmentArchivalStatusActionString(newArchivalStatus)}.`,
+        equipmentId,
+        0,
+    );
+};
+
+// Shared helpers
+//
+
+const getExistingLogEntryToUpdate = <
+    T extends BookingChangelogEntryObjectionModel | EquipmentChangelogEntryObjectionModel,
+>(
+    logEntries: T[],
+    message: string,
+    deDuplicateTimeout: number,
+) =>
+    logEntries.find(
+        (entry) => entry.name === message && new Date(entry.updated).getTime() > Date.now() - deDuplicateTimeout * 1000,
+    );
 
 // Note: this function only does a shallow compare of non-object and non-array properties.
 export const hasChanges = <T extends HasId>(entity: T, updates: Partial<T>, ignoreProperties: string[] = []) => {
