@@ -1,4 +1,5 @@
 import { Font, StyleSheet } from '@react-pdf/renderer';
+import { getNumberOfDays } from '../lib/datetimeUtils';
 import { Booking } from '../models/interfaces';
 import { PricedEntity } from '../models/interfaces/BaseEntity';
 import { EquipmentListEntry } from '../models/interfaces/EquipmentList';
@@ -81,10 +82,6 @@ export const commonStyles = StyleSheet.create({
     },
 });
 
-export const getBookingDocumentId = (booking: Booking): string => {
-    return `#${booking.created?.getFullYear()}-${booking.id}`;
-};
-
 export const formatEquipmentListEntryCount = (entry: EquipmentListEntry, t: (t: string) => string) => {
     if (entry.numberOfUnits === 1) {
         return `${entry.numberOfUnits} ${t('common.misc.count-unit-single')}`;
@@ -118,3 +115,19 @@ export const formatEquipmentListEntryPrice = (entry: PricedEntity, t: (t: string
         return `${entry.pricePerUnit} kr + ${entry.pricePerHour} kr/h`;
     }
 };
+
+export const allListsAreOneDay = (booking: Booking) =>
+    booking.equipmentLists &&
+    booking.equipmentLists.length > 0 &&
+    booking.equipmentLists.every((list) => getNumberOfDays(list) === 1);
+
+export const allListsHaveSameDates = (booking: Booking) =>
+    booking.equipmentLists &&
+    booking.equipmentLists.length > 0 &&
+    booking.equipmentLists.every(
+        (list) =>
+            booking.equipmentLists &&
+            list.numberOfDays === booking.equipmentLists[0]?.numberOfDays &&
+            list.usageEndDatetime?.getTime() === booking.equipmentLists[0]?.usageEndDatetime?.getTime() &&
+            list.usageStartDatetime?.getTime() === booking.equipmentLists[0]?.usageStartDatetime?.getTime(),
+    );

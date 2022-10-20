@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
     equipmentListSection: {
         flexDirection: 'column',
         marginBottom: 15,
+        marginLeft: 263,
     },
 });
 
@@ -26,8 +27,8 @@ export const TotalPriceSection: React.FC<Props> = ({ booking }: Props) => {
     const { t } = useTextResources();
 
     return (
-        <View style={styles.equipmentListSection}>
-            <Text style={styles.heading}>{t('common.total-price-section.heading')}</Text>
+        <View style={styles.equipmentListSection} wrap={false}>
+            <Text style={{ ...styles.heading, ...styles.bold }}>{t('common.total-price-section.heading')}</Text>
 
             <View>
                 {booking.equipmentLists?.map((list) => (

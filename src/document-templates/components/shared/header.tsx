@@ -8,13 +8,19 @@ const styles = StyleSheet.create({
         padding: 5,
         marginTop: 5,
         borderBottom: '1px solid black',
-        fontSize: 12,
+        fontSize: 14,
         fontFamily: 'Open Sans',
         flexDirection: 'row',
     },
-    title: {
+    titleContainer: {
         flexGrow: 1,
+        marginBottom: 3,
+    },
+    title: {
         fontWeight: 'bold',
+    },
+    subTitle: {
+        fontWeight: 'light',
     },
     aside: {
         fontWeight: 'light',
@@ -23,11 +29,14 @@ const styles = StyleSheet.create({
 
 type Props = {
     title: string;
-    documentId: string;
+    subTitle: string;
 };
-export const Header: React.FC<Props> = ({ title, documentId }: Props) => (
+export const Header: React.FC<Props> = ({ title, subTitle }: Props) => (
     <View style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.aside}>{documentId}</Text>
+        <View style={styles.titleContainer}>
+            <Text style={styles.title}>{title}</Text>
+            <Text style={styles.subTitle}>{subTitle}</Text>
+        </View>
+        <Text style={styles.aside}></Text>
     </View>
 );

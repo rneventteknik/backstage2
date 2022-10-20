@@ -72,7 +72,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking }: Props) => 
                     const isHeading = wrappedEntry.typeIdentifier === 'H';
                     return (
                         <>
-                            <TableRow key={wrappedEntry.id}>
+                            <TableRow key={wrappedEntry.id + wrappedEntry.typeIdentifier}>
                                 <TableCellAutoWidth>
                                     <Text>{wrappedEntry.entity.name}</Text>
                                     <Text style={{ color: '#999999' }}>{wrappedEntry.entity.description}</Text>

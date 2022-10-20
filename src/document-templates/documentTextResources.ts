@@ -5,12 +5,12 @@ import { Language } from '../models/enums/Language';
 export const documentTextResources: Record<Language, Record<string, string>> = {
     sv: {
         // Booking info
-        'common.booking-info.booking-gig': 'Arrangemang',
-        'common.booking-info.booking-rental': 'Hyra',
-        'common.booking-info.contact-person': 'Kontaktperson',
+        'common.booking-info.contact-person': 'Er referens',
         'common.booking-info.email-phone': 'Email / Telefon',
         'common.booking-info.our-reference': 'Vår referens',
-        'common.booking-info.print-date': 'Utskriftsdatum',
+        'common.booking-info.customer': 'Arrangör',
+        'common.booking-info.dates': 'Datum',
+        'common.booking-info.days': 'Antal dagar',
 
         // Equipment list
         'common.equipment-list.table-header.specification': 'Specifikation',
@@ -35,7 +35,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
 
         // Footer
         'common.footer.title': 'Backstage2',
-        'common.footer.content': process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION ?? '',
+        'common.footer.print-date': 'Utskriftsdatum',
 
         // Price estimate
         'price-estimate.filename': 'Prisuppskattning',
@@ -67,12 +67,12 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
     },
     en: {
         // Booking info
-        'common.booking-info.booking-gig': 'Event',
-        'common.booking-info.booking-rental': 'Rental',
-        'common.booking-info.contact-person': 'Contact person',
+        'common.booking-info.contact-person': 'Your reference',
         'common.booking-info.email-phone': 'Email / Telephone',
         'common.booking-info.our-reference': 'Our reference',
-        'common.booking-info.print-date': 'Print date',
+        'common.booking-info.customer': 'Organizer',
+        'common.booking-info.dates': 'Date',
+        'common.booking-info.days': 'Number of days',
 
         // Equipment list
         'common.equipment-list.table-header.specification': 'Item',
@@ -97,7 +97,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
 
         // Footer
         'common.footer.title': 'Backstage2',
-        'common.footer.content': process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION ?? '',
+        'common.footer.print-date': 'Print date',
 
         // Price estimate
         'price-estimate.filename': 'Price Estimate',

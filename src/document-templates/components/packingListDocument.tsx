@@ -1,7 +1,7 @@
 import React from 'react';
 import { Booking } from '../../models/interfaces';
 import { Page, View, Document } from '@react-pdf/renderer';
-import { commonStyles, getBookingDocumentId } from '../utils';
+import { commonStyles } from '../utils';
 import { BookingInfo } from './shared/bookingInfo';
 import { PageCount } from './shared/pageCount';
 import { Header } from './shared/header';
@@ -26,7 +26,7 @@ export const PackingListDocument: React.FC<Props> = ({ booking }: Props) => {
             <Page size="A4" style={styles.page}>
                 <PageCount />
 
-                <Header title={t('packing-list.title')} documentId={getBookingDocumentId(booking)} />
+                <Header title={t('packing-list.title')} subTitle={booking.name} />
                 <BookingInfo booking={booking} />
 
                 <MainContent>
@@ -37,7 +37,7 @@ export const PackingListDocument: React.FC<Props> = ({ booking }: Props) => {
                     </View>
                 </MainContent>
 
-                <Footer />
+                <Footer booking={booking} />
             </Page>
         </Document>
     );

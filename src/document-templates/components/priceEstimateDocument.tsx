@@ -1,7 +1,7 @@
 import React from 'react';
 import { Booking } from '../../models/interfaces';
 import { Page, View, Text, Document } from '@react-pdf/renderer';
-import { commonStyles, getBookingDocumentId } from '../utils';
+import { commonStyles } from '../utils';
 import { BookingInfo } from './shared/bookingInfo';
 import { PageCount } from './shared/pageCount';
 import { Header } from './shared/header';
@@ -29,7 +29,7 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking }: Props) => {
             <Page size="A4" style={styles.page}>
                 <PageCount />
 
-                <Header title={t('price-estimate.title')} documentId={getBookingDocumentId(booking)} />
+                <Header title={t('price-estimate.title')} subTitle={booking.name} />
                 <BookingInfo booking={booking} />
 
                 <MainContent>
@@ -38,14 +38,14 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking }: Props) => {
                             <EquipmentListInfo list={l} booking={booking} key={l.id} />
                         ))}
                         <TimeEstimateListInfo booking={booking} />
-                        <TotalPriceSection booking={booking} />
                     </View>
 
+                    <TotalPriceSection booking={booking} />
                     <Text style={styles.bold}>{t('price-estimate.legal-note.title')}</Text>
                     <Text>{t('price-estimate.legal-note.content')}</Text>
                 </MainContent>
 
-                <Footer />
+                <Footer booking={booking} />
             </Page>
         </Document>
     );
