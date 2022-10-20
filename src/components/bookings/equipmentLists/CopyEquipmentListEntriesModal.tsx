@@ -286,7 +286,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
         const entry = getEquipmentListEntryFromViewModel(viewModel);
 
         return (
-            <div onClick={() => toggleEquipmentListEntrySelection(entry)}>
+            <div onClick={() => (viewModel.isSubEntry ? null : toggleEquipmentListEntrySelection(entry))}>
                 <div className="mb-0">
                     {entry.name}
                     {resetNames && entry.name != getEquipmentName(entry.equipment) && !isDisabled(entry) ? (
