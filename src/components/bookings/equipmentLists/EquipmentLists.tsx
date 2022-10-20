@@ -524,13 +524,19 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
 
     const importEquipmentEntries = (
         equipmentListEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[],
+        equipmentListHeadings: {
+            name: string;
+            description: string;
+            listEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[];
+        }[],
     ) => {
-        let nextId = getNextEquipmentListEntryId();
+        let nextEntryId = getNextEquipmentListEntryId();
+        let nextHeadingId = getNextEquipmentListHeadingEntryId();
         let nextSortIndex = getNextSortIndex(listEntries);
 
-        const equipmentListEntriesToImport: EquipmentListEntry[] = equipmentListEntries.map((x) => {
+        const mapEntry = (x: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>) => {
             const entity: EquipmentListEntry = {
-                id: nextId,
+                id: nextEntryId,
                 sortIndex: nextSortIndex,
 
                 equipmentId: x.equipmentId,
@@ -548,13 +554,41 @@ const EquipmentListDisplay: React.FC<EquipmentListDisplayProps> = ({
                 isHidden: x.isHidden,
             };
 
-            nextId += 1;
+            nextEntryId -= 1;
             nextSortIndex += 10;
 
             return entity;
-        });
+        };
 
-        saveList({ ...list, listEntries: [...list.listEntries, ...equipmentListEntriesToImport] });
+        const mapHeading = (x: {
+            name: string;
+            description: string;
+            listEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[];
+        }) => {
+            const entity: EquipmentListHeading = {
+                id: nextHeadingId,
+                sortIndex: nextSortIndex,
+
+                name: x.name,
+                description: x.description,
+
+                listEntries: x.listEntries.map(mapEntry),
+            };
+
+            nextHeadingId -= 1;
+            nextSortIndex += 10;
+
+            return entity;
+        };
+
+        const equipmentListEntriesToImport: EquipmentListEntry[] = equipmentListEntries.map(mapEntry);
+        const equipmentListheadingsToImport: EquipmentListHeading[] = equipmentListHeadings.map(mapHeading);
+
+        saveList({
+            ...list,
+            listEntries: [...list.listEntries, ...equipmentListEntriesToImport],
+            listHeadings: [...list.listHeadings, ...equipmentListheadingsToImport],
+        });
     };
 
     // Function to save list. Note: this function instantly calls the API to save on the server.
