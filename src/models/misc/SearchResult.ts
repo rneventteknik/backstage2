@@ -5,6 +5,7 @@ import {
     IEquipmentPackageObjectionModel,
     IEquipmentTagObjectionModel,
 } from '../objection-models';
+import { ICustomerObjectionModel } from '../objection-models/CustomerObjectionModel';
 
 export interface SearchResult {
     bookings: IBookingObjectionModel[];
@@ -20,4 +21,8 @@ export interface EquipmentSearchResult {
 
 export interface BookingsSearchResult {
     bookings: IBookingObjectionModel[];
+}
+
+export interface CustomersSearchResult {
+    customers: ICustomerObjectionModel[];
 }

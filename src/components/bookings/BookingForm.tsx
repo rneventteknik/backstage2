@@ -207,7 +207,7 @@ const BookingForm: React.FC<Props> = ({
                             defaultValue={booking.pricePlan}
                             required={isFieldRequired(Status.DRAFT)}
                         >
-                            {booking.pricePlan ? null : <option value="">Välj prisplan</option>}
+                            <option value="">Välj prisplan</option>
                             <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
                             <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
                         </Form.Control>
@@ -225,7 +225,7 @@ const BookingForm: React.FC<Props> = ({
                             defaultValue={booking.accountKind}
                             required={isFieldRequired(Status.BOOKED)}
                         >
-                            {booking.accountKind ? null : <option value="">Välj kontotyp</option>}
+                            <option value="">Välj kontotyp</option>
                             <option value={AccountKind.EXTERNAL}>{getAccountKindName(AccountKind.EXTERNAL)}</option>
                             <option value={AccountKind.INTERNAL}>{getAccountKindName(AccountKind.INTERNAL)}</option>
                         </Form.Control>
@@ -482,6 +482,22 @@ const BookingForm: React.FC<Props> = ({
                     </Row>
                 </>
             )}
+
+            <Form.Control type="hidden" name="calendarBookingId" defaultValue={booking?.calendarBookingId} />
+            {isNewBooking ? (
+                <>
+                    <Form.Control
+                        type="hidden"
+                        name="invoiceHogiaId"
+                        defaultValue={booking.invoiceHogiaId ?? undefined}
+                    />
+                    <Form.Control
+                        type="hidden"
+                        name="invoiceAddress"
+                        defaultValue={booking.invoiceAddress ?? undefined}
+                    />
+                </>
+            ) : null}
         </Form>
     );
 };

@@ -77,6 +77,7 @@ export {
     insertInvoiceGroup,
     validateInvoiceGroupObjectionModel,
 } from './invoiceGroup';
+export { searchCustomers } from './customer';
 export {
     fetchSalaryGroup,
     fetchSalaryGroups,

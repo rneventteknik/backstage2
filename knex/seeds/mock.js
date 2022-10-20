@@ -1813,4 +1813,43 @@ export async function seed(knex) {
             invoiceGroupId: firstInvoiceGroupId,
         },
     ]);
+
+    await knex('Customer')
+        .insert([
+            {
+                name: 'Hatasektionen',
+                created: '2022-09-01 13:45',
+                updated: '2022-09-07 13:45',
+                pricePlan: 1,
+                accountKind: 0,
+                invoiceHogiaId: '45',
+            },
+            {
+                name: 'Hoppborgsnämnden',
+                created: '2022-10-01 13:45',
+                updated: '2022-10-07 13:45',
+                pricePlan: 1,
+                accountKind: 1,
+                invoiceHogiaId: '1',
+            },
+            {
+                name: 'Eventföretaget Expo & Ljus AB',
+                created: '2022-10-06 13:45',
+                updated: '2022-10-07 13:45',
+                pricePlan: 0,
+                accountKind: 0,
+                invoiceHogiaId: '2',
+            },
+            {
+                name: 'The Student Concert Society',
+                created: '2022-10-06 13:45',
+                updated: '2022-10-07 13:45',
+                pricePlan: 1,
+                accountKind: 0,
+                language: 'en',
+                invoiceAddress: 'Spexvägen 3',
+            },
+        ])
+        .returning('id')
+        .then((ids) => ids[0].id);
 }

@@ -22,6 +22,9 @@ import { Role } from '../../models/enums/Role';
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { addDays, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
+import CustomerSearch from '../../components/CustomerSearch';
+import { Customer } from '../../models/interfaces/Customer';
+import { BookingType } from '../../models/enums/BookingType';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
@@ -31,6 +34,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const router = useRouter();
     const pageTitle = 'Ny bokning';
     const [selectedDefaultBooking, setSelectedDefaultBooking] = useState<Partial<Booking> | undefined>();
+    const [wizardStep, setWizardStep] = useState<'step-one' | 'step-two' | 'step-three'>('step-one');
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
 
@@ -45,6 +49,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         setSelectedDefaultBooking(undefined);
         setStartDate(undefined);
         setEndDate(undefined);
+        setWizardStep('step-one');
     };
 
     const createBookingFrom = (calendarBooking: CalendarResult | null) => {
@@ -72,7 +77,37 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             } else {
                 setEndDate(toDatetimeOrUndefined(calendarBooking.end)?.toISOString());
             }
+
+            // Try to detect rentals based on calendar event name
+            const rentalRegex = /\b[Hh]yra\b/;
+            if (calendarBooking.name?.search(rentalRegex) !== -1) {
+                setSelectedDefaultBooking((booking) => ({ ...booking, bookingType: BookingType.RENTAL }));
+            } else {
+                setSelectedDefaultBooking((booking) => ({ ...booking, bookingType: BookingType.GIG }));
+            }
         }
+
+        setWizardStep('step-two');
+    };
+
+    const selectCustomer = (customer: Customer | null) => {
+        if (customer === null) {
+            setWizardStep('step-three');
+            return;
+        }
+
+        // Extend default booking with customer info
+        setSelectedDefaultBooking((booking) => ({
+            ...booking,
+            customerName: customer.name ?? undefined,
+            accountKind: customer.accountKind ?? undefined,
+            pricePlan: customer.pricePlan ?? undefined,
+            invoiceHogiaId: customer.invoiceHogiaId ?? undefined,
+            invoiceAddress: customer.invoiceAddress ?? undefined,
+            language: customer.language ?? undefined,
+        }));
+
+        setWizardStep('step-three');
     };
 
     const handleSubmit = async (booking: Partial<IBookingObjectionModel>) => {
@@ -122,7 +157,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
 
-            <Tab.Container id="new-booking-tabs" activeKey={selectedDefaultBooking ? 'step-two' : 'step-one'}>
+            <Tab.Container id="new-booking-tabs" activeKey={wizardStep}>
                 <Tab.Content>
                     <Tab.Pane eventKey="step-one">
                         <Card className="mb-3">
@@ -130,7 +165,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <Card.Body>
                                 <div className="d-flex">
                                     <p className="text-muted flex-grow-1 mb-0">
-                                        <strong>Steg 1 av 2</strong> Välj en bokning från kalendern nedan eller skapa en
+                                        <strong>Steg 1 av 3</strong> Välj en bokning från kalendern nedan eller skapa en
                                         manuellt.
                                     </p>
                                     <Button onClick={() => createBookingFrom(null)}>Skapa bokning manuellt</Button>
@@ -146,7 +181,30 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             <Card.Body>
                                 <div className="d-flex">
                                     <p className="text-muted flex-grow-1 mb-0">
-                                        <strong>Steg 2 av 2</strong> Fyll i bokningsdetaljerna nedan.
+                                        <strong>Steg 2 av 3</strong> Sök efter en kund nedan eller fortsätt utan kund.
+                                    </p>
+                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2">
+                                        Avbryt
+                                    </Button>
+                                    <Button onClick={() => selectCustomer(null)}>Fyll i kunddetaljer manuellt</Button>
+                                </div>
+                            </Card.Body>
+                        </Card>
+
+                        <CustomerSearch
+                            id={'customer-search'}
+                            placeholder="Sök..."
+                            onSelect={(x) => selectCustomer(x)}
+                            autoFocus={true}
+                        />
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="step-three">
+                        <Card className="mb-3">
+                            <Card.Header className="p-1"></Card.Header>
+                            <Card.Body>
+                                <div className="d-flex">
+                                    <p className="text-muted flex-grow-1 mb-0">
+                                        <strong>Steg 3 av 3</strong> Fyll i bokningsdetaljerna nedan.
                                     </p>
                                     <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2">
                                         Avbryt
@@ -157,7 +215,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                 </div>
                             </Card.Body>
                         </Card>
-                        {selectedDefaultBooking ? (
+                        {selectedDefaultBooking && wizardStep == 'step-three' ? (
                             <BookingForm
                                 handleSubmitBooking={handleSubmit}
                                 formId="editBookingForm"

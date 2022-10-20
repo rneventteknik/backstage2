@@ -152,7 +152,7 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
                 getValue: () => '',
                 getContentOverride: CalendarResultActionsDisplayFn,
                 disableSort: true,
-                columnWidth: 175,
+                columnWidth: 190,
                 textAlignment: 'center',
             },
         ],
