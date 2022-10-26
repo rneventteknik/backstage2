@@ -14,9 +14,11 @@ Our package manager of choice is [`yarn`](https://yarnpkg.com/). After cloning t
 
 `yarn seed` will seed your database with some mock data.
 
+`yarn reset-sqlite` will remove the existing sqlite database, create a new one, and seed it with data.
+
 `yarn dev` will start a local development server.
 
-`yarn type-check` will type-check all of the code using _Typescript_.
+`yarn tc` will type-check all of the code using _Typescript_.
 
 `yarn lint` will run _eslint_ on all relevant files and fix any problems it knows how to fix automatically.
 
