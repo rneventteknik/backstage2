@@ -179,7 +179,7 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser }: Props) 
             equipmentPublicCategoryId: equipment.equipmentPublicCategoryId ?? undefined,
             equipmentPublicCategory: undefined,
             tags: [],
-            changeLog: [],
+            changelog: [],
             prices:
                 equipment.prices?.map((price) => ({
                     name: price.name,

@@ -28,6 +28,10 @@ const IndexPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         <Layout title="Hem" fixedWidth={true} currentUser={currentUser}>
             <Header title="Backstage2" breadcrumbs={[]}></Header>
             <Row className="mb-3">
+                <Col xl={8}>
+                    <SmallBookingTable title="Mina Bokningar" bookings={myBookings}></SmallBookingTable>
+                    <SmallBookingTable title="Aktiva bokningar" bookings={activeBookings}></SmallBookingTable>
+                </Col>
                 <Col xl={4}>
                     <Card className="mb-3">
                         <Card.Header>Nuvarande session</Card.Header>
@@ -65,11 +69,6 @@ const IndexPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
-                </Col>
-
-                <Col xl={8}>
-                    <SmallBookingTable title="Mina Bokningar" bookings={myBookings}></SmallBookingTable>
-                    <SmallBookingTable title="Aktiva bokningar" bookings={activeBookings}></SmallBookingTable>
                 </Col>
             </Row>
         </Layout>

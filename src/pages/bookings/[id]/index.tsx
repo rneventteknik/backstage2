@@ -194,6 +194,27 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             </Header>
 
             <Row className="mb-3">
+                <Col xl={8}>
+                    <TimeEstimateList
+                        showContent={showTimeEstimateContent}
+                        setShowContent={setShowTimeEstimateContent}
+                        bookingId={booking.id}
+                        pricePlan={booking.pricePlan}
+                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                    />
+                    <TimeReportList
+                        showContent={showTimeReportContent}
+                        setShowContent={setShowTimeReportContent}
+                        bookingId={booking.id}
+                        pricePlan={booking.pricePlan}
+                        currentUser={currentUser}
+                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                    />
+                    <EquipmentLists
+                        bookingId={booking.id}
+                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                    />
+                </Col>
                 <Col xl={4}>
                     <Card className="mb-3">
                         <Card.Header>
@@ -286,27 +307,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     />
 
                     <ChangelogCard changelog={booking.changelog ?? []} />
-                </Col>
-                <Col xl={8}>
-                    <TimeEstimateList
-                        showContent={showTimeEstimateContent}
-                        setShowContent={setShowTimeEstimateContent}
-                        bookingId={booking.id}
-                        pricePlan={booking.pricePlan}
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
-                    />
-                    <TimeReportList
-                        showContent={showTimeReportContent}
-                        setShowContent={setShowTimeReportContent}
-                        bookingId={booking.id}
-                        pricePlan={booking.pricePlan}
-                        currentUser={currentUser}
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
-                    />
-                    <EquipmentLists
-                        bookingId={booking.id}
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
-                    />
                 </Col>
             </Row>
         </Layout>
