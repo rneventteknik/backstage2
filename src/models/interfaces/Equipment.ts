@@ -7,7 +7,7 @@ import { EquipmentPublicCategory } from './EquipmentPublicCategory';
 import { EquipmentLocation } from './EquipmentLocation';
 
 export interface Equipment extends BaseEntityWithName {
-    inventoryCount: number;
+    inventoryCount: number | null;
     nameEN: string;
     description: string;
     descriptionEN: string;

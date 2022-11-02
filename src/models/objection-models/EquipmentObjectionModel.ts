@@ -7,7 +7,7 @@ export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     name: string;
     created?: string;
     updated?: string;
-    inventoryCount: number;
+    inventoryCount: number | null;
     nameEN: string;
     description: string;
     descriptionEN: string;

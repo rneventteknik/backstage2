@@ -98,8 +98,9 @@ const tableSettings: TableConfiguration<Equipment> = {
         {
             key: 'count',
             displayName: 'Antal',
-            getValue: (equipment: Equipment) => equipment.inventoryCount,
-            getContentOverride: (equipment: Equipment) => equipment.inventoryCount + ' st',
+            getValue: (equipment: Equipment) => equipment.inventoryCount ?? '-',
+            getContentOverride: (equipment: Equipment) =>
+                equipment.inventoryCount === null ? '-' : equipment.inventoryCount + ' st',
             textAlignment: 'center',
             cellHideSize: 'md',
             columnWidth: 120,

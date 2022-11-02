@@ -36,7 +36,12 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                 <Card.Header>
                     <div className="d-flex">
                         <div className="flex-grow-1">
-                            Tillgänglighet<div className="text-muted">Minsta tillgängliga antal per dag</div>
+                            Tillgänglighet
+                            <div className="text-muted">
+                                {equipment.inventoryCount === null
+                                    ? 'Antal utlämnade'
+                                    : 'Minsta tillgängliga antal per dag'}
+                            </div>
                         </div>
                         <div>
                             <Form.Control
@@ -169,6 +174,10 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
             return styles.allAvailable;
         }
 
+        if (equipment.inventoryCount === null) {
+            return styles.someAvailable + ' text-dark';
+        }
+
         if (maxNumberOfUnitsUsed > 0 && maxNumberOfUnitsUsed < equipment.inventoryCount) {
             return styles.someAvailable + ' text-dark';
         }
@@ -233,9 +242,13 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
                             </Tooltip>
                         }
                     >
-                        <span>
-                            {equipment.inventoryCount - maxNumberOfUnitsUsed}&nbsp;/&nbsp;{equipment.inventoryCount}
-                        </span>
+                        {equipment.inventoryCount != null ? (
+                            <span>
+                                {equipment.inventoryCount - maxNumberOfUnitsUsed}&nbsp;/&nbsp;{equipment.inventoryCount}
+                            </span>
+                        ) : (
+                            <span>{maxNumberOfUnitsUsed} ute</span>
+                        )}
                     </OverlayTrigger>
                 )}
             </div>

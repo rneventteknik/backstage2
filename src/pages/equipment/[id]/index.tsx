@@ -87,7 +87,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Antal</span>
-                                <span>{equipment.inventoryCount}</span>
+                                <span>{equipment.inventoryCount ?? '-'}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Plats</span>

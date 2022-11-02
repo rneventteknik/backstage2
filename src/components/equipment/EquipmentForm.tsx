@@ -87,7 +87,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
             equipmentPublicCategoryId: toIntOrUndefined(getValueFromForm('publicCategory')) ?? null,
             equipmentLocationId: toIntOrUndefined(getValueFromForm('equipmentLocation')) ?? null,
 
-            inventoryCount: toIntOrUndefined(getValueFromForm('inventoryCount')) ?? 1,
+            inventoryCount: toIntOrUndefined(getValueFromForm('inventoryCount')) ?? null,
             publiclyHidden: getValueFromForm('publiclyHidden') === 'true',
             note: getValueFromForm('note'),
         };
@@ -170,12 +170,14 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                             <Form.Group controlId="formInventoryCount">
                                 <Form.Label>Antal i inventarie</Form.Label>
                                 <FormNumberFieldWithoutScroll
-                                    required
                                     type="number"
-                                    placeholder="15"
+                                    placeholder=""
                                     name="inventoryCount"
-                                    defaultValue={equipment?.inventoryCount}
+                                    defaultValue={equipment?.inventoryCount ?? undefined}
                                 />
+                                <Form.Text className="text-muted">
+                                    Lämna detta fält tomt för att stänga av inventariestatus.
+                                </Form.Text>
                             </Form.Group>
                         </Col>
                         <Col lg="9">

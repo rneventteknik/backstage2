@@ -44,6 +44,10 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
         );
     }
 
+    if (equipment.inventoryCount === null) {
+        return null;
+    }
+
     if (error) {
         return (
             <span className="text-danger">
