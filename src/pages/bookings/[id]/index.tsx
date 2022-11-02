@@ -43,6 +43,7 @@ import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/Tim
 import TimeReportAddButton from '../../../components/bookings/timeReport/TimeReportAddButton';
 import RentalStatusTag from '../../../components/utils/RentalStatusTag';
 import { getNumberOfBookingDays, getNumberOfEventHours, toBookingViewModel } from '../../../lib/datetimeUtils';
+import MarkdownCard from '../../../components/MarkdownCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -272,19 +273,17 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         </ListGroup>
                     </Card>
 
-                    <Card className="mb-3">
-                        <Card.Header>Anteckningar</Card.Header>
-                        <ListGroup variant="flush">
-                            <ListGroup.Item>
-                                <div className="mb-1">Anteckning</div>
-                                <div className="text-muted">{booking.note}</div>
-                            </ListGroup.Item>
-                            <ListGroup.Item>
-                                <div className="mb-1">Återlämningsanmärkning</div>
-                                <div className="text-muted">{booking.returnalNote}</div>
-                            </ListGroup.Item>
-                        </ListGroup>
-                    </Card>
+                    <MarkdownCard
+                        text={booking.note}
+                        onSubmit={(note) => saveBooking({ note })}
+                        cardTitle="Anteckningar"
+                    />
+
+                    <MarkdownCard
+                        text={booking.returnalNote}
+                        onSubmit={(returnalNote) => saveBooking({ returnalNote })}
+                        cardTitle="Återlämningsanmärkning"
+                    />
 
                     <ChangelogCard changelog={booking.changelog ?? []} />
                 </Col>

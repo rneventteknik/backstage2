@@ -294,7 +294,7 @@ const BookingForm: React.FC<Props> = ({
                 <Col>
                     <Form.Group controlId="formNote">
                         <Form.Label>Anteckningar</Form.Label>
-                        <Form.Control as="textarea" name="note" rows={2} defaultValue={booking.note} />
+                        <Form.Control as="textarea" name="note" rows={4} defaultValue={booking.note} />
                     </Form.Group>
                 </Col>
             </Row>
