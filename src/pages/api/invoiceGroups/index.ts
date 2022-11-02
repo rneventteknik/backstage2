@@ -10,18 +10,23 @@ import { SessionContext, withSessionContext } from '../../../lib/sessionContext'
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
+        if (context.currentUser.role != Role.ADMIN) {
+            respondWithAccessDeniedResponse(res);
+            return;
+        }
+
         switch (req.method) {
             case 'POST':
-                if (context.currentUser.role == Role.READONLY) {
-                    respondWithAccessDeniedResponse(res);
-                    return;
-                }
-
                 if (!req.body.invoiceGroup) {
                     throw Error('Missing invoiceGroup parameter');
                 }
 
                 if (!validateInvoiceGroupObjectionModel(req.body.invoiceGroup)) {
+                    respondWithInvalidDataResponse(res);
+                    return;
+                }
+
+                if (req.body.invoiceGroup.userId !== context.currentUser.userId) {
                     respondWithInvalidDataResponse(res);
                     return;
                 }
