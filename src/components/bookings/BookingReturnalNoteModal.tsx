@@ -1,18 +1,17 @@
 import React from 'react';
-import { Booking } from '../../models/interfaces';
 import EditTextModal from '../utils/EditTextModal';
 
 type Props = {
-    booking: Partial<Booking>;
+    returnalNote: string | undefined;
     onSubmit: (returnalNote: string) => void;
     onCancel?: () => void;
     hide: () => void;
     show: boolean;
 };
 
-const BookingReturnalNoteModal: React.FC<Props> = ({ booking, onSubmit, onCancel, hide, show }: Props) => (
+const BookingReturnalNoteModal: React.FC<Props> = ({ returnalNote, onSubmit, onCancel, hide, show }: Props) => (
     <EditTextModal
-        text={booking.returnalNote}
+        text={returnalNote}
         onSubmit={onSubmit}
         onCancel={onCancel}
         hide={hide}

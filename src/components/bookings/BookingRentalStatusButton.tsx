@@ -54,7 +54,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({ booking, onChange, classNa
                     <FontAwesomeIcon icon={faRightToBracket} className="mr-1" /> Ta emot
                 </Button>
                 <BookingReturnalNoteModal
-                    booking={booking}
+                    returnalNote={booking.returnalNote}
                     onSubmit={(returnalNote) => changeRentalStatusTo(RentalStatus.RETURNED, returnalNote)}
                     hide={() => setShowReturnalNoteModal(false)}
                     show={showReturnalNoteModal}
