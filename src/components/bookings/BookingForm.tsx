@@ -1,5 +1,5 @@
-import React, { FormEvent, useState } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import React, { FormEvent, useRef, useState } from 'react';
+import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { Booking } from '../../models/interfaces';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import {
@@ -25,6 +25,7 @@ import RequiredIndicator from '../utils/RequiredIndicator';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
 import { Language } from '../../models/enums/Language';
+import BookingSearchCustomerModal from './BookingSearchCustomerModal';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
@@ -46,8 +47,13 @@ const BookingForm: React.FC<Props> = ({
     const [hoogiaIdIsRequired, setHogiaIdIsRequired] = useState((booking.invoiceAddress?.length ?? 0) === 0);
     const [invoceAddressIsRequired, setInvoceAddressIsRequired] = useState(!booking.invoiceHogiaId);
     const [showAdvancedFields, setShowAdvancedFields] = useState(false);
+    const [showCustomerSearchModal, setCustomerSearchModal] = useState(false);
 
     const { data: users } = useSwr('/api/users', usersFetcher);
+
+    const customerNameField = useRef<HTMLInputElement>(null);
+    const hogiaField = useRef<HTMLInputElement>(null);
+    const invoiceAddressField = useRef<HTMLTextAreaElement>(null);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -123,7 +129,7 @@ const BookingForm: React.FC<Props> = ({
                 <Col lg="6">
                     <Form.Group controlId="formName">
                         <Form.Label>
-                            Namn
+                            Bokningsnamn
                             <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
                         <Form.Control
@@ -183,15 +189,38 @@ const BookingForm: React.FC<Props> = ({
                 <Col lg="6">
                     <Form.Group controlId="formLocation">
                         <Form.Label>
-                            Beställare
+                            Kundnamn
                             <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
                         </Form.Label>
-                        <Form.Control
-                            required={isFieldRequired(Status.BOOKED)}
-                            type="text"
-                            placeholder="THS"
-                            name="customerName"
-                            defaultValue={booking.customerName}
+
+                        <InputGroup className="mb-3">
+                            <Form.Control
+                                required={isFieldRequired(Status.BOOKED)}
+                                type="text"
+                                placeholder="THS"
+                                name="customerName"
+                                defaultValue={booking.customerName}
+                                ref={customerNameField}
+                            />
+                            <Button variant="secondary" className="ml-2" onClick={() => setCustomerSearchModal(true)}>
+                                Sök kund
+                            </Button>
+                        </InputGroup>
+
+                        <BookingSearchCustomerModal
+                            onSubmit={(customer) => {
+                                if (customerNameField.current) {
+                                    customerNameField.current.value = customer.name ?? '';
+                                }
+                                if (hogiaField.current) {
+                                    hogiaField.current.value = customer.invoiceHogiaId?.toString() ?? '';
+                                }
+                                if (invoiceAddressField.current) {
+                                    invoiceAddressField.current.value = customer.invoiceAddress ?? '';
+                                }
+                            }}
+                            hide={() => setCustomerSearchModal(false)}
+                            show={showCustomerSearchModal}
                         />
                     </Form.Group>
                 </Col>
@@ -356,12 +385,14 @@ const BookingForm: React.FC<Props> = ({
                                         required={isFieldRequired(Status.BOOKED) && hoogiaIdIsRequired}
                                     />
                                 </Form.Label>
+
                                 <FormNumberFieldWithoutScroll
                                     type="number"
                                     placeholder="1234"
                                     name="invoiceHogiaId"
                                     onChange={(e) => setInvoceAddressIsRequired(e.target.value.length === 0)}
                                     defaultValue={booking.invoiceHogiaId ?? undefined}
+                                    ref={hogiaField}
                                 />
                             </Form.Group>
                         </Col>
@@ -387,6 +418,7 @@ const BookingForm: React.FC<Props> = ({
                                     rows={3}
                                     onChange={(e) => setHogiaIdIsRequired(e.target.value.length === 0)}
                                     defaultValue={booking.invoiceAddress}
+                                    ref={invoiceAddressField}
                                 />
                             </Form.Group>
                         </Col>

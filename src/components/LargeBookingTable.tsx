@@ -48,7 +48,7 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
         },
         {
             key: 'customerName',
-            displayName: 'Beställare',
+            displayName: 'Kund',
             getValue: (booking: BookingViewModel) => booking.customerName ?? '-',
             textTruncation: true,
             cellHideSize: 'lg',
