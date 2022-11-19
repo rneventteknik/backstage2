@@ -39,6 +39,7 @@ export interface EquipmentListEntry extends BaseEntityWithName {
     equipmentPrice?: EquipmentPrice;
     discount: number;
     isHidden: boolean;
+    account: string | null;
 
     equipmentListId?: number;
     equipmentListHeadingId?: number;

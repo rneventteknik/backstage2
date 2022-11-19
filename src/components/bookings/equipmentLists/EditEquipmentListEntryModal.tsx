@@ -2,10 +2,11 @@ import React from 'react';
 import { Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
-import { toIntOrUndefined } from '../../../lib/utils';
+import { replaceEmptyStringWithNull, toIntOrUndefined } from '../../../lib/utils';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
 import { EquipmentPrice } from '../../../models/interfaces';
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 type Props = {
     show: boolean;
@@ -22,6 +23,15 @@ type Props = {
     nextId: number;
     nextSortIndex: number;
 };
+
+type Account = {
+    accountNumber: string;
+    description: string;
+};
+
+const invoiceAccounts: Account[] = process.env.NEXT_PUBLIC_INVOICE_ACCOUNTS
+    ? JSON.parse(process.env.NEXT_PUBLIC_INVOICE_ACCOUNTS)
+    : [];
 
 const EditEquipmentListEntryModal: React.FC<Props> = ({
     show,
@@ -197,6 +207,41 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                 </InputGroup>
                             </Form.Group>
                         </Col>
+                        <Col lg={8} xs={6}>
+                            <Form.Group>
+                                <Form.Label>Konto</Form.Label>
+                                <Typeahead<Account>
+                                    id="account-typeahead"
+                                    options={invoiceAccounts}
+                                    defaultInputValue={equipmentListEntryToEditViewModel.account ?? ''}
+                                    labelKey="accountNumber"
+                                    renderMenuItemChildren={(option) => {
+                                        return (
+                                            <>
+                                                {option.accountNumber}{' '}
+                                                <span className="text-muted">- {option.description}</span>
+                                            </>
+                                        );
+                                    }}
+                                    onChange={(s) =>
+                                        setEquipmentListEntryToEditViewModel({
+                                            ...equipmentListEntryToEditViewModel,
+                                            account: s.length > 0 ? s[0].accountNumber : '',
+                                        })
+                                    }
+                                    onInputChange={(s) =>
+                                        setEquipmentListEntryToEditViewModel({
+                                            ...equipmentListEntryToEditViewModel,
+                                            account: s,
+                                        })
+                                    }
+                                    placeholder="Följer bokningen"
+                                />
+                                <Form.Text className="text-muted">
+                                    Lämna fältet tomt för att låta kontot styras av bokningens kontotyp.
+                                </Form.Text>
+                            </Form.Group>
+                        </Col>
                     </Row>
                     <Row>
                         <Col>
@@ -267,6 +312,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                             equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
                             discount: Math.abs(equipmentListEntryToEditViewModel.discount ?? 0),
                             isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
+                            account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),
                         };
 
                         onSave(entryToSave, !equipmentListEntryToEditViewModel.id);

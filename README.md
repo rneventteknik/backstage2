@@ -47,9 +47,10 @@ CALENDAR_API_KEY={Google Calender API Key, with read-access to calendars}
 CALENDAR_ID={Google Calender ID to fetch events from}
 INVOICE_OUR_REFERENCE={Our reference on invoice exports, test suite expects value Person Personsson}
 INVOICE_DIMENSION_1={'Resultatställe' on invoice exports, test suite expects value 81}
-INVOICE_DEFAULT_EQUPEMENT_ACCOUNT={Equpment account on invoice exports, test suite expects value 3550}
+INVOICE_DEFAULT_EQUIPMENT_ACCOUNT={Equipment account on invoice exports, test suite expects value 3550}
 INVOICE_SALARY_ACCOUNT_EXTERNAL={Salary account for THS on invoice exports, test suite expects value 3620}
 INVOICE_SALARY_ACCOUNT_INTERNAL={Salary account for other customers on invoice exports, test suite expects value 7900}
+NEXT_PUBLIC_INVOICE_ACCOUNTS={json array with accounts, where each account is an object with `accountNumber` (string) and `description` (string)}
 ```
 
 ### Version Control

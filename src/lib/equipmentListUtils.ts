@@ -114,6 +114,7 @@ export const getDefaultListEntryFromEquipment = (
         description: language === Language.SV ? equipment.description : equipment.descriptionEN,
         discount: 0,
         isHidden: false,
+        account: null,
         ...prices,
     };
 
@@ -332,6 +333,7 @@ export const importEquipmentEntries = (
             pricePerUnit: x.pricePerUnit,
             pricePerHour: x.pricePerHour,
             isHidden: x.isHidden,
+            account: x.account,
         };
 
         nextEntryId -= 1;

@@ -75,7 +75,7 @@ const formatInvoiceRow = (
     numberOfUnits?: number,
     pricePerUnit?: number,
     discount?: number,
-    account?: string,
+    account?: string | null,
     unit?: string,
 ): string => {
     const rowFormat = new Map([
@@ -110,7 +110,7 @@ const formatEquipmentListEntry = (
             entry.numberOfUnits,
             getUnitPrice(entry, numberOfDays),
             getCalculatedDiscount(entry, numberOfDays),
-            process.env.INVOICE_DEFAULT_EQUPEMENT_ACCOUNT ?? '',
+            entry.account ?? process.env.INVOICE_DEFAULT_EQUIPMENT_ACCOUNT ?? '',
             t(unitTextResourceKey),
         ) +
         ((numberOfDays > 1 || entry.numberOfHours) && entry.pricePerUnit ? formatUnitPrices(entry, t) : '') +
@@ -131,7 +131,7 @@ const formatEquipmentListHeading = (
             1,
             getEquipmentListHeadingPrice(heading, numberOfDays),
             0,
-            process.env.INVOICE_DEFAULT_EQUPEMENT_ACCOUNT ?? '',
+            process.env.INVOICE_DEFAULT_EQUIPMENT_ACCOUNT ?? '',
             t('common.misc.count-unit-single'),
         ) +
         formatInvoiceRow(

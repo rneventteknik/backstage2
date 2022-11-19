@@ -376,23 +376,26 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                         </Dropdown.Item>
                         <Dropdown.Divider />
                         {getHeaderOfEntity(entry, list) ? (
-                            <Dropdown.Item onClick={() => moveListEntryIntoHeading(entry, null, list, saveList)}>
-                                <FontAwesomeIcon icon={faAngleLeft} className="mr-1 fa-fw" /> Flytta ut ur{' '}
-                                {getHeaderOfEntity(entry, list)?.name}
-                            </Dropdown.Item>
+                            <>
+                                <Dropdown.Item onClick={() => moveListEntryIntoHeading(entry, null, list, saveList)}>
+                                    <FontAwesomeIcon icon={faAngleLeft} className="mr-1 fa-fw" /> Flytta ut ur{' '}
+                                    {getHeaderOfEntity(entry, list)?.name}
+                                </Dropdown.Item>
+                            </>
                         ) : (
                             getSortedList(list.listHeadings).map((heading) => (
-                                <Dropdown.Item
-                                    key={heading.id}
-                                    onClick={() => moveListEntryIntoHeading(entry, heading.id, list, saveList)}
-                                >
-                                    <FontAwesomeIcon icon={faAngleRight} className="mr-1 fa-fw" /> Flytta in i{' '}
-                                    {heading.name}
-                                </Dropdown.Item>
+                                <>
+                                    <Dropdown.Item
+                                        key={heading.id}
+                                        onClick={() => moveListEntryIntoHeading(entry, heading.id, list, saveList)}
+                                    >
+                                        <FontAwesomeIcon icon={faAngleRight} className="mr-1 fa-fw" /> Flytta in i{' '}
+                                        {heading.name}
+                                    </Dropdown.Item>
+                                </>
                             ))
                         )}
-
-                        <Dropdown.Divider />
+                        {list.listHeadings.length > 0 ? <Dropdown.Divider /> : null}
                     </>
                 )}
                 <Dropdown.Item href={'/equipment/' + entry.equipmentId} target="_blank" disabled={!entry.equipment}>

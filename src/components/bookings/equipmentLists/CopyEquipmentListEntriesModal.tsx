@@ -38,6 +38,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
     const [resetNames, setResetNames] = useState<boolean>(true);
     const [resetPrices, setResetPrices] = useState<boolean>(true);
     const [resetManualPrices, setResetManualPrices] = useState<boolean>(true);
+    const [resetManualAccounts, setResetManualAccounts] = useState<boolean>(true);
 
     const { showErrorMessage } = useNotifications();
 
@@ -109,6 +110,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
             pricePerHour: x.pricePerHour,
             pricePerUnit: x.pricePerUnit,
             isHidden: x.isHidden,
+            account: x.account,
         };
 
         if (resetNames && x.equipment) {
@@ -124,6 +126,10 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                 entry.pricePerUnit = getEquipmentListEntryPrices(x.equipment.prices[0]).pricePerUnit;
                 entry.pricePerHour = getEquipmentListEntryPrices(x.equipment.prices[0]).pricePerHour;
             }
+        }
+
+        if (resetManualAccounts) {
+            entry.account = null;
         }
 
         return entry;
@@ -591,6 +597,14 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                             checked={resetManualPrices && resetPrices}
                                             onChange={() => setResetManualPrices(!resetManualPrices)}
                                             disabled={!resetPrices}
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="resetManualAccounts">
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Återställ anpassade konton"
+                                            checked={resetManualAccounts}
+                                            onChange={() => setResetManualAccounts(!resetManualAccounts)}
                                         />
                                     </Form.Group>
                                 </>
