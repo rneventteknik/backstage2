@@ -1,7 +1,12 @@
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles } from '../../utils';
-import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
+import {
+    formatNumberAsCurrency,
+    getTimeEstimatePrice,
+    getTotalTimeEstimatesPrice,
+    addVAT,
+} from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { useTextResources } from '../../useTextResources';
 import { Booking } from '../../../models/interfaces';
@@ -51,10 +56,10 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking }: Props) => {
                             </Text>
                         </TableCellFixedWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{formatNumberAsCurrency(timeEstimate.pricePerHour)}</Text>
+                            <Text>{formatNumberAsCurrency(addVAT(timeEstimate.pricePerHour))}</Text>
                         </TableCellFixedWidth>
                         <TableCellFixedWidth width={180} textAlign="right">
-                            <Text>{formatNumberAsCurrency(getTimeEstimatePrice(timeEstimate))}</Text>
+                            <Text>{formatNumberAsCurrency(addVAT(getTimeEstimatePrice(timeEstimate)))}</Text>
                         </TableCellFixedWidth>
                     </TableRow>
                 ))}
@@ -66,7 +71,7 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking }: Props) => {
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={40} textAlign="right">
                     <Text style={styles.bold}>
-                        {formatNumberAsCurrency(getTotalTimeEstimatesPrice(booking.timeEstimates))}
+                        {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
                     </Text>
                 </TableCellFixedWidth>
             </TableRow>

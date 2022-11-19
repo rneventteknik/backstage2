@@ -32,6 +32,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.total-price-section.heading': 'Totalt',
         'common.total-price-section.time-estimate-sum': 'Personalkostnader',
         'common.total-price-section.total-sum': 'Att betala SEK',
+        'common.total-price-section.vat': 'Varav moms (25%)',
 
         // Footer
         'common.footer.title': 'Backstage2',
@@ -107,6 +108,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.total-price-section.heading': 'Total',
         'common.total-price-section.time-estimate-sum': 'Personnel costs',
         'common.total-price-section.total-sum': 'To pay SEK',
+        'common.total-price-section.vat': 'VAT (25%)',
 
         // Footer
         'common.footer.title': 'Backstage2',

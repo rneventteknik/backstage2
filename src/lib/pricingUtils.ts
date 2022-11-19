@@ -91,6 +91,8 @@ export const getBookingPrice = (booking: Booking, forceEstimatedTime = false): n
     return equipmentPrice + timeEstimatePrice;
 };
 
+export const addVAT = (price: number): number => 1.25 * price;
+
 // Format price
 //
 export const formatPrice = (price: PricedEntity): string => {
