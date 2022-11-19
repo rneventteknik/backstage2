@@ -28,7 +28,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.time-estimate-list.table-header.total-price': 'Belopp',
         'common.time-estimate-list.total': 'Total',
 
-        // Booking total sectopm
+        // Booking total section
         'common.total-price-section.heading': 'Totalt',
         'common.total-price-section.time-estimate-sum': 'Personalkostnader',
         'common.total-price-section.total-sum': 'Att betala SEK',
@@ -47,6 +47,19 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         // Packing list
         'packing-list.filename': 'Packlista',
         'packing-list.title': 'Packlista',
+
+        // Rental agreement
+        'rental-agreement.filename': 'Hyresavtal',
+        'rental-agreement.title': 'Hyresavtal',
+        'rental-agreement.legal-note.title': 'Hyresvillkor',
+        'rental-agreement.legal-note.content':
+            'Utrustningen skall lämnas tillbaka i det skick och nedpackat på samma vis som den hämtades i. Detta innebär att alla kablar skall rullas ihop snyggt och om något blivit smutsigt, kladdigt eller lämnats kvar tejprester på skall detta göras rent.',
+        'rental-agreement.signature.1': 'Namnteckning:',
+        'rental-agreement.signature.2': 'Datum:',
+        'rental-agreement.signature.3': 'Ort:',
+        'rental-agreement.signature.4': 'Namnförtydligande:',
+        'rental-agreement.signature.5': 'Personnummer:',
+        'rental-agreement.signature.6': 'Utlämnat av:',
 
         // Misc
         'common.pagenumber.label': 'Sida',
@@ -90,7 +103,7 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.time-estimate-list.table-header.total-price': 'Total price',
         'common.time-estimate-list.total': 'Total',
 
-        // Booking total sectopm
+        // Booking total section
         'common.total-price-section.heading': 'Total',
         'common.total-price-section.time-estimate-sum': 'Personnel costs',
         'common.total-price-section.total-sum': 'To pay SEK',
@@ -109,6 +122,19 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         // Packing list
         'packing-list.filename': 'Packing List',
         'packing-list.title': 'Packing list',
+
+        // Rental agreement
+        'rental-agreement.filename': 'Rental agreement',
+        'rental-agreement.title': 'Rental agreement',
+        'rental-agreement.legal-note.title': 'Rental conditions',
+        'rental-agreement.legal-note.content':
+            'The equipment shall be returned in the same condition and packed in the same wat as it was picked up in. All cabled should be neatly rolled and if anything has become dirty or sticky it must be cleaned.',
+        'rental-agreement.signature.1': 'Signature:',
+        'rental-agreement.signature.2': 'Date:',
+        'rental-agreement.signature.3': 'Place:',
+        'rental-agreement.signature.4': 'Name in block letters:',
+        'rental-agreement.signature.5': 'Personal identity number:',
+        'rental-agreement.signature.6': 'Handed out by:',
 
         // Misc
         'common.pagenumber.label': 'Page',

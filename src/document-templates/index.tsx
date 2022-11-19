@@ -5,6 +5,7 @@ import { registerFonts } from './utils';
 import { getTextResource, TextResourcesLanguageContext } from './useTextResources';
 import { PackingListDocument } from './components/packingListDocument';
 import { Language } from '../models/enums/Language';
+import { RentalConfirmationDocument } from './components/rentalConfirmationDocument';
 
 registerFonts();
 
@@ -25,6 +26,15 @@ export const getPackingListDocument = (booking: Booking, documentLanguage: Langu
 
 export const getPackingListDocumentFileName = (booking: Booking, documentLanguage: Language): string =>
     `${getTextResource('packing-list.filename', documentLanguage)} ${booking.name}.pdf`;
+
+export const getRentalConfirmationDocument = (booking: Booking, documentLanguage: Language): ReactElement => (
+    <TextResourcesLanguageContext.Provider value={documentLanguage}>
+        <RentalConfirmationDocument booking={booking} />
+    </TextResourcesLanguageContext.Provider>
+);
+
+export const getRentalConfirmationDocumentFileName = (booking: Booking, documentLanguage: Language): string =>
+    `${getTextResource('rental-agreement.filename', documentLanguage)} ${booking.name}.pdf`;
 
 export const getHogiaInvoiceFileName = (booking: Booking): string =>
     `${booking.invoiceNumber ?? ''} ${booking.name}.txt`;

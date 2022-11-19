@@ -51,15 +51,28 @@ export const commonStyles = StyleSheet.create({
         fontSize: 8,
         fontFamily: 'Roboto',
     },
+    row: {
+        flexDirection: 'row',
+    },
     col: {
         padding: 5,
         flexGrow: 1,
+        flexBasis: 0,
     },
     flexGrow: {
         flexGrow: 1,
     },
     marginBottom: {
-        marginBottom: 5,
+        marginBottom: '5px',
+    },
+    marginBottomLarge: {
+        marginBottom: '15px',
+    },
+    marginTop: {
+        marginTop: '5px',
+    },
+    marginTopLarge: {
+        marginTop: '15px',
     },
     bold: {
         fontWeight: 700,

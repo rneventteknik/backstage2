@@ -153,6 +153,12 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         <Dropdown.Item href={'/api/documents/packing-list/sv/' + booking.id} target="_blank">
                             <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Packlista
                         </Dropdown.Item>
+                        <Dropdown.Item
+                            href={`/api/documents/rental-agreement/${booking.language}/` + booking.id}
+                            target="_blank"
+                        >
+                            <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Hyresavtal
+                        </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
                 <IfNotReadonly currentUser={currentUser}>

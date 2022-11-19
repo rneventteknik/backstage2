@@ -9,8 +9,19 @@ const styles = StyleSheet.create({
         flexDirection: 'column',
         marginBottom: 20,
     },
-    row: { flexDirection: 'row', width: '100%', borderBottom: '1px solid #DDDDDD', paddingBottom: 5, paddingTop: 5 },
+    tableRow: {
+        flexDirection: 'row',
+        width: '100%',
+        borderBottom: '1px solid #DDDDDD',
+        paddingBottom: 5,
+        paddingTop: 5,
+    },
 });
+
+type RowProps = {
+    children?: ReactNode;
+};
+export const Row: React.FC<RowProps> = ({ children }: RowProps) => <View style={styles.row}>{children}</View>;
 
 type ColProps = {
     children?: ReactNode;
@@ -23,7 +34,7 @@ type InfoItemProps = {
 };
 export const InfoItem: React.FC<InfoItemProps> = ({ title, content }: InfoItemProps) => (
     <View style={[styles.marginBottom, { flexDirection: 'row' }]}>
-        <View style={[styles.flexGrow, { flex: '0 0 80' }]}>
+        <View style={[styles.flexGrow, { flex: '0 0 70' }]}>
             <Text>{title}:</Text>
         </View>
         <View style={styles.flexGrow}>
@@ -36,7 +47,7 @@ type TableRowProps = {
     children?: ReactNode;
 };
 export const TableRow: React.FC<TableRowProps> = ({ children }: TableRowProps) => (
-    <View style={styles.row}>{children}</View>
+    <View style={styles.tableRow}>{children}</View>
 );
 
 type TableCellFixedWidthProps = {

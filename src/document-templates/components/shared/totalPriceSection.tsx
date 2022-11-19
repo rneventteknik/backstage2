@@ -22,8 +22,9 @@ const styles = StyleSheet.create({
 
 type Props = {
     booking: Booking;
+    showPersonnelCosts?: boolean;
 };
-export const TotalPriceSection: React.FC<Props> = ({ booking }: Props) => {
+export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts = true }: Props) => {
     const { t } = useTextResources();
 
     return (
@@ -41,14 +42,16 @@ export const TotalPriceSection: React.FC<Props> = ({ booking }: Props) => {
                         </TableCellFixedWidth>
                     </TableRow>
                 ))}
-                <TableRow>
-                    <TableCellAutoWidth>
-                        <Text>{t('common.total-price-section.time-estimate-sum')}</Text>
-                    </TableCellAutoWidth>
-                    <TableCellFixedWidth width={40} textAlign="right">
-                        <Text>{formatNumberAsCurrency(getTotalTimeEstimatesPrice(booking.timeEstimates))}</Text>
-                    </TableCellFixedWidth>
-                </TableRow>
+                {showPersonnelCosts ? (
+                    <TableRow>
+                        <TableCellAutoWidth>
+                            <Text>{t('common.total-price-section.time-estimate-sum')}</Text>
+                        </TableCellAutoWidth>
+                        <TableCellFixedWidth width={40} textAlign="right">
+                            <Text>{formatNumberAsCurrency(getTotalTimeEstimatesPrice(booking.timeEstimates))}</Text>
+                        </TableCellFixedWidth>
+                    </TableRow>
+                ) : null}
             </View>
 
             <TableRow>
