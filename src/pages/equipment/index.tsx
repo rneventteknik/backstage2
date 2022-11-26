@@ -96,6 +96,13 @@ const tableSettings: TableConfiguration<Equipment> = {
             getContentOverride: EquipmentNameDisplayFn,
         },
         {
+            key: 'location',
+            displayName: 'Plats',
+            getValue: (equipment: Equipment) => equipment.equipmentLocation?.name ?? '-',
+            cellHideSize: 'xl',
+            columnWidth: 200,
+        },
+        {
             key: 'count',
             displayName: 'Antal',
             getValue: (equipment: Equipment) => equipment.inventoryCount ?? '-',
@@ -124,10 +131,10 @@ const pageTitle = 'Utrustning';
 const breadcrumbs = [{ link: 'equipment', displayName: pageTitle }];
 
 const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
-    const { data: equipment, error, isValidating } = useSwr('/api/equipment', equipmentsFetcher);
+    const { data: equipment, error } = useSwr('/api/equipment', equipmentsFetcher);
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
-    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+    const [showAdvancedFilters, setShowAdvancedFilters] = useState(true);
     const [searchText, setSearchText] = useState('');
     const [filterTags, setFilterTags] = useState<EquipmentTag[]>([]);
     const [filterPubliclyHidden, setFilterPubliclyHidden] = useState('all');
@@ -136,7 +143,7 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
     }
 
-    if (isValidating || !equipment) {
+    if (!equipment) {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
     }
 

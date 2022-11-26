@@ -60,7 +60,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
             : SortDirection.Descending,
     );
     const [storedFilterString, setFilterString] = React.useState<string>('');
-    const [viewCount, setViewCount] = React.useState(25);
+    const [viewCount, setViewCount] = React.useState(200);
 
     // Check if we should use the tables filter field or the filter string from the parent
     //
