@@ -58,13 +58,16 @@ export const getPricePlanName = (pricePlan: PricePlan): string => {
     }
 };
 
-export const getAccountKindName = (accountKind: AccountKind): string => {
+export const getAccountKindName = (accountKind: AccountKind | null): string => {
     switch (accountKind) {
         case AccountKind.EXTERNAL:
             return 'Normal';
 
         case AccountKind.INTERNAL:
             return 'Intern';
+
+        case null:
+            return '-';
     }
 };
 

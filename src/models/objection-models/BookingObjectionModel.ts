@@ -36,7 +36,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     note: string;
     returnalNote: string;
     pricePlan: number;
-    accountKind: number;
+    accountKind: number | null;
     location: string;
     contactPersonName: string;
     contactPersonPhone: string;

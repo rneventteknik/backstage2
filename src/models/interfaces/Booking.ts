@@ -29,7 +29,7 @@ export interface Booking extends BaseEntityWithName {
     invoiceTag: string;
     invoiceNumber: string;
     pricePlan: PricePlan;
-    accountKind: AccountKind;
+    accountKind: AccountKind | null;
     note: string;
     returnalNote: string;
     location: string;

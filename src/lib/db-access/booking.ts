@@ -183,10 +183,22 @@ export const deleteBooking = async (id: number): Promise<boolean> => {
 export const validateBookingObjectionModel = (booking: BookingObjectionModel): boolean => {
     if (!booking) return false;
 
-    if (booking.bookingType !== undefined && !isMemberOfEnum(booking.bookingType, BookingType)) return false;
-    if (booking.status !== undefined && !isMemberOfEnum(booking.status, Status)) return false;
-    if (booking.pricePlan !== undefined && !isMemberOfEnum(booking.pricePlan, PricePlan)) return false;
-    if (booking.accountKind !== undefined && !isMemberOfEnum(booking.accountKind, AccountKind)) return false;
+    if (
+        booking.bookingType !== undefined &&
+        booking.bookingType !== null &&
+        !isMemberOfEnum(booking.bookingType, BookingType)
+    )
+        return false;
+    if (booking.status !== undefined && booking.status !== null && !isMemberOfEnum(booking.status, Status))
+        return false;
+    if (booking.pricePlan !== undefined && booking.pricePlan !== null && !isMemberOfEnum(booking.pricePlan, PricePlan))
+        return false;
+    if (
+        booking.accountKind !== undefined &&
+        booking.accountKind !== null &&
+        !isMemberOfEnum(booking.accountKind, AccountKind)
+    )
+        return false;
 
     return true;
 };

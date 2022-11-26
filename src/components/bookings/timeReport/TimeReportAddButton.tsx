@@ -8,6 +8,7 @@ import { Booking } from '../../../models/interfaces';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { formatDatetime } from '../../../lib/datetimeUtils';
 import { getPricePerHour, getResponseContentOrError } from '../../../lib/utils';
+import { AccountKind } from '../../../models/enums/AccountKind';
 
 type Props = {
     booking: Booking;
@@ -44,7 +45,7 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
             endDatetime: formatDatetime(new Date()),
             pricePerHour: pricePerHour ?? 0,
             name: '',
-            accountKind: booking.accountKind,
+            accountKind: booking.accountKind ?? AccountKind.EXTERNAL,
             sortIndex: sortIndex,
         };
 

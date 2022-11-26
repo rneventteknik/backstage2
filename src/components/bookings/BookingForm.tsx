@@ -87,7 +87,7 @@ const BookingForm: React.FC<Props> = ({
             location: getValueFromForm('location'),
             ownerUserId: toIntOrUndefined(getValueFromForm('ownerUser')),
             pricePlan: toIntOrUndefined(getValueFromForm('pricePlan')),
-            accountKind: toIntOrUndefined(getValueFromForm('accountKind')),
+            accountKind: toIntOrUndefined(getValueFromForm('accountKind')) ?? null,
             contactPersonName: getValueFromForm('contactPersonName'),
             contactPersonPhone: getValueFromForm('contactPersonPhone'),
             contactPersonEmail: getValueFromForm('contactPersonEmail'),
@@ -251,10 +251,10 @@ const BookingForm: React.FC<Props> = ({
                         <Form.Control
                             as="select"
                             name="accountKind"
-                            defaultValue={booking.accountKind}
+                            defaultValue={booking.accountKind ?? ''}
                             required={isFieldRequired(Status.BOOKED)}
                         >
-                            <option value="">Välj kontotyp</option>
+                            <option value="">Ingen kontotyp</option>
                             <option value={AccountKind.EXTERNAL}>{getAccountKindName(AccountKind.EXTERNAL)}</option>
                             <option value={AccountKind.INTERNAL}>{getAccountKindName(AccountKind.INTERNAL)}</option>
                         </Form.Control>
