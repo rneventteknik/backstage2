@@ -18,6 +18,7 @@ import EquipmentCalendar from '../../../components/equipment/EquipmentCalendar';
 import EquipmentBookings from '../../../components/equipment/EquipmentBookings';
 import EquipmentTagDisplay from '../../../components/utils/EquipmentTagDisplay';
 import ChangelogCard from '../../../components/ChangelogCard';
+import MarkdownCard from '../../../components/MarkdownCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessControl();
@@ -133,6 +134,15 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </Card>
 
                     <ChangelogCard changelog={equipment.changelog ?? []} />
+
+                    {equipment.note ? (
+                        <MarkdownCard
+                            text={equipment.note}
+                            onSubmit={() => false}
+                            cardTitle="Anteckningar"
+                            readonly={true}
+                        />
+                    ) : null}
                 </Col>
                 <Col xl={8}>
                     <EquipmentCalendar equipment={equipment} />

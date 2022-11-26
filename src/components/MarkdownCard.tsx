@@ -11,9 +11,10 @@ type Props = {
     onSubmit: (text: string) => void;
     cardTitle: string;
     editModelTitle?: string;
+    readonly?: boolean;
 };
 
-const MarkdownCard: React.FC<Props> = ({ text, onSubmit, cardTitle, editModelTitle }: Props) => {
+const MarkdownCard: React.FC<Props> = ({ text, onSubmit, cardTitle, editModelTitle, readonly = false }: Props) => {
     const [showEditTextModal, setShowEditTextModal] = useState(false);
     const [showContent, setShowContent] = useState(true);
 
@@ -22,14 +23,18 @@ const MarkdownCard: React.FC<Props> = ({ text, onSubmit, cardTitle, editModelTit
             <Card className="mb-3">
                 <Card.Header className="d-flex">
                     <span className="flex-grow-1">{cardTitle}</span>
-                    {text ? (
-                        <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
-                            <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
-                        </Button>
+                    {!readonly ? (
+                        <>
+                            {text ? (
+                                <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+                                    <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
+                                </Button>
+                            ) : null}
+                            <Button variant="secondary" size="sm" onClick={() => setShowEditTextModal(true)}>
+                                <FontAwesomeIcon icon={text ? faPen : faPlus} /> {text ? 'Redigera' : 'Skapa'}
+                            </Button>
+                        </>
                     ) : null}
-                    <Button variant="secondary" size="sm" onClick={() => setShowEditTextModal(true)}>
-                        <FontAwesomeIcon icon={text ? faPen : faPlus} /> {text ? 'Redigera' : 'Skapa'}
-                    </Button>
                 </Card.Header>
                 {showContent && text ? (
                     <Card.Body>
