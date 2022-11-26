@@ -145,12 +145,12 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                     >
                         {entry.name}
                         {entry.equipment?.isArchived ? (
-                            <Badge variant="warning" className="ml-1">
+                            <Badge variant="warning" className="ml-1" title="">
                                 Arkiverad
                             </Badge>
                         ) : null}
                         {entry.equipment && getEquipmentOutDatetime(list) && getEquipmentInDatetime(list) ? (
-                            <span className="ml-1">
+                            <span className="ml-1" title="">
                                 <EquipmentListEntryConflictStatus
                                     equipment={entry.equipment}
                                     equipmentList={list}
@@ -159,7 +159,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                                 />
                             </span>
                         ) : null}
-                        {entry.isHidden ? <FontAwesomeIcon icon={faEyeSlash} className="ml-1" /> : null}
+                        {entry.isHidden ? <FontAwesomeIcon icon={faEyeSlash} className="ml-1" title="" /> : null}
                     </DoubleClickToEdit>
                 </div>
                 <div className="mb-0">
