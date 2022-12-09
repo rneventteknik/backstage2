@@ -4,7 +4,6 @@ import { Card, Form } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import Header from '../../components/layout/Header';
-import { Role } from '../../models/enums/Role';
 import EquipmentSearch, { ResultType, SearchResultViewModel } from '../../components/EquipmentSearch';
 import { Equipment } from '../../models/interfaces';
 import { EquipmentCalendarRow } from '../../components/equipment/EquipmentCalendar';
@@ -17,7 +16,7 @@ import { addDays, formatDateForForm, toDatetimeOrUndefined } from '../../lib/dat
 import TableStyleLink from '../../components/utils/TableStyleLink';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl(Role.ADMIN);
+export const getServerSideProps = useUserWithDefaultAccessControl();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Jämför tillgänglighet';
 const breadcrumbs = [
@@ -25,7 +24,7 @@ const breadcrumbs = [
     { link: '/equipment/compare-availability', displayName: pageTitle },
 ];
 
-const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const defaultDate = new Date();
     defaultDate.setHours(0, 0, 0, 0);
 
@@ -144,4 +143,4 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser }: Props) 
     );
 };
 
-export default EquipmentJsonImportPage;
+export default CompareAvailabilityPage;
