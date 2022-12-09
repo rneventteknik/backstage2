@@ -88,7 +88,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
     };
 
     const createGroup = () => {
-        const group: PartialDeep<ISalaryGroupObjectionModel> = {
+        const group: PartialDeep<ISalaryGroupObjectionModel, { recurseIntoArrays: true }> = {
             name: selectedGroupName,
             bookings: selectedBookingIds.map((id) => ({ id })),
         };

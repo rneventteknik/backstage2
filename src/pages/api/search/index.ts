@@ -8,7 +8,7 @@ import { getValueOrFirst } from '../../../lib/utils';
 const numberOfEachType = 8;
 
 const handler = withSessionContext(async (_req: NextApiRequest, res: NextApiResponse): Promise<void> => {
-    const searchString = getValueOrFirst(_req.query.s);
+    const searchString = getValueOrFirst(_req.query.s) ?? '';
 
     try {
         const result: SearchResult = {

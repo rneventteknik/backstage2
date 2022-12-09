@@ -98,7 +98,7 @@ const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
         <SidebarLinkGroup>
             <SidebarLink displayName="Hem" link="/" icon={faHome} exactMatch={true} />
             <SidebarLink displayName="Aktiva bokningar" link="/bookings" icon={faCalendarDay} />
-            <SidebarLink displayName="Alla bokingar" link="/archive" icon={faArchive} />
+            <SidebarLink displayName="Alla bokningar" link="/archive" icon={faArchive} />
             <SidebarLink displayName="Utrustning" link="/equipment" icon={faCube} />
             <SidebarLink displayName="Användare" link="/users" icon={faUsers} />
             <SidebarLink displayName="Statistik" link="/statistics" icon={faChartPie} />

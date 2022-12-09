@@ -11,7 +11,7 @@ import BookingReturnalNoteModal from './BookingReturnalNoteModal';
 
 type Props = {
     booking: Partial<Booking>;
-    onChange: (booking: PartialDeep<IBookingObjectionModel>) => void;
+    onChange: (booking: PartialDeep<IBookingObjectionModel, { recurseIntoArrays: true }>) => void;
     className?: string;
 };
 

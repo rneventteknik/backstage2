@@ -87,7 +87,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
     };
 
     const createGroup = () => {
-        const group: PartialDeep<IInvoiceGroupObjectionModel> = {
+        const group: PartialDeep<IInvoiceGroupObjectionModel, { recurseIntoArrays: true }> = {
             name: selectedGroupName,
             bookings: selectedBookingIds.map((id) => ({ id })),
         };

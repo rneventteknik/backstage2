@@ -8,7 +8,7 @@ import { CustomersSearchResult } from '../../../models/misc/SearchResult';
 const numberOfEachType = 12;
 
 const handler = withSessionContext(async (_req: NextApiRequest, res: NextApiResponse): Promise<void> => {
-    const searchString = getValueOrFirst(_req.query.s);
+    const searchString = getValueOrFirst(_req.query.s) ?? '';
     try {
         const result: CustomersSearchResult = {
             customers: await searchCustomers(searchString, numberOfEachType),

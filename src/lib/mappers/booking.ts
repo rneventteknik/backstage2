@@ -104,7 +104,7 @@ export const toBookingChangelogEntry = (
 export const toEquipmentListObjectionModel = (
     clientModel: EquipmentList,
     bookingId: number,
-): PartialDeep<IEquipmentListObjectionModel> => {
+): PartialDeep<IEquipmentListObjectionModel, { recurseIntoArrays: true }> => {
     return {
         ...clientModel,
         created: undefined,
@@ -134,7 +134,7 @@ export const toEquipmentListObjectionModel = (
 
 export const toEquipmentListHeadingEntryObjectionModel = (
     clientModel: EquipmentListHeading,
-): PartialDeep<IEquipmentListHeadingEntryObjectionModel> => {
+): PartialDeep<IEquipmentListHeadingEntryObjectionModel, { recurseIntoArrays: true }> => {
     return {
         ...clientModel,
         created: undefined,

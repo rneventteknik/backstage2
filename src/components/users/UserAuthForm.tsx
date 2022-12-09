@@ -40,7 +40,7 @@ const UserAuthForm: React.FC<Props> = ({
         const modifiedUserAuth: UpdateAuthRequest = {
             userId: userId,
             username: form.username.value,
-            role: form.role?.value,
+            role: form.userRole?.value,
             password: form.password.value,
         };
 
@@ -59,7 +59,7 @@ const UserAuthForm: React.FC<Props> = ({
                     <Form.Label>Behörighet</Form.Label>
                     <Form.Control
                         as="select"
-                        name="role"
+                        name="userRole"
                         defaultValue={previousRole ?? Role.USER}
                         disabled={hideRoleInput}
                     >

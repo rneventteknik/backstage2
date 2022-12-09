@@ -67,7 +67,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
         const getValueFromForm = (key: string): string | undefined => form[key]?.value;
 
-        const modifiedEquipment: PartialDeep<IEquipmentObjectionModel> = {
+        const modifiedEquipment: PartialDeep<IEquipmentObjectionModel, { recurseIntoArrays: true }> = {
             id: equipment?.id,
 
             image: equipment?.image,

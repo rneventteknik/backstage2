@@ -9,7 +9,7 @@ import { EquipmentSearchResult } from '../../../models/misc/SearchResult';
 const numberOfEachType = 12;
 
 const handler = withSessionContext(async (_req: NextApiRequest, res: NextApiResponse): Promise<void> => {
-    const searchString = getValueOrFirst(_req.query.s);
+    const searchString = getValueOrFirst(_req.query.s) ?? '';
     const includePackages = getValueOrFirst(_req.query.includePackages) === 'true';
     const includeTags = getValueOrFirst(_req.query.includeTags) === 'true';
 
