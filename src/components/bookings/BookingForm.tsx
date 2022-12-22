@@ -440,21 +440,7 @@ const BookingForm: React.FC<Props> = ({
                     </Row>
                 </>
             )}
-            {!showAdvancedFields ? (
-                <div className="d-flex">
-                    <div className="flex-grow-1"></div>
-                    <div>
-                        <Button
-                            className="mb-3"
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => setShowAdvancedFields(true)}
-                        >
-                            Visa avancerade fält
-                        </Button>
-                    </div>
-                </div>
-            ) : (
+            {!showAdvancedFields ? null : (
                 <>
                     <h6>Avancerat</h6>
                     <hr />
@@ -514,6 +500,20 @@ const BookingForm: React.FC<Props> = ({
                     </Row>
                 </>
             )}
+
+            <div className="d-flex">
+                <div className="flex-grow-1"></div>
+                <div>
+                    <Button
+                        className="mb-3"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setShowAdvancedFields((x) => !x)}
+                    >
+                        {showAdvancedFields ? 'Dölj' : 'Visa'} avancerade fält
+                    </Button>
+                </div>
+            </div>
 
             <Form.Control type="hidden" name="calendarBookingId" defaultValue={booking?.calendarBookingId} />
             {isNewBooking ? (
