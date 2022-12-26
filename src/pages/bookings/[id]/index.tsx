@@ -33,7 +33,13 @@ import { useNotifications } from '../../../lib/useNotifications';
 import { Status } from '../../../models/enums/Status';
 import { PaymentStatus } from '../../../models/enums/PaymentStatus';
 import ChangelogCard from '../../../components/ChangelogCard';
-import { formatNumberAsCurrency, getBookingPrice } from '../../../lib/pricingUtils';
+import {
+    addVAT,
+    formatNumberAsCurrency,
+    getBookingPrice,
+    getEquipmentListPrice,
+    getTotalTimeEstimatesPrice,
+} from '../../../lib/pricingUtils';
 import { Language } from '../../../models/enums/Language';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
@@ -245,7 +251,38 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </div>
                             <div className="text-muted">{booking.displayUsageInterval}</div>
                         </Card.Header>
-
+                    </Card>
+                    <Card className="mb-3">
+                        <Card.Header>Prisinformation (ink. moms)</Card.Header>
+                        <ListGroup variant="flush">
+                            {booking.equipmentLists?.map((list) => (
+                                <ListGroup.Item className="d-flex" key={list.id}>
+                                    <span className="flex-grow-1">{list.name}</span>
+                                    <span>{formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}</span>
+                                </ListGroup.Item>
+                            ))}
+                            <ListGroup.Item className="d-flex">
+                                <span className="flex-grow-1">Personal (estimat)</span>
+                                <span>
+                                    {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
+                                </span>
+                            </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
+                                <strong className="flex-grow-1">Totalpris</strong>
+                                <strong>{formatNumberAsCurrency(addVAT(getBookingPrice(booking)))}</strong>
+                            </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
+                                <strong className="flex-grow-1">varav moms (25%)</strong>
+                                <strong>
+                                    {formatNumberAsCurrency(
+                                        addVAT(getBookingPrice(booking)) - getBookingPrice(booking),
+                                    )}
+                                </strong>
+                            </ListGroup.Item>
+                        </ListGroup>
+                    </Card>
+                    <Card className="mb-3">
+                        <Card.Header>Bokningsinformation</Card.Header>
                         <ListGroup variant="flush">
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Ansvarig</span>
@@ -277,7 +314,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
-
                     <Card className="mb-3">
                         <Card.Header>Fakturainformation</Card.Header>
                         <ListGroup variant="flush">
@@ -299,19 +335,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
-
                     <MarkdownCard
                         text={booking.note}
                         onSubmit={(note) => saveBooking({ note })}
                         cardTitle="Anteckningar"
                     />
-
                     <MarkdownCard
                         text={booking.returnalNote}
                         onSubmit={(returnalNote) => saveBooking({ returnalNote })}
                         cardTitle="Återlämningsanmärkning"
                     />
-
                     <ChangelogCard changelog={booking.changelog ?? []} />
                 </Col>
             </Row>
