@@ -42,6 +42,7 @@ import {
     getEquipmentListEntryPrices,
     getEquipmentListHeadingFromViewModel,
     getHeaderOfEntity,
+    getPeersOfViewModel,
     getSubEntitiesToDisplay,
     moveListEntryDown,
     moveListEntryIntoHeading,
@@ -358,19 +359,20 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
         }
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
+        const peers = getPeersOfViewModel(viewModel, list);
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
                 {readonly ? null : (
                     <>
                         <Dropdown.Item
                             onClick={() => moveListEntryUp(viewModel, list, saveList)}
-                            disabled={isFirst(listEntries, viewModel)}
+                            disabled={isFirst(peers, viewModel)}
                         >
                             <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
                         </Dropdown.Item>
                         <Dropdown.Item
                             onClick={() => moveListEntryDown(viewModel, list, saveList)}
-                            disabled={isLast(listEntries, viewModel)}
+                            disabled={isLast(peers, viewModel)}
                         >
                             <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
                         </Dropdown.Item>

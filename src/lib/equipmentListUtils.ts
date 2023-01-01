@@ -17,19 +17,19 @@ export interface EquipmentListEntityViewModel {
     entity: EquipmentListEntry | EquipmentListHeading;
     id: string;
     sortIndex: number;
-    isSubEntry: boolean;
+    parentId: string | null;
 }
 
 const getViewModel = (
     entity: EquipmentListEntry | EquipmentListHeading,
     type: 'E' | 'H',
-    isSubEntry = false,
+    parentId: string | null = null,
 ): EquipmentListEntityViewModel => ({
     type: type,
     entity: entity,
     id: type + entity.id,
     sortIndex: entity.sortIndex,
-    isSubEntry,
+    parentId,
 });
 
 export const viewModelIsHeading = (viewModel: EquipmentListEntityViewModel) => viewModel.type === 'H';
@@ -65,12 +65,18 @@ export const getSubEntitiesToDisplay = (list: EquipmentList) => {
 
     return list.listHeadings.map((x) => ({
         parentId: 'H' + x.id,
-        entities: x.listEntries.map((e) => getViewModel(e, 'E', true)),
+        entities: x.listEntries.map((e) => getViewModel(e, 'E', 'H' + x.id)),
     }));
 };
 
 export const getHeaderOfEntity = (entity: EquipmentListEntry, list: EquipmentList) =>
     list.listHeadings.find((heading) => heading.listEntries.some((x) => x.id === entity.id));
+
+// The peers of the entity is all the items in the same list or under the same heading, including the supplied item.
+export const getPeersOfViewModel = (viewModel: EquipmentListEntityViewModel, list: EquipmentList) =>
+    viewModel.parentId
+        ? getSubEntitiesToDisplay(list).find((x) => x.parentId === viewModel.parentId)?.entities ?? []
+        : getEntitiesToDisplay(list);
 
 // Heper functions to get default values
 //
@@ -142,7 +148,7 @@ const addMultipleEquipment = (
     saveList: (updatedList: EquipmentList) => void,
 ) => {
     let nextId = getNextEquipmentListEntryId(list);
-    let nextSortIndex = getNextSortIndex(list.listEntries);
+    let nextSortIndex = getNextSortIndex([...list.listEntries, ...list.listHeadings]);
 
     const entriesToAdd = entries.map((x) => {
         const overrides: Partial<EquipmentListEntry> = {};
@@ -455,16 +461,54 @@ const saveViewModels = (
     });
 };
 
+export const saveViewModelsOfHeading = (
+    updatedEntities: EquipmentListEntityViewModel[],
+    headingViewModel: EquipmentListEntityViewModel,
+    list: EquipmentList,
+    saveList: (updatedList: EquipmentList) => void,
+) => {
+    if (updatedEntities.some((x) => viewModelIsHeading(x))) {
+        throw new Error('Headings can only contain entities, not other headings');
+    }
+
+    const heading = getEquipmentListHeadingFromViewModel(headingViewModel);
+
+    const newEquipmentListEntries = updateItemsInArrayById(
+        heading.listEntries,
+        ...updatedEntities.map((x) => getEquipmentListEntryFromViewModel(x)),
+    );
+
+    const newHeading = {
+        ...heading,
+        listEntries: newEquipmentListEntries,
+    };
+
+    const newViewModel = getViewModel(newHeading, 'H');
+
+    saveViewModels([newViewModel], list, saveList);
+};
+
 export const moveListEntryUp = (
     viewModel: EquipmentListEntityViewModel,
     list: EquipmentList,
     saveList: (updatedList: EquipmentList) => void,
 ) => {
     // Move view models in list
-    const movedItems = moveItemUp(getEntitiesToDisplay(list), viewModel);
+    const movedItems = moveItemUp(getPeersOfViewModel(viewModel, list), viewModel);
 
     // Set sortindex of inner object as well
     movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
+
+    if (viewModel.parentId) {
+        const heading = getEntitiesToDisplay(list).find((x) => x.id === viewModel.parentId);
+
+        if (!heading) {
+            throw new Error('Invalid heading');
+        }
+
+        saveViewModelsOfHeading(movedItems, heading, list, saveList);
+        return;
+    }
 
     // Save view models
     saveViewModels(movedItems, list, saveList);
@@ -476,10 +520,21 @@ export const moveListEntryDown = (
     saveList: (updatedList: EquipmentList) => void,
 ) => {
     // Move view models in list
-    const movedItems = moveItemDown(getEntitiesToDisplay(list), viewModel);
+    const movedItems = moveItemDown(getPeersOfViewModel(viewModel, list), viewModel);
 
     // Set sortindex of inner object as well
     movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
+
+    if (viewModel.parentId) {
+        const heading = getEntitiesToDisplay(list).find((x) => x.id === viewModel.parentId);
+
+        if (!heading) {
+            throw new Error('Invalid heading');
+        }
+
+        saveViewModelsOfHeading(movedItems, heading, list, saveList);
+        return;
+    }
 
     // Save view models
     saveViewModels(movedItems, list, saveList);
