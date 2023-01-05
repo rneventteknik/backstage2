@@ -4,7 +4,7 @@ import Header from '../components/layout/Header';
 import useSwr from 'swr';
 import Link from 'next/link';
 import LargeBookingTable from '../components/LargeBookingTable';
-import { useUserWithDefaultAccessControl } from '../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { Button } from 'react-bootstrap';
 import { bookingsFetcher } from '../lib/fetchers';
@@ -16,7 +16,7 @@ import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { toBookingViewModel } from '../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Alla bokningar';
 const breadcrumbs = [{ link: 'archive', displayName: pageTitle }];

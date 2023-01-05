@@ -2,7 +2,7 @@ import React from 'react';
 import Layout from '../components/layout/Layout';
 import Header from '../components/layout/Header';
 import useSwr from 'swr';
-import { useUserWithDefaultAccessControl } from '../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { Card, Nav, Tab } from 'react-bootstrap';
 import { bookingsFetcher } from '../lib/fetchers';
@@ -18,7 +18,7 @@ import { Status } from '../models/enums/Status';
 import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Statistik';
 const breadcrumbs = [{ link: 'statistics', displayName: pageTitle }];

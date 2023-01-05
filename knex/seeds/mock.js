@@ -43,6 +43,7 @@ export async function seed(knex) {
     await knex('EquipmentChangelogEntry').del();
     await knex('Booking').del();
     await knex('User').del();
+    await knex('Setting').del();
 
     // Users and authentication
     //
@@ -1811,6 +1812,23 @@ export async function seed(knex) {
         {
             bookingId: bookingIds.lunchföreläsningEk,
             invoiceGroupId: firstInvoiceGroupId,
+        },
+    ]);
+
+    await knex('Setting').insert([
+        {
+            key: 'salary.ths',
+            note: 'Lön för THS-kund, anges i kr/h',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '125',
+        },
+        {
+            key: 'salary.external',
+            note: 'Lön för externkund, anges i kr/h',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '250',
         },
     ]);
 

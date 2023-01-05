@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../../components/layout/Layout';
 import { Card, Form } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import Header from '../../components/layout/Header';
 import EquipmentSearch, { ResultType, SearchResultViewModel } from '../../components/EquipmentSearch';
 import { Equipment } from '../../models/interfaces';
@@ -16,7 +16,7 @@ import { addDays, formatDateForForm, toDatetimeOrUndefined } from '../../lib/dat
 import TableStyleLink from '../../components/utils/TableStyleLink';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Jämför tillgänglighet';
 const breadcrumbs = [

@@ -4,7 +4,7 @@ import Header from '../components/layout/Header';
 import Layout from '../components/layout/Layout';
 import { TableLoadingPage } from '../components/layout/LoadingPageSkeleton';
 import { salaryGroupsFetcher } from '../lib/fetchers';
-import { useUserWithDefaultAccessControl } from '../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import useSwr from 'swr';
 import { Role } from '../models/enums/Role';
@@ -24,7 +24,7 @@ import CreateSalaryGroupModal from '../components/salaries/CreateSalaryGroupModa
 import ViewSalaryGroupModal from '../components/salaries/ViewSalaryGroupModal';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl(Role.ADMIN);
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Löneunderlag';
 const breadcrumbs = [{ link: '/salary/', displayName: pageTitle }];

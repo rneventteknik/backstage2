@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
-import { getPricePerHour, getResponseContentOrError } from '../../../lib/utils';
+import { getResponseContentOrError } from '../../../lib/utils';
 import { toTimeEstimate } from '../../../lib/mappers/timeEstimate';
 import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';
@@ -13,6 +13,7 @@ type Props = {
     onAdd: (data: TimeEstimate) => void;
     buttonType: 'dropdown' | 'button';
     children?: ReactNode;
+    defaultSalary: number;
 };
 
 const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button>> = ({
@@ -21,17 +22,16 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
     sortIndex,
     buttonType,
     children,
+    defaultSalary,
     ...rest
 }: Props & React.ComponentProps<typeof Button>) => {
     const { showCreateFailedNotification } = useNotifications();
 
     const addEmptyTimeEstimate = async () => {
-        const pricePerHour = getPricePerHour(booking.pricePlan);
-
         const timeEstimate: ITimeEstimateObjectionModel = {
             bookingId: booking.id,
             numberOfHours: 0,
-            pricePerHour: pricePerHour ?? 0,
+            pricePerHour: defaultSalary,
             name: '',
             sortIndex: sortIndex,
         };

@@ -3,7 +3,7 @@ import Layout from '../../components/layout/Layout';
 import { useRouter } from 'next/router';
 import { Button, Card, Tab } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import BookingForm from '../../components/bookings/BookingForm';
 import { getResponseContentOrError } from '../../lib/utils';
@@ -27,7 +27,7 @@ import { Customer } from '../../models/interfaces/Customer';
 import { BookingType } from '../../models/enums/BookingType';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
 type Props = { user: CurrentUserInfo };
 
 const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {

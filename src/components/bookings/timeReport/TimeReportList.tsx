@@ -4,7 +4,7 @@ import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher, usersFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
-import { getAccountKindName, getPricePerHour, getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
+import { getAccountKindName, getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
 import {
     faAngleDown,
     faAngleUp,
@@ -34,15 +34,16 @@ type Props = {
     readonly: boolean;
     showContent: boolean;
     setShowContent: (bol: boolean) => void;
+    defaultSalary: number;
 };
 
 const TimeReportList: React.FC<Props> = ({
     bookingId,
-    pricePlan,
     currentUser,
     readonly,
     showContent,
     setShowContent,
+    defaultSalary,
 }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
     const { data: users } = useSwr('/api/users', usersFetcher);
@@ -235,9 +236,8 @@ const TimeReportList: React.FC<Props> = ({
     );
 
     const TimeReportSumDisplayFn = (entry: TimeReport) => {
-        const getPricePerHourIfChanged = (timeReport: TimeReport) => {
-            const pricePerHour = getPricePerHour(pricePlan);
-            return timeReport.pricePerHour === pricePerHour
+        const getPricePerHourIfNotDefault = (timeReport: TimeReport) => {
+            return timeReport.pricePerHour === defaultSalary
                 ? ''
                 : formatNumberAsCurrency(timeReport.pricePerHour) + '/h';
         };
@@ -245,7 +245,7 @@ const TimeReportList: React.FC<Props> = ({
         return (
             <>
                 {formatNumberAsCurrency(getTimeReportPrice(entry))}
-                <div className="text-muted font-italic mb-0">{getPricePerHourIfChanged(entry)}</div>
+                <div className="text-muted font-italic mb-0">{getPricePerHourIfNotDefault(entry)}</div>
             </>
         );
     };
@@ -358,6 +358,7 @@ const TimeReportList: React.FC<Props> = ({
                         variant="secondary"
                         size="sm"
                         icon={faAdd}
+                        defaultSalary={defaultSalary}
                     >
                         Ny rad
                     </TimeReportAddButton>

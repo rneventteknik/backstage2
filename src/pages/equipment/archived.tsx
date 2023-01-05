@@ -5,7 +5,7 @@ import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import { Badge } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../components/layout/Header';
@@ -60,7 +60,7 @@ const tableSettings: TableConfiguration<Equipment> = {
 };
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Arkiverad utrustning';
 const breadcrumbs = [

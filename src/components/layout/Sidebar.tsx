@@ -16,6 +16,7 @@ import {
     faInfoCircle,
     faListCheck,
     faMoneyBillWave,
+    faPaintBrush,
     faUsers,
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
@@ -110,6 +111,7 @@ const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
                 <SidebarLink displayName="Översikt" link="/admin-overview" icon={faListCheck} />
                 <SidebarLink displayName="Löneunderlag" link="/salary" icon={faMoneyBillWave} />
                 <SidebarLink displayName="Fakturaunderlag" link="/invoices" icon={faFileInvoiceDollar} />
+                <SidebarLink displayName="Inställningar" link="/settings" icon={faPaintBrush} />
             </SidebarLinkGroup>
         </IfAdmin>
 

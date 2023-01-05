@@ -4,7 +4,7 @@ import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import Header from '../../../components/layout/Header';
@@ -15,12 +15,10 @@ import { faCoins, faEyeSlash, faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 
-const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
-    // Edit user
-    //
+const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const router = useRouter();
     const {
         data: equipmentPackage,
@@ -136,4 +134,4 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     );
 };
 
-export default UserPage;
+export default EquipmentPackagePage;

@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Button, Col, Collapse, Form } from 'react-bootstrap';
 import { EquipmentPackageObjectionModel, IEquipmentTagObjectionModel } from '../../models/objection-models';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { faAdd, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Typeahead } from 'react-bootstrap-typeahead';
@@ -68,7 +68,7 @@ const tableSettings: TableConfiguration<EquipmentPackage> = {
 };
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Utrustningspaket';
 const breadcrumbs = [

@@ -29,9 +29,16 @@ type Props = {
     readonly: boolean;
     showContent: boolean;
     setShowContent: (bool: boolean) => void;
+    defaultSalary: number;
 };
 
-const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, setShowContent }: Props) => {
+const TimeEstimateList: React.FC<Props> = ({
+    bookingId,
+    readonly,
+    showContent,
+    setShowContent,
+    defaultSalary,
+}: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
     const { showSaveFailedNotification, showDeleteFailedNotification } = useNotifications();
@@ -272,6 +279,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
                         variant="secondary"
                         size="sm"
                         buttonType="button"
+                        defaultSalary={defaultSalary}
                     >
                         <FontAwesomeIcon icon={faPlus} className="mr-1" />
                         Ny rad

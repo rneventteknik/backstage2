@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { getMemberStatusName, getRoleName } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
 import UserDisplay from '../../../components/utils/UserDisplay';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
@@ -18,7 +18,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SmallBookingTable from '../../../components/SmallBookingTable';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 
 const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {

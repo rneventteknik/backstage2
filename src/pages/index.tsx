@@ -1,6 +1,6 @@
 import React from 'react';
 import Layout from '../components/layout/Layout';
-import { useUserWithDefaultAccessControl } from '../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import Header from '../components/layout/Header';
 import { Card, Col, ListGroup, Row } from 'react-bootstrap';
@@ -11,7 +11,7 @@ import { showActiveBookings, getRoleName } from '../lib/utils';
 import { formatDatetime, toBookingViewModel } from '../lib/datetimeUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 
 const IndexPage: React.FC<Props> = ({ user: currentUser }: Props) => {

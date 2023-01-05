@@ -11,7 +11,7 @@ import { toUser } from '../../../lib/mappers/user';
 import { useNotifications } from '../../../lib/useNotifications';
 import { IUserObjectionModel } from '../../../models/objection-models/UserObjectionModel';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
 import { Role } from '../../../models/enums/Role';
 import Header from '../../../components/layout/Header';
@@ -23,7 +23,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 
 const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {

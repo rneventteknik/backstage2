@@ -12,6 +12,7 @@ import { BookingViewModel, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
 import { getEquipmentOutDatetime, getEquipmentInDatetime } from './datetimeUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 // Helper functions for array operations
 //
@@ -248,16 +249,31 @@ export const replaceEmptyStringWithNull = (s: string | undefined | null): string
 //
 export const getValueOrFirst = <T>(data: T | T[]) => (Array.isArray(data) ? data[0] : data);
 
-export const getPricePerHour = (pricePlan: PricePlan): number | undefined => {
-    if (!process.env.NEXT_PUBLIC_SALARY_NORMAL)
-        throw new Error('Configuration missing salary for the Normal price plan');
+export const toKeyValue = (keyValue: KeyValue): KeyValue => {
+    if (!keyValue.key || !keyValue.value) {
+        throw 'Invalid key or value';
+    }
 
-    if (!process.env.NEXT_PUBLIC_SALARY_THS) throw new Error('Configuration missing salary for the THS price plan');
+    return {
+        key: keyValue.key,
+        value: keyValue.value,
+    };
+};
 
-    const pricePerHour =
-        pricePlan == PricePlan.EXTERNAL ? process.env.NEXT_PUBLIC_SALARY_NORMAL : process.env.NEXT_PUBLIC_SALARY_THS;
+export const getGlobalSetting = (key: string, globalSettings: KeyValue[]): string => {
+    const setting = globalSettings.find((x) => x.key == key);
+    if (!setting) throw new Error(`${key} cannot be found in the settings database`);
 
-    return toIntOrUndefined(pricePerHour);
+    return setting.value;
+};
+
+export const getDefaultSalary = (pricePlan: PricePlan, globalSettings: KeyValue[]): number => {
+    const SalaryExternal = getGlobalSetting('salary.external', globalSettings);
+    const SalaryTHS = getGlobalSetting('salary.ths', globalSettings);
+
+    const defaultSalary = pricePlan == PricePlan.EXTERNAL ? SalaryExternal : SalaryTHS;
+
+    return toIntOrUndefined(defaultSalary) ?? 0;
 };
 
 export const showActiveBookings = (booking: BookingViewModel) => {

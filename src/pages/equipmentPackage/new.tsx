@@ -3,7 +3,7 @@ import Layout from '../../components/layout/Layout';
 import { useRouter } from 'next/router';
 import { Button } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IEquipmentPackageObjectionModel } from '../../models/objection-models';
 import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 import EquipmentPackageForm from '../../components/equipmentPackage/EquipmentPackageForm';
@@ -15,7 +15,7 @@ import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
 type Props = { user: CurrentUserInfo };
 
 const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => {

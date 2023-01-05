@@ -7,12 +7,13 @@ import {
     getAccountKindName,
     getLanguageName,
     getPaymentStatusName,
+    getDefaultSalary,
     getPricePlanName,
     getResponseContentOrError,
     getStatusName,
 } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
 import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
 import BookingTypeTag from '../../../components/utils/BookingTypeTag';
@@ -49,13 +50,14 @@ import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/Tim
 import TimeReportAddButton from '../../../components/bookings/timeReport/TimeReportAddButton';
 import RentalStatusTag from '../../../components/utils/RentalStatusTag';
 import { getNumberOfBookingDays, getNumberOfEventHours, toBookingViewModel } from '../../../lib/datetimeUtils';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 import MarkdownCard from '../../../components/MarkdownCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
     const [showTimeEstimateContent, setShowTimeEstimateContent] = useState(false);
     const [showTimeReportContent, setShowTimeReportContent] = useState(false);
@@ -129,6 +131,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         mutateTimeReports([...(booking.timeReports ?? []), timeReport]);
     };
 
+    const defaultSalary = getDefaultSalary(booking.pricePlan, globalSettings);
+
     return (
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
@@ -175,6 +179,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         onAdd={onAddTimeReport}
                         currentUser={currentUser}
                         variant="dark"
+                        defaultSalary={defaultSalary}
                     >
                         <FontAwesomeIcon icon={faStopwatch} className="mr-1" />
                         Rapportera tid
@@ -197,6 +202,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             sortIndex={getNextSortIndex(booking.timeEstimates ?? [])}
                             onAdd={onAddTimeEstimate}
                             buttonType="dropdown"
+                            defaultSalary={defaultSalary}
                         >
                             <FontAwesomeIcon icon={faClock} className="mr-1 fw" />
                             Lägg till tidsuppskattning
@@ -213,6 +219,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
                         readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                        defaultSalary={defaultSalary}
                     />
                     <TimeReportList
                         showContent={showTimeReportContent}
@@ -221,6 +228,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                         pricePlan={booking.pricePlan}
                         currentUser={currentUser}
                         readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                        defaultSalary={defaultSalary}
                     />
                     <EquipmentLists
                         bookingId={booking.id}

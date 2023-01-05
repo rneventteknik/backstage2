@@ -7,7 +7,7 @@ import { getMemberStatusName, getRoleName } from '../../lib/utils';
 import Link from 'next/link';
 import { Button } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IfAdmin } from '../../components/utils/IfAdmin';
 import { faAdd, faBan, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,7 +18,7 @@ import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Användare';
 const breadcrumbs = [{ link: 'users', displayName: pageTitle }];

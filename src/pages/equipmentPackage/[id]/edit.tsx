@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import { IEquipmentPackageObjectionModel } from '../../../models/objection-models';
 import { useNotifications } from '../../../lib/useNotifications';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
@@ -21,7 +21,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
 type Props = { user: CurrentUserInfo };
 
 const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => {

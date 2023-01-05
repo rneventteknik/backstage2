@@ -6,6 +6,7 @@ import { toTimeEstimate } from './mappers/timeEstimate';
 import { getResponseContentOrError } from './utils';
 import { toBooking, toEquipmentList } from './mappers/booking';
 import { toInvoiceGroup } from './mappers/invoiceGroup';
+import { toSetting } from './mappers/setting';
 import { toSalaryGroup } from './mappers/salaryGroup';
 
 // Since all fetchers follow the same pattern we have these two helper functions to
@@ -57,6 +58,9 @@ export const timeEstimatesFetcher = generateListFetcher(toTimeEstimate);
 
 export const invoiceGroupFetcher = generateFetcher(toInvoiceGroup);
 export const invoiceGroupsFetcher = generateListFetcher(toInvoiceGroup);
+
+export const settingFetcher = generateFetcher(toSetting);
+export const settingsFetcher = generateListFetcher(toSetting);
 
 export const salaryGroupFetcher = generateFetcher(toSalaryGroup);
 export const salaryGroupsFetcher = generateListFetcher(toSalaryGroup);

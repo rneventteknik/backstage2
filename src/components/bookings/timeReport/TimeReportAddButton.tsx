@@ -7,7 +7,7 @@ import { useNotifications } from '../../../lib/useNotifications';
 import { Booking } from '../../../models/interfaces';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { formatDatetime } from '../../../lib/datetimeUtils';
-import { getPricePerHour, getResponseContentOrError } from '../../../lib/utils';
+import { getResponseContentOrError } from '../../../lib/utils';
 import { AccountKind } from '../../../models/enums/AccountKind';
 
 type Props = {
@@ -16,6 +16,7 @@ type Props = {
     sortIndex: number;
     onAdd: (data: TimeReport) => void;
     currentUser: CurrentUserInfo;
+    defaultSalary: number;
 };
 
 const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>> = ({
@@ -24,6 +25,7 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
     sortIndex,
     currentUser,
     children,
+    defaultSalary,
     ...rest
 }: Props & React.ComponentProps<typeof Button>) => {
     const { showCreateFailedNotification } = useNotifications();
@@ -34,8 +36,6 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
             return;
         }
 
-        const pricePerHour = getPricePerHour(booking.pricePlan);
-
         const timeReport: ITimeReportObjectionModel = {
             bookingId: booking.id,
             billableWorkingHours: 0,
@@ -43,7 +43,7 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
             userId: currentUser.userId,
             startDatetime: formatDatetime(new Date()),
             endDatetime: formatDatetime(new Date()),
-            pricePerHour: pricePerHour ?? 0,
+            pricePerHour: defaultSalary,
             name: '',
             accountKind: booking.accountKind ?? AccountKind.EXTERNAL,
             sortIndex: sortIndex,

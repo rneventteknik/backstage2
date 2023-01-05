@@ -3,7 +3,7 @@ import Layout from '../../components/layout/Layout';
 import useSwr from 'swr';
 import { Button, Card, Form, ProgressBar } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { faCheckCircle, faExclamationCircle, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../components/layout/Header';
@@ -28,7 +28,7 @@ import { EquipmentPublicCategory, EquipmentTag } from '../../models/interfaces';
 import { EquipmentLocation } from '../../models/interfaces/EquipmentLocation';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl(Role.ADMIN);
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Importera Utrustning';
 const breadcrumbs = [

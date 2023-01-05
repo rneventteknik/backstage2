@@ -6,7 +6,7 @@ import { TableDisplay, TableConfiguration } from '../../components/TableDisplay'
 import Link from 'next/link';
 import { Button, Col, Collapse, Dropdown, DropdownButton, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import {
     faAdd,
     faArchive,
@@ -125,7 +125,7 @@ const tableSettings: TableConfiguration<Equipment> = {
 };
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo };
 const pageTitle = 'Utrustning';
 const breadcrumbs = [{ link: 'equipment', displayName: pageTitle }];
