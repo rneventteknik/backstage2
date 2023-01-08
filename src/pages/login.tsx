@@ -33,6 +33,16 @@ const LoginPage: React.FC = () => {
         }
     }, [usernameFieldRef]);
 
+    const getRedirectUrl = () => {
+        const url = getValueOrFirst(Router.query.redirectUrl);
+
+        if (!url || url.startsWith('/api/') || url.startsWith('/_next/')) {
+            return '/';
+        }
+
+        return url;
+    };
+
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -57,7 +67,7 @@ const LoginPage: React.FC = () => {
             .then((data) => data as CurrentUserInfo)
             .then((user) => {
                 if (user.isLoggedIn) {
-                    Router.push(getValueOrFirst(Router.query.redirectUrl) ?? '/');
+                    Router.push(getRedirectUrl());
                 } else {
                     setShowWrongPasswordError(true);
                 }
