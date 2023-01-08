@@ -9,12 +9,13 @@ import SmallBookingTable from '../components/SmallBookingTable';
 import { bookingsFetcher } from '../lib/fetchers';
 import { showActiveBookings, getRoleName } from '../lib/utils';
 import { formatDatetime, toBookingViewModel } from '../lib/datetimeUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const IndexPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: bookings } = useSwr('/api/bookings', bookingsFetcher);
     const { data: myBookings } = useSwr('/api/users/' + currentUser.userId + '/bookings', bookingsFetcher);
 
@@ -25,7 +26,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ) ?? ['-', '-', '-'];
 
     return (
-        <Layout title="Hem" fixedWidth={true} currentUser={currentUser}>
+        <Layout title="Hem" fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title="Backstage2" breadcrumbs={[]}></Header>
             <Row className="mb-3">
                 <Col xl={8}>

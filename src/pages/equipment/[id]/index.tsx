@@ -19,23 +19,31 @@ import EquipmentBookings from '../../../components/equipment/EquipmentBookings';
 import EquipmentTagDisplay from '../../../components/utils/EquipmentTagDisplay';
 import ChangelogCard from '../../../components/ChangelogCard';
 import MarkdownCard from '../../../components/MarkdownCard';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     // Edit user
     //
     const router = useRouter();
     const { data: equipment, error, isValidating } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !equipment) {
-        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} />;
+        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     // The page itself
@@ -47,7 +55,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href={'/equipment/' + equipment.id + '/edit'} passHref>

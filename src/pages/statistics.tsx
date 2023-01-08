@@ -16,10 +16,11 @@ import { PricePlan } from '../models/enums/PricePlan';
 import { getSortedList } from '../lib/sortIndexUtils';
 import { Status } from '../models/enums/Status';
 import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Statistik';
 const breadcrumbs = [{ link: 'statistics', displayName: pageTitle }];
 
@@ -204,15 +205,22 @@ const getUserStatistics = (bookings: BookingViewModel[]): UserStatisticViewModel
 
 // Page
 //
-const StatisticsPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: bookings, error, isValidating } = useSwr('/api/bookings', bookingsFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !bookings) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const bookingsViewModels = bookings
@@ -400,7 +408,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const statistics = getStatistics(bookingsViewModels);
 
     return (
-        <Layout title={pageTitle} currentUser={currentUser} fixedWidth={true}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
 
             <Tab.Container id="statistics-tabs" defaultActiveKey="equipment" transition={false}>

@@ -14,17 +14,18 @@ import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../..
 import { useNotifications } from '../../lib/useNotifications';
 import { addDays, formatDateForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 import TableStyleLink from '../../components/utils/TableStyleLink';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Jämför tillgänglighet';
 const breadcrumbs = [
     { link: '/equipment', displayName: 'Utrustning' },
     { link: '/equipment/compare-availability', displayName: pageTitle },
 ];
 
-const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const defaultDate = new Date();
     defaultDate.setHours(0, 0, 0, 0);
 
@@ -82,7 +83,7 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser }: Props) 
         }
     };
     return (
-        <Layout title={pageTitle} currentUser={currentUser} fixedWidth={true}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs} />
 
             <Card className="mb-3">

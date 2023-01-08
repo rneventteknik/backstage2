@@ -15,27 +15,35 @@ import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { Button } from 'react-bootstrap';
 import { showActiveBookings } from '../../lib/utils';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Aktiva bokningar';
 const breadcrumbs = [{ link: 'bookings', displayName: pageTitle }];
 
-const BookingListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: bookings, error, isValidating } = useSwr('/api/bookings', bookingsFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !bookings) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const bookingsToShow = bookings?.map(toBookingViewModel).filter(showActiveBookings);
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/bookings/new" passHref>

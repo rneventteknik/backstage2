@@ -72,13 +72,13 @@ export const getAccountKindName = (accountKind: AccountKind | null): string => {
     }
 };
 
-export const getAccountKindInvoiceAccount = (accountKind: AccountKind): string => {
+export const getAccountKindSalaryInvoiceAccount = (accountKind: AccountKind, globalSettings: KeyValue[]): string => {
     switch (accountKind) {
         case AccountKind.EXTERNAL:
-            return process.env.INVOICE_SALARY_ACCOUNT_EXTERNAL ?? '';
+            return getGlobalSetting('accounts.defaultSalaryAccount.external', globalSettings);
 
         case AccountKind.INTERNAL:
-            return process.env.INVOICE_SALARY_ACCOUNT_INTERNAL ?? '';
+            return getGlobalSetting('accounts.defaultSalaryAccount.internal', globalSettings);
     }
 };
 
@@ -250,7 +250,7 @@ export const replaceEmptyStringWithNull = (s: string | undefined | null): string
 export const getValueOrFirst = <T>(data: T | T[]) => (Array.isArray(data) ? data[0] : data);
 
 export const toKeyValue = (keyValue: KeyValue): KeyValue => {
-    if (!keyValue.key || !keyValue.value) {
+    if (!keyValue.key || keyValue.value === undefined) {
         throw 'Invalid key or value';
     }
 
@@ -260,20 +260,27 @@ export const toKeyValue = (keyValue: KeyValue): KeyValue => {
     };
 };
 
-export const getGlobalSetting = (key: string, globalSettings: KeyValue[]): string => {
-    const setting = globalSettings.find((x) => x.key == key);
-    if (!setting) throw new Error(`${key} cannot be found in the settings database`);
+export const getGlobalSetting = (key: string, globalSettings: KeyValue[], defaultValue?: string | null): string => {
+    const setting = globalSettings?.find((x) => x.key == key);
 
-    return setting.value;
+    if (setting) {
+        return setting.value;
+    }
+
+    if (defaultValue != undefined) {
+        return defaultValue;
+    }
+
+    throw new Error(`${key} cannot be found in the settings database`);
 };
 
-export const getDefaultSalary = (pricePlan: PricePlan, globalSettings: KeyValue[]): number => {
-    const SalaryExternal = getGlobalSetting('salary.external', globalSettings);
-    const SalaryTHS = getGlobalSetting('salary.ths', globalSettings);
+export const getDefaultLaborHourlyRate = (pricePlan: PricePlan, globalSettings: KeyValue[]): number => {
+    const LaborHourlyRateExternal = getGlobalSetting('laborHourlyRate.external', globalSettings);
+    const LaborHourlyRateTHS = getGlobalSetting('laborHourlyRate.ths', globalSettings);
 
-    const defaultSalary = pricePlan == PricePlan.EXTERNAL ? SalaryExternal : SalaryTHS;
+    const defaultLaborHourlyRate = pricePlan == PricePlan.EXTERNAL ? LaborHourlyRateExternal : LaborHourlyRateTHS;
 
-    return toIntOrUndefined(defaultSalary) ?? 0;
+    return toIntOrUndefined(defaultLaborHourlyRate) ?? 0;
 };
 
 export const showActiveBookings = (booking: BookingViewModel) => {

@@ -20,6 +20,7 @@ import { ErrorPage } from '../../components/layout/ErrorPage';
 import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import EquipmentTagDisplay from '../../components/utils/EquipmentTagDisplay';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 const EquipmentPackageNameDisplayFn = (equipmentPackage: EquipmentPackage) => (
     <>
@@ -69,14 +70,14 @@ const tableSettings: TableConfiguration<EquipmentPackage> = {
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Utrustningspaket';
 const breadcrumbs = [
     { link: '/equipment', displayName: 'Utrustning' },
     { link: 'equipmentPackage', displayName: pageTitle },
 ];
 
-const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: equipmentPackages, error, isValidating } = useSwr('/api/equipmentPackage', fetcher);
     const { data: equipmentPackageTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
@@ -85,11 +86,18 @@ const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser }: Props)
     const [filterTags, setFilterTags] = useState<EquipmentTag[]>([]);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !equipmentPackages) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     // Handlers for changed bookings
@@ -106,7 +114,7 @@ const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser }: Props)
     );
 
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/equipmentPackage/new" passHref>

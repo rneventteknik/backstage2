@@ -34,7 +34,7 @@ type Props = {
     readonly: boolean;
     showContent: boolean;
     setShowContent: (bol: boolean) => void;
-    defaultSalary: number;
+    defaultLaborHourlyRate: number;
 };
 
 const TimeReportList: React.FC<Props> = ({
@@ -43,7 +43,7 @@ const TimeReportList: React.FC<Props> = ({
     readonly,
     showContent,
     setShowContent,
-    defaultSalary,
+    defaultLaborHourlyRate,
 }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
     const { data: users } = useSwr('/api/users', usersFetcher);
@@ -237,7 +237,7 @@ const TimeReportList: React.FC<Props> = ({
 
     const TimeReportSumDisplayFn = (entry: TimeReport) => {
         const getPricePerHourIfNotDefault = (timeReport: TimeReport) => {
-            return timeReport.pricePerHour === defaultSalary
+            return timeReport.pricePerHour === defaultLaborHourlyRate
                 ? ''
                 : formatNumberAsCurrency(timeReport.pricePerHour) + '/h';
         };
@@ -358,7 +358,7 @@ const TimeReportList: React.FC<Props> = ({
                         variant="secondary"
                         size="sm"
                         icon={faAdd}
-                        defaultSalary={defaultSalary}
+                        defaultLaborHourlyRate={defaultLaborHourlyRate}
                     >
                         Ny rad
                     </TimeReportAddButton>

@@ -19,12 +19,13 @@ import { Role } from '../../../models/enums/Role';
 import { faBoxesPacking, faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showArchiveModal, setShowArchiveModal] = useState(false);
     const [showUnarchiveModal, setShowUnarchiveModal] = useState(false);
@@ -45,11 +46,18 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     });
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !equipment) {
-        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
+        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const handleSubmit = async (equipment: PartialDeep<IEquipmentObjectionModel>) => {
@@ -129,7 +137,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara utrustning

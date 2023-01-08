@@ -22,6 +22,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { IfAdmin } from '../utils/IfAdmin';
+import { KeyValue } from '../../models/interfaces/KeyValue';
+import { getGlobalSetting } from '../../lib/utils';
 
 // Component for a single link
 //
@@ -64,13 +66,11 @@ const SidebarLinkGroup: React.FC<SidebarLinkGroupProps> = ({ children, title }: 
 
 // External links
 //
-const getExternalLinksFromEnv = () => {
+const getExternalLinksFromGlobalSettings = (globalSettings: KeyValue[]) => {
     try {
         type LinkObject = { title: string; url: string };
-        const links = (
-            process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS
-                ? JSON.parse(process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS)
-                : []
+        const links = JSON.parse(
+            getGlobalSetting('content.sidebarExternalLinks', globalSettings, '[]'),
         ) as LinkObject[];
 
         if (links.length === 0) {
@@ -83,7 +83,7 @@ const getExternalLinksFromEnv = () => {
     } catch {
         return (
             <Alert className="mx-4 p-3" variant="danger">
-                <strong>Error</strong> Invalid JSON
+                <strong>Error</strong> Invalid JSON in <code>content.sidebarExternalLinks</code> setting
             </Alert>
         );
     }
@@ -93,8 +93,9 @@ const getExternalLinksFromEnv = () => {
 //
 type Props = {
     currentUser: CurrentUserInfo;
+    globalSettings: KeyValue[];
 };
-const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
+const sidebar: React.FC<Props> = ({ currentUser, globalSettings }: Props) => (
     <div className={styles.container + ' pt-2'}>
         <SidebarLinkGroup>
             <SidebarLink displayName="Hem" link="/" icon={faHome} exactMatch={true} />
@@ -115,8 +116,10 @@ const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
             </SidebarLinkGroup>
         </IfAdmin>
 
-        {getExternalLinksFromEnv() ? (
-            <SidebarLinkGroup title="Externa länkar">{getExternalLinksFromEnv()}</SidebarLinkGroup>
+        {getExternalLinksFromGlobalSettings(globalSettings) ? (
+            <SidebarLinkGroup title="Externa länkar">
+                {getExternalLinksFromGlobalSettings(globalSettings)}
+            </SidebarLinkGroup>
         ) : null}
 
         <div className={styles.debugInfo}>

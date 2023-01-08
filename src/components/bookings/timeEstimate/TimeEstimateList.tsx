@@ -29,7 +29,7 @@ type Props = {
     readonly: boolean;
     showContent: boolean;
     setShowContent: (bool: boolean) => void;
-    defaultSalary: number;
+    defaultLaborHourlyRate: number;
 };
 
 const TimeEstimateList: React.FC<Props> = ({
@@ -37,7 +37,7 @@ const TimeEstimateList: React.FC<Props> = ({
     readonly,
     showContent,
     setShowContent,
-    defaultSalary,
+    defaultLaborHourlyRate,
 }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
@@ -279,7 +279,7 @@ const TimeEstimateList: React.FC<Props> = ({
                         variant="secondary"
                         size="sm"
                         buttonType="button"
-                        defaultSalary={defaultSalary}
+                        defaultLaborHourlyRate={defaultLaborHourlyRate}
                     >
                         <FontAwesomeIcon icon={faPlus} className="mr-1" />
                         Ny rad

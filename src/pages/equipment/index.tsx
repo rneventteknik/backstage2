@@ -27,6 +27,7 @@ import { ErrorPage } from '../../components/layout/ErrorPage';
 import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { IfAdmin, IfNotReadonly } from '../../components/utils/IfAdmin';
 import EquipmentTagDisplay from '../../components/utils/EquipmentTagDisplay';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -126,11 +127,11 @@ const tableSettings: TableConfiguration<Equipment> = {
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Utrustning';
 const breadcrumbs = [{ link: 'equipment', displayName: pageTitle }];
 
-const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: equipment, error } = useSwr('/api/equipment', equipmentsFetcher);
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
@@ -140,11 +141,18 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const [filterPubliclyHidden, setFilterPubliclyHidden] = useState('all');
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (!equipment) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     // Handlers for changed bookings
@@ -168,7 +176,7 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         );
 
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/equipment/new" passHref>

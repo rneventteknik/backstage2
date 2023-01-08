@@ -25,12 +25,13 @@ import { addDays, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 import CustomerSearch from '../../components/CustomerSearch';
 import { Customer } from '../../models/interfaces/Customer';
 import { BookingType } from '../../models/enums/BookingType';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const router = useRouter();
     const pageTitle = 'Ny bokning';
     const [selectedDefaultBooking, setSelectedDefaultBooking] = useState<Partial<Booking> | undefined>();
@@ -153,7 +154,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     };
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
 
             <Tab.Container id="new-booking-tabs" activeKey={wizardStep}>

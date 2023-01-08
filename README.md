@@ -37,18 +37,10 @@ DB_PASS={database password (optional, only needed when using PostgreSQL)}
 DB_NAME={database name (optional, only needed when using PostgreSQL)}
 DB_SSL={true or false (optional, only needed when using PostgreSQL)}
 
-NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS={json array with external links, where each link is an object with a title and an url attribute (optional, defaults to empty list)}
-
 MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay logged in. (optional, defaults to forever if not set)}
 
 CALENDAR_API_KEY={Google Calender API Key, with read-access to calendars}
 CALENDAR_ID={Google Calender ID to fetch events from}
-INVOICE_OUR_REFERENCE={Our reference on invoice exports, test suite expects value Person Personsson}
-INVOICE_DIMENSION_1={'Resultatställe' on invoice exports, test suite expects value 81}
-INVOICE_DEFAULT_EQUIPMENT_ACCOUNT={Equipment account on invoice exports, test suite expects value 3550}
-INVOICE_SALARY_ACCOUNT_EXTERNAL={Salary account for THS on invoice exports, test suite expects value 3620}
-INVOICE_SALARY_ACCOUNT_INTERNAL={Salary account for other customers on invoice exports, test suite expects value 7900}
-NEXT_PUBLIC_INVOICE_ACCOUNTS={json array with accounts, where each account is an object with `accountNumber` (string) and `description` (string)}
 ```
 
 ### Version Control

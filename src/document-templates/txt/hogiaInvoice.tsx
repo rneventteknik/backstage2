@@ -9,11 +9,12 @@ import {
     getCalculatedDiscount,
 } from '../../lib/pricingUtils';
 import { getSortedList } from '../../lib/sortIndexUtils';
-import { getAccountKindInvoiceAccount, range } from '../../lib/utils';
+import { getAccountKindSalaryInvoiceAccount, getGlobalSetting, range } from '../../lib/utils';
 import { AccountKind } from '../../models/enums/AccountKind';
 import { BookingType } from '../../models/enums/BookingType';
 import { BookingViewModel, TimeReport } from '../../models/interfaces';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../models/interfaces/EquipmentList';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 enum RowType {
     ITEM = 1,
@@ -23,7 +24,11 @@ enum RowType {
     SUM = 12,
 }
 
-export const getHogiaTxtInvoice = (booking: BookingViewModel, t: (t: string) => string): Buffer => {
+export const getHogiaTxtInvoice = (
+    booking: BookingViewModel,
+    globalSettings: KeyValue[],
+    t: (t: string) => string,
+): Buffer => {
     const lists = booking.equipmentLists ?? [];
 
     // This wrapping is used to merge and sort the list entries and headings
@@ -45,8 +50,18 @@ export const getHogiaTxtInvoice = (booking: BookingViewModel, t: (t: string) => 
             ...sortedListEntriesAndHeadings.flatMap((wrappedEntity) => {
                 const isHeading = wrappedEntity.typeIdentifier === 'H';
                 return isHeading
-                    ? formatEquipmentListHeading(wrappedEntity.entity as EquipmentListHeading, getNumberOfDays(list), t)
-                    : formatEquipmentListEntry(wrappedEntity.entity as EquipmentListEntry, getNumberOfDays(list), t);
+                    ? formatEquipmentListHeading(
+                          wrappedEntity.entity as EquipmentListHeading,
+                          getNumberOfDays(list),
+                          globalSettings,
+                          t,
+                      )
+                    : formatEquipmentListEntry(
+                          wrappedEntity.entity as EquipmentListEntry,
+                          getNumberOfDays(list),
+                          globalSettings,
+                          t,
+                      );
             }),
         ];
     });
@@ -54,16 +69,23 @@ export const getHogiaTxtInvoice = (booking: BookingViewModel, t: (t: string) => 
         formatTimeReports(
             booking.timeReports?.filter((x) => x.accountKind == AccountKind.EXTERNAL),
             AccountKind.EXTERNAL,
+            globalSettings,
             t,
         ),
         formatTimeReports(
             booking.timeReports?.filter((x) => x.accountKind == AccountKind.INTERNAL),
             AccountKind.INTERNAL,
+            globalSettings,
             t,
         ),
     ];
 
-    const invoiceLines = [formatHeader(booking, t), ...equipmentLines, ...timeReportLines, formatFooter()];
+    const invoiceLines = [
+        formatHeader(booking, globalSettings, t),
+        ...equipmentLines,
+        ...timeReportLines,
+        formatFooter(),
+    ];
     const content = invoiceLines.join('');
     // Hogia requires 'ANSI' encoded text
     return iconv.encode(content, 'WINDOWS-1252');
@@ -99,6 +121,7 @@ const formatInvoiceRow = (
 const formatEquipmentListEntry = (
     entry: EquipmentListEntry,
     numberOfDays: number,
+    globalSettings: KeyValue[],
     t: (t: string) => string,
 ): string => {
     const unitTextResourceKey = entry.numberOfUnits > 1 ? 'common.misc.count-unit' : 'common.misc.count-unit-single';
@@ -110,7 +133,7 @@ const formatEquipmentListEntry = (
             entry.numberOfUnits,
             getUnitPrice(entry, numberOfDays),
             getCalculatedDiscount(entry, numberOfDays),
-            entry.account ?? process.env.INVOICE_DEFAULT_EQUIPMENT_ACCOUNT ?? '',
+            entry.account ?? getGlobalSetting('accounts.defaultEquipmentAccount', globalSettings),
             t(unitTextResourceKey),
         ) +
         ((numberOfDays > 1 || entry.numberOfHours) && entry.pricePerUnit ? formatUnitPrices(entry, t) : '') +
@@ -122,6 +145,7 @@ const formatEquipmentListEntry = (
 const formatEquipmentListHeading = (
     heading: EquipmentListHeading,
     numberOfDays: number,
+    globalSettings: KeyValue[],
     t: (t: string) => string,
 ): string => {
     return (
@@ -131,7 +155,7 @@ const formatEquipmentListHeading = (
             1,
             getEquipmentListHeadingPrice(heading, numberOfDays),
             0,
-            process.env.INVOICE_DEFAULT_EQUIPMENT_ACCOUNT ?? '',
+            getGlobalSetting('accounts.defaultEquipmentAccount', globalSettings),
             t('common.misc.count-unit-single'),
         ) +
         formatInvoiceRow(
@@ -170,6 +194,7 @@ const formatHourlyPrice = (entry: EquipmentListEntry, t: (t: string) => string):
 const formatTimeReports = (
     timeReports: TimeReport[] | undefined,
     accountKind: AccountKind,
+    globalSettings: KeyValue[],
     t: (t: string) => string,
 ): string => {
     const price = getTotalTimeReportsPrice(timeReports);
@@ -184,7 +209,7 @@ const formatTimeReports = (
         1,
         price,
         undefined,
-        getAccountKindInvoiceAccount(accountKind),
+        getAccountKindSalaryInvoiceAccount(accountKind, globalSettings),
         t('common.misc.count-unit'),
     );
 };
@@ -192,7 +217,7 @@ const formatTimeReports = (
 const formatEquipmentList = (list: EquipmentList): string => {
     return formatInvoiceRow(RowType.TEXT, list.name);
 };
-const formatHeader = (booking: BookingViewModel, t: (t: string) => string): string => {
+const formatHeader = (booking: BookingViewModel, globalSettings: KeyValue[], t: (t: string) => string): string => {
     const bookingTypeTextResourceKey =
         booking.bookingType === BookingType.GIG
             ? 'common.booking-info.booking-gig'
@@ -212,8 +237,8 @@ const formatHeader = (booking: BookingViewModel, t: (t: string) => string): stri
     const rowFormat = new Map([
         [1, 'Kundfaktura'],
         [5, booking.invoiceHogiaId?.toString() ?? '0'],
-        [10, process.env.INVOICE_DIMENSION_1 ?? ''],
-        [13, process.env.INVOICE_OUR_REFERENCE ?? ''],
+        [10, getGlobalSetting('invoice.dimension1', globalSettings)],
+        [13, getGlobalSetting('invoice.ourReference', globalSettings)],
         [16, invoiceComment],
         [17, booking.contactPersonName ?? ''],
         [26, booking.invoiceAddress?.replaceAll('\n', '<CR>') ?? ''],

@@ -16,22 +16,30 @@ import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
 import { usersFetcher } from '../../lib/fetchers';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Användare';
 const breadcrumbs = [{ link: 'users', displayName: pageTitle }];
 
-const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const UserListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: users, error, isValidating } = useSwr('/api/users', usersFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !users) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const UserNameDisplayFn = (user: User) => (
@@ -91,7 +99,7 @@ const UserListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     };
 
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfAdmin currentUser={currentUser}>
                     <Link href="/users/new" passHref>

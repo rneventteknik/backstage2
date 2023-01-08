@@ -7,15 +7,17 @@ import Layout from './Layout';
 import styles from './ErrorPage.module.scss';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import Link from 'next/link';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 type Props = {
     currentUser: CurrentUserInfo;
+    globalSettings: KeyValue[];
     fixedWidth: boolean;
     errorMessage?: string;
 };
 
-export const ErrorPage: React.FC<Props> = ({ fixedWidth, currentUser, errorMessage }: Props) => (
-    <Layout title="Fel" fixedWidth={fixedWidth} currentUser={currentUser}>
+export const ErrorPage: React.FC<Props> = ({ fixedWidth, currentUser, globalSettings, errorMessage }: Props) => (
+    <Layout title="Fel" fixedWidth={fixedWidth} currentUser={currentUser} globalSettings={globalSettings}>
         <Breadcrumbs breadcrumbs={[{ link: '', displayName: 'Fel' }]} />
 
         <ErrorPageContent errorMessage={errorMessage} />

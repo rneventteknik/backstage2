@@ -14,27 +14,35 @@ import { IfNotReadonly } from '../components/utils/IfAdmin';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { toBookingViewModel } from '../lib/datetimeUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Alla bokningar';
 const breadcrumbs = [{ link: 'archive', displayName: pageTitle }];
 
-const ArchiveListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const ArchiveListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: bookings, error, isValidating } = useSwr('/api/bookings', bookingsFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !bookings) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const bookingsToShow = bookings?.map(toBookingViewModel);
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/bookings/new" passHref>

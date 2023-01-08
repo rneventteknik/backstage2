@@ -22,25 +22,33 @@ import DoneIcon from '../components/utils/DoneIcon';
 import { formatDatetime } from '../lib/datetimeUtils';
 import CreateSalaryGroupModal from '../components/salaries/CreateSalaryGroupModal';
 import ViewSalaryGroupModal from '../components/salaries/ViewSalaryGroupModal';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Löneunderlag';
 const breadcrumbs = [{ link: '/salary/', displayName: pageTitle }];
 
-const SalaryGroupPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: salaryGroups, error, isValidating, mutate } = useSwr('/api/salaryGroups', salaryGroupsFetcher);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [salaryGroupToViewId, setSalaryGroupToViewId] = useState<number | null>(null);
     const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if ((isValidating || !salaryGroups) && salaryGroupToViewId === null) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const createSalaryGroup = (newSalaryGroup: PartialDeep<ISalaryGroupObjectionModel>) => {
@@ -183,7 +191,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     };
 
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button onClick={() => setShowCreateModal(true)}>
                     <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Löneunderlagsgrupp

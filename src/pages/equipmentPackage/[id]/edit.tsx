@@ -19,12 +19,13 @@ import { Role } from '../../../models/enums/Role';
 import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage } = useNotifications();
@@ -43,11 +44,18 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     });
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !equipmentPackage) {
-        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
+        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => {
@@ -103,7 +111,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentPackageForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara utrustningspaket

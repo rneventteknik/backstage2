@@ -36,7 +36,7 @@ const SettingsModal: React.FC<Props> = ({ setting, onSubmit, onChange, hide, sho
                         <Form.Label>Värde</Form.Label>
                         <RequiredIndicator />
                         <Form.Control
-                            type="text"
+                            as="textarea"
                             name="value"
                             defaultValue={setting?.value}
                             onChange={(e) => onChange({ ...setting, value: e.target.value })}

@@ -8,6 +8,7 @@ import { getTextResource } from '../../../../../document-templates/useTextResour
 import { getHogiaInvoiceFileName } from '../../../../../document-templates';
 import { Language } from '../../../../../models/enums/Language';
 import { toBookingViewModel } from '../../../../../lib/datetimeUtils';
+import { fetchSettings } from '../../../../../lib/db-access/setting';
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     if (isNaN(Number(req.query.bookingId))) {
@@ -30,6 +31,8 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             return getTextResource(key, documentLanguage);
         };
 
+        const globalSettings = await fetchSettings();
+
         res.setHeader('Content-Type', 'text/plain; charset=windows-1252');
         // If the download flag is set, tell the browser to download the file instead of showing it in a new tab.
         if (req.query.download) {
@@ -38,7 +41,7 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
         }
 
-        const content = getHogiaTxtInvoice(bookingViewModel, t);
+        const content = getHogiaTxtInvoice(bookingViewModel, globalSettings, t);
 
         res.send(content);
     });

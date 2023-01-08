@@ -26,10 +26,11 @@ import {
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { EquipmentPublicCategory, EquipmentTag } from '../../models/interfaces';
 import { EquipmentLocation } from '../../models/interfaces/EquipmentLocation';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Importera Utrustning';
 const breadcrumbs = [
     { link: '/equipment', displayName: 'Utrustning' },
@@ -42,7 +43,7 @@ interface EquipmentImportModel extends IEquipmentObjectionModel {
     equipmentTagNames?: string[];
 }
 
-const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const {
         data: equipment,
         error,
@@ -89,13 +90,34 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser }: Props) 
     // Error handling of equipment list from server
     //
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
     if (equipmentTagsError) {
-        return <ErrorPage errorMessage={equipmentTagsError.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={equipmentTagsError.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
     if (equipmentLocationsError) {
-        return <ErrorPage errorMessage={equipmentLocationsError.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={equipmentLocationsError.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
     if (equipmentPublicCategoriesError) {
         return (
@@ -103,6 +125,7 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser }: Props) 
                 errorMessage={equipmentPublicCategoriesError.message}
                 fixedWidth={true}
                 currentUser={currentUser}
+                globalSettings={globalSettings}
             />
         );
     }
@@ -114,7 +137,7 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser }: Props) 
         equipmentPublicCategoriesIsValidating ||
         !equipment
     ) {
-        return <TextLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TextLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     // Parse JSON
@@ -394,7 +417,7 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser }: Props) 
     };
 
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button
                     variant="primary"

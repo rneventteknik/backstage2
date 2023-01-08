@@ -5,11 +5,13 @@ import React, { ReactNode, useState } from 'react';
 import Sidebar from './Sidebar';
 import styles from './Layout.module.scss';
 import { SkeletonTheme } from 'react-loading-skeleton';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 type Props = {
     children?: ReactNode;
     title?: string;
     currentUser: CurrentUserInfo;
+    globalSettings: KeyValue[];
     fixedWidth?: boolean;
 };
 
@@ -18,6 +20,7 @@ const Layout: React.FC<Props> = ({
     title = 'This is the default title',
     fixedWidth = false,
     currentUser,
+    globalSettings,
 }: Props) => {
     const [sidebarIsToggled, setSidebarIsToggled] = useState(false);
     const toggleSidebar = () => setSidebarIsToggled(!sidebarIsToggled);
@@ -33,7 +36,7 @@ const Layout: React.FC<Props> = ({
             <Topbar currentUser={currentUser} toggleSidebar={toggleSidebar} />
 
             <aside className={styles.sidebar}>
-                <Sidebar currentUser={currentUser} />
+                <Sidebar currentUser={currentUser} globalSettings={globalSettings} />
             </aside>
 
             <SkeletonTheme

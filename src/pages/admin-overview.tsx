@@ -11,22 +11,30 @@ import { Role } from '../models/enums/Role';
 import { Status } from '../models/enums/Status';
 import AdminBookingList from '../components/admin/AdminBookingList';
 import { toBookingViewModel } from '../lib/datetimeUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Adminöversikt';
 const breadcrumbs = [{ link: 'admin-overview', displayName: pageTitle }];
 
-const AdminOverviewPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const AdminOverviewPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: bookings, error, isValidating } = useSwr('/api/bookings', bookingsFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !bookings) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const bookingsToShow = bookings
@@ -34,7 +42,7 @@ const AdminOverviewPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         ?.filter((b) => b.status === Status.DONE || b.status === Status.BOOKED)
         ?.filter((b) => b.usageStartDatetime && b.usageStartDatetime?.getTime() < Date.now());
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
             <AdminBookingList bookings={bookingsToShow} />
         </Layout>

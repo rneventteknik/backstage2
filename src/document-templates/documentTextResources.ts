@@ -11,6 +11,8 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.booking-info.customer': 'Arrangör',
         'common.booking-info.dates': 'Datum',
         'common.booking-info.days': 'Antal dagar',
+        'common.booking-info.booking-gig': 'Arrangemang',
+        'common.booking-info.booking-rental': 'Hyra',
 
         // Equipment list
         'common.equipment-list.table-header.specification': 'Specifikation',
@@ -87,6 +89,8 @@ export const documentTextResources: Record<Language, Record<string, string>> = {
         'common.booking-info.customer': 'Organizer',
         'common.booking-info.dates': 'Date',
         'common.booking-info.days': 'Number of days',
+        'common.booking-info.booking-gig': 'Event',
+        'common.booking-info.booking-rental': 'Rental',
 
         // Equipment list
         'common.equipment-list.table-header.specification': 'Item',

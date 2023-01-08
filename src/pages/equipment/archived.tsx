@@ -14,6 +14,7 @@ import { equipmentsFetcher } from '../../lib/fetchers';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
 import { formatDatetimeForForm } from '../../lib/datetimeUtils';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -61,26 +62,33 @@ const tableSettings: TableConfiguration<Equipment> = {
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Arkiverad utrustning';
 const breadcrumbs = [
     { link: '/equipment', displayName: 'Utrustning' },
     { link: '/equipment/archived', displayName: pageTitle },
 ];
 
-const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: equipment, error, isValidating } = useSwr('/api/equipment/archived', equipmentsFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !equipment) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs} />
             <TableDisplay entities={equipment} configuration={tableSettings} />
         </Layout>

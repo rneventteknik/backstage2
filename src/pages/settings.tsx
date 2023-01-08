@@ -21,14 +21,15 @@ import SettingsModal from '../components/utils/setting/SettingsModal';
 import ConfirmModal from '../components/utils/ConfirmModal';
 import { settingsFetcher } from '../lib/fetchers';
 import { formatDate } from '../lib/datetimeUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Inställningar';
 const breadcrumbs = [{ link: 'setting', displayName: pageTitle }];
 
-const SettingListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const SettingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: settings, error, isValidating, mutate } = useSwr('/api/setting', settingsFetcher);
 
     const [settingToEdit, setSettingToEdit] = useState<Setting | null>(null);
@@ -43,11 +44,18 @@ const SettingListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     } = useNotifications();
 
     if (error) {
-        return <ErrorPage errorMessage={error} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !settings) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const addSetting = async (setting: ISettingObjectionModel | null) => {
@@ -158,6 +166,7 @@ const SettingListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 displayName: 'Värde',
                 getValue: (entry: Setting) => entry.value,
                 columnWidth: 100,
+                textTruncation: true,
             },
             {
                 key: 'note',
@@ -185,7 +194,7 @@ const SettingListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
 
     return (
         <>
-            <Layout title={pageTitle} currentUser={currentUser}>
+            <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
                 <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                     <IfNotReadonly currentUser={currentUser}>
                         <Button

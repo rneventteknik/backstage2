@@ -22,25 +22,33 @@ import ViewInvoiceGroupModal from '../components/invoices/ViewInvoiceGroupModal'
 import { PaymentStatus } from '../models/enums/PaymentStatus';
 import DoneIcon from '../components/utils/DoneIcon';
 import { formatDatetime } from '../lib/datetimeUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Fakturaunderlag';
 const breadcrumbs = [{ link: '/invoices/', displayName: pageTitle }];
 
-const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: invoiceGroups, error, isValidating, mutate } = useSwr('/api/invoiceGroups', invoiceGroupsFetcher);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [invoiceGroupToViewId, setInvoiceGroupToViewId] = useState<number | null>(null);
     const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if ((isValidating || !invoiceGroups) && invoiceGroupToViewId === null) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const createInvoiceGroup = (newInvoiceGroup: PartialDeep<IInvoiceGroupObjectionModel>) => {
@@ -183,7 +191,7 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     };
 
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button onClick={() => setShowCreateModal(true)}>
                     <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Fakturaunderlagsgrupp

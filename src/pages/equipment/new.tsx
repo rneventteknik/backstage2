@@ -14,12 +14,13 @@ import { PartialDeep } from 'type-fest';
 import { Role } from '../../models/enums/Role';
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const router = useRouter();
     const pageTitle = 'Ny utrustning';
     const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
@@ -52,7 +53,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     };
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till utrustning

@@ -16,12 +16,13 @@ import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import SmallBookingTable from '../../../components/SmallBookingTable';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     // Edit user
     //
     const router = useRouter();
@@ -29,11 +30,18 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     const { data: bookings } = useSwr('/api/users/' + router.query.id + '/bookings', bookingsFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !user) {
-        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} />;
+        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     // The page itself
@@ -45,7 +53,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
                     <Link href={'/users/' + user.id + '/edit'} passHref>

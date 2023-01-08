@@ -16,7 +16,7 @@ type Props = {
     sortIndex: number;
     onAdd: (data: TimeReport) => void;
     currentUser: CurrentUserInfo;
-    defaultSalary: number;
+    defaultLaborHourlyRate: number;
 };
 
 const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>> = ({
@@ -25,7 +25,7 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
     sortIndex,
     currentUser,
     children,
-    defaultSalary,
+    defaultLaborHourlyRate,
     ...rest
 }: Props & React.ComponentProps<typeof Button>) => {
     const { showCreateFailedNotification } = useNotifications();
@@ -43,7 +43,7 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
             userId: currentUser.userId,
             startDatetime: formatDatetime(new Date()),
             endDatetime: formatDatetime(new Date()),
-            pricePerHour: defaultSalary,
+            pricePerHour: defaultLaborHourlyRate,
             name: '',
             accountKind: booking.accountKind ?? AccountKind.EXTERNAL,
             sortIndex: sortIndex,

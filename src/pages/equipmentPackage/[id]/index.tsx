@@ -13,12 +13,13 @@ import { equipmentPackageFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faCoins, faEyeSlash, faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
-type Props = { user: CurrentUserInfo };
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const router = useRouter();
     const {
         data: equipmentPackage,
@@ -27,11 +28,18 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     } = useSwr('/api/equipmentPackage/' + router.query.id, equipmentPackageFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !equipmentPackage) {
-        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} />;
+        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     // The page itself
@@ -44,7 +52,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href={'/equipmentPackage/' + equipmentPackage.id + '/edit'} passHref>

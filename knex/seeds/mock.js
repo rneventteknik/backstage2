@@ -1817,18 +1817,74 @@ export async function seed(knex) {
 
     await knex('Setting').insert([
         {
-            key: 'salary.ths',
-            note: 'Lön för THS-kund, anges i kr/h',
+            key: 'laborHourlyRate.ths',
+            note: 'Timkostnad arbete för THS-kund, anges i kr/h',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
             value: '125',
         },
         {
-            key: 'salary.external',
-            note: 'Lön för externkund, anges i kr/h',
+            key: 'laborHourlyRate.external',
+            note: 'Timkostnad arbete för externkund, anges i kr/h',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
             value: '250',
+        },
+        {
+            key: 'accounts.availableAccounts',
+            note: 'Tillgängliga konton, som JSON-lista med objekt som har "accountNumber" och "description"-attribut (båda strängar).',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '[]',
+        },
+        {
+            key: 'accounts.defaultEquipmentAccount',
+            note: 'Standardkonto för utrustning',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '3550',
+        },
+        {
+            key: 'accounts.defaultSalaryAccount.internal',
+            note: 'Standardkonto för lön för interna evenemang',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '7900',
+        },
+        {
+            key: 'accounts.defaultSalaryAccount.external',
+            note: 'Standardkonto för lön för externa evenemang',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '3620',
+        },
+        {
+            key: 'invoice.dimension1',
+            note: 'Resultatställe på fakturaexporter',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '81',
+        },
+        {
+            key: 'invoice.ourReference',
+            note: 'Vår referens på fakturaexporter',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: 'Person Personsson',
+        },
+        {
+            key: 'content.sidebarExternalLinks',
+            note: 'Länkar för sidomenyn, som JSON-lista med objekt som har "url" och "title"-attribut.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '[]',
+        },
+        {
+            key: 'content.helpPageText',
+            note: 'Text för hjälpsidan, som Markdown',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eleifend vulputate ligula a semper. In hac habitasse platea dictumst. Aliquam vel neque nec turpis facilisis iaculis vitae quis lectus. Praesent accumsan pellentesque mi, vitae blandit massa tincidunt vel. Sed nec dolor a eros hendrerit pretium eget non libero. Nulla id mollis nisl. Praesent libero lacus, pellentesque vel lacus at, elementum bibendum ex. Praesent orci ante, egestas non ligula id, fermentum sodales neque. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi malesuada orci ac eros vulputate, in fringilla nibh ornare. Nullam dapibus enim a enim posuere pulvinar. Phasellus sodales, eros eget rutrum interdum, nisi urna maximus libero, pellentesque interdum nisl massa nec quam.\n\nVivamus sed libero id ex sodales dictum quis a elit. In sit amet hendrerit diam. Suspendisse vitae dui nec turpis finibus vestibulum. Vivamus vehicula vulputate erat, laoreet pretium dolor ultrices sed. Aenean quis rutrum augue. Aenean ut consectetur diam, sit amet fermentum magna. Nulla facilisis, erat id convallis pretium, sapien tellus dictum tortor, nec efficitur quam quam eget lectus.',
         },
     ]);
 

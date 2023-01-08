@@ -13,7 +13,7 @@ type Props = {
     onAdd: (data: TimeEstimate) => void;
     buttonType: 'dropdown' | 'button';
     children?: ReactNode;
-    defaultSalary: number;
+    defaultLaborHourlyRate: number;
 };
 
 const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button>> = ({
@@ -22,7 +22,7 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
     sortIndex,
     buttonType,
     children,
-    defaultSalary,
+    defaultLaborHourlyRate,
     ...rest
 }: Props & React.ComponentProps<typeof Button>) => {
     const { showCreateFailedNotification } = useNotifications();
@@ -31,7 +31,7 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
         const timeEstimate: ITimeEstimateObjectionModel = {
             bookingId: booking.id,
             numberOfHours: 0,
-            pricePerHour: defaultSalary,
+            pricePerHour: defaultLaborHourlyRate,
             name: '',
             sortIndex: sortIndex,
         };
