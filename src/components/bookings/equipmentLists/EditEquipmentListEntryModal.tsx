@@ -2,11 +2,12 @@ import React from 'react';
 import { Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
-import { replaceEmptyStringWithNull, toIntOrUndefined } from '../../../lib/utils';
+import { getGlobalSetting, replaceEmptyStringWithNull, toIntOrUndefined } from '../../../lib/utils';
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
 import { EquipmentPrice } from '../../../models/interfaces';
 import { Typeahead } from 'react-bootstrap-typeahead';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 type Props = {
     show: boolean;
@@ -22,16 +23,13 @@ type Props = {
     onSave: (entryToSave: EquipmentListEntry, isNew: boolean) => void;
     nextId: number;
     nextSortIndex: number;
+    globalSettings: KeyValue[];
 };
 
 type Account = {
     accountNumber: string;
     description: string;
 };
-
-const invoiceAccounts: Account[] = process.env.NEXT_PUBLIC_INVOICE_ACCOUNTS
-    ? JSON.parse(process.env.NEXT_PUBLIC_INVOICE_ACCOUNTS)
-    : [];
 
 const EditEquipmentListEntryModal: React.FC<Props> = ({
     show,
@@ -43,7 +41,9 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
     nextId,
     nextSortIndex,
     onSave,
+    globalSettings,
 }: Props) => {
+    const invoiceAccounts: Account[] = JSON.parse(getGlobalSetting('accounts.availableAccounts', globalSettings, '[]'));
     return (
         <Modal show={show} onHide={() => onHide()} size="lg">
             {!!equipmentListEntryToEditViewModel ? (

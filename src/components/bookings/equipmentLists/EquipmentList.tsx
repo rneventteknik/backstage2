@@ -26,6 +26,7 @@ import {
 import { EquipmentPrice } from '../../../models/interfaces';
 import EquipmentListTable from './EquipmentListTable';
 import EquipmentListHeader from './EquipmentListHeader';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 type Props = {
     bookingId: number;
@@ -35,6 +36,7 @@ type Props = {
     moveListFn: (x: EquipmentList, direction: 'UP' | 'DOWN') => void;
     isFirstFn: (x: EquipmentList) => boolean;
     isLastFn: (x: EquipmentList) => boolean;
+    globalSettings: KeyValue[];
 };
 
 const EquipmentListDisplay: React.FC<Props> = ({
@@ -45,6 +47,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
     isFirstFn: parentIsFirstFn,
     isLastFn: parentIsLastFn,
     readonly,
+    globalSettings,
 }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
@@ -210,6 +213,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                 onSave={onEditModalSave}
                 nextId={getNextEquipmentListEntryId(list)}
                 nextSortIndex={getNextSortIndex(getEntitiesToDisplay(list))}
+                globalSettings={globalSettings}
             />
         </Card>
     );

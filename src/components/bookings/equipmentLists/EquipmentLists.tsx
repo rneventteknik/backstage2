@@ -22,16 +22,18 @@ import {
     moveItemUp,
 } from '../../../lib/sortIndexUtils';
 import EquipmentListDisplay from './EquipmentList';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 type Props = {
     bookingId: number;
     readonly: boolean;
+    globalSettings: KeyValue[];
 };
 
 // This component only contains logic to create and delete lists. Everything else
 // is handled by the EquipmentListDisplay component which manages it's list internally.
 //
-const EquipmentLists: React.FC<Props> = ({ bookingId, readonly }: Props) => {
+const EquipmentLists: React.FC<Props> = ({ bookingId, readonly, globalSettings }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
     const {
@@ -183,6 +185,7 @@ const EquipmentLists: React.FC<Props> = ({ bookingId, readonly }: Props) => {
                     moveListFn={moveList}
                     isFirstFn={(list: EquipmentList) => isFirst(equipmentLists, list)}
                     isLastFn={(list: EquipmentList) => isLast(equipmentLists, list)}
+                    globalSettings={globalSettings}
                 />
             ))}
             {readonly ? null : (

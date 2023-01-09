@@ -246,6 +246,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <EquipmentLists
                         bookingId={booking.id}
                         readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                        globalSettings={globalSettings}
                     />
                 </Col>
                 <Col xl={4}>
