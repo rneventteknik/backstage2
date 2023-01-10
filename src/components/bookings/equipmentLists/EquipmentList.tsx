@@ -173,6 +173,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
             <Card.Header>
                 <EquipmentListHeader
                     list={list}
+                    bookingId={bookingId}
                     pricePlan={booking.pricePlan}
                     language={booking.language}
                     bookingStatus={booking.status}

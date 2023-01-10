@@ -18,9 +18,13 @@ export const getPriceEstimateDocument = (booking: Booking, documentLanguage: Lan
 export const getPriceEstimateDocumentFileName = (booking: Booking, documentLanguage: Language): string =>
     `${getTextResource('price-estimate.filename', documentLanguage)} ${booking.name}.pdf`;
 
-export const getPackingListDocument = (booking: Booking, documentLanguage: Language): ReactElement => (
+export const getPackingListDocument = (
+    booking: Booking,
+    documentLanguage: Language,
+    equipmentListId?: number,
+): ReactElement => (
     <TextResourcesLanguageContext.Provider value={documentLanguage}>
-        <PackingListDocument booking={booking} />
+        <PackingListDocument booking={booking} equipmentListId={equipmentListId} />
     </TextResourcesLanguageContext.Provider>
 );
 

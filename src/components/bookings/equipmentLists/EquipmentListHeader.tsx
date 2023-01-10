@@ -13,6 +13,7 @@ import {
     faPlus,
     faRightFromBracket,
     faRightToBracket,
+    faFileDownload,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
@@ -38,6 +39,7 @@ import { useNotifications } from '../../../lib/useNotifications';
 
 type Props = {
     list: EquipmentList;
+    bookingId: number;
     pricePlan: PricePlan;
     language: Language;
     bookingStatus: Status;
@@ -58,6 +60,7 @@ type Props = {
 
 const EquipmentListHeader: React.FC<Props> = ({
     list,
+    bookingId,
     pricePlan,
     language,
     bookingStatus,
@@ -179,6 +182,9 @@ const EquipmentListHeader: React.FC<Props> = ({
                                 <Dropdown.Item onClick={() => moveListDown()} disabled={disableMoveDown}>
                                     <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
                                 </Dropdown.Item>
+
+                                <Dropdown.Divider />
+
                                 <Dropdown.Item
                                     onClick={() =>
                                         editEntry({
@@ -190,12 +196,28 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" />
                                     Lägg till egen rad
                                 </Dropdown.Item>
+
                                 <Dropdown.Item
                                     onClick={() => addHeadingEntry('Ny rubrikrad', list, pricePlan, language, saveList)}
                                 >
                                     <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" />
                                     Lägg till rubrikrad
                                 </Dropdown.Item>
+
+                                <Dropdown.Item onClick={() => setShowImportModal(true)}>
+                                    <FontAwesomeIcon icon={faClone} className="mr-1 fa-fw" />
+                                    Hämta utrustning från bokning
+                                </Dropdown.Item>
+                                <CopyEquipmentListEntriesModal
+                                    show={showImportModal}
+                                    onHide={() => setShowImportModal(false)}
+                                    onImport={(listEntries, listHeadings) =>
+                                        importEquipmentEntries(listEntries, listHeadings, list, saveList)
+                                    }
+                                    pricePlan={pricePlan}
+                                    language={language}
+                                />
+
                                 {list.numberOfDays === null ? (
                                     bookingStatus === Status.DRAFT ? (
                                         <>
@@ -240,6 +262,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                                         Sätt datum
                                     </Dropdown.Item>
                                 )}
+
                                 {bookingType === BookingType.RENTAL ? (
                                     <Dropdown.Item
                                         onClick={() => saveList({ ...list, rentalStatus: null })}
@@ -250,19 +273,14 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     </Dropdown.Item>
                                 ) : null}
 
-                                <Dropdown.Item onClick={() => setShowImportModal(true)}>
-                                    <FontAwesomeIcon icon={faClone} className="mr-1 fa-fw" /> Hämta utrustning från
-                                    bokning
+                                <Dropdown.Item
+                                    href={'/api/documents/packing-list/sv/' + bookingId + '?list=' + list.id}
+                                    target="_blank"
+                                >
+                                    <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Packlista
                                 </Dropdown.Item>
-                                <CopyEquipmentListEntriesModal
-                                    show={showImportModal}
-                                    onHide={() => setShowImportModal(false)}
-                                    onImport={(listEntries, listHeadings) =>
-                                        importEquipmentEntries(listEntries, listHeadings, list, saveList)
-                                    }
-                                    pricePlan={pricePlan}
-                                    language={language}
-                                />
+
+                                <Dropdown.Divider />
 
                                 <Dropdown.Item onClick={() => setShowEmptyListModal(true)}>
                                     <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" /> Töm utrustningslistan

@@ -12,13 +12,14 @@ import { EquipmentListPackingInfo } from './shared/equipmentListPackingInfo';
 
 type Props = {
     booking: Booking;
+    equipmentListId?: number;
 };
 
 const styles = {
     ...commonStyles,
 };
 
-export const PackingListDocument: React.FC<Props> = ({ booking }: Props) => {
+export const PackingListDocument: React.FC<Props> = ({ booking, equipmentListId: equipmentListId }: Props) => {
     const { t } = useTextResources();
 
     return (
@@ -26,14 +27,23 @@ export const PackingListDocument: React.FC<Props> = ({ booking }: Props) => {
             <Page size="A4" style={styles.page}>
                 <PageCount />
 
-                <Header title={t('packing-list.title')} subTitle={booking.name} />
+                <Header
+                    title={t('packing-list.title')}
+                    subTitle={
+                        equipmentListId === undefined
+                            ? booking.name
+                            : `${booking.name} - ${booking.equipmentLists?.find((l) => l.id === equipmentListId)?.name}`
+                    }
+                />
                 <BookingInfo booking={booking} />
 
                 <MainContent>
                     <View style={styles.flexGrow}>
-                        {booking.equipmentLists?.map((l) => (
-                            <EquipmentListPackingInfo list={l} booking={booking} key={l.id} />
-                        ))}
+                        {booking.equipmentLists
+                            ?.filter((l) => equipmentListId === undefined || equipmentListId === l.id)
+                            .map((l) => (
+                                <EquipmentListPackingInfo list={l} booking={booking} key={l.id} />
+                            ))}
                     </View>
                 </MainContent>
 

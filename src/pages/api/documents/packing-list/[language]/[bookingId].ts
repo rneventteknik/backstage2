@@ -21,9 +21,16 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             }
 
             const booking = toBooking(result);
+            const equipmentListId = isNaN(Number(req.query.list)) ? undefined : Number(req.query.list);
             const documentLanguage = req.query.language === 'en' ? Language.EN : Language.SV;
             const filename = getPackingListDocumentFileName(booking, documentLanguage);
-            const stream = await renderToStream(getPackingListDocument(booking, documentLanguage));
+
+            if (equipmentListId !== undefined && !result.equipmentLists?.some((l) => l.id === equipmentListId)) {
+                respondWithEntityNotFoundResponse(res);
+                return;
+            }
+
+            const stream = await renderToStream(getPackingListDocument(booking, documentLanguage, equipmentListId));
 
             // If the download flag is set, tell the browser to download the file instead of showing it in a new tab.
             if (req.query.download) {
