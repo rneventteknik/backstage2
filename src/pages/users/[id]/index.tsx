@@ -28,6 +28,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
     const router = useRouter();
     const { data: user, error, isValidating } = useSwr('/api/users/' + router.query.id, userFetcher);
     const { data: bookings } = useSwr('/api/users/' + router.query.id + '/bookings', bookingsFetcher);
+    const { data: coOwnerBookings } = useSwr('/api/users/' + router.query.id + '/coOwnerBookings', bookingsFetcher);
 
     if (error) {
         return (
@@ -165,6 +166,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
 
                 <Col xl={8}>
                     <SmallBookingTable title="Bokningar" bookings={bookings}></SmallBookingTable>
+                    <SmallBookingTable title="Favoritbokningar" bookings={coOwnerBookings}></SmallBookingTable>
                 </Col>
             </Row>
         </Layout>

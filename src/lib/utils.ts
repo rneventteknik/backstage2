@@ -11,7 +11,7 @@ import { RentalStatus } from '../models/enums/RentalStatus';
 import { BookingViewModel, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
-import { getEquipmentOutDatetime, getEquipmentInDatetime } from './datetimeUtils';
+import { getEquipmentOutDatetime, getEquipmentInDatetime, addDays } from './datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 
 // Helper functions for array operations
@@ -283,8 +283,41 @@ export const getDefaultLaborHourlyRate = (pricePlan: PricePlan, globalSettings: 
     return toIntOrUndefined(defaultLaborHourlyRate) ?? 0;
 };
 
-export const showActiveBookings = (booking: BookingViewModel) => {
+export const IsBookingActive = (booking: BookingViewModel) => {
     return booking.status === Status.BOOKED || (booking.status === Status.DRAFT && booking.usageStartDatetime);
+};
+
+export const IsBookingDraftOrBooked = (booking: BookingViewModel) => {
+    return booking.status === Status.BOOKED || booking.status === Status.DRAFT;
+};
+
+export const IsBookingOut = (booking: BookingViewModel) => {
+    if (!booking.equipmentLists) {
+        throw new Error('Missing equipmentLists property');
+    }
+
+    if (booking.bookingType !== BookingType.RENTAL) {
+        return false;
+    }
+
+    return booking.equipmentLists?.some((x) => x.rentalStatus === RentalStatus.OUT);
+};
+
+export const IsBookingUpcomingRental = (booking: BookingViewModel) => {
+    if (!booking.equipmentLists) {
+        throw new Error('Missing equipmentLists property');
+    }
+
+    if (booking.bookingType !== BookingType.RENTAL) {
+        return false;
+    }
+
+    return booking.equipmentLists?.some(
+        (x) =>
+            x.equipmentOutDatetime &&
+            x.equipmentOutDatetime > new Date() &&
+            x.equipmentOutDatetime < addDays(new Date(), 1),
+    );
 };
 
 // Calculate the max number of equipment used at the same time. To do this, we look
@@ -335,3 +368,23 @@ export const getPartialSearchStrings = (searchString: string) =>
         .trim()
         .split(/\s+/)
         .map((x) => '%' + x + '%');
+
+// Function to sort entitied by created date
+export const createdSortFn = (a: BaseEntity, b: BaseEntity) => {
+    if ((a.created ?? 0) < (b.created ?? 0)) {
+        return 1;
+    }
+    if ((a.created ?? 0) > (b.created ?? 0)) {
+        return -1;
+    }
+
+    // Use id for sorting as a fallback
+    if (a.id < b.id) {
+        return -1;
+    }
+    if (a.id > b.id) {
+        return 1;
+    }
+
+    return 0;
+};

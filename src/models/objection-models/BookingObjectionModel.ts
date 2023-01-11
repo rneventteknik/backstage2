@@ -25,6 +25,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     changelog: IBookingChangelogEntryObjectionModel[];
     ownerUser?: IUserObjectionModel;
     ownerUserId?: number;
+    coOwnerUsers: IUserObjectionModel[];
     bookingType: number;
     status: number;
     salaryStatus: number;
@@ -67,6 +68,30 @@ export class BookingObjectionModel extends Model {
                 ),
             join: {
                 from: 'Booking.ownerUserId',
+                to: 'User.id',
+            },
+        },
+        coOwnerUsers: {
+            relation: Model.ManyToManyRelation,
+            modelClass: UserObjectionModel,
+            filter: (query) =>
+                query.select(
+                    'id',
+                    'name',
+                    'created',
+                    'updated',
+                    'memberStatus',
+                    'nameTag',
+                    'phoneNumber',
+                    'slackId',
+                    'emailAddress',
+                ),
+            join: {
+                from: 'Booking.id',
+                through: {
+                    from: 'CoOwner.bookingId',
+                    to: 'CoOwner.userId',
+                },
                 to: 'User.id',
             },
         },
@@ -113,6 +138,7 @@ export class BookingObjectionModel extends Model {
     timeEstimates!: TimeEstimateObjectionModel[];
     timeReports!: TimeReportObjectionModel[];
     ownerUser!: UserObjectionModel;
+    coOwnerUsers!: UserObjectionModel[];
     changelog!: BookingChangelogEntryObjectionModel[];
     bookingType!: number;
     status!: number;

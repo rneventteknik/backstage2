@@ -52,6 +52,7 @@ import RentalStatusTag from '../../../components/utils/RentalStatusTag';
 import { getNumberOfBookingDays, getNumberOfEventHours, toBookingViewModel } from '../../../lib/datetimeUtils';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import MarkdownCard from '../../../components/MarkdownCard';
+import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButton';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -198,6 +199,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         Rapportera tid
                     </TimeReportAddButton>
                 </IfNotReadonly>
+                <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="dark" />
                 <IfNotReadonly currentUser={currentUser}>
                     <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer">
                         <Dropdown.Item

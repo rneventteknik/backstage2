@@ -41,7 +41,30 @@ export const fetchBookings = async (): Promise<BookingObjectionModel[]> => {
 export const fetchBookingsForUser = async (userId: number): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query().where('ownerUserId', userId).withGraphFetched('equipmentLists');
+    return BookingObjectionModel.query()
+        .where('ownerUserId', userId)
+        .withGraphFetched('equipmentLists')
+        .withGraphFetched('changelog(changelogInfo)')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(25);
+            },
+        });
+};
+
+export const fetchBookingsForCoOwnerUser = async (userId: number): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .withGraphFetched('equipmentLists')
+        .joinRelated('coOwnerUsers')
+        .where('coOwnerUsers.id', userId)
+        .withGraphFetched('changelog(changelogInfo)')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(25);
+            },
+        });
 };
 
 export const fetchBookingsForEquipment = async (equipmentId: number): Promise<BookingObjectionModel[]> => {
@@ -79,6 +102,7 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
     return BookingObjectionModel.query()
         .where('id', id)
         .withGraphFetched('ownerUser')
+        .withGraphFetched('coOwnerUsers')
         .withGraphFetched('equipmentLists.listEntries')
         .withGraphFetched('equipmentLists.listEntries.equipment.prices')
         .withGraphFetched('equipmentLists.listEntries.equipmentPrice')
@@ -108,6 +132,7 @@ export const fetchBookingWithEquipmentLists = async (id: number): Promise<Bookin
     return BookingObjectionModel.query()
         .where('id', id)
         .withGraphFetched('ownerUser')
+        .withGraphFetched('coOwnerUsers')
         .withGraphFetched('equipmentLists.listEntries.equipment.equipmentLocation')
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.equipmentLocation')
         .withGraphFetched('timeEstimates')
@@ -247,4 +272,25 @@ export const fetchBookingsWithEquipmentInInterval = async (
     }
 
     return query.select();
+};
+
+export const registerUserAsCoOwnerForBooking = async (
+    userId: number,
+    bookingId: number,
+): Promise<BookingObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    await BookingObjectionModel.relatedQuery('coOwnerUsers').for(bookingId).relate(userId);
+
+    return fetchBookingWithUser(bookingId);
+};
+export const unRegisterUserAsCoOwnerForBooking = async (
+    userId: number,
+    bookingId: number,
+): Promise<BookingObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    await BookingObjectionModel.relatedQuery('coOwnerUsers').for(bookingId).findById(userId).unrelate();
+
+    return fetchBookingWithUser(bookingId);
 };

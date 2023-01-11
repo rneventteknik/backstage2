@@ -46,6 +46,18 @@ export class UserObjectionModel extends Model implements IUserObjectionModel {
                 to: 'UserAuth.userId',
             },
         },
+        coOwnerBookings: {
+            relation: Model.ManyToManyRelation,
+            modelClass: BookingObjectionModel,
+            join: {
+                from: 'User.id',
+                through: {
+                    from: 'CoOwner.userId',
+                    to: 'CoOwner.bookingId',
+                },
+                to: 'Booking.id',
+            },
+        },
     });
 
     id?: number;

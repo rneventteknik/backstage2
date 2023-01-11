@@ -13,7 +13,7 @@ import { IfNotReadonly } from '../../components/utils/IfAdmin';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { Button } from 'react-bootstrap';
-import { showActiveBookings } from '../../lib/utils';
+import { IsBookingActive } from '../../lib/utils';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 
@@ -41,7 +41,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
-    const bookingsToShow = bookings?.map(toBookingViewModel).filter(showActiveBookings);
+    const bookingsToShow = bookings?.map(toBookingViewModel).filter(IsBookingActive);
     return (
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>

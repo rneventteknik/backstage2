@@ -24,6 +24,7 @@ export const toBooking = (objectionModel: IBookingObjectionModel): Booking => {
         ...objectionModel,
         id: objectionModel.id,
         ownerUser: objectionModel.ownerUser ? toUser(objectionModel.ownerUser) : undefined,
+        coOwnerUsers: objectionModel.coOwnerUsers ? objectionModel.coOwnerUsers.map(toUser) : undefined,
         updated: toDatetimeOrUndefined(objectionModel.updated),
         created: toDatetimeOrUndefined(objectionModel.created),
         equipmentLists: objectionModel.equipmentLists ? objectionModel.equipmentLists.map(toEquipmentList) : undefined,
