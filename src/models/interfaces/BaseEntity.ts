@@ -19,3 +19,9 @@ export interface PricedEntity {
     pricePerHour: number;
     pricePerUnit: number;
 }
+export interface PricedEntityWithTHS {
+    pricePerHour: number;
+    pricePerUnit: number;
+    pricePerHourTHS: number;
+    pricePerUnitTHS: number;
+}

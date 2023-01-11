@@ -1,5 +1,5 @@
-import { EquipmentPrice, Booking, TimeEstimate, TimeReport } from '../models/interfaces';
-import { PricedEntity } from '../models/interfaces/BaseEntity';
+import { Booking, TimeEstimate, TimeReport } from '../models/interfaces';
+import { PricedEntity, PricedEntityWithTHS } from '../models/interfaces/BaseEntity';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../models/interfaces/EquipmentList';
 import { getNumberOfDays } from './datetimeUtils';
 
@@ -93,21 +93,32 @@ export const getBookingPrice = (booking: Booking, forceEstimatedTime = false): n
 
 export const addVAT = (price: number): number => 1.25 * price;
 
+export const addVATToPrice = (price: PricedEntity): PricedEntity => ({
+    pricePerHour: addVAT(price.pricePerHour),
+    pricePerUnit: addVAT(price.pricePerUnit),
+});
+export const addVATToPriceWithTHS = (price: PricedEntityWithTHS): PricedEntityWithTHS => ({
+    pricePerHour: addVAT(price.pricePerHour),
+    pricePerUnit: addVAT(price.pricePerUnit),
+    pricePerHourTHS: addVAT(price.pricePerHourTHS),
+    pricePerUnitTHS: addVAT(price.pricePerUnitTHS),
+});
+
 // Format price
 //
-export const formatPrice = (price: PricedEntity): string => {
+export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 'st'): string => {
     if (price.pricePerHour && !price.pricePerUnit) {
-        return `${price.pricePerHour} kr/h`;
+        return `${formatNumberAsCurrency(price.pricePerHour)}/${hoursUnit}`;
     } else if (!price.pricePerHour && price.pricePerUnit) {
-        return `${price.pricePerUnit} kr/st`;
+        return `${formatNumberAsCurrency(price.pricePerUnit)}/${unitsUnit}`;
     } else {
-        return `${price.pricePerUnit} kr + ${price.pricePerHour} kr/h`;
+        return `${formatNumberAsCurrency(price.pricePerUnit)} + ${formatNumberAsCurrency(price.pricePerHour)}/h`;
     }
 };
 
-export const formatTHSPrice = (price: EquipmentPrice): string => {
+export const formatTHSPrice = (price: PricedEntityWithTHS): string => {
     return formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
 };
 
 export const formatNumberAsCurrency = (number: number): string =>
-    Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 0 }).format(number);
+    Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(number);

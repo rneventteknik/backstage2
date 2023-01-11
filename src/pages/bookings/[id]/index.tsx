@@ -270,8 +270,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             ) : null}
                             <div className="text-muted mt-2"> {booking.customerName}</div>
                             <div className="text-muted">
-                                {getNumberOfBookingDays(booking) ? `${getNumberOfBookingDays(booking)} dagar / ` : null}
-                                {getNumberOfEventHours(booking)} h / {formatNumberAsCurrency(getBookingPrice(booking))}
+                                {getNumberOfBookingDays(booking)
+                                    ? `${getNumberOfBookingDays(booking)} debiterade dagar / `
+                                    : null}
+                                {getNumberOfEventHours(booking)} arbetstimmar
                             </div>
                             <div className="text-muted">{booking.displayUsageInterval}</div>
                         </Card.Header>

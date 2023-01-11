@@ -3,7 +3,7 @@ import { getNumberOfDays } from '../lib/datetimeUtils';
 import { Booking } from '../models/interfaces';
 import { PricedEntity } from '../models/interfaces/BaseEntity';
 import { EquipmentListEntry } from '../models/interfaces/EquipmentList';
-import { addVAT } from '../lib/pricingUtils';
+import { addVATToPrice, formatPrice } from '../lib/pricingUtils';
 
 export const registerFonts = (): void => {
     Font.register({
@@ -118,17 +118,8 @@ export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, 
     return formatEquipmentListEntryCount(entry, t);
 };
 
-export const formatEquipmentListEntryPriceWithVAT = (entry: PricedEntity, t: (t: string) => string) => {
-    if (entry.pricePerHour && !entry.pricePerUnit) {
-        return `${addVAT(entry.pricePerHour)} kr/${t('common.misc.hours-unit')}`;
-    } else if (!entry.pricePerHour && entry.pricePerUnit) {
-        return `${addVAT(entry.pricePerUnit)} kr/${t('common.misc.count-unit-single')}`;
-    } else if (entry.pricePerHour == 0 && entry.pricePerUnit == 0) {
-        return '-';
-    } else {
-        return `${addVAT(entry.pricePerUnit)} kr + ${addVAT(entry.pricePerHour)} kr/h`;
-    }
-};
+export const formatEquipmentListEntryPriceWithVAT = (entry: PricedEntity, t: (t: string) => string) =>
+    formatPrice(addVATToPrice(entry), t('common.misc.hours-unit'), t('common.misc.count-unit-single'));
 
 export const allListsAreOneDay = (booking: Booking) =>
     booking.equipmentLists &&

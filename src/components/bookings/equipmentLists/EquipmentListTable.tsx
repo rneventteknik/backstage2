@@ -21,6 +21,9 @@ import { toIntOrUndefined, reduceSumFn } from '../../../lib/utils';
 import EquipmentSearch from '../../EquipmentSearch';
 import { DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
 import {
+    addVAT,
+    addVATToPrice,
+    addVATToPriceWithTHS,
     formatNumberAsCurrency,
     formatPrice,
     formatTHSPrice,
@@ -292,7 +295,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                             : [customPriceDropdownValue, ...entry.equipment.prices]
                     }
                     value={entry.equipmentPrice ?? customPriceDropdownValue}
-                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(x)}`}
+                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(x))}`}
                     optionKeyFn={(x) => x.id.toString()}
                     onChange={(newPrice) =>
                         newPrice && newPrice.id != -1
@@ -314,14 +317,14 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                     }
                     readonly={readonly}
                 >
-                    {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
+                    {formatPrice(addVATToPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit }))}
                     {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
                         <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
                     ) : null}
                 </DoubleClickToEditDropdown>
             </>
         ) : (
-            formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })
+            formatPrice(addVATToPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit }))
         );
     };
 
@@ -336,15 +339,15 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                 title={
                     entry.discount > 0
                         ? `${formatNumberAsCurrency(
-                              getPrice(entry, getNumberOfDays(list), false),
+                              addVAT(getPrice(entry, getNumberOfDays(list), false)),
                           )}\n-${formatNumberAsCurrency(
-                              getCalculatedDiscount(entry, getNumberOfDays(list)),
+                              addVAT(getCalculatedDiscount(entry, getNumberOfDays(list))),
                           )} (rabatt)\n`
                         : ''
                 }
                 className={entry.discount > 0 ? 'text-danger' : ''}
             >
-                {formatNumberAsCurrency(getPrice(entry, getNumberOfDays(list)))}
+                {formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list))))}
             </em>
         );
     };
@@ -530,11 +533,13 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                 key: 'sum',
                 displayName: 'Summa',
                 getValue: (viewModel: EquipmentListEntityViewModel) =>
-                    viewModelIsHeading(viewModel)
-                        ? getEquipmentListHeadingFromViewModel(viewModel)
-                              .listEntries.map((x) => getPrice(x, getNumberOfDays(list)))
-                              .reduce(reduceSumFn, 0)
-                        : getPrice(getEquipmentListEntryFromViewModel(viewModel), getNumberOfDays(list)),
+                    addVAT(
+                        viewModelIsHeading(viewModel)
+                            ? getEquipmentListHeadingFromViewModel(viewModel)
+                                  .listEntries.map((x) => getPrice(x, getNumberOfDays(list)))
+                                  .reduce(reduceSumFn, 0)
+                            : getPrice(getEquipmentListEntryFromViewModel(viewModel), getNumberOfDays(list)),
+                    ),
                 getContentOverride: EquipmentListEntryTotalPriceDisplayFn,
                 columnWidth: 90,
                 textAlignment: 'right',

@@ -137,7 +137,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking }: Props) => 
                 <TableCellAutoWidth>
                     <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
                 </TableCellAutoWidth>
-                <TableCellFixedWidth width={40} textAlign="right">
+                <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.bold}>{formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
                 </TableCellFixedWidth>
             </TableRow>

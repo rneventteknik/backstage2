@@ -7,6 +7,7 @@ import { faLink } from '@fortawesome/free-solid-svg-icons';
 import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
 import { EquipmentPrice } from '../../../models/interfaces';
 import { Typeahead } from 'react-bootstrap-typeahead';
+import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 type Props = {
@@ -141,7 +142,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                             </Col>
                             <Col lg={4} xs={6}>
                                 <Form.Group>
-                                    <Form.Label>Pris per styck</Form.Label>
+                                    <Form.Label>Pris per styck (ex. moms)</Form.Label>
                                     <InputGroup>
                                         <Form.Control
                                             type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
@@ -159,11 +160,12 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             <InputGroup.Text>kr/st</InputGroup.Text>
                                         </InputGroup.Append>
                                     </InputGroup>
+                                    <PriceWithVATPreview price={equipmentListEntryToEditViewModel?.pricePerUnit} />
                                 </Form.Group>
                             </Col>
                             <Col lg={4} xs={6}>
                                 <Form.Group>
-                                    <Form.Label>Pris per timme</Form.Label>
+                                    <Form.Label>Pris per timme (ex. moms)</Form.Label>
                                     <InputGroup>
                                         <Form.Control
                                             type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
@@ -181,6 +183,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             <InputGroup.Text>kr/h</InputGroup.Text>
                                         </InputGroup.Append>
                                     </InputGroup>
+                                    <PriceWithVATPreview price={equipmentListEntryToEditViewModel?.pricePerHour} />
                                 </Form.Group>
                             </Col>
                         </Row>
@@ -188,7 +191,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                     <Row>
                         <Col lg={4} xs={6}>
                             <Form.Group>
-                                <Form.Label>Rabatt</Form.Label>
+                                <Form.Label>Rabatt (ex. moms)</Form.Label>
                                 <InputGroup>
                                     <FormNumberFieldWithoutScroll
                                         type="number"
@@ -205,6 +208,10 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         <InputGroup.Text>kr</InputGroup.Text>
                                     </InputGroup.Append>
                                 </InputGroup>
+                                <PriceWithVATPreview
+                                    price={equipmentListEntryToEditViewModel?.discount}
+                                    text={'Rabatt inklusive moms: '}
+                                />
                             </Form.Group>
                         </Col>
                         <Col lg={8} xs={6}>

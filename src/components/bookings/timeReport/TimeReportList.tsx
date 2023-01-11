@@ -20,12 +20,18 @@ import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import Skeleton from 'react-loading-skeleton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toTimeReport } from '../../../lib/mappers/timeReport';
-import { formatNumberAsCurrency, getTimeReportPrice, getTotalTimeReportsPrice } from '../../../lib/pricingUtils';
+import {
+    addVAT,
+    formatNumberAsCurrency,
+    getTimeReportPrice,
+    getTotalTimeReportsPrice,
+} from '../../../lib/pricingUtils';
 import { useNotifications } from '../../../lib/useNotifications';
 import { DoubleClickToEdit, DoubleClickToEditDatetime, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
 import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
 import { formatDatetime, validDate, toDatetimeOrUndefined } from '../../../lib/datetimeUtils';
 import TimeReportAddButton from './TimeReportAddButton';
+import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 
 type Props = {
     bookingId: number;
@@ -239,12 +245,12 @@ const TimeReportList: React.FC<Props> = ({
         const getPricePerHourIfNotDefault = (timeReport: TimeReport) => {
             return timeReport.pricePerHour === defaultLaborHourlyRate
                 ? ''
-                : formatNumberAsCurrency(timeReport.pricePerHour) + '/h';
+                : formatNumberAsCurrency(addVAT(timeReport.pricePerHour)) + '/h';
         };
 
         return (
             <>
-                {formatNumberAsCurrency(getTimeReportPrice(entry))}
+                {formatNumberAsCurrency(addVAT(getTimeReportPrice(entry)))}
                 <div className="text-muted font-italic mb-0">{getPricePerHourIfNotDefault(entry)}</div>
             </>
         );
@@ -300,7 +306,7 @@ const TimeReportList: React.FC<Props> = ({
             {
                 key: 'sum',
                 displayName: 'Summa',
-                getValue: (timeReport: TimeReport) => formatNumberAsCurrency(getTimeReportPrice(timeReport)),
+                getValue: (timeReport: TimeReport) => formatNumberAsCurrency(addVAT(getTimeReportPrice(timeReport))),
                 getContentOverride: TimeReportSumDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 20,
@@ -341,8 +347,8 @@ const TimeReportList: React.FC<Props> = ({
                     </div>
                 </div>
                 <p className="text-muted">
-                    {timeReports.reduce((sum, entry) => sum + entry.billableWorkingHours, 0)} h /{' '}
-                    {formatNumberAsCurrency(getTotalTimeReportsPrice(timeReports))}
+                    {formatNumberAsCurrency(addVAT(getTotalTimeReportsPrice(timeReports)))} /{' '}
+                    {timeReports.reduce((sum, entry) => sum + entry.billableWorkingHours, 0)} h
                 </p>
             </Card.Header>
             {showContent ? (
@@ -427,7 +433,7 @@ const TimeReportList: React.FC<Props> = ({
                         <Row>
                             <Col md={4} xs={6}>
                                 <Form.Group>
-                                    <Form.Label>Pris per timme</Form.Label>
+                                    <Form.Label>Pris per timme (ex. moms)</Form.Label>
                                     <InputGroup>
                                         <Form.Control
                                             type="text"
@@ -443,6 +449,7 @@ const TimeReportList: React.FC<Props> = ({
                                             <InputGroup.Text>kr/h</InputGroup.Text>
                                         </InputGroup.Append>
                                     </InputGroup>
+                                    <PriceWithVATPreview price={timeReportToEditViewModel.pricePerHour} />
                                 </Form.Group>
                             </Col>
                             <Col md={4} xs={6}>

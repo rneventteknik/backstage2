@@ -18,7 +18,7 @@ import {
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
 import { DoubleClickToEdit, DoubleClickToEditDatetime } from '../../utils/DoubleClickToEdit';
-import { formatNumberAsCurrency, getEquipmentListPrice } from '../../../lib/pricingUtils';
+import { addVAT, formatNumberAsCurrency, getEquipmentListPrice } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import {
     formatDatetime,
@@ -320,7 +320,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                 </div>
             </div>
             <p className="text-muted">
-                {list.listEntries.length} rader / {formatNumberAsCurrency(getEquipmentListPrice(list))}
+                {formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}
                 {getNumberOfDays(list) && getNumberOfEquipmentOutDays(list) ? (
                     <>
                         {' '}

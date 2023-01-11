@@ -24,7 +24,7 @@ import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
 import { equipmentTagsFetcher, equipmentsFetcher } from '../../lib/fetchers';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import { ErrorPage } from '../../components/layout/ErrorPage';
-import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
+import { addVAT, addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { IfAdmin, IfNotReadonly } from '../../components/utils/IfAdmin';
 import EquipmentTagDisplay from '../../components/utils/EquipmentTagDisplay';
 import { KeyValue } from '../../models/interfaces/KeyValue';
@@ -52,9 +52,9 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
         case 1:
             return (
                 <>
-                    {formatPrice(equipment.prices[0])}
+                    {formatPrice(addVATToPriceWithTHS(equipment.prices[0]))}
                     <br />
-                    {formatTHSPrice(equipment.prices[0])}
+                    {formatTHSPrice(addVATToPriceWithTHS(equipment.prices[0]))}
                 </>
             );
         default:
@@ -67,9 +67,9 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
                                 {equipment.prices.map((p) => (
                                     <p key={p.id}>
                                         <h2 style={{ fontSize: '1em' }}>{p.name}</h2>
-                                        {formatPrice(p)}
+                                        {formatPrice(addVATToPriceWithTHS(p))}
                                         <br />
-                                        {formatTHSPrice(p)}
+                                        {formatTHSPrice(addVATToPriceWithTHS(p))}
                                     </p>
                                 ))}
                             </small>
@@ -116,8 +116,15 @@ const tableSettings: TableConfiguration<Equipment> = {
         {
             key: 'price',
             displayName: 'Pris',
-            getValue: () => '',
-            disableSort: true,
+            getValue: (equipment: Equipment) =>
+                equipment.prices && equipment.prices.length === 1
+                    ? addVAT(
+                          equipment.prices[0].pricePerHour +
+                              equipment.prices[0].pricePerUnit +
+                              equipment.prices[0].pricePerHourTHS +
+                              equipment.prices[0].pricePerUnitTHS,
+                      ) / 4
+                    : -Infinity,
             getContentOverride: EquipmentPriceDisplayFn,
             columnWidth: 120,
             textAlignment: 'center',

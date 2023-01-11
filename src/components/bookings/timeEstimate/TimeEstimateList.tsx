@@ -18,7 +18,12 @@ import {
     faClock,
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
-import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
+import {
+    addVAT,
+    formatNumberAsCurrency,
+    getTimeEstimatePrice,
+    getTotalTimeEstimatesPrice,
+} from '../../../lib/pricingUtils';
 import Skeleton from 'react-loading-skeleton';
 import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from './TimeEstimateAddButton';
@@ -171,12 +176,12 @@ const TimeEstimateList: React.FC<Props> = ({
             size="sm"
             readonly={readonly}
         >
-            {timeEstimate.pricePerHour} kr/h
+            {addVAT(timeEstimate.pricePerHour)} kr/h
         </DoubleClickToEdit>
     );
 
     const TimeEstimateTotalPriceDisplayFn = (entry: TimeEstimate) => {
-        return <em>{formatNumberAsCurrency(getTimeEstimatePrice(entry))}</em>;
+        return <em>{formatNumberAsCurrency(addVAT(getTimeEstimatePrice(entry)))}</em>;
     };
 
     const TimeEstimateEntryActionsDisplayFn = (entry: TimeEstimate) => {
@@ -215,7 +220,7 @@ const TimeEstimateList: React.FC<Props> = ({
             {
                 key: 'price',
                 displayName: 'A pris',
-                getValue: (timeEstimate: TimeEstimate) => timeEstimate.pricePerHour + ' kr/h',
+                getValue: (timeEstimate: TimeEstimate) => addVAT(timeEstimate.pricePerHour) + ' kr/h',
                 getContentOverride: TimeEstimatePricePerHourDisplayFn,
                 columnWidth: 140,
                 textAlignment: 'right',
@@ -223,7 +228,7 @@ const TimeEstimateList: React.FC<Props> = ({
             {
                 key: 'sum',
                 displayName: 'Summa',
-                getValue: (timeEstimate: TimeEstimate) => getTimeEstimatePrice(timeEstimate),
+                getValue: (timeEstimate: TimeEstimate) => addVAT(getTimeEstimatePrice(timeEstimate)),
                 getContentOverride: TimeEstimateTotalPriceDisplayFn,
                 columnWidth: 90,
                 textAlignment: 'right',
@@ -264,8 +269,8 @@ const TimeEstimateList: React.FC<Props> = ({
                     </div>
                 </div>
                 <p className="text-muted">
-                    {timeEstimates.reduce((sum: number, entry: TimeEstimate) => sum + entry.numberOfHours, 0)} h /{' '}
-                    {formatNumberAsCurrency(getTotalTimeEstimatesPrice(timeEstimates))}
+                    {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(timeEstimates)))} /{' '}
+                    {timeEstimates.reduce((sum: number, entry: TimeEstimate) => sum + entry.numberOfHours, 0)} h
                 </p>
             </Card.Header>
             {showContent ? (

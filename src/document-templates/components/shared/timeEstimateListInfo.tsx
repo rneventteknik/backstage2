@@ -69,7 +69,7 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking }: Props) => {
                 <TableCellAutoWidth>
                     <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
                 </TableCellAutoWidth>
-                <TableCellFixedWidth width={40} textAlign="right">
+                <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.bold}>
                         {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
                     </Text>

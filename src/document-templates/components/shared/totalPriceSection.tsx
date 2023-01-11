@@ -38,7 +38,7 @@ export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts
                         <TableCellAutoWidth>
                             <Text>{list.name}</Text>
                         </TableCellAutoWidth>
-                        <TableCellFixedWidth width={40} textAlign="right">
+                        <TableCellFixedWidth width={90} textAlign="right">
                             <Text>{formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
                         </TableCellFixedWidth>
                     </TableRow>
@@ -48,7 +48,7 @@ export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts
                         <TableCellAutoWidth>
                             <Text>{t('common.total-price-section.time-estimate-sum')}</Text>
                         </TableCellAutoWidth>
-                        <TableCellFixedWidth width={40} textAlign="right">
+                        <TableCellFixedWidth width={90} textAlign="right">
                             <Text>
                                 {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
                             </Text>
@@ -61,7 +61,7 @@ export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts
                 <TableCellAutoWidth>
                     <Text style={styles.bold}>{t('common.total-price-section.total-sum')}</Text>
                 </TableCellAutoWidth>
-                <TableCellFixedWidth width={40} textAlign="right">
+                <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.bold}>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true)))}</Text>
                 </TableCellFixedWidth>
             </TableRow>
@@ -70,7 +70,7 @@ export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts
                 <TableCellAutoWidth>
                     <Text style={styles.bold}>{t('common.total-price-section.vat')}</Text>
                 </TableCellAutoWidth>
-                <TableCellFixedWidth width={40} textAlign="right">
+                <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.bold}>
                         {formatNumberAsCurrency(
                             addVAT(getBookingPrice(booking, true)) - getBookingPrice(booking, true),

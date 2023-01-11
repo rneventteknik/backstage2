@@ -11,7 +11,7 @@ import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { equipmentFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
+import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import EquipmentCalendar from '../../../components/equipment/EquipmentCalendar';
@@ -118,7 +118,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     </Card>
 
                     <Card className="mb-3">
-                        <Card.Header>Prissättning</Card.Header>
+                        <Card.Header>Prissättning (ink. moms)</Card.Header>
                         <ListGroup variant="flush">
                             {equipment.prices.map((p) => (
                                 <ListGroup.Item key={p.id} className="d-flex">
@@ -128,7 +128,8 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                         <span className="text-muted">{p.name} (THS)</span>
                                     </span>
                                     <span>
-                                        {formatPrice(p)} <br /> <span className="text-muted">{formatTHSPrice(p)}</span>
+                                        {formatPrice(addVATToPriceWithTHS(p))} <br />
+                                        <span className="text-muted">{formatTHSPrice(addVATToPriceWithTHS(p))}</span>
                                     </span>
                                 </ListGroup.Item>
                             ))}
