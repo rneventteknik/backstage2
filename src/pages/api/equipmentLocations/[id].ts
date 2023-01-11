@@ -5,27 +5,27 @@ import {
     respondWithEntityNotFoundResponse,
     respondWithInvalidDataResponse,
 } from '../../../lib/apiResponses';
-import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
 import {
-    deleteEquipmentTag,
-    fetchEquipmentTagWithEquipment,
-    updateEquipmentTag,
-    validateEquipmentTagObjectionModel,
-} from '../../../lib/db-access/equipmentTag';
+    deleteEquipmentLocation,
+    validateEquipmentLocationObjectionModel,
+    updateEquipmentLocation,
+    fetchEquipmentLocation,
+} from '../../../lib/db-access/equipmentLocations';
+import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
 import { Role } from '../../../models/enums/Role';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<Promise<void> | void> => {
-        const equipmentTagId = Number(req.query.id);
+        const EquipmentLocationId = Number(req.query.id);
 
-        if (isNaN(equipmentTagId)) {
+        if (isNaN(EquipmentLocationId)) {
             respondWithEntityNotFoundResponse(res);
             return;
         }
 
         switch (req.method) {
             case 'GET':
-                await fetchEquipmentTagWithEquipment(equipmentTagId)
+                await fetchEquipmentLocation(EquipmentLocationId)
                     .then((result) => (result ? res.status(200).json(result) : respondWithEntityNotFoundResponse(res)))
                     .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
 
@@ -37,7 +37,7 @@ const handler = withSessionContext(
                     return;
                 }
 
-                return deleteEquipmentTag(equipmentTagId)
+                return deleteEquipmentLocation(EquipmentLocationId)
                     .then((result) => res.status(200).json(result))
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
@@ -47,12 +47,12 @@ const handler = withSessionContext(
                     return;
                 }
 
-                if (!validateEquipmentTagObjectionModel(req.body.equipmentTag)) {
+                if (!validateEquipmentLocationObjectionModel(req.body.equipmentLocation)) {
                     respondWithInvalidDataResponse(res);
                     return;
                 }
 
-                await updateEquipmentTag(equipmentTagId, req.body.equipmentTag)
+                await updateEquipmentLocation(EquipmentLocationId, req.body.equipmentLocation)
                     .then((result) => res.status(200).json(result))
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 

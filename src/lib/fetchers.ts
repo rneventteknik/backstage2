@@ -8,6 +8,7 @@ import { toBooking, toEquipmentList } from './mappers/booking';
 import { toInvoiceGroup } from './mappers/invoiceGroup';
 import { toSetting } from './mappers/setting';
 import { toSalaryGroup } from './mappers/salaryGroup';
+import { toCustomer } from './mappers/customer';
 
 // Since all fetchers follow the same pattern we have these two helper functions to
 // generate a fetcher for a specified mapper.
@@ -64,3 +65,6 @@ export const settingsFetcher = generateListFetcher(toSetting);
 
 export const salaryGroupFetcher = generateFetcher(toSalaryGroup);
 export const salaryGroupsFetcher = generateListFetcher(toSalaryGroup);
+
+export const customerFetcher = generateFetcher(toCustomer);
+export const customersFetcher = generateListFetcher(toCustomer);

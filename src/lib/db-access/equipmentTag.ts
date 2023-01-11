@@ -1,6 +1,6 @@
 import { EquipmentTagObjectionModel } from '../../models/objection-models/EquipmentObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
-import { withCreatedDate, removeIdAndDates } from './utils';
+import { withCreatedDate, removeIdAndDates, withUpdatedDate } from './utils';
 
 export const fetchEquipmentTags = async (): Promise<EquipmentTagObjectionModel[]> => {
     ensureDatabaseIsInitialized();
@@ -32,6 +32,23 @@ export const insertEquipmentTag = async (
     ensureDatabaseIsInitialized();
 
     return EquipmentTagObjectionModel.query().insert(withCreatedDate(removeIdAndDates(equipmentTag)));
+};
+
+export const updateEquipmentTag = async (
+    id: number,
+    EquipmentTag: EquipmentTagObjectionModel,
+): Promise<EquipmentTagObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    return EquipmentTagObjectionModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(EquipmentTag)));
+};
+
+export const deleteEquipmentTag = async (id: number): Promise<boolean> => {
+    ensureDatabaseIsInitialized();
+
+    return EquipmentTagObjectionModel.query()
+        .deleteById(id)
+        .then((res) => res > 0);
 };
 
 export const validateEquipmentTagObjectionModel = (equipmentTag: EquipmentTagObjectionModel): boolean => {

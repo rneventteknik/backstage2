@@ -9,6 +9,7 @@ import {
     faArchive,
     faCalendarDay,
     faChartPie,
+    faCog,
     faCube,
     faExternalLinkAlt,
     faFileInvoiceDollar,
@@ -16,7 +17,6 @@ import {
     faInfoCircle,
     faListCheck,
     faMoneyBillWave,
-    faPaintBrush,
     faUsers,
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
@@ -112,7 +112,7 @@ const sidebar: React.FC<Props> = ({ currentUser, globalSettings }: Props) => (
                 <SidebarLink displayName="Översikt" link="/admin-overview" icon={faListCheck} />
                 <SidebarLink displayName="Löneunderlag" link="/salary" icon={faMoneyBillWave} />
                 <SidebarLink displayName="Fakturaunderlag" link="/invoices" icon={faFileInvoiceDollar} />
-                <SidebarLink displayName="Inställningar" link="/settings" icon={faPaintBrush} />
+                <SidebarLink displayName="Inställningar" link="/settings" icon={faCog} />
             </SidebarLinkGroup>
         </IfAdmin>
 
