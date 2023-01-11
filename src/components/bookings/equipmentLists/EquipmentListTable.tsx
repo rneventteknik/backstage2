@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Badge, Dropdown, DropdownButton, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { EquipmentPrice } from '../../../models/interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -13,6 +13,7 @@ import {
     faAngleLeft,
     faEyeSlash,
     faEye,
+    faDollarSign,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
@@ -160,7 +161,30 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                                 />
                             </span>
                         ) : null}
-                        {entry.isHidden ? <FontAwesomeIcon icon={faEyeSlash} className="ml-1" title="" /> : null}
+                        {entry.isHidden ? (
+                            <OverlayTrigger
+                                placement="right"
+                                overlay={
+                                    <Tooltip id="1">
+                                        <strong>Denna utrustning är dold för kunden.</strong>
+                                    </Tooltip>
+                                }
+                            >
+                                <FontAwesomeIcon icon={faEyeSlash} className="ml-1" title="" />
+                            </OverlayTrigger>
+                        ) : null}
+                        {entry.account ? (
+                            <OverlayTrigger
+                                placement="right"
+                                overlay={
+                                    <Tooltip id="1">
+                                        <strong>Denna utrustning har ett anpassat konto ({entry.account}).</strong>
+                                    </Tooltip>
+                                }
+                            >
+                                <FontAwesomeIcon icon={faDollarSign} className="ml-1" title="" />
+                            </OverlayTrigger>
+                        ) : null}
                     </DoubleClickToEdit>
                 </div>
                 <div className="mb-0">

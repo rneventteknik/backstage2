@@ -9,12 +9,20 @@ export const fetchInvoiceGroup = async (
 ): Promise<InvoiceGroupObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
-    return InvoiceGroupObjectionModel.query(trx).findById(id).withGraphFetched('user').withGraphFetched('bookings');
+    return InvoiceGroupObjectionModel.query(trx)
+        .findById(id)
+        .withGraphFetched('user')
+        .withGraphFetched('bookings.equipmentLists.listEntries')
+        .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
 };
 
 export const fetchInvoiceGroups = async (): Promise<InvoiceGroupObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return InvoiceGroupObjectionModel.query().withGraphFetched('user').withGraphFetched('bookings.equipmentLists');
+    return InvoiceGroupObjectionModel.query()
+        .withGraphFetched('user')
+        .withGraphFetched('bookings.equipmentLists')
+        .withGraphFetched('bookings.equipmentLists.listEntries')
+        .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
 };
 
 export const updateInvoiceGroup = async (

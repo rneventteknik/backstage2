@@ -2,7 +2,13 @@ import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { getPaymentStatusName, getSalaryStatusName, getStatusName, replaceEmptyStringWithNull } from '../../lib/utils';
+import {
+    getPaymentStatusName,
+    getSalaryStatusName,
+    getStatusName,
+    onlyUnique,
+    replaceEmptyStringWithNull,
+} from '../../lib/utils';
 import { BookingType } from '../../models/enums/BookingType';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { RentalStatus } from '../../models/enums/RentalStatus';
@@ -55,17 +61,45 @@ const AdminBookingList: React.FC<Props> = ({
         return 'Inte utlämnad';
     };
 
-    const bookingNameDisplayFn = (booking: BookingViewModel) => (
-        <>
-            <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
+    const bookingNameDisplayFn = (booking: BookingViewModel) => {
+        const customAccountsOnBooking =
+            booking.equipmentLists
+                ?.flatMap((list) =>
+                    [...list.listEntries, ...list.listHeadings.flatMap((heading) => heading.listEntries)].map(
+                        (entry) => entry.account,
+                    ),
+                )
+                .filter((x) => x !== null)
+                .filter(onlyUnique) ?? [];
 
-            <BookingTypeTag booking={booking} className="ml-1" />
-            <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
-            <p className="text-muted mb-0">{booking.ownerUser?.name ?? '-'}</p>
-            <p className="text-muted mb-0 d-lg-none">{replaceEmptyStringWithNull(booking.invoiceNumber) ?? '-'}</p>
-            <p className="text-muted mb-0 d-lg-none">{booking.displayUsageStartString ?? '-'}</p>
-        </>
-    );
+        return (
+            <>
+                <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
+
+                <BookingTypeTag booking={booking} className="ml-1" />
+
+                {customAccountsOnBooking.length > 0 ? (
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={
+                            <Tooltip id="1">
+                                <strong>
+                                    Denna bokning har anpassade konton ({customAccountsOnBooking.join(', ')}).
+                                </strong>
+                            </Tooltip>
+                        }
+                    >
+                        <FontAwesomeIcon icon={faCircleInfo} className="ml-1" title="" />
+                    </OverlayTrigger>
+                ) : null}
+
+                <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
+                <p className="text-muted mb-0">{booking.ownerUser?.name ?? '-'}</p>
+                <p className="text-muted mb-0 d-lg-none">{replaceEmptyStringWithNull(booking.invoiceNumber) ?? '-'}</p>
+                <p className="text-muted mb-0 d-lg-none">{booking.displayUsageStartString ?? '-'}</p>
+            </>
+        );
+    };
 
     const bookingStatusDisplayFn = (booking: BookingViewModel) => (
         <>

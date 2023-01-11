@@ -421,6 +421,20 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                     <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
                 ) : null}
                 {!entry.equipmentPrice ? <p className="text-muted mb-0 font-italic">Manuellt pris</p> : null}
+
+                {entry.account ? (
+                    <p className="text-muted mb-0">
+                        Konto: {entry.account}{' '}
+                        {resetManualAccounts ? (
+                            <OverlayTrigger
+                                placement="right"
+                                overlay={<Tooltip id="1">Det manuella kontot kommer tas bort</Tooltip>}
+                            >
+                                <FontAwesomeIcon icon={faSync} className="ml-1" />
+                            </OverlayTrigger>
+                        ) : null}
+                    </p>
+                ) : null}
             </>
         );
     };

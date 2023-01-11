@@ -9,12 +9,21 @@ export const fetchSalaryGroup = async (
 ): Promise<SalaryGroupObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
-    return SalaryGroupObjectionModel.query(trx).findById(id).withGraphFetched('user').withGraphFetched('bookings');
+    return SalaryGroupObjectionModel.query(trx)
+        .findById(id)
+        .withGraphFetched('user')
+        .withGraphFetched('bookings')
+        .withGraphFetched('bookings.equipmentLists.listEntries')
+        .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
 };
 
 export const fetchSalaryGroups = async (): Promise<SalaryGroupObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return SalaryGroupObjectionModel.query().withGraphFetched('user').withGraphFetched('bookings.equipmentLists');
+    return SalaryGroupObjectionModel.query()
+        .withGraphFetched('user')
+        .withGraphFetched('bookings.equipmentLists')
+        .withGraphFetched('bookings.equipmentLists.listEntries')
+        .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
 };
 
 export const updateSalaryGroup = async (
