@@ -14,7 +14,6 @@ import {
     faExternalLinkAlt,
     faFileInvoiceDollar,
     faHome,
-    faInfoCircle,
     faListCheck,
     faMoneyBillWave,
     faUsers,
@@ -104,7 +103,6 @@ const sidebar: React.FC<Props> = ({ currentUser, globalSettings }: Props) => (
             <SidebarLink displayName="Utrustning" link="/equipment" icon={faCube} />
             <SidebarLink displayName="Användare" link="/users" icon={faUsers} />
             <SidebarLink displayName="Statistik" link="/statistics" icon={faChartPie} />
-            <SidebarLink displayName="Hjälp" link="/about" icon={faInfoCircle} />
         </SidebarLinkGroup>
 
         <IfAdmin currentUser={currentUser}>

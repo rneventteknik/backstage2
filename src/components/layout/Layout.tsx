@@ -33,7 +33,7 @@ const Layout: React.FC<Props> = ({
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
             </Head>
 
-            <Topbar currentUser={currentUser} toggleSidebar={toggleSidebar} />
+            <Topbar currentUser={currentUser} globalSettings={globalSettings} toggleSidebar={toggleSidebar} />
 
             <aside className={styles.sidebar}>
                 <Sidebar currentUser={currentUser} globalSettings={globalSettings} />
