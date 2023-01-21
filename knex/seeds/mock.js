@@ -1880,6 +1880,13 @@ export async function seed(knex) {
             value: '[]',
         },
         {
+            key: 'googleCalendar.keywordBlackList',
+            note: 'En blacklist som JSON-lista med strängar. Om ett event i kalendern innehåller någon av dessa strängar i namnet visas det inte i listan.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '["Lunchbemanning", "Kvällsbemanning", "Planeringsmöte"]',
+        },
+        {
             key: 'content.helpPageText',
             note: 'Text för hjälpsidan, som Markdown',
             created: getVarianceDateString(-100),
