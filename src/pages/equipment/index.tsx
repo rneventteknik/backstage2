@@ -50,11 +50,11 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser, globalSettings 
                     </Link>
                 </IfNotReadonly>
                 <Link href="/equipmentPackage" passHref>
-                    <Button variant="dark" as="span">
+                    <Button variant="secondary" as="span">
                         <FontAwesomeIcon icon={faCubes} className="mr-1" /> Visa utrustningspaket
                     </Button>
                 </Link>
-                <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block">
+                <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer" className="d-inline-block">
                     <Link href="/equipment/compare-availability" passHref>
                         <Dropdown.Item href={'/equipment/compare-availability'}>
                             <FontAwesomeIcon icon={faCalendarXmark} className="mr-1 fa-fw" /> Jämför tillgänglighet

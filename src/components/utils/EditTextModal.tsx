@@ -49,7 +49,7 @@ const EditTextModal: React.FC<Props> = ({
                 <Form.Text className="text-muted">{modalHelpText}</Form.Text>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="dark" onClick={onCancel}>
+                <Button variant="secondary" onClick={onCancel}>
                     Avbryt
                 </Button>
                 <Button variant="primary" onClick={() => onSubmit(text)}>

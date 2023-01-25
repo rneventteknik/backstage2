@@ -41,7 +41,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({ booking, onChange, classNa
 
     if (booking.equipmentLists?.some((list) => list.rentalStatus == undefined)) {
         return (
-            <Button variant="dark" className={className} onClick={() => changeRentalStatusTo(RentalStatus.OUT)}>
+            <Button variant="secondary" className={className} onClick={() => changeRentalStatusTo(RentalStatus.OUT)}>
                 <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
             </Button>
         );
@@ -50,7 +50,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({ booking, onChange, classNa
     if (booking.equipmentLists?.some((list) => list.rentalStatus === RentalStatus.OUT)) {
         return (
             <>
-                <Button variant="dark" className={className} onClick={() => setShowReturnalNoteModal(true)}>
+                <Button variant="secondary" className={className} onClick={() => setShowReturnalNoteModal(true)}>
                     <FontAwesomeIcon icon={faRightToBracket} className="mr-1" /> Ta emot
                 </Button>
                 <BookingReturnalNoteModal

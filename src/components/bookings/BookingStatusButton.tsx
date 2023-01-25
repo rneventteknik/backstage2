@@ -31,14 +31,14 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
                 <>
                     <Dropdown as={ButtonGroup} className={className}>
                         <Button
-                            variant="dark"
+                            variant="secondary"
                             onClick={() => setShowStatusChangeModal(true)}
                             disabled={!allEquipmentListsHaveDates}
                         >
                             <FontAwesomeIcon icon={faCircleCheckRegular} className="mr-1" /> Sätt till bokad
                         </Button>
 
-                        <Dropdown.Toggle split variant="dark" id="booking-status-dropdown" />
+                        <Dropdown.Toggle split variant="secondary" id="booking-status-dropdown" />
 
                         <Dropdown.Menu>
                             <BookingStatusCancelButton onClick={() => changeStatusTo(Status.CANCELED)} />
@@ -57,11 +57,11 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
             return (
                 <>
                     <Dropdown as={ButtonGroup} className={className}>
-                        <Button variant="dark" onClick={() => setShowStatusChangeModal(true)}>
+                        <Button variant="secondary" onClick={() => setShowStatusChangeModal(true)}>
                             <FontAwesomeIcon icon={faCircleCheckSolid} className="mr-1" /> Klarmarkera
                         </Button>
 
-                        <Dropdown.Toggle split variant="dark" id="booking-status-dropdown" />
+                        <Dropdown.Toggle split variant="secondary" id="booking-status-dropdown" />
 
                         <Dropdown.Menu>
                             <Dropdown.Item onClick={() => changeStatusTo(Status.DRAFT)}>
@@ -82,7 +82,7 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
         case Status.CANCELED:
             return (
                 <Dropdown as={ButtonGroup} className={className}>
-                    <Button variant="dark" onClick={() => changeStatusTo(Status.DRAFT)}>
+                    <Button variant="secondary" onClick={() => changeStatusTo(Status.DRAFT)}>
                         <FontAwesomeIcon icon={faDotCircle} className="mr-1" /> Gör till utkast
                     </Button>
                 </Dropdown>
@@ -151,7 +151,7 @@ const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
                 />
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="dark" onClick={hide}>
+                <Button variant="secondary" onClick={hide}>
                     Avbryt
                 </Button>
                 <Button variant="primary" form="status-modal-booking-form" type="submit">

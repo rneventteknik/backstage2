@@ -188,7 +188,7 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                 </Col>
                 <Col md="auto">
                     <Form.Group>
-                        <Button variant="dark" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
+                        <Button variant="secondary" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
                             <FontAwesomeIcon icon={faFilter} /> {showAdvancedFilters ? 'Göm' : 'Visa'} filter
                         </Button>
                     </Form.Group>

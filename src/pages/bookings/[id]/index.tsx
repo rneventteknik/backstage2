@@ -164,14 +164,14 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 </IfNotReadonly>
                 <Dropdown as={ButtonGroup}>
                     <Button
-                        variant="dark"
+                        variant="secondary"
                         href={`/api/documents/price-estimate/${booking.language}/${booking.id}`}
                         target="_blank"
                     >
                         <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning
                     </Button>
 
-                    <Dropdown.Toggle split variant="dark" id="dropdown-split-basic" />
+                    <Dropdown.Toggle split variant="secondary" id="dropdown-split-basic" />
 
                     <Dropdown.Menu>
                         <Dropdown.Item href={'/api/documents/packing-list/sv/' + booking.id} target="_blank">
@@ -192,16 +192,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         sortIndex={getNextSortIndex(booking.timeEstimates ?? [])}
                         onAdd={onAddTimeReport}
                         currentUser={currentUser}
-                        variant="dark"
+                        variant="secondary"
                         defaultLaborHourlyRate={defaultLaborHourlyRate}
                     >
                         <FontAwesomeIcon icon={faStopwatch} className="mr-1" />
                         Rapportera tid
                     </TimeReportAddButton>
                 </IfNotReadonly>
-                <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="dark" />
+                <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="secondary" />
                 <IfNotReadonly currentUser={currentUser}>
-                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer">
+                    <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer">
                         <Dropdown.Item
                             onClick={() => saveBooking({ paymentStatus: PaymentStatus.PAID })}
                             disabled={

@@ -74,7 +74,9 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                 </Modal.Header>
                 <Modal.Body>
                     <Row>
-                        <Col md={8}>{getGlobalSetting('content.helpPageText', globalSettings)}</Col>
+                        <Col md={8} className="mb-3">
+                            {getGlobalSetting('content.helpPageText', globalSettings)}
+                        </Col>
                         <Col md={4}>
                             <Card>
                                 <ListGroup variant="flush">

@@ -116,7 +116,7 @@ const GeneralSettingsEditor: React.FC = () => {
 
     const SettingEntryActionsDisplayFn = (entry: Setting) => (
         <>
-            <Button variant="dark" size="sm" onClick={() => setSettingToEdit(entry)} className="mr-2">
+            <Button variant="secondary" size="sm" onClick={() => setSettingToEdit(entry)} className="mr-2">
                 Redigera
             </Button>
             <Button variant="danger" size="sm" onClick={() => setSettingToDelete(entry)}>
@@ -156,7 +156,7 @@ const GeneralSettingsEditor: React.FC = () => {
                 key: 'updated',
                 displayName: 'Senast ändrad',
                 getValue: (entry: Setting) => formatDatetimeForForm(entry.updated),
-                columnWidth: 125,
+                columnWidth: 150,
             },
             {
                 key: 'actions',

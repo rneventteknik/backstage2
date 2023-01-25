@@ -55,7 +55,7 @@ const BookingSearchCustomerModal: React.FC<Props> = ({
                 ) : null}
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="dark" onClick={onCancel}>
+                <Button variant="secondary" onClick={onCancel}>
                     Avbryt
                 </Button>
                 <Button

@@ -55,7 +55,7 @@ const SettingsModal: React.FC<Props> = ({ setting, onSubmit, onChange, hide, sho
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="dark" onClick={hide}>
+                <Button variant="secondary" onClick={hide}>
                     Avbryt
                 </Button>
                 <Button variant="primary" onClick={onSubmit} disabled={!setting?.key || !setting?.value}>

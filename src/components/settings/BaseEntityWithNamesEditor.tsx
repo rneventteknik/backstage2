@@ -121,7 +121,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
     const actionsDisplayFn = (entity: T) => (
         <>
             <Button
-                variant="dark"
+                variant="secondary"
                 size="sm"
                 onClick={() => {
                     setEntityToEdit({ ...entity });
@@ -162,7 +162,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
                 key: 'updated',
                 displayName: 'Senast ändrad',
                 getValue: (entry: T) => formatDatetimeForForm(entry.updated),
-                columnWidth: 125,
+                columnWidth: 150,
             },
             {
                 key: 'actions',

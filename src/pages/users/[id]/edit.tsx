@@ -241,7 +241,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     />
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="dark" onClick={() => setShowEditAuthModal(false)}>
+                    <Button variant="secondary" onClick={() => setShowEditAuthModal(false)}>
                         Avbryt
                     </Button>
                     <Button variant="primary" form="editUserAuthForm" type="submit">
