@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent } from 'react';
 import { BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
@@ -10,7 +10,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
-import { validDate } from '../lib/datetimeUtils';
+import { formatDateForForm, validDate } from '../lib/datetimeUtils';
+import { useLocalStorageState, useLocalStorageStateForDate } from '../lib/useLocalStorageState';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
@@ -83,12 +84,15 @@ type Props = {
 };
 
 const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }: Props) => {
-    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-    const [searchText, setSearchText] = useState('');
-    const [userIds, setUserIds] = useState<(number | undefined)[]>([]);
-    const [statuses, setStatuses] = useState<(Status | undefined)[]>([]);
-    const [startDate, setStartDate] = useState<Date | undefined>();
-    const [endDate, setEndDate] = useState<Date | undefined>();
+    const [showAdvancedFilters, setShowAdvancedFilters] = useLocalStorageState(
+        'large-booking-table-show-advanced-filters',
+        false,
+    );
+    const [searchText, setSearchText] = useLocalStorageState('large-booking-table-search-text', '');
+    const [userIds, setUserIds] = useLocalStorageState<number[]>('large-booking-table-user-ids', []);
+    const [statuses, setStatuses] = useLocalStorageState<Status[]>('large-booking-table-statuses', []);
+    const [startDate, setStartDate] = useLocalStorageStateForDate('large-booking-table-start-date');
+    const [endDate, setEndDate] = useLocalStorageStateForDate('large-booking-table-end-date');
 
     // Generate option lists for filters
     //
@@ -103,6 +107,15 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
         .filter(notEmpty)
         .filter(onlyUniqueById)
         .map((user) => ({ label: user.name, value: user.id }));
+
+    // Check stored values against available values and reset stored values if they do not match available ones
+    //
+    if (userIds.some((id) => !ownerUserOptions.some((x) => x.value === id))) {
+        setUserIds([]);
+    }
+    if (statuses.some((status) => !statusOptions.some((x) => x.value === status))) {
+        setUserIds([]);
+    }
 
     // Handlers for changed bookings
     //
@@ -121,7 +134,10 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
     // Filter list. Note that the free text filter are handled by the table and not here.
     //
     const bookingsToShow = bookings
-        .filter((booking: BookingViewModel) => userIds.length === 0 || userIds.indexOf(booking.ownerUser?.id) >= 0)
+        .filter(
+            (booking: BookingViewModel) =>
+                userIds.length === 0 || (booking.ownerUser?.id && userIds.indexOf(booking.ownerUser?.id) >= 0),
+        )
         .filter((booking: BookingViewModel) => statuses.length === 0 || statuses.indexOf(booking.status) >= 0)
         .filter(
             (booking: BookingViewModel) =>
@@ -139,7 +155,12 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
             <Form.Row>
                 <Col>
                     <Form.Group>
-                        <Form.Control type="text" placeholder="Fritextfilter" onChange={handleChangeFilterString} />
+                        <Form.Control
+                            type="text"
+                            placeholder="Fritextfilter"
+                            onChange={handleChangeFilterString}
+                            defaultValue={searchText}
+                        />
                     </Form.Group>
                 </Col>
                 <Col md="auto">
@@ -163,32 +184,46 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
                                 options={statusOptions}
                                 onChange={(e) => setStatuses(e.map((o) => o.value))}
                                 placeholder="Filtrera på status"
+                                defaultSelected={statuses
+                                    .map((id) => statusOptions.find((x) => x.value === id))
+                                    .filter(notEmpty)}
                             />
                         </Form.Group>
                     </Col>
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Ansvarig</Form.Label>
-                            <Typeahead<{ label: string; value: Status }>
+                            <Typeahead<{ label: string; value: number }>
                                 id="user-typeahead"
                                 multiple
                                 labelKey={(x) => x.label}
                                 options={ownerUserOptions}
                                 onChange={(e) => setUserIds(e.map((o) => o.value))}
                                 placeholder="Filtrera på ansvarig"
+                                defaultSelected={userIds
+                                    .map((id) => ownerUserOptions.find((x) => x.value === id))
+                                    .filter(notEmpty)}
                             />
                         </Form.Group>
                     </Col>
                     <Col md="2">
                         <Form.Group>
                             <Form.Label>Börjar efter</Form.Label>
-                            <Form.Control type="date" onChange={handleChangeStartDate} />
+                            <Form.Control
+                                type="date"
+                                onChange={handleChangeStartDate}
+                                defaultValue={formatDateForForm(startDate)}
+                            />
                         </Form.Group>
                     </Col>
                     <Col md="2">
                         <Form.Group>
                             <Form.Label>Slutar före</Form.Label>
-                            <Form.Control type="date" onChange={handleChangeEndDate} />
+                            <Form.Control
+                                type="date"
+                                onChange={handleChangeEndDate}
+                                defaultValue={formatDateForForm(endDate)}
+                            />
                         </Form.Group>
                     </Col>
                 </Form.Row>

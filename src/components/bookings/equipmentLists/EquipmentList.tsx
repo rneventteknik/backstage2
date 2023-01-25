@@ -27,6 +27,7 @@ import { EquipmentPrice } from '../../../models/interfaces';
 import EquipmentListTable from './EquipmentListTable';
 import EquipmentListHeader from './EquipmentListHeader';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
+import { useLocalStorageState } from '../../../lib/useLocalStorageState';
 
 type Props = {
     bookingId: number;
@@ -53,7 +54,10 @@ const EquipmentListDisplay: React.FC<Props> = ({
 
     const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
 
-    const [showListContent, setShowListContent] = useState(true);
+    const [showListContent, setShowListContent] = useLocalStorageState(
+        'equipment-list-' + partialList.id + '-show-list-content',
+        true,
+    );
     const [equipmentListEntryToEditViewModel, setEquipmentListEntryToEditViewModel] =
         useState<Partial<EquipmentListEntry> | null>(null);
 
