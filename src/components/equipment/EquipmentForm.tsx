@@ -10,6 +10,7 @@ import PricesEditor from './PricesEditor';
 import { toEquipmentPriceObjectionModel } from '../../lib/mappers/equipment';
 import { toIntOrUndefined } from '../../lib/utils';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
+import { getSortedList } from '../../lib/sortIndexUtils';
 
 type Props = {
     handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel>) => void;
@@ -216,7 +217,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     defaultValue={equipment?.equipmentPublicCategory?.id}
                                 >
                                     <option value={undefined}>Ingen kategori</option>
-                                    {equipmentPublicCategories?.map((x) => (
+                                    {getSortedList(equipmentPublicCategories ?? []).map((x) => (
                                         <option
                                             key={x.id}
                                             value={x.id}
@@ -236,7 +237,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 <Form.Label>Plats</Form.Label>
                                 <Form.Control as="select" name="equipmentLocation">
                                     <option value={undefined}>Okänd plats</option>
-                                    {equipmentLocations?.map((x) => (
+                                    {getSortedList(equipmentLocations ?? []).map((x) => (
                                         <option
                                             key={x.id}
                                             value={x.id}

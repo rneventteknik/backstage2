@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Skeleton from 'react-loading-skeleton';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import { getResponseContentOrError, updateItemsInArrayById } from '../../lib/utils';
-import { BaseEntityWithName } from '../../models/interfaces/BaseEntity';
+import { BaseEntityWithName, HasId } from '../../models/interfaces/BaseEntity';
 import { useNotifications } from '../../lib/useNotifications';
 import { Button, Modal } from 'react-bootstrap';
 import useSwr from 'swr';
@@ -10,6 +10,7 @@ import ConfirmModal from '../utils/ConfirmModal';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatDatetimeForForm } from '../../lib/datetimeUtils';
+import { HasSortIndex, sortIndexSortFn } from '../../lib/sortIndexUtils';
 
 type Props<T extends BaseEntityWithName> = {
     fetcher: (s: string) => Promise<T[]>;
@@ -17,6 +18,7 @@ type Props<T extends BaseEntityWithName> = {
     entityName: string;
     entityDisplayName: string;
     getEditComponent: (x: T, save: (x: T) => void) => React.ReactElement;
+    sortBySortIndex?: boolean;
 };
 
 const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
@@ -25,6 +27,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
     entityDisplayName,
     fetcher,
     getEditComponent,
+    sortBySortIndex = false,
 }: Props<T>): React.ReactElement => {
     const { data, mutate, error, isValidating } = useSwr(apiUrl, fetcher);
     const [entityToDelete, setEntityToDelete] = useState<T | null>(null);
@@ -143,6 +146,10 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
         entityTypeDisplayName: '',
         defaultSortPropertyName: 'name',
         defaultSortAscending: true,
+        customSortFn: sortBySortIndex
+            ? (a: T, b: T) =>
+                  sortIndexSortFn(a as unknown as HasSortIndex & HasId, b as unknown as HasSortIndex & HasId)
+            : undefined,
         hideTableFilter: true,
         hideTableCountControls: true,
         columns: [

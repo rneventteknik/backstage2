@@ -9,9 +9,11 @@ import { faEyeSlash, faFilter, faTags } from '@fortawesome/free-solid-svg-icons'
 import TableStyleLink from './utils/TableStyleLink';
 import { useLocalStorageState } from '../lib/useLocalStorageState';
 import useSwr from 'swr';
-import { equipmentTagsFetcher } from '../lib/fetchers';
+import { equipmentLocationsFetcher, equipmentTagsFetcher } from '../lib/fetchers';
 import { formatPrice, addVATToPriceWithTHS, formatTHSPrice, addVAT } from '../lib/pricingUtils';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
+import { EquipmentLocation } from '../models/interfaces/EquipmentLocation';
+import { getSortedList } from '../lib/sortIndexUtils';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -123,6 +125,7 @@ type Props = {
 
 const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride }: Props) => {
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
+    const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentLocationsFetcher);
 
     const [showAdvancedFilters, setShowAdvancedFilters] = useLocalStorageState(
         'large-equipment-table-show-advanced-filters',
@@ -130,6 +133,10 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
     );
     const [searchText, setSearchText] = useLocalStorageState('equipment-page-search-text', '');
     const [filterTags, setFilterTags] = useLocalStorageState<EquipmentTag[]>('equipment-page-filter-tags', []);
+    const [filterLocations, setFilterLocations] = useLocalStorageState<EquipmentLocation[]>(
+        'equipment-page-filter-location',
+        [],
+    );
     const [filterPubliclyHidden, setFilterPubliclyHidden] = useLocalStorageState(
         'equipment-page-publicly-hidden',
         'all',
@@ -153,6 +160,11 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
         .filter(
             (equipment: Equipment) =>
                 filterTags.length === 0 || filterTags.every((tag) => equipment.tags.some((x) => x.id === tag.id)),
+        )
+        .filter(
+            (equipment: Equipment) =>
+                filterLocations.length === 0 ||
+                filterLocations.some((location) => location.id === equipment.equipmentLocation?.id),
         )
         .filter(
             (equipment: Equipment) =>
@@ -198,6 +210,24 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                                 selected={
                                     filterTags
                                         .map((tag) => equipmentTags?.find((x) => x.id === tag.id))
+                                        ?.filter(notEmpty) ?? []
+                                }
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md="4">
+                        <Form.Group>
+                            <Form.Label>Platser</Form.Label>
+                            <Typeahead<EquipmentLocation>
+                                id="tags-typeahead"
+                                multiple
+                                labelKey={(x) => x.name}
+                                options={getSortedList(equipmentLocations ?? [])}
+                                onChange={(e) => setFilterLocations(e)}
+                                placeholder="Filtrera på plats"
+                                selected={
+                                    filterLocations
+                                        .map((location) => equipmentLocations?.find((x) => x.id === location.id))
                                         ?.filter(notEmpty) ?? []
                                 }
                             />

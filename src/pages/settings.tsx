@@ -75,6 +75,7 @@ const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                             entityName={'equipmentLocation'}
                             entityDisplayName={'Plats'}
                             getEditComponent={(entity, save) => <EquipmentLocationEditor entity={entity} save={save} />}
+                            sortBySortIndex={true}
                         />
                     </Tab.Pane>
                     <Tab.Pane eventKey="equipmentPublicCategories">
@@ -86,6 +87,7 @@ const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                             getEditComponent={(entity, save) => (
                                 <EquipmentPublicCategoryEditor entity={entity} save={save} />
                             )}
+                            sortBySortIndex={true}
                         />
                     </Tab.Pane>
                     <Tab.Pane eventKey="generalSettings">
