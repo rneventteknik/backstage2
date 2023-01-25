@@ -57,6 +57,12 @@ export async function seed(knex) {
                 nameTag: 'AM',
                 phoneNumber: '08 000 123 45',
                 slackId: null,
+                personalIdentityNumber: '19780101-4567',
+                bankName: 'Handelssparbanken',
+                clearingNumber: '1234',
+                bankAccount: '456-123-7890',
+                homeAddress: 'Hemvägen 8',
+                zipCode: '123 45',
             },
             {
                 name: 'Markus Medlem',
@@ -1815,6 +1821,25 @@ export async function seed(knex) {
         },
     ]);
 
+    const firstSalaryGroupId = await knex('SalaryGroup')
+        .insert([
+            {
+                name: 'Lön för mars 2021 v1',
+                created: '2021-04-01 13:45',
+                updated: '2021-04-01 13:45',
+                userId: firstUserId,
+            },
+        ])
+        .returning('id')
+        .then((ids) => ids[0].id);
+
+    await knex('BookingSalaryGroup').insert([
+        {
+            bookingId: bookingIds.lunchföreläsning,
+            salaryGroupId: firstSalaryGroupId,
+        },
+    ]);
+
     await knex('Setting').insert([
         {
             key: 'laborHourlyRate.ths',
@@ -1871,6 +1896,27 @@ export async function seed(knex) {
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
             value: 'Person Personsson',
+        },
+        {
+            key: 'salary.rs',
+            note: 'Resultatställe på löneexporter',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '81',
+        },
+        {
+            key: 'salary.wageRatio.ths',
+            note: 'Hur stor andel av timpriset som arbetaren får som lön, som decimaltal med punkt som decimaltecken (Bokningar med prisplan THS). Exempelvis "0.5".',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '0.72',
+        },
+        {
+            key: 'salary.wageRatio.external',
+            note: 'Hur stor andel av timpriset som arbetaren får som lön, som decimaltal med punkt som decimaltecken (Bokningar med prisplan Standardpris). Exempelvis "0.6".',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '0.68',
         },
         {
             key: 'content.sidebarExternalLinks',

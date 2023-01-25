@@ -6,7 +6,7 @@ import { useTextResources } from '../../useTextResources';
 import { commonStyles } from '../../utils';
 
 type Props = {
-    booking: Booking;
+    booking?: Booking;
 };
 
 const styles = StyleSheet.create({
@@ -27,7 +27,8 @@ export const Footer: React.FC<Props> = ({ booking }: Props) => {
         <View style={styles.footer} fixed>
             <Text style={styles.bold}>{t('common.footer.title')}</Text>
             <Text>
-                {t('common.footer.print-date')}: {formatDatetimeForForm(new Date(), '-', locale)} / #{booking.id}
+                {t('common.footer.print-date')}: {formatDatetimeForForm(new Date(), '-', locale)}
+                {booking ? <Text> / #{booking.id}</Text> : null}
             </Text>
         </View>
     );

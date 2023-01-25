@@ -1,7 +1,11 @@
+import { PricePlan } from '../models/enums/PricePlan';
 import { Booking, TimeEstimate, TimeReport } from '../models/interfaces';
 import { PricedEntity, PricedEntityWithTHS } from '../models/interfaces/BaseEntity';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../models/interfaces/EquipmentList';
-import { getNumberOfDays } from './datetimeUtils';
+import { SalaryGroup } from '../models/interfaces/SalaryGroup';
+import { SalaryReport, UserSalaryReport } from '../models/misc/Salary';
+import { formatDateForForm, getNumberOfDays } from './datetimeUtils';
+import { groupBy, reduceSumFn } from './utils';
 
 // Calculate total price
 //
@@ -122,3 +126,63 @@ export const formatTHSPrice = (price: PricedEntityWithTHS): string => {
 
 export const formatNumberAsCurrency = (number: number): string =>
     Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(number);
+
+// Salary calculations
+//
+export const getSalaryReport = (
+    salaryGroup: SalaryGroup,
+    rs: string,
+    wageRatioExternal: number,
+    wageRatioThs: number,
+): SalaryReport => ({
+    name: salaryGroup.name,
+    userSalaryReports: calculateSalary(salaryGroup.bookings ?? [], rs, wageRatioExternal, wageRatioThs),
+});
+
+export const calculateSalary = (
+    bookings: Booking[],
+    rs: string,
+    wageRatioExternal: number,
+    wageRatioThs: number,
+): UserSalaryReport[] => {
+    const timeReports = bookings.flatMap((booking) =>
+        (booking.timeReports ?? []).map((timereport) => ({ ...timereport, booking: booking })),
+    );
+
+    const timeReportsByUser = groupBy(timeReports, (x) => x?.userId ?? 0);
+
+    const salaryReportSections = [];
+    for (const userId in timeReportsByUser) {
+        const timeReportByUser = timeReportsByUser[userId];
+
+        if (!timeReportByUser[0].user) {
+            throw new Error('Invalid data, user information is mandatory');
+        }
+
+        const salaryLines = timeReportByUser.map((x) => {
+            const hourlyWageRatio = x.booking.pricePlan === PricePlan.THS ? wageRatioThs : wageRatioExternal;
+            const hourlyWage = x.pricePerHour * hourlyWageRatio;
+
+            return {
+                timeReportId: x.id,
+                rs: rs,
+                date: formatDateForForm(x?.startDatetime),
+                name: x.name
+                    ? `${x.booking.customerName} - ${x.booking.name} (${x.name})`
+                    : `${x.booking.customerName} - ${x.booking.name}`,
+                hours: x.billableWorkingHours,
+                hourlyRate: hourlyWage,
+                sum: x.billableWorkingHours * hourlyWage,
+            };
+        });
+
+        salaryReportSections.push({
+            userId: userId,
+            user: timeReportByUser[0].user,
+            salaryLines,
+            sum: salaryLines.map((x) => x.sum).reduce(reduceSumFn),
+        });
+    }
+
+    return salaryReportSections;
+};

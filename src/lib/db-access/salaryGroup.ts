@@ -17,6 +17,31 @@ export const fetchSalaryGroup = async (
         .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
 };
 
+export const fetchSalaryGroupWithSalaryInformation = async (
+    id: number,
+    trx?: Objection.Transaction,
+): Promise<SalaryGroupObjectionModel | undefined> => {
+    ensureDatabaseIsInitialized();
+
+    return SalaryGroupObjectionModel.query(trx)
+        .findById(id)
+        .withGraphFetched('user')
+        .withGraphFetched('bookings')
+        .withGraphFetched('bookings.timeReports.user(selectPersonalInformation)')
+        .modifiers({
+            selectPersonalInformation(builder) {
+                builder.select(
+                    'personalIdentityNumber',
+                    'bankName',
+                    'clearingNumber',
+                    'bankAccount',
+                    'homeAddress',
+                    'zipCode',
+                );
+            },
+        });
+};
+
 export const fetchSalaryGroups = async (): Promise<SalaryGroupObjectionModel[]> => {
     ensureDatabaseIsInitialized();
     return SalaryGroupObjectionModel.query()

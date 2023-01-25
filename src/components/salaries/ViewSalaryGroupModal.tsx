@@ -85,7 +85,7 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                         <Button
                             variant="secondary"
                             className="d-inline-block mr-2 mb-2"
-                            href={`/api/documents/hogia-salary?${getSelectedBookingIds()
+                            href={`/api/documents/salary-report/${salaryGroup.id}?${getSelectedBookingIds()
                                 ?.map((id) => `bookingId=${id}`)
                                 .join('&')}`}
                             target="_blank"
