@@ -440,7 +440,7 @@ export const deleteListHeadingEntry = (
     saveList({ ...list, listHeadings: newEquipmentListHeadingEntries });
 };
 
-const saveViewModels = (
+export const saveViewModels = (
     updatedEntities: EquipmentListEntityViewModel[],
     list: EquipmentList,
     saveList: (updatedList: EquipmentList) => void,

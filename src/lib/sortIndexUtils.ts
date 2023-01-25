@@ -106,6 +106,27 @@ export const moveItemDown = <T extends Sortable>(list: T[], item: T): T[] => {
     ];
 };
 
+export const moveItemToItem = <T extends Sortable>(list: T[], item: T, target: T): T[] => {
+    if (
+        !list ||
+        !item ||
+        !target ||
+        item.id === target.id ||
+        !list.some((x) => x.id === item.id) ||
+        !list.some((x) => x.id === target.id)
+    ) {
+        throw new Error('Invalid parameters');
+    }
+
+    const sortedList = getSortedList(list.filter((x) => x.id !== item.id));
+    const targetIndex = sortedList.findIndex((x) => x.id === target.id);
+
+    sortedList.splice(targetIndex, 0, item);
+
+    // Reset sort index
+    return resetSortIndexes(sortedList);
+};
+
 export const getNextSortIndex = <T extends Sortable>(list: T[]): number => {
     if (!list) {
         throw new Error('Invalid list');
@@ -121,7 +142,9 @@ export const getNextSortIndex = <T extends Sortable>(list: T[]): number => {
 export const checkSortIndexUniqueness = <T extends Sortable>(list: T[]): boolean =>
     !list.some((entity) => list.some((x) => x.sortIndex === entity.sortIndex && x.id !== entity.id));
 
-export const fixSortIndexUniqueness = <T extends Sortable>(list: T[]): T[] => {
+export const fixSortIndexUniqueness = <T extends Sortable>(list: T[]): T[] => resetSortIndexes(getSortedList(list));
+
+export const resetSortIndexes = <T extends Sortable>(list: T[]): T[] => {
     let sortIndex = 0;
-    return getSortedList(list).map((x) => ({ ...x, sortIndex: (sortIndex += 10) }));
+    return list.map((x) => ({ ...x, sortIndex: (sortIndex += 10) }));
 };

@@ -31,7 +31,7 @@ import {
     getPrice,
 } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
-import { getSortedList, isFirst, isLast, sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import { getSortedList, isFirst, isLast, moveItemToItem, sortIndexSortFn } from '../../../lib/sortIndexUtils';
 import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus';
 import { getEquipmentInDatetime, getEquipmentOutDatetime, getNumberOfDays } from '../../../lib/datetimeUtils';
 import { Language } from '../../../models/enums/Language';
@@ -51,6 +51,8 @@ import {
     moveListEntryDown,
     moveListEntryIntoHeading,
     moveListEntryUp,
+    saveViewModels,
+    saveViewModelsOfHeading,
     toggleHideListEntry,
     updateListEntry,
     updateListHeadingEntry,
@@ -469,6 +471,48 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
     };
 
     const sortFn = (a: EquipmentListEntityViewModel, b: EquipmentListEntityViewModel) => sortIndexSortFn(a, b);
+    const moveFn = (a: EquipmentListEntityViewModel, b: EquipmentListEntityViewModel) => {
+        if (a.id === b.id) {
+            return;
+        }
+
+        const listEntries = getEntitiesToDisplay(list);
+        const subListEntries = getSubEntitiesToDisplay(list).flatMap((x) => x.entities);
+
+        if (listEntries.some((x) => x.id === a.id) && listEntries.some((x) => x.id === b.id)) {
+            // Move items
+            const movedItems = moveItemToItem(getEntitiesToDisplay(list), a, b);
+
+            // Save inner entity as well
+            movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
+
+            // Save list
+            saveViewModels(movedItems, list, saveList);
+
+            return;
+        }
+
+        if (subListEntries.some((x) => x.id === a.id) && subListEntries.some((x) => x.id === b.id)) {
+            const heading = getEntitiesToDisplay(list).find((x) => x.id === a.parentId);
+
+            if (a.parentId != b.parentId || !heading) {
+                throw new Error('Invalid target');
+            }
+
+            // Move items
+            const movedItems = moveItemToItem(getPeersOfViewModel(a, list), a, b);
+
+            // Save inner entity as well
+            movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
+
+            // Save list
+            saveViewModelsOfHeading(movedItems, heading, list, saveList);
+
+            return;
+        }
+
+        throw new Error('Invalid target');
+    };
 
     // Lists of entities for table
     //
@@ -480,6 +524,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
     const tableSettings: TableConfiguration<EquipmentListEntityViewModel> = {
         entityTypeDisplayName: '',
         customSortFn: sortFn,
+        moveFn: moveFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         noResultsLabel: 'Listan är tom',
@@ -561,7 +606,12 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
     //
     return (
         <>
-            <TableDisplay entities={listEntries} subEntities={subListEntries} configuration={tableSettings} />
+            <TableDisplay
+                entities={listEntries}
+                subEntities={subListEntries}
+                configuration={tableSettings}
+                tableId={'equipment-list-' + list.id}
+            />
 
             {readonly ? null : (
                 <div className="ml-2 mr-2 mb-2">
