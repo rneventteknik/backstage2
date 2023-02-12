@@ -27,7 +27,7 @@ import {
     getTotalTimeReportsPrice,
 } from '../../../lib/pricingUtils';
 import { useNotifications } from '../../../lib/useNotifications';
-import { DoubleClickToEdit, DoubleClickToEditDatetime, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
+import { DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
 import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
 import { formatDatetime, validDate, toDatetimeOrUndefined } from '../../../lib/datetimeUtils';
 import TimeReportAddButton from './TimeReportAddButton';
@@ -141,24 +141,35 @@ const TimeReportList: React.FC<Props> = ({
             });
     };
 
-    const TimeReportNameDisplayFn = (timeReport: TimeReport) => (
-        <DoubleClickToEdit
-            value={timeReport.name}
-            onUpdate={(newValue) =>
-                updateTimeReport({
-                    ...timeReport,
-                    name: newValue && newValue.length > 0 ? newValue : timeReport.name,
-                })
-            }
-            size="sm"
-            readonly={readonly}
-        >
-            {timeReport && timeReport.name && timeReport.name.trim() && timeReport.name.trim().length > 0 ? (
-                timeReport.name
+    const TimeReportSpecificationDisplayFn = (timeReport: TimeReport) => (
+        <>
+            <DoubleClickToEdit
+                value={timeReport.name}
+                onUpdate={(newValue) =>
+                    updateTimeReport({
+                        ...timeReport,
+                        name: newValue && newValue.length > 0 ? newValue : timeReport.name,
+                    })
+                }
+                size="sm"
+                readonly={readonly}
+            >
+                {timeReport && timeReport.name && timeReport.name.trim() && timeReport.name.trim().length > 0 ? (
+                    timeReport.name
+                ) : (
+                    <span className="text-muted font-italic">Dubbelklicka för att lägga till en beskrivning</span>
+                )}
+            </DoubleClickToEdit>
+            {readonly ? (
+                <p className="text-muted">
+                    {formatDatetime(timeReport.startDatetime)} - {formatDatetime(timeReport.startDatetime)}
+                </p>
             ) : (
-                <span className="text-muted font-italic">Dubbelklicka för att lägga till en beskrivning</span>
+                <p role="button" onClick={() => setTimeReportToEditViewModel(timeReport)} className="text-muted">
+                    {formatDatetime(timeReport.startDatetime)} - {formatDatetime(timeReport.startDatetime)}
+                </p>
             )}
-        </DoubleClickToEdit>
+        </>
     );
 
     const TimeReportBillableWorkingHoursDisplayFn = (timeReport: TimeReport) => (
@@ -204,32 +215,6 @@ const TimeReportList: React.FC<Props> = ({
         </DoubleClickToEditDropdown>
     );
 
-    const TimeReportStartDatetimeDisplayFn = (timeReport: TimeReport) => (
-        <DoubleClickToEditDatetime
-            value={timeReport.startDatetime}
-            onUpdate={(newValue) =>
-                updateTimeReport({
-                    ...timeReport,
-                    startDatetime: newValue,
-                })
-            }
-            readonly={readonly}
-        />
-    );
-
-    const TimeReportEndDatetimeDisplayFn = (timeReport: TimeReport) => (
-        <DoubleClickToEditDatetime
-            value={timeReport.endDatetime}
-            onUpdate={(newValue) =>
-                updateTimeReport({
-                    ...timeReport,
-                    endDatetime: newValue,
-                })
-            }
-            readonly={readonly}
-        />
-    );
-
     const TimeReportEntryActionsDisplayFn = (entry: TimeReport) => (
         <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
             <Dropdown.Item onClick={() => deleteTimeReport(entry)} className="text-danger">
@@ -266,34 +251,18 @@ const TimeReportList: React.FC<Props> = ({
         hideTableCountControls: true,
         columns: [
             {
-                key: 'name',
-                displayName: 'Beskrivning',
-                getValue: (timeReport: TimeReport) => timeReport.name,
-                getContentOverride: TimeReportNameDisplayFn,
-                columnWidth: 100,
-            },
-            {
                 key: 'userId',
                 displayName: 'Användare',
                 getValue: (timeReport: TimeReport) => timeReport.user?.name ?? '',
                 getContentOverride: TimeReportUserIdDisplayFn,
-                columnWidth: 20,
+                columnWidth: 150,
             },
             {
-                key: 'startDatetime',
-                displayName: 'Start',
+                key: 'specification',
+                displayName: 'Specification',
                 getValue: (timeReport: TimeReport) =>
                     timeReport.startDatetime ? formatDatetime(timeReport.startDatetime) : '-',
-                getContentOverride: TimeReportStartDatetimeDisplayFn,
-                columnWidth: 150,
-            },
-            {
-                key: 'endDatetime',
-                displayName: 'Slut',
-                getValue: (timeReport: TimeReport) =>
-                    timeReport.endDatetime ? formatDatetime(timeReport.endDatetime) : '-',
-                getContentOverride: TimeReportEndDatetimeDisplayFn,
-                columnWidth: 150,
+                getContentOverride: TimeReportSpecificationDisplayFn,
             },
             {
                 key: 'billableWorkingHours',
@@ -301,7 +270,7 @@ const TimeReportList: React.FC<Props> = ({
                 getValue: (timeReport: TimeReport) => timeReport.billableWorkingHours + ' h',
                 getContentOverride: TimeReportBillableWorkingHoursDisplayFn,
                 textAlignment: 'right',
-                columnWidth: 20,
+                columnWidth: 150,
             },
             {
                 key: 'sum',
