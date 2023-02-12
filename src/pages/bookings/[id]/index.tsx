@@ -295,13 +295,13 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <strong className="flex-grow-1">Totalpris</strong>
-                                <strong>{formatNumberAsCurrency(addVAT(getBookingPrice(booking)))}</strong>
+                                <strong>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true)))}</strong>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <strong className="flex-grow-1">varav moms (25%)</strong>
                                 <strong>
                                     {formatNumberAsCurrency(
-                                        addVAT(getBookingPrice(booking)) - getBookingPrice(booking),
+                                        addVAT(getBookingPrice(booking)) - getBookingPrice(booking, true),
                                     )}
                                 </strong>
                             </ListGroup.Item>
