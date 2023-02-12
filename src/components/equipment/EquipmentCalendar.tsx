@@ -217,7 +217,16 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
 
             <div className="text-center py-2">
                 {maxNumberOfUnitsUsed === 0 ? (
-                    <FontAwesomeIcon icon={faCheck} size="lg" />
+                    <OverlayTrigger
+                        placement="left"
+                        overlay={
+                            <Tooltip id="1">
+                                <strong>Alla {equipment.inventoryCount} st tillgängliga</strong>
+                            </Tooltip>
+                        }
+                    >
+                        <FontAwesomeIcon icon={faCheck} size="lg" />
+                    </OverlayTrigger>
                 ) : (
                     <OverlayTrigger
                         placement="left"

@@ -84,7 +84,10 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                 placement="right"
                 overlay={
                     <Tooltip id="1">
-                        <strong>Inga konflikter (ingen annat bokning använder denna utrustningen dessa tider)</strong>
+                        <strong>
+                            Inga konflikter (ingen annat bokning använder denna utrustningen dessa tider, totalt finns{' '}
+                            {equipment.inventoryCount} st)
+                        </strong>
                     </Tooltip>
                 }
             >
@@ -148,7 +151,8 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
             overlay={
                 <Tooltip id="1">
                     <strong>
-                        Notera att samma typ av utrustning används samma tid av följande andra utrustningslistor:
+                        Notera att samma typ av utrustning används samma tid av följande andra utrustningslistor (totalt
+                        finns {equipment.inventoryCount} st):
                     </strong>
                     {bookings.map((booking) => (
                         <div key={booking.id}>
