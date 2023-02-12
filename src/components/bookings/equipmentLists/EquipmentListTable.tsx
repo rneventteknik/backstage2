@@ -336,20 +336,27 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
         }
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
+        const priceWithoutDiscount = formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list), false)));
+        const discount = formatNumberAsCurrency(addVAT(getCalculatedDiscount(entry, getNumberOfDays(list))));
+        const priceWithDiscount = formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list))));
+
         return (
-            <em
-                title={
-                    entry.discount > 0
-                        ? `${formatNumberAsCurrency(
-                              addVAT(getPrice(entry, getNumberOfDays(list), false)),
-                          )}\n-${formatNumberAsCurrency(
-                              addVAT(getCalculatedDiscount(entry, getNumberOfDays(list))),
-                          )} (rabatt)\n`
-                        : ''
-                }
-                className={entry.discount > 0 ? 'text-danger' : ''}
-            >
-                {formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list))))}
+            <em>
+                {entry.discount > 0 ? (
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={
+                            <Tooltip id="1">
+                                <p className="mb-0">{priceWithoutDiscount}</p>
+                                <p className="mb-0">-{discount} (rabatt)</p>
+                            </Tooltip>
+                        }
+                    >
+                        <span className="text-danger">{priceWithDiscount}</span>
+                    </OverlayTrigger>
+                ) : (
+                    <span>{priceWithDiscount}</span>
+                )}
             </em>
         );
     };
