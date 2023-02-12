@@ -524,7 +524,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
     const tableSettings: TableConfiguration<EquipmentListEntityViewModel> = {
         entityTypeDisplayName: '',
         customSortFn: sortFn,
-        moveFn: moveFn,
+        moveFn: readonly ? undefined : moveFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         noResultsLabel: 'Listan är tom',

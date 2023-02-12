@@ -365,11 +365,13 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         text={booking.note}
                         onSubmit={(note) => saveBooking({ note })}
                         cardTitle="Anteckningar"
+                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
                     />
                     <MarkdownCard
                         text={booking.returnalNote}
                         onSubmit={(returnalNote) => saveBooking({ returnalNote })}
                         cardTitle="Återlämningsanmärkning"
+                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
                     />
                     <ChangelogCard changelog={booking.changelog ?? []} />
                 </Col>
