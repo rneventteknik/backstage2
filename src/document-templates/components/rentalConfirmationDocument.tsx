@@ -15,16 +15,18 @@ import { TotalPriceSection } from './shared/totalPriceSection';
 import { Col, Row } from './shared/utils';
 import { Signature } from './shared/signature';
 import { getTotalTimeEstimatesPrice } from '../../lib/pricingUtils';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 type Props = {
     booking: Booking;
+    globalSettings: KeyValue[];
 };
 
 const styles = {
     ...commonStyles,
 };
 
-export const RentalConfirmationDocument: React.FC<Props> = ({ booking }: Props) => {
+export const RentalConfirmationDocument: React.FC<Props> = ({ booking, globalSettings }: Props) => {
     const { t } = useTextResources();
 
     const showPersonnelCosts = getTotalTimeEstimatesPrice(booking.timeEstimates) !== 0;
@@ -34,7 +36,7 @@ export const RentalConfirmationDocument: React.FC<Props> = ({ booking }: Props) 
             <Page size="A4" style={styles.page}>
                 <PageCount />
 
-                <Header title={t('rental-agreement.title')} subTitle={booking.name} />
+                <Header title={t('rental-agreement.title')} subTitle={booking.name} globalSettings={globalSettings} />
 
                 <BookingInfo booking={booking} />
 

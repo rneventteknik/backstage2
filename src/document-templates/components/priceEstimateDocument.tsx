@@ -12,16 +12,18 @@ import { TotalPriceSection } from './shared/totalPriceSection';
 import { EquipmentListInfo } from './shared/equipmentListInfo';
 import { TimeEstimateListInfo } from './shared/timeEstimateListInfo';
 import { getSortedList } from '../../lib/sortIndexUtils';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 type Props = {
     booking: Booking;
+    globalSettings: KeyValue[];
 };
 
 const styles = {
     ...commonStyles,
 };
 
-export const PriceEstimateDocument: React.FC<Props> = ({ booking }: Props) => {
+export const PriceEstimateDocument: React.FC<Props> = ({ booking, globalSettings }: Props) => {
     const { t } = useTextResources();
 
     return (
@@ -29,7 +31,7 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking }: Props) => {
             <Page size="A4" style={styles.page}>
                 <PageCount />
 
-                <Header title={t('price-estimate.title')} subTitle={booking.name} />
+                <Header title={t('price-estimate.title')} subTitle={booking.name} globalSettings={globalSettings} />
                 <BookingInfo booking={booking} />
 
                 <MainContent>

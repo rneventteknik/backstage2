@@ -6,6 +6,7 @@ import Sidebar from './Sidebar';
 import styles from './Layout.module.scss';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { KeyValue } from '../../models/interfaces/KeyValue';
+import { getGlobalSetting } from '../../lib/utils';
 
 type Props = {
     children?: ReactNode;
@@ -31,6 +32,12 @@ const Layout: React.FC<Props> = ({
                 <title>{title} | Backstage2</title>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                <link
+                    rel="icon"
+                    type="image/png"
+                    sizes="16x16"
+                    href={getGlobalSetting('content.image.favIcon', globalSettings, '')}
+                />
             </Head>
 
             <Topbar currentUser={currentUser} globalSettings={globalSettings} toggleSidebar={toggleSidebar} />

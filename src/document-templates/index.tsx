@@ -8,14 +8,19 @@ import { Language } from '../models/enums/Language';
 import { RentalConfirmationDocument } from './components/rentalConfirmationDocument';
 import { SalaryReport } from '../models/misc/Salary';
 import { SalaryReportDocument } from './components/salaryReportDocument';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 registerFonts();
 
 // Pricing Estimate
 //
-export const getPriceEstimateDocument = (booking: Booking, documentLanguage: Language): ReactElement => (
+export const getPriceEstimateDocument = (
+    booking: Booking,
+    documentLanguage: Language,
+    globalSettings: KeyValue[],
+): ReactElement => (
     <TextResourcesLanguageContext.Provider value={documentLanguage}>
-        <PriceEstimateDocument booking={booking} />
+        <PriceEstimateDocument booking={booking} globalSettings={globalSettings} />
     </TextResourcesLanguageContext.Provider>
 );
 
@@ -27,10 +32,11 @@ export const getPriceEstimateDocumentFileName = (booking: Booking, documentLangu
 export const getPackingListDocument = (
     booking: Booking,
     documentLanguage: Language,
+    globalSettings: KeyValue[],
     equipmentListId?: number,
 ): ReactElement => (
     <TextResourcesLanguageContext.Provider value={documentLanguage}>
-        <PackingListDocument booking={booking} equipmentListId={equipmentListId} />
+        <PackingListDocument booking={booking} globalSettings={globalSettings} equipmentListId={equipmentListId} />
     </TextResourcesLanguageContext.Provider>
 );
 
@@ -39,9 +45,13 @@ export const getPackingListDocumentFileName = (booking: Booking, documentLanguag
 
 // Rental Confirmation
 //
-export const getRentalConfirmationDocument = (booking: Booking, documentLanguage: Language): ReactElement => (
+export const getRentalConfirmationDocument = (
+    booking: Booking,
+    documentLanguage: Language,
+    globalSettings: KeyValue[],
+): ReactElement => (
     <TextResourcesLanguageContext.Provider value={documentLanguage}>
-        <RentalConfirmationDocument booking={booking} />
+        <RentalConfirmationDocument booking={booking} globalSettings={globalSettings} />
     </TextResourcesLanguageContext.Provider>
 );
 
@@ -50,8 +60,8 @@ export const getRentalConfirmationDocumentFileName = (booking: Booking, document
 
 // Salary Report (no language support)
 //
-export const getSalaryReportDocument = (salaryReport: SalaryReport): ReactElement => (
-    <SalaryReportDocument salaryReport={salaryReport} />
+export const getSalaryReportDocument = (salaryReport: SalaryReport, globalSettings: KeyValue[]): ReactElement => (
+    <SalaryReportDocument salaryReport={salaryReport} globalSettings={globalSettings} />
 );
 
 export const getSalaryReportDocumentFileName = (salaryReport: SalaryReport): string => `${salaryReport.name}.pdf`;

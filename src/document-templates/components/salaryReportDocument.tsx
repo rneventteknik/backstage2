@@ -8,9 +8,11 @@ import { SalaryReport } from '../../models/misc/Salary';
 import { Footer } from './shared/footer';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth, Col, InfoItem } from './shared/utils';
 import { formatNumberAsCurrency } from '../../lib/pricingUtils';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 type Props = {
     salaryReport: SalaryReport;
+    globalSettings: KeyValue[];
 };
 
 const styles = StyleSheet.create({
@@ -22,7 +24,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export const SalaryReportDocument: React.FC<Props> = ({ salaryReport }: Props) => {
+export const SalaryReportDocument: React.FC<Props> = ({ salaryReport, globalSettings }: Props) => {
     return (
         <Document title={salaryReport.name}>
             {salaryReport.userSalaryReports.map((userSalaryReport) => (
@@ -32,6 +34,7 @@ export const SalaryReportDocument: React.FC<Props> = ({ salaryReport }: Props) =
                     <Header
                         title={userSalaryReport.user.name}
                         subTitle={userSalaryReport.user.personalIdentityNumber ?? ''}
+                        globalSettings={globalSettings}
                     />
 
                     <View style={styles.infoSection}>

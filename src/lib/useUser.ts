@@ -57,10 +57,13 @@ const useUser = (
                 };
             }
 
+            const settings = (await fetchSettings()).map(toKeyValue);
+            const publicSettings = ['content.image.favIcon'];
+
             return {
                 props: {
                     user: user,
-                    globalSettings: (await fetchSettings()).map(toKeyValue),
+                    globalSettings: user.isLoggedIn ? settings : settings.filter((s) => publicSettings.includes(s.key)),
                 },
             };
         },

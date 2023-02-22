@@ -61,7 +61,7 @@ const handler = withSessionContext(
                 );
 
                 const filename = getSalaryReportDocumentFileName(salaryReport);
-                const stream = await renderToStream(getSalaryReportDocument(salaryReport));
+                const stream = await renderToStream(getSalaryReportDocument(salaryReport, globalSettings));
 
                 // If the download flag is set, tell the browser to download the file instead of showing it in a new tab.
                 if (req.query.download) {

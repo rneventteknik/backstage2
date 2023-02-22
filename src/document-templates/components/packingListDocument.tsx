@@ -9,9 +9,11 @@ import { MainContent } from './shared/mainContent';
 import { Footer } from './shared/footer';
 import { useTextResources } from '../useTextResources';
 import { EquipmentListPackingInfo } from './shared/equipmentListPackingInfo';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 type Props = {
     booking: Booking;
+    globalSettings: KeyValue[];
     equipmentListId?: number;
 };
 
@@ -19,7 +21,11 @@ const styles = {
     ...commonStyles,
 };
 
-export const PackingListDocument: React.FC<Props> = ({ booking, equipmentListId: equipmentListId }: Props) => {
+export const PackingListDocument: React.FC<Props> = ({
+    booking,
+    globalSettings,
+    equipmentListId: equipmentListId,
+}: Props) => {
     const { t } = useTextResources();
 
     return (
@@ -34,6 +40,7 @@ export const PackingListDocument: React.FC<Props> = ({ booking, equipmentListId:
                             ? booking.name
                             : `${booking.name} - ${booking.equipmentLists?.find((l) => l.id === equipmentListId)?.name}`
                     }
+                    globalSettings={globalSettings}
                 />
                 <BookingInfo booking={booking} />
 

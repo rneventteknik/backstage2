@@ -6,6 +6,7 @@ import {
 } from '../../../../../document-templates';
 import { respondWithEntityNotFoundResponse } from '../../../../../lib/apiResponses';
 import { fetchBookingWithEquipmentLists } from '../../../../../lib/db-access/booking';
+import { fetchSettings } from '../../../../../lib/db-access/setting';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { withSessionContext } from '../../../../../lib/sessionContext';
 import { Language } from '../../../../../models/enums/Language';
@@ -24,9 +25,12 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             }
 
             const booking = toBooking(result);
+            const globalSettings = await fetchSettings();
             const documentLanguage = req.query.language === 'en' ? Language.EN : Language.SV;
             const filename = getRentalConfirmationDocumentFileName(booking, documentLanguage);
-            const stream = await renderToStream(getRentalConfirmationDocument(booking, documentLanguage));
+            const stream = await renderToStream(
+                getRentalConfirmationDocument(booking, documentLanguage, globalSettings),
+            );
 
             // If the download flag is set, tell the browser to download the file instead of showing it in a new tab.
             if (req.query.download) {

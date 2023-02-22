@@ -1939,6 +1939,20 @@ export async function seed(knex) {
             updated: getVarianceDateString(100),
             value: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eleifend vulputate ligula a semper. In hac habitasse platea dictumst. Aliquam vel neque nec turpis facilisis iaculis vitae quis lectus. Praesent accumsan pellentesque mi, vitae blandit massa tincidunt vel. Sed nec dolor a eros hendrerit pretium eget non libero. Nulla id mollis nisl. Praesent libero lacus, pellentesque vel lacus at, elementum bibendum ex. Praesent orci ante, egestas non ligula id, fermentum sodales neque. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Morbi malesuada orci ac eros vulputate, in fringilla nibh ornare. Nullam dapibus enim a enim posuere pulvinar. Phasellus sodales, eros eget rutrum interdum, nisi urna maximus libero, pellentesque interdum nisl massa nec quam.\n\nVivamus sed libero id ex sodales dictum quis a elit. In sit amet hendrerit diam. Suspendisse vitae dui nec turpis finibus vestibulum. Vivamus vehicula vulputate erat, laoreet pretium dolor ultrices sed. Aenean quis rutrum augue. Aenean ut consectetur diam, sit amet fermentum magna. Nulla facilisis, erat id convallis pretium, sapien tellus dictum tortor, nec efficitur quam quam eget lectus.',
         },
+        {
+            key: 'content.image.favIcon',
+            note: 'FavIcon-bild, som base64-sträng.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: ' ',
+        },
+        {
+            key: 'content.image.documentHeaderImage',
+            note: 'Bild för header i pdfdokumentexporter, som base64-sträng.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: ' ',
+        },
     ]);
 
     await knex('Customer')

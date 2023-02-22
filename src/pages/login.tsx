@@ -3,7 +3,9 @@ import { Form, FormControl, Button, FormGroup, Alert, Spinner } from 'react-boot
 import Router from 'next/router';
 import { useUser } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
-import { getValueOrFirst } from '../lib/utils';
+import { getGlobalSetting, getValueOrFirst } from '../lib/utils';
+import { KeyValue } from '../models/interfaces/KeyValue';
+import Head from 'next/head';
 
 const containerStyle = {
     margin: 'auto',
@@ -16,8 +18,9 @@ const containerStyle = {
 // Redirect to '/' if the user is already logged in
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUser(undefined, undefined, '/');
+type Props = { globalSettings: KeyValue[] };
 
-const LoginPage: React.FC = () => {
+const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const [showWrongPasswordError, setShowWrongPasswordError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
     const [waitingForResponse, setWaitingForResponse] = useState(false);
@@ -85,6 +88,17 @@ const LoginPage: React.FC = () => {
 
     return (
         <div style={containerStyle}>
+            <Head>
+                <title>Login | Backstage2</title>
+                <meta charSet="utf-8" />
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                <link
+                    rel="icon"
+                    type="image/png"
+                    sizes="16x16"
+                    href={getGlobalSetting('content.image.favIcon', globalSettings, '')}
+                />
+            </Head>
             <h1>Backstage2</h1>
             <Form action="/api/users/login" method="post" onSubmit={handleSubmit}>
                 <FormGroup>
