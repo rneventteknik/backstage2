@@ -5,7 +5,14 @@ import Link from 'next/link';
 import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
-import { faAdd, faArchive, faCalendarXmark, faCubes, faFileImport } from '@fortawesome/free-solid-svg-icons';
+import {
+    faAdd,
+    faArchive,
+    faCalendarXmark,
+    faCubes,
+    faFileExport,
+    faFileImport,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../components/layout/Header';
 import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
@@ -60,15 +67,22 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser, globalSettings 
                             <FontAwesomeIcon icon={faCalendarXmark} className="mr-1 fa-fw" /> Jämför tillgänglighet
                         </Dropdown.Item>
                     </Link>
+                    <Link href="/equipment/archived" passHref>
+                        <Dropdown.Item href={'/equipment/archived'}>
+                            <FontAwesomeIcon icon={faArchive} className="mr-1 fa-fw" /> Visa arkiverad utrustning
+                        </Dropdown.Item>
+                    </Link>
                     <IfAdmin currentUser={currentUser}>
-                        <Link href="/equipment/archived" passHref>
-                            <Dropdown.Item href={'/equipment/archived'}>
-                                <FontAwesomeIcon icon={faArchive} className="mr-1 fa-fw" /> Visa arkiverad utrustning
-                            </Dropdown.Item>
-                        </Link>
+                        <Dropdown.Divider />
                         <Link href="/equipment/json-import" passHref>
                             <Dropdown.Item href={'/equipment/json-import'}>
                                 <FontAwesomeIcon icon={faFileImport} className="mr-1 fa-fw" /> Importera utrustning från
+                                JSON
+                            </Dropdown.Item>
+                        </Link>
+                        <Link href="/equipment/json-export" passHref>
+                            <Dropdown.Item href={'/equipment/json-export'}>
+                                <FontAwesomeIcon icon={faFileExport} className="mr-1 fa-fw" /> Exportera utrustning till
                                 JSON
                             </Dropdown.Item>
                         </Link>

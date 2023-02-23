@@ -27,6 +27,7 @@ import {
 import { EquipmentPublicCategory, EquipmentTag } from '../../models/interfaces';
 import { EquipmentLocation } from '../../models/interfaces/EquipmentLocation';
 import { KeyValue } from '../../models/interfaces/KeyValue';
+import { EquipmentImportExportModel } from '../../models/misc/EquipmentImportExportModel';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
@@ -36,12 +37,6 @@ const breadcrumbs = [
     { link: '/equipment', displayName: 'Utrustning' },
     { link: '/equipment/json-import', displayName: pageTitle },
 ];
-
-interface EquipmentImportModel extends IEquipmentObjectionModel {
-    equipmentPublicCategoryName?: string;
-    equipmentLocationName?: string;
-    equipmentTagNames?: string[];
-}
 
 const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const {
@@ -142,8 +137,8 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSet
 
     // Parse JSON
     //
-    let equipmentInJson: Partial<EquipmentImportModel>[] | null = null;
-    let equipmentToImport: Partial<EquipmentImportModel>[] = [];
+    let equipmentInJson: Partial<EquipmentImportExportModel>[] | null = null;
+    let equipmentToImport: Partial<EquipmentImportExportModel>[] = [];
     let uniqueEquipmentTagNames: string[] = [];
     let uniqueEquipmentLocationNames: string[] = [];
     let uniqueEquipmentPublicCategoryNames: string[] = [];
