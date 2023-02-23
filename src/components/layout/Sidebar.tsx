@@ -95,7 +95,7 @@ type Props = {
     globalSettings: KeyValue[];
 };
 const sidebar: React.FC<Props> = ({ currentUser, globalSettings }: Props) => (
-    <div className={styles.container + ' pt-2'}>
+    <div className={styles.container + ' pt-2 pb-4'}>
         <SidebarLinkGroup>
             <SidebarLink displayName="Hem" link="/" icon={faHome} exactMatch={true} />
             <SidebarLink displayName="Aktiva bokningar" link="/bookings" icon={faCalendarDay} />
@@ -119,12 +119,6 @@ const sidebar: React.FC<Props> = ({ currentUser, globalSettings }: Props) => (
                 {getExternalLinksFromGlobalSettings(globalSettings)}
             </SidebarLinkGroup>
         ) : null}
-
-        <div className={styles.debugInfo}>
-            <small className="text-muted">
-                <p>{process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION}</p>
-            </small>
-        </div>
     </div>
 );
 

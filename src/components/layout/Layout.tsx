@@ -43,7 +43,9 @@ const Layout: React.FC<Props> = ({
             <Topbar currentUser={currentUser} globalSettings={globalSettings} toggleSidebar={toggleSidebar} />
 
             <aside className={styles.sidebar}>
-                <Sidebar currentUser={currentUser} globalSettings={globalSettings} />
+                <div className={styles.sidebarContentContainer}>
+                    <Sidebar currentUser={currentUser} globalSettings={globalSettings} />
+                </div>
             </aside>
 
             <SkeletonTheme

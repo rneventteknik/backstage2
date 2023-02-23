@@ -1,8 +1,9 @@
 @import '../../style/variables';
 
-$navbar-height-compensation: 56px;
+$navbar-height-compensation: 50px;
 $sidebar-width: 260px;
 $sidebar-transition-time: 0.1s;
+$sidebar-bottom-off-screen-length: 100px;
 
 .sidebar {
     width: $sidebar-width;
@@ -10,12 +11,20 @@ $sidebar-transition-time: 0.1s;
     z-index: 99;
     top: 0;
     left: 0;
-    bottom: 0;
-    padding-top: $navbar-height-compensation;
+    bottom: -$sidebar-bottom-off-screen-length;
+    margin-top: $navbar-height-compensation;
     background-color: $backstage-color-2;
     box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
 
     transition: left $sidebar-transition-time, width $sidebar-transition-time;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebarContentContainer {
+    overflow-y: auto;
+    margin-bottom: $sidebar-bottom-off-screen-length;
+    height: 100%;
 }
 
 .mainContentContainer {
