@@ -7,7 +7,7 @@ import { fetchUserAuthById } from './db-access/userAuth';
 import { IncomingMessage } from 'http';
 
 export const authenticate = async (username: string, password: string): Promise<UserAuthObjectionModel | null> => {
-    const user = await fetchUserAuth(username);
+    const user = await fetchUserAuth(username.toLowerCase());
 
     if (!user) {
         return null;
