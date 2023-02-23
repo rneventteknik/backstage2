@@ -124,12 +124,12 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
             .then((data) => {
                 mutate({ ...user, username: data.username }, false);
                 showSaveSuccessNotification('Inloggningsuppgifterna');
+                setShowEditAuthModal(false);
             })
             .catch((error: Error) => {
                 console.error(error);
                 showSaveFailedNotification('Inloggningsuppgifterna');
-            })
-            .finally(() => setShowEditAuthModal(false));
+            });
     };
 
     // Delete user auth

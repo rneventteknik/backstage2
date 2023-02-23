@@ -4,6 +4,7 @@ import { User } from '../../models/interfaces';
 import { IUserObjectionModel } from '../../models/objection-models/UserObjectionModel';
 import { MemberStatus } from '../../models/enums/MemberStatus';
 import { getMemberStatusName } from '../../lib/utils';
+import RequiredIndicator from '../utils/RequiredIndicator';
 
 type Props = {
     handleSubmitUser: (user: IUserObjectionModel) => void;
@@ -52,7 +53,10 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
             <Row>
                 <Col lg="6">
                     <Form.Group controlId="formName">
-                        <Form.Label>Namn</Form.Label>
+                        <Form.Label>
+                            Namn
+                            <RequiredIndicator />
+                        </Form.Label>
                         <Form.Control
                             required
                             type="text"
@@ -65,7 +69,10 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                 </Col>
                 <Col lg="3">
                     <Form.Group controlId="formNameTag">
-                        <Form.Label>Tagg</Form.Label>
+                        <Form.Label>
+                            Tagg
+                            <RequiredIndicator />
+                        </Form.Label>
                         <Form.Control
                             required
                             type="text"
@@ -77,7 +84,10 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                 </Col>
                 <Col lg="3">
                     <Form.Group controlId="formMemberStatus">
-                        <Form.Label>Medlemsstatus</Form.Label>
+                        <Form.Label>
+                            Medlemsstatus
+                            <RequiredIndicator />
+                        </Form.Label>
                         <Form.Control
                             as="select"
                             name="memberStatus"
@@ -101,7 +111,10 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
             <Row>
                 <Col lg="3">
                     <Form.Group controlId="formEmailAddress">
-                        <Form.Label>Emailadress</Form.Label>
+                        <Form.Label>
+                            Emailadress
+                            <RequiredIndicator />
+                        </Form.Label>
                         <Form.Control
                             required
                             type="email"

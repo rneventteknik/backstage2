@@ -16,6 +16,23 @@ export const authenticate = async (username: string, password: string): Promise<
     return bcrypt.compare(password, user.hashedPassword).then((isAuthenticated) => (isAuthenticated ? user : null));
 };
 
+export const authenticateById = async (
+    userId: number | undefined,
+    password: string,
+): Promise<UserAuthObjectionModel | null> => {
+    if (userId == undefined) {
+        return null;
+    }
+
+    const user = await fetchUserAuthById(userId);
+
+    if (!user) {
+        return null;
+    }
+
+    return bcrypt.compare(password, user.hashedPassword).then((isAuthenticated) => (isAuthenticated ? user : null));
+};
+
 export const getHashedPassword = async (password: string): Promise<string> => {
     return bcrypt.genSalt().then((salt) => bcrypt.hash(password, salt));
 };
