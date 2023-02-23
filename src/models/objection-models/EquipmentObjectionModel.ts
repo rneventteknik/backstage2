@@ -11,6 +11,7 @@ export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     nameEN: string;
     description: string;
     descriptionEN: string;
+    searchKeywords: string;
     note: string;
     image: unknown; // TODO Add images
     publiclyHidden: boolean;
@@ -82,6 +83,7 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
     nameEN!: string;
     description!: string;
     descriptionEN!: string;
+    searchKeywords!: string;
     note!: string;
     image!: unknown; // TODO Add images
     publiclyHidden!: boolean;

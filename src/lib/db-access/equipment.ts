@@ -24,6 +24,15 @@ export const searchEquipment = async (searchString: string, count: number): Prom
                     searchStrings.forEach((partialSearchString) => {
                         innerBuilder.andWhere('nameEN', getCaseInsensitiveComparisonKeyword(), partialSearchString);
                     });
+                })
+                .orWhere((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere(
+                            'searchKeywords',
+                            getCaseInsensitiveComparisonKeyword(),
+                            partialSearchString,
+                        );
+                    });
                 }),
         )
         .withGraphFetched('tags')

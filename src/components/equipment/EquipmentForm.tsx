@@ -77,6 +77,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
             description: getValueFromForm('description'),
             nameEN: getValueFromForm('equipmentNameEN'),
             descriptionEN: getValueFromForm('descriptionEN'),
+            searchKeywords: getValueFromForm('searchKeywords'),
 
             tags: selectedTags.map((x) => ({
                 ...x,
@@ -167,6 +168,34 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                     <h6>Övriga inställningar</h6>
                     <hr />
                     <Row>
+                        <Col lg="6">
+                            <Form.Group>
+                                <Form.Label>Söktermer</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="MDHX, MD-HX"
+                                    name="searchKeywords"
+                                    defaultValue={equipment?.searchKeywords}
+                                />
+                                <Form.Text className="text-muted">
+                                    Dessa termer visas inte, men används vid sökning (utöver namnen).
+                                </Form.Text>
+                            </Form.Group>
+                        </Col>
+                        <Col lg="6">
+                            <Form.Group>
+                                <Form.Label>Taggar</Form.Label>
+                                <Typeahead<EquipmentTag>
+                                    id="tags-typeahead"
+                                    multiple
+                                    labelKey={(x) => x.name}
+                                    options={equipmentTags ?? []}
+                                    onChange={(e) => setSelectedTags(e)}
+                                    placeholder="Taggar"
+                                    defaultSelected={equipment.tags ?? []}
+                                />
+                            </Form.Group>
+                        </Col>
                         <Col lg="3">
                             <Form.Group controlId="formInventoryCount">
                                 <Form.Label>Antal i inventarie</Form.Label>
@@ -179,20 +208,6 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 <Form.Text className="text-muted">
                                     Lämna detta fält tomt för att stänga av inventariestatus.
                                 </Form.Text>
-                            </Form.Group>
-                        </Col>
-                        <Col lg="9">
-                            <Form.Group>
-                                <Form.Label>Taggar</Form.Label>
-                                <Typeahead<EquipmentTag>
-                                    id="tags-typeahead"
-                                    multiple
-                                    labelKey={(x) => x.name}
-                                    options={equipmentTags ?? []}
-                                    onChange={(e) => setSelectedTags(e)}
-                                    placeholder="Taggar"
-                                    defaultSelected={equipment.tags ?? []}
-                                />
                             </Form.Group>
                         </Col>
                         <Col lg="3">

@@ -11,6 +11,7 @@ export interface Equipment extends BaseEntityWithName {
     nameEN: string;
     description: string;
     descriptionEN: string;
+    searchKeywords: string;
     note: string;
     image?: Image;
     publiclyHidden: boolean;
