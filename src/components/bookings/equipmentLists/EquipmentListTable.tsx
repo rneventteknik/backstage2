@@ -422,15 +422,13 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                             </>
                         ) : (
                             getSortedList(list.listHeadings).map((heading) => (
-                                <>
-                                    <Dropdown.Item
-                                        key={heading.id}
-                                        onClick={() => moveListEntryIntoHeading(entry, heading.id, list, saveList)}
-                                    >
-                                        <FontAwesomeIcon icon={faAngleRight} className="mr-1 fa-fw" /> Flytta in i{' '}
-                                        {heading.name}
-                                    </Dropdown.Item>
-                                </>
+                                <Dropdown.Item
+                                    key={heading.id}
+                                    onClick={() => moveListEntryIntoHeading(entry, heading.id, list, saveList)}
+                                >
+                                    <FontAwesomeIcon icon={faAngleRight} className="mr-1 fa-fw" /> Flytta in i{' '}
+                                    {heading.name}
+                                </Dropdown.Item>
                             ))
                         )}
                         {list.listHeadings.length > 0 ? <Dropdown.Divider /> : null}
