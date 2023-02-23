@@ -6,8 +6,7 @@ import TableFooterWithViewCount from './utils/TableFooter';
 import styles from './TableDisplay.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
-import { DndProvider, useDrag, useDrop } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useDrag, useDrop } from 'react-dnd';
 
 enum SortDirection {
     Ascending,
@@ -160,79 +159,74 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     // Create the table
     //
     return (
-        <DndProvider backend={HTML5Backend}>
-            <div>
-                {configuration.hideTableFilter ? null : (
-                    <FormGroup>
-                        <FormControl placeholder="Filter" onChange={setFilterConfiguration}></FormControl>
-                    </FormGroup>
-                )}
-                <Table>
-                    <thead>
-                        <tr>
-                            {configuration.moveFn && sortDirection === SortDirection.Custom ? (
-                                <th className="d-none d-md-table-cell" style={{ width: 10 }}></th>
-                            ) : null}
-                            {configuration.columns.map((p) => (
-                                <th
-                                    key={p.key}
-                                    style={{ width: p.columnWidth }}
-                                    className={
-                                        getTextAlignmentClassName(p.textAlignment) +
-                                        ' ' +
-                                        getCellDisplayClassName(p.cellHideSize)
-                                    }
-                                >
-                                    {p.disableSort ? (
-                                        <span>
-                                            {p.getHeaderOverride ? p.getHeaderOverride(entitiesToShow) : p.displayName}
-                                        </span>
-                                    ) : (
-                                        <span style={{ cursor: 'pointer' }} onClick={() => setSortConfiguration(p.key)}>
-                                            {p.getHeaderOverride ? p.getHeaderOverride(entitiesToShow) : p.displayName}{' '}
-                                            {p.key === sortKey ? getSortingArrow(sortDirection) : null}
-                                        </span>
-                                    )}
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {entitiesToShow.map((entity) => (
-                            <TableRow
-                                key={entity.id}
-                                entity={entity}
-                                entitiesToShow={entitiesToShow}
-                                tableId={tableId}
-                                configuration={configuration}
-                                isSubItem={isSubItem}
-                                getParentIdOfSubItem={getParentIdOfSubItem}
-                                showMoveControl={!!configuration.moveFn && sortDirection === SortDirection.Custom}
-                            />
-                        ))}
-                        {entitiesToShow.length === 0 ? (
-                            <tr>
-                                <td
-                                    colSpan={configuration.columns.length}
-                                    className="text-center font-italic text-muted"
-                                >
-                                    {configuration.noResultsLabel ?? 'Inga matchingar'}
-                                </td>
-                            </tr>
+        <div>
+            {configuration.hideTableFilter ? null : (
+                <FormGroup>
+                    <FormControl placeholder="Filter" onChange={setFilterConfiguration}></FormControl>
+                </FormGroup>
+            )}
+            <Table>
+                <thead>
+                    <tr>
+                        {configuration.moveFn && sortDirection === SortDirection.Custom ? (
+                            <th className="d-none d-md-table-cell" style={{ width: 10 }}></th>
                         ) : null}
-                    </tbody>
-                </Table>
+                        {configuration.columns.map((p) => (
+                            <th
+                                key={p.key}
+                                style={{ width: p.columnWidth }}
+                                className={
+                                    getTextAlignmentClassName(p.textAlignment) +
+                                    ' ' +
+                                    getCellDisplayClassName(p.cellHideSize)
+                                }
+                            >
+                                {p.disableSort ? (
+                                    <span>
+                                        {p.getHeaderOverride ? p.getHeaderOverride(entitiesToShow) : p.displayName}
+                                    </span>
+                                ) : (
+                                    <span style={{ cursor: 'pointer' }} onClick={() => setSortConfiguration(p.key)}>
+                                        {p.getHeaderOverride ? p.getHeaderOverride(entitiesToShow) : p.displayName}{' '}
+                                        {p.key === sortKey ? getSortingArrow(sortDirection) : null}
+                                    </span>
+                                )}
+                            </th>
+                        ))}
+                    </tr>
+                </thead>
+                <tbody>
+                    {entitiesToShow.map((entity) => (
+                        <TableRow
+                            key={entity.id}
+                            entity={entity}
+                            entitiesToShow={entitiesToShow}
+                            tableId={tableId}
+                            configuration={configuration}
+                            isSubItem={isSubItem}
+                            getParentIdOfSubItem={getParentIdOfSubItem}
+                            showMoveControl={!!configuration.moveFn && sortDirection === SortDirection.Custom}
+                        />
+                    ))}
+                    {entitiesToShow.length === 0 ? (
+                        <tr>
+                            <td colSpan={configuration.columns.length} className="text-center font-italic text-muted">
+                                {configuration.noResultsLabel ?? 'Inga matchingar'}
+                            </td>
+                        </tr>
+                    ) : null}
+                </tbody>
+            </Table>
 
-                {!configuration.hideTableCountControls ? (
-                    <TableFooterWithViewCount
-                        viewCount={viewCount}
-                        totalCount={sortedEntities.length}
-                        setViewCount={setViewCount}
-                        entityTypeDisplayName={configuration.entityTypeDisplayName}
-                    />
-                ) : null}
-            </div>
-        </DndProvider>
+            {!configuration.hideTableCountControls ? (
+                <TableFooterWithViewCount
+                    viewCount={viewCount}
+                    totalCount={sortedEntities.length}
+                    setViewCount={setViewCount}
+                    entityTypeDisplayName={configuration.entityTypeDisplayName}
+                />
+            ) : null}
+        </div>
     );
 };
 
