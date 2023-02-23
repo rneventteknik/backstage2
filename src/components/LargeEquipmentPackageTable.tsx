@@ -1,16 +1,15 @@
 import React, { ChangeEvent } from 'react';
 import { EquipmentPackage, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
-import { notEmpty } from '../lib/utils';
+import { countNullorEmpty, notEmpty } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Button, Col, Collapse, Form } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
+import { Col, Form } from 'react-bootstrap';
 import TableStyleLink from './utils/TableStyleLink';
 import { useLocalStorageState } from '../lib/useLocalStorageState';
 import useSwr from 'swr';
 import { equipmentTagsFetcher } from '../lib/fetchers';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
+import AdvancedFilters from './AdvancedFilters';
 
 const EquipmentPackageNameDisplayFn = (equipmentPackage: EquipmentPackage) => (
     <>
@@ -66,10 +65,6 @@ type Props = {
 const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableSettingsOverride }: Props) => {
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
-    const [showAdvancedFilters, setShowAdvancedFilters] = useLocalStorageState(
-        'large-equipment-package-table-show-advanced-filters',
-        false,
-    );
     const [searchText, setSearchText] = useLocalStorageState('large-equipment-package-table-search-text', '');
     const [filterTags, setFilterTags] = useLocalStorageState<EquipmentTag[]>(
         'large-equipment-package-table-filter-tags',
@@ -97,27 +92,15 @@ const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableS
 
     return (
         <>
-            <Form.Row>
-                <Col>
-                    <Form.Group>
-                        <Form.Control
-                            type="text"
-                            placeholder="Fritextfilter"
-                            onChange={handleChangeFilterString}
-                            defaultValue={searchText}
-                        />
-                    </Form.Group>
-                </Col>
-                <Col md="auto">
-                    <Form.Group>
-                        <Button variant="secondary" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
-                            <FontAwesomeIcon icon={faFilter} /> {showAdvancedFilters ? 'Göm' : 'Visa'} filter
-                        </Button>
-                    </Form.Group>
-                </Col>
-            </Form.Row>
-
-            <Collapse in={showAdvancedFilters}>
+            <AdvancedFilters
+                handleChangeFilterString={handleChangeFilterString}
+                searchText={searchText}
+                resetAdvancedFilters={() => {
+                    setSearchText('');
+                    setFilterTags([]);
+                }}
+                activeFilterCount={countNullorEmpty(searchText, filterTags)}
+            >
                 <Form.Row className="mb-2">
                     <Col md="4">
                         <Form.Group>
@@ -138,7 +121,7 @@ const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableS
                         </Form.Group>
                     </Col>
                 </Form.Row>
-            </Collapse>
+            </AdvancedFilters>
 
             <TableDisplay
                 entities={equipmentPackageToShow}

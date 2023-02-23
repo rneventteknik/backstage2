@@ -2,16 +2,15 @@ import React, { ChangeEvent } from 'react';
 import { BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
-import { getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
+import { countNullorEmpty, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Button, Col, Collapse, Form } from 'react-bootstrap';
+import { Col, Form } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
 import { formatDateForForm, validDate } from '../lib/datetimeUtils';
 import { useLocalStorageState, useLocalStorageStateForDate } from '../lib/useLocalStorageState';
+import AdvancedFilters from './AdvancedFilters';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
@@ -84,10 +83,6 @@ type Props = {
 };
 
 const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }: Props) => {
-    const [showAdvancedFilters, setShowAdvancedFilters] = useLocalStorageState(
-        'large-booking-table-show-advanced-filters',
-        false,
-    );
     const [searchText, setSearchText] = useLocalStorageState('large-booking-table-search-text', '');
     const [userIds, setUserIds] = useLocalStorageState<number[]>('large-booking-table-user-ids', []);
     const [statuses, setStatuses] = useLocalStorageState<Status[]>('large-booking-table-statuses', []);
@@ -152,27 +147,18 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
 
     return (
         <>
-            <Form.Row>
-                <Col>
-                    <Form.Group>
-                        <Form.Control
-                            type="text"
-                            placeholder="Fritextfilter"
-                            onChange={handleChangeFilterString}
-                            defaultValue={searchText}
-                        />
-                    </Form.Group>
-                </Col>
-                <Col md="auto">
-                    <Form.Group>
-                        <Button variant="secondary" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
-                            <FontAwesomeIcon icon={faFilter} /> {showAdvancedFilters ? 'Göm' : 'Visa'} filter
-                        </Button>
-                    </Form.Group>
-                </Col>
-            </Form.Row>
-
-            <Collapse in={showAdvancedFilters}>
+            <AdvancedFilters
+                handleChangeFilterString={handleChangeFilterString}
+                searchText={searchText}
+                resetAdvancedFilters={() => {
+                    setSearchText('');
+                    setUserIds([]);
+                    setStatuses([]);
+                    setStartDate(undefined);
+                    setEndDate(undefined);
+                }}
+                activeFilterCount={countNullorEmpty(searchText, userIds, statuses, startDate, endDate)}
+            >
                 <Form.Row className="mb-2">
                     <Col md="4">
                         <Form.Group>
@@ -184,7 +170,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
                                 options={statusOptions}
                                 onChange={(e) => setStatuses(e.map((o) => o.value))}
                                 placeholder="Filtrera på status"
-                                defaultSelected={statuses
+                                selected={statuses
                                     .map((id) => statusOptions.find((x) => x.value === id))
                                     .filter(notEmpty)}
                             />
@@ -200,7 +186,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
                                 options={ownerUserOptions}
                                 onChange={(e) => setUserIds(e.map((o) => o.value))}
                                 placeholder="Filtrera på ansvarig"
-                                defaultSelected={userIds
+                                selected={userIds
                                     .map((id) => ownerUserOptions.find((x) => x.value === id))
                                     .filter(notEmpty)}
                             />
@@ -212,7 +198,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
                             <Form.Control
                                 type="date"
                                 onChange={handleChangeStartDate}
-                                defaultValue={formatDateForForm(startDate)}
+                                value={formatDateForForm(startDate)}
                             />
                         </Form.Group>
                     </Col>
@@ -222,12 +208,12 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
                             <Form.Control
                                 type="date"
                                 onChange={handleChangeEndDate}
-                                defaultValue={formatDateForForm(endDate)}
+                                value={formatDateForForm(endDate)}
                             />
                         </Form.Group>
                     </Col>
                 </Form.Row>
-            </Collapse>
+            </AdvancedFilters>
 
             <TableDisplay
                 entities={bookingsToShow}

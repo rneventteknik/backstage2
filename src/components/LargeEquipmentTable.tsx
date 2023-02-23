@@ -1,11 +1,11 @@
 import React, { ChangeEvent } from 'react';
 import { Equipment, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
-import { notEmpty } from '../lib/utils';
+import { countNullorEmpty, notEmpty } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Button, Col, Collapse, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEyeSlash, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
+import { faEyeSlash, faTags } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from './utils/TableStyleLink';
 import { useLocalStorageState } from '../lib/useLocalStorageState';
 import useSwr from 'swr';
@@ -14,6 +14,7 @@ import { formatPrice, addVATToPriceWithTHS, formatTHSPrice, addVAT } from '../li
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 import { EquipmentLocation } from '../models/interfaces/EquipmentLocation';
 import { getSortedList } from '../lib/sortIndexUtils';
+import AdvancedFilters from './AdvancedFilters';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -127,10 +128,6 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
     const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentLocationsFetcher);
 
-    const [showAdvancedFilters, setShowAdvancedFilters] = useLocalStorageState(
-        'large-equipment-table-show-advanced-filters',
-        false,
-    );
     const [searchText, setSearchText] = useLocalStorageState('equipment-page-search-text', '');
     const [filterTags, setFilterTags] = useLocalStorageState<EquipmentTag[]>('equipment-page-filter-tags', []);
     const [filterLocations, setFilterLocations] = useLocalStorageState<EquipmentLocation[]>(
@@ -175,27 +172,22 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
 
     return (
         <>
-            <Form.Row>
-                <Col>
-                    <Form.Group>
-                        <Form.Control
-                            type="text"
-                            placeholder="Fritextfilter"
-                            onChange={handleChangeFilterString}
-                            defaultValue={searchText}
-                        />
-                    </Form.Group>
-                </Col>
-                <Col md="auto">
-                    <Form.Group>
-                        <Button variant="secondary" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
-                            <FontAwesomeIcon icon={faFilter} /> {showAdvancedFilters ? 'Göm' : 'Visa'} filter
-                        </Button>
-                    </Form.Group>
-                </Col>
-            </Form.Row>
-
-            <Collapse in={showAdvancedFilters}>
+            <AdvancedFilters
+                handleChangeFilterString={handleChangeFilterString}
+                searchText={searchText}
+                resetAdvancedFilters={() => {
+                    setSearchText('');
+                    setFilterTags([]);
+                    setFilterLocations([]);
+                    setFilterPubliclyHidden('all');
+                }}
+                activeFilterCount={countNullorEmpty(
+                    searchText,
+                    filterTags,
+                    filterLocations,
+                    filterPubliclyHidden !== 'all',
+                )}
+            >
                 <Form.Row className="mb-2">
                     <Col md="4">
                         <Form.Group>
@@ -240,7 +232,7 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                                 as="select"
                                 name="publiclyHidden"
                                 onChange={(e) => setFilterPubliclyHidden(e.target.value)}
-                                defaultValue={filterPubliclyHidden}
+                                value={filterPubliclyHidden}
                             >
                                 <option value="all">Visa alla</option>
                                 <option value="false">Synlig i publika prislistan</option>
@@ -249,7 +241,7 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                         </Form.Group>
                     </Col>
                 </Form.Row>
-            </Collapse>
+            </AdvancedFilters>
 
             <TableDisplay
                 entities={equipmentToShow}
