@@ -12,7 +12,7 @@ import { useNotifications } from '../../../lib/useNotifications';
 import { IUserObjectionModel } from '../../../models/objection-models/UserObjectionModel';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
-import { IfAdmin } from '../../../components/utils/IfAdmin';
+import { IfAdmin, IfNotAdmin } from '../../../components/utils/IfAdmin';
 import { Role } from '../../../models/enums/Role';
 import Header from '../../../components/layout/Header';
 import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
@@ -169,37 +169,44 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                 <Button variant="primary" form="editUserForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara användare
                 </Button>
-                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
-                    {user.username ? (
-                        <>
-                            <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
-                                <FontAwesomeIcon icon={faUserPen} className="mr-1 fa-fw" /> Redigera
-                                inloggningsuppgifter
-                            </Dropdown.Item>
-                            <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
-                                <Dropdown.Divider />
-                                <Dropdown.Item onClick={() => setShowDeleteAuthModal(true)} className="text-danger">
-                                    <FontAwesomeIcon icon={faLock} className="mr-1 fa-fw" /> Ta bort
+
+                <IfNotAdmin currentUser={currentUser}>
+                    <Button variant="secondary" onClick={() => setShowEditAuthModal(true)}>
+                        <FontAwesomeIcon icon={faUserPen} className="mr-1 fa-fw" /> Redigera inloggningsuppgifter
+                    </Button>
+                </IfNotAdmin>
+
+                <IfAdmin currentUser={currentUser}>
+                    <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                        {user.username ? (
+                            <>
+                                <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
+                                    <FontAwesomeIcon icon={faUserPen} className="mr-1 fa-fw" /> Redigera
                                     inloggningsuppgifter
                                 </Dropdown.Item>
-                            </IfAdmin>
-                        </>
-                    ) : (
-                        <>
-                            <IfAdmin currentUser={currentUser}>
+                                <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
+                                    <Dropdown.Divider />
+                                    <Dropdown.Item onClick={() => setShowDeleteAuthModal(true)} className="text-danger">
+                                        <FontAwesomeIcon icon={faLock} className="mr-1 fa-fw" /> Ta bort
+                                        inloggningsuppgifter
+                                    </Dropdown.Item>
+                                </IfAdmin>
+                            </>
+                        ) : (
+                            <>
                                 <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
                                     <FontAwesomeIcon icon={faKey} className="mr-1 fa-fw" /> Skapa inloggningsuppgifter
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
-                            </IfAdmin>
-                        </>
-                    )}
-                    <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
-                        <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort användare
-                        </Dropdown.Item>
-                    </IfAdmin>
-                </DropdownButton>
+                            </>
+                        )}
+                        <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
+                            <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
+                                <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort användare
+                            </Dropdown.Item>
+                        </IfAdmin>
+                    </DropdownButton>
+                </IfAdmin>
             </Header>
 
             <UserForm user={user} handleSubmitUser={handleSubmit} formId="editUserForm" />
