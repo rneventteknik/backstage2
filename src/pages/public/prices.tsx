@@ -129,7 +129,7 @@ const PublicPricePage: React.FC = () => {
 
             {equipmentGroups.map((x) => (
                 <div key={`category-${x.category.id}`} className="mb-5">
-                    {x.category.name ? <h5>{x.category.name}</h5> : null}
+                    {x.category.name ? <h2 className="h5">{x.category.name}</h2> : null}
                     {x.category.description ? <div className="text-muted mb-3">{x.category.description}</div> : null}
                     <Table style={{ width: '100%' }}>
                         <colgroup>

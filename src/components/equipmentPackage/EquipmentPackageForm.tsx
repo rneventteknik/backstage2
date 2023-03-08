@@ -222,7 +222,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                 </Col>
             </Row>
 
-            <h6>Översättningar</h6>
+            <h2 className="h5 mt-4">Översättningar</h2>
             <hr />
             <Row>
                 <Col lg="6">
@@ -251,23 +251,30 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
 
             {!equipmentPackage ? null : (
                 <>
-                    <h6>Inkluderad utrustning</h6>
-                    <div className="mb-3 mt-3">
-                        <TableDisplay
-                            entities={selectedEquipmentPackageEntries}
-                            configuration={equipmentTableSettings}
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <EquipmentSearch
-                            placeholder="Lägg till utrustning"
-                            includePackages={false}
-                            id="equipment-search"
-                            onSelect={(x) => addEquipment(x as unknown as IEquipmentObjectionModel)}
-                        />
-                    </div>
+                    <Row>
+                        <Col>
+                            <Form.Group controlId="includedEquipment">
+                                <h2 className="h5 mt-4">Inkluderad utrustning</h2>
+                                <hr />
+                                <div className="mb-3 mt-3">
+                                    <TableDisplay
+                                        entities={selectedEquipmentPackageEntries}
+                                        configuration={equipmentTableSettings}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <EquipmentSearch
+                                        placeholder="Lägg till utrustning"
+                                        includePackages={false}
+                                        id="equipment-search"
+                                        onSelect={(x) => addEquipment(x as unknown as IEquipmentObjectionModel)}
+                                    />
+                                </div>
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
-                    <h6>Övriga inställningar</h6>
+                    <h2 className="h5 mt-4">Övriga inställningar</h2>
                     <hr />
                     <Row>
                         <Col lg="3">

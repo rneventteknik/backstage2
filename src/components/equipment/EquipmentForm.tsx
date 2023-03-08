@@ -125,7 +125,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                 </Col>
             </Row>
 
-            <h6>Översättningar</h6>
+            <h2 className="h5 mt-4">Översättningar</h2>
             <hr />
             <Row>
                 <Col lg="6">
@@ -155,7 +155,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
             {!equipment ? null : (
                 <>
-                    <h6>Prissättning</h6>
+                    <h2 className="h5 mt-4">Prissättning</h2>
                     <hr />
                     <Row>
                         <Col lg="12">
@@ -165,7 +165,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         </Col>
                     </Row>
 
-                    <h6>Övriga inställningar</h6>
+                    <h2 className="h5 mt-4">Övriga inställningar</h2>
                     <hr />
                     <Row>
                         <Col lg="6">

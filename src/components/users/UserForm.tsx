@@ -106,7 +106,7 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                 </Col>
             </Row>
 
-            <h6>Kontaktuppgifter</h6>
+            <h2 className="h5 mt-4">Kontaktuppgifter</h2>
             <hr />
             <Row>
                 <Col lg="3">
@@ -143,7 +143,7 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                 </Col>
             </Row>
 
-            <h6>Bankuppgifter</h6>
+            <h2 className="h5 mt-4">Bankuppgifter</h2>
             <hr />
             <Row>
                 <Col lg="3">

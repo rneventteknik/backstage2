@@ -327,7 +327,7 @@ const BookingForm: React.FC<Props> = ({
                     </Form.Group>
                 </Col>
             </Row>
-            <h6>Kontaktperson</h6>
+            <h2 className="h5 mt-4">Kontaktperson</h2>
             <hr />
             <Row>
                 <Col lg="4" md="4">
@@ -374,7 +374,7 @@ const BookingForm: React.FC<Props> = ({
             </Row>
             {!booking || isNewBooking ? null : (
                 <>
-                    <h6>Fakturainformation</h6>
+                    <h2 className="h5 mt-4">Fakturainformation</h2>
                     <hr />
                     <Row>
                         <Col lg="6" md="6">
@@ -423,7 +423,7 @@ const BookingForm: React.FC<Props> = ({
                             </Form.Group>
                         </Col>
                     </Row>
-                    <h6>Övrigt</h6>
+                    <h2 className="h5 mt-4">Övrigt</h2>
                     <hr />
                     <Row>
                         <Col>
@@ -442,7 +442,7 @@ const BookingForm: React.FC<Props> = ({
             )}
             {!showAdvancedFields ? null : (
                 <>
-                    <h6>Avancerat</h6>
+                    <h2 className="h5 mt-4">Avancerat</h2>
                     <hr />
                     <Row>
                         <Col lg="4" md="4">
