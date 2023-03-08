@@ -20,6 +20,8 @@ import EquipmentTagDisplay from '../../../components/utils/EquipmentTagDisplay';
 import ChangelogCard from '../../../components/ChangelogCard';
 import MarkdownCard from '../../../components/MarkdownCard';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
+import { getPricePlanName } from '../../../lib/utils';
+import { PricePlan } from '../../../models/enums/PricePlan';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -121,15 +123,15 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         <Card.Header>Prissättning (ink. moms)</Card.Header>
                         <ListGroup variant="flush">
                             {equipment.prices.map((p) => (
-                                <ListGroup.Item key={p.id} className="d-flex">
-                                    <span className="flex-grow-1">
-                                        {p.name}
-                                        <br />
-                                        <span className="text-muted">{p.name} (THS)</span>
+                                <ListGroup.Item key={p.id}>
+                                    <span className="d-block">{p.name}</span>
+                                    <span className="d-flex text-muted">
+                                        <span className="flex-grow-1">{getPricePlanName(PricePlan.EXTERNAL)}</span>
+                                        <span>{formatPrice(addVATToPriceWithTHS(p))}</span>
                                     </span>
-                                    <span>
-                                        {formatPrice(addVATToPriceWithTHS(p))} <br />
-                                        <span className="text-muted">{formatTHSPrice(addVATToPriceWithTHS(p))}</span>
+                                    <span className="d-flex text-muted">
+                                        <span className="flex-grow-1">{getPricePlanName(PricePlan.THS)}</span>
+                                        <span>{formatTHSPrice(addVATToPriceWithTHS(p))}</span>
                                     </span>
                                 </ListGroup.Item>
                             ))}

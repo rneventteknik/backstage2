@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
-import { toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
+import { getPricePlanName, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
+import { PricePlan } from '../../models/enums/PricePlan';
 import { EquipmentPrice } from '../../models/interfaces';
 import { HasId } from '../../models/interfaces/BaseEntity';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
@@ -147,7 +148,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
             },
             {
                 key: 'price',
-                displayName: 'Pris (ex. moms)',
+                displayName: `${getPricePlanName(PricePlan.EXTERNAL)} (ex. moms)`,
                 disableSort: true,
                 getValue: (entry: EquipmentPrice) => entry.pricePerUnit + ' ' + entry.pricePerHour,
                 getContentOverride: PriceEntryPriceDisplayFn,
@@ -156,7 +157,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
             },
             {
                 key: 'ThsPrice',
-                displayName: 'Pris THS (ex. moms)',
+                displayName: `${getPricePlanName(PricePlan.THS)} (ex. moms)`,
                 disableSort: true,
                 getValue: (entry: EquipmentPrice) => entry.pricePerUnitTHS + ' ' + entry.pricePerHourTHS,
                 getContentOverride: PriceEntryThsPriceDisplayFn,
