@@ -22,9 +22,6 @@ type Props = {
 const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }: Props) => {
     const [searchActive, setSearchActive] = useState(false);
     const [showHelpModal, setShowHelpModal] = useState(false);
-    const [version, commitId, compileDate] = process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION?.split('/').map((x) =>
-        x.trim(),
-    ) ?? ['-', '-', '-'];
 
     const logOut = async () => {
         const res = await fetch('/api/users/logout');
@@ -75,7 +72,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                 <Modal.Body>
                     <Row>
                         <Col md={8} className="mb-3">
-                            {getGlobalSetting('content.helpPageText', globalSettings)}
+                            {getGlobalSetting('content.helpPageText', globalSettings, '')}
                         </Col>
                         <Col md={4}>
                             <Card>
@@ -93,18 +90,33 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                                     </ListGroup.Item>
 
                                     <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Version</span>
-                                        <span>{version}</span>
+                                        <span className="flex-grow-1">Code Version</span>
+                                        <span>
+                                            {getGlobalSetting('metadata.build.currentVersion', globalSettings, '-')}
+                                        </span>
+                                    </ListGroup.Item>
+
+                                    <ListGroup.Item className="d-flex">
+                                        <span className="flex-grow-1">Build Number</span>
+                                        <span>
+                                            {getGlobalSetting('metadata.heroku.releaseVersion', globalSettings, '-')}
+                                        </span>
                                     </ListGroup.Item>
 
                                     <ListGroup.Item className="d-flex">
                                         <span className="flex-grow-1">Commit id</span>
-                                        <span>{commitId}</span>
+                                        <span>
+                                            {getGlobalSetting(
+                                                'metadata.heroku.slugCommit',
+                                                globalSettings,
+                                                '-',
+                                            ).substring(0, 10)}
+                                        </span>
                                     </ListGroup.Item>
 
                                     <ListGroup.Item className="d-flex">
                                         <span className="flex-grow-1">Kompileringsdatum</span>
-                                        <span>{compileDate}</span>
+                                        <span>{getGlobalSetting('metadata.build.buildDate', globalSettings, '-')}</span>
                                     </ListGroup.Item>
                                 </ListGroup>
                             </Card>

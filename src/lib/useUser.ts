@@ -60,10 +60,47 @@ const useUser = (
             const settings = (await fetchSettings()).map(toKeyValue);
             const publicSettings = ['content.image.favIcon'];
 
+            // Append some metadata as settings
+            //
+            const metadata = [
+                {
+                    key: 'metadata.heroku.appId',
+                    value: process.env.HEROKU_APP_ID ?? '-',
+                },
+                {
+                    key: 'metadata.heroku.appName',
+                    value: process.env.HEROKU_APP_NAME ?? '-',
+                },
+                {
+                    key: 'metadata.heroku.releaseVersion',
+                    value: process.env.HEROKU_RELEASE_VERSION ?? '-',
+                },
+                {
+                    key: 'metadata.heroku.slugCommit',
+                    value: process.env.HEROKU_SLUG_COMMIT ?? '-',
+                },
+                {
+                    key: 'metadata.heroku.slugDescription',
+                    value: process.env.HEROKU_SLUG_DESCRIPTION ?? '-',
+                },
+                {
+                    key: 'metadata.build.currentVersion',
+                    value: process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION ?? '-',
+                },
+                {
+                    key: 'metadata.build.buildDate',
+                    value: process.env.NEXT_PUBLIC_BACKSTAGE2_BUILD_DATE ?? '-',
+                },
+            ];
+
+            const globalSettings = [...settings, ...metadata];
+
             return {
                 props: {
                     user: user,
-                    globalSettings: user.isLoggedIn ? settings : settings.filter((s) => publicSettings.includes(s.key)),
+                    globalSettings: user.isLoggedIn
+                        ? globalSettings
+                        : globalSettings.filter((s) => publicSettings.includes(s.key)),
                 },
             };
         },
