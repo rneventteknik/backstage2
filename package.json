@@ -12,7 +12,8 @@
         "migrate": "knex --esm migrate:latest",
         "migrate:down": "knex --esm migrate:down",
         "migrate:make": "knex --esm migrate:make --stub knex/migrations_stub.js",
-        "seed": "knex --esm seed:run",
+        "seed": "knex --esm seed:run --specific=mock.js",
+        "seed:init": "knex --esm seed:run --specific=init.js",
         "prepare": "husky install",
         "test": "cypress run -q",
         "reset-sqlite": "rimraf dev.sqlite3 && yarn migrate && yarn seed"
