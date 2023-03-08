@@ -1,6 +1,6 @@
 # Backstage2
 
-Backstage2 is a web app that is created by RN, for RN, and is used to keep track of all of our events.
+Backstage2 is a web app that is created by RN, for RN, and is used to keep track of all of our events. It is hosted in Heroku.
 
 ## Tech Stack
 
