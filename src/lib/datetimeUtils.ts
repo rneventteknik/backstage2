@@ -214,6 +214,15 @@ export const addDays = <T extends Date | undefined>(date: T, days: number) => {
     return dateCopy;
 };
 
+export const addHours = <T extends Date | undefined>(date: T, hours: number) => {
+    if (!date) {
+        return date;
+    }
+    const dateCopy = new Date(date);
+    dateCopy.setHours(dateCopy.getHours() + hours);
+    return dateCopy;
+};
+
 // Display helper functions
 //
 export const timeIsMidnight = (datetime?: Date | null) =>

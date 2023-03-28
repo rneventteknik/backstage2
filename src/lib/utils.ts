@@ -11,7 +11,7 @@ import { RentalStatus } from '../models/enums/RentalStatus';
 import { BookingViewModel, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
-import { getEquipmentOutDatetime, getEquipmentInDatetime, addDays } from './datetimeUtils';
+import { getEquipmentOutDatetime, getEquipmentInDatetime, addDays, addHours } from './datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 
 // Helper functions for array operations
@@ -316,12 +316,14 @@ export const IsBookingUpcomingRental = (booking: BookingViewModel) => {
         return false;
     }
 
-    return booking.equipmentLists?.some(
-        (x) =>
-            x.equipmentOutDatetime &&
-            x.equipmentOutDatetime > new Date() &&
-            x.equipmentOutDatetime < addDays(new Date(), 1),
-    );
+    return booking.equipmentLists?.some((x) => {
+        const equipmentOutDatetime = getEquipmentOutDatetime(x);
+        return (
+            equipmentOutDatetime &&
+            equipmentOutDatetime > addHours(new Date(), -12) &&
+            equipmentOutDatetime < addDays(new Date(), 1)
+        );
+    });
 };
 
 // Calculate the max number of equipment used at the same time. To do this, we look
