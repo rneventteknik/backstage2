@@ -6,6 +6,7 @@ import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { getGlobalSetting, getValueOrFirst } from '../lib/utils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import Head from 'next/head';
+import EnvironmentTypeTag from '../components/utils/EnvironmentTypeTag';
 
 const containerStyle = {
     margin: 'auto',
@@ -99,7 +100,12 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                     href={getGlobalSetting('content.image.favIcon', globalSettings, '')}
                 />
             </Head>
-            <h1>Backstage2</h1>
+            <h1>
+                Backstage2
+                <span style={{ fontSize: '0.6em', position: 'relative', top: '-3px' }} className="ml-2">
+                    <EnvironmentTypeTag globalSettings={globalSettings} />
+                </span>
+            </h1>
             <Form action="/api/users/login" method="post" onSubmit={handleSubmit}>
                 <FormGroup>
                     <FormControl

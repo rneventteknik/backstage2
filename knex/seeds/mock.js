@@ -1953,6 +1953,20 @@ export async function seed(knex) {
             updated: getVarianceDateString(100),
             value: ' ',
         },
+        {
+            key: 'content.environment.name',
+            note: 'Namn på miljön att visa för användaren.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: 'Dev',
+        },
+        {
+            key: 'content.environment.variant',
+            note: 'Bootstrap-variant av tagg för att visa miljön för användaren (warning, danger, success, info, dark, etc).',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: 'danger',
+        },
     ]);
 
     await knex('Customer')

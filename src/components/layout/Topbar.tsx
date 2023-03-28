@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { getGlobalSetting } from '../../lib/utils';
 import { formatDatetimeForForm } from '../../lib/datetimeUtils';
+import EnvironmentTypeTag from '../utils/EnvironmentTypeTag';
 
 type Props = {
     currentUser: CurrentUserInfo;
@@ -39,7 +40,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                 <div className={styles.branding}>
                     <Link href="/" passHref>
                         <Navbar.Brand as="a" href="/">
-                            Backstage2
+                            Backstage2 <EnvironmentTypeTag globalSettings={globalSettings} />
                         </Navbar.Brand>
                     </Link>
                 </div>
@@ -78,7 +79,9 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                             <Card>
                                 <ListGroup variant="flush">
                                     <ListGroup.Item className="d-flex">
-                                        <strong>Backstage2</strong>
+                                        <strong>
+                                            Backstage2 <EnvironmentTypeTag globalSettings={globalSettings} />
+                                        </strong>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
                                         <span className="flex-grow-1">Session startad</span>

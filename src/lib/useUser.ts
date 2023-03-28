@@ -58,7 +58,7 @@ const useUser = (
             }
 
             const settings = (await fetchSettings()).map(toKeyValue);
-            const publicSettings = ['content.image.favIcon'];
+            const publicSettings = ['content.image.favIcon', 'content.environment.name', 'content.environment.variant'];
 
             // Append some metadata as settings
             //
