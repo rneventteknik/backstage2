@@ -57,7 +57,11 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                             </Link>
                         </IfNotReadonly>
                     </TinyBookingTable>
-                    <TinyBookingTable title="Mina favoritbokningar" bookings={coOwnerBookings}></TinyBookingTable>
+                    <TinyBookingTable
+                        title="Mina favoritbokningar"
+                        bookings={coOwnerBookings}
+                        tableSettingsOverride={{ defaultSortAscending: false }}
+                    ></TinyBookingTable>
                 </Col>
                 <Col xl={6}>
                     <TinyBookingTable

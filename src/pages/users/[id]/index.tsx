@@ -166,7 +166,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
 
                 <Col xl={8}>
                     <SmallBookingTable title="Bokningar" bookings={bookings}></SmallBookingTable>
-                    <SmallBookingTable title="Favoritbokningar" bookings={coOwnerBookings}></SmallBookingTable>
+                    <SmallBookingTable
+                        title="Favoritbokningar"
+                        bookings={coOwnerBookings}
+                        tableSettingsOverride={{ defaultSortAscending: false }}
+                    ></SmallBookingTable>
                 </Col>
             </Row>
         </Layout>
