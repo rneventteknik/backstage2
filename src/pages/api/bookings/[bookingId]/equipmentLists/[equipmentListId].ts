@@ -52,7 +52,12 @@ const handler = withSessionContext(
                     return;
                 }
 
-                await logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.EQUIPMENTLIST);
+                await logChangeToBooking(
+                    context.currentUser,
+                    bookingId,
+                    booking.name,
+                    BookingChangelogEntryType.EQUIPMENTLIST,
+                );
 
                 await deleteEquipmentList(equipmentListId)
                     .then((result) => res.status(200).json(result))
@@ -97,6 +102,7 @@ const handler = withSessionContext(
                             await logChangeToBooking(
                                 context.currentUser,
                                 bookingId,
+                                booking.name,
                                 BookingChangelogEntryType.EQUIPMENTLIST,
                             );
                         }
@@ -106,6 +112,7 @@ const handler = withSessionContext(
                             await logRentalStatusChangeToBooking(
                                 context.currentUser,
                                 bookingId,
+                                booking.name,
                                 newList.name ?? existingList?.name,
                                 newList.rentalStatus ?? null,
                             );

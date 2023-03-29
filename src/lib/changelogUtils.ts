@@ -14,6 +14,7 @@ import {
     updateEquipmentChangelogEntry,
     insertEquipmentChangelogEntry,
 } from './db-access/equipmentChangelogEntry';
+import { sendSlackMessageForBooking } from './slack';
 
 // Bookings
 //
@@ -86,26 +87,47 @@ const addChangelogToBooking = async (message: string, bookingId: number, deDupli
 export const logChangeToBooking = (
     user: CurrentUserInfo,
     bookingId: number,
+    bookingName: string,
     type = BookingChangelogEntryType.BOOKING,
 ) => {
-    return addChangelogToBooking(`${user.name} ${getBookingEditActionString(type)}.`, bookingId);
+    const message = `${user.name} ${getBookingEditActionString(type)}.`;
+
+    if (type === BookingChangelogEntryType.CREATE) {
+        sendSlackMessageForBooking(message, bookingId, bookingName);
+    }
+
+    return addChangelogToBooking(message, bookingId);
 };
 
-export const logStatusChangeToBooking = (user: CurrentUserInfo, bookingId: number, newStatus: Status) => {
-    return addChangelogToBooking(`${user.name} ${getStatusActionString(newStatus)}.`, bookingId, 0);
+export const logStatusChangeToBooking = (
+    user: CurrentUserInfo,
+    bookingId: number,
+    bookingName: string,
+    newStatus: Status,
+) => {
+    const message = `${user.name} ${getStatusActionString(newStatus)}.`;
+
+    sendSlackMessageForBooking(message, bookingId, bookingName);
+    return addChangelogToBooking(message, bookingId, 0);
 };
 
 export const logRentalStatusChangeToBooking = (
     user: CurrentUserInfo,
     bookingId: number,
+    bookingName: string,
     equipmentListName: string,
     newStatus: RentalStatus | null,
 ) => {
-    return addChangelogToBooking(
-        `${user.name} ${getRentalStatusActionString(newStatus)} ${equipmentListName}.`,
-        bookingId,
-        0,
-    );
+    const message = `${user.name} ${getRentalStatusActionString(newStatus)} ${equipmentListName}.`;
+
+    sendSlackMessageForBooking(message, bookingId, bookingName);
+    return addChangelogToBooking(message, bookingId, 0);
+};
+
+export const logBookingDeletion = (user: CurrentUserInfo, bookingId: number, bookingName: string) => {
+    const message = `${user.name} tog bort bokningen.`;
+
+    sendSlackMessageForBooking(message, bookingId, bookingName);
 };
 
 // Equipment

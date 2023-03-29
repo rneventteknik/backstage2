@@ -46,9 +46,12 @@ const handler = withSessionContext(
                 }
                 await deleteTimeReport(timeReportId)
                     .then((result) => {
-                        logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.TIMEREPORT).then(
-                            () => res.status(200).json(result),
-                        );
+                        logChangeToBooking(
+                            context.currentUser,
+                            bookingId,
+                            booking.name,
+                            BookingChangelogEntryType.TIMEREPORT,
+                        ).then(() => res.status(200).json(result));
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;
@@ -75,6 +78,7 @@ const handler = withSessionContext(
                             await logChangeToBooking(
                                 context.currentUser,
                                 bookingId,
+                                booking.name,
                                 BookingChangelogEntryType.TIMEREPORT,
                             );
                         }

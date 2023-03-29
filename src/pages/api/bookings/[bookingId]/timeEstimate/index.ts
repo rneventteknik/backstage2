@@ -43,9 +43,12 @@ const handler = withSessionContext(
                 }
                 await insertTimeEstimate(req.body.timeEstimate)
                     .then((result) => {
-                        logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.TIMEESTIMATE).then(
-                            () => res.status(200).json(result),
-                        );
+                        logChangeToBooking(
+                            context.currentUser,
+                            bookingId,
+                            booking.name,
+                            BookingChangelogEntryType.TIMEESTIMATE,
+                        ).then(() => res.status(200).json(result));
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;

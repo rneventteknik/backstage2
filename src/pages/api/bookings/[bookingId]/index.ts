@@ -9,6 +9,7 @@ import {
     BookingChangelogEntryType,
     hasChanges,
     hasListChanges,
+    logBookingDeletion,
     logChangeToBooking,
     logRentalStatusChangeToBooking,
     logStatusChangeToBooking,
@@ -54,7 +55,10 @@ const handler = withSessionContext(
                 }
 
                 await deleteBooking(bookingId)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        logBookingDeletion(context.currentUser, booking.id, booking.name);
+                        res.status(200).json(result);
+                    })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
                 break;
@@ -76,14 +80,14 @@ const handler = withSessionContext(
                 await updateBooking(bookingId, req.body.booking)
                     .then(async (result) => {
                         if (hasChanges(booking, req.body.booking, ['status'])) {
-                            await logChangeToBooking(context.currentUser, bookingId);
+                            await logChangeToBooking(context.currentUser, bookingId, booking.name);
                         }
 
                         const newStatus =
                             booking.status !== req.body.booking.status ? req.body.booking.status : undefined;
 
                         if (newStatus !== null && newStatus !== undefined) {
-                            await logStatusChangeToBooking(context.currentUser, bookingId, newStatus);
+                            await logStatusChangeToBooking(context.currentUser, bookingId, booking.name, newStatus);
                         }
 
                         // Special case: If the equipment lists are modified as a child to the booking, log that as well
@@ -91,7 +95,12 @@ const handler = withSessionContext(
                             req.body.booking.equipmentLists &&
                             hasListChanges(booking.equipmentLists, req.body.booking.equipmentLists, ['rentalStatus'])
                         ) {
-                            logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.EQUIPMENTLIST);
+                            logChangeToBooking(
+                                context.currentUser,
+                                bookingId,
+                                booking.name,
+                                BookingChangelogEntryType.EQUIPMENTLIST,
+                            );
                         }
 
                         // Check for rental status changes
@@ -111,6 +120,7 @@ const handler = withSessionContext(
                                 logRentalStatusChangeToBooking(
                                     context.currentUser,
                                     bookingId,
+                                    booking.name,
                                     list.name ?? getExistingEquipmentListWithId(list.id)?.name,
                                     list.rentalStatus ?? null,
                                 ),

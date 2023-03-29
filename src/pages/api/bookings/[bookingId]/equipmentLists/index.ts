@@ -52,6 +52,7 @@ const handler = withSessionContext(
                         logChangeToBooking(
                             context.currentUser,
                             bookingId,
+                            booking.name,
                             BookingChangelogEntryType.EQUIPMENTLIST,
                         ).then(() => res.status(200).json(result));
                     })
