@@ -25,7 +25,7 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             const globalSettings = await fetchSettings();
             const equipmentListId = isNaN(Number(req.query.list)) ? undefined : Number(req.query.list);
             const documentLanguage = req.query.language === 'en' ? Language.EN : Language.SV;
-            const filename = getPackingListDocumentFileName(booking, documentLanguage);
+            const filename = getPackingListDocumentFileName(booking, documentLanguage, globalSettings);
 
             if (equipmentListId !== undefined && !result.equipmentLists?.some((l) => l.id === equipmentListId)) {
                 respondWithEntityNotFoundResponse(res);

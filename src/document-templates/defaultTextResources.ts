@@ -2,7 +2,7 @@ import { Language } from '../models/enums/Language';
 
 // This file contains all text resources for the document exports.
 
-export const documentTextResources: Record<Language, Record<string, string>> = {
+export const defaultTextResources: Record<Language, Record<string, string>> = {
     sv: {
         // Booking info
         'common.booking-info.contact-person': 'Er referens',

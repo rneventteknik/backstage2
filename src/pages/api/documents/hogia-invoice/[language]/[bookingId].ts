@@ -9,6 +9,7 @@ import { getHogiaInvoiceFileName } from '../../../../../document-templates';
 import { Language } from '../../../../../models/enums/Language';
 import { toBookingViewModel } from '../../../../../lib/datetimeUtils';
 import { fetchSettings } from '../../../../../lib/db-access/setting';
+import { getTextResourcesFromGlobalSettings } from '../../../../../document-templates/utils';
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     if (isNaN(Number(req.query.bookingId))) {
@@ -24,14 +25,13 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
 
         const booking = toBooking(result);
         const bookingViewModel = toBookingViewModel(booking);
+        const globalSettings = await fetchSettings();
         const documentLanguage = req.query.language === 'en' ? Language.EN : Language.SV;
         const filename = getHogiaInvoiceFileName(bookingViewModel);
 
         const t = (key: string): string => {
-            return getTextResource(key, documentLanguage);
+            return getTextResource(key, documentLanguage, getTextResourcesFromGlobalSettings(globalSettings));
         };
-
-        const globalSettings = await fetchSettings();
 
         res.setHeader('Content-Type', 'text/plain; charset=windows-1252');
         // If the download flag is set, tell the browser to download the file instead of showing it in a new tab.

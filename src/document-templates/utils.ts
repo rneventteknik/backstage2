@@ -4,6 +4,8 @@ import { Booking } from '../models/interfaces';
 import { PricedEntity } from '../models/interfaces/BaseEntity';
 import { EquipmentListEntry } from '../models/interfaces/EquipmentList';
 import { addVATToPrice, formatPrice } from '../lib/pricingUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
+import { getGlobalSetting } from '../lib/utils';
 
 export const registerFonts = (): void => {
     Font.register({
@@ -136,3 +138,8 @@ export const allListsHaveSameDates = (booking: Booking) =>
             list.usageEndDatetime?.getTime() === booking.equipmentLists[0]?.usageEndDatetime?.getTime() &&
             list.usageStartDatetime?.getTime() === booking.equipmentLists[0]?.usageStartDatetime?.getTime(),
     );
+
+export const getTextResourcesFromGlobalSettings = (globalSettings: KeyValue[]) => ({
+    sv: JSON.parse(getGlobalSetting('content.documentTextResources.sv', globalSettings, '{}')),
+    en: JSON.parse(getGlobalSetting('content.documentTextResources.en', globalSettings, '{}')),
+});

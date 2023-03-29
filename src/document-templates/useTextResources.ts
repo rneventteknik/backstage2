@@ -1,16 +1,22 @@
 import React, { useContext } from 'react';
 import { Language } from '../models/enums/Language';
-import { documentTextResources } from './documentTextResources';
+import { defaultTextResources } from './defaultTextResources';
 
-export const TextResourcesLanguageContext = React.createContext(Language.SV);
+export const TextResourcesContext = React.createContext<{
+    language: Language;
+    textResources: Record<Language, Record<string, string>>;
+}>({ language: Language.SV, textResources: { sv: {}, en: {} } });
 
-export const getTextResource = (key: string, language: Language): string =>
-    documentTextResources[language][key] ?? `[${key}]`;
+export const getTextResource = (
+    key: string,
+    language: Language,
+    textResources: Record<Language, Record<string, string>>,
+): string => textResources[language][key] ?? defaultTextResources[language][key] ?? `[${key}]`;
 
 export const useTextResources = (): { t: (key: string) => string; locale: 'sv-SE' | 'en-SE' } => {
-    const language = useContext(TextResourcesLanguageContext);
+    const { language, textResources } = useContext(TextResourcesContext);
     return {
-        t: (key: string) => getTextResource(key, language),
+        t: (key: string) => getTextResource(key, language, textResources),
         locale: language === Language.EN ? 'en-SE' : 'sv-SE',
     };
 };

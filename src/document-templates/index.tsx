@@ -1,8 +1,8 @@
 import React, { ReactElement } from 'react';
 import { PriceEstimateDocument } from './components/priceEstimateDocument';
 import { Booking } from '../models/interfaces';
-import { registerFonts } from './utils';
-import { getTextResource, TextResourcesLanguageContext } from './useTextResources';
+import { getTextResourcesFromGlobalSettings, registerFonts } from './utils';
+import { getTextResource, TextResourcesContext } from './useTextResources';
 import { PackingListDocument } from './components/packingListDocument';
 import { Language } from '../models/enums/Language';
 import { RentalConfirmationDocument } from './components/rentalConfirmationDocument';
@@ -19,13 +19,23 @@ export const getPriceEstimateDocument = (
     documentLanguage: Language,
     globalSettings: KeyValue[],
 ): ReactElement => (
-    <TextResourcesLanguageContext.Provider value={documentLanguage}>
+    <TextResourcesContext.Provider
+        value={{ language: documentLanguage, textResources: getTextResourcesFromGlobalSettings(globalSettings) }}
+    >
         <PriceEstimateDocument booking={booking} globalSettings={globalSettings} />
-    </TextResourcesLanguageContext.Provider>
+    </TextResourcesContext.Provider>
 );
 
-export const getPriceEstimateDocumentFileName = (booking: Booking, documentLanguage: Language): string =>
-    `${getTextResource('price-estimate.filename', documentLanguage)} ${booking.name}.pdf`;
+export const getPriceEstimateDocumentFileName = (
+    booking: Booking,
+    documentLanguage: Language,
+    globalSettings: KeyValue[],
+): string =>
+    `${getTextResource(
+        'price-estimate.filename',
+        documentLanguage,
+        getTextResourcesFromGlobalSettings(globalSettings),
+    )} ${booking.name}.pdf`;
 
 // Packing List
 //
@@ -35,13 +45,23 @@ export const getPackingListDocument = (
     globalSettings: KeyValue[],
     equipmentListId?: number,
 ): ReactElement => (
-    <TextResourcesLanguageContext.Provider value={documentLanguage}>
+    <TextResourcesContext.Provider
+        value={{ language: documentLanguage, textResources: getTextResourcesFromGlobalSettings(globalSettings) }}
+    >
         <PackingListDocument booking={booking} globalSettings={globalSettings} equipmentListId={equipmentListId} />
-    </TextResourcesLanguageContext.Provider>
+    </TextResourcesContext.Provider>
 );
 
-export const getPackingListDocumentFileName = (booking: Booking, documentLanguage: Language): string =>
-    `${getTextResource('packing-list.filename', documentLanguage)} ${booking.name}.pdf`;
+export const getPackingListDocumentFileName = (
+    booking: Booking,
+    documentLanguage: Language,
+    globalSettings: KeyValue[],
+): string =>
+    `${getTextResource(
+        'packing-list.filename',
+        documentLanguage,
+        getTextResourcesFromGlobalSettings(globalSettings),
+    )} ${booking.name}.pdf`;
 
 // Rental Confirmation
 //
@@ -50,13 +70,23 @@ export const getRentalConfirmationDocument = (
     documentLanguage: Language,
     globalSettings: KeyValue[],
 ): ReactElement => (
-    <TextResourcesLanguageContext.Provider value={documentLanguage}>
+    <TextResourcesContext.Provider
+        value={{ language: documentLanguage, textResources: getTextResourcesFromGlobalSettings(globalSettings) }}
+    >
         <RentalConfirmationDocument booking={booking} globalSettings={globalSettings} />
-    </TextResourcesLanguageContext.Provider>
+    </TextResourcesContext.Provider>
 );
 
-export const getRentalConfirmationDocumentFileName = (booking: Booking, documentLanguage: Language): string =>
-    `${getTextResource('rental-agreement.filename', documentLanguage)} ${booking.name}.pdf`;
+export const getRentalConfirmationDocumentFileName = (
+    booking: Booking,
+    documentLanguage: Language,
+    globalSettings: KeyValue[],
+): string =>
+    `${getTextResource(
+        'rental-agreement.filename',
+        documentLanguage,
+        getTextResourcesFromGlobalSettings(globalSettings),
+    )} ${booking.name}.pdf`;
 
 // Salary Report (no language support)
 //

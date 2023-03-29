@@ -9,6 +9,7 @@ import { respondWithCustomErrorMessage, respondWithEntityNotFoundResponse } from
 import { getHogiaInvoiceFileName } from '../../../../document-templates';
 import { toBookingViewModel } from '../../../../lib/datetimeUtils';
 import { fetchSettings } from '../../../../lib/db-access/setting';
+import { getTextResourcesFromGlobalSettings } from '../../../../document-templates/utils';
 
 const getEncodedHogiaInvoice = async (id: number) => {
     return fetchBookingWithUser(id).then(async (result) => {
@@ -18,12 +19,11 @@ const getEncodedHogiaInvoice = async (id: number) => {
 
         const booking = toBooking(result);
         const bookingViewModel = toBookingViewModel(booking);
+        const globalSettings = await fetchSettings();
 
         const t = (key: string): string => {
-            return getTextResource(key, booking.language);
+            return getTextResource(key, booking.language, getTextResourcesFromGlobalSettings(globalSettings));
         };
-
-        const globalSettings = await fetchSettings();
 
         const content = getHogiaTxtInvoice(bookingViewModel, globalSettings, t);
 

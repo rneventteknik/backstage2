@@ -24,7 +24,7 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             const booking = toBooking(result);
             const globalSettings = await fetchSettings();
             const documentLanguage = req.query.language === 'en' ? Language.EN : Language.SV;
-            const filename = getPriceEstimateDocumentFileName(booking, documentLanguage);
+            const filename = getPriceEstimateDocumentFileName(booking, documentLanguage, globalSettings);
             const stream = await renderToStream(getPriceEstimateDocument(booking, documentLanguage, globalSettings));
 
             // If the download flag is set, tell the browser to download the file instead of showing it in a new tab.

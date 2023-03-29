@@ -27,7 +27,7 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             const booking = toBooking(result);
             const globalSettings = await fetchSettings();
             const documentLanguage = req.query.language === 'en' ? Language.EN : Language.SV;
-            const filename = getRentalConfirmationDocumentFileName(booking, documentLanguage);
+            const filename = getRentalConfirmationDocumentFileName(booking, documentLanguage, globalSettings);
             const stream = await renderToStream(
                 getRentalConfirmationDocument(booking, documentLanguage, globalSettings),
             );
