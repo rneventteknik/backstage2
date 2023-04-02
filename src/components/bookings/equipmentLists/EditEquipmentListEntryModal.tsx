@@ -9,6 +9,7 @@ import { EquipmentPrice } from '../../../models/interfaces';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
+import RequiredIndicator from '../../utils/RequiredIndicator';
 
 type Props = {
     show: boolean;
@@ -52,7 +53,10 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                     <Row>
                         <Col lg={4}>
                             <Form.Group>
-                                <Form.Label>Namn</Form.Label>
+                                <Form.Label>
+                                    Namn
+                                    <RequiredIndicator />
+                                </Form.Label>
                                 <Form.Control
                                     type="text"
                                     value={equipmentListEntryToEditViewModel?.name}
