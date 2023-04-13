@@ -3,7 +3,7 @@ import { Alert, Button, ButtonGroup, Table } from 'react-bootstrap';
 import useSwr from 'swr';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
 import { equipmentsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
-import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
+import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { groupBy } from '../../lib/utils';
 import { EquipmentPrice } from '../../models/interfaces';
 
@@ -17,14 +17,6 @@ const containerStyle = {
 
 const pageTitle = 'Prislista';
 
-const addVatToPrice = (price: EquipmentPrice): EquipmentPrice => ({
-    ...price,
-    pricePerUnit: price.pricePerUnit * 1.25,
-    pricePerHour: price.pricePerHour * 1.25,
-    pricePerUnitTHS: price.pricePerUnitTHS * 1.25,
-    pricePerHourTHS: price.pricePerHourTHS * 1.25,
-});
-
 type PriceCellsProps = {
     price: EquipmentPrice;
     showWithVat: boolean;
@@ -36,8 +28,8 @@ const PriceCells: React.FC<PriceCellsProps> = ({ price, hidePriceType, showWithV
         <>
             <td>{hidePriceType ? null : price.name}</td>
             <td>
-                <div>{formatPrice(showWithVat ? addVatToPrice(price) : price)}</div>
-                <div className="text-muted">{formatTHSPrice(showWithVat ? addVatToPrice(price) : price)}</div>
+                <div>{formatPrice(showWithVat ? addVATToPriceWithTHS(price) : price)}</div>
+                <div className="text-muted">{formatTHSPrice(showWithVat ? addVATToPriceWithTHS(price) : price)}</div>
             </td>
         </>
     ) : (
