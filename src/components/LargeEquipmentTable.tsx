@@ -28,7 +28,9 @@ const EquipmentNameDisplayFn = (equipment: Equipment) => (
             <EquipmentTagDisplay tag={x} key={x.id} className="ml-1" />
         ))}
         <div className="text-muted mb-0">{equipment.description}</div>
-        <div className="text-muted mb-0 d-md-none">{equipment.inventoryCount + ' st'}</div>
+        {equipment.inventoryCount === null ? null : (
+            <div className="text-muted mb-0 d-md-none">{equipment.inventoryCount + ' st'}</div>
+        )}
     </>
 );
 
