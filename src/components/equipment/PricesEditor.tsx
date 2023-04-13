@@ -1,8 +1,9 @@
 import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
+import { Badge, Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
+import { idSortFn } from '../../lib/sortIndexUtils';
 import { getPricePlanName, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { EquipmentPrice } from '../../models/interfaces';
@@ -46,6 +47,11 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
     const PriceEntryNameDisplayFn = (price: EquipmentPrice) => (
         <>
             <p className="mb-0">
+                {price.id === Math.min(...prices.map((x) => x.id)) && prices.length > 1 ? (
+                    <Badge variant="dark" className="mb-2">
+                        Standardvärde
+                    </Badge>
+                ) : null}
                 <Form.Control
                     type="text"
                     defaultValue={price.name}
@@ -134,10 +140,9 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
     //
     const tableSettings: TableConfiguration<EquipmentPrice> = {
         entityTypeDisplayName: '',
-        defaultSortPropertyName: 'name',
-        defaultSortAscending: true,
         hideTableFilter: true,
         hideTableCountControls: true,
+        customSortFn: idSortFn,
         noResultsLabel: 'Inga priser konfigurerade',
         columns: [
             {

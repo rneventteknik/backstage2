@@ -16,6 +16,10 @@ export const sortIndexSortFn = (a: Sortable, b: Sortable) => {
     }
 
     // Use id for sorting as a fallback
+    return idSortFn(a, b);
+};
+
+export const idSortFn = (a: HasId | HasStringId, b: HasId | HasStringId) => {
     if (a.id < b.id) {
         return -1;
     }
