@@ -82,7 +82,8 @@ const tableSettings: TableConfiguration<Equipment> = {
         {
             key: 'name',
             displayName: 'Utrustning',
-            getValue: (equipment: Equipment) => equipment.name + ' ' + equipment.description,
+            getValue: (equipment: Equipment) =>
+                equipment.name + ' ' + equipment.description + ' ' + equipment.searchKeywords,
             getContentOverride: EquipmentNameDisplayFn,
         },
         {
