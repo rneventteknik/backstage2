@@ -5,5 +5,5 @@ const seeds = { directory: './knex/seeds' };
 
 export default {
     development: { ...knexConfiguration.development, migrations: migrations, seeds: seeds },
-    production: { ...knexConfiguration.production, migrations: migrations },
+    production: { ...knexConfiguration.production, migrations: migrations, seeds: seeds },
 };
