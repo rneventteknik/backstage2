@@ -11,6 +11,7 @@ import {
     hasListChanges,
     logBookingDeletion,
     logChangeToBooking,
+    logPaymentStatusChangeToBooking,
     logRentalStatusChangeToBooking,
     logStatusChangeToBooking,
 } from '../../../../lib/changelogUtils';
@@ -79,7 +80,7 @@ const handler = withSessionContext(
 
                 await updateBooking(bookingId, req.body.booking)
                     .then(async (result) => {
-                        if (hasChanges(booking, req.body.booking, ['status'])) {
+                        if (hasChanges(booking, req.body.booking, ['status', 'paymentStatus'])) {
                             await logChangeToBooking(context.currentUser, bookingId, booking.name);
                         }
 
@@ -88,6 +89,20 @@ const handler = withSessionContext(
 
                         if (newStatus !== null && newStatus !== undefined) {
                             await logStatusChangeToBooking(context.currentUser, bookingId, booking.name, newStatus);
+                        }
+
+                        const newPaymentStatus =
+                            booking.paymentStatus !== req.body.booking.paymentStatus
+                                ? req.body.booking.paymentStatus
+                                : undefined;
+
+                        if (newPaymentStatus !== null && newPaymentStatus !== undefined) {
+                            await logPaymentStatusChangeToBooking(
+                                context.currentUser,
+                                bookingId,
+                                booking.name,
+                                newPaymentStatus,
+                            );
                         }
 
                         // Special case: If the equipment lists are modified as a child to the booking, log that as well

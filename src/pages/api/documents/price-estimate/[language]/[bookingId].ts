@@ -40,6 +40,6 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
         .catch((err) => {
             throw err;
         });
-});
+}, null);
 
 export default handler;

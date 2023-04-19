@@ -53,6 +53,7 @@ import { getNumberOfBookingDays, getNumberOfEventHours, toBookingViewModel } fro
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import MarkdownCard from '../../../components/MarkdownCard';
 import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButton';
+import ConfirmModal from '../../../components/utils/ConfirmModal';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -62,6 +63,9 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
     const [showTimeEstimateContent, setShowTimeEstimateContent] = useState(false);
     const [showTimeReportContent, setShowTimeReportContent] = useState(false);
+
+    const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
+    const [showConfirmPaidModal, setShowConfirmPaidModal] = useState(false);
 
     // Edit booking
     //
@@ -105,6 +109,24 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             .then(toBooking)
             .then((booking) => {
                 mutate(booking);
+                showSaveSuccessNotification('Bokningen');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Bokningen');
+            });
+    };
+
+    const updateBookingPaymentStatus = async (paymentStatus: PaymentStatus) => {
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+        };
+
+        fetch('/api/bookings/paymentStatus/' + router.query.id + '?status=' + paymentStatus, request)
+            .then((apiResponse) => getResponseContentOrError(apiResponse))
+            .then(() => {
+                mutate();
                 showSaveSuccessNotification('Bokningen');
             })
             .catch((error: Error) => {
@@ -185,7 +207,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
-                <IfNotReadonly currentUser={currentUser}>
+                <IfNotReadonly currentUser={currentUser} and={booking.status !== Status.DONE}>
                     <TimeReportAddButton
                         booking={booking}
                         disabled={booking.status === Status.DONE}
@@ -200,20 +222,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     </TimeReportAddButton>
                 </IfNotReadonly>
                 <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="secondary" />
-                <IfNotReadonly currentUser={currentUser}>
+                <IfNotReadonly currentUser={currentUser} and={booking.status !== Status.DONE}>
                     <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer">
-                        <Dropdown.Item
-                            onClick={() => saveBooking({ paymentStatus: PaymentStatus.PAID })}
-                            disabled={
-                                booking.paymentStatus === PaymentStatus.PAID ||
-                                booking.paymentStatus === PaymentStatus.PAID_WITH_INVOICE
-                            }
-                        >
-                            <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som betald
-                        </Dropdown.Item>
                         <TimeEstimateAddButton
                             booking={booking}
-                            disabled={booking.status === Status.DONE}
                             sortIndex={getNextSortIndex(booking.timeEstimates ?? [])}
                             onAdd={onAddTimeEstimate}
                             buttonType="dropdown"
@@ -223,6 +235,44 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             Lägg till tidsuppskattning
                         </TimeEstimateAddButton>
                     </DropdownButton>
+                </IfNotReadonly>
+                <IfNotReadonly
+                    currentUser={currentUser}
+                    and={booking.status === Status.DONE && booking.paymentStatus === PaymentStatus.NOT_PAID}
+                >
+                    <Button variant="secondary" onClick={() => setShowConfirmReadyForCashPaymentModal(true)}>
+                        <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Skicka till KårX för betalning
+                    </Button>
+                    <ConfirmModal
+                        show={showConfirmReadyForCashPaymentModal}
+                        onHide={() => setShowConfirmReadyForCashPaymentModal(false)}
+                        onConfirm={() => {
+                            updateBookingPaymentStatus(PaymentStatus.READY_FOR_CASH_PAYMENT);
+                            setShowConfirmReadyForCashPaymentModal(false);
+                        }}
+                        title="Bekräfta"
+                        confirmLabel="Markera som redo att betalas i KårX"
+                        confirmButtonType="primary"
+                    >
+                        Vill du markera bokningen <em>{booking.name}</em> som redo att betalas i KårX?
+                    </ConfirmModal>
+
+                    <Button variant="secondary" onClick={() => setShowConfirmPaidModal(true)}>
+                        <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som betald
+                    </Button>
+                    <ConfirmModal
+                        show={showConfirmPaidModal}
+                        onHide={() => setShowConfirmPaidModal(false)}
+                        onConfirm={() => {
+                            updateBookingPaymentStatus(PaymentStatus.PAID);
+                            setShowConfirmPaidModal(false);
+                        }}
+                        title="Bekräfta"
+                        confirmLabel="Markera som betald"
+                        confirmButtonType="primary"
+                    >
+                        Vill du markera bokningen <em>{booking.name}</em> som betald?
+                    </ConfirmModal>
                 </IfNotReadonly>
             </Header>
 

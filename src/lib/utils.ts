@@ -115,6 +115,12 @@ export const getPaymentStatusName = (paymentStatus: PaymentStatus): string => {
 
         case PaymentStatus.PAID_WITH_INVOICE:
             return 'Betald med faktura';
+
+        case PaymentStatus.READY_FOR_CASH_PAYMENT:
+            return 'Redo för KårX';
+
+        case PaymentStatus.PAID_WITH_CASH:
+            return 'Betald i KårX';
     }
 };
 
@@ -164,6 +170,9 @@ export const getRoleName = (role: Role | undefined): string => {
 
         case Role.READONLY:
             return 'Läsbehörighet';
+
+        case Role.CASH_PAYMENT_MANAGER:
+            return 'Betalningshanterarbehörighet';
 
         default:
             return '';

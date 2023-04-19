@@ -461,6 +461,12 @@ const BookingForm: React.FC<Props> = ({
                                     <option value={PaymentStatus.PAID_WITH_INVOICE}>
                                         {getPaymentStatusName(PaymentStatus.PAID_WITH_INVOICE)}
                                     </option>
+                                    <option value={PaymentStatus.READY_FOR_CASH_PAYMENT}>
+                                        {getPaymentStatusName(PaymentStatus.READY_FOR_CASH_PAYMENT)}
+                                    </option>
+                                    <option value={PaymentStatus.PAID_WITH_CASH}>
+                                        {getPaymentStatusName(PaymentStatus.PAID_WITH_CASH)}
+                                    </option>
                                 </Form.Control>
                             </Form.Group>
                         </Col>

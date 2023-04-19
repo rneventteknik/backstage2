@@ -74,6 +74,7 @@ const UserAuthForm: React.FC<Props> = ({
                         <option value={Role.ADMIN}> {getRoleName(Role.ADMIN)}</option>
                         <option value={Role.USER}> {getRoleName(Role.USER)}</option>
                         <option value={Role.READONLY}> {getRoleName(Role.READONLY)}</option>
+                        <option value={Role.CASH_PAYMENT_MANAGER}> {getRoleName(Role.CASH_PAYMENT_MANAGER)}</option>
                     </Form.Control>
                 </Form.Group>
             ) : null}

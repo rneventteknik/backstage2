@@ -1,5 +1,6 @@
 import { AccountKind } from '../../models/enums/AccountKind';
 import { BookingType } from '../../models/enums/BookingType';
+import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { Status } from '../../models/enums/Status';
 import { BookingObjectionModel } from '../../models/objection-models';
@@ -88,6 +89,26 @@ export const fetchBookingsForEquipment = async (equipmentId: number): Promise<Bo
         .withGraphFetched('equipmentLists');
 };
 
+export const fetchBookingsReadyForCashPayment = async (): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .where('Booking.paymentStatus', PaymentStatus.READY_FOR_CASH_PAYMENT)
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries')
+        .withGraphFetched('timeReports');
+};
+
+export const fetchBookingsPaidWithCash = async (): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .where('Booking.paymentStatus', PaymentStatus.PAID_WITH_CASH)
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries')
+        .withGraphFetched('timeReports');
+};
+
 export const fetchBooking = async (id: number): Promise<BookingObjectionModel> => {
     ensureDatabaseIsInitialized();
 
@@ -155,7 +176,10 @@ export const fetchFirstBookingByCalendarBookingId = async (
         .then((bookings) => bookings[0]);
 };
 
-export const updateBooking = async (id: number, booking: BookingObjectionModel): Promise<BookingObjectionModel> => {
+export const updateBooking = async (
+    id: number,
+    booking: Partial<BookingObjectionModel>,
+): Promise<BookingObjectionModel> => {
     ensureDatabaseIsInitialized();
 
     const existingDatabaseModel = await BookingObjectionModel.query()

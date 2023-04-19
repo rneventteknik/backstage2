@@ -1,3 +1,4 @@
+import { PaymentStatus } from '../models/enums/PaymentStatus';
 import { RentalStatus } from '../models/enums/RentalStatus';
 import { Status } from '../models/enums/Status';
 import { HasId } from '../models/interfaces/BaseEntity';
@@ -66,6 +67,28 @@ const getRentalStatusActionString = (type: RentalStatus | null) => {
     }
 };
 
+const getPaymentStatusActionString = (type: PaymentStatus | null) => {
+    switch (type) {
+        case PaymentStatus.NOT_PAID:
+            return 'markerade bokningen som obetald';
+
+        case PaymentStatus.PAID:
+            return 'markerade bokningen som betald';
+
+        case PaymentStatus.INVOICED:
+            return 'skickade faktura för bokningen';
+
+        case PaymentStatus.PAID_WITH_INVOICE:
+            return 'markerade bokningen som betald med faktura';
+
+        case PaymentStatus.READY_FOR_CASH_PAYMENT:
+            return 'skickade bokningen för betalning i KårX';
+
+        case PaymentStatus.PAID_WITH_CASH:
+            return 'markerade bokningen som betald i KårX';
+    }
+};
+
 // The deDuplicateTimeout is how far back (in seconds) we should look for a log entry to update instead of creating a new (duplicate one). Default is fifteen minutes (900 seconds).
 const addChangelogToBooking = async (message: string, bookingId: number, deDuplicateTimeout = 900) => {
     const logEntries = await fetchBookingChangelogEntrysByBookingId(bookingId);
@@ -128,6 +151,18 @@ export const logBookingDeletion = (user: CurrentUserInfo, bookingId: number, boo
     const message = `${user.name} tog bort bokningen.`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
+};
+
+export const logPaymentStatusChangeToBooking = (
+    user: CurrentUserInfo,
+    bookingId: number,
+    bookingName: string,
+    newStatus: PaymentStatus | null,
+) => {
+    const message = `${user.name} ${getPaymentStatusActionString(newStatus)}.`;
+
+    sendSlackMessageForBooking(message, bookingId, bookingName);
+    return addChangelogToBooking(message, bookingId, 0);
 };
 
 // Equipment

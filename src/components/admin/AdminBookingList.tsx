@@ -130,7 +130,8 @@ const AdminBookingList: React.FC<Props> = ({
         <>
             {getPaymentStatusName(booking.paymentStatus)}
             {booking.paymentStatus === PaymentStatus.PAID ||
-            booking.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ? (
+            booking.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
+            booking.paymentStatus === PaymentStatus.PAID_WITH_CASH ? (
                 <DoneIcon />
             ) : null}
         </>

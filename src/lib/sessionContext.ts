@@ -4,6 +4,8 @@ import { respondWithAccessDeniedResponse } from './apiResponses';
 import { getAndVerifyUser } from './authenticate';
 import { withApiSession } from './session';
 import { IncomingMessage } from 'http';
+import { Role } from '../models/enums/Role';
+import { hasSufficientAccess } from './useUser';
 
 export interface SessionContext {
     currentUser: CurrentUserInfo;
@@ -14,11 +16,17 @@ export interface SessionContext {
 // as well as a context object with information about the context of the request (such as the current user)
 export const withSessionContext = (
     handler: (req: NextApiRequest & IncomingMessage, res: NextApiResponse, context: SessionContext) => void,
+    requiredRole: Role | null = Role.READONLY,
 ): NextApiHandler => {
     const internalHandler = async (req: NextApiRequest & IncomingMessage, res: NextApiResponse) => {
         const currentUser = await getAndVerifyUser(req);
 
         if (!currentUser.isLoggedIn) {
+            respondWithAccessDeniedResponse(res);
+            return;
+        }
+
+        if (!hasSufficientAccess(currentUser.role, requiredRole)) {
             respondWithAccessDeniedResponse(res);
             return;
         }

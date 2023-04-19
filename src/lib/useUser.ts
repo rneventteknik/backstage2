@@ -34,9 +34,7 @@ const useUser = (
                 return `?redirectUrl=${req.url}`;
             };
 
-            const insufficientAccess =
-                (requiredRole == Role.ADMIN && user?.role != Role.ADMIN) ||
-                (requiredRole == Role.USER && user?.role != Role.ADMIN && user?.role != Role.USER);
+            const insufficientAccess = !hasSufficientAccess(user.role, requiredRole);
 
             if (!user.isLoggedIn && redirectUrlIfNotLoggedIn) {
                 return {
@@ -110,4 +108,23 @@ const useUserWithDefaultAccessAndWithSettings = (requiredRole: Role = Role.READO
     return useUser('/login', '/no-access', undefined, true, requiredRole);
 };
 
-export { useUser, useUserWithDefaultAccessAndWithSettings };
+const hasSufficientAccess = (role: Role | null | undefined, requiredRole: Role | null) => {
+    switch (requiredRole) {
+        case Role.ADMIN:
+            return role === Role.ADMIN;
+
+        case Role.USER:
+            return role === Role.USER || role === Role.ADMIN;
+
+        case Role.READONLY:
+            return role === Role.READONLY || role === Role.USER || role === Role.ADMIN;
+
+        case Role.CASH_PAYMENT_MANAGER:
+            return role === Role.CASH_PAYMENT_MANAGER || role === Role.USER || role === Role.ADMIN;
+
+        case null:
+            return true;
+    }
+};
+
+export { useUser, useUserWithDefaultAccessAndWithSettings, hasSufficientAccess };

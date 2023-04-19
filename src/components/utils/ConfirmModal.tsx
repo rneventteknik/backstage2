@@ -8,6 +8,8 @@ type Props = {
     title: string;
     confirmLabel?: string;
     cancelLabel?: string;
+    confirmButtonType?: 'danger' | 'primary' | 'secondary';
+    cancelButtonType?: 'danger' | 'primary' | 'secondary';
     children?: ReactNode;
 };
 
@@ -18,6 +20,8 @@ const ConfirmModal: React.FC<Props> = ({
     title,
     confirmLabel = 'Fortsätt',
     cancelLabel = 'Avbryt',
+    confirmButtonType = 'danger',
+    cancelButtonType = 'secondary',
     children,
 }: Props) => {
     return (
@@ -27,10 +31,10 @@ const ConfirmModal: React.FC<Props> = ({
             </Modal.Header>
             <Modal.Body>{children}</Modal.Body>
             <Modal.Footer>
-                <Button variant="danger" onClick={() => onConfirm()}>
+                <Button variant={confirmButtonType} onClick={() => onConfirm()}>
                     {confirmLabel}
                 </Button>
-                <Button variant="secondary" onClick={() => onHide()}>
+                <Button variant={cancelButtonType} onClick={() => onHide()}>
                     {cancelLabel}
                 </Button>
             </Modal.Footer>

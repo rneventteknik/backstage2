@@ -12,7 +12,7 @@ import { TableConfiguration, TableDisplay } from '../components/TableDisplay';
 import { InvoiceGroup } from '../models/interfaces/InvoiceGroup';
 import { Button } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faCoins, faPlus } from '@fortawesome/free-solid-svg-icons';
 import CreateInvoiceGroupModal from '../components/invoices/CreateInvoiceGroupModal';
 import { IInvoiceGroupObjectionModel } from '../models/objection-models/InvoiceGroupObjectionModel';
 import { PartialDeep } from 'type-fest';
@@ -23,6 +23,7 @@ import { PaymentStatus } from '../models/enums/PaymentStatus';
 import DoneIcon from '../components/utils/DoneIcon';
 import { formatDatetime } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import Link from 'next/link';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
@@ -109,7 +110,10 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
     const getPaymentStatusString = (invoiceGroup: InvoiceGroup): string | number | Date => {
         if (
             invoiceGroup.bookings?.every(
-                (b) => b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE || b.paymentStatus === PaymentStatus.PAID,
+                (b) =>
+                    b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
+                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
+                    b.paymentStatus === PaymentStatus.PAID,
             )
         ) {
             return 'Betald';
@@ -117,7 +121,10 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
 
         if (
             invoiceGroup.bookings?.some(
-                (b) => b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE || b.paymentStatus === PaymentStatus.PAID,
+                (b) =>
+                    b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
+                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
+                    b.paymentStatus === PaymentStatus.PAID,
             )
         ) {
             return 'Delvis betald';
@@ -125,7 +132,10 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
 
         if (
             invoiceGroup.bookings?.every(
-                (b) => b.paymentStatus === PaymentStatus.INVOICED || b.paymentStatus === PaymentStatus.PAID,
+                (b) =>
+                    b.paymentStatus === PaymentStatus.INVOICED ||
+                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
+                    b.paymentStatus === PaymentStatus.PAID,
             )
         ) {
             return 'Fakturerad';
@@ -133,7 +143,10 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
 
         if (
             invoiceGroup.bookings?.some(
-                (b) => b.paymentStatus === PaymentStatus.INVOICED || b.paymentStatus === PaymentStatus.PAID,
+                (b) =>
+                    b.paymentStatus === PaymentStatus.INVOICED ||
+                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
+                    b.paymentStatus === PaymentStatus.PAID,
             )
         ) {
             return 'Delvis fakturerad';
@@ -196,6 +209,11 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
                 <Button onClick={() => setShowCreateModal(true)}>
                     <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Fakturaunderlagsgrupp
                 </Button>
+                <Link href="/cash-payments" passHref>
+                    <Button variant="secondary" as="span">
+                        <FontAwesomeIcon icon={faCoins} className="mr-1" /> Hantera KårX-betalningar
+                    </Button>
+                </Link>
             </Header>
             <TableDisplay entities={invoiceGroups ?? []} configuration={{ ...tableSettings }} />
             <CreateInvoiceGroupModal

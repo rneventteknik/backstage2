@@ -109,7 +109,10 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
     const getPaymentStatusString = (salaryGroup: SalaryGroup): string | number | Date => {
         if (
             salaryGroup.bookings?.every(
-                (b) => b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE || b.paymentStatus === PaymentStatus.PAID,
+                (b) =>
+                    b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
+                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
+                    b.paymentStatus === PaymentStatus.PAID,
             )
         ) {
             return 'Betald';
@@ -117,7 +120,10 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
 
         if (
             salaryGroup.bookings?.some(
-                (b) => b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE || b.paymentStatus === PaymentStatus.PAID,
+                (b) =>
+                    b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
+                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
+                    b.paymentStatus === PaymentStatus.PAID,
             )
         ) {
             return 'Delvis betald';
@@ -125,7 +131,10 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
 
         if (
             salaryGroup.bookings?.every(
-                (b) => b.paymentStatus === PaymentStatus.INVOICED || b.paymentStatus === PaymentStatus.PAID,
+                (b) =>
+                    b.paymentStatus === PaymentStatus.INVOICED ||
+                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
+                    b.paymentStatus === PaymentStatus.PAID,
             )
         ) {
             return 'Fakturerad';
@@ -133,7 +142,10 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
 
         if (
             salaryGroup.bookings?.some(
-                (b) => b.paymentStatus === PaymentStatus.INVOICED || b.paymentStatus === PaymentStatus.PAID,
+                (b) =>
+                    b.paymentStatus === PaymentStatus.INVOICED ||
+                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
+                    b.paymentStatus === PaymentStatus.PAID,
             )
         ) {
             return 'Delvis fakturerad';
