@@ -111,7 +111,9 @@ export const addVATToPriceWithTHS = (price: PricedEntityWithTHS): PricedEntityWi
 // Format price
 //
 export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 'st'): string => {
-    if (price.pricePerHour && !price.pricePerUnit) {
+    if (!price.pricePerHour && !price.pricePerUnit) {
+        return `-`;
+    } else if (price.pricePerHour && !price.pricePerUnit) {
         return `${formatNumberAsCurrency(price.pricePerHour)}/${hoursUnit}`;
     } else if (!price.pricePerHour && price.pricePerUnit) {
         return `${formatNumberAsCurrency(price.pricePerUnit)}/${unitsUnit}`;

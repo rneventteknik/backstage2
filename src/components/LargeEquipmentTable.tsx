@@ -39,6 +39,14 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
         case 0:
             return '-';
         case 1:
+            if (
+                !equipment.prices[0].pricePerUnit &&
+                !equipment.prices[0].pricePerHour &&
+                !equipment.prices[0].pricePerUnitTHS &&
+                !equipment.prices[0].pricePerHourTHS
+            ) {
+                return '-';
+            }
             return (
                 <>
                     {formatPrice(addVATToPriceWithTHS(equipment.prices[0]))}
