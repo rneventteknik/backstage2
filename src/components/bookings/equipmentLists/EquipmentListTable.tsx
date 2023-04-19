@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge, Dropdown, DropdownButton, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { EquipmentPrice } from '../../../models/interfaces';
+import { Equipment, EquipmentPrice } from '../../../models/interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faAngleDown,
@@ -17,8 +17,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
-import { toIntOrUndefined, reduceSumFn } from '../../../lib/utils';
-import EquipmentSearch from '../../EquipmentSearch';
+import { toIntOrUndefined, reduceSumFn, getResponseContentOrError } from '../../../lib/utils';
+import EquipmentSearch, { ResultType } from '../../EquipmentSearch';
 import { DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
 import {
     addVAT,
@@ -36,7 +36,8 @@ import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus
 import { getEquipmentInDatetime, getEquipmentOutDatetime, getNumberOfDays } from '../../../lib/datetimeUtils';
 import { Language } from '../../../models/enums/Language';
 import {
-    addFromSearch,
+    addEquipment,
+    addEquipmentPackage,
     deleteListEntry,
     deleteListHeadingEntry,
     EquipmentListEntityViewModel,
@@ -58,6 +59,10 @@ import {
     updateListHeadingEntry,
     viewModelIsHeading,
 } from '../../../lib/equipmentListUtils';
+import SelectNumberOfUnitsAndHoursModal from './SelectNumberOfUnitsAndHoursModal';
+import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../../models/objection-models';
+import { toEquipment } from '../../../lib/mappers/equipment';
+import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 
 type Props = {
     list: EquipmentList;
@@ -69,6 +74,8 @@ type Props = {
 };
 
 const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveList, editEntry, readonly }: Props) => {
+    const [equipmentToAdd, setEquipmentToAdd] = useState<Equipment | null>(null);
+
     // Helper functions
     //
     const priceDisplayFn = pricePlan === PricePlan.EXTERNAL ? formatPrice : formatTHSPrice;
@@ -625,8 +632,63 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                         includePackages={true}
                         language={language}
                         id="equipment-search"
-                        onSelect={(x) => addFromSearch(x, list, pricePlan, language, saveList)}
+                        onSelect={(x) => {
+                            switch (x.type) {
+                                case ResultType.EQUIPMENT:
+                                    return fetch('/api/equipment/' + x.id)
+                                        .then((apiResponse) =>
+                                            getResponseContentOrError<IEquipmentObjectionModel>(apiResponse),
+                                        )
+                                        .then(toEquipment)
+                                        .then((equipment) => {
+                                            setEquipmentToAdd(equipment);
+                                        });
+
+                                case ResultType.EQUIPMENTPACKAGE:
+                                    return fetch('/api/equipmentPackage/' + x.id)
+                                        .then((apiResponse) =>
+                                            getResponseContentOrError<IEquipmentPackageObjectionModel>(apiResponse),
+                                        )
+                                        .then(toEquipmentPackage)
+                                        .then((equipmentPackage) => {
+                                            addEquipmentPackage(equipmentPackage, list, pricePlan, language, saveList);
+                                        });
+                            }
+                        }}
                     />
+                    {!!equipmentToAdd ? (
+                        <SelectNumberOfUnitsAndHoursModal
+                            show={!!equipmentToAdd}
+                            onHide={() => setEquipmentToAdd(null)}
+                            onSave={(numberOfUnits, numberOfHours) => {
+                                if (!equipmentToAdd) {
+                                    throw new Error('Invalid state: Missing searchResultModelToAdd.');
+                                }
+
+                                addEquipment(
+                                    equipmentToAdd,
+                                    list,
+                                    pricePlan,
+                                    language,
+                                    saveList,
+                                    numberOfUnits,
+                                    numberOfHours,
+                                );
+                                setEquipmentToAdd(null);
+                            }}
+                            // Number of hours are shown if and only if there is a price per hour.
+                            // Number of units are shown if there is no price per hour, or if there is both a price per hour and price per unit and the number of units in our inventory is larger than 1.
+                            showNumberOfUnits={
+                                (!!getEquipmentListEntryPrices(equipmentToAdd.prices[0], pricePlan).pricePerUnit &&
+                                    equipmentToAdd.inventoryCount != 1) ||
+                                !getEquipmentListEntryPrices(equipmentToAdd.prices[0], pricePlan).pricePerHour
+                            }
+                            showNumberOfHours={
+                                !!getEquipmentListEntryPrices(equipmentToAdd.prices[0], pricePlan).pricePerHour
+                            }
+                            title={language === Language.SV ? equipmentToAdd.name : equipmentToAdd.nameEN}
+                        />
+                    ) : null}
                 </div>
             )}
         </>

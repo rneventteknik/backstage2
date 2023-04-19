@@ -1,13 +1,9 @@
-import { ResultType, SearchResultViewModel } from '../components/EquipmentSearch';
 import { Language } from '../models/enums/Language';
 import { PricePlan } from '../models/enums/PricePlan';
-import { EquipmentPrice, Equipment } from '../models/interfaces';
+import { EquipmentPrice, Equipment, EquipmentPackage } from '../models/interfaces';
 import { EquipmentListEntry, EquipmentListHeading, EquipmentList } from '../models/interfaces/EquipmentList';
-import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../models/objection-models';
-import { toEquipment } from './mappers/equipment';
-import { toEquipmentPackage } from './mappers/equipmentPackage';
 import { getNextSortIndex, moveItemUp, moveItemDown } from './sortIndexUtils';
-import { getResponseContentOrError, updateItemsInArrayById } from './utils';
+import { updateItemsInArrayById } from './utils';
 
 // EquipmentListEntityViewModel and helpers
 //
@@ -141,7 +137,13 @@ const getNextEquipmentListHeadingEntryId = (list: EquipmentList) =>
     Math.min(-1, ...(list?.listHeadings ?? []).map((x) => x.id)) - 1;
 
 const addMultipleEquipment = (
-    entries: { equipment: Equipment; numberOfUnits?: number; isFree?: boolean; isHidden?: boolean }[],
+    entries: {
+        equipment: Equipment;
+        numberOfUnits?: number;
+        numberOfHours?: number;
+        isFree?: boolean;
+        isHidden?: boolean;
+    }[],
     list: EquipmentList,
     pricePlan: PricePlan,
     language: Language,
@@ -155,6 +157,10 @@ const addMultipleEquipment = (
 
         if (x.numberOfUnits !== undefined) {
             overrides.numberOfUnits = x.numberOfUnits;
+        }
+
+        if (x.numberOfHours !== undefined) {
+            overrides.numberOfHours = x.numberOfHours;
         }
 
         if (x.isHidden !== undefined) {
@@ -183,71 +189,54 @@ const addMultipleEquipment = (
     }
 };
 
-const addEquipment = (
+export const addEquipment = (
     equipment: Equipment,
     list: EquipmentList,
     pricePlan: PricePlan,
     language: Language,
     saveList: (updatedList: EquipmentList) => void,
     numberOfUnits?: number,
+    numberOfHours?: number,
 ) => {
-    addMultipleEquipment([{ equipment, numberOfUnits }], list, pricePlan, language, saveList);
+    addMultipleEquipment([{ equipment, numberOfUnits, numberOfHours }], list, pricePlan, language, saveList);
 };
 
-export const addFromSearch = (
-    res: SearchResultViewModel,
+export const addEquipmentPackage = (
+    equipmentPackage: EquipmentPackage,
     list: EquipmentList,
     pricePlan: PricePlan,
     language: Language,
     saveList: (updatedList: EquipmentList) => void,
 ) => {
-    switch (res.type) {
-        case ResultType.EQUIPMENT:
-            return fetch('/api/equipment/' + res.id)
-                .then((apiResponse) => getResponseContentOrError<IEquipmentObjectionModel>(apiResponse))
-                .then(toEquipment)
-                .then((equipment) => {
-                    addEquipment(equipment, list, pricePlan, language, saveList);
-                });
-
-        case ResultType.EQUIPMENTPACKAGE:
-            return fetch('/api/equipmentPackage/' + res.id)
-                .then((apiResponse) => getResponseContentOrError<IEquipmentPackageObjectionModel>(apiResponse))
-                .then(toEquipmentPackage)
-                .then((equipmentPackage) => {
-                    if (equipmentPackage.addAsHeading) {
-                        addHeadingEntry(
-                            language === Language.SV
-                                ? equipmentPackage.name
-                                : equipmentPackage.nameEN ?? equipmentPackage.name,
-                            list,
-                            pricePlan,
-                            language,
-                            saveList,
-                            language === Language.SV ? equipmentPackage.description : equipmentPackage.descriptionEN,
-                            equipmentPackage.equipmentEntries.filter((x) => x.equipment) as {
-                                equipment: Equipment;
-                                numberOfUnits?: number;
-                                isFree: boolean;
-                                isHidden: boolean;
-                            }[],
-                        );
-                        return;
-                    }
-                    addMultipleEquipment(
-                        equipmentPackage.equipmentEntries.filter((x) => x.equipment) as {
-                            equipment: Equipment;
-                            numberOfUnits?: number;
-                            isFree: boolean;
-                            isHidden: boolean;
-                        }[],
-                        list,
-                        pricePlan,
-                        language,
-                        saveList,
-                    );
-                });
+    if (equipmentPackage.addAsHeading) {
+        addHeadingEntry(
+            language === Language.SV ? equipmentPackage.name : equipmentPackage.nameEN ?? equipmentPackage.name,
+            list,
+            pricePlan,
+            language,
+            saveList,
+            language === Language.SV ? equipmentPackage.description : equipmentPackage.descriptionEN,
+            equipmentPackage.equipmentEntries.filter((x) => x.equipment) as {
+                equipment: Equipment;
+                numberOfUnits?: number;
+                isFree: boolean;
+                isHidden: boolean;
+            }[],
+        );
+        return;
     }
+    addMultipleEquipment(
+        equipmentPackage.equipmentEntries.filter((x) => x.equipment) as {
+            equipment: Equipment;
+            numberOfUnits?: number;
+            isFree: boolean;
+            isHidden: boolean;
+        }[],
+        list,
+        pricePlan,
+        language,
+        saveList,
+    );
 };
 
 export const addHeadingEntry = (
