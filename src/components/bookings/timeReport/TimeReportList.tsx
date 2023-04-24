@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Card, Button, DropdownButton, Dropdown, Modal, Row, Col, Form, InputGroup } from 'react-bootstrap';
+import { Card, Button, DropdownButton, Dropdown } from 'react-bootstrap';
 import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher, usersFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
-import { getAccountKindName, getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
+import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
 import {
     faAngleDown,
     faAngleUp,
@@ -13,9 +13,9 @@ import {
     faTrashCan,
     faStopwatch,
     faAdd,
+    faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { TimeReport, User } from '../../../models/interfaces';
-import { AccountKind } from '../../../models/enums/AccountKind';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import Skeleton from 'react-loading-skeleton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -28,10 +28,10 @@ import {
 } from '../../../lib/pricingUtils';
 import { useNotifications } from '../../../lib/useNotifications';
 import { DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
-import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
-import { formatDatetime, validDate, toDatetimeOrUndefined } from '../../../lib/datetimeUtils';
+import { sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import { formatDatetime, toBookingViewModel } from '../../../lib/datetimeUtils';
 import TimeReportAddButton from './TimeReportAddButton';
-import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
+import TimeReportModal from './TimeReportModal';
 
 type Props = {
     bookingId: number;
@@ -51,23 +51,16 @@ const TimeReportList: React.FC<Props> = ({
     setShowContent,
     defaultLaborHourlyRate,
 }: Props) => {
-    const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
+    const { data: data, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
     const { data: users } = useSwr('/api/users', usersFetcher);
 
-    const [timeReportToEditViewModel, setTimeReportToEditViewModel] = useState<
-        | (Partial<TimeReport> &
-              Pick<TimeReport, 'id' | 'bookingId'> & {
-                  editedStartDatetimeString?: string;
-                  editedEndDatetimeString?: string;
-              })
-        | null
-    >(null);
+    const [timeReportToEditViewModel, setTimeReportToEditViewModel] = useState<Partial<TimeReport> | null>(null);
 
     const { showSaveFailedNotification, showDeleteFailedNotification } = useNotifications();
 
     // Extract the lists
     //
-    const timeReports = booking?.timeReports;
+    const timeReports = data?.timeReports;
 
     const mutateTimeReports = (updatedTimeReports: TimeReport[]) => {
         if (!booking) {
@@ -78,7 +71,7 @@ const TimeReportList: React.FC<Props> = ({
 
     // Error handling
     //
-    if (error || (booking && !timeReports)) {
+    if (error || (data && !timeReports)) {
         return (
             <Card className="mb-3">
                 <Card.Header>
@@ -100,9 +93,11 @@ const TimeReportList: React.FC<Props> = ({
 
     // Loading skeleton
     //
-    if (!booking || !timeReports) {
+    if (!data || !timeReports) {
         return <Skeleton height={200} className="mb-3" />;
     }
+
+    const booking = toBookingViewModel(data);
 
     const updateTimeReport = (timeReport: TimeReport) => {
         const filteredTimeReports = timeReports?.map((x) => (x.id !== timeReport.id ? x : timeReport));
@@ -133,7 +128,7 @@ const TimeReportList: React.FC<Props> = ({
             headers: { 'Content-Type': 'application/json' },
         };
 
-        fetch('/api/bookings/' + timeReport.bookingId + '/timeReport/' + timeReport?.id, request)
+        fetch('/api/bookings/' + timeReport.bookingId + '/timeReport/' + timeReport.id, request)
             .then(getResponseContentOrError)
             .catch((error) => {
                 console.error(error);
@@ -178,16 +173,16 @@ const TimeReportList: React.FC<Props> = ({
             onUpdate={(newValue) =>
                 updateTimeReport({
                     ...timeReport,
-                    billableWorkingHours: toIntOrUndefined(newValue) ?? 0,
+                    billableWorkingHours: toIntOrUndefined(newValue) ?? timeReport.billableWorkingHours,
                 })
             }
             size="sm"
             readonly={readonly}
         >
-            {timeReport.billableWorkingHours ? (
-                timeReport.billableWorkingHours + ' h'
-            ) : (
+            {isNaN(timeReport.billableWorkingHours) ? (
                 <span className="text-muted font-italic">Dubbelklicka för att lägga till en tid</span>
+            ) : (
+                timeReport.billableWorkingHours + ' h'
             )}
         </DoubleClickToEdit>
     );
@@ -212,6 +207,10 @@ const TimeReportList: React.FC<Props> = ({
             {timeReport.user?.name ?? (
                 <span className="text-muted font-italic">Dubbelklicka för att välja användare</span>
             )}
+            <div className="mb-0 text-muted d-md-none">{timeReport.billableWorkingHours + ' h'}</div>
+            <div className="mb-0 text-muted d-md-none">
+                {formatNumberAsCurrency(addVAT(getTimeReportPrice(timeReport)))}
+            </div>
         </DoubleClickToEditDropdown>
     );
 
@@ -259,7 +258,7 @@ const TimeReportList: React.FC<Props> = ({
             },
             {
                 key: 'specification',
-                displayName: 'Specification',
+                displayName: 'Beskrivning',
                 getValue: (timeReport: TimeReport) =>
                     timeReport.startDatetime ? formatDatetime(timeReport.startDatetime) : '-',
                 getContentOverride: TimeReportSpecificationDisplayFn,
@@ -271,6 +270,7 @@ const TimeReportList: React.FC<Props> = ({
                 getContentOverride: TimeReportBillableWorkingHoursDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 150,
+                cellHideSize: 'md',
             },
             {
                 key: 'sum',
@@ -279,6 +279,7 @@ const TimeReportList: React.FC<Props> = ({
                 getContentOverride: TimeReportSumDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 20,
+                cellHideSize: 'md',
             },
             {
                 key: 'actions',
@@ -327,7 +328,6 @@ const TimeReportList: React.FC<Props> = ({
                         currentUser={currentUser}
                         disabled={readonly}
                         booking={booking}
-                        sortIndex={getNextSortIndex(booking.timeReports ?? [])}
                         onAdd={onAdd}
                         className="ml-2 mr-2 mb-2"
                         variant="secondary"
@@ -335,231 +335,28 @@ const TimeReportList: React.FC<Props> = ({
                         icon={faAdd}
                         defaultLaborHourlyRate={defaultLaborHourlyRate}
                     >
-                        Ny rad
+                        <FontAwesomeIcon icon={faPlus} className="mr-1" />
+                        Ny tidrapport
                     </TimeReportAddButton>
                 </>
             ) : null}
-            <Modal show={!!timeReportToEditViewModel} onHide={() => setTimeReportToEditViewModel(null)} size="lg">
-                {!!timeReportToEditViewModel ? (
-                    <Modal.Body>
-                        <Row>
-                            <Col md={4}>
-                                <Form.Group>
-                                    <Form.Label>Namn</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={timeReportToEditViewModel?.name}
-                                        onChange={(e) =>
-                                            setTimeReportToEditViewModel({
-                                                ...timeReportToEditViewModel,
-                                                name: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col md={4} xs={6}>
-                                <Form.Group>
-                                    <Form.Label>Fakturerade timmar</Form.Label>
-                                    <InputGroup>
-                                        <Form.Control
-                                            type="text"
-                                            value={timeReportToEditViewModel?.billableWorkingHours ?? ''}
-                                            onChange={(e) =>
-                                                setTimeReportToEditViewModel({
-                                                    ...timeReportToEditViewModel,
-                                                    billableWorkingHours: toIntOrUndefined(e.target.value),
-                                                })
-                                            }
-                                        />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>h</InputGroup.Text>
-                                        </InputGroup.Append>
-                                    </InputGroup>
-                                </Form.Group>
-                            </Col>
-                            <Col md={4} xs={6}>
-                                <Form.Group>
-                                    <Form.Label>Jobbade timmar</Form.Label>
-                                    <InputGroup>
-                                        <Form.Control
-                                            type="text"
-                                            value={timeReportToEditViewModel.actualWorkingHours ?? ''}
-                                            onChange={(e) =>
-                                                setTimeReportToEditViewModel({
-                                                    ...timeReportToEditViewModel,
-                                                    actualWorkingHours: toIntOrUndefined(e.target.value),
-                                                })
-                                            }
-                                        />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>h</InputGroup.Text>
-                                        </InputGroup.Append>
-                                    </InputGroup>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col md={4} xs={6}>
-                                <Form.Group>
-                                    <Form.Label>Pris per timme (ex. moms)</Form.Label>
-                                    <InputGroup>
-                                        <Form.Control
-                                            type="text"
-                                            value={timeReportToEditViewModel.pricePerHour ?? ''}
-                                            onChange={(e) =>
-                                                setTimeReportToEditViewModel({
-                                                    ...timeReportToEditViewModel,
-                                                    pricePerHour: toIntOrUndefined(e.target.value),
-                                                })
-                                            }
-                                        />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>kr/h</InputGroup.Text>
-                                        </InputGroup.Append>
-                                    </InputGroup>
-                                    <PriceWithVATPreview price={timeReportToEditViewModel.pricePerHour} />
-                                </Form.Group>
-                            </Col>
-                            <Col md={4} xs={6}>
-                                <Form.Group>
-                                    <Form.Label>Konto</Form.Label>
-                                    <Form.Control
-                                        as="select"
-                                        name="accountKind"
-                                        defaultValue={timeReportToEditViewModel.accountKind}
-                                        onChange={(e) =>
-                                            setTimeReportToEditViewModel({
-                                                ...timeReportToEditViewModel,
-                                                accountKind: toIntOrUndefined(e.target.value),
-                                            })
-                                        }
-                                    >
-                                        {timeReportToEditViewModel.accountKind ? null : (
-                                            <option value="">Välj kontotyp</option>
-                                        )}
-                                        <option value={AccountKind.EXTERNAL}>
-                                            {getAccountKindName(AccountKind.EXTERNAL)}
-                                        </option>
-                                        <option value={AccountKind.INTERNAL}>
-                                            {getAccountKindName(AccountKind.INTERNAL)}
-                                        </option>
-                                    </Form.Control>
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col>
-                                <Form.Group>
-                                    <Form.Label>Ansvarig medlem</Form.Label>
-                                    <Form.Control
-                                        as="select"
-                                        defaultValue={timeReportToEditViewModel.userId}
-                                        onChange={(e) =>
-                                            setTimeReportToEditViewModel({
-                                                ...timeReportToEditViewModel,
-                                                userId: toIntOrUndefined(e.target.value),
-                                            })
-                                        }
-                                    >
-                                        <option value="">Inte tilldelat</option>
-                                        {users?.map((user) => (
-                                            <option key={user.id} value={user.id}>
-                                                {user.name}
-                                            </option>
-                                        ))}
-                                    </Form.Control>
-                                </Form.Group>
-                            </Col>
-                            <Col>
-                                <Form.Group>
-                                    <Form.Label>Start</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={
-                                            timeReportToEditViewModel.editedStartDatetimeString ??
-                                            (timeReportToEditViewModel.startDatetime
-                                                ? formatDatetime(timeReportToEditViewModel.startDatetime)
-                                                : '-')
-                                        }
-                                        onChange={(e) =>
-                                            setTimeReportToEditViewModel({
-                                                ...timeReportToEditViewModel,
-                                                editedStartDatetimeString: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Form.Group>
-                            </Col>
-                            <Col>
-                                <Form.Group>
-                                    <Form.Label>Slut</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        value={
-                                            timeReportToEditViewModel.editedEndDatetimeString ??
-                                            (timeReportToEditViewModel.endDatetime
-                                                ? formatDatetime(timeReportToEditViewModel.endDatetime)
-                                                : '-')
-                                        }
-                                        onChange={(e) =>
-                                            setTimeReportToEditViewModel({
-                                                ...timeReportToEditViewModel,
-                                                editedEndDatetimeString: e.target.value,
-                                            })
-                                        }
-                                    />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                    </Modal.Body>
-                ) : null}
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setTimeReportToEditViewModel(null)}>
-                        Avbryt
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={() => {
-                            if (!timeReportToEditViewModel) {
-                                throw new Error('Invalid timeReportToEditViewModel');
-                            }
-
-                            // Since we are editing a partial model we need to set default values to any properties without value before saving
-                            const entryToSave: TimeReport = {
-                                bookingId: timeReportToEditViewModel.bookingId,
-                                id: timeReportToEditViewModel.id,
-                                userId: timeReportToEditViewModel.userId ?? 0,
-                                user: users?.find((x) => x.id === timeReportToEditViewModel.userId),
-                                accountKind: timeReportToEditViewModel.accountKind ?? AccountKind.INTERNAL,
-                                name: timeReportToEditViewModel.name ?? '',
-                                actualWorkingHours: timeReportToEditViewModel.actualWorkingHours ?? 0,
-                                billableWorkingHours: timeReportToEditViewModel.billableWorkingHours ?? 0,
-                                pricePerHour: timeReportToEditViewModel.pricePerHour ?? 0,
-                                startDatetime: timeReportToEditViewModel.editedStartDatetimeString
-                                    ? validDate(
-                                          toDatetimeOrUndefined(timeReportToEditViewModel.editedStartDatetimeString),
-                                      )
-                                        ? toDatetimeOrUndefined(timeReportToEditViewModel.editedStartDatetimeString)
-                                        : undefined
-                                    : timeReportToEditViewModel.startDatetime,
-                                endDatetime: timeReportToEditViewModel.editedEndDatetimeString
-                                    ? validDate(
-                                          toDatetimeOrUndefined(timeReportToEditViewModel.editedEndDatetimeString),
-                                      )
-                                        ? toDatetimeOrUndefined(timeReportToEditViewModel.editedEndDatetimeString)
-                                        : undefined
-                                    : timeReportToEditViewModel.endDatetime,
-                                sortIndex: timeReportToEditViewModel.sortIndex ?? 0,
-                            };
-                            updateTimeReport(entryToSave);
-                            setTimeReportToEditViewModel(null);
-                        }}
-                    >
-                        Spara
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <TimeReportModal
+                formId="form-edit-timeReport-modal"
+                booking={booking}
+                defaultLaborHourlyRate={defaultLaborHourlyRate}
+                setTimeReport={setTimeReportToEditViewModel}
+                timeReport={timeReportToEditViewModel ?? undefined}
+                onHide={() => {
+                    setTimeReportToEditViewModel(null);
+                }}
+                onSubmit={(timeReport) => {
+                    const tr: TimeReport = {
+                        ...toTimeReport(timeReport),
+                        user: users?.find((x) => x.id === timeReport.userId),
+                    };
+                    updateTimeReport(tr);
+                }}
+            ></TimeReportModal>
         </Card>
     );
 };

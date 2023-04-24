@@ -44,6 +44,11 @@ export const deleteTimeReport = async (id: number): Promise<boolean> => {
 
 export const validateTimeReportObjectionModel = (timeReport: TimeReportObjectionModel): boolean => {
     if (!timeReport) return false;
+    if (!timeReport.name) return false;
+
+    if (isNaN(timeReport.pricePerHour) || timeReport.pricePerHour < 0) return false;
+    if (isNaN(timeReport.billableWorkingHours) || timeReport.billableWorkingHours < 0) return false;
+    if (isNaN(timeReport.actualWorkingHours) || timeReport.billableWorkingHours < 0) return false;
 
     return true;
 };

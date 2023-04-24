@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Button, DropdownButton, Dropdown } from 'react-bootstrap';
 import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
-import { getResponseContentOrError } from '../../../lib/utils';
+import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
 import { toTimeEstimate } from '../../../lib/mappers/timeEstimate';
 import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';
@@ -17,6 +17,7 @@ import {
     faTrashCan,
     faClock,
     faPlus,
+    faGears,
 } from '@fortawesome/free-solid-svg-icons';
 import {
     addVAT,
@@ -27,6 +28,7 @@ import {
 import Skeleton from 'react-loading-skeleton';
 import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from './TimeEstimateAddButton';
+import TimeEstimateModal from './TimeEstimateModal';
 
 type Props = {
     bookingId: number;
@@ -47,6 +49,7 @@ const TimeEstimateList: React.FC<Props> = ({
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
     const { showSaveFailedNotification, showDeleteFailedNotification } = useNotifications();
+    const [timeEstimateToEditViewModel, setTimeEstimateToEditViewModel] = useState<Partial<TimeEstimate> | null>(null);
 
     // Extract the lists
     //
@@ -150,33 +153,17 @@ const TimeEstimateList: React.FC<Props> = ({
             onUpdate={(newValue) =>
                 updateTimeEstimate({
                     ...timeEstimate,
-                    numberOfHours: isNaN(parseInt(newValue)) ? 0 : parseInt(newValue),
+                    numberOfHours: toIntOrUndefined(newValue) ?? timeEstimate.numberOfHours,
                 })
             }
             size="sm"
             readonly={readonly}
         >
-            {timeEstimate.numberOfHours ? (
-                timeEstimate.numberOfHours + ' h'
-            ) : (
+            {isNaN(timeEstimate.numberOfHours) ? (
                 <span className="text-muted font-italic">Dubbelklicka för att lägga till en tid</span>
+            ) : (
+                timeEstimate.numberOfHours + ' h'
             )}
-        </DoubleClickToEdit>
-    );
-
-    const TimeEstimatePricePerHourDisplayFn = (timeEstimate: TimeEstimate) => (
-        <DoubleClickToEdit
-            value={timeEstimate.pricePerHour?.toString()}
-            onUpdate={(newValue) =>
-                updateTimeEstimate({
-                    ...timeEstimate,
-                    pricePerHour: isNaN(parseInt(newValue)) ? 0 : parseInt(newValue),
-                })
-            }
-            size="sm"
-            readonly={readonly}
-        >
-            {addVAT(timeEstimate.pricePerHour)} kr/h
         </DoubleClickToEdit>
     );
 
@@ -189,6 +176,9 @@ const TimeEstimateList: React.FC<Props> = ({
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
                 <Dropdown.Item onClick={() => deleteTimeEstimate(entry)} className="text-danger">
                     <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setTimeEstimateToEditViewModel(entry)}>
+                    <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
                 </Dropdown.Item>
             </DropdownButton>
         );
@@ -211,19 +201,11 @@ const TimeEstimateList: React.FC<Props> = ({
             },
             {
                 key: 'count',
-                displayName: 'Antal',
+                displayName: 'Timmar',
                 getValue: (timeEstimate: TimeEstimate) => timeEstimate.numberOfHours + ' h',
                 getContentOverride: TimeEstimateNumberOfHoursDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 150,
-            },
-            {
-                key: 'price',
-                displayName: 'A pris',
-                getValue: (timeEstimate: TimeEstimate) => addVAT(timeEstimate.pricePerHour) + ' kr/h',
-                getContentOverride: TimeEstimatePricePerHourDisplayFn,
-                columnWidth: 140,
-                textAlignment: 'right',
             },
             {
                 key: 'sum',
@@ -283,14 +265,37 @@ const TimeEstimateList: React.FC<Props> = ({
                         onAdd={onAdd}
                         variant="secondary"
                         size="sm"
-                        buttonType="button"
                         defaultLaborHourlyRate={defaultLaborHourlyRate}
                     >
                         <FontAwesomeIcon icon={faPlus} className="mr-1" />
-                        Ny rad
+                        Ny tiduppskattning
                     </TimeEstimateAddButton>
                 </>
             ) : null}
+            <TimeEstimateModal
+                formId="form-edit-timeEstimate-modal"
+                booking={booking}
+                defaultLaborHourlyRate={defaultLaborHourlyRate}
+                setTimeEstimate={setTimeEstimateToEditViewModel}
+                timeEstimate={timeEstimateToEditViewModel ?? undefined}
+                onHide={() => {
+                    setTimeEstimateToEditViewModel(null);
+                }}
+                onSubmit={() => {
+                    if (timeEstimateToEditViewModel?.id) {
+                        const timeEstimateToSend: TimeEstimate = {
+                            ...timeEstimateToEditViewModel,
+                            id: timeEstimateToEditViewModel.id,
+                            bookingId: booking.id,
+                            numberOfHours: timeEstimateToEditViewModel?.numberOfHours ?? 0,
+                            pricePerHour: timeEstimateToEditViewModel?.pricePerHour ?? 0,
+                            name: timeEstimateToEditViewModel?.name ?? '',
+                            sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
+                        };
+                        updateTimeEstimate(timeEstimateToSend);
+                    }
+                }}
+            ></TimeEstimateModal>
         </Card>
     );
 };

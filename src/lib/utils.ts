@@ -194,7 +194,7 @@ export const getLanguageName = (language: Language): string => {
 export const isMemberOfEnum = (value: number, enumObject: Record<string, unknown>): boolean =>
     !isNaN(Number(value)) && Object.keys(enumObject).indexOf(value.toString()) >= 0;
 
-// Parse int woth check for undefined/null
+// Parse int with check for undefined/null
 //
 export const toIntOrUndefined = (value: string | undefined | null, forceAbsoluteValue = false): number | undefined => {
     if (value === undefined || value === null || value.length === 0) {

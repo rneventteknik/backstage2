@@ -1088,7 +1088,6 @@ export async function seed(knex) {
             startDatetime: '2020-06-15 23:00',
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
-            accountKind: 1,
             sortIndex: 10,
         },
         {
@@ -1102,7 +1101,6 @@ export async function seed(knex) {
             startDatetime: '2020-06-15 23:00',
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 500,
-            accountKind: 1,
             sortIndex: 20,
         },
         {
@@ -1116,7 +1114,6 @@ export async function seed(knex) {
             startDatetime: '2020-06-15 23:00',
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
-            accountKind: 1,
             sortIndex: 30,
         },
         {
@@ -1130,7 +1127,6 @@ export async function seed(knex) {
             startDatetime: '2020-06-15 23:00',
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
-            accountKind: 1,
             sortIndex: 40,
         },
 
@@ -1146,7 +1142,6 @@ export async function seed(knex) {
             startDatetime: '2020-06-15 23:00',
             endDatetime: '2020-06-15 23:00',
             pricePerHour: 125,
-            accountKind: 1,
             sortIndex: 10,
         },
 
@@ -1162,7 +1157,6 @@ export async function seed(knex) {
             startDatetime: new Date().addHours(-1).toISOString(),
             endDatetime: new Date().addHours(1).toISOString(),
             pricePerHour: 250,
-            accountKind: 1,
             sortIndex: 10,
         },
         {
@@ -1176,7 +1170,6 @@ export async function seed(knex) {
             startDatetime: new Date().addHours(-1).toISOString(),
             endDatetime: new Date().addHours(1).toISOString(),
             pricePerHour: 250,
-            accountKind: 1,
             sortIndex: 20,
         },
         {
@@ -1190,7 +1183,6 @@ export async function seed(knex) {
             startDatetime: new Date().addHours(-1).toISOString(),
             endDatetime: new Date().addHours(1).toISOString(),
             pricePerHour: 250,
-            accountKind: 1,
             sortIndex: 30,
         },
 
@@ -1206,7 +1198,6 @@ export async function seed(knex) {
             startDatetime: new Date().addHours(-1).toISOString(),
             endDatetime: new Date().addHours(1).toISOString(),
             pricePerHour: 250,
-            accountKind: 1,
             sortIndex: 10,
         },
         {
@@ -1220,7 +1211,6 @@ export async function seed(knex) {
             startDatetime: new Date().addHours(-1).toISOString(),
             endDatetime: new Date().addHours(1).toISOString(),
             pricePerHour: 250,
-            accountKind: 0,
             sortIndex: 20,
         },
 
@@ -1236,7 +1226,6 @@ export async function seed(knex) {
             startDatetime: '2021-03-01 11:00',
             endDatetime: '2021-03-01 13:00',
             pricePerHour: 250,
-            accountKind: 1,
             sortIndex: 30,
         },
 
@@ -1252,7 +1241,6 @@ export async function seed(knex) {
             startDatetime: '2021-03-02 11:00',
             endDatetime: '2021-03-02 13:00',
             pricePerHour: 250,
-            accountKind: 1,
             sortIndex: 30,
         },
 
@@ -1268,7 +1256,6 @@ export async function seed(knex) {
             startDatetime: '2021-03-03 11:00',
             endDatetime: '2021-03-03 13:00',
             pricePerHour: 250,
-            accountKind: 1,
             sortIndex: 30,
         },
 
@@ -1284,7 +1271,6 @@ export async function seed(knex) {
             startDatetime: '2021-03-04 11:00',
             endDatetime: '2021-03-04 13:00',
             pricePerHour: 250,
-            accountKind: 1,
             sortIndex: 30,
         },
     ]);

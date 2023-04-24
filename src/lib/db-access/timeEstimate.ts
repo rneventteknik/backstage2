@@ -45,5 +45,9 @@ export const deleteTimeEstimate = async (id: number): Promise<boolean> => {
 export const validateTimeEstimateObjectionModel = (timeEstimate: TimeEstimateObjectionModel): boolean => {
     if (!timeEstimate) return false;
 
+    if (!timeEstimate.name) return false;
+
+    if (isNaN(timeEstimate.pricePerHour) || timeEstimate.pricePerHour < 0) return false;
+    if (isNaN(timeEstimate.numberOfHours) || timeEstimate.numberOfHours < 0) return false;
     return true;
 };

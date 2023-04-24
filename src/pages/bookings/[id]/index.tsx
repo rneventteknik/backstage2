@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Badge, Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, ListGroup, Row } from 'react-bootstrap';
+import { Badge, Button, ButtonGroup, Card, Col, Dropdown, ListGroup, Row } from 'react-bootstrap';
 import {
     getAccountKindName,
     getLanguageName,
@@ -45,7 +45,6 @@ import { Language } from '../../../models/enums/Language';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
 import { TimeEstimate, TimeReport } from '../../../models/interfaces';
-import { getNextSortIndex } from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/TimeEstimateAddButton';
 import TimeReportAddButton from '../../../components/bookings/timeReport/TimeReportAddButton';
 import RentalStatusTag from '../../../components/utils/RentalStatusTag';
@@ -208,34 +207,37 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     </Dropdown.Menu>
                 </Dropdown>
                 <IfNotReadonly currentUser={currentUser} and={booking.status !== Status.DONE}>
-                    <TimeReportAddButton
-                        booking={booking}
-                        disabled={booking.status === Status.DONE}
-                        sortIndex={getNextSortIndex(booking.timeEstimates ?? [])}
-                        onAdd={onAddTimeReport}
-                        currentUser={currentUser}
-                        variant="secondary"
-                        defaultLaborHourlyRate={defaultLaborHourlyRate}
-                    >
-                        <FontAwesomeIcon icon={faStopwatch} className="mr-1" />
-                        Rapportera tid
-                    </TimeReportAddButton>
-                </IfNotReadonly>
-                <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="secondary" />
-                <IfNotReadonly currentUser={currentUser} and={booking.status !== Status.DONE}>
-                    <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer">
-                        <TimeEstimateAddButton
+                    <Dropdown as={ButtonGroup}>
+                        <TimeReportAddButton
                             booking={booking}
-                            sortIndex={getNextSortIndex(booking.timeEstimates ?? [])}
-                            onAdd={onAddTimeEstimate}
-                            buttonType="dropdown"
+                            disabled={booking.status === Status.DONE}
+                            onAdd={onAddTimeReport}
+                            currentUser={currentUser}
+                            variant="secondary"
                             defaultLaborHourlyRate={defaultLaborHourlyRate}
                         >
-                            <FontAwesomeIcon icon={faClock} className="mr-1 fw" />
-                            Lägg till tidsuppskattning
-                        </TimeEstimateAddButton>
-                    </DropdownButton>
+                            <FontAwesomeIcon icon={faStopwatch} className="mr-1" />
+                            Rapportera tid
+                        </TimeReportAddButton>
+
+                        <Dropdown.Toggle split variant="secondary" id="dropdown-split-basic" />
+
+                        <Dropdown.Menu>
+                            <TimeEstimateAddButton
+                                booking={booking}
+                                disabled={booking.status === Status.DONE}
+                                onAdd={onAddTimeEstimate}
+                                defaultLaborHourlyRate={defaultLaborHourlyRate}
+                                variant="secondary"
+                                className="dropdown-item"
+                            >
+                                <FontAwesomeIcon icon={faClock} className="mr-1 fw" />
+                                Ny tidsuppskattning
+                            </TimeEstimateAddButton>
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </IfNotReadonly>
+                <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="secondary" />
                 <IfNotReadonly
                     currentUser={currentUser}
                     and={booking.status === Status.DONE && booking.paymentStatus === PaymentStatus.NOT_PAID}

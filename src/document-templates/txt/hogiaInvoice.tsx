@@ -65,20 +65,13 @@ export const getHogiaTxtInvoice = (
             }),
         ];
     });
-    const timeReportLines = [
-        formatTimeReports(
-            booking.timeReports?.filter((x) => x.accountKind == AccountKind.EXTERNAL),
-            AccountKind.EXTERNAL,
-            globalSettings,
-            t,
-        ),
-        formatTimeReports(
-            booking.timeReports?.filter((x) => x.accountKind == AccountKind.INTERNAL),
-            AccountKind.INTERNAL,
-            globalSettings,
-            t,
-        ),
-    ];
+
+    // Im only here until Markus will replace me
+    if (!booking.accountKind) {
+        throw 'Missing accountKind from booking';
+    }
+
+    const timeReportLines = formatTimeReports(booking.timeReports, booking.accountKind, globalSettings, t);
 
     const invoiceLines = [
         formatHeader(booking, globalSettings, t),
