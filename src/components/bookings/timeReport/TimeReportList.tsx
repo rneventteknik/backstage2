@@ -157,11 +157,11 @@ const TimeReportList: React.FC<Props> = ({
             </DoubleClickToEdit>
             {readonly ? (
                 <p className="text-muted">
-                    {formatDatetime(timeReport.startDatetime)} - {formatDatetime(timeReport.startDatetime)}
+                    {formatDatetime(timeReport.startDatetime)} - {formatDatetime(timeReport.endDatetime)}
                 </p>
             ) : (
                 <p role="button" onClick={() => setTimeReportToEditViewModel(timeReport)} className="text-muted">
-                    {formatDatetime(timeReport.startDatetime)} - {formatDatetime(timeReport.startDatetime)}
+                    {formatDatetime(timeReport.startDatetime)} - {formatDatetime(timeReport.endDatetime)}
                 </p>
             )}
         </>
