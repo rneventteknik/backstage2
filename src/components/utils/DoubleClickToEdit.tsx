@@ -169,7 +169,13 @@ export const DoubleClickToEditDropdown = <T,>({
 
     if (!isEditing) {
         return (
-            <span role="button" title={doubleClickToEditHelpText} onDoubleClick={() => setIsEditing(true)}>
+            <span
+                role="button"
+                title={doubleClickToEditHelpText}
+                tabIndex={0}
+                onDoubleClick={() => setIsEditing(true)}
+                onFocus={() => setIsEditing(true)}
+            >
                 {children}
             </span>
         );
