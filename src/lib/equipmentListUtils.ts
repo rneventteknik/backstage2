@@ -2,8 +2,22 @@ import { Language } from '../models/enums/Language';
 import { PricePlan } from '../models/enums/PricePlan';
 import { EquipmentPrice, Equipment, EquipmentPackage } from '../models/interfaces';
 import { EquipmentListEntry, EquipmentListHeading, EquipmentList } from '../models/interfaces/EquipmentList';
+import {
+    EquipmentListEntryObjectionModel,
+    EquipmentListHeadingObjectionModel,
+    IEquipmentListEntryObjectionModel,
+    IEquipmentListHeadingEntryObjectionModel,
+    IEquipmentListObjectionModel,
+} from '../models/objection-models/BookingObjectionModel';
+import {
+    toEquipmentListEntryObjectionModel,
+    toEquipmentListHeadingEntryObjectionModel,
+    toEquipmentListObjectionModel,
+} from './mappers/booking';
+import { getResponseContentOrError } from './utils';
 import { getNextSortIndex, moveItemUp, moveItemDown } from './sortIndexUtils';
-import { updateItemsInArrayById } from './utils';
+import { ITimeEstimateObjectionModel } from '../models/objection-models';
+import { toTimeEstimate } from './mappers/timeEstimate';
 
 // EquipmentListEntityViewModel and helpers
 //
@@ -147,7 +161,7 @@ const addMultipleEquipment = (
     list: EquipmentList,
     pricePlan: PricePlan,
     language: Language,
-    saveList: (updatedList: EquipmentList) => void,
+    addListEntries: (entries: EquipmentListEntry[], listId: number | undefined, headerId?: number | undefined) => void,
 ) => {
     let nextId = getNextEquipmentListEntryId(list);
     let nextSortIndex = getNextSortIndex([...list.listEntries, ...list.listHeadings]);
@@ -184,9 +198,7 @@ const addMultipleEquipment = (
         return entity;
     });
 
-    if (list) {
-        saveList({ ...list, listEntries: [...list.listEntries, ...entriesToAdd] });
-    }
+    addListEntries(entriesToAdd, list.id);
 };
 
 export const addEquipment = (
@@ -194,11 +206,11 @@ export const addEquipment = (
     list: EquipmentList,
     pricePlan: PricePlan,
     language: Language,
-    saveList: (updatedList: EquipmentList) => void,
+    addListEntries: (entries: EquipmentListEntry[], listId: number | undefined, headerId?: number | undefined) => void,
     numberOfUnits?: number,
     numberOfHours?: number,
 ) => {
-    addMultipleEquipment([{ equipment, numberOfUnits, numberOfHours }], list, pricePlan, language, saveList);
+    addMultipleEquipment([{ equipment, numberOfUnits, numberOfHours }], list, pricePlan, language, addListEntries);
 };
 
 export const addEquipmentPackage = (
@@ -206,15 +218,24 @@ export const addEquipmentPackage = (
     list: EquipmentList,
     pricePlan: PricePlan,
     language: Language,
-    saveList: (updatedList: EquipmentList) => void,
+    addListHeading: (heading: EquipmentListHeading, listId: number) => void,
+    addListEntries: (entries: EquipmentListEntry[], listId: number | undefined, headerId?: number | undefined) => void,
+    addTimeEstimate: (name: string, hours: number) => void,
 ) => {
+    if (equipmentPackage.estimatedHours > 0) {
+        addTimeEstimate(
+            language === Language.SV ? equipmentPackage.name : equipmentPackage.nameEN ?? equipmentPackage.name,
+            equipmentPackage.estimatedHours,
+        );
+    }
+
     if (equipmentPackage.addAsHeading) {
         addHeadingEntry(
             language === Language.SV ? equipmentPackage.name : equipmentPackage.nameEN ?? equipmentPackage.name,
             list,
             pricePlan,
             language,
-            saveList,
+            addListHeading,
             language === Language.SV ? equipmentPackage.description : equipmentPackage.descriptionEN,
             equipmentPackage.equipmentEntries.filter((x) => x.equipment) as {
                 equipment: Equipment;
@@ -235,7 +256,7 @@ export const addEquipmentPackage = (
         list,
         pricePlan,
         language,
-        saveList,
+        addListEntries,
     );
 };
 
@@ -244,7 +265,7 @@ export const addHeadingEntry = (
     list: EquipmentList,
     pricePlan: PricePlan,
     language: Language,
-    saveList: (updatedList: EquipmentList) => void,
+    addListHeading: (heading: EquipmentListHeading, listId: number) => void,
     headingDescription = '',
     entries: { equipment: Equipment; numberOfUnits?: number; isFree?: boolean; isHidden?: boolean }[] = [],
 ) => {
@@ -291,9 +312,7 @@ export const addHeadingEntry = (
         listEntries: entriesToAdd,
     };
 
-    if (list) {
-        saveList({ ...list, listHeadings: [...list.listHeadings, entity] });
-    }
+    addListHeading(entity, list.id);
 };
 
 export const importEquipmentEntries = (
@@ -304,11 +323,15 @@ export const importEquipmentEntries = (
         listEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[];
     }[],
     list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
+    addListEntriesAndHeadings: (
+        entries: EquipmentListEntry[],
+        headings: EquipmentListHeading[],
+        listId: number,
+    ) => void,
 ) => {
     let nextEntryId = getNextEquipmentListEntryId(list);
     let nextHeadingId = getNextEquipmentListHeadingEntryId(list);
-    let nextSortIndex = getNextSortIndex(list.listEntries);
+    let nextSortIndex = getNextSortIndex(getEntitiesToDisplay(list));
 
     const mapEntry = (x: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>) => {
         const entity: EquipmentListEntry = {
@@ -359,128 +382,39 @@ export const importEquipmentEntries = (
     };
 
     const equipmentListEntriesToImport: EquipmentListEntry[] = equipmentListEntries.map(mapEntry);
-    const equipmentListheadingsToImport: EquipmentListHeading[] = equipmentListHeadings.map(mapHeading);
+    const equipmentListHeadingsToImport: EquipmentListHeading[] = equipmentListHeadings.map(mapHeading);
 
-    saveList({
-        ...list,
-        listEntries: [...list.listEntries, ...equipmentListEntriesToImport],
-        listHeadings: [...list.listHeadings, ...equipmentListheadingsToImport],
-    });
+    addListEntriesAndHeadings(equipmentListEntriesToImport, equipmentListHeadingsToImport, list.id);
 };
 
 // Helper functions to update, delete and move list entries and headings
 //
-
-export const updateListEntry = (
-    listEntry: EquipmentListEntry,
-    list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
-) => {
-    const newEquipmentListEntries = updateItemsInArrayById(list.listEntries, listEntry);
-    const newEquipmentListHeadingEntries = list.listHeadings.map(
-        (x): EquipmentListHeading => ({
-            ...x,
-            listEntries: updateItemsInArrayById(x.listEntries, listEntry),
-        }),
-    );
-
-    saveList({
-        ...list,
-        listEntries: newEquipmentListEntries,
-        listHeadings: newEquipmentListHeadingEntries,
-    });
-};
-
-export const deleteListEntry = (
-    listEntry: EquipmentListEntry,
-    list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
-) => {
-    const newEquipmentListEntries = list.listEntries.filter((x) => x.id != listEntry.id);
-    const newEquipmentListHeadingEntries = list.listHeadings.map(
-        (x): EquipmentListHeading => ({
-            ...x,
-            listEntries: x.listEntries.filter((x) => x.id != listEntry.id),
-        }),
-    );
-
-    saveList({
-        ...list,
-        listEntries: newEquipmentListEntries,
-        listHeadings: newEquipmentListHeadingEntries,
-    });
-};
-
-export const updateListHeadingEntry = (
-    listHeaderEntry: EquipmentListHeading,
-    list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
-) => {
-    const newEquipmentListHeadingEntries = updateItemsInArrayById(list.listHeadings, listHeaderEntry);
-    saveList({ ...list, listHeadings: newEquipmentListHeadingEntries });
-};
-
-export const deleteListHeadingEntry = (
-    listHeaderEntry: EquipmentListHeading,
-    list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
-) => {
-    const newEquipmentListHeadingEntries = list.listHeadings.filter((x) => x.id != listHeaderEntry.id);
-    saveList({ ...list, listHeadings: newEquipmentListHeadingEntries });
-};
-
-export const saveViewModels = (
+export const saveSortIndexOfViewModels = (
     updatedEntities: EquipmentListEntityViewModel[],
-    list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
+    saveListEntriesAndHeadings: (
+        entries: Partial<EquipmentListEntry>[],
+        headings: Partial<EquipmentListHeading>[],
+    ) => void,
 ) => {
-    const newEquipmentListEntries = updateItemsInArrayById(
-        list.listEntries,
-        ...updatedEntities.filter((x) => viewModelIsEntity(x)).map((x) => getEquipmentListEntryFromViewModel(x)),
+    saveListEntriesAndHeadings(
+        updatedEntities
+            .filter((x) => viewModelIsEntity(x))
+            .map((x) => getEquipmentListEntryFromViewModel(x))
+            .map((x) => ({ id: x.id, sortIndex: x.sortIndex })),
+        updatedEntities
+            .filter((x) => viewModelIsHeading(x))
+            .map((x) => getEquipmentListHeadingFromViewModel(x))
+            .map((x) => ({ id: x.id, sortIndex: x.sortIndex })),
     );
-    const newEquipmentListHeadingEntries = updateItemsInArrayById(
-        list.listHeadings,
-        ...updatedEntities.filter((x) => viewModelIsHeading(x)).map((x) => getEquipmentListHeadingFromViewModel(x)),
-    );
-
-    saveList({
-        ...list,
-        listEntries: newEquipmentListEntries,
-        listHeadings: newEquipmentListHeadingEntries,
-    });
-};
-
-export const saveViewModelsOfHeading = (
-    updatedEntities: EquipmentListEntityViewModel[],
-    headingViewModel: EquipmentListEntityViewModel,
-    list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
-) => {
-    if (updatedEntities.some((x) => viewModelIsHeading(x))) {
-        throw new Error('Headings can only contain entities, not other headings');
-    }
-
-    const heading = getEquipmentListHeadingFromViewModel(headingViewModel);
-
-    const newEquipmentListEntries = updateItemsInArrayById(
-        heading.listEntries,
-        ...updatedEntities.map((x) => getEquipmentListEntryFromViewModel(x)),
-    );
-
-    const newHeading = {
-        ...heading,
-        listEntries: newEquipmentListEntries,
-    };
-
-    const newViewModel = getViewModel(newHeading, 'H');
-
-    saveViewModels([newViewModel], list, saveList);
 };
 
 export const moveListEntryUp = (
     viewModel: EquipmentListEntityViewModel,
     list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
+    saveListEntriesAndHeadings: (
+        entries: Partial<EquipmentListEntry>[],
+        headings: Partial<EquipmentListHeading>[],
+    ) => void,
 ) => {
     // Move view models in list
     const movedItems = moveItemUp(getPeersOfViewModel(viewModel, list), viewModel);
@@ -488,25 +422,17 @@ export const moveListEntryUp = (
     // Set sortindex of inner object as well
     movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
 
-    if (viewModel.parentId) {
-        const heading = getEntitiesToDisplay(list).find((x) => x.id === viewModel.parentId);
-
-        if (!heading) {
-            throw new Error('Invalid heading');
-        }
-
-        saveViewModelsOfHeading(movedItems, heading, list, saveList);
-        return;
-    }
-
     // Save view models
-    saveViewModels(movedItems, list, saveList);
+    saveSortIndexOfViewModels(movedItems, saveListEntriesAndHeadings);
 };
 
 export const moveListEntryDown = (
     viewModel: EquipmentListEntityViewModel,
     list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
+    saveListEntriesAndHeadings: (
+        entries: Partial<EquipmentListEntry>[],
+        headings: Partial<EquipmentListHeading>[],
+    ) => void,
 ) => {
     // Move view models in list
     const movedItems = moveItemDown(getPeersOfViewModel(viewModel, list), viewModel);
@@ -514,46 +440,25 @@ export const moveListEntryDown = (
     // Set sortindex of inner object as well
     movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
 
-    if (viewModel.parentId) {
-        const heading = getEntitiesToDisplay(list).find((x) => x.id === viewModel.parentId);
-
-        if (!heading) {
-            throw new Error('Invalid heading');
-        }
-
-        saveViewModelsOfHeading(movedItems, heading, list, saveList);
-        return;
-    }
-
     // Save view models
-    saveViewModels(movedItems, list, saveList);
+    saveSortIndexOfViewModels(movedItems, saveListEntriesAndHeadings);
 };
 
 export const moveListEntryIntoHeading = (
     listEntry: EquipmentListEntry,
     listHeadingEntryId: number | null,
     list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
+    saveListEntry: (
+        updatedListEntry: EquipmentListEntry,
+        objectionModelOverrides: Partial<EquipmentListEntryObjectionModel>,
+    ) => void,
 ) => {
     // Special case: move out of heading into equipment list
     if (!listHeadingEntryId) {
-        saveList({
-            ...list,
-            listEntries: [
-                ...list.listEntries,
-                {
-                    ...listEntry,
-                    sortIndex: getNextSortIndex(list.listEntries),
-                    equipmentListHeadingId: undefined,
-                    equipmentListId: undefined,
-                },
-            ],
-            listHeadings: list.listHeadings.map(
-                (heading): EquipmentListHeading => ({
-                    ...heading,
-                    listEntries: heading.listEntries.filter((x) => x.id !== listEntry.id),
-                }),
-            ),
+        saveListEntry(listEntry, {
+            equipmentListId: list.id,
+            equipmentListHeadingId: null,
+            sortIndex: getNextSortIndex(list.listEntries),
         });
         return;
     }
@@ -564,31 +469,147 @@ export const moveListEntryIntoHeading = (
         throw new Error('Invalid List Heading Entry');
     }
 
-    const updatedListHeadingEntry: EquipmentListHeading = {
-        ...listHeadingEntryToUpdate,
-        listEntries: [
-            ...listHeadingEntryToUpdate.listEntries,
-            {
-                ...listEntry,
-                sortIndex: getNextSortIndex(listHeadingEntryToUpdate.listEntries),
-                equipmentListHeadingId: undefined,
-                equipmentListId: undefined,
-            },
-        ],
-    };
-    const updatedEquipmentListHeadingEntries = updateItemsInArrayById(list.listHeadings, updatedListHeadingEntry);
-
-    saveList({
-        ...list,
-        listEntries: list.listEntries.filter((x) => x.id !== listEntry.id),
-        listHeadings: updatedEquipmentListHeadingEntries,
+    saveListEntry(listEntry, {
+        equipmentListId: null,
+        equipmentListHeadingId: listHeadingEntryToUpdate.id,
+        sortIndex: getNextSortIndex(listHeadingEntryToUpdate.listEntries),
     });
 };
 
 export const toggleHideListEntry = (
     entry: EquipmentListEntry,
-    list: EquipmentList,
-    saveList: (updatedList: EquipmentList) => void,
+    saveListEntry: (updatedListEntry: EquipmentListEntry) => void,
 ) => {
-    updateListEntry({ ...entry, isHidden: !entry.isHidden }, list, saveList);
+    saveListEntry({ ...entry, isHidden: !entry.isHidden });
+};
+
+// Functions to call the API
+//
+
+export const saveListApiCall = async (updatedList: EquipmentList, bookingId: number) => {
+    const body = { equipmentList: toEquipmentListObjectionModel(updatedList, bookingId) };
+
+    const request = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    };
+
+    return fetch('/api/bookings/' + bookingId + '/equipmentLists/' + updatedList.id, request).then((apiResponse) =>
+        getResponseContentOrError<IEquipmentListObjectionModel>(apiResponse),
+    );
+};
+
+export const saveListEntryApiCall = async (
+    entry: Partial<EquipmentListEntry>,
+    bookingId: number,
+    objectionModelOverrides: Partial<EquipmentListEntryObjectionModel> = {},
+) => {
+    const body = {
+        equipmentListEntry: { ...toEquipmentListEntryObjectionModel(entry), ...objectionModelOverrides },
+    };
+
+    const request = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    };
+
+    return fetch('/api/bookings/' + bookingId + '/equipmentListEntry/' + entry.id, request).then((apiResponse) =>
+        getResponseContentOrError<IEquipmentListEntryObjectionModel>(apiResponse),
+    );
+};
+
+export const saveListHeadingApiCall = async (
+    heading: Partial<EquipmentListHeading>,
+    bookingId: number,
+    objectionModelOverrides: Partial<EquipmentListHeadingObjectionModel> = {},
+) => {
+    const body = {
+        equipmentListHeading: { ...toEquipmentListHeadingEntryObjectionModel(heading), ...objectionModelOverrides },
+    };
+
+    const request = {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    };
+
+    return fetch('/api/bookings/' + bookingId + '/equipmentListHeading/' + heading.id, request).then((apiResponse) =>
+        getResponseContentOrError<IEquipmentListHeadingEntryObjectionModel>(apiResponse),
+    );
+};
+
+export const deleteListEntryApiCall = async (entry: EquipmentListEntry, bookingId: number) => {
+    const request = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+    };
+
+    return fetch('/api/bookings/' + bookingId + '/equipmentListEntry/' + entry.id, request).then((apiResponse) =>
+        getResponseContentOrError(apiResponse),
+    );
+};
+
+export const deleteListHeadingApiCall = async (heading: EquipmentListHeading, bookingId: number) => {
+    const request = {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+    };
+
+    return fetch('/api/bookings/' + bookingId + '/equipmentListHeading/' + heading.id, request).then((apiResponse) =>
+        getResponseContentOrError(apiResponse),
+    );
+};
+
+export const addListEntryApiCall = async (
+    entry: EquipmentListEntry,
+    bookingId: number,
+    listId: number | undefined,
+    headerId?: number | undefined,
+) => {
+    const body = {
+        equipmentListEntry: toEquipmentListEntryObjectionModel(entry),
+    };
+
+    const request = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    };
+
+    return fetch(
+        `/api/bookings/${bookingId}/equipmentListEntry?equipmentListId=${listId}&equipmentListHeadingId=${headerId}`,
+        request,
+    ).then((apiResponse) => getResponseContentOrError(apiResponse));
+};
+
+export const addListHeadingApiCall = async (heading: EquipmentListHeading, bookingId: number, listId: number) => {
+    const body = {
+        equipmentListHeading: toEquipmentListHeadingEntryObjectionModel(heading),
+    };
+
+    const request = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    };
+
+    return fetch(`/api/bookings/${bookingId}/equipmentListHeading?equipmentListId=${listId}`, request).then(
+        (apiResponse) => getResponseContentOrError(apiResponse),
+    );
+};
+
+export const addTimeEstimateApiCall = async (timeEstimate: ITimeEstimateObjectionModel, bookingId: number) => {
+    const body = { timeEstimate: timeEstimate };
+
+    const request = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    };
+
+    return fetch(`/api/bookings/${bookingId}/timeEstimate`, request)
+        .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
+        .then(toTimeEstimate);
 };

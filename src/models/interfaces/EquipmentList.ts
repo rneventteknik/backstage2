@@ -41,6 +41,6 @@ export interface EquipmentListEntry extends BaseEntityWithName {
     isHidden: boolean;
     account: string | null;
 
-    equipmentListId?: number;
-    equipmentListHeadingId?: number;
+    equipmentListId?: number | null;
+    equipmentListHeadingId?: number | null;
 }

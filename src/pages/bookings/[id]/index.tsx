@@ -301,6 +301,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         bookingId={booking.id}
                         readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
                         globalSettings={globalSettings}
+                        defaultLaborHourlyRate={defaultLaborHourlyRate}
                     />
                 </Col>
                 <Col xl={4}>

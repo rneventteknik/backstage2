@@ -6,22 +6,23 @@ import {
     respondWithInvalidDataResponse,
     respondWithInvalidMethodResponse,
 } from '../../../../../lib/apiResponses';
-import {
-    fetchEquipmentListsForBooking,
-    insertEquipmentList,
-    validateEquipmentListObjectionModel,
-} from '../../../../../lib/db-access/equipmentList';
 import { SessionContext, withSessionContext } from '../../../../../lib/sessionContext';
 import { fetchBooking } from '../../../../../lib/db-access';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
 import { logChangeToBooking, BookingChangelogEntryType } from '../../../../../lib/changelogUtils';
+import {
+    insertEquipmentListEntry,
+    validateEquipmentListEntryObjectionModel,
+} from '../../../../../lib/db-access/equipmentListEntry';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
         const bookingId = Number(req.query.bookingId);
+        const equipmentListId = Number(req.query.equipmentListId);
+        const equipmentListHeadingId = Number(req.query.equipmentListHeadingId);
 
-        if (isNaN(bookingId)) {
+        if (isNaN(bookingId) || (isNaN(equipmentListId) && isNaN(equipmentListHeadingId))) {
             respondWithEntityNotFoundResponse(res);
             return;
         }
@@ -38,31 +39,28 @@ const handler = withSessionContext(
                     return;
                 }
 
-                if (!req.body.equipmentList) {
-                    throw Error('Missing equipmentList parameter');
+                if (!req.body.equipmentListEntry) {
+                    throw Error('Missing equipmentListEntry parameter');
                 }
 
-                if (!validateEquipmentListObjectionModel(req.body.equipmentList)) {
+                if (!validateEquipmentListEntryObjectionModel(req.body.equipmentListEntry, true)) {
                     respondWithInvalidDataResponse(res);
                     return;
                 }
 
-                await insertEquipmentList(req.body.equipmentList, bookingId)
-                    .then(async (result) => {
-                        await logChangeToBooking(
+                await insertEquipmentListEntry(
+                    req.body.equipmentListEntry,
+                    isNaN(equipmentListId) ? undefined : equipmentListId,
+                    isNaN(equipmentListHeadingId) ? undefined : equipmentListHeadingId,
+                )
+                    .then((result) => {
+                        logChangeToBooking(
                             context.currentUser,
                             bookingId,
                             booking.name,
                             BookingChangelogEntryType.EQUIPMENTLIST,
                         ).then(() => res.status(200).json(result));
                     })
-                    .catch((err) => res.status(500).json({ statusCode: 500, message: err.message }));
-
-                break;
-
-            case 'GET':
-                await fetchEquipmentListsForBooking(bookingId)
-                    .then((result) => res.status(200).json(result))
                     .catch((err) => res.status(500).json({ statusCode: 500, message: err.message }));
 
                 break;

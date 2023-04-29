@@ -4,13 +4,19 @@ import useSwr from 'swr';
 import { bookingFetcher } from '../../../lib/fetchers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
-import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { getResponseContentOrError, updateItemsInArrayById } from '../../../lib/utils';
 import {
+    EquipmentListEntryObjectionModel,
+    EquipmentListHeadingObjectionModel,
     IBookingObjectionModel,
-    IEquipmentListObjectionModel,
 } from '../../../models/objection-models/BookingObjectionModel';
-import { toBooking, toEquipmentList, toEquipmentListObjectionModel } from '../../../lib/mappers/booking';
+import {
+    toBooking,
+    toEquipmentList,
+    toEquipmentListEntry,
+    toEquipmentListHeadingEntry,
+} from '../../../lib/mappers/booking';
 import { useNotifications } from '../../../lib/useNotifications';
 import Skeleton from 'react-loading-skeleton';
 import { formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
@@ -18,21 +24,30 @@ import { PricePlan } from '../../../models/enums/PricePlan';
 import { getNextSortIndex } from '../../../lib/sortIndexUtils';
 import EditEquipmentListEntryModal from './EditEquipmentListEntryModal';
 import {
+    addTimeEstimateApiCall,
+    addListEntryApiCall,
+    addListHeadingApiCall,
+    deleteListEntryApiCall,
+    deleteListHeadingApiCall,
     getEntitiesToDisplay,
     getEquipmentListEntryPrices,
     getNextEquipmentListEntryId,
-    updateListEntry,
+    saveListApiCall,
+    saveListEntryApiCall,
+    saveListHeadingApiCall,
 } from '../../../lib/equipmentListUtils';
 import { EquipmentPrice } from '../../../models/interfaces';
 import EquipmentListTable from './EquipmentListTable';
 import EquipmentListHeader from './EquipmentListHeader';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import { useLocalStorageState } from '../../../lib/useLocalStorageState';
+import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
 
 type Props = {
     bookingId: number;
     list: Partial<EquipmentList>;
     readonly: boolean;
+    defaultLaborHourlyRate: number;
     deleteListFn: (x: EquipmentList) => void;
     moveListFn: (x: EquipmentList, direction: 'UP' | 'DOWN') => void;
     isFirstFn: (x: EquipmentList) => boolean;
@@ -43,6 +58,7 @@ type Props = {
 const EquipmentListDisplay: React.FC<Props> = ({
     list: partialList,
     bookingId,
+    defaultLaborHourlyRate,
     deleteListFn: parentDeleteListFn,
     moveListFn: parentMoveListFn,
     isFirstFn: parentIsFirstFn,
@@ -52,7 +68,12 @@ const EquipmentListDisplay: React.FC<Props> = ({
 }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
-    const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
+    const {
+        showSaveSuccessNotification,
+        showSaveFailedNotification,
+        showCreateSuccessNotification,
+        showCreateFailedNotification,
+    } = useNotifications();
 
     const [showListContent, setShowListContent] = useLocalStorageState(
         'equipment-list-' + partialList.id + '-show-list-content',
@@ -109,19 +130,11 @@ const EquipmentListDisplay: React.FC<Props> = ({
     const saveList = (updatedList: EquipmentList) => {
         mutateList(updatedList);
 
-        const body = { equipmentList: toEquipmentListObjectionModel(updatedList, booking.id) };
-
-        const request = {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-
-        fetch('/api/bookings/' + booking.id + '/equipmentLists/' + partialList.id, request)
-            .then((apiResponse) => getResponseContentOrError<IEquipmentListObjectionModel>(apiResponse))
+        saveListApiCall(updatedList, booking.id)
             .then(toEquipmentList)
             .then(() => {
                 showSaveSuccessNotification('Listan');
+                mutate();
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -129,8 +142,216 @@ const EquipmentListDisplay: React.FC<Props> = ({
             });
     };
 
+    // Note: this function instantly calls the API to save on the server.
+    // We may want to add some debouncing or a delay to reduce the number of requests to the server.
+    const saveListEntry = (
+        entry: EquipmentListEntry,
+        objectionModelOverrides: Partial<EquipmentListEntryObjectionModel> = {},
+    ) => {
+        // Before updating serverside, do a local update. Note: This local update will not perform moving into our out from headings, that is only done server side.
+        const listToUpdate = booking.equipmentLists?.find(
+            (list) =>
+                list.listEntries.some((e) => e.id === entry.id) ||
+                list.listHeadings.some((heading) => heading.listEntries.some((e) => e.id === entry.id)),
+        );
+
+        if (!listToUpdate) {
+            throw new Error('Invalid list entry. No corresponding list found.');
+        }
+
+        mutateList({
+            ...listToUpdate,
+            listEntries: updateItemsInArrayById(listToUpdate.listEntries, entry),
+            listHeadings: listToUpdate.listHeadings.map((h) => ({
+                ...h,
+                listEntries: updateItemsInArrayById(h.listEntries, entry),
+            })),
+        });
+
+        saveListEntryApiCall(entry, booking.id, objectionModelOverrides)
+            .then(toEquipmentListEntry)
+            .then(() => {
+                showSaveSuccessNotification('Listposten');
+                mutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Listposten');
+                mutate();
+            });
+    };
+
+    const saveListHeading = (
+        heading: EquipmentListHeading,
+        objectionModelOverrides: Partial<EquipmentListHeadingObjectionModel> = {},
+    ) => {
+        // Before updating serverside, do a local update.
+        const listToUpdate = booking.equipmentLists?.find((list) => list.listHeadings.some((h) => h.id === heading.id));
+
+        if (!listToUpdate) {
+            throw new Error('Invalid list entry. No corresponding list found.');
+        }
+
+        mutateList({
+            ...listToUpdate,
+            listHeadings: updateItemsInArrayById(listToUpdate.listHeadings, heading),
+        });
+
+        saveListHeadingApiCall(heading, booking.id, objectionModelOverrides)
+            .then(toEquipmentListHeadingEntry)
+            .then(() => {
+                showSaveSuccessNotification('Listposten');
+                mutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Listposten');
+                mutate();
+            });
+    };
+
+    const saveListEntriesAndHeadings = async (
+        entries: Partial<EquipmentListEntry>[],
+        headings: Partial<EquipmentListHeading>[],
+    ) => {
+        // Local update of shallow properties to make the UI more snappy
+        mutate(
+            {
+                ...booking,
+                equipmentLists: booking.equipmentLists?.map((list) => ({
+                    ...list,
+                    listEntries: list.listEntries.map((entry) => ({
+                        ...entry,
+                        ...(entries.find((x) => x.id === entry.id) ?? {}),
+                    })),
+                    listHeadings: list.listHeadings.map((heading) => ({
+                        ...heading,
+                        ...(headings.find((x) => x.id === heading.id) ?? {}),
+                        listEntries: list.listEntries.map((entry) => ({
+                            ...entry,
+                            ...(entries.find((x) => x.id === entry.id) ?? {}),
+                        })),
+                    })),
+                })),
+            },
+            false,
+        );
+
+        Promise.all([
+            ...entries.map(async (entry) => saveListEntryApiCall(entry, booking.id)),
+            ...headings.map(async (heading) => saveListHeadingApiCall(heading, booking.id)),
+        ])
+            .then(() => {
+                showSaveSuccessNotification('Listan');
+                mutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Listan');
+                mutate();
+            });
+    };
+
     const deleteList = () => {
         parentDeleteListFn(list);
+    };
+
+    const deleteListEntry = (entry: EquipmentListEntry) => {
+        deleteListEntryApiCall(entry, booking.id)
+            .then(() => {
+                showSaveSuccessNotification('Listposten');
+                mutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Listposten');
+                mutate();
+            });
+    };
+
+    const deleteListHeading = (heading: EquipmentListHeading) => {
+        deleteListHeadingApiCall(heading, booking.id)
+            .then(() => {
+                showSaveSuccessNotification('Listposten');
+                mutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Listposten');
+                mutate();
+            });
+    };
+
+    const addListEntries = async (
+        entries: EquipmentListEntry[],
+        listId: number | undefined,
+        headerId?: number | undefined,
+    ) => {
+        Promise.all(entries.map(async (entry) => addListEntryApiCall(entry, booking.id, listId, headerId)))
+            .then(() => {
+                showSaveSuccessNotification('Listan');
+                mutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Listan');
+                mutate();
+            });
+    };
+
+    const addListHeading = async (heading: EquipmentListHeading, listId: number) => {
+        addListHeadingApiCall(heading, booking.id, listId)
+            .then(() => {
+                showSaveSuccessNotification('Listan');
+                mutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Listan');
+                mutate();
+            });
+    };
+
+    const addListEntriesAndHeadings = async (
+        entries: EquipmentListEntry[],
+        headings: EquipmentListHeading[],
+        listId: number,
+    ) => {
+        Promise.all([
+            ...entries.map(async (entry) => addListEntryApiCall(entry, booking.id, listId)),
+            ...headings.map(async (heading) => addListHeadingApiCall(heading, booking.id, listId)),
+        ])
+
+            .then(() => {
+                showSaveSuccessNotification('Listan');
+                mutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Listan');
+                mutate();
+            });
+    };
+
+    const addTimeEstimate = async (name: string, hours: number) => {
+        const timeEstimateToSend: ITimeEstimateObjectionModel = {
+            bookingId: booking.id,
+            numberOfHours: hours,
+            pricePerHour: defaultLaborHourlyRate,
+            name: name,
+            sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
+        };
+
+        addTimeEstimateApiCall(timeEstimateToSend, booking.id)
+            .then(() => {
+                showCreateSuccessNotification('Tidsestimatet');
+                mutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showCreateFailedNotification('Tidsestimatet');
+                mutate();
+            });
     };
 
     // Note: This function modifies the booking, not the list
@@ -159,7 +380,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
     // On edit-modal save
     const onEditModalSave = (entryToSave: EquipmentListEntry, isNew: boolean) => {
         if (!isNew) {
-            updateListEntry(entryToSave, list, saveList);
+            saveListEntry(entryToSave);
         } else {
             saveList({
                 ...list,
@@ -185,6 +406,8 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     returnalNote={booking.returnalNote}
                     showListContent={showListContent}
                     saveList={saveList}
+                    addListHeading={addListHeading}
+                    addListEntriesAndHeadings={addListEntriesAndHeadings}
                     deleteList={deleteList}
                     editEntry={setEquipmentListEntryToEditViewModel}
                     saveReturnalNote={saveReturnalNote}
@@ -202,7 +425,14 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     list={list}
                     pricePlan={booking.pricePlan}
                     language={booking.language}
-                    saveList={saveList}
+                    saveListEntry={saveListEntry}
+                    saveListHeading={saveListHeading}
+                    saveListEntriesAndHeadings={saveListEntriesAndHeadings}
+                    deleteListEntry={deleteListEntry}
+                    deleteListHeading={deleteListHeading}
+                    addListEntries={addListEntries}
+                    addListHeading={addListHeading}
+                    addTimeEstimate={addTimeEstimate}
                     editEntry={setEquipmentListEntryToEditViewModel}
                     readonly={readonly}
                 />

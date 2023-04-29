@@ -126,15 +126,15 @@ export const toEquipmentListObjectionModel = (
             : clientModel.usageEndDatetime,
         listEntries: clientModel.listEntries
             ? clientModel.listEntries.map((x) => toEquipmentListEntryObjectionModel(x))
-            : [],
+            : undefined,
         listHeadings: clientModel.listHeadings
             ? clientModel.listHeadings.map((x) => toEquipmentListHeadingEntryObjectionModel(x))
-            : [],
+            : undefined,
     };
 };
 
 export const toEquipmentListHeadingEntryObjectionModel = (
-    clientModel: EquipmentListHeading,
+    clientModel: Partial<EquipmentListHeading>,
 ): PartialDeep<IEquipmentListHeadingEntryObjectionModel, { recurseIntoArrays: true }> => {
     return {
         ...clientModel,
@@ -143,12 +143,12 @@ export const toEquipmentListHeadingEntryObjectionModel = (
         id: clientModel.id,
         listEntries: clientModel.listEntries
             ? clientModel.listEntries.map((x) => toEquipmentListEntryObjectionModel(x))
-            : [],
+            : undefined,
     };
 };
 
 export const toEquipmentListEntryObjectionModel = (
-    clientModel: EquipmentListEntry,
+    clientModel: Partial<EquipmentListEntry>,
 ): Partial<IEquipmentListEntryObjectionModel> => {
     return {
         ...clientModel,

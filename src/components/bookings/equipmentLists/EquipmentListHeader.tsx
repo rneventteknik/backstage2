@@ -15,7 +15,7 @@ import {
     faRightToBracket,
     faFileDownload,
 } from '@fortawesome/free-solid-svg-icons';
-import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
 import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
 import { addVAT, formatNumberAsCurrency, getEquipmentListPrice } from '../../../lib/pricingUtils';
@@ -47,6 +47,12 @@ type Props = {
     returnalNote: string | undefined;
     showListContent: boolean;
     saveList: (updatedList: EquipmentList) => void;
+    addListHeading: (heading: EquipmentListHeading, listId: number) => void;
+    addListEntriesAndHeadings: (
+        entries: EquipmentListEntry[],
+        headings: EquipmentListHeading[],
+        listId: number,
+    ) => void;
     deleteList: () => void;
     editEntry: (entry: Partial<EquipmentListEntry>) => void;
     saveReturnalNote: (returnalNote: string) => void;
@@ -68,6 +74,8 @@ const EquipmentListHeader: React.FC<Props> = ({
     returnalNote,
     showListContent,
     saveList,
+    addListHeading,
+    addListEntriesAndHeadings,
     deleteList,
     editEntry,
     saveReturnalNote,
@@ -172,7 +180,9 @@ const EquipmentListHeader: React.FC<Props> = ({
                                 </Dropdown.Item>
 
                                 <Dropdown.Item
-                                    onClick={() => addHeadingEntry('Ny rubrikrad', list, pricePlan, language, saveList)}
+                                    onClick={() =>
+                                        addHeadingEntry('Ny rubrikrad', list, pricePlan, language, addListHeading)
+                                    }
                                 >
                                     <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" />
                                     Lägg till rubrikrad
@@ -186,7 +196,12 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     show={showImportModal}
                                     onHide={() => setShowImportModal(false)}
                                     onImport={(listEntries, listHeadings) =>
-                                        importEquipmentEntries(listEntries, listHeadings, list, saveList)
+                                        importEquipmentEntries(
+                                            listEntries,
+                                            listHeadings,
+                                            list,
+                                            addListEntriesAndHeadings,
+                                        )
                                     }
                                     pricePlan={pricePlan}
                                     language={language}

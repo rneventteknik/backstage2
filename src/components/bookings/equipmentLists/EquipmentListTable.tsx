@@ -15,7 +15,7 @@ import {
     faEye,
     faDollarSign,
 } from '@fortawesome/free-solid-svg-icons';
-import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
 import { toIntOrUndefined, reduceSumFn, getResponseContentOrError } from '../../../lib/utils';
 import EquipmentSearch, { ResultType } from '../../EquipmentSearch';
@@ -38,8 +38,6 @@ import { Language } from '../../../models/enums/Language';
 import {
     addEquipment,
     addEquipmentPackage,
-    deleteListEntry,
-    deleteListHeadingEntry,
     EquipmentListEntityViewModel,
     getDefaultListEntryFromEquipment,
     getEntitiesToDisplay,
@@ -52,11 +50,8 @@ import {
     moveListEntryDown,
     moveListEntryIntoHeading,
     moveListEntryUp,
-    saveViewModels,
-    saveViewModelsOfHeading,
+    saveSortIndexOfViewModels,
     toggleHideListEntry,
-    updateListEntry,
-    updateListHeadingEntry,
     viewModelIsHeading,
 } from '../../../lib/equipmentListUtils';
 import SelectNumberOfUnitsAndHoursModal from './SelectNumberOfUnitsAndHoursModal';
@@ -68,12 +63,36 @@ type Props = {
     list: EquipmentList;
     pricePlan: PricePlan;
     language: Language;
-    saveList: (updatedList: EquipmentList) => void;
+    saveListEntry: (entry: EquipmentListEntry) => void;
+    saveListHeading: (heading: EquipmentListHeading) => void;
+    saveListEntriesAndHeadings: (
+        entries: Partial<EquipmentListEntry>[],
+        headings: Partial<EquipmentListHeading>[],
+    ) => void;
+    deleteListEntry: (entry: EquipmentListEntry) => void;
+    deleteListHeading: (heading: EquipmentListHeading) => void;
+    addListEntries: (entries: EquipmentListEntry[], listId: number | undefined, headerId?: number | undefined) => void;
+    addListHeading: (heading: EquipmentListHeading, listId: number) => void;
+    addTimeEstimate: (name: string, hours: number) => void;
     editEntry: (entry: EquipmentListEntry) => void;
     readonly: boolean;
 };
 
-const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveList, editEntry, readonly }: Props) => {
+const EquipmentListTable: React.FC<Props> = ({
+    list,
+    pricePlan,
+    language,
+    saveListEntry,
+    saveListHeading,
+    saveListEntriesAndHeadings,
+    deleteListEntry,
+    deleteListHeading,
+    addListEntries,
+    addListHeading,
+    addTimeEstimate,
+    editEntry,
+    readonly,
+}: Props) => {
     const [equipmentToAdd, setEquipmentToAdd] = useState<Equipment | null>(null);
 
     // Helper functions
@@ -93,14 +112,10 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                         <DoubleClickToEdit
                             value={heading.name}
                             onUpdate={(newValue) =>
-                                updateListHeadingEntry(
-                                    {
-                                        ...heading,
-                                        name: newValue && newValue.length > 0 ? newValue : heading.name,
-                                    },
-                                    list,
-                                    saveList,
-                                )
+                                saveListHeading({
+                                    ...heading,
+                                    name: newValue && newValue.length > 0 ? newValue : heading.name,
+                                })
                             }
                             size="sm"
                             readonly={readonly}
@@ -115,14 +130,10 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                         <DoubleClickToEdit
                             value={heading.description}
                             onUpdate={(newValue) =>
-                                updateListHeadingEntry(
-                                    {
-                                        ...heading,
-                                        description: newValue && newValue.length > 0 ? newValue : heading.description,
-                                    },
-                                    list,
-                                    saveList,
-                                )
+                                saveListHeading({
+                                    ...heading,
+                                    description: newValue && newValue.length > 0 ? newValue : heading.description,
+                                })
                             }
                             size="sm"
                             readonly={readonly}
@@ -148,11 +159,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                     <DoubleClickToEdit
                         value={entry.name}
                         onUpdate={(newValue) =>
-                            updateListEntry(
-                                { ...entry, name: newValue && newValue.length > 0 ? newValue : entry.name },
-                                list,
-                                saveList,
-                            )
+                            saveListEntry({ ...entry, name: newValue && newValue.length > 0 ? newValue : entry.name })
                         }
                         size="sm"
                         readonly={readonly}
@@ -202,7 +209,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                 <div className="mb-0">
                     <DoubleClickToEdit
                         value={entry.description}
-                        onUpdate={(newValue) => updateListEntry({ ...entry, description: newValue }, list, saveList)}
+                        onUpdate={(newValue) => saveListEntry({ ...entry, description: newValue })}
                         size="sm"
                         readonly={readonly}
                     >
@@ -240,7 +247,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
             <DoubleClickToEdit
                 value={entry.numberOfUnits?.toString()}
                 onUpdate={(newValue) =>
-                    updateListEntry({ ...entry, numberOfUnits: toIntOrUndefined(newValue, true) ?? 0 }, list, saveList)
+                    saveListEntry({ ...entry, numberOfUnits: toIntOrUndefined(newValue, true) ?? 0 })
                 }
                 size="sm"
                 readonly={readonly}
@@ -266,7 +273,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
             <DoubleClickToEdit
                 value={entry.numberOfHours.toString()}
                 onUpdate={(newValue) =>
-                    updateListEntry({ ...entry, numberOfHours: toIntOrUndefined(newValue, true) ?? 0 }, list, saveList)
+                    saveListEntry({ ...entry, numberOfHours: toIntOrUndefined(newValue, true) ?? 0 })
                 }
                 size="sm"
                 readonly={readonly}
@@ -308,20 +315,12 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                     optionKeyFn={(x) => x.id.toString()}
                     onChange={(newPrice) =>
                         newPrice && newPrice.id != -1
-                            ? updateListEntry(
-                                  { ...entry, ...getEquipmentListEntryPrices(newPrice, pricePlan) },
-                                  list,
-                                  saveList,
-                              )
+                            ? saveListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice, pricePlan) })
                             : null
                     }
                     onClose={(newPrice) =>
                         newPrice && newPrice.id != -1
-                            ? updateListEntry(
-                                  { ...entry, ...getEquipmentListEntryPrices(newPrice, pricePlan) },
-                                  list,
-                                  saveList,
-                              )
+                            ? saveListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice, pricePlan) })
                             : null
                     }
                     readonly={readonly}
@@ -377,22 +376,19 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                     {readonly ? null : (
                         <>
                             <Dropdown.Item
-                                onClick={() => moveListEntryUp(viewModel, list, saveList)}
+                                onClick={() => moveListEntryUp(viewModel, list, saveListEntriesAndHeadings)}
                                 disabled={isFirst(listEntries, viewModel)}
                             >
                                 <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
                             </Dropdown.Item>
                             <Dropdown.Item
-                                onClick={() => moveListEntryDown(viewModel, list, saveList)}
+                                onClick={() => moveListEntryDown(viewModel, list, saveListEntriesAndHeadings)}
                                 disabled={isLast(listEntries, viewModel)}
                             >
                                 <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
                             </Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item
-                                onClick={() => deleteListHeadingEntry(heading, list, saveList)}
-                                className="text-danger"
-                            >
+                            <Dropdown.Item onClick={() => deleteListHeading(heading)} className="text-danger">
                                 <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
                             </Dropdown.Item>
                         </>
@@ -408,13 +404,13 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                 {readonly ? null : (
                     <>
                         <Dropdown.Item
-                            onClick={() => moveListEntryUp(viewModel, list, saveList)}
+                            onClick={() => moveListEntryUp(viewModel, list, saveListEntriesAndHeadings)}
                             disabled={isFirst(peers, viewModel)}
                         >
                             <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
                         </Dropdown.Item>
                         <Dropdown.Item
-                            onClick={() => moveListEntryDown(viewModel, list, saveList)}
+                            onClick={() => moveListEntryDown(viewModel, list, saveListEntriesAndHeadings)}
                             disabled={isLast(peers, viewModel)}
                         >
                             <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
@@ -422,7 +418,9 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                         <Dropdown.Divider />
                         {getHeaderOfEntity(entry, list) ? (
                             <>
-                                <Dropdown.Item onClick={() => moveListEntryIntoHeading(entry, null, list, saveList)}>
+                                <Dropdown.Item
+                                    onClick={() => moveListEntryIntoHeading(entry, null, list, saveListEntry)}
+                                >
                                     <FontAwesomeIcon icon={faAngleLeft} className="mr-1 fa-fw" /> Flytta ut ur{' '}
                                     {getHeaderOfEntity(entry, list)?.name}
                                 </Dropdown.Item>
@@ -431,7 +429,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                             getSortedList(list.listHeadings).map((heading) => (
                                 <Dropdown.Item
                                     key={heading.id}
-                                    onClick={() => moveListEntryIntoHeading(entry, heading.id, list, saveList)}
+                                    onClick={() => moveListEntryIntoHeading(entry, heading.id, list, saveListEntry)}
                                 >
                                     <FontAwesomeIcon icon={faAngleRight} className="mr-1 fa-fw" /> Flytta in i{' '}
                                     {heading.name}
@@ -446,7 +444,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                 </Dropdown.Item>
                 {readonly ? null : (
                     <>
-                        <Dropdown.Item onClick={() => toggleHideListEntry(entry, list, saveList)}>
+                        <Dropdown.Item onClick={() => toggleHideListEntry(entry, saveListEntry)}>
                             <FontAwesomeIcon icon={entry.isHidden ? faEye : faEyeSlash} className="mr-1 fa-fw" />{' '}
                             {entry.isHidden ? 'Sluta dölja rad för kund' : 'Dölj rad för kund'}
                         </Dropdown.Item>
@@ -457,7 +455,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                         <Dropdown.Item
                             onClick={() =>
                                 entry.equipment
-                                    ? updateListEntry(
+                                    ? saveListEntry(
                                           getDefaultListEntryFromEquipment(
                                               entry.equipment,
                                               pricePlan,
@@ -465,15 +463,13 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                                               entry.id,
                                               entry.sortIndex,
                                           ),
-                                          list,
-                                          saveList,
                                       )
                                     : null
                             }
                         >
                             <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" /> Återställ rad
                         </Dropdown.Item>
-                        <Dropdown.Item onClick={() => deleteListEntry(entry, list, saveList)} className="text-danger">
+                        <Dropdown.Item onClick={() => deleteListEntry(entry)} className="text-danger">
                             <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
                         </Dropdown.Item>
                     </>
@@ -499,7 +495,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
             movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
 
             // Save list
-            saveViewModels(movedItems, list, saveList);
+            saveSortIndexOfViewModels(movedItems, saveListEntriesAndHeadings);
 
             return;
         }
@@ -518,7 +514,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
             movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
 
             // Save list
-            saveViewModelsOfHeading(movedItems, heading, list, saveList);
+            saveSortIndexOfViewModels(movedItems, saveListEntriesAndHeadings);
 
             return;
         }
@@ -651,7 +647,15 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                                         )
                                         .then(toEquipmentPackage)
                                         .then((equipmentPackage) => {
-                                            addEquipmentPackage(equipmentPackage, list, pricePlan, language, saveList);
+                                            addEquipmentPackage(
+                                                equipmentPackage,
+                                                list,
+                                                pricePlan,
+                                                language,
+                                                addListHeading,
+                                                addListEntries,
+                                                addTimeEstimate,
+                                            );
                                         });
                             }
                         }}
@@ -670,7 +674,7 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                                     list,
                                     pricePlan,
                                     language,
-                                    saveList,
+                                    addListEntries,
                                     numberOfUnits,
                                     numberOfHours,
                                 );

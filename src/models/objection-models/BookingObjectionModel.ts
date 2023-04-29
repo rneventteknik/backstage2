@@ -277,8 +277,8 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
     isHidden: boolean;
     account: string | null;
 
-    equipmentListId?: number;
-    equipmentListHeadingId?: number;
+    equipmentListId?: number | null;
+    equipmentListHeadingId?: number | null;
 }
 
 export class EquipmentListEntryObjectionModel extends Model implements IEquipmentListEntryObjectionModel {
@@ -324,8 +324,8 @@ export class EquipmentListEntryObjectionModel extends Model implements IEquipmen
     isHidden!: boolean;
     account!: string | null;
 
-    equipmentListId?: number;
-    equipmentListHeadingId?: number;
+    equipmentListId?: number | null;
+    equipmentListHeadingId?: number | null;
 }
 
 export interface IBookingChangelogEntryObjectionModel extends BaseObjectionModelWithName {

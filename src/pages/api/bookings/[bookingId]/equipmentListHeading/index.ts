@@ -6,22 +6,22 @@ import {
     respondWithInvalidDataResponse,
     respondWithInvalidMethodResponse,
 } from '../../../../../lib/apiResponses';
-import {
-    fetchEquipmentListsForBooking,
-    insertEquipmentList,
-    validateEquipmentListObjectionModel,
-} from '../../../../../lib/db-access/equipmentList';
 import { SessionContext, withSessionContext } from '../../../../../lib/sessionContext';
 import { fetchBooking } from '../../../../../lib/db-access';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
 import { logChangeToBooking, BookingChangelogEntryType } from '../../../../../lib/changelogUtils';
+import {
+    insertEquipmentListHeading,
+    validateEquipmentListHeadingObjectionModel,
+} from '../../../../../lib/db-access/equipmentListHeading';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
         const bookingId = Number(req.query.bookingId);
+        const equipmentListId = Number(req.query.equipmentListId);
 
-        if (isNaN(bookingId)) {
+        if (isNaN(bookingId) || isNaN(equipmentListId)) {
             respondWithEntityNotFoundResponse(res);
             return;
         }
@@ -38,16 +38,16 @@ const handler = withSessionContext(
                     return;
                 }
 
-                if (!req.body.equipmentList) {
-                    throw Error('Missing equipmentList parameter');
+                if (!req.body.equipmentListHeading) {
+                    throw Error('Missing equipmentListHeading parameter');
                 }
 
-                if (!validateEquipmentListObjectionModel(req.body.equipmentList)) {
+                if (!validateEquipmentListHeadingObjectionModel(req.body.equipmentListHeading)) {
                     respondWithInvalidDataResponse(res);
                     return;
                 }
 
-                await insertEquipmentList(req.body.equipmentList, bookingId)
+                await insertEquipmentListHeading(req.body.equipmentListHeading, equipmentListId)
                     .then(async (result) => {
                         await logChangeToBooking(
                             context.currentUser,
@@ -56,13 +56,6 @@ const handler = withSessionContext(
                             BookingChangelogEntryType.EQUIPMENTLIST,
                         ).then(() => res.status(200).json(result));
                     })
-                    .catch((err) => res.status(500).json({ statusCode: 500, message: err.message }));
-
-                break;
-
-            case 'GET':
-                await fetchEquipmentListsForBooking(bookingId)
-                    .then((result) => res.status(200).json(result))
                     .catch((err) => res.status(500).json({ statusCode: 500, message: err.message }));
 
                 break;

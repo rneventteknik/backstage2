@@ -1,13 +1,12 @@
 import React, { ReactNode, useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
-import { getResponseContentOrError } from '../../../lib/utils';
-import { toTimeEstimate } from '../../../lib/mappers/timeEstimate';
 import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Booking } from '../../../models/interfaces';
 import TimeEstimateModal from './TimeEstimateModal';
 import { getNextSortIndex } from '../../../lib/sortIndexUtils';
+import { addTimeEstimateApiCall } from '../../../lib/equipmentListUtils';
 
 type Props = {
     booking: Booking;
@@ -27,17 +26,7 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
     const [timeEstimateViewModel, setTimeEstimateViewModel] = useState<Partial<TimeEstimate> | undefined>(undefined);
 
     const addTimeEstimate = async (timeEstimate: ITimeEstimateObjectionModel) => {
-        const body = { timeEstimate: timeEstimate };
-
-        const request = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-
-        fetch('/api/bookings/' + booking.id + '/timeEstimate', request)
-            .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
-            .then(toTimeEstimate)
+        addTimeEstimateApiCall(timeEstimate, booking.id)
             .then((data) => {
                 onAdd(data);
             })

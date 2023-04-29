@@ -27,13 +27,14 @@ import { KeyValue } from '../../../models/interfaces/KeyValue';
 type Props = {
     bookingId: number;
     readonly: boolean;
+    defaultLaborHourlyRate: number;
     globalSettings: KeyValue[];
 };
 
 // This component only contains logic to create and delete lists. Everything else
 // is handled by the EquipmentListDisplay component which manages it's list internally.
 //
-const EquipmentLists: React.FC<Props> = ({ bookingId, readonly, globalSettings }: Props) => {
+const EquipmentLists: React.FC<Props> = ({ bookingId, readonly, defaultLaborHourlyRate, globalSettings }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
     const {
@@ -181,6 +182,7 @@ const EquipmentLists: React.FC<Props> = ({ bookingId, readonly, globalSettings }
                     key={x.id}
                     bookingId={bookingId}
                     readonly={readonly}
+                    defaultLaborHourlyRate={defaultLaborHourlyRate}
                     deleteListFn={deleteList}
                     moveListFn={moveList}
                     isFirstFn={(list: EquipmentList) => isFirst(equipmentLists, list)}

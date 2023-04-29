@@ -6,6 +6,7 @@ import {
     EquipmentListHeadingObjectionModel,
 } from '../../models/objection-models/BookingObjectionModel';
 import { ensureDatabaseIsInitialized } from '../database';
+import { validateEquipmentListEntryObjectionModel } from './equipmentListEntry';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const fetchEquipmentList = async (
@@ -195,21 +196,11 @@ export const validateEquipmentListObjectionModel = (equipmentList: EquipmentList
 
     if (equipmentList.name === null) return false;
 
-    if (equipmentList.listEntries && equipmentList.listEntries.some((x) => !validatelistEntriesObjectionModel(x)))
+    if (
+        equipmentList.listEntries &&
+        equipmentList.listEntries.some((x) => !validateEquipmentListEntryObjectionModel(x, true))
+    )
         return false;
-
-    return true;
-};
-
-export const validatelistEntriesObjectionModel = (equipmentListEntry: EquipmentListEntryObjectionModel): boolean => {
-    if (!equipmentListEntry) return false;
-
-    if (equipmentListEntry.name === null) return false;
-
-    if (isNaN(equipmentListEntry.pricePerHour) || equipmentListEntry.pricePerHour < 0) return false;
-    if (isNaN(equipmentListEntry.pricePerUnit) || equipmentListEntry.pricePerUnit < 0) return false;
-    if (isNaN(equipmentListEntry.numberOfHours) || equipmentListEntry.numberOfHours < 0) return false;
-    if (isNaN(equipmentListEntry.numberOfUnits) || equipmentListEntry.numberOfUnits < 0) return false;
 
     return true;
 };

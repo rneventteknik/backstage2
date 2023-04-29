@@ -35,6 +35,11 @@ const handler = withSessionContext(
 
         const booking = await fetchBookingWithEquipmentLists(bookingId);
 
+        if (!booking.equipmentLists.some((list) => list.id === equipmentListId)) {
+            respondWithEntityNotFoundResponse(res);
+            return;
+        }
+
         switch (req.method) {
             case 'GET':
                 await fetchEquipmentList(equipmentListId)
