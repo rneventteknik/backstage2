@@ -227,7 +227,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     listHeadings: list.listHeadings.map((heading) => ({
                         ...heading,
                         ...(headings.find((x) => x.id === heading.id) ?? {}),
-                        listEntries: list.listEntries.map((entry) => ({
+                        listEntries: heading.listEntries.map((entry) => ({
                             ...entry,
                             ...(entries.find((x) => x.id === entry.id) ?? {}),
                         })),
