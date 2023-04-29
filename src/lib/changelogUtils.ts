@@ -1,5 +1,6 @@
 import { PaymentStatus } from '../models/enums/PaymentStatus';
 import { RentalStatus } from '../models/enums/RentalStatus';
+import { SalaryStatus } from '../models/enums/SalaryStatus';
 import { Status } from '../models/enums/Status';
 import { HasId } from '../models/interfaces/BaseEntity';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
@@ -53,6 +54,16 @@ const getStatusActionString = (type: Status) => {
             return 'klarmarkerade bokningen';
         case Status.CANCELED:
             return 'ställde in bokningen';
+    }
+};
+
+const getSalaryStatusActionString = (type: SalaryStatus | null) => {
+    switch (type) {
+        case SalaryStatus.SENT:
+            return 'markerade lön som skickad';
+        case SalaryStatus.NOT_SENT:
+        case null:
+            return 'markerade lön som inte skickad';
     }
 };
 
@@ -129,6 +140,31 @@ export const logStatusChangeToBooking = (
     newStatus: Status,
 ) => {
     const message = `${user.name} ${getStatusActionString(newStatus)}.`;
+
+    sendSlackMessageForBooking(message, bookingId, bookingName);
+    return addChangelogToBooking(message, bookingId, 0);
+};
+
+export const logSalaryStatusChangeToBooking = (
+    user: CurrentUserInfo,
+    bookingId: number,
+    bookingName: string,
+    newStatus: SalaryStatus,
+) => {
+    const message = `${user.name} ${getSalaryStatusActionString(newStatus)}.`;
+
+    sendSlackMessageForBooking(message, bookingId, bookingName);
+    return addChangelogToBooking(message, bookingId, 0);
+};
+
+export const logOwnerUserChangeToBooking = (
+    user: CurrentUserInfo,
+    bookingId: number,
+    bookingName: string,
+    oldOwnerUserName: string | null,
+    newOwnerUserName: string | null,
+) => {
+    const message = `${user.name} ändrade ansvarig från ${oldOwnerUserName} till ${newOwnerUserName}.`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
     return addChangelogToBooking(message, bookingId, 0);
