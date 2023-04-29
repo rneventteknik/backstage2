@@ -17,7 +17,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
-import { DoubleClickToEdit, DoubleClickToEditDatetime } from '../../utils/DoubleClickToEdit';
+import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
 import { addVAT, formatNumberAsCurrency, getEquipmentListPrice } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import {
@@ -35,7 +35,7 @@ import { Status } from '../../../models/enums/Status';
 import ConfirmModal from '../../utils/ConfirmModal';
 import BookingReturnalNoteModal from '../BookingReturnalNoteModal';
 import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
-import { useNotifications } from '../../../lib/useNotifications';
+import EditEquipmentListDatesModal from './EditEquipmentListDatesModal';
 
 type Props = {
     list: EquipmentList;
@@ -83,8 +83,7 @@ const EquipmentListHeader: React.FC<Props> = ({
     const [showReturnalNoteModal, setShowReturnalNoteModal] = useState(false);
     const [showResetDatesModal, setShowResetDatesModal] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false);
-
-    const { showErrorMessage } = useNotifications();
+    const [showEditDatesModal, setShowEditDatesModal] = useState(false);
 
     // Consts to control which date edit components are shown (i.e. interval, dates or both). Note that
     // the logic for usage dates and in/out dates are seperated.
@@ -96,31 +95,6 @@ const EquipmentListHeader: React.FC<Props> = ({
         list.usageEndDatetime ||
         list.equipmentOutDatetime ||
         list.equipmentInDatetime;
-
-    // Verify that start dates are before end dates, and if ok, then save the list. Otherwise show an eror and return.
-    const verifyTimesAndSaveList = (updatedList: EquipmentList) => {
-        if (
-            updatedList.usageStartDatetime &&
-            updatedList.usageEndDatetime &&
-            updatedList.usageStartDatetime.getTime() >= updatedList.usageEndDatetime.getTime()
-        ) {
-            showErrorMessage('Starttid måste vara innan sluttid');
-            return;
-        }
-
-        const equipmentInDatetime = getEquipmentInDatetime(updatedList);
-        const equipmentOutDatetime = getEquipmentOutDatetime(updatedList);
-
-        if (
-            equipmentOutDatetime &&
-            equipmentInDatetime &&
-            equipmentOutDatetime.getTime() >= equipmentInDatetime.getTime()
-        ) {
-            showErrorMessage('Utlämning måste vara innan återlämning');
-            return;
-        }
-        saveList(updatedList);
-    };
 
     // HTML template
     //
@@ -374,75 +348,51 @@ const EquipmentListHeader: React.FC<Props> = ({
                 </>
             ) : null}
             {showDateControls ? (
-                <Row>
-                    <Col md={3} xs={6}>
-                        <small>Debiterad starttid</small>
-                        <div style={{ fontSize: '1.2em' }}>
-                            <DoubleClickToEditDatetime
-                                value={list.usageStartDatetime}
-                                onUpdate={(newValue) =>
-                                    verifyTimesAndSaveList({ ...list, usageStartDatetime: newValue ?? null })
-                                }
-                                max={list.usageEndDatetime
-                                    ?.toISOString()
-                                    .substring(0, list.usageEndDatetime?.toISOString().indexOf('T') + 6)}
-                                readonly={readonly}
-                                className="d-block"
-                            />
-                        </div>
-                    </Col>
-                    <Col md={3} xs={6}>
-                        <small>Debiterad sluttid</small>
-                        <div style={{ fontSize: '1.2em' }}>
-                            <DoubleClickToEditDatetime
-                                value={list.usageEndDatetime}
-                                onUpdate={(newValue) =>
-                                    verifyTimesAndSaveList({ ...list, usageEndDatetime: newValue ?? null })
-                                }
-                                min={list.usageStartDatetime
-                                    ?.toISOString()
-                                    .substring(0, list.usageStartDatetime?.toISOString().indexOf('T') + 6)}
-                                readonly={readonly}
-                                className="d-block"
-                            />
-                        </div>
-                    </Col>
-                    <Col md={3} xs={6}>
-                        <small>Utlämning</small>
-                        <div style={{ fontSize: '1.2em' }}>
-                            <DoubleClickToEditDatetime
-                                value={list.equipmentOutDatetime}
-                                onUpdate={(newValue) =>
-                                    verifyTimesAndSaveList({ ...list, equipmentOutDatetime: newValue ?? null })
-                                }
-                                max={getEquipmentInDatetime(list)
-                                    ?.toISOString()
-                                    .substring(0, (getEquipmentInDatetime(list)?.toISOString()?.indexOf('T') ?? 0) + 6)}
-                                readonly={readonly}
-                                placeholder={formatDatetime(list.usageStartDatetime, 'N/A')}
-                            />
-                        </div>
-                    </Col>
-                    <Col md={3} xs={6}>
-                        <small>Återlämning</small>
-                        <div style={{ fontSize: '1.2em' }}>
-                            <DoubleClickToEditDatetime
-                                value={list.equipmentInDatetime}
-                                onUpdate={(newValue) =>
-                                    verifyTimesAndSaveList({ ...list, equipmentInDatetime: newValue ?? null })
-                                }
-                                min={getEquipmentOutDatetime(list)
-                                    ?.toISOString()
-                                    .substring(
-                                        0,
-                                        (getEquipmentOutDatetime(list)?.toISOString()?.indexOf('T') ?? 0) + 6,
-                                    )}
-                                readonly={readonly}
-                                placeholder={formatDatetime(list.usageEndDatetime, 'N/A')}
-                            />
-                        </div>
-                    </Col>
-                </Row>
+                <>
+                    {showEditDatesModal ? (
+                        <EditEquipmentListDatesModal
+                            show={showEditDatesModal}
+                            onHide={() => setShowEditDatesModal(false)}
+                            equipmentList={list}
+                            onSave={(e) => {
+                                setShowEditDatesModal(false);
+                                saveList(e);
+                            }}
+                        />
+                    ) : null}
+                    <Row onClick={() => setShowEditDatesModal(true)} role="button">
+                        <Col md={3} xs={6}>
+                            <small>Debiterad starttid</small>
+                            <div className="mb-3" style={{ fontSize: '1.2em' }}>
+                                {formatDatetime(list.usageStartDatetime)}
+                            </div>
+                        </Col>
+                        <Col md={3} xs={6}>
+                            <small>Debiterad sluttid</small>
+                            <div className="mb-3" style={{ fontSize: '1.2em' }}>
+                                {formatDatetime(list.usageEndDatetime)}
+                            </div>
+                        </Col>
+                        <Col md={3} xs={6}>
+                            <small>Utlämning</small>
+                            <div
+                                className={'mb-3 ' + (!!list.equipmentOutDatetime ? '' : 'text-muted')}
+                                style={{ fontSize: '1.2em' }}
+                            >
+                                {formatDatetime(getEquipmentOutDatetime(list))}
+                            </div>
+                        </Col>
+                        <Col md={3} xs={6}>
+                            <small>Återlämning</small>
+                            <div
+                                className={'mb-3 ' + (!!list.equipmentOutDatetime ? '' : 'text-muted')}
+                                style={{ fontSize: '1.2em' }}
+                            >
+                                {formatDatetime(getEquipmentInDatetime(list))}
+                            </div>
+                        </Col>
+                    </Row>
+                </>
             ) : null}
         </>
     );
