@@ -687,6 +687,9 @@ const EquipmentListTable: React.FC<Props> = ({ list, pricePlan, language, saveLi
                                 !!getEquipmentListEntryPrices(equipmentToAdd.prices[0], pricePlan).pricePerHour
                             }
                             title={language === Language.SV ? equipmentToAdd.name : equipmentToAdd.nameEN}
+                            equipment={equipmentToAdd}
+                            startDatetime={getEquipmentOutDatetime(list) ?? null}
+                            endDatetime={getEquipmentInDatetime(list) ?? null}
                         />
                     ) : null}
                 </div>

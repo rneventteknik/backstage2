@@ -1,6 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Button, Form, InputGroup, Modal } from 'react-bootstrap';
-import { toIntOrUndefined } from '../../../lib/utils';
+import { Alert, Button, Form, InputGroup, Modal } from 'react-bootstrap';
+import useSwr from 'swr';
+import { bookingsFetcher } from '../../../lib/fetchers';
+import { getMaximumNumberOfUnitUsed, toIntOrUndefined } from '../../../lib/utils';
+import { Status } from '../../../models/enums/Status';
+import { Equipment } from '../../../models/interfaces';
 import RequiredIndicator from '../../utils/RequiredIndicator';
 
 type Props = {
@@ -10,6 +14,9 @@ type Props = {
     showNumberOfUnits: boolean;
     showNumberOfHours: boolean;
     title: string;
+    equipment: Equipment;
+    startDatetime: Date | null;
+    endDatetime: Date | null;
 };
 
 const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
@@ -19,6 +26,9 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
     showNumberOfUnits,
     showNumberOfHours,
     title,
+    equipment,
+    startDatetime,
+    endDatetime,
 }: Props) => {
     const [numberOfUnits, setNumberOfUnits] = useState<string>('1');
     const [numberOfHours, setNumberOfHours] = useState<string>(showNumberOfHours ? '1' : '0');
@@ -33,6 +43,43 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
             numberOfHoursRef.current.select();
         }
     }, [numberOfUnitsRef, numberOfHoursRef]);
+
+    const { data: conflictData } = useSwr(
+        startDatetime && endDatetime
+            ? '/api/conflict-detection/booking-with-equipment?equipmentId=' +
+                  equipment.id +
+                  '&startDatetime=' +
+                  startDatetime?.toISOString() +
+                  '&endDatetime=' +
+                  endDatetime?.toISOString()
+            : null,
+        bookingsFetcher,
+    );
+
+    // Filter bookings
+    const bookings = conflictData?.filter((x) => x.status !== Status.CANCELED) ?? [];
+    const overlappingEquipmentLists = bookings.flatMap((x) => x.equipmentLists ?? []);
+    const numberOfUnitsUsed = getMaximumNumberOfUnitUsed(overlappingEquipmentLists, equipment);
+
+    const getDescription = () => {
+        if (!startDatetime || !endDatetime) {
+            return null;
+        }
+
+        if (equipment.inventoryCount == null) {
+            return `Totalt används ${numberOfUnitsUsed} den här tiden.`;
+        }
+
+        if (equipment.inventoryCount <= numberOfUnitsUsed) {
+            return `Totalt finns ${equipment.inventoryCount} och alla används den här tiden.`;
+        }
+
+        if (equipment.inventoryCount && numberOfUnitsUsed === 0) {
+            return `Totalt finns ${equipment.inventoryCount} och ingen används den här tiden.`;
+        }
+
+        return `Totalt finns ${equipment.inventoryCount} och ${numberOfUnitsUsed} används den här tiden.`;
+    };
 
     return (
         <Modal show={show} onHide={() => onHide()}>
@@ -58,6 +105,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                                     <InputGroup.Text>st</InputGroup.Text>
                                 </InputGroup.Append>
                             </InputGroup>
+                            <Form.Text className="text-muted">{getDescription()}</Form.Text>
                         </Form.Group>
                     ) : null}
                     {showNumberOfHours ? (
@@ -78,6 +126,14 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                                 </InputGroup.Append>
                             </InputGroup>
                         </Form.Group>
+                    ) : null}
+                    {startDatetime &&
+                    endDatetime &&
+                    equipment.inventoryCount &&
+                    equipment.inventoryCount <= numberOfUnitsUsed ? (
+                        <Alert variant="warning">
+                            All utrustning av den här typen ({title}) används redan den här tiden.
+                        </Alert>
                     ) : null}
                 </Modal.Body>
                 <Modal.Footer>
