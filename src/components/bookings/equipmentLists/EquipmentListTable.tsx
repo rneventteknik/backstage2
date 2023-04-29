@@ -455,15 +455,17 @@ const EquipmentListTable: React.FC<Props> = ({
                         <Dropdown.Item
                             onClick={() =>
                                 entry.equipment
-                                    ? saveListEntry(
-                                          getDefaultListEntryFromEquipment(
+                                    ? saveListEntry({
+                                          ...getDefaultListEntryFromEquipment(
                                               entry.equipment,
                                               pricePlan,
                                               language,
                                               entry.id,
                                               entry.sortIndex,
                                           ),
-                                      )
+                                          numberOfUnits: entry.numberOfUnits,
+                                          numberOfHours: entry.numberOfHours,
+                                      })
                                     : null
                             }
                         >
