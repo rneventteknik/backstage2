@@ -61,7 +61,7 @@ const Layout: React.FC<Props> = ({
                         {children}
 
                         <footer className={styles.footer + ' text-center font-italic text-muted'}>
-                            <small>Backstage2 - 2021</small>
+                            <small>Backstage2</small>
                         </footer>
                     </div>
                 </section>
