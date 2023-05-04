@@ -11,6 +11,7 @@ import {
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { Booking } from '../../../models/interfaces';
 import { useTextResources } from '../../useTextResources';
+import { getSortedList } from '../../../lib/sortIndexUtils';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -33,7 +34,7 @@ export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts
             <Text style={{ ...styles.heading, ...styles.bold }}>{t('common.total-price-section.heading')}</Text>
 
             <View>
-                {booking.equipmentLists?.map((list) => (
+                {getSortedList(booking.equipmentLists ?? []).map((list) => (
                     <TableRow key={list.id}>
                         <TableCellAutoWidth>
                             <Text>{list.name}</Text>
