@@ -91,9 +91,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Pakettyp</span>
-                                <span>
-                                    {equipmentPackage.addAsHeading ? 'Rubrik med rader' : 'Individuellta rader'}
-                                </span>
+                                <span>{equipmentPackage.addAsHeading ? 'Rubrik med rader' : 'Individuella rader'}</span>
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 <div className="mb-1">Beskrivning</div>
