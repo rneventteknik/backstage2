@@ -211,6 +211,9 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
                 </Modal.Header>
                 <Modal.Body>{entityToEdit ? getEditComponent(entityToEdit, setEntityToEdit) : null}</Modal.Body>
                 <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setEntityToEdit(null)}>
+                        Avbryt
+                    </Button>
                     <Button
                         variant="primary"
                         onClick={() => {
@@ -225,9 +228,6 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
                         }}
                     >
                         Spara
-                    </Button>
-                    <Button variant="secondary" onClick={() => setEntityToEdit(null)}>
-                        Avbryt
                     </Button>
                 </Modal.Footer>
             </Modal>

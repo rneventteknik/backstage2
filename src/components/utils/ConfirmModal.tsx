@@ -31,11 +31,11 @@ const ConfirmModal: React.FC<Props> = ({
             </Modal.Header>
             <Modal.Body>{children}</Modal.Body>
             <Modal.Footer>
-                <Button variant={confirmButtonType} onClick={() => onConfirm()}>
-                    {confirmLabel}
-                </Button>
                 <Button variant={cancelButtonType} onClick={() => onHide()}>
                     {cancelLabel}
+                </Button>
+                <Button variant={confirmButtonType} onClick={() => onConfirm()}>
+                    {confirmLabel}
                 </Button>
             </Modal.Footer>
         </Modal>

@@ -88,6 +88,7 @@ const EquipmentListHeader: React.FC<Props> = ({
 }: Props) => {
     const [showEmptyListModal, setShowEmptyListModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showConfirmOutModal, setShowConfirmOutModal] = useState(false);
     const [showReturnalNoteModal, setShowReturnalNoteModal] = useState(false);
     const [showResetDatesModal, setShowResetDatesModal] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false);
@@ -127,13 +128,28 @@ const EquipmentListHeader: React.FC<Props> = ({
                     {readonly ? null : (
                         <>
                             {bookingType === BookingType.RENTAL && list.rentalStatus == undefined ? (
-                                <Button
-                                    variant="secondary"
-                                    onClick={() => saveList({ ...list, rentalStatus: RentalStatus.OUT })}
-                                    className="mr-2"
-                                >
-                                    <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
-                                </Button>
+                                <>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => setShowConfirmOutModal(true)}
+                                        className="mr-2"
+                                    >
+                                        <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
+                                    </Button>
+                                    <ConfirmModal
+                                        show={showConfirmOutModal}
+                                        onHide={() => setShowConfirmOutModal(false)}
+                                        onConfirm={() => {
+                                            saveList({ ...list, rentalStatus: RentalStatus.OUT });
+                                            setShowConfirmOutModal(false);
+                                        }}
+                                        title="Bekräfta"
+                                        confirmLabel="Lämna ut"
+                                        confirmButtonType="primary"
+                                    >
+                                        Är du säker på att du vill lämna ut {list.name}?
+                                    </ConfirmModal>
+                                </>
                             ) : null}
 
                             {bookingType === BookingType.RENTAL && list.rentalStatus == RentalStatus.OUT ? (

@@ -8,6 +8,7 @@ import { faRightFromBracket, faRightToBracket } from '@fortawesome/free-solid-sv
 import { RentalStatus } from '../../models/enums/RentalStatus';
 import { PartialDeep } from 'type-fest';
 import BookingReturnalNoteModal from './BookingReturnalNoteModal';
+import ConfirmModal from '../utils/ConfirmModal';
 
 type Props = {
     booking: Partial<Booking>;
@@ -16,6 +17,7 @@ type Props = {
 };
 
 const BookingRentalStatusButton: React.FC<Props> = ({ booking, onChange, className }: Props) => {
+    const [showConfirmOutModal, setShowConfirmOutModal] = useState(false);
     const [showReturnalNoteModal, setShowReturnalNoteModal] = useState(false);
 
     const changeRentalStatusTo = (status: RentalStatus, returnalNote?: string) =>
@@ -41,9 +43,24 @@ const BookingRentalStatusButton: React.FC<Props> = ({ booking, onChange, classNa
 
     if (booking.equipmentLists?.some((list) => list.rentalStatus == undefined)) {
         return (
-            <Button variant="secondary" className={className} onClick={() => changeRentalStatusTo(RentalStatus.OUT)}>
-                <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
-            </Button>
+            <>
+                <Button variant="secondary" className={className} onClick={() => setShowConfirmOutModal(true)}>
+                    <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
+                </Button>
+                <ConfirmModal
+                    show={showConfirmOutModal}
+                    onHide={() => setShowConfirmOutModal(false)}
+                    onConfirm={() => {
+                        changeRentalStatusTo(RentalStatus.OUT);
+                        setShowConfirmOutModal(false);
+                    }}
+                    title="Bekräfta"
+                    confirmLabel="Lämna ut"
+                    confirmButtonType="primary"
+                >
+                    Är du säker på att du vill lämna ut bokningen {booking.name}?
+                </ConfirmModal>
+            </>
         );
     }
 
