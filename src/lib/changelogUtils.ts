@@ -40,7 +40,7 @@ const getBookingEditActionString = (type: BookingChangelogEntryType) => {
         case BookingChangelogEntryType.TIMEESTIMATE:
             return 'redigerade bokningens tidsestimat';
         case BookingChangelogEntryType.TIMEREPORT:
-            return 'redigerade bokningens tidsrapporter';
+            return 'redigerade bokningens tidrapporter';
     }
 };
 
@@ -49,7 +49,7 @@ const getStatusActionString = (type: Status) => {
         case Status.DRAFT:
             return 'gjorde bokningen till ett utkast';
         case Status.BOOKED:
-            return 'markarade bokningen som bokad';
+            return 'markerade bokningen som bokad';
         case Status.DONE:
             return 'klarmarkerade bokningen';
         case Status.CANCELED:
