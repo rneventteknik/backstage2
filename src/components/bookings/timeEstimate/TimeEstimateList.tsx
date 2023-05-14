@@ -4,7 +4,7 @@ import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
-import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
+import { getResponseContentOrError, toIntOrUndefined, updateItemsInArrayById } from '../../../lib/utils';
 import { toTimeEstimate } from '../../../lib/mappers/timeEstimate';
 import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';
@@ -26,7 +26,15 @@ import {
     getTotalTimeEstimatesPrice,
 } from '../../../lib/pricingUtils';
 import Skeleton from 'react-loading-skeleton';
-import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import {
+    getNextSortIndex,
+    isFirst,
+    isLast,
+    moveItemDown,
+    moveItemToItem,
+    moveItemUp,
+    sortIndexSortFn,
+} from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from './TimeEstimateAddButton';
 import TimeEstimateModal from './TimeEstimateModal';
 
@@ -48,7 +56,8 @@ const TimeEstimateList: React.FC<Props> = ({
 }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
-    const { showSaveFailedNotification, showDeleteFailedNotification } = useNotifications();
+    const { showSaveSuccessNotification, showSaveFailedNotification, showDeleteFailedNotification } =
+        useNotifications();
     const [timeEstimateToEditViewModel, setTimeEstimateToEditViewModel] = useState<Partial<TimeEstimate> | null>(null);
 
     // Extract the lists
@@ -90,23 +99,30 @@ const TimeEstimateList: React.FC<Props> = ({
         return <Skeleton height={200} className="mb-3" />;
     }
 
-    const updateTimeEstimate = (timeEstimate: TimeEstimate) => {
-        const filteredTimeEstimates = timeEstimates?.map((x) => (x.id !== timeEstimate.id ? x : timeEstimate));
+    const updateTimeEstimates = (...updatedTimeEstimates: TimeEstimate[]) => {
+        mutateTimeEstimates(updateItemsInArrayById(timeEstimates, ...updatedTimeEstimates));
 
-        mutateTimeEstimates(filteredTimeEstimates);
-
-        const body = { timeEstimate: timeEstimate };
-        const request = {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-        fetch('/api/bookings/' + timeEstimate.bookingId + '/timeEstimate/' + timeEstimate.id, request)
-            .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
-            .then(toTimeEstimate)
+        Promise.all(
+            updatedTimeEstimates.map(async (timeEstimate) => {
+                const body = { timeEstimate: timeEstimate };
+                const request = {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                };
+                return fetch('/api/bookings/' + timeEstimate.bookingId + '/timeEstimate/' + timeEstimate.id, request)
+                    .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
+                    .then(toTimeEstimate);
+            }),
+        )
+            .then(() => {
+                showSaveSuccessNotification('Tidsuppskattningen');
+                mutate();
+            })
             .catch((error: Error) => {
                 console.error(error);
                 showSaveFailedNotification('Tidsuppskattningen');
+                mutate();
             });
     };
 
@@ -131,7 +147,7 @@ const TimeEstimateList: React.FC<Props> = ({
         <DoubleClickToEdit
             value={timeEstimate.name}
             onUpdate={(newValue) =>
-                updateTimeEstimate({
+                updateTimeEstimates({
                     ...timeEstimate,
                     name: newValue && newValue.length > 0 ? newValue : timeEstimate.name,
                 })
@@ -151,7 +167,7 @@ const TimeEstimateList: React.FC<Props> = ({
         <DoubleClickToEdit
             value={timeEstimate.numberOfHours?.toString()}
             onUpdate={(newValue) =>
-                updateTimeEstimate({
+                updateTimeEstimates({
                     ...timeEstimate,
                     numberOfHours: toIntOrUndefined(newValue) ?? timeEstimate.numberOfHours,
                 })
@@ -174,6 +190,19 @@ const TimeEstimateList: React.FC<Props> = ({
     const TimeEstimateEntryActionsDisplayFn = (entry: TimeEstimate) => {
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
+                <Dropdown.Item
+                    onClick={() => updateTimeEstimates(...moveItemUp(timeEstimates, entry))}
+                    disabled={isFirst(timeEstimates, entry)}
+                >
+                    <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+                </Dropdown.Item>
+                <Dropdown.Item
+                    onClick={() => updateTimeEstimates(...moveItemDown(timeEstimates, entry))}
+                    disabled={isLast(timeEstimates, entry)}
+                >
+                    <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+                </Dropdown.Item>
+                <Dropdown.Divider />
                 <Dropdown.Item onClick={() => deleteTimeEstimate(entry)} className="text-danger">
                     <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
                 </Dropdown.Item>
@@ -185,11 +214,13 @@ const TimeEstimateList: React.FC<Props> = ({
     };
 
     const sortFn = (a: TimeEstimate, b: TimeEstimate) => sortIndexSortFn(a, b);
+    const moveFn = (a: TimeEstimate, b: TimeEstimate) => updateTimeEstimates(...moveItemToItem(timeEstimates, a, b));
 
     const tableSettings: TableConfiguration<TimeEstimate> = {
         entityTypeDisplayName: '',
         defaultSortAscending: true,
         customSortFn: sortFn,
+        moveFn: moveFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         columns: [
@@ -257,7 +288,7 @@ const TimeEstimateList: React.FC<Props> = ({
             </Card.Header>
             {showContent ? (
                 <>
-                    <TableDisplay entities={timeEstimates} configuration={tableSettings} />
+                    <TableDisplay entities={timeEstimates} configuration={tableSettings} tableId="time-estimate-list" />
                     <TimeEstimateAddButton
                         booking={booking}
                         disabled={readonly}
@@ -292,7 +323,7 @@ const TimeEstimateList: React.FC<Props> = ({
                             name: timeEstimateToEditViewModel?.name ?? '',
                             sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
                         };
-                        updateTimeEstimate(timeEstimateToSend);
+                        updateTimeEstimates(timeEstimateToSend);
                     }
                 }}
             ></TimeEstimateModal>

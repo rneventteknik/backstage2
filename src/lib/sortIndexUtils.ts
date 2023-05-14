@@ -111,15 +111,12 @@ export const moveItemDown = <T extends Sortable>(list: T[], item: T): T[] => {
 };
 
 export const moveItemToItem = <T extends Sortable>(list: T[], item: T, target: T): T[] => {
-    if (
-        !list ||
-        !item ||
-        !target ||
-        item.id === target.id ||
-        !list.some((x) => x.id === item.id) ||
-        !list.some((x) => x.id === target.id)
-    ) {
+    if (!list || !item || !target || !list.some((x) => x.id === item.id) || !list.some((x) => x.id === target.id)) {
         throw new Error('Invalid parameters');
+    }
+
+    if (item.id === target.id) {
+        return [];
     }
 
     const sortedList = getSortedList(list.filter((x) => x.id !== item.id));

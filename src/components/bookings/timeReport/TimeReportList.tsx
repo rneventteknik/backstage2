@@ -4,7 +4,7 @@ import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher, usersFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
-import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
+import { getResponseContentOrError, toIntOrUndefined, updateItemsInArrayById } from '../../../lib/utils';
 import {
     faAngleDown,
     faAngleUp,
@@ -28,7 +28,14 @@ import {
 } from '../../../lib/pricingUtils';
 import { useNotifications } from '../../../lib/useNotifications';
 import { DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
-import { sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import {
+    isFirst,
+    isLast,
+    moveItemDown,
+    moveItemToItem,
+    moveItemUp,
+    sortIndexSortFn,
+} from '../../../lib/sortIndexUtils';
 import { formatDatetime, toBookingViewModel } from '../../../lib/datetimeUtils';
 import TimeReportAddButton from './TimeReportAddButton';
 import TimeReportModal from './TimeReportModal';
@@ -56,7 +63,8 @@ const TimeReportList: React.FC<Props> = ({
 
     const [timeReportToEditViewModel, setTimeReportToEditViewModel] = useState<Partial<TimeReport> | null>(null);
 
-    const { showSaveFailedNotification, showDeleteFailedNotification } = useNotifications();
+    const { showSaveSuccessNotification, showSaveFailedNotification, showDeleteFailedNotification } =
+        useNotifications();
 
     // Extract the lists
     //
@@ -99,23 +107,32 @@ const TimeReportList: React.FC<Props> = ({
 
     const booking = toBookingViewModel(data);
 
-    const updateTimeReport = (timeReport: TimeReport) => {
-        const filteredTimeReports = timeReports?.map((x) => (x.id !== timeReport.id ? x : timeReport));
+    const updateTimeReports = (...updatedTimeReports: TimeReport[]) => {
+        mutateTimeReports(updateItemsInArrayById(timeReports, ...updatedTimeReports));
 
-        mutateTimeReports(filteredTimeReports);
+        Promise.all(
+            updatedTimeReports.map(async (timeReport) => {
+                const body = { timeReport: timeReport };
 
-        const body = { timeReport: timeReport };
-        const request = {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-        fetch('/api/bookings/' + timeReport.bookingId + '/timeReport/' + timeReport.id, request)
-            .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
-            .then(toTimeReport)
+                const request = {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                };
+
+                return fetch('/api/bookings/' + timeReport.bookingId + '/timeReport/' + timeReport.id, request)
+                    .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
+                    .then(toTimeReport);
+            }),
+        )
+            .then(() => {
+                showSaveSuccessNotification('Tidrapporten');
+                mutate();
+            })
             .catch((error: Error) => {
                 console.error(error);
                 showSaveFailedNotification('Tidrapporten');
+                mutate();
             });
     };
 
@@ -141,7 +158,7 @@ const TimeReportList: React.FC<Props> = ({
             <DoubleClickToEdit
                 value={timeReport.name}
                 onUpdate={(newValue) =>
-                    updateTimeReport({
+                    updateTimeReports({
                         ...timeReport,
                         name: newValue && newValue.length > 0 ? newValue : timeReport.name,
                     })
@@ -171,7 +188,7 @@ const TimeReportList: React.FC<Props> = ({
         <DoubleClickToEdit
             value={timeReport.billableWorkingHours?.toString()}
             onUpdate={(newValue) =>
-                updateTimeReport({
+                updateTimeReports({
                     ...timeReport,
                     billableWorkingHours: toIntOrUndefined(newValue) ?? timeReport.billableWorkingHours,
                 })
@@ -195,7 +212,7 @@ const TimeReportList: React.FC<Props> = ({
             optionKeyFn={(x) => x?.id.toString() ?? ''}
             onChange={(newValue) =>
                 newValue
-                    ? updateTimeReport({
+                    ? updateTimeReports({
                           ...timeReport,
                           userId: newValue.id,
                           user: newValue,
@@ -216,6 +233,19 @@ const TimeReportList: React.FC<Props> = ({
 
     const TimeReportEntryActionsDisplayFn = (entry: TimeReport) => (
         <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
+            <Dropdown.Item
+                onClick={() => updateTimeReports(...moveItemUp(timeReports, entry))}
+                disabled={isFirst(timeReports, entry)}
+            >
+                <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+            </Dropdown.Item>
+            <Dropdown.Item
+                onClick={() => updateTimeReports(...moveItemDown(timeReports, entry))}
+                disabled={isLast(timeReports, entry)}
+            >
+                <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+            </Dropdown.Item>
+            <Dropdown.Divider />
             <Dropdown.Item onClick={() => deleteTimeReport(entry)} className="text-danger">
                 <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
             </Dropdown.Item>
@@ -241,11 +271,13 @@ const TimeReportList: React.FC<Props> = ({
     };
 
     const sortFn = (a: TimeReport, b: TimeReport) => sortIndexSortFn(a, b);
+    const moveFn = (a: TimeReport, b: TimeReport) => updateTimeReports(...moveItemToItem(timeReports, a, b));
 
     const tableSettings: TableConfiguration<TimeReport> = {
         entityTypeDisplayName: '',
         defaultSortAscending: true,
         customSortFn: sortFn,
+        moveFn: moveFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         columns: [
@@ -323,7 +355,7 @@ const TimeReportList: React.FC<Props> = ({
             </Card.Header>
             {showContent ? (
                 <>
-                    <TableDisplay entities={timeReports} configuration={tableSettings} />
+                    <TableDisplay entities={timeReports} configuration={tableSettings} tableId="time-report-list" />
                     <TimeReportAddButton
                         currentUser={currentUser}
                         disabled={readonly}
@@ -354,7 +386,7 @@ const TimeReportList: React.FC<Props> = ({
                         ...toTimeReport(timeReport),
                         user: users?.find((x) => x.id === timeReport.userId),
                     };
-                    updateTimeReport(tr);
+                    updateTimeReports(tr);
                 }}
             ></TimeReportModal>
         </Card>

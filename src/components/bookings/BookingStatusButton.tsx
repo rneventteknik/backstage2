@@ -5,8 +5,6 @@ import { Status } from '../../models/enums/Status';
 import { Alert, Button, ButtonGroup, Dropdown, Modal } from 'react-bootstrap';
 import BookingForm from './BookingForm';
 import { BookingType } from '../../models/enums/BookingType';
-import { timeReportsFetcher } from '../../lib/fetchers';
-import useSwr from 'swr';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck as faCircleCheckRegular, faTimesCircle, faDotCircle } from '@fortawesome/free-regular-svg-icons';
 import { faCircleCheck as faCircleCheckSolid } from '@fortawesome/free-solid-svg-icons';
@@ -123,7 +121,7 @@ const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
     hide,
     show,
 }: BookingStatusModalProps) => {
-    const { data: timeReports } = useSwr('/api/bookings/' + booking.id + '/timeReport', timeReportsFetcher);
+    const timeReports = booking.timeReports;
 
     const onSubmit = (booking: Partial<IBookingObjectionModel>) => {
         hide();
