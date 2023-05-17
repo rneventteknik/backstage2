@@ -93,14 +93,14 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                                     </ListGroup.Item>
 
                                     <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Code Version</span>
+                                        <span className="flex-grow-1">Versionsnummer</span>
                                         <span>
                                             {getGlobalSetting('metadata.build.currentVersion', globalSettings, '-')}
                                         </span>
                                     </ListGroup.Item>
 
                                     <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Build Number</span>
+                                        <span className="flex-grow-1">Heroku byggnummer</span>
                                         <span>
                                             {getGlobalSetting('metadata.heroku.releaseVersion', globalSettings, '-')}
                                         </span>
@@ -113,7 +113,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                                                 'metadata.heroku.slugCommit',
                                                 globalSettings,
                                                 '-',
-                                            ).substring(0, 10)}
+                                            ).substring(0, 7)}
                                         </span>
                                     </ListGroup.Item>
 
