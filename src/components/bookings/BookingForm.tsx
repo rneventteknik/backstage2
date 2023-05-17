@@ -440,7 +440,7 @@ const BookingForm: React.FC<Props> = ({
                     </Row>
                 </>
             )}
-            {!showAdvancedFields ? null : (
+            {showAdvancedFields ? (
                 <>
                     <h2 className="h5 mt-4">Avancerat</h2>
                     <hr />
@@ -505,7 +505,7 @@ const BookingForm: React.FC<Props> = ({
                         </Col>
                     </Row>
                 </>
-            )}
+            ) : null}
 
             <div className="d-flex">
                 <div className="flex-grow-1"></div>
@@ -521,7 +521,22 @@ const BookingForm: React.FC<Props> = ({
                 </div>
             </div>
 
-            <Form.Control type="hidden" name="calendarBookingId" defaultValue={booking?.calendarBookingId} />
+            {!showAdvancedFields ? (
+                <>
+                    <Form.Control type="hidden" name="calendarBookingId" defaultValue={booking?.calendarBookingId} />
+                    <Form.Control type="hidden" name="invoiceNumber" defaultValue={booking?.invoiceNumber} />
+                    <Form.Control
+                        type="hidden"
+                        name="salaryStatus"
+                        defaultValue={booking?.salaryStatus ?? SalaryStatus.NOT_SENT}
+                    />
+                    <Form.Control
+                        type="hidden"
+                        name="paymentStatus"
+                        defaultValue={booking?.paymentStatus ?? PaymentStatus.NOT_PAID}
+                    />
+                </>
+            ) : null}
             {isNewBooking ? (
                 <>
                     <Form.Control
