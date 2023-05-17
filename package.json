@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.0.0-mango",
+    "version": "1.1.0-lime",
     "scripts": {
         "dev": "next",
         "build": "next build",
