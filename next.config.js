@@ -13,4 +13,21 @@ module.exports = {
         NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION: versionNumber,
         NEXT_PUBLIC_BACKSTAGE2_BUILD_DATE: currentDate,
     },
+    async headers() {
+        return [
+            {
+                source: '/:path*',
+                headers: [
+                    {
+                        key: 'Strict-Transport-Security',
+                        value: 'max-age=63072000; includeSubDomains; preload',
+                    },
+                    {
+                        key: 'X-Frame-Options',
+                        value: 'DENY',
+                    },
+                ],
+            },
+        ];
+    },
 };

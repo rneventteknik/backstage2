@@ -80,14 +80,14 @@ const UserAuthForm: React.FC<Props> = ({
             ) : null}
             <Form.Group controlId="formPassword">
                 <Form.Label>Nytt Lösenord</Form.Label>
-                <Form.Control type="password" name="password" />
+                <Form.Control type="password" name="password" autoComplete="off" />
                 <Form.Text className="text-muted">
                     Max 72 tecken. Lämnas fältet tomt kommer inte lösenordet att bytas.
                 </Form.Text>
             </Form.Group>
             <Form.Group controlId="formConfirmPassword">
                 <Form.Label>Bekräfta det nya lösenordet</Form.Label>
-                <Form.Control type="password" name="confirmPassword" />
+                <Form.Control type="password" name="confirmPassword" autoComplete="off" />
             </Form.Group>
             <hr />
             <Form.Group controlId="formPassword">
@@ -95,7 +95,7 @@ const UserAuthForm: React.FC<Props> = ({
                     Ditt nuvarande lösenord
                     <RequiredIndicator />
                 </Form.Label>
-                <Form.Control type="password" name="existingPassword" />
+                <Form.Control type="password" name="existingPassword" autoComplete="off" />
                 <Form.Text className="text-muted">
                     Bekräfta din identitet genom att ange ditt nuvarande lösenord.
                 </Form.Text>

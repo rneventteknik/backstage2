@@ -121,6 +121,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                         type="password"
                         placeholder="Lösenord"
                         name="password"
+                        autoComplete="off"
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </FormGroup>
