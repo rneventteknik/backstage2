@@ -50,7 +50,6 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
             </Button>
             <TimeEstimateModal
                 formId="form-add-time-estimate-modal"
-                booking={booking}
                 defaultLaborHourlyRate={defaultLaborHourlyRate}
                 timeEstimate={timeEstimateViewModel}
                 setTimeEstimate={setTimeEstimateViewModel}

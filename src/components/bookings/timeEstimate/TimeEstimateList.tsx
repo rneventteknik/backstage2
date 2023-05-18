@@ -305,7 +305,6 @@ const TimeEstimateList: React.FC<Props> = ({
             ) : null}
             <TimeEstimateModal
                 formId="form-edit-timeEstimate-modal"
-                booking={booking}
                 defaultLaborHourlyRate={defaultLaborHourlyRate}
                 setTimeEstimate={setTimeEstimateToEditViewModel}
                 timeEstimate={timeEstimateToEditViewModel ?? undefined}

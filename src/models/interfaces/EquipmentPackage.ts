@@ -19,6 +19,8 @@ export interface EquipmentPackageEntry extends BaseEntity {
     equipmentId: number;
     equipment?: Equipment;
     numberOfUnits: number;
+    numberOfHours: number;
+    sortIndex: number;
     isHidden: boolean;
     isFree: boolean;
 }

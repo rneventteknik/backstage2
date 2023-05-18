@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Badge, Dropdown, DropdownButton, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import { Equipment, EquipmentPrice } from '../../../models/interfaces';
+import { Equipment, EquipmentPackage, EquipmentPrice, TimeEstimate } from '../../../models/interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faAngleDown,
@@ -58,12 +58,14 @@ import SelectNumberOfUnitsAndHoursModal from './SelectNumberOfUnitsAndHoursModal
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../../models/objection-models';
 import { toEquipment } from '../../../lib/mappers/equipment';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
+import TimeEstimateModal from '../timeEstimate/TimeEstimateModal';
 
 type Props = {
     list: EquipmentList;
     otherLists: EquipmentList[];
     pricePlan: PricePlan;
     language: Language;
+    defaultLaborHourlyRate: number;
     saveListEntry: (entry: EquipmentListEntry) => void;
     saveListHeading: (heading: EquipmentListHeading) => void;
     saveListEntriesAndHeadings: (
@@ -74,7 +76,7 @@ type Props = {
     deleteListHeading: (heading: EquipmentListHeading) => void;
     addListEntries: (entries: EquipmentListEntry[], listId: number | undefined, headerId?: number | undefined) => void;
     addListHeading: (heading: EquipmentListHeading, listId: number) => void;
-    addTimeEstimate: (name: string, hours: number) => void;
+    addTimeEstimate: (timeEstimate: Partial<TimeEstimate>) => void;
     editEntry: (entry: EquipmentListEntry) => void;
     readonly: boolean;
 };
@@ -84,6 +86,7 @@ const EquipmentListTable: React.FC<Props> = ({
     otherLists,
     pricePlan,
     language,
+    defaultLaborHourlyRate,
     saveListEntry,
     saveListHeading,
     saveListEntriesAndHeadings,
@@ -96,6 +99,9 @@ const EquipmentListTable: React.FC<Props> = ({
     readonly,
 }: Props) => {
     const [equipmentToAdd, setEquipmentToAdd] = useState<Equipment | null>(null);
+    const [equipmentPackageToAdd, setEquipmentPackageToAdd] = useState<EquipmentPackage | null>(null);
+    const [equipmentPackageTimeEstimateToAdd, setEquipmentPackageTimeEstimateToAdd] =
+        useState<Partial<TimeEstimate> | null>(null);
 
     // Helper functions
     //
@@ -652,15 +658,26 @@ const EquipmentListTable: React.FC<Props> = ({
                                         )
                                         .then(toEquipmentPackage)
                                         .then((equipmentPackage) => {
-                                            addEquipmentPackage(
-                                                equipmentPackage,
-                                                list,
-                                                pricePlan,
-                                                language,
-                                                addListHeading,
-                                                addListEntries,
-                                                addTimeEstimate,
-                                            );
+                                            if (equipmentPackage.estimatedHours > 0) {
+                                                setEquipmentPackageToAdd(equipmentPackage);
+                                                setEquipmentPackageTimeEstimateToAdd({
+                                                    name:
+                                                        language === Language.SV
+                                                            ? equipmentPackage.name
+                                                            : equipmentPackage.nameEN ?? '',
+                                                    numberOfHours: equipmentPackage.estimatedHours,
+                                                    pricePerHour: defaultLaborHourlyRate,
+                                                });
+                                            } else {
+                                                addEquipmentPackage(
+                                                    equipmentPackage,
+                                                    list,
+                                                    pricePlan,
+                                                    language,
+                                                    addListHeading,
+                                                    addListEntries,
+                                                );
+                                            }
                                         });
                             }
                         }}
@@ -699,6 +716,33 @@ const EquipmentListTable: React.FC<Props> = ({
                             equipment={equipmentToAdd}
                             startDatetime={getEquipmentOutDatetime(list) ?? null}
                             endDatetime={getEquipmentInDatetime(list) ?? null}
+                        />
+                    ) : null}
+                    {equipmentPackageToAdd && equipmentPackageTimeEstimateToAdd ? (
+                        <TimeEstimateModal
+                            timeEstimate={equipmentPackageTimeEstimateToAdd}
+                            setTimeEstimate={(x) =>
+                                setEquipmentPackageTimeEstimateToAdd({ ...equipmentPackageTimeEstimateToAdd, ...x })
+                            }
+                            defaultLaborHourlyRate={defaultLaborHourlyRate}
+                            formId={'time-estimate-form'}
+                            onSubmit={() => {
+                                addEquipmentPackage(
+                                    equipmentPackageToAdd,
+                                    list,
+                                    pricePlan,
+                                    language,
+                                    addListHeading,
+                                    addListEntries,
+                                );
+                                addTimeEstimate(equipmentPackageTimeEstimateToAdd);
+                                setEquipmentPackageToAdd(null);
+                                setEquipmentPackageTimeEstimateToAdd(null);
+                            }}
+                            onHide={() => {
+                                setEquipmentPackageToAdd(null);
+                                setEquipmentPackageTimeEstimateToAdd(null);
+                            }}
                         />
                     ) : null}
                 </div>

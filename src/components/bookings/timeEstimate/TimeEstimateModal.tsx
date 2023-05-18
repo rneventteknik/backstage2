@@ -3,11 +3,10 @@ import { Modal, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import RequiredIndicator from '../../utils/RequiredIndicator';
-import { Booking, TimeEstimate } from '../../../models/interfaces';
+import { TimeEstimate } from '../../../models/interfaces';
 import { formatNumberAsCurrency } from '../../../lib/pricingUtils';
 
 type Props = {
-    booking: Booking;
     timeEstimate?: Partial<TimeEstimate>;
     setTimeEstimate: (timeEstimate: Partial<TimeEstimate>) => void;
     defaultLaborHourlyRate: number;

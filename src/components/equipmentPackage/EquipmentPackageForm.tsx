@@ -1,5 +1,5 @@
 import React, { FormEvent, useState, useEffect } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../models/objection-models';
 import { EquipmentTag } from '../../models/interfaces';
@@ -11,6 +11,8 @@ import EquipmentSearch from '../EquipmentSearch';
 import { equipmentTagsFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
+import { fixSortIndexUniqueness, getNextSortIndex, moveItemToItem, sortIndexSortFn } from '../../lib/sortIndexUtils';
+import { updateItemsInArrayById } from '../../lib/utils';
 
 type Props = {
     handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => void;
@@ -43,12 +45,16 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         const equipmentPackageEntry: EquipmentPackageEntry = {
             id: nextId, // This id is only used in the client, it is striped before sending to the server
             numberOfUnits: 1,
+            numberOfHours: 0,
             isFree: false,
             isHidden: false,
             equipment: toEquipment(equipment),
             equipmentId: equipment.id,
+            sortIndex: getNextSortIndex(selectedEquipmentPackageEntries),
         };
-        setSelectedEquipmentPackageEntries([...selectedEquipmentPackageEntries, equipmentPackageEntry]);
+        setSelectedEquipmentPackageEntries(
+            fixSortIndexUniqueness([...selectedEquipmentPackageEntries, equipmentPackageEntry]),
+        );
     };
 
     const deleteEquipment = (equipmentPackageEntry: EquipmentPackageEntry) => {
@@ -58,16 +64,37 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
     };
 
     const EquipmentPackageNumberOfUnitsDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
-        <Form.Control
-            required
-            type="text"
-            size="sm"
-            name={'equipmentPackageNumberOfUnits-' + equipmentPackageEntry.id}
-            defaultValue={equipmentPackageEntry.numberOfUnits}
-            onChange={(e) => {
-                equipmentPackageEntry.numberOfUnits = parseInt(e.target.value);
-            }}
-        />
+        <InputGroup className="mb-1" size="sm">
+            <Form.Control
+                required
+                type="text"
+                name={'equipmentPackageNumberOfUnits-' + equipmentPackageEntry.id}
+                defaultValue={equipmentPackageEntry.numberOfUnits}
+                onChange={(e) => {
+                    equipmentPackageEntry.numberOfUnits = parseInt(e.target.value);
+                }}
+            />
+            <InputGroup.Append>
+                <InputGroup.Text>st</InputGroup.Text>
+            </InputGroup.Append>
+        </InputGroup>
+    );
+
+    const EquipmentPackageNumberOfHoursDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
+        <InputGroup className="mb-1" size="sm">
+            <Form.Control
+                required
+                type="text"
+                name={'equipmentPackageNumberOfHours-' + equipmentPackageEntry.id}
+                defaultValue={equipmentPackageEntry.numberOfHours}
+                onChange={(e) => {
+                    equipmentPackageEntry.numberOfHours = parseInt(e.target.value);
+                }}
+            />
+            <InputGroup.Append>
+                <InputGroup.Text>h</InputGroup.Text>
+            </InputGroup.Append>
+        </InputGroup>
     );
 
     const EquipmentPackageIsFreeDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
@@ -98,10 +125,19 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         </Button>
     );
 
+    const moveFn = (a: EquipmentPackageEntry, b: EquipmentPackageEntry) =>
+        setSelectedEquipmentPackageEntries(
+            updateItemsInArrayById(
+                selectedEquipmentPackageEntries,
+                ...moveItemToItem(selectedEquipmentPackageEntries, a, b),
+            ),
+        );
+
     const equipmentTableSettings: TableConfiguration<EquipmentPackageEntry> = {
         entityTypeDisplayName: '',
         noResultsLabel: 'Ingen utrustning konfigurerad',
-        defaultSortPropertyName: 'name',
+        customSortFn: sortIndexSortFn,
+        moveFn: moveFn,
         defaultSortAscending: true,
         hideTableCountControls: true,
         hideTableFilter: true,
@@ -134,6 +170,13 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                 displayName: 'Antal',
                 getValue: (equipmentPackageEntry: EquipmentPackageEntry) => equipmentPackageEntry.numberOfUnits,
                 getContentOverride: EquipmentPackageNumberOfUnitsDisplayFn,
+                columnWidth: 140,
+            },
+            {
+                key: 'hours',
+                displayName: 'Antal timmar',
+                getValue: (equipmentPackageEntry: EquipmentPackageEntry) => equipmentPackageEntry.numberOfUnits,
+                getContentOverride: EquipmentPackageNumberOfHoursDisplayFn,
                 columnWidth: 140,
             },
             {

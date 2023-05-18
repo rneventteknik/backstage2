@@ -73,6 +73,8 @@ export interface IEquipmentPackageEntryObjectionModel extends BaseObjectionModel
 
     equipment?: IEquipmentObjectionModel;
     numberOfUnits: number;
+    numberOfHours: number;
+    sortIndex: number;
     isHidden: boolean;
     isFree: boolean;
 }
@@ -98,6 +100,8 @@ export class EquipmentPackageEntryObjectionModel extends Model implements IEquip
 
     equipment?: EquipmentObjectionModel;
     numberOfUnits!: number;
+    numberOfHours!: number;
+    sortIndex!: number;
     isHidden!: boolean;
     isFree!: boolean;
 }

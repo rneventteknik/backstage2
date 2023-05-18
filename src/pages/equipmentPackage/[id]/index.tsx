@@ -14,6 +14,7 @@ import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faCoins, faEyeSlash, faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
+import { getSortedList } from '../../../lib/sortIndexUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -108,7 +109,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                     <Card className="mb-3">
                         <Card.Header>Utrustning</Card.Header>
                         <ListGroup variant="flush">
-                            {equipmentPackage.equipmentEntries.map((e) => (
+                            {getSortedList(equipmentPackage.equipmentEntries).map((e) => (
                                 <ListGroup.Item key={e.id} className="d-flex">
                                     <span className="flex-grow-1">
                                         {e.equipment?.name}
@@ -122,7 +123,11 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                                         {e.isFree ? (
                                             <FontAwesomeIcon icon={faCoins} className="mr-1" title="Utan pris" />
                                         ) : null}
-                                        {e.numberOfUnits} st
+                                        {e.numberOfUnits != 1 || e.numberOfHours == 0 ? (
+                                            <>{e.numberOfUnits} st</>
+                                        ) : null}
+                                        {e.numberOfUnits != 1 && e.numberOfHours != 0 ? <> / </> : null}
+                                        {e.numberOfHours > 0 ? <>{e.numberOfHours} h</> : null}
                                     </span>
                                 </ListGroup.Item>
                             ))}

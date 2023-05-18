@@ -15,9 +15,10 @@ import {
     toEquipmentListObjectionModel,
 } from './mappers/booking';
 import { getResponseContentOrError } from './utils';
-import { getNextSortIndex, moveItemUp, moveItemDown } from './sortIndexUtils';
+import { getNextSortIndex, moveItemUp, moveItemDown, getSortedList } from './sortIndexUtils';
 import { ITimeEstimateObjectionModel } from '../models/objection-models';
 import { toTimeEstimate } from './mappers/timeEstimate';
+import { EquipmentPackageEntry } from '../models/interfaces/EquipmentPackage';
 
 // EquipmentListEntityViewModel and helpers
 //
@@ -220,15 +221,7 @@ export const addEquipmentPackage = (
     language: Language,
     addListHeading: (heading: EquipmentListHeading, listId: number) => void,
     addListEntries: (entries: EquipmentListEntry[], listId: number | undefined, headerId?: number | undefined) => void,
-    addTimeEstimate: (name: string, hours: number) => void,
 ) => {
-    if (equipmentPackage.estimatedHours > 0) {
-        addTimeEstimate(
-            language === Language.SV ? equipmentPackage.name : equipmentPackage.nameEN ?? equipmentPackage.name,
-            equipmentPackage.estimatedHours,
-        );
-    }
-
     if (equipmentPackage.addAsHeading) {
         addHeadingEntry(
             language === Language.SV ? equipmentPackage.name : equipmentPackage.nameEN ?? equipmentPackage.name,
@@ -237,22 +230,16 @@ export const addEquipmentPackage = (
             language,
             addListHeading,
             language === Language.SV ? equipmentPackage.description : equipmentPackage.descriptionEN,
-            equipmentPackage.equipmentEntries.filter((x) => x.equipment) as {
+            equipmentPackage.equipmentEntries.filter((x) => x.equipment) as (EquipmentPackageEntry & {
                 equipment: Equipment;
-                numberOfUnits?: number;
-                isFree: boolean;
-                isHidden: boolean;
-            }[],
+            })[],
         );
         return;
     }
     addMultipleEquipment(
-        equipmentPackage.equipmentEntries.filter((x) => x.equipment) as {
+        getSortedList(equipmentPackage.equipmentEntries).filter((x) => x.equipment) as (EquipmentPackageEntry & {
             equipment: Equipment;
-            numberOfUnits?: number;
-            isFree: boolean;
-            isHidden: boolean;
-        }[],
+        })[],
         list,
         pricePlan,
         language,
@@ -267,7 +254,15 @@ export const addHeadingEntry = (
     language: Language,
     addListHeading: (heading: EquipmentListHeading, listId: number) => void,
     headingDescription = '',
-    entries: { equipment: Equipment; numberOfUnits?: number; isFree?: boolean; isHidden?: boolean }[] = [],
+    entries: {
+        id: number;
+        equipment: Equipment;
+        numberOfUnits?: number;
+        numberOfHours?: number;
+        sortIndex: number;
+        isFree?: boolean;
+        isHidden?: boolean;
+    }[] = [],
 ) => {
     const nextHeadingId = getNextEquipmentListHeadingEntryId(list);
     const nextHeadingSortIndex = getNextSortIndex(list.listEntries);
@@ -275,11 +270,15 @@ export const addHeadingEntry = (
     let nextId = getNextEquipmentListEntryId(list);
     let nextSortIndex = 10;
 
-    const entriesToAdd = entries.map((x) => {
+    const entriesToAdd = getSortedList(entries).map((x) => {
         const overrides: Partial<EquipmentListEntry> = {};
 
         if (x.numberOfUnits !== undefined) {
             overrides.numberOfUnits = x.numberOfUnits;
+        }
+
+        if (x.numberOfHours !== undefined) {
+            overrides.numberOfHours = x.numberOfHours;
         }
 
         if (x.isHidden !== undefined) {

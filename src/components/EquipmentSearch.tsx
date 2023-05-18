@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
 import styles from './EquipmentSearch.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCubes, faTag } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faCubes, faTag } from '@fortawesome/free-solid-svg-icons';
 import { toEquipmentPackage } from '../lib/mappers/equipmentPackage';
 import { EquipmentSearchResult } from '../models/misc/SearchResult';
 import { getResponseContentOrError } from '../lib/utils';
@@ -126,6 +126,9 @@ const EquipmentSearch: React.FC<Props> = ({
                     <SplitHighlighter search={state.text} textToHighlight={displayName} />{' '}
                     {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
                     {entity.type === ResultType.EQUIPMENTTAG ? <FontAwesomeIcon icon={faTag} /> : null}
+                    {(typedEntity as IEquipmentPackageObjectionModel).estimatedHours > 0 ? (
+                        <FontAwesomeIcon icon={faClock} className="ml-2" />
+                    ) : null}
                 </div>
                 <div>
                     <small>

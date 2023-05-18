@@ -572,6 +572,17 @@ export async function seed(knex) {
                 descriptionEN: '',
                 addAsHeading: 1,
             },
+            {
+                name: 'Lunchföreläsning',
+                created: getVarianceDateString(-100),
+                updated: getVarianceDateString(100),
+                note: '',
+                estimatedHours: 2,
+                nameEN: 'Lunch lecture',
+                description: '',
+                descriptionEN: '',
+                addAsHeading: 0,
+            },
         ])
         .returning('id')
         .then((ids) => ids[0].id);
@@ -583,6 +594,7 @@ export async function seed(knex) {
             equipmentId: equipmentIds.baseSpeaker,
             equipmentPackageId: firstEquipmentPackageId,
             numberOfUnits: 4,
+            numberOfHours: 0,
             isHidden: 0,
         },
         {
@@ -591,6 +603,7 @@ export async function seed(knex) {
             equipmentId: equipmentIds.topSpeaker,
             equipmentPackageId: firstEquipmentPackageId,
             numberOfUnits: 2,
+            numberOfHours: 0,
             isHidden: 0,
         },
         {
@@ -599,7 +612,26 @@ export async function seed(knex) {
             equipmentId: equipmentIds.amplifier,
             equipmentPackageId: firstEquipmentPackageId,
             numberOfUnits: 1,
+            numberOfHours: 0,
             isHidden: 1,
+        },
+        {
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.projector,
+            equipmentPackageId: firstEquipmentPackageId + 1,
+            numberOfUnits: 1,
+            numberOfHours: 1,
+            isHidden: 0,
+        },
+        {
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            equipmentId: equipmentIds.wirelessMicrophone,
+            equipmentPackageId: firstEquipmentPackageId + 1,
+            numberOfUnits: 2,
+            numberOfHours: 0,
+            isHidden: 0,
         },
     ]);
 

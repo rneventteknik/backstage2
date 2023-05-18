@@ -36,7 +36,7 @@ import {
     saveListEntryApiCall,
     saveListHeadingApiCall,
 } from '../../../lib/equipmentListUtils';
-import { EquipmentPrice } from '../../../models/interfaces';
+import { EquipmentPrice, TimeEstimate } from '../../../models/interfaces';
 import EquipmentListTable from './EquipmentListTable';
 import EquipmentListHeader from './EquipmentListHeader';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
@@ -333,12 +333,12 @@ const EquipmentListDisplay: React.FC<Props> = ({
             });
     };
 
-    const addTimeEstimate = async (name: string, hours: number) => {
+    const addTimeEstimate = async (timeEstimate: Partial<TimeEstimate>) => {
         const timeEstimateToSend: ITimeEstimateObjectionModel = {
             bookingId: booking.id,
-            numberOfHours: hours,
-            pricePerHour: defaultLaborHourlyRate,
-            name: name,
+            numberOfHours: timeEstimate.numberOfHours ?? 0,
+            pricePerHour: timeEstimate.pricePerHour ?? defaultLaborHourlyRate,
+            name: timeEstimate.name ?? '',
             sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
         };
 
@@ -426,6 +426,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     otherLists={booking.equipmentLists?.filter((x) => x.id !== list.id) ?? []}
                     pricePlan={booking.pricePlan}
                     language={booking.language}
+                    defaultLaborHourlyRate={defaultLaborHourlyRate}
                     saveListEntry={saveListEntry}
                     saveListHeading={saveListHeading}
                     saveListEntriesAndHeadings={saveListEntriesAndHeadings}
