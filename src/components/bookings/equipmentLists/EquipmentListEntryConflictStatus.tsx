@@ -10,10 +10,12 @@ import { getMaximumNumberOfUnitUsed } from '../../../lib/utils';
 import { Status } from '../../../models/enums/Status';
 import { Equipment } from '../../../models/interfaces';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
+import { getEquipmentInDatetime, getEquipmentOutDatetime } from '../../../lib/datetimeUtils';
 
 type Props = {
     equipment: Equipment;
     equipmentList: EquipmentList;
+    otherLists: EquipmentList[];
     startDatetime: Date;
     endDatetime: Date;
 };
@@ -23,6 +25,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
     startDatetime,
     endDatetime,
     equipmentList,
+    otherLists,
 }: Props) => {
     const { data, error, isValidating } = useSwr(
         '/api/conflict-detection/booking-with-equipment?equipmentId=' +
@@ -67,6 +70,29 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
         );
     }
 
+    // Check local lists in client for conflicts. These override the remote lists if they have the same id.
+    const startTime = getEquipmentOutDatetime(equipmentList);
+    const endTime = getEquipmentInDatetime(equipmentList);
+
+    const localOverlappingLists = otherLists
+        .filter(
+            (list) =>
+                list.listEntries.some((entry) => entry.equipment?.id === equipment.id) ||
+                list.listHeadings.some((heading) =>
+                    heading.listEntries.some((entry) => entry.equipment?.id === equipment.id),
+                ),
+        )
+        .filter((list) => {
+            const equipmentOut = getEquipmentOutDatetime(list);
+            const equipmentIn = getEquipmentInDatetime(list);
+
+            if (!equipmentOut || !equipmentIn || !startTime || !endTime) {
+                return false;
+            }
+
+            return equipmentOut <= endTime && equipmentIn >= startTime;
+        });
+
     // Filter bookings
     const bookings = data?.filter((x) => x.status !== Status.CANCELED) ?? [];
 
@@ -74,7 +100,10 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
     const numberOfUnitsUsedByThisList = getMaximumNumberOfUnitUsed([equipmentList], equipment);
 
     // Calculate the max number of units used at the same time.
-    const overlappingEquipmentLists = bookings.flatMap((x) => x.equipmentLists ?? []);
+    const remoteOverlappingEquipmentLists = bookings
+        .flatMap((x) => x.equipmentLists ?? [])
+        .filter((list) => !otherLists.some((x) => x.id === list.id));
+    const overlappingEquipmentLists = [...localOverlappingLists, ...remoteOverlappingEquipmentLists];
     const numberOfUnitsUsedByOthers = getMaximumNumberOfUnitUsed(overlappingEquipmentLists, equipment);
     const maxNumberOfUnitsUsed = numberOfUnitsUsedByOthers + numberOfUnitsUsedByThisList;
 

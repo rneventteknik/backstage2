@@ -423,6 +423,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
             {showListContent ? (
                 <EquipmentListTable
                     list={list}
+                    otherLists={booking.equipmentLists?.filter((x) => x.id !== list.id) ?? []}
                     pricePlan={booking.pricePlan}
                     language={booking.language}
                     saveListEntry={saveListEntry}

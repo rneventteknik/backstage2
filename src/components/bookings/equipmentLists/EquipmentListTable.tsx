@@ -61,6 +61,7 @@ import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 
 type Props = {
     list: EquipmentList;
+    otherLists: EquipmentList[];
     pricePlan: PricePlan;
     language: Language;
     saveListEntry: (entry: EquipmentListEntry) => void;
@@ -80,6 +81,7 @@ type Props = {
 
 const EquipmentListTable: React.FC<Props> = ({
     list,
+    otherLists,
     pricePlan,
     language,
     saveListEntry,
@@ -175,6 +177,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                 <EquipmentListEntryConflictStatus
                                     equipment={entry.equipment}
                                     equipmentList={list}
+                                    otherLists={otherLists}
                                     startDatetime={getEquipmentOutDatetime(list) ?? new Date()}
                                     endDatetime={getEquipmentInDatetime(list) ?? new Date()}
                                 />
