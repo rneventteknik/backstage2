@@ -31,9 +31,9 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.time-estimate-list.total': 'Total',
 
         // Booking total section
-        'common.total-price-section.heading': 'Totalt',
+        'common.total-price-section.heading': 'Sammanfattning',
         'common.total-price-section.time-estimate-sum': 'Personalkostnader',
-        'common.total-price-section.total-sum': 'Att betala SEK',
+        'common.total-price-section.total-sum': 'Summa inkl moms (SEK)',
         'common.total-price-section.vat': 'Varav moms (25%)',
 
         // Footer
@@ -109,9 +109,9 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.time-estimate-list.total': 'Total',
 
         // Booking total section
-        'common.total-price-section.heading': 'Total',
+        'common.total-price-section.heading': 'Summary',
         'common.total-price-section.time-estimate-sum': 'Personnel costs',
-        'common.total-price-section.total-sum': 'To pay SEK',
+        'common.total-price-section.total-sum': 'Total amount incl VAT (SEK)',
         'common.total-price-section.vat': 'VAT (25%)',
 
         // Footer
