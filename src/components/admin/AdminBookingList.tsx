@@ -215,7 +215,7 @@ const AdminBookingList: React.FC<Props> = ({
             {
                 key: 'date',
                 displayName: 'Datum',
-                getValue: (booking: BookingViewModel) => booking.displayUsageStartString,
+                getValue: (booking: BookingViewModel) => booking.isoFormattedUsageStartString,
                 cellHideSize: 'lg',
                 columnWidth: 150,
                 textAlignment: 'left',
