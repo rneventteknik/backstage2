@@ -10,6 +10,7 @@ import { Footer } from './shared/footer';
 import { useTextResources } from '../useTextResources';
 import { EquipmentListPackingInfo } from './shared/equipmentListPackingInfo';
 import { KeyValue } from '../../models/interfaces/KeyValue';
+import { getSortedList } from '../../lib/sortIndexUtils';
 
 type Props = {
     booking: Booking;
@@ -46,7 +47,7 @@ export const PackingListDocument: React.FC<Props> = ({
 
                 <MainContent>
                     <View style={styles.flexGrow}>
-                        {booking.equipmentLists
+                        {getSortedList(booking.equipmentLists ?? [])
                             ?.filter((l) => equipmentListId === undefined || equipmentListId === l.id)
                             .map((l) => (
                                 <EquipmentListPackingInfo list={l} booking={booking} key={l.id} />

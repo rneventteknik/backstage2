@@ -10,6 +10,7 @@ import {
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { useTextResources } from '../../useTextResources';
 import { Booking } from '../../../models/interfaces';
+import { getSortedList } from '../../../lib/sortIndexUtils';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -45,7 +46,7 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking }: Props) => {
             </TableRow>
 
             <View>
-                {booking.timeEstimates?.map((timeEstimate) => (
+                {getSortedList(booking.timeEstimates ?? []).map((timeEstimate) => (
                     <TableRow key={timeEstimate.id}>
                         <TableCellAutoWidth>
                             <Text>{timeEstimate.name}</Text>
