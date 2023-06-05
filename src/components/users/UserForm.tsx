@@ -42,7 +42,6 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
             clearingNumber: form.clearingNumber.value,
             bankName: form.bankName.value,
             homeAddress: form.homeAddress.value,
-            zipCode: form.zipCode.value,
         };
 
         handleSubmitUser(modifiedUser);
@@ -174,16 +173,16 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                         <Form.Control type="text" name="bankName" defaultValue={user?.bankName} />
                     </Form.Group>
                 </Col>
-                <Col lg="3">
+                <Col lg="12">
                     <Form.Group controlId="formHomeAddress">
-                        <Form.Label>Hemadress</Form.Label>
-                        <Form.Control type="text" name="homeAddress" defaultValue={user?.homeAddress} />
-                    </Form.Group>
-                </Col>
-                <Col lg="3">
-                    <Form.Group controlId="formZipCode">
-                        <Form.Label>Postnummer</Form.Label>
-                        <Form.Control type="text" name="zipCode" defaultValue={user?.zipCode} />
+                        <Form.Label>Adress</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            name="homeAddress"
+                            defaultValue={user?.homeAddress}
+                            placeholder={'Hemvägen 2\n123 45 Ort'}
+                            rows={2}
+                        />
                     </Form.Group>
                 </Col>
             </Row>

@@ -61,8 +61,7 @@ export async function seed(knex) {
                 bankName: 'Handelssparbanken',
                 clearingNumber: '1234',
                 bankAccount: '456-123-7890',
-                homeAddress: 'Hemvägen 8',
-                zipCode: '123 45',
+                homeAddress: 'Hemvägen 8\n123 45 Storstaden',
             },
             {
                 name: 'Markus Medlem',

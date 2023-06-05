@@ -14,6 +14,5 @@ export interface User extends BaseEntityWithName {
     clearingNumber?: string;
     bankAccount?: string;
     homeAddress?: string;
-    zipCode?: string;
     username?: string;
 }

@@ -36,7 +36,6 @@ export async function seed(knex) {
                 clearingNumber: '',
                 bankAccount: '',
                 homeAddress: '',
-                zipCode: '',
             },
         ])
         .returning('id')

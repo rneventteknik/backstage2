@@ -127,8 +127,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                             user.bankAccount ||
                             user.clearingNumber ||
                             user.bankName ||
-                            user.homeAddress ||
-                            user.zipCode ? (
+                            user.homeAddress ? (
                                 <ListGroup variant="flush">
                                     <ListGroup.Item className="d-flex">
                                         <span className="flex-grow-1">Personnummer</span>
@@ -146,13 +145,13 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                         <span className="flex-grow-1">Banknamn</span>
                                         <span>{user.bankName}</span>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Hemadress</span>
-                                        <span>{user.homeAddress}</span>
-                                    </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Postnummer</span>
-                                        <span>{user.zipCode}</span>
+                                    <ListGroup.Item>
+                                        <div className="mb-1">Adress</div>
+                                        <div className="text-muted">
+                                            {user.homeAddress?.split('\n').map((addressLine, i) => (
+                                                <div key={i}>{addressLine}</div>
+                                            ))}
+                                        </div>
                                     </ListGroup.Item>
                                 </ListGroup>
                             ) : (

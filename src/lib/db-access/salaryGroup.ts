@@ -30,14 +30,7 @@ export const fetchSalaryGroupWithSalaryInformation = async (
         .withGraphFetched('bookings.timeReports.user(selectPersonalInformation)')
         .modifiers({
             selectPersonalInformation(builder) {
-                builder.select(
-                    'personalIdentityNumber',
-                    'bankName',
-                    'clearingNumber',
-                    'bankAccount',
-                    'homeAddress',
-                    'zipCode',
-                );
+                builder.select('personalIdentityNumber', 'bankName', 'clearingNumber', 'bankAccount', 'homeAddress');
             },
         });
 };

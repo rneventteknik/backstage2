@@ -42,7 +42,6 @@ export const SalaryReportDocument: React.FC<Props> = ({ salaryReport, globalSett
                             <InfoItem title={'E-mail'} content={userSalaryReport.user.emailAddress}></InfoItem>
                             <InfoItem title={'Telefon'} content={userSalaryReport.user.phoneNumber}></InfoItem>
                             <InfoItem title={'Adress'} content={userSalaryReport.user.homeAddress}></InfoItem>
-                            <InfoItem title={'Postnummer'} content={userSalaryReport.user.zipCode}></InfoItem>
                         </Col>
                         <Col>
                             <InfoItem title={'Banknamn'} content={userSalaryReport.user.bankName}></InfoItem>
