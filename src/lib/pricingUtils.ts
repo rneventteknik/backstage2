@@ -148,7 +148,9 @@ export const calculateSalary = (
     wageRatioThs: number,
 ): UserSalaryReport[] => {
     const timeReports = bookings.flatMap((booking) =>
-        (booking.timeReports ?? []).map((timereport) => ({ ...timereport, booking: booking })),
+        (booking.timeReports ?? [])
+            .filter((timeReport) => timeReport.billableWorkingHours > 0)
+            .map((timeReport) => ({ ...timeReport, booking: booking })),
     );
 
     const timeReportsByUser = groupBy(timeReports, (x) => x?.userId ?? 0);
@@ -163,7 +165,7 @@ export const calculateSalary = (
 
         const salaryLines = timeReportByUser.map((x) => {
             const hourlyWageRatio = x.booking.pricePlan === PricePlan.THS ? wageRatioThs : wageRatioExternal;
-            const hourlyWage = x.pricePerHour * hourlyWageRatio;
+            const hourlyWage = Math.floor(x.pricePerHour * hourlyWageRatio);
 
             return {
                 timeReportId: x.id,
