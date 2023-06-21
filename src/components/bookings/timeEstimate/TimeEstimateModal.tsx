@@ -36,7 +36,7 @@ const TimeEstimateModal: React.FC<Props> = ({
     return (
         <Modal show={!!timeEstimate} onHide={() => handleHide()} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{timeEstimate?.id ? 'Redigera tidsestimat' : 'Lägg till tidsestimat'}</Modal.Title>
+                <Modal.Title>{timeEstimate?.id ? 'Redigera tidsestimat' : 'Nytt tidsestimat'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit} id={formId}>

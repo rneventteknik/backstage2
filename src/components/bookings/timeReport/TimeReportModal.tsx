@@ -72,7 +72,7 @@ const TimeReportModal: React.FC<Props> = ({
     return (
         <Modal show={!!timeReport} onHide={() => handleHide()} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{timeReport?.id ? 'Redigera tidrapport' : 'Rapportera tid'}</Modal.Title>
+                <Modal.Title>{timeReport?.id ? 'Redigera tidrapport' : 'Ny tidrapport'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit} id={formId}>
@@ -136,7 +136,6 @@ const TimeReportModal: React.FC<Props> = ({
                         </Col>
                     </Row>
                     <hr />
-
                     <Row>
                         <Col md={4} xs={6}>
                             <Form.Group>
@@ -244,6 +243,10 @@ const TimeReportModal: React.FC<Props> = ({
                             </Form.Group>
                         </Col>
                     </Row>
+                    <span className="text-muted">
+                        Tidrapporter används för att fakturera kunden för arbetad tid. Vill du skapa en prisuppskattning
+                        med personalkostnad i, använd tidsestimat istället.
+                    </span>
                 </Form>
             </Modal.Body>
             <Modal.Footer>

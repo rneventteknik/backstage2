@@ -42,23 +42,17 @@ type Props = {
     bookingId: number;
     pricePlan: number;
     readonly: boolean;
-    showContent: boolean;
-    setShowContent: (bool: boolean) => void;
     defaultLaborHourlyRate: number;
 };
 
-const TimeEstimateList: React.FC<Props> = ({
-    bookingId,
-    readonly,
-    showContent,
-    setShowContent,
-    defaultLaborHourlyRate,
-}: Props) => {
+const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHourlyRate }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
+
+    const [timeEstimateToEditViewModel, setTimeEstimateToEditViewModel] = useState<Partial<TimeEstimate> | null>(null);
+    const [showContent, setShowContent] = useState(false);
 
     const { showSaveSuccessNotification, showSaveFailedNotification, showDeleteFailedNotification } =
         useNotifications();
-    const [timeEstimateToEditViewModel, setTimeEstimateToEditViewModel] = useState<Partial<TimeEstimate> | null>(null);
 
     // Extract the lists
     //
@@ -116,12 +110,12 @@ const TimeEstimateList: React.FC<Props> = ({
             }),
         )
             .then(() => {
-                showSaveSuccessNotification('Tidsuppskattningen');
+                showSaveSuccessNotification('Tidsestimatet');
                 mutate();
             })
             .catch((error: Error) => {
                 console.error(error);
-                showSaveFailedNotification('Tidsuppskattningen');
+                showSaveFailedNotification('Tidsestimatet');
                 mutate();
             });
     };
@@ -139,7 +133,7 @@ const TimeEstimateList: React.FC<Props> = ({
             .then(getResponseContentOrError)
             .catch((error) => {
                 console.error(error);
-                showDeleteFailedNotification('Tidsuppskattningen');
+                showDeleteFailedNotification('Tidsestimatet');
             });
     };
 
@@ -258,10 +252,6 @@ const TimeEstimateList: React.FC<Props> = ({
         ],
     };
 
-    if (!timeEstimates.length) {
-        return null;
-    }
-
     const onAdd = async (data: TimeEstimate) => {
         setShowContent(true);
         mutateTimeEstimates([...(timeEstimates ?? []), data]);
@@ -273,7 +263,7 @@ const TimeEstimateList: React.FC<Props> = ({
                 <div className="d-flex">
                     <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
                         <FontAwesomeIcon className="mr-2" icon={faClock} />
-                        Tidsuppskattning
+                        Tidsestimat
                     </div>
                     <div className="d-flex">
                         <Button className="mr-2" variant="" onClick={() => setShowContent(!showContent)}>
@@ -300,7 +290,7 @@ const TimeEstimateList: React.FC<Props> = ({
                             defaultLaborHourlyRate={defaultLaborHourlyRate}
                         >
                             <FontAwesomeIcon icon={faPlus} className="mr-1" />
-                            Ny tiduppskattning
+                            Nytt tidsestimat
                         </TimeEstimateAddButton>
                     )}
                 </>

@@ -20,7 +20,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faClock, faCoins, faFileDownload, faPen, faStopwatch } from '@fortawesome/free-solid-svg-icons';
+import { faCoins, faFileDownload, faPen } from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
 import EquipmentLists from '../../../components/bookings/equipmentLists/EquipmentLists';
 import BookingStatusButton from '../../../components/bookings/BookingStatusButton';
@@ -39,9 +39,6 @@ import {
 } from '../../../lib/pricingUtils';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
-import { TimeEstimate, TimeReport } from '../../../models/interfaces';
-import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/TimeEstimateAddButton';
-import TimeReportAddButton from '../../../components/bookings/timeReport/TimeReportAddButton';
 import { toBookingViewModel } from '../../../lib/datetimeUtils';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import MarkdownCard from '../../../components/MarkdownCard';
@@ -55,8 +52,6 @@ type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
 const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
-    const [showTimeEstimateContent, setShowTimeEstimateContent] = useState(false);
-    const [showTimeReportContent, setShowTimeReportContent] = useState(false);
 
     // Enable this when we enable the KårX feature
     // const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
@@ -138,30 +133,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         { link: '/bookings/' + booking.id, displayName: pageTitle },
     ];
 
-    const mutateTimeEstimates = (updatedTimeEstimates: TimeEstimate[]) => {
-        if (!booking) {
-            throw new Error('Invalid booking');
-        }
-        mutate({ ...booking, timeEstimates: updatedTimeEstimates }, false);
-    };
-
-    const mutateTimeReports = (updatedTimeReports: TimeReport[]) => {
-        if (!booking) {
-            throw new Error('Invalid booking');
-        }
-        mutate({ ...booking, timeReports: updatedTimeReports }, false);
-    };
-
-    const onAddTimeEstimate = async (timeEstimate: TimeEstimate) => {
-        setShowTimeEstimateContent(true);
-        mutateTimeEstimates([...(booking.timeEstimates ?? []), timeEstimate]);
-    };
-
-    const onAddTimeReport = async (timeReport: TimeReport) => {
-        setShowTimeReportContent(true);
-        mutateTimeReports([...(booking.timeReports ?? []), timeReport]);
-    };
-
     const defaultLaborHourlyRate = getDefaultLaborHourlyRate(booking.pricePlan, globalSettings);
 
     return (
@@ -202,37 +173,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
-                <IfNotReadonly currentUser={currentUser} and={booking.status !== Status.DONE}>
-                    <Dropdown as={ButtonGroup}>
-                        <TimeReportAddButton
-                            booking={booking}
-                            disabled={booking.status === Status.DONE}
-                            onAdd={onAddTimeReport}
-                            currentUser={currentUser}
-                            variant="secondary"
-                            defaultLaborHourlyRate={defaultLaborHourlyRate}
-                        >
-                            <FontAwesomeIcon icon={faStopwatch} className="mr-1" />
-                            Rapportera tid
-                        </TimeReportAddButton>
-
-                        <Dropdown.Toggle split variant="secondary" id="dropdown-split-basic" />
-
-                        <Dropdown.Menu>
-                            <TimeEstimateAddButton
-                                booking={booking}
-                                disabled={booking.status === Status.DONE}
-                                onAdd={onAddTimeEstimate}
-                                defaultLaborHourlyRate={defaultLaborHourlyRate}
-                                variant="secondary"
-                                className="dropdown-item"
-                            >
-                                <FontAwesomeIcon icon={faClock} className="mr-1 fw" />
-                                Ny tidsuppskattning
-                            </TimeEstimateAddButton>
-                        </Dropdown.Menu>
-                    </Dropdown>
-                </IfNotReadonly>
                 <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="secondary" />
                 <IfNotReadonly
                     currentUser={currentUser}
@@ -282,16 +222,12 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 <Col xl={8}>
                     <BookingInfoSection booking={booking} showName={false} className="d-xl-none mb-3" />
                     <TimeEstimateList
-                        showContent={showTimeEstimateContent}
-                        setShowContent={setShowTimeEstimateContent}
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
                         readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
                         defaultLaborHourlyRate={defaultLaborHourlyRate}
                     />
                     <TimeReportList
-                        showContent={showTimeReportContent}
-                        setShowContent={setShowTimeReportContent}
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
                         currentUser={currentUser}
@@ -317,7 +253,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                 </ListGroup.Item>
                             ))}
                             <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Personal (estimat)</span>
+                                <span className="flex-grow-1">Estimerad personalkostnad</span>
                                 <span>
                                     {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
                                 </span>

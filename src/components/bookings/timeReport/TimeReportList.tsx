@@ -45,23 +45,15 @@ type Props = {
     pricePlan: number;
     currentUser: CurrentUserInfo;
     readonly: boolean;
-    showContent: boolean;
-    setShowContent: (bol: boolean) => void;
     defaultLaborHourlyRate: number;
 };
 
-const TimeReportList: React.FC<Props> = ({
-    bookingId,
-    currentUser,
-    readonly,
-    showContent,
-    setShowContent,
-    defaultLaborHourlyRate,
-}: Props) => {
+const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, defaultLaborHourlyRate }: Props) => {
     const { data: data, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
     const { data: users } = useSwr('/api/users', usersFetcher);
 
     const [timeReportToEditViewModel, setTimeReportToEditViewModel] = useState<Partial<TimeReport> | null>(null);
+    const [showContent, setShowContent] = useState(false);
 
     const { showSaveSuccessNotification, showSaveFailedNotification, showDeleteFailedNotification } =
         useNotifications();
@@ -325,10 +317,6 @@ const TimeReportList: React.FC<Props> = ({
         ],
     };
 
-    if (!timeReports.length) {
-        return null;
-    }
-
     const onAdd = async (data: TimeReport) => {
         setShowContent(true);
         mutateTimeReports([...(timeReports ?? []), data]);
@@ -340,7 +328,7 @@ const TimeReportList: React.FC<Props> = ({
                 <div className="d-flex">
                     <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
                         <FontAwesomeIcon className="mr-2" icon={faStopwatch} />
-                        Tidrapportering
+                        Tidrapporter
                     </div>
                     <div className="d-flex">
                         <Button className="mr-2" variant="" onClick={() => setShowContent(!showContent)}>
