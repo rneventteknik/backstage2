@@ -6,7 +6,7 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { bookingsFetcher } from '../../../lib/fetchers';
-import { getMaximumNumberOfUnitUsed } from '../../../lib/utils';
+import { getMaximumNumberOfUnitUsed, listContainsEquipment } from '../../../lib/utils';
 import { Status } from '../../../models/enums/Status';
 import { Equipment } from '../../../models/interfaces';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
@@ -75,13 +75,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
     const endTime = getEquipmentInDatetime(equipmentList);
 
     const localOverlappingLists = otherLists
-        .filter(
-            (list) =>
-                list.listEntries.some((entry) => entry.equipment?.id === equipment.id) ||
-                list.listHeadings.some((heading) =>
-                    heading.listEntries.some((entry) => entry.equipment?.id === equipment.id),
-                ),
-        )
+        .filter((list) => listContainsEquipment(list, equipment))
         .filter((list) => {
             const equipmentOut = getEquipmentOutDatetime(list);
             const equipmentIn = getEquipmentInDatetime(list);

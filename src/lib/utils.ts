@@ -397,6 +397,10 @@ export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equi
             ),
     );
 
+export const listContainsEquipment = (list: EquipmentList, equipment: HasId) =>
+    list.listEntries.some((entry) => entry.equipment?.id === equipment.id) ||
+    list.listHeadings.some((heading) => heading.listEntries.some((entry) => entry.equipment?.id === equipment.id));
+
 export const range = (start: number, end: number): number[] => {
     return [...Array(end - start).keys()].map((i) => i + start);
 };

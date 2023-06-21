@@ -4,7 +4,9 @@ import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import { bookingsFetcher } from '../../lib/fetchers';
-import { Equipment } from '../../models/interfaces';
+import { listContainsEquipment } from '../../lib/utils';
+import { RentalStatus } from '../../models/enums/RentalStatus';
+import { BookingViewModel, Equipment } from '../../models/interfaces';
 import SmallBookingTable from '../SmallBookingTable';
 
 type Props = {
@@ -16,27 +18,35 @@ const EquipmentBookings: React.FC<Props> = ({ equipment }: Props) => {
 
     const bookingViewModels = bookings?.map(toBookingViewModel) ?? [];
 
+    const bookingHasNonReturnedListWithEquipment = (booking: BookingViewModel) =>
+        booking.equipmentLists?.some(
+            (list) => list.rentalStatus === RentalStatus.OUT && listContainsEquipment(list, equipment),
+        );
+
     const currentBookings = bookingViewModels.filter(
         (x) =>
-            x.usageStartDatetime &&
-            x.usageEndDatetime &&
-            x.usageStartDatetime.getTime() < Date.now() &&
-            x.usageEndDatetime.getTime() > Date.now(),
+            (x.equipmentOutDatetime &&
+                x.equipmentInDatetime &&
+                x.equipmentOutDatetime.getTime() < Date.now() &&
+                x.equipmentInDatetime.getTime() > Date.now()) ||
+            bookingHasNonReturnedListWithEquipment(x),
     );
     const futureBookings = bookingViewModels.filter(
         (x) =>
-            x.usageStartDatetime &&
-            x.usageEndDatetime &&
-            x.usageStartDatetime.getTime() > Date.now() &&
-            x.usageEndDatetime.getTime() > Date.now(),
+            x.equipmentOutDatetime &&
+            x.equipmentInDatetime &&
+            x.equipmentOutDatetime.getTime() > Date.now() &&
+            x.equipmentInDatetime.getTime() > Date.now() &&
+            !bookingHasNonReturnedListWithEquipment(x),
     );
     const pastBookings = bookingViewModels
         .filter(
             (x) =>
-                x.usageStartDatetime &&
-                x.usageEndDatetime &&
-                x.usageStartDatetime.getTime() < Date.now() &&
-                x.usageEndDatetime.getTime() < Date.now(),
+                x.equipmentOutDatetime &&
+                x.equipmentInDatetime &&
+                x.equipmentOutDatetime.getTime() < Date.now() &&
+                x.equipmentInDatetime.getTime() < Date.now() &&
+                !bookingHasNonReturnedListWithEquipment(x),
         )
         .slice(0, 10);
 
@@ -47,7 +57,7 @@ const EquipmentBookings: React.FC<Props> = ({ equipment }: Props) => {
     return (
         <>
             <SmallBookingTable
-                title={'Pågående bokningar'}
+                title={'Pågående eller utlämnade bokningar'}
                 bookings={currentBookings}
                 tableSettingsOverride={{ noResultsLabel: 'Inga pågående bokningar använder ' + equipment.name }}
             />

@@ -86,7 +86,11 @@ export const fetchBookingsForEquipment = async (equipmentId: number): Promise<Bo
                 .where('equipmentLists:listHeadings:listEntries.equipmentId', equipmentId)
                 .select('Booking.id'),
         )
-        .withGraphFetched('equipmentLists');
+        .withGraphFetched('equipmentLists')
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('equipmentLists.listEntries.equipment')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment');
 };
 
 export const fetchBookingsReadyForCashPayment = async (): Promise<BookingObjectionModel[]> => {
