@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Role } from '../../../../../models/enums/Role';
 import {
     respondWithAccessDeniedResponse,
+    respondWithCustomErrorMessage,
     respondWithEntityNotFoundResponse,
     respondWithInvalidMethodResponse,
 } from '../../../../../lib/apiResponses';
@@ -54,6 +55,11 @@ const handler = withSessionContext(
                     (booking.status === Status.DONE && context.currentUser.role !== Role.ADMIN)
                 ) {
                     respondWithAccessDeniedResponse(res);
+                    return;
+                }
+
+                if (booking.equipmentLists.length === 1) {
+                    respondWithCustomErrorMessage(res, 'At least one list is required.');
                     return;
                 }
 

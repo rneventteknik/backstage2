@@ -62,6 +62,7 @@ type Props = {
     moveListDown: () => void;
     disableMoveUp: boolean;
     disableMoveDown: boolean;
+    disableDelete: boolean;
     readonly: boolean;
 };
 
@@ -85,6 +86,7 @@ const EquipmentListHeader: React.FC<Props> = ({
     moveListDown,
     disableMoveUp,
     disableMoveDown,
+    disableDelete,
     readonly,
 }: Props) => {
     const [showEmptyListModal, setShowEmptyListModal] = useState(false);
@@ -304,22 +306,26 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     Vill du verkligen tömma listan {list.name}?
                                 </ConfirmModal>
 
-                                <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                                    <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort
-                                    utrustningslistan
-                                </Dropdown.Item>
-                                <ConfirmModal
-                                    show={showDeleteModal}
-                                    onHide={() => setShowDeleteModal(false)}
-                                    confirmLabel="Ta bort"
-                                    onConfirm={() => {
-                                        setShowDeleteModal(false);
-                                        deleteList();
-                                    }}
-                                    title="Bekräfta"
-                                >
-                                    Vill du verkligen ta bort listan {list.name}?
-                                </ConfirmModal>
+                                {!disableDelete ? (
+                                    <>
+                                        <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
+                                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort
+                                            utrustningslistan
+                                        </Dropdown.Item>
+                                        <ConfirmModal
+                                            show={showDeleteModal}
+                                            onHide={() => setShowDeleteModal(false)}
+                                            confirmLabel="Ta bort"
+                                            onConfirm={() => {
+                                                setShowDeleteModal(false);
+                                                deleteList();
+                                            }}
+                                            title="Bekräfta"
+                                        >
+                                            Vill du verkligen ta bort listan {list.name}?
+                                        </ConfirmModal>
+                                    </>
+                                ) : null}
                             </DropdownButton>
                         </>
                     )}

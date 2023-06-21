@@ -84,7 +84,8 @@ const EquipmentListDisplay: React.FC<Props> = ({
 
     // Extract this list
     //
-    const list = booking?.equipmentLists?.find((list) => list.id === partialList.id);
+    const list = booking?.equipmentLists?.find((x) => x.id === partialList.id);
+    const otherLists = booking?.equipmentLists?.filter((x) => x.id !== list?.id) ?? [];
 
     // Error handling
     //
@@ -416,6 +417,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     moveListDown={() => parentMoveListFn(list, 'DOWN')}
                     disableMoveUp={parentIsFirstFn(list)}
                     disableMoveDown={parentIsLastFn(list)}
+                    disableDelete={otherLists.length === 0}
                     readonly={readonly}
                 />
             </Card.Header>
@@ -423,7 +425,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
             {showListContent ? (
                 <EquipmentListTable
                     list={list}
-                    otherLists={booking.equipmentLists?.filter((x) => x.id !== list.id) ?? []}
+                    otherLists={otherLists}
                     pricePlan={booking.pricePlan}
                     language={booking.language}
                     defaultLaborHourlyRate={defaultLaborHourlyRate}

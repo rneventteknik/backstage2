@@ -134,6 +134,7 @@ const EquipmentLists: React.FC<Props> = ({ bookingId, readonly, defaultLaborHour
             .catch((error) => {
                 console.error(error);
                 showDeleteFailedNotification('Listan');
+                mutate();
             });
     };
 
