@@ -18,11 +18,14 @@ import { BookingViewModel } from '../../models/interfaces';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import BookingTypeTag from '../utils/BookingTypeTag';
 import DoneIcon from '../utils/DoneIcon';
+import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
 import TableStyleLink from '../utils/TableStyleLink';
 
 type Props = {
     bookings: BookingViewModel[];
     selectedBookingIds?: number[];
+    allowEditInvoiceNumber?: boolean;
+    updateInvoiceNumber?: (booking: BookingViewModel, newInvoiceNumber: string) => void;
     onToggleSelect?: (booking: BookingViewModel) => void;
     isDisabled?: (booking: BookingViewModel) => boolean;
     tableSettingsOverride?: Partial<TableConfiguration<BookingViewModel>>;
@@ -31,9 +34,11 @@ type Props = {
 const AdminBookingList: React.FC<Props> = ({
     bookings,
     selectedBookingIds,
+    updateInvoiceNumber,
     onToggleSelect,
     isDisabled,
     tableSettingsOverride,
+    allowEditInvoiceNumber = false,
 }: Props) => {
     // Table display functions
     //
@@ -60,6 +65,23 @@ const AdminBookingList: React.FC<Props> = ({
 
         return 'Inte utlämnad';
     };
+
+    const bookingReferenceDisplayFn = (booking: BookingViewModel) => (
+        <>
+            <DoubleClickToEdit
+                readonly={!allowEditInvoiceNumber}
+                onUpdate={(newInvoiceNumber: string) => {
+                    if (!updateInvoiceNumber) {
+                        throw new Error('Missing updateInvoiceNumber');
+                    }
+                    updateInvoiceNumber(booking, newInvoiceNumber);
+                }}
+                value={booking.invoiceNumber}
+            >
+                {replaceEmptyStringWithNull(booking.invoiceNumber) ?? <span className="text-muted">XXXXXXX</span>}
+            </DoubleClickToEdit>
+        </>
+    );
 
     const bookingNameDisplayFn = (booking: BookingViewModel) => {
         const customAccountsOnBooking =
@@ -201,9 +223,10 @@ const AdminBookingList: React.FC<Props> = ({
                 key: 'reference',
                 displayName: 'Referens',
                 getValue: (booking: BookingViewModel) => booking.invoiceNumber,
+                getContentOverride: bookingReferenceDisplayFn,
                 textTruncation: true,
                 cellHideSize: 'lg',
-                columnWidth: 90,
+                columnWidth: 110,
             },
             {
                 key: 'name',

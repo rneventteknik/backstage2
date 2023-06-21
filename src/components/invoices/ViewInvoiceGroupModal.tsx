@@ -69,6 +69,33 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
         });
     };
 
+    const setBookingInvoiceNumber = (invoiceNumber: string, bookingId: number) => {
+        const body = {
+            booking: {
+                id: bookingId,
+                invoiceNumber: invoiceNumber,
+            },
+        };
+
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        fetch('/api/bookings/' + bookingId, request)
+            .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
+            .then(toBooking)
+            .then(() => {
+                showSaveSuccessNotification('Bokningen');
+                onMutate();
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Bokningen');
+            });
+    };
+
     const resetAndHide = () => {
         onHide();
         setSelectedBookingIds([]);
@@ -120,6 +147,10 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                             bookings={invoiceGroup.bookings?.map(toBookingViewModel) ?? []}
                             selectedBookingIds={getSelectedBookingIds()}
                             onToggleSelect={toggleBookingSelection}
+                            allowEditInvoiceNumber={true}
+                            updateInvoiceNumber={(booking, newInvoiceNumber) =>
+                                setBookingInvoiceNumber(newInvoiceNumber, booking.id)
+                            }
                             isDisabled={() => false}
                             tableSettingsOverride={{ hideTableFilter: true, hideTableCountControls: true }}
                         />
