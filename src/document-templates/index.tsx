@@ -9,6 +9,7 @@ import { RentalConfirmationDocument } from './components/rentalConfirmationDocum
 import { SalaryReport } from '../models/misc/Salary';
 import { SalaryReportDocument } from './components/salaryReportDocument';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import { formatDateForForm, toBookingViewModel } from '../lib/datetimeUtils';
 import { InvoiceData } from '../models/misc/Invoice';
 import { InvoiceDocument } from './components/invoiceDocument';
 
@@ -32,12 +33,22 @@ export const getPriceEstimateDocumentFileName = (
     booking: Booking,
     documentLanguage: Language,
     globalSettings: KeyValue[],
-): string =>
-    `${getTextResource(
+): string => {
+    const prefix = getTextResource(
         'price-estimate.filename',
         documentLanguage,
         getTextResourcesFromGlobalSettings(globalSettings),
-    )} ${booking.name}.pdf`;
+    );
+
+    const date = toBookingViewModel(booking).usageStartDatetime;
+    const formattedDate = formatDateForForm(date);
+
+    if (!date) {
+        return `${prefix} ${booking.name}.pdf`;
+    }
+
+    return `${prefix} ${formattedDate} ${booking.name}.pdf`;
+};
 
 // Packing List
 //
