@@ -13,7 +13,7 @@ export interface UserSalaryReport {
 }
 
 export interface SalaryLine {
-    rs: string;
+    dimension1: string;
     date: string;
     name: string;
     hours: number;

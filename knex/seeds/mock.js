@@ -1915,6 +1915,20 @@ export async function seed(knex) {
             value: 'Person Personsson',
         },
         {
+            key: 'invoice.templateName',
+            note: 'Namnet på vår fakturamall i Hogia.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: 'RN',
+        },
+        {
+            key: 'invoice.documentName',
+            note: 'Namnet på txt-exporten. Visas endast när fakturan importeras.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: 'RN Faktura',
+        },
+        {
             key: 'salary.rs',
             note: 'Resultatställe på löneexporter',
             created: getVarianceDateString(-100),

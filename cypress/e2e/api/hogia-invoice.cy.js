@@ -10,7 +10,7 @@ context('Hogia invoice with user', () => {
 
     it('Get bookingid 6 in hogia invoice format', () => {
         cy.fixture('../fixtures/hogia-invoice-bookingid-6.txt').then((userFixture) => {
-            cy.request({ url: '/api/documents/hogia-invoice/sv/6' }).should((response) => {
+            cy.request({ url: '/api/documents/invoice/hogia/sv/6' }).should((response) => {
                 expect(response.body, 'the same data').to.deep.equal(userFixture);
             });
         });
@@ -19,7 +19,7 @@ context('Hogia invoice with user', () => {
 
 context('Hogia invoice without user', () => {
     it('Get bookingid 6 in hogia invoice format', () => {
-        cy.request({ url: '/api/documents/hogia-invoice/sv/6', failOnStatusCode: false }).should((response) => {
+        cy.request({ url: '/api/documents/invoice/hogia/sv/6', failOnStatusCode: false }).should((response) => {
             expect(response.status).to.eq(403);
             expect(response.body.message).to.eq('Access Denied');
         });

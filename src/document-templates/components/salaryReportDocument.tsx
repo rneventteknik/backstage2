@@ -46,7 +46,7 @@ export const SalaryReportDocument: React.FC<Props> = ({ salaryReport, globalSett
                         <Col>
                             <InfoItem title={'Banknamn'} content={userSalaryReport.user.bankName}></InfoItem>
                             <InfoItem
-                                title={'Clearningnummer'}
+                                title={'Clearingnummer'}
                                 content={userSalaryReport.user.clearingNumber}
                             ></InfoItem>
                             <InfoItem title={'Kontonummer'} content={userSalaryReport.user.bankAccount}></InfoItem>
@@ -79,7 +79,7 @@ export const SalaryReportDocument: React.FC<Props> = ({ salaryReport, globalSett
                             {userSalaryReport.salaryLines.map((line) => (
                                 <TableRow key={line.timeReportId}>
                                     <TableCellFixedWidth width={30}>
-                                        <Text>{line.rs}</Text>
+                                        <Text>{line.dimension1}</Text>
                                     </TableCellFixedWidth>
                                     <TableCellFixedWidth width={70}>
                                         <Text>{line.date}</Text>

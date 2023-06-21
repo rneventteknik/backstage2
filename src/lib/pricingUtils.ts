@@ -1,11 +1,14 @@
 import { PricePlan } from '../models/enums/PricePlan';
-import { Booking, TimeEstimate, TimeReport } from '../models/interfaces';
+import { AccountKind } from '../models/enums/AccountKind';
+import { Booking, BookingViewModel, TimeEstimate, TimeReport } from '../models/interfaces';
 import { PricedEntity, PricedEntityWithTHS } from '../models/interfaces/BaseEntity';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../models/interfaces/EquipmentList';
 import { SalaryGroup } from '../models/interfaces/SalaryGroup';
+import { InvoiceCustomer, InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../models/misc/Invoice';
 import { SalaryReport, UserSalaryReport } from '../models/misc/Salary';
-import { formatDateForForm, getNumberOfDays } from './datetimeUtils';
-import { groupBy, reduceSumFn } from './utils';
+import { formatDateForForm, getBookingDateDisplayValues, getNumberOfDays } from './datetimeUtils';
+import { getSortedList } from './sortIndexUtils';
+import { getTotalNumberOfHoursReported, groupBy, reduceSumFn } from './utils';
 
 // Calculate total price
 //
@@ -23,10 +26,10 @@ export const getUnitPrice = (entry: EquipmentListEntry, numberOfDays: number): n
         return 0;
     }
 
-    return getHourlyPrice(entry) + entry.pricePerUnit + getExtraDaysPrice(entry, numberOfDays);
+    return getTimePrice(entry) + entry.pricePerUnit + getExtraDaysPrice(entry, numberOfDays);
 };
 
-export const getHourlyPrice = (entry: EquipmentListEntry): number => {
+export const getTimePrice = (entry: EquipmentListEntry): number => {
     if (entry.isHidden) {
         return 0;
     }
@@ -122,23 +125,194 @@ export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 's
     }
 };
 
-export const formatTHSPrice = (price: PricedEntityWithTHS): string => {
-    return formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
-};
+export const formatTHSPrice = (price: PricedEntityWithTHS): string =>
+    formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
 
 export const formatNumberAsCurrency = (number: number): string =>
     Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(number);
+
+export const getInvoiceData = (
+    booking: BookingViewModel,
+    dimension1: string, // Resultatställe
+    ourReference: string,
+    templateName: string,
+    documentName: string,
+    defaultEquipmentAccount: string,
+    defaultSalaryAccountExternal: string,
+    defaultSalaryAccountInternal: string,
+    t: (t: string) => string,
+    locale: 'sv-SE' | 'en-SE' | undefined,
+): InvoiceData => {
+    const getInvoiceCustomer = (booking: BookingViewModel): InvoiceCustomer => ({
+        invoiceHogiaId: booking.invoiceHogiaId?.toString() ?? '000000',
+        invoiceAddress: booking.invoiceAddress ?? '',
+        name: booking.customerName,
+        theirReference: booking.contactPersonName ?? '',
+        email: booking.contactPersonEmail,
+        phone: booking.contactPersonPhone,
+    });
+
+    const getInvoiceRows = (booking: BookingViewModel): InvoiceRow[] => {
+        const equipmentRows = booking.equipmentLists ? booking.equipmentLists.flatMap(equipmentListToInvoiceRows) : [];
+        const laborRows = timeReportsToLaborRows(booking.timeReports);
+        return [...equipmentRows, ...laborRows];
+    };
+
+    const equipmentListToInvoiceRows = (equipmentList: EquipmentList): InvoiceRow[] => {
+        const listHeadingRow: InvoiceRow = {
+            rowType: InvoiceRowType.HEADING,
+            text: equipmentList.name,
+        };
+
+        interface WrappedEquipmentListEntity {
+            typeIdentifier: string;
+            entity: EquipmentListEntry | EquipmentListHeading;
+            id: string;
+            sortIndex: number;
+        }
+
+        // This wrapping is used to merge and sort the list entries and headings
+        const wrapEntity = (
+            entity: EquipmentListEntry | EquipmentListHeading,
+            typeIdentifier: 'E' | 'H',
+        ): WrappedEquipmentListEntity => ({
+            typeIdentifier,
+            entity,
+            id: typeIdentifier + entity.id, // TODO: behövs detta fält?
+            sortIndex: entity.sortIndex,
+        });
+        const sortedListEntriesAndHeadings = getSortedList([
+            ...equipmentList.listEntries.filter((x) => !x.isHidden).map((x) => wrapEntity(x, 'E')),
+            ...equipmentList.listHeadings.map((x) => wrapEntity(x, 'H')),
+        ]);
+
+        const equipmentListEntityToInvoiceRows = (wrappedEntity: WrappedEquipmentListEntity): InvoiceRow[] => {
+            const isHeading = wrappedEntity.typeIdentifier === 'H';
+            const numberOfDays = getNumberOfDays(equipmentList);
+            if (isHeading) {
+                const heading = wrappedEntity.entity as EquipmentListHeading;
+                const mainRow: PricedInvoiceRow = {
+                    rowType: InvoiceRowType.ITEM,
+                    text: wrappedEntity.entity.name,
+                    numberOfUnits: 1, // Packages are always singular
+                    pricePerUnit: getEquipmentListHeadingPrice(heading, numberOfDays),
+                    discount: 0, // Package headings does not show discounts
+                    account: defaultEquipmentAccount, // TODO: Should this be something else if all members have the same different account?
+                    unit: t('common.misc.count-unit-single'),
+                };
+                const packageDescriptionRow = {
+                    rowType: InvoiceRowType.ITEM_COMMENT,
+                    text: t('hogia-invoice.package-price'),
+                    indented: true,
+                };
+                return [mainRow, packageDescriptionRow];
+            } else {
+                const entry = wrappedEntity.entity as EquipmentListEntry;
+                const mainRow: PricedInvoiceRow = {
+                    rowType: InvoiceRowType.ITEM,
+                    text: entry.name,
+                    numberOfUnits: entry.numberOfUnits,
+                    pricePerUnit: getUnitPrice(entry, numberOfDays),
+                    discount: getCalculatedDiscount(entry, numberOfDays),
+                    account: entry.account ?? defaultEquipmentAccount,
+                    unit: t(entry.numberOfUnits > 1 ? 'common.misc.count-unit' : 'common.misc.count-unit-single'),
+                };
+                const invoiceRows: InvoiceRow[] = [mainRow];
+
+                // Descriptive row with base price
+                if ((numberOfDays > 1 || entry.numberOfHours) && entry.pricePerUnit) {
+                    invoiceRows.push({
+                        rowType: InvoiceRowType.ITEM_COMMENT,
+                        text: `${t('hogia-invoice.start-cost')}: ${entry.pricePerUnit} kr`,
+                    });
+                }
+
+                // Descriptive row with price for multiple days
+                if (numberOfDays > 1 && entry.pricePerUnit) {
+                    invoiceRows.push({
+                        rowType: InvoiceRowType.ITEM_COMMENT,
+                        text: `${numberOfDays - 1} ${t(
+                            numberOfDays - 1 > 1 ? 'hogia-invoice.day-cost' : 'hogia-invoice.day-cost-single',
+                        )}: ${getExtraDaysPrice(entry, numberOfDays)} kr`,
+                    });
+                }
+
+                // Descriptive row with hourly rate
+                if (entry.numberOfHours) {
+                    invoiceRows.push({
+                        rowType: InvoiceRowType.ITEM_COMMENT,
+                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${getTimePrice(entry)} kr`,
+                    });
+                }
+
+                return invoiceRows;
+            }
+        };
+
+        return [listHeadingRow, ...sortedListEntriesAndHeadings.flatMap(equipmentListEntityToInvoiceRows)];
+    };
+
+    const timeReportsToLaborRows = (timeReports: TimeReport[] | undefined): InvoiceRow[] => {
+        if (!timeReports?.length) {
+            return [];
+        }
+
+        const headingRow = {
+            rowType: InvoiceRowType.HEADING,
+            text: t('hogia-invoice.staff-cost'),
+            indented: true,
+        };
+
+        const mainRow = {
+            rowType: InvoiceRowType.ITEM,
+            text: t('hogia-invoice.staff-cost'),
+            indented: false,
+            numberOfUnits: 1,
+            pricePerUnit: getTotalTimeReportsPrice(timeReports),
+            discount: 0,
+            account:
+                booking.accountKind === AccountKind.EXTERNAL
+                    ? defaultSalaryAccountExternal
+                    : defaultSalaryAccountInternal,
+            unit: t('common.misc.count-unit-single'),
+        };
+
+        const descriptiveRow = {
+            rowType: InvoiceRowType.ITEM_COMMENT,
+            text: `${t('hogia-invoice.number-of-hours')}: ${getTotalNumberOfHoursReported(timeReports)} ${t(
+                'common.misc.hours-unit',
+            )}`,
+            indented: true,
+        };
+
+        return [headingRow, mainRow, descriptiveRow];
+    };
+
+    return {
+        documentName: `${documentName}${booking.invoiceNumber ? ' ' + booking.invoiceNumber : ''}`,
+        name: booking.name,
+        dates: getBookingDateDisplayValues(booking, locale).displayUsageInterval,
+        invoiceTag: booking.invoiceTag,
+        invoiceNumber: booking.invoiceNumber,
+        dimension1: dimension1,
+        templateName: templateName,
+        bookingType: booking.bookingType,
+        ourReference: ourReference,
+        customer: getInvoiceCustomer(booking),
+        invoiceRows: getInvoiceRows(booking),
+    };
+};
 
 // Salary calculations
 //
 export const getSalaryReport = (
     salaryGroup: SalaryGroup,
-    rs: string,
+    dimension1: string, // Resultatställe
     wageRatioExternal: number,
     wageRatioThs: number,
 ): SalaryReport => ({
     name: salaryGroup.name,
-    userSalaryReports: calculateSalary(salaryGroup.bookings ?? [], rs, wageRatioExternal, wageRatioThs),
+    userSalaryReports: calculateSalary(salaryGroup.bookings ?? [], dimension1, wageRatioExternal, wageRatioThs),
 });
 
 export const calculateSalary = (
@@ -169,7 +343,7 @@ export const calculateSalary = (
 
             return {
                 timeReportId: x.id,
-                rs: rs,
+                dimension1: rs,
                 date: formatDateForForm(x?.startDatetime),
                 name: x.name
                     ? `${x.booking.customerName} - ${x.booking.name} (${x.name})`

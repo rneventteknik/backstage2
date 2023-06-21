@@ -72,14 +72,24 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.misc.days-unit': 'dagar',
         'common.misc.days-unit-single': 'dag',
 
-        // Hogia invoice
-        'hogia-invoice.general-information': 'Vid frågor om innehållet kontakta RN Eventteknik på rn@ths.kth.se, ange',
-        'hogia-invoice.start-cost': 'Utrustningskostnad',
+        // Invoice
+        'hogia-invoice.general-information': 'Vid frågor om innehållet; kontakta RN Eventteknik på rn@ths.kth.se. Ange',
+        'hogia-invoice.start-cost': 'Grundkostnad',
         'hogia-invoice.hourly-cost': 'Timkostnad',
         'hogia-invoice.staff-cost': 'Personalkostnad',
+        'hogia-invoice.staff': 'Personal',
         'hogia-invoice.day-cost': 'extra dagar',
         'hogia-invoice.day-cost-single': 'extra dag',
-        'hogia-invoice.package-price': 'Paketpris',
+        'hogia-invoice.package-price': 'Utrustningspaket',
+        'hogia-invoice.number-of-hours': 'Antal arbetstimmar',
+        'invoice.title': 'Fakturaunderlag',
+        'invoice.tag': 'Fakturamärkning',
+        'invoice.address': 'Fakturaadress',
+        'invoice.customer': 'Kund / Kundnr.',
+        'invoice.comment': 'Kommentar',
+        'invoice.account': 'Konto',
+        'invoice.total-price-section.total-sum-ex-vat': 'Summa (exkl. moms)',
+        'invoice.total-price-section.vat': 'Moms (25%)',
     },
     en: {
         // Booking info
@@ -97,7 +107,7 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.equipment-list.table-header.count': 'Count',
         'common.equipment-list.table-header.price': 'Price',
         'common.equipment-list.table-header.discount': 'Discount',
-        'common.equipment-list.table-header.total-price': 'Total price',
+        'common.equipment-list.table-header.total-price': 'Amount',
         'common.equipment-list.total': 'Total',
 
         // Time Estimate list
@@ -152,12 +162,22 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
 
         // Hogia invoice
         'hogia-invoice.general-information':
-            'If you have any questions regarding the content please contact RN Eventteknik on rn@ths.kth.se, state',
-        'hogia-invoice.start-cost': 'Equipment cost',
-        'hogia-invoice.hourly-cost': 'Hourly rate',
+            'If you have any questions regarding the content, please contact RN Eventteknik on rn@ths.kth.se and state the following reference',
+        'hogia-invoice.start-cost': 'Base cost',
+        'hogia-invoice.hourly-cost': 'Hourly cost',
         'hogia-invoice.staff-cost': 'Staff cost',
+        'hogia-invoice.staff': 'Staff',
         'hogia-invoice.day-cost': 'extra days',
         'hogia-invoice.day-cost-single': 'extra day',
-        'hogia-invoice.package-price': 'Package price',
+        'hogia-invoice.package-price': 'Equipment package',
+        'hogia-invoice.number-of-hours': 'Number of working hours',
+        'invoice.title': 'Invoice Data',
+        'invoice.tag': 'Invoice marking',
+        'invoice.address': 'Invoice address',
+        'invoice.customer': 'Customer / Customer no.',
+        'invoice.comment': 'Comment',
+        'invoice.account': 'Account',
+        'invoice.total-price-section.total-sum-ex-vat': 'Total amount (excl. VAT)',
+        'invoice.total-price-section.vat': 'VAT (25%)',
     },
 };

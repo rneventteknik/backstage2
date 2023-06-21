@@ -1,22 +1,9 @@
 import iconv from 'iconv-lite';
-import { getNumberOfDays } from '../../lib/datetimeUtils';
-import {
-    getEquipmentListHeadingPrice,
-    getExtraDaysPrice,
-    getHourlyPrice,
-    getTotalTimeReportsPrice,
-    getUnitPrice,
-    getCalculatedDiscount,
-} from '../../lib/pricingUtils';
-import { getSortedList } from '../../lib/sortIndexUtils';
-import { getAccountKindSalaryInvoiceAccount, getGlobalSetting, range } from '../../lib/utils';
-import { AccountKind } from '../../models/enums/AccountKind';
+import { range } from '../../lib/utils';
+import { InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../../models/misc/Invoice';
 import { BookingType } from '../../models/enums/BookingType';
-import { BookingViewModel, TimeReport } from '../../models/interfaces';
-import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../models/interfaces/EquipmentList';
-import { KeyValue } from '../../models/interfaces/KeyValue';
 
-enum RowType {
+enum HogiaRowType {
     ITEM = 1,
     TEXT = 2,
     TEMPORARY = 3,
@@ -24,231 +11,107 @@ enum RowType {
     SUM = 12,
 }
 
-export const getHogiaTxtInvoice = (
-    booking: BookingViewModel,
-    globalSettings: KeyValue[],
-    t: (t: string) => string,
-): Buffer => {
-    const lists = booking.equipmentLists ?? [];
+export const getHogiaTxtInvoice = (invoiceData: InvoiceData, t: (key: string) => string): Buffer => {
+    const formatInvoiceRow = (invoiceRow: InvoiceRow): string => {
+        const invoiceRowTypeToHogiaRowTypeString = (invoiceRowType: InvoiceRowType): string => {
+            switch (invoiceRowType) {
+                case InvoiceRowType.ITEM:
+                    return HogiaRowType.TEMPORARY.toString();
+                case InvoiceRowType.ITEM_COMMENT:
+                case InvoiceRowType.HEADING:
+                    return HogiaRowType.TEXT.toString();
+            }
+        };
 
-    // This wrapping is used to merge and sort the list entries and headings
-    const wrapEntity = (entity: EquipmentListEntry | EquipmentListHeading, typeIdentifier: 'E' | 'H') => ({
-        typeIdentifier,
-        entity,
-        id: typeIdentifier + entity.id,
-        sortIndex: entity.sortIndex,
-    });
+        const getRowFormat = (): Map<number, string> => {
+            switch (invoiceRow.rowType) {
+                case InvoiceRowType.ITEM:
+                    const pricedInvoiceRow = invoiceRow as PricedInvoiceRow;
+                    return new Map([
+                        [1, 'Fakturarad'],
+                        [2, invoiceRowTypeToHogiaRowTypeString(invoiceRow.rowType)],
+                        [4, pricedInvoiceRow.numberOfUnits?.toString() ?? ''],
+                        [5, pricedInvoiceRow.pricePerUnit?.toString().replace('.', ',') ?? ''],
+                        [6, pricedInvoiceRow.discount.toString().replace('.', ',') ?? ''],
+                        [7, pricedInvoiceRow.text],
+                        [8, pricedInvoiceRow.account ?? ''],
+                        [12, pricedInvoiceRow.unit ?? ''],
+                    ]);
+                case InvoiceRowType.ITEM_COMMENT:
+                    return new Map([
+                        [1, 'Fakturarad'],
+                        [2, invoiceRowTypeToHogiaRowTypeString(invoiceRow.rowType)],
+                        [14, `| ${invoiceRow.text}`],
+                    ]);
+                case InvoiceRowType.HEADING:
+                    return new Map([
+                        [1, 'Fakturarad'],
+                        [2, invoiceRowTypeToHogiaRowTypeString(invoiceRow.rowType)],
+                        [14, `=== ${invoiceRow.text} ===`],
+                    ]);
+            }
+        };
 
-    const equipmentLines = lists.flatMap((list) => {
-        const sortedListEntriesAndHeadings = getSortedList([
-            ...list.listEntries.filter((x) => !x.isHidden).map((x) => wrapEntity(x, 'E')),
-            ...list.listHeadings.map((x) => wrapEntity(x, 'H')),
+        const rowFormat = getRowFormat();
+
+        const highestKey = Array.from(rowFormat.keys()).pop() ?? 0;
+
+        const positions = range(1, highestKey + 1);
+
+        return '\r' + positions.map((position) => rowFormat.get(position)).join('\t');
+    };
+
+    const formatHeader = (invoiceData: InvoiceData): string => {
+        const invoiceCommentLines = [
+            `${t(
+                invoiceData.bookingType === BookingType.GIG
+                    ? 'common.booking-info.booking-gig'
+                    : 'common.booking-info.booking-rental',
+            )}: ${invoiceData.name} ${invoiceData.dates}`,
+        ];
+        if (invoiceData.invoiceTag) {
+            invoiceCommentLines.push(`${t('invoice.invoiceTag')}: ${invoiceData.invoiceTag}`);
+        }
+        invoiceCommentLines.push(
+            `${t('hogia-invoice.general-information')} ${
+                invoiceData.invoiceNumber ? invoiceData.invoiceNumber : `"${invoiceData.name}"`
+            }`,
+        );
+        const invoiceComment = invoiceCommentLines.join('<CR>');
+        const eInvoiceStatus = '0';
+        const rowFormat = new Map([
+            [1, 'Kundfaktura'],
+            [5, invoiceData.customer.invoiceHogiaId],
+            [10, invoiceData.dimension1],
+            [13, invoiceData.ourReference],
+            [15, invoiceData.templateName],
+            [16, invoiceComment],
+            [17, invoiceData.customer.theirReference],
+            [26, invoiceData.customer.invoiceAddress?.replaceAll('\n', '<CR>')],
+            [44, eInvoiceStatus],
         ]);
 
-        return [
-            formatEquipmentList(list),
-            ...sortedListEntriesAndHeadings.flatMap((wrappedEntity) => {
-                const isHeading = wrappedEntity.typeIdentifier === 'H';
-                return isHeading
-                    ? formatEquipmentListHeading(
-                          wrappedEntity.entity as EquipmentListHeading,
-                          getNumberOfDays(list),
-                          globalSettings,
-                          t,
-                      )
-                    : formatEquipmentListEntry(
-                          wrappedEntity.entity as EquipmentListEntry,
-                          getNumberOfDays(list),
-                          globalSettings,
-                          t,
-                      );
-            }),
-        ];
-    });
+        const highestKey = Array.from(rowFormat.keys()).pop() ?? 0;
 
-    // Im only here until Markus will replace me
-    if (!booking.accountKind) {
-        throw 'Missing accountKind from booking';
-    }
+        const positions = range(1, highestKey + 1);
 
-    const timeReportLines = formatTimeReports(booking.timeReports, booking.accountKind, globalSettings, t);
+        return (
+            `Rubrik\t${invoiceData.documentName}\r\n` +
+            'Datumformat\tYYYY - MM - DD\r\n' +
+            positions.map((position) => rowFormat.get(position)).join('\t')
+        );
+    };
 
-    const invoiceLines = [
-        formatHeader(booking, globalSettings, t),
-        ...equipmentLines,
-        ...timeReportLines,
+    const formatFooter = () => {
+        return '\r\nKundfaktura-Slut\r\n';
+    };
+
+    const txtInvoiceComponents = [
+        formatHeader(invoiceData),
+        ...invoiceData.invoiceRows.map(formatInvoiceRow),
         formatFooter(),
     ];
-    const content = invoiceLines.join('');
+    const content = txtInvoiceComponents.join('');
     // Hogia requires 'ANSI' encoded text
     return iconv.encode(content, 'WINDOWS-1252');
-};
-
-const formatInvoiceRow = (
-    rowType: RowType,
-    name: string,
-    numberOfUnits?: number,
-    pricePerUnit?: number,
-    discount?: number,
-    account?: string | null,
-    unit?: string,
-): string => {
-    const rowFormat = new Map([
-        [1, 'Fakturarad'],
-        [2, rowType.toString()],
-        [4, numberOfUnits?.toString() ?? ''],
-        [5, pricePerUnit?.toString().replace('.', ',') ?? ''],
-        [6, discount?.toString().replace('.', ',') ?? ''],
-        [7, name],
-        [8, account ?? ''],
-        [12, unit ?? ''],
-    ]);
-
-    const highestKey = Array.from(rowFormat.keys()).pop() ?? 0;
-
-    const positions = range(1, highestKey + 1);
-
-    return '\r' + positions.map((position) => rowFormat.get(position)).join('\t');
-};
-
-const formatEquipmentListEntry = (
-    entry: EquipmentListEntry,
-    numberOfDays: number,
-    globalSettings: KeyValue[],
-    t: (t: string) => string,
-): string => {
-    const unitTextResourceKey = entry.numberOfUnits > 1 ? 'common.misc.count-unit' : 'common.misc.count-unit-single';
-
-    return (
-        formatInvoiceRow(
-            RowType.TEMPORARY,
-            entry.name,
-            entry.numberOfUnits,
-            getUnitPrice(entry, numberOfDays),
-            getCalculatedDiscount(entry, numberOfDays),
-            entry.account ?? getGlobalSetting('accounts.defaultEquipmentAccount', globalSettings),
-            t(unitTextResourceKey),
-        ) +
-        ((numberOfDays > 1 || entry.numberOfHours) && entry.pricePerUnit ? formatUnitPrices(entry, t) : '') +
-        (numberOfDays > 1 && entry.pricePerUnit ? formatExtraDayPrice(entry, numberOfDays, t) : '') +
-        (entry.numberOfHours ? formatHourlyPrice(entry, t) : '')
-    );
-};
-
-const formatEquipmentListHeading = (
-    heading: EquipmentListHeading,
-    numberOfDays: number,
-    globalSettings: KeyValue[],
-    t: (t: string) => string,
-): string => {
-    return (
-        formatInvoiceRow(
-            RowType.TEMPORARY,
-            heading.name,
-            1,
-            getEquipmentListHeadingPrice(heading, numberOfDays),
-            0,
-            getGlobalSetting('accounts.defaultEquipmentAccount', globalSettings),
-            t('common.misc.count-unit-single'),
-        ) +
-        formatInvoiceRow(
-            RowType.TEXT,
-            `  ${t('hogia-invoice.package-price')}`,
-            undefined,
-            getEquipmentListHeadingPrice(heading, numberOfDays),
-        )
-    );
-};
-
-const formatUnitPrices = (entry: EquipmentListEntry, t: (t: string) => string): string => {
-    return formatInvoiceRow(RowType.TEXT, `  ${t('hogia-invoice.start-cost')}`, undefined, entry.pricePerUnit);
-};
-
-const formatExtraDayPrice = (entry: EquipmentListEntry, numberOfDays: number, t: (t: string) => string): string => {
-    const dayCostResourceKey = numberOfDays - 1 > 1 ? 'hogia-invoice.day-cost' : 'hogia-invoice.day-cost-single';
-
-    return formatInvoiceRow(
-        RowType.TEXT,
-        `  ${numberOfDays - 1} ${t(dayCostResourceKey)} `,
-        undefined,
-        getExtraDaysPrice(entry, numberOfDays),
-    );
-};
-
-const formatHourlyPrice = (entry: EquipmentListEntry, t: (t: string) => string): string => {
-    return formatInvoiceRow(
-        RowType.TEXT,
-        `  ${entry.numberOfHours} ${t('common.misc.hours-unit')}`,
-        undefined,
-        getHourlyPrice(entry),
-    );
-};
-
-const formatTimeReports = (
-    timeReports: TimeReport[] | undefined,
-    accountKind: AccountKind,
-    globalSettings: KeyValue[],
-    t: (t: string) => string,
-): string => {
-    const price = getTotalTimeReportsPrice(timeReports);
-
-    if (!timeReports?.length) {
-        return '';
-    }
-
-    return formatInvoiceRow(
-        RowType.TEMPORARY,
-        t('hogia-invoice.staff-cost'),
-        1,
-        price,
-        undefined,
-        getAccountKindSalaryInvoiceAccount(accountKind, globalSettings),
-        t('common.misc.count-unit'),
-    );
-};
-
-const formatEquipmentList = (list: EquipmentList): string => {
-    return formatInvoiceRow(RowType.TEXT, list.name);
-};
-const formatHeader = (booking: BookingViewModel, globalSettings: KeyValue[], t: (t: string) => string): string => {
-    const bookingTypeTextResourceKey =
-        booking.bookingType === BookingType.GIG
-            ? 'common.booking-info.booking-gig'
-            : 'common.booking-info.booking-rental';
-
-    const invoiceComment =
-        t(bookingTypeTextResourceKey) +
-        ': ' +
-        booking.name +
-        ' ' +
-        booking.displayUsageStartString +
-        '<CR>' +
-        t('hogia-invoice.general-information') +
-        ' ' +
-        (booking.invoiceNumber ?? '');
-
-    const rowFormat = new Map([
-        [1, 'Kundfaktura'],
-        [5, booking.invoiceHogiaId?.toString() ?? '0'],
-        [10, getGlobalSetting('invoice.dimension1', globalSettings)],
-        [13, getGlobalSetting('invoice.ourReference', globalSettings)],
-        [16, invoiceComment],
-        [17, booking.contactPersonName ?? ''],
-        [26, booking.invoiceAddress?.replaceAll('\n', '<CR>') ?? ''],
-        [44, '0'],
-    ]);
-
-    const highestKey = Array.from(rowFormat.keys()).pop() ?? 0;
-
-    const positions = range(1, highestKey + 1);
-
-    return (
-        'Rubrik\tRN Faktura\r' +
-        'Datumformat\tYYYY - MM - DD\r' +
-        positions.map((position) => rowFormat.get(position)).join('\t')
-    );
-};
-
-const formatFooter = () => {
-    return '\rKundfaktura-slut';
 };

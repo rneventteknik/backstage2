@@ -16,6 +16,19 @@ const styles = StyleSheet.create({
         paddingBottom: 5,
         paddingTop: 5,
     },
+    tableRowWithTopBorder: {
+        flexDirection: 'row',
+        width: '100%',
+        borderTop: '1px solid #DDDDDD',
+        paddingBottom: 5,
+        paddingTop: 5,
+    },
+    tableRowWithNoBorder: {
+        flexDirection: 'row',
+        width: '100%',
+        paddingBottom: 5,
+        paddingTop: 0,
+    },
 });
 
 type RowProps = {
@@ -48,6 +61,20 @@ type TableRowProps = {
 };
 export const TableRow: React.FC<TableRowProps> = ({ children }: TableRowProps) => (
     <View style={styles.tableRow}>{children}</View>
+);
+
+type TableRowWithTopBorderProps = {
+    children?: ReactNode;
+};
+export const TableRowWithTopBorder: React.FC<TableRowWithTopBorderProps> = ({
+    children,
+}: TableRowWithTopBorderProps) => <View style={styles.tableRowWithTopBorder}>{children}</View>;
+
+type TableRowWithNoBorderProps = {
+    children?: ReactNode;
+};
+export const TableRowWithNoBorder: React.FC<TableRowWithNoBorderProps> = ({ children }: TableRowWithNoBorderProps) => (
+    <View style={styles.tableRowWithNoBorder}>{children}</View>
 );
 
 type TableCellFixedWidthProps = {

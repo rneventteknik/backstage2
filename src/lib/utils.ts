@@ -8,7 +8,7 @@ import { BookingType } from '../models/enums/BookingType';
 import { SalaryStatus } from '../models/enums/SalaryStatus';
 import { PaymentStatus } from '../models/enums/PaymentStatus';
 import { RentalStatus } from '../models/enums/RentalStatus';
-import { BookingViewModel, Equipment } from '../models/interfaces';
+import { BookingViewModel, Equipment, TimeReport } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
 import { getEquipmentOutDatetime, getEquipmentInDatetime, addDays, addHours } from './datetimeUtils';
@@ -352,6 +352,9 @@ export const IsBookingUpcomingRental = (booking: BookingViewModel) => {
         );
     });
 };
+
+export const getTotalNumberOfHoursReported = (timeReports: TimeReport[]) =>
+    timeReports.reduce((hours, timeReport) => hours + timeReport.billableWorkingHours, 0);
 
 // Calculate the max number of equipment used at the same time. To do this, we look
 // at the start of each equipment list and check how many equipments are used. We

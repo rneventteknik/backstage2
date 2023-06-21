@@ -9,6 +9,8 @@ import { RentalConfirmationDocument } from './components/rentalConfirmationDocum
 import { SalaryReport } from '../models/misc/Salary';
 import { SalaryReportDocument } from './components/salaryReportDocument';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import { InvoiceData } from '../models/misc/Invoice';
+import { InvoiceDocument } from './components/invoiceDocument';
 
 registerFonts();
 
@@ -96,7 +98,22 @@ export const getSalaryReportDocument = (salaryReport: SalaryReport, globalSettin
 
 export const getSalaryReportDocumentFileName = (salaryReport: SalaryReport): string => `${salaryReport.name}.pdf`;
 
-// Other
-//
+// Invoice
+
+export const getInvoiceDocument = (
+    invoiceData: InvoiceData,
+    documentLanguage: Language,
+    globalSettings: KeyValue[],
+): ReactElement => (
+    <TextResourcesContext.Provider
+        value={{ language: documentLanguage, textResources: getTextResourcesFromGlobalSettings(globalSettings) }}
+    >
+        <InvoiceDocument invoiceData={invoiceData} globalSettings={globalSettings} />
+    </TextResourcesContext.Provider>
+);
+
+export const getInvoiceDocumentFileName = (invoiceData: InvoiceData): string =>
+    `${invoiceData.invoiceNumber ?? ''} ${invoiceData.name}.pdf`;
+
 export const getHogiaInvoiceFileName = (booking: Booking): string =>
     `${booking.invoiceNumber ?? ''} ${booking.name}.txt`;

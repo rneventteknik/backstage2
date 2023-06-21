@@ -38,13 +38,16 @@ type Props = {
     subTitle: string;
     globalSettings: KeyValue[];
 };
-export const Header: React.FC<Props> = ({ title, subTitle, globalSettings }: Props) => (
-    <View style={styles.header}>
-        <View style={styles.titleContainer}>
-            <Text style={styles.title}>{title}</Text>
-            <Text style={styles.subTitle}>{subTitle}</Text>
+export const Header: React.FC<Props> = ({ title, subTitle, globalSettings }: Props) => {
+    const imageSrc = getGlobalSetting('content.image.documentHeaderImage', globalSettings, '').trim();
+    return (
+        <View style={styles.header}>
+            <View style={styles.titleContainer}>
+                <Text style={styles.title}>{title}</Text>
+                <Text style={styles.subTitle}>{subTitle}</Text>
+            </View>
+            <Text style={styles.aside}></Text>
+            {imageSrc ? <Image style={styles.image} src={imageSrc} /> : null}
         </View>
-        <Text style={styles.aside}></Text>
-        <Image style={styles.image} src={getGlobalSetting('content.image.documentHeaderImage', globalSettings, '')} />
-    </View>
-);
+    );
+};

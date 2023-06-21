@@ -85,7 +85,7 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                         <Button
                             variant="secondary"
                             className="d-inline-block mr-2 mb-2"
-                            href={`/api/documents/hogia-invoice?${getSelectedBookingIds()
+                            href={`/api/documents/invoice?${getSelectedBookingIds()
                                 ?.map((id) => `bookingId=${id}`)
                                 .join('&')}`}
                             target="_blank"

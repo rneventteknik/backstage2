@@ -15,7 +15,7 @@ import { getSortedList } from '../../../lib/sortIndexUtils';
 
 const styles = StyleSheet.create({
     ...commonStyles,
-    equipmentListSection: {
+    totalPriceSection: {
         flexDirection: 'column',
         marginBottom: 15,
         marginLeft: 263,
@@ -30,7 +30,7 @@ export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts
     const { t } = useTextResources();
 
     return (
-        <View style={styles.equipmentListSection} wrap={false}>
+        <View style={styles.totalPriceSection} wrap={false}>
             <Text style={{ ...styles.heading, ...styles.bold }}>{t('common.total-price-section.heading')}</Text>
 
             <View>
