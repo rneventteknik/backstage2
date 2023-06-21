@@ -22,6 +22,7 @@ import { addVAT, formatNumberAsCurrency, getEquipmentListPrice } from '../../../
 import { PricePlan } from '../../../models/enums/PricePlan';
 import {
     formatDatetime,
+    formatDatetimeForForm,
     getEquipmentInDatetime,
     getEquipmentOutDatetime,
     getNumberOfDays,
@@ -356,25 +357,27 @@ const EquipmentListHeader: React.FC<Props> = ({
                                 </DoubleClickToEdit>
                             </div>
                         </div>
-                        <div>
-                            <Button
-                                variant="secondary"
-                                onClick={() =>
-                                    saveList({
-                                        ...list,
-                                        numberOfDays: null,
-                                        usageStartDatetime: null,
-                                        usageEndDatetime: null,
-                                        equipmentInDatetime: null,
-                                        equipmentOutDatetime: null,
-                                    })
-                                }
-                                className="mr-2"
-                            >
-                                <FontAwesomeIcon icon={faCalendarDays} className="mr-1 fa-fw" />
-                                Sätt datum
-                            </Button>
-                        </div>
+                        {readonly ? null : (
+                            <div>
+                                <Button
+                                    variant="secondary"
+                                    onClick={() =>
+                                        saveList({
+                                            ...list,
+                                            numberOfDays: null,
+                                            usageStartDatetime: null,
+                                            usageEndDatetime: null,
+                                            equipmentInDatetime: null,
+                                            equipmentOutDatetime: null,
+                                        })
+                                    }
+                                    className="mr-2"
+                                >
+                                    <FontAwesomeIcon icon={faCalendarDays} className="mr-1 fa-fw" />
+                                    Sätt datum
+                                </Button>
+                            </div>
+                        )}
                     </div>
                 </>
             ) : null}
@@ -391,16 +394,27 @@ const EquipmentListHeader: React.FC<Props> = ({
                             }}
                         />
                     ) : null}
-                    <Row onClick={() => setShowEditDatesModal(true)} role="button">
+                    <Row
+                        onClick={() => (readonly ? null : setShowEditDatesModal(true))}
+                        role={readonly ? undefined : 'button'}
+                    >
                         <Col md={3} xs={6}>
                             <small>Debiterad starttid</small>
-                            <div className="mb-3" style={{ fontSize: '1.2em' }}>
+                            <div
+                                className="mb-3"
+                                style={{ fontSize: '1.2em' }}
+                                title={formatDatetimeForForm(list.usageStartDatetime)}
+                            >
                                 {formatDatetime(list.usageStartDatetime)}
                             </div>
                         </Col>
                         <Col md={3} xs={6}>
                             <small>Debiterad sluttid</small>
-                            <div className="mb-3" style={{ fontSize: '1.2em' }}>
+                            <div
+                                className="mb-3"
+                                style={{ fontSize: '1.2em' }}
+                                title={formatDatetimeForForm(list.usageEndDatetime)}
+                            >
                                 {formatDatetime(list.usageEndDatetime)}
                             </div>
                         </Col>
@@ -409,6 +423,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                             <div
                                 className={'mb-3 ' + (!!list.equipmentOutDatetime ? '' : 'text-muted')}
                                 style={{ fontSize: '1.2em' }}
+                                title={formatDatetimeForForm(getEquipmentOutDatetime(list))}
                             >
                                 {formatDatetime(getEquipmentOutDatetime(list))}
                             </div>
@@ -418,6 +433,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                             <div
                                 className={'mb-3 ' + (!!list.equipmentOutDatetime ? '' : 'text-muted')}
                                 style={{ fontSize: '1.2em' }}
+                                title={formatDatetimeForForm(getEquipmentInDatetime(list))}
                             >
                                 {formatDatetime(getEquipmentInDatetime(list))}
                             </div>

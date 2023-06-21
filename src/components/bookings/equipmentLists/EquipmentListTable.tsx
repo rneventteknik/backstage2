@@ -152,7 +152,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                 <span className="text-muted ">{heading.description}</span>
                             ) : (
                                 <span className="text-muted font-italic">
-                                    Dubbelklicka för att lägga till en beskrivning
+                                    {readonly ? null : 'Dubbelklicka för att lägga till en beskrivning'}
                                 </span>
                             )}{' '}
                         </DoubleClickToEdit>
@@ -228,7 +228,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             <span className="text-muted ">{entry.description}</span>
                         ) : (
                             <span className="text-muted font-italic">
-                                Dubbelklicka för att lägga till en beskrivning
+                                {readonly ? null : 'Dubbelklicka för att lägga till en beskrivning'}
                             </span>
                         )}
                     </DoubleClickToEdit>

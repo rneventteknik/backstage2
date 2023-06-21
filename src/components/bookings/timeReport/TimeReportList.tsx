@@ -277,7 +277,7 @@ const TimeReportList: React.FC<Props> = ({
         entityTypeDisplayName: '',
         defaultSortAscending: true,
         customSortFn: sortFn,
-        moveFn: moveFn,
+        moveFn: readonly ? undefined : moveFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         columns: [
@@ -356,20 +356,22 @@ const TimeReportList: React.FC<Props> = ({
             {showContent ? (
                 <>
                     <TableDisplay entities={timeReports} configuration={tableSettings} tableId="time-report-list" />
-                    <TimeReportAddButton
-                        currentUser={currentUser}
-                        disabled={readonly}
-                        booking={booking}
-                        onAdd={onAdd}
-                        className="ml-2 mr-2 mb-2"
-                        variant="secondary"
-                        size="sm"
-                        icon={faAdd}
-                        defaultLaborHourlyRate={defaultLaborHourlyRate}
-                    >
-                        <FontAwesomeIcon icon={faPlus} className="mr-1" />
-                        Ny tidrapport
-                    </TimeReportAddButton>
+                    {readonly ? null : (
+                        <TimeReportAddButton
+                            currentUser={currentUser}
+                            disabled={readonly}
+                            booking={booking}
+                            onAdd={onAdd}
+                            className="ml-2 mr-2 mb-2"
+                            variant="secondary"
+                            size="sm"
+                            icon={faAdd}
+                            defaultLaborHourlyRate={defaultLaborHourlyRate}
+                        >
+                            <FontAwesomeIcon icon={faPlus} className="mr-1" />
+                            Ny tidrapport
+                        </TimeReportAddButton>
+                    )}
                 </>
             ) : null}
             <TimeReportModal

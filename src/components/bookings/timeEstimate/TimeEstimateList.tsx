@@ -220,7 +220,7 @@ const TimeEstimateList: React.FC<Props> = ({
         entityTypeDisplayName: '',
         defaultSortAscending: true,
         customSortFn: sortFn,
-        moveFn: moveFn,
+        moveFn: readonly ? undefined : moveFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         columns: [
@@ -289,18 +289,20 @@ const TimeEstimateList: React.FC<Props> = ({
             {showContent ? (
                 <>
                     <TableDisplay entities={timeEstimates} configuration={tableSettings} tableId="time-estimate-list" />
-                    <TimeEstimateAddButton
-                        booking={booking}
-                        disabled={readonly}
-                        sortIndex={getNextSortIndex(timeEstimates)}
-                        onAdd={onAdd}
-                        variant="secondary"
-                        size="sm"
-                        defaultLaborHourlyRate={defaultLaborHourlyRate}
-                    >
-                        <FontAwesomeIcon icon={faPlus} className="mr-1" />
-                        Ny tiduppskattning
-                    </TimeEstimateAddButton>
+                    {readonly ? null : (
+                        <TimeEstimateAddButton
+                            booking={booking}
+                            disabled={readonly}
+                            sortIndex={getNextSortIndex(timeEstimates)}
+                            onAdd={onAdd}
+                            variant="secondary"
+                            size="sm"
+                            defaultLaborHourlyRate={defaultLaborHourlyRate}
+                        >
+                            <FontAwesomeIcon icon={faPlus} className="mr-1" />
+                            Ny tiduppskattning
+                        </TimeEstimateAddButton>
+                    )}
                 </>
             ) : null}
             <TimeEstimateModal
