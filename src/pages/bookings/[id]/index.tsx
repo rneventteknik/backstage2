@@ -280,7 +280,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
             <Row className="mb-3">
                 <Col xl={8}>
-                    <BookingInfoSection booking={booking} showName={false} className="d-md-none mb-3" />
+                    <BookingInfoSection booking={booking} showName={false} className="d-xl-none mb-3" />
                     <TimeEstimateList
                         showContent={showTimeEstimateContent}
                         setShowContent={setShowTimeEstimateContent}
@@ -306,7 +306,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     />
                 </Col>
                 <Col xl={4}>
-                    <BookingInfoSection booking={booking} className="d-none d-md-block mb-3" />
+                    <BookingInfoSection booking={booking} className="d-none d-xl-block mb-3" />
                     <Card className="mb-3">
                         <Card.Header>Prisinformation (ink. moms)</Card.Header>
                         <ListGroup variant="flush">
