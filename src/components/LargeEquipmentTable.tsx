@@ -92,12 +92,14 @@ const tableSettings: TableConfiguration<Equipment> = {
             displayName: 'Utrustning',
             getValue: (equipment: Equipment) =>
                 equipment.name + ' ' + equipment.description + ' ' + equipment.searchKeywords,
+            getHeadingValue: (equipment: Equipment) => equipment.name.charAt(0),
             getContentOverride: EquipmentNameDisplayFn,
         },
         {
             key: 'location',
             displayName: 'Plats',
             getValue: (equipment: Equipment) => equipment.equipmentLocation?.name ?? '-',
+            getHeadingValue: (equipment: Equipment) => equipment.equipmentLocation?.name ?? '-',
             cellHideSize: 'xl',
             columnWidth: 200,
         },
@@ -106,6 +108,8 @@ const tableSettings: TableConfiguration<Equipment> = {
             displayName: 'Antal',
             getValue: (equipment: Equipment) => equipment.inventoryCount ?? '-',
             getContentOverride: (equipment: Equipment) =>
+                equipment.inventoryCount === null ? '-' : equipment.inventoryCount + ' st',
+            getHeadingValue: (equipment: Equipment) =>
                 equipment.inventoryCount === null ? '-' : equipment.inventoryCount + ' st',
             textAlignment: 'center',
             cellHideSize: 'md',

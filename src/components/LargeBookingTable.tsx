@@ -8,7 +8,7 @@ import { Col, Form } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
-import { formatDateForForm, validDate } from '../lib/datetimeUtils';
+import { formatDateForForm, getBookingDateHeadingValue, validDate } from '../lib/datetimeUtils';
 import { useLocalStorageState, useLocalStorageStateForDate } from '../lib/useLocalStorageState';
 import AdvancedFilters from './AdvancedFilters';
 import BookingStatusTag from './utils/BookingStatusTag';
@@ -56,6 +56,7 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             key: 'date',
             displayName: 'Datum',
             getValue: (booking: BookingViewModel) => booking.isoFormattedUsageStartString,
+            getHeadingValue: getBookingDateHeadingValue,
             getContentOverride: BookingUsageIntervalDisplayFn,
         },
         {
@@ -69,6 +70,7 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             key: 'ownerUser',
             displayName: 'Ansvarig',
             getValue: (booking: BookingViewModel) => booking.ownerUser?.name ?? '-',
+            getHeadingValue: (booking: BookingViewModel) => booking.ownerUser?.name ?? '-',
             cellHideSize: 'lg',
             columnWidth: 180,
         },

@@ -91,6 +91,7 @@ const UserListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                 key: 'role',
                 displayName: 'Medlemsstatus',
                 getValue: (user: User) => getMemberStatusName(user?.memberStatus),
+                getHeadingValue: (user: User) => getMemberStatusName(user?.memberStatus),
                 textAlignment: 'center',
                 columnWidth: 180,
                 cellHideSize: 'md',

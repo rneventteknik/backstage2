@@ -7,6 +7,7 @@ import styles from './TableDisplay.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { useDrag, useDrop } from 'react-dnd';
+import { notEmpty, onlyUnique } from '../lib/utils';
 
 enum SortDirection {
     Ascending,
@@ -27,6 +28,7 @@ export type TableConfiguration<T extends HasId | HasStringId> = {
         key: string;
         displayName: string;
         getValue: (entity: T) => string | number | Date;
+        getHeadingValue?: (entity: T) => string | number | Date | null;
         getContentOverride?: null | ((entity: T) => React.ReactElement | string);
         getHeaderOverride?: null | ((entityList: T[]) => React.ReactElement | string);
         disableSort?: boolean;
@@ -77,11 +79,20 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     //
     const filterString = configuration.hideTableFilter ? filterStringFromParent ?? '' : storedFilterString;
 
+    const getHeadingValue = configuration.columns.find((c) => c.key === sortKey)?.getHeadingValue ?? (() => null);
+
+    // Set up wrapping. We do this inside the function so we can access T and simplify the typing.
+    //
+    type WrappedEntity = { entity: T };
+    type WrappedHeading = { heading: string | number | boolean | Date | null };
+    const hasEntity = (wrapperObject: WrappedEntity | WrappedHeading): wrapperObject is WrappedEntity =>
+        !!wrapperObject && !!(wrapperObject as WrappedEntity).entity;
+
     // Set up sorting
     //
-    const sortFn = (a: T, b: T) => {
+    const sortFn = (a: WrappedEntity, b: WrappedEntity) => {
         if (sortDirection === SortDirection.Custom && configuration.customSortFn) {
-            return configuration.customSortFn(a, b);
+            return configuration.customSortFn(a.entity, b.entity);
         }
 
         const sortDirectionMultiplier = sortDirection == SortDirection.Ascending ? 1 : -1;
@@ -91,10 +102,10 @@ export const TableDisplay = <T extends HasId | HasStringId>({
             throw 'Invalid column';
         }
 
-        if (getValueFn(a) < getValueFn(b)) {
+        if (getValueFn(a.entity) < getValueFn(b.entity)) {
             return -1 * sortDirectionMultiplier;
         }
-        if (getValueFn(a) > getValueFn(b)) {
+        if (getValueFn(a.entity) > getValueFn(b.entity)) {
             return 1 * sortDirectionMultiplier;
         }
         return 0;
@@ -128,11 +139,11 @@ export const TableDisplay = <T extends HasId | HasStringId>({
 
     // Set up filters
     //
-    const filterFn = (entity: T) => {
+    const filterFn = (entity: WrappedEntity) => {
         return configuration.columns.some(
             (c) =>
-                c.getValue(entity) &&
-                c.getValue(entity).toString().toLowerCase().indexOf(filterString.toLowerCase().trim()) > -1,
+                c.getValue(entity.entity) &&
+                c.getValue(entity.entity).toString().toLowerCase().indexOf(filterString.toLowerCase().trim()) > -1,
         );
     };
 
@@ -140,18 +151,25 @@ export const TableDisplay = <T extends HasId | HasStringId>({
         setFilterString(filterString.target.value);
     };
 
+    // Wrap entities in a wrapper object
+    //
+    const wrappedEntities: WrappedEntity[] = [...entities].map((x) => ({ entity: x }));
+
     // Sort and filter the entities before we generate the table
     //
-    const sortedEntities = [...entities].sort(sortFn).filter(filterFn);
+    const sortedEntities: WrappedEntity[] = wrappedEntities.sort(sortFn).filter(filterFn);
     const sortedSubEntities = subEntities.map((list) => ({
         parentId: list.parentId,
-        entities: list.entities.sort(sortFn).filter(filterFn),
+        entities: list.entities
+            .map((x) => ({ entity: x }))
+            .sort(sortFn)
+            .filter(filterFn),
     }));
 
     // Insert sub entities into table
     //
     sortedSubEntities.forEach((subList) => {
-        const index = sortedEntities.findIndex((x) => x.id === subList.parentId);
+        const index = sortedEntities.findIndex((x) => x.entity && x.entity.id === subList.parentId);
         sortedEntities.splice(index + 1, 0, ...subList.entities);
     });
 
@@ -159,7 +177,21 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     const getParentIdOfSubItem = (item: T) =>
         subEntities.find((list) => list.entities.some((x) => x.id === item.id))?.parentId;
 
-    const entitiesToShow = configuration.hideTableCountControls ? sortedEntities : sortedEntities.slice(0, viewCount);
+    const rowsToShow: (WrappedEntity | WrappedHeading)[] = configuration.hideTableCountControls
+        ? sortedEntities
+        : sortedEntities.slice(0, viewCount);
+
+    // Insert headings into table
+    //
+    const differentValues = rowsToShow
+        .filter(hasEntity)
+        .map((x) => getHeadingValue(x.entity))
+        .filter(onlyUnique)
+        .filter((x) => notEmpty(x) && x !== '');
+    differentValues.forEach((value) => {
+        const index = rowsToShow.findIndex((x) => hasEntity(x) && getHeadingValue(x.entity) === value);
+        rowsToShow.splice(index, 0, { heading: value });
+    });
 
     // Create the table
     //
@@ -191,11 +223,15 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                             >
                                 {p.disableSort ? (
                                     <span>
-                                        {p.getHeaderOverride ? p.getHeaderOverride(entitiesToShow) : p.displayName}
+                                        {p.getHeaderOverride
+                                            ? p.getHeaderOverride(rowsToShow.filter(hasEntity).map((x) => x.entity))
+                                            : p.displayName}
                                     </span>
                                 ) : (
                                     <span style={{ cursor: 'pointer' }} onClick={() => setSortConfiguration(p.key)}>
-                                        {p.getHeaderOverride ? p.getHeaderOverride(entitiesToShow) : p.displayName}{' '}
+                                        {p.getHeaderOverride
+                                            ? p.getHeaderOverride(rowsToShow.filter(hasEntity).map((x) => x.entity))
+                                            : p.displayName}{' '}
                                         {p.key === sortKey ? getSortingArrow(sortDirection) : null}
                                     </span>
                                 )}
@@ -204,21 +240,38 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                     </tr>
                 </thead>
                 <tbody>
-                    {entitiesToShow.map((entity) => (
-                        <TableRow
-                            key={entity.id}
-                            entity={entity}
-                            entitiesToShow={entitiesToShow}
-                            tableId={tableId}
-                            configuration={configuration}
-                            isSubItem={isSubItem}
-                            getParentIdOfSubItem={getParentIdOfSubItem}
-                            showMoveControl={!!configuration.moveFn && sortDirection === SortDirection.Custom}
-                        />
-                    ))}
-                    {entitiesToShow.length === 0 ? (
+                    {rowsToShow.map((x) =>
+                        hasEntity(x) ? (
+                            <TableRow
+                                key={x.entity.id}
+                                entity={x.entity}
+                                entitiesToShow={rowsToShow.filter(hasEntity).map((x) => x.entity)}
+                                tableId={tableId}
+                                configuration={configuration}
+                                isSubItem={isSubItem}
+                                getParentIdOfSubItem={getParentIdOfSubItem}
+                                showMoveControl={!!configuration.moveFn && sortDirection === SortDirection.Custom}
+                            />
+                        ) : (
+                            <tr key={'heading-' + x.heading} className={styles.headingRow}>
+                                {configuration.statusColumns?.map((p) => (
+                                    <td key={p.key} className={'p-0'}></td>
+                                ))}
+                                <td
+                                    colSpan={configuration.columns.length + (configuration.statusColumns?.length ?? 0)}
+                                    className="pt-4"
+                                >
+                                    <strong>{x.heading}</strong>
+                                </td>
+                            </tr>
+                        ),
+                    )}
+                    {rowsToShow.length === 0 ? (
                         <tr>
-                            <td colSpan={configuration.columns.length} className="text-center font-italic text-muted">
+                            <td
+                                colSpan={configuration.columns.length + (configuration.statusColumns?.length ?? 0)}
+                                className="text-center font-italic text-muted"
+                            >
                                 {configuration.noResultsLabel ?? 'Inga matchingar'}
                             </td>
                         </tr>
@@ -313,8 +366,8 @@ const TableRow = <T extends HasId | HasStringId>({
             accept: isSubItem(entity)
                 ? `table-${tableId}-subentity-${getParentIdOfSubItem(entity)}`
                 : `table-${tableId}-entity`,
-            drop: (data) => {
-                const item = entitiesToShow.find((x) => x.id === (data as HasId | HasStringId).id);
+            drop: (data: HasId | HasStringId) => {
+                const item = entitiesToShow.find((x) => x.id === data.id);
 
                 if (!configuration.moveFn) {
                     throw new Error('Invalid state, moveFn is invalid');

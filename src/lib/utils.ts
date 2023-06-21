@@ -31,6 +31,8 @@ export const notEmpty = <T>(value: T | null | undefined): value is T => value !=
 export const updateItemsInArrayById = <T extends HasId | HasStringId>(list: T[], ...updatedItems: T[]): T[] =>
     list.map((item) => updatedItems.find((x) => x.id === item.id) ?? item);
 
+export const uppercaseFirstLetter = (string: string) => string.charAt(0).toUpperCase() + string.slice(1);
+
 // Get string from status code
 //
 export const getStatusName = (status: Status): string => {

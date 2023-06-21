@@ -67,8 +67,13 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                     <TinyBookingTable
                         title="Kommande hyror (inom 24h)"
                         bookings={upcomingRentalBookings}
+                        showDateHeadings={false}
                     ></TinyBookingTable>
-                    <TinyBookingTable title="Utlämnade hyror" bookings={outBookings}></TinyBookingTable>
+                    <TinyBookingTable
+                        title="Utlämnade hyror"
+                        bookings={outBookings}
+                        showDateHeadings={false}
+                    ></TinyBookingTable>
                     <Card className="mb-3">
                         <Card.Header className="d-flex">
                             <span className="flex-grow-1">Aktivitet</span>

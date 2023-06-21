@@ -7,7 +7,7 @@ import { Card } from 'react-bootstrap';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import RentalStatusTag from './utils/RentalStatusTag';
-import { toBookingViewModel } from '../lib/datetimeUtils';
+import { getBookingDateHeadingValue, toBookingViewModel } from '../lib/datetimeUtils';
 import BookingStatusTag from './utils/BookingStatusTag';
 
 type Props = {
@@ -72,6 +72,7 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             displayName: 'Datum',
             getValue: (booking: BookingViewModel) => booking.isoFormattedUsageStartString,
             getContentOverride: BookingUsageIntervalDisplayFn,
+            getHeadingValue: getBookingDateHeadingValue,
             columnWidth: 180,
         },
     ],

@@ -1,5 +1,6 @@
 import { Booking, BookingViewModel } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
+import { uppercaseFirstLetter } from './utils';
 
 // Date/Time formatters
 //
@@ -40,6 +41,11 @@ const dateFormFormatOptions: Intl.DateTimeFormatOptions = {
     day: 'numeric',
 };
 
+const monthYearFormatOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'long',
+};
+
 export const formatDatetime = (
     date: Date | null | undefined,
     defaultValue = '-',
@@ -75,6 +81,12 @@ export const formatDateForForm = (
     defaultValue = '-',
     locale: 'sv-SE' | 'en-SE' = 'sv-SE',
 ): string => (date ? date.toLocaleString(locale, dateFormFormatOptions) : defaultValue);
+
+export const formatMonthYear = (
+    date: Date | null | undefined,
+    defaultValue = '-',
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+): string => (date ? uppercaseFirstLetter(date.toLocaleString(locale, monthYearFormatOptions)) : defaultValue);
 
 // Check if value is a valid date
 //
@@ -315,6 +327,7 @@ const getDateDisplayValues = (entity: HasDatetimes, hasTimeValues: boolean, loca
             locale,
         ),
         isoFormattedUsageStartString: formatDatetimeForForm(entity.usageStartDatetime),
+        monthYearUsageStartString: formatMonthYear(entity.usageStartDatetime),
     };
 };
 
@@ -333,6 +346,9 @@ export const toBookingViewModel = (booking: Booking): BookingViewModel => {
         ...getBookingDateDisplayValues(booking),
     };
 };
+
+export const getBookingDateHeadingValue = (booking: BookingViewModel) =>
+    booking.usageStartDatetime ? booking.monthYearUsageStartString : 'Saknar datum';
 
 export interface HasDatetimes {
     equipmentOutDatetime?: Date | null;
