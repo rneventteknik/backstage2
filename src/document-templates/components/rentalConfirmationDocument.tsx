@@ -29,7 +29,8 @@ const styles = {
 export const RentalConfirmationDocument: React.FC<Props> = ({ booking, globalSettings }: Props) => {
     const { t } = useTextResources();
 
-    const showPersonnelCosts = getTotalTimeEstimatesPrice(booking.timeEstimates) !== 0;
+    const showPrices = booking.fixedPrice === null;
+    const showPersonnelCosts = getTotalTimeEstimatesPrice(booking.timeEstimates) !== 0 && showPrices;
 
     return (
         <Document title={t('rental-agreement.title')}>
@@ -43,11 +44,16 @@ export const RentalConfirmationDocument: React.FC<Props> = ({ booking, globalSet
                 <MainContent>
                     <View style={styles.flexGrow}>
                         {getSortedList(booking.equipmentLists ?? []).map((l) => (
-                            <EquipmentListInfo list={l} booking={booking} key={l.id} />
+                            <EquipmentListInfo list={l} booking={booking} key={l.id} showPrices={showPrices} />
                         ))}
-                        {showPersonnelCosts ? <TimeEstimateListInfo booking={booking} /> : null}
+                        {showPersonnelCosts ? <TimeEstimateListInfo booking={booking} showPrices={showPrices} /> : null}
                     </View>
-                    <TotalPriceSection booking={booking} showPersonnelCosts={showPersonnelCosts} />
+                    <TotalPriceSection
+                        booking={booking}
+                        showPersonnelCosts={showPersonnelCosts}
+                        showEquipmentCosts={showPrices}
+                        priceByAgreement={!showPrices}
+                    />
                     <View wrap={false}>
                         <Text style={[styles.bold, styles.marginTopLarge]}>
                             {t('rental-agreement.legal-note.title')}

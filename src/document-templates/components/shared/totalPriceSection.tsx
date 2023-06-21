@@ -24,9 +24,16 @@ const styles = StyleSheet.create({
 
 type Props = {
     booking: Booking;
+    showEquipmentCosts?: boolean;
     showPersonnelCosts?: boolean;
+    priceByAgreement?: boolean;
 };
-export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts = true }: Props) => {
+export const TotalPriceSection: React.FC<Props> = ({
+    booking,
+    showEquipmentCosts = true,
+    showPersonnelCosts = true,
+    priceByAgreement = false,
+}: Props) => {
     const { t } = useTextResources();
 
     return (
@@ -34,16 +41,18 @@ export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts
             <Text style={{ ...styles.heading, ...styles.bold }}>{t('common.total-price-section.heading')}</Text>
 
             <View>
-                {getSortedList(booking.equipmentLists ?? []).map((list) => (
-                    <TableRow key={list.id}>
-                        <TableCellAutoWidth>
-                            <Text>{list.name}</Text>
-                        </TableCellAutoWidth>
-                        <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
-                        </TableCellFixedWidth>
-                    </TableRow>
-                ))}
+                {showEquipmentCosts
+                    ? getSortedList(booking.equipmentLists ?? []).map((list) => (
+                          <TableRow key={list.id}>
+                              <TableCellAutoWidth>
+                                  <Text>{list.name}</Text>
+                              </TableCellAutoWidth>
+                              <TableCellFixedWidth width={90} textAlign="right">
+                                  <Text>{formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
+                              </TableCellFixedWidth>
+                          </TableRow>
+                      ))
+                    : null}
                 {showPersonnelCosts ? (
                     <TableRow>
                         <TableCellAutoWidth>
@@ -60,7 +69,13 @@ export const TotalPriceSection: React.FC<Props> = ({ booking, showPersonnelCosts
 
             <TableRow>
                 <TableCellAutoWidth>
-                    <Text style={styles.bold}>{t('common.total-price-section.total-sum')}</Text>
+                    <Text style={styles.bold}>
+                        {t(
+                            priceByAgreement
+                                ? 'common.total-price-section.price-by-agreement'
+                                : 'common.total-price-section.total-sum',
+                        )}
+                    </Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.bold}>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true)))}</Text>

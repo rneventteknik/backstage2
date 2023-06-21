@@ -26,10 +26,12 @@ import {
     fetchBookingWithEquipmentLists,
 } from '../../../../lib/db-access/booking';
 import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
+import { PaymentStatus } from '../../../../models/enums/PaymentStatus';
 import { Role } from '../../../../models/enums/Role';
 import { Status } from '../../../../models/enums/Status';
 import { CurrentUserInfo } from '../../../../models/misc/CurrentUserInfo';
 import {
+    BookingObjectionModel,
     EquipmentListObjectionModel,
     IBookingObjectionModel,
 } from '../../../../models/objection-models/BookingObjectionModel';
@@ -85,9 +87,11 @@ const handler = withSessionContext(
                     return;
                 }
 
-                await updateBooking(bookingId, req.body.booking)
+                const updatedBooking = await performAutomaticActions(booking, req.body.booking);
+
+                await updateBooking(bookingId, updatedBooking)
                     .then(async (result) => {
-                        await logChangesToBooking(booking, req.body.booking, context.currentUser);
+                        await logChangesToBooking(booking, updatedBooking, context.currentUser);
 
                         res.status(200).json(result);
                     })
@@ -101,9 +105,28 @@ const handler = withSessionContext(
     },
 );
 
+const performAutomaticActions = async (
+    booking: IBookingObjectionModel,
+    newBooking: Partial<BookingObjectionModel>,
+): Promise<Partial<BookingObjectionModel>> => {
+    // Booking is set to done
+    if (newBooking.status === Status.DONE && booking.status !== Status.DONE) {
+        // Check if there is a fixed price which is 0, and the payments status is not paid (and it was not changed manually)
+        if (
+            newBooking.fixedPrice === 0 &&
+            booking.paymentStatus === PaymentStatus.NOT_PAID &&
+            newBooking.paymentStatus === PaymentStatus.NOT_PAID
+        ) {
+            return { ...newBooking, paymentStatus: PaymentStatus.PAID };
+        }
+    }
+
+    return newBooking;
+};
+
 const logChangesToBooking = async (
     booking: IBookingObjectionModel,
-    newBooking: IBookingObjectionModel,
+    newBooking: Partial<BookingObjectionModel>,
     currentUser: CurrentUserInfo,
 ) => {
     const bookingId = booking.id;

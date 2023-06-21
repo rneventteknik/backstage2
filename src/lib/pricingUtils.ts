@@ -86,7 +86,11 @@ export const getTotalTimeReportsPrice = (timeReports: TimeReport[] | undefined):
     return timeReports?.reduce((sum, l) => sum + getTimeReportPrice(l), 0) ?? 0;
 };
 
-export const getBookingPrice = (booking: Booking, forceEstimatedTime = false): number => {
+export const getBookingPrice = (booking: Booking, forceEstimatedTime = false, forceNoFixedPrice = false): number => {
+    if (!forceNoFixedPrice && booking.fixedPrice !== null && booking.fixedPrice !== undefined) {
+        return booking.fixedPrice;
+    }
+
     const equipmentPrice = booking.equipmentLists?.reduce((sum, l) => sum + getEquipmentListPrice(l), 0) ?? 0;
     const timeEstimatePrice = getTotalTimeEstimatesPrice(booking.timeEstimates);
     const timeReportsPrice = getTotalTimeReportsPrice(booking.timeReports);

@@ -26,6 +26,8 @@ const styles = {
 export const PriceEstimateDocument: React.FC<Props> = ({ booking, globalSettings }: Props) => {
     const { t } = useTextResources();
 
+    const showPrices = booking.fixedPrice === null;
+
     return (
         <Document title={t('price-estimate.title')}>
             <Page size="A4" style={styles.page}>
@@ -37,12 +39,17 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking, globalSettings
                 <MainContent>
                     <View style={styles.flexGrow}>
                         {getSortedList(booking.equipmentLists ?? []).map((l) => (
-                            <EquipmentListInfo list={l} booking={booking} key={l.id} />
+                            <EquipmentListInfo list={l} booking={booking} showPrices={showPrices} key={l.id} />
                         ))}
-                        <TimeEstimateListInfo booking={booking} />
+                        <TimeEstimateListInfo booking={booking} showPrices={showPrices} />
                     </View>
 
-                    <TotalPriceSection booking={booking} />
+                    <TotalPriceSection
+                        booking={booking}
+                        showEquipmentCosts={showPrices}
+                        showPersonnelCosts={showPrices}
+                        priceByAgreement={!showPrices}
+                    />
                     <Text style={styles.bold}>{t('price-estimate.legal-note.title')}</Text>
                     <Text>{t('price-estimate.legal-note.content')}</Text>
                 </MainContent>

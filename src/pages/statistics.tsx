@@ -90,8 +90,8 @@ type EquipmentStatisticViewModel = {
     id: number;
     name: string;
     numberOfBookings: number;
-    totalNumberOfUnitDays: number;
-    totalNumberOfUnitHours: number;
+    totalNumberOfUnitDays: number | null;
+    totalNumberOfUnitHours: number | null;
     sum: number;
     percentTHS: number;
 };
@@ -120,11 +120,27 @@ const getEquipmentStatistics = (bookings: BookingViewModel[]): EquipmentStatisti
             numberOfBookings: bookingsForThisEquipment.length,
             totalNumberOfUnitDays: entries.map((x) => x.numberOfUnits * getNumberOfDays(x.list)).reduce(reduceSumFn, 0),
             totalNumberOfUnitHours: entries.map((x) => x.numberOfUnits * x.numberOfHours).reduce(reduceSumFn, 0),
-            sum: entries.map((x) => getPrice(x, getNumberOfDays(x.list))).reduce(reduceSumFn, 0),
+            sum: entries
+                .filter((x) => x.booking.fixedPrice === null)
+                .map((x) => getPrice(x, getNumberOfDays(x.list)))
+                .reduce(reduceSumFn, 0),
             percentTHS:
                 (bookingsForThisEquipment.filter((x) => x.pricePlan === PricePlan.THS).length /
                     bookingsForThisEquipment.length) *
                 100,
+        });
+    }
+
+    const fixedPriceBookings = bookings.filter((x) => x.fixedPrice !== null);
+    if (fixedPriceBookings.length > 0) {
+        equipmentStatistics.push({
+            id: -1,
+            name: 'Fast pris (totalt)',
+            numberOfBookings: fixedPriceBookings.length,
+            totalNumberOfUnitDays: null,
+            totalNumberOfUnitHours: null,
+            sum: bookings.map((x) => x.fixedPrice ?? 0).reduce(reduceSumFn, 0),
+            percentTHS: (bookings.filter((x) => x.pricePlan === PricePlan.THS).length / bookings.length) * 100,
         });
     }
 
@@ -237,9 +253,9 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
     // Table display functions
     //
     const totalNumberOfUnitHoursDisplayFn = (model: EquipmentStatisticViewModel) =>
-        model.totalNumberOfUnitHours > 0 ? model.totalNumberOfUnitHours + ' h' : '-';
+        model.totalNumberOfUnitHours ?? 0 > 0 ? model.totalNumberOfUnitHours + ' h' : '-';
     const totalNumberOfUnitDaysDisplayFn = (model: EquipmentStatisticViewModel) =>
-        model.totalNumberOfUnitDays > 0 ? model.totalNumberOfUnitDays + ' st' : '-';
+        model.totalNumberOfUnitDays ?? 0 > 0 ? model.totalNumberOfUnitDays + ' st' : '-';
 
     const totalNumberOfHoursDisplayFn = (model: CustomerStatisticViewModel) => model.totalNumberOfHours + ' h';
 
@@ -273,7 +289,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
             {
                 key: 'totalNumberOfUnits',
                 displayName: 'Uthyrda dagar',
-                getValue: (model: EquipmentStatisticViewModel) => model.totalNumberOfUnitDays,
+                getValue: (model: EquipmentStatisticViewModel) => model.totalNumberOfUnitDays ?? -1,
                 getContentOverride: totalNumberOfUnitDaysDisplayFn,
                 textAlignment: 'right',
                 cellHideSize: 'md',
@@ -282,7 +298,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
             {
                 key: 'totalnumberOfHours',
                 displayName: 'Timmar använt',
-                getValue: (model: EquipmentStatisticViewModel) => model.totalNumberOfUnitHours,
+                getValue: (model: EquipmentStatisticViewModel) => model.totalNumberOfUnitHours ?? -1,
                 getContentOverride: totalNumberOfUnitHoursDisplayFn,
                 textAlignment: 'right',
                 cellHideSize: 'md',

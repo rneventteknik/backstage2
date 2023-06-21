@@ -39,6 +39,7 @@ export interface Booking extends BaseEntityWithName {
     calendarBookingId: string;
     customerName: string;
     language: Language;
+    fixedPrice: number | null;
 }
 
 export interface BookingViewModel extends Booking {

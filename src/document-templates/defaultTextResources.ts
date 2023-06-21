@@ -34,6 +34,7 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.total-price-section.heading': 'Sammanfattning',
         'common.total-price-section.time-estimate-sum': 'Personalkostnader',
         'common.total-price-section.total-sum': 'Summa inkl moms (SEK)',
+        'common.total-price-section.price-by-agreement': 'Pris enligt överenskommelse inkl moms (SEK)',
         'common.total-price-section.vat': 'Varav moms (25%)',
 
         // Footer
@@ -122,6 +123,7 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.total-price-section.heading': 'Summary',
         'common.total-price-section.time-estimate-sum': 'Personnel costs',
         'common.total-price-section.total-sum': 'Total amount incl VAT (SEK)',
+        'common.total-price-section.price-by-agreement': 'Price according to agreement incl VAT (SEK)',
         'common.total-price-section.vat': 'VAT (25%)',
 
         // Footer

@@ -66,6 +66,7 @@ type Props = {
     pricePlan: PricePlan;
     language: Language;
     defaultLaborHourlyRate: number;
+    showPricesAsMuted: boolean;
     saveListEntry: (entry: EquipmentListEntry) => void;
     saveListHeading: (heading: EquipmentListHeading) => void;
     saveListEntriesAndHeadings: (
@@ -87,6 +88,7 @@ const EquipmentListTable: React.FC<Props> = ({
     pricePlan,
     language,
     defaultLaborHourlyRate,
+    showPricesAsMuted,
     saveListEntry,
     saveListHeading,
     saveListEntriesAndHeadings,
@@ -312,7 +314,7 @@ const EquipmentListTable: React.FC<Props> = ({
             pricePerHourTHS: entry.pricePerHour,
         };
         return entry.equipment && entry.equipment.prices.length ? (
-            <>
+            <span className={showPricesAsMuted ? 'text-muted' : ''}>
                 <DoubleClickToEditDropdown<EquipmentPrice>
                     options={
                         entry.equipmentPrice
@@ -339,9 +341,11 @@ const EquipmentListTable: React.FC<Props> = ({
                         <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
                     ) : null}
                 </DoubleClickToEditDropdown>
-            </>
+            </span>
         ) : (
-            formatPrice(addVATToPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit }))
+            <span className={showPricesAsMuted ? 'text-muted' : ''}>
+                {formatPrice(addVATToPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit }))}
+            </span>
         );
     };
 
@@ -356,7 +360,7 @@ const EquipmentListTable: React.FC<Props> = ({
         const priceWithDiscount = formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list))));
 
         return (
-            <em>
+            <em className={showPricesAsMuted ? 'text-muted' : ''}>
                 {entry.discount > 0 ? (
                     <OverlayTrigger
                         placement="right"

@@ -45,6 +45,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     calendarBookingId: string;
     customerName: string;
     language: Language;
+    fixedPrice: number | null;
 }
 
 export class BookingObjectionModel extends Model {
@@ -138,6 +139,7 @@ export class BookingObjectionModel extends Model {
     timeEstimates!: TimeEstimateObjectionModel[];
     timeReports!: TimeReportObjectionModel[];
     ownerUser!: UserObjectionModel;
+    ownerUserId?: number;
     coOwnerUsers!: UserObjectionModel[];
     changelog!: BookingChangelogEntryObjectionModel[];
     bookingType!: number;
@@ -159,6 +161,7 @@ export class BookingObjectionModel extends Model {
     calendarBookingId!: string;
     customerName!: string;
     language!: Language;
+    fixedPrice!: number;
 }
 
 export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName {

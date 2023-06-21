@@ -28,8 +28,9 @@ const styles = StyleSheet.create({
 type Props = {
     list: EquipmentList;
     booking: Booking;
+    showPrices: boolean;
 };
-export const EquipmentListInfo: React.FC<Props> = ({ list, booking }: Props) => {
+export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }: Props) => {
     const { t } = useTextResources();
 
     const wrapEntity = (entity: EquipmentListEntry | EquipmentListHeading, typeIdentifier: 'E' | 'H') => ({
@@ -55,15 +56,19 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking }: Props) => 
                 <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.italic}>{t('common.equipment-list.table-header.count')}</Text>
                 </TableCellFixedWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.italic}>{t('common.equipment-list.table-header.price')}</Text>
-                </TableCellFixedWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.italic}>{t('common.equipment-list.table-header.discount')}</Text>
-                </TableCellFixedWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.italic}>{t('common.equipment-list.table-header.total-price')}</Text>
-                </TableCellFixedWidth>
+                {showPrices ? (
+                    <>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text style={styles.italic}>{t('common.equipment-list.table-header.price')}</Text>
+                        </TableCellFixedWidth>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text style={styles.italic}>{t('common.equipment-list.table-header.discount')}</Text>
+                        </TableCellFixedWidth>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text style={styles.italic}>{t('common.equipment-list.table-header.total-price')}</Text>
+                        </TableCellFixedWidth>
+                    </>
+                ) : null}
             </TableRow>
 
             <View>
@@ -85,62 +90,80 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking }: Props) => 
                                         <Text>1 {t('common.misc.count-unit-single')}</Text>
                                     )}
                                 </TableCellFixedWidth>
-                                <TableCellFixedWidth width={90} textAlign="right">
-                                    {!isHeading ? (
-                                        <Text>{formatEquipmentListEntryPriceWithVAT(entry, t)}</Text>
-                                    ) : (
-                                        <Text>
-                                            {formatEquipmentListEntryPriceWithVAT(
-                                                {
-                                                    pricePerUnit: getEquipmentListHeadingPrice(
-                                                        heading,
-                                                        getNumberOfDays(list),
-                                                    ),
-                                                    pricePerHour: 0,
-                                                },
-                                                t,
+                                {showPrices ? (
+                                    <>
+                                        <TableCellFixedWidth width={90} textAlign="right">
+                                            {!isHeading ? (
+                                                <Text>{formatEquipmentListEntryPriceWithVAT(entry, t)}</Text>
+                                            ) : (
+                                                <Text>
+                                                    {formatEquipmentListEntryPriceWithVAT(
+                                                        {
+                                                            pricePerUnit: getEquipmentListHeadingPrice(
+                                                                heading,
+                                                                getNumberOfDays(list),
+                                                            ),
+                                                            pricePerHour: 0,
+                                                        },
+                                                        t,
+                                                    )}
+                                                </Text>
                                             )}
-                                        </Text>
-                                    )}
-                                </TableCellFixedWidth>
-                                <TableCellFixedWidth width={90} textAlign="right">
-                                    {!isHeading ? (
-                                        <Text>
-                                            {getCalculatedDiscount(entry, getNumberOfDays(list)) > 0
-                                                ? formatNumberAsCurrency(
-                                                      addVAT(getCalculatedDiscount(entry, getNumberOfDays(list))),
-                                                  )
-                                                : ''}
-                                        </Text>
-                                    ) : null}
-                                </TableCellFixedWidth>
-                                <TableCellFixedWidth width={90} textAlign="right">
-                                    {!isHeading ? (
-                                        <Text>
-                                            {formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list))))}
-                                        </Text>
-                                    ) : (
-                                        <Text>
-                                            {formatNumberAsCurrency(
-                                                addVAT(getEquipmentListHeadingPrice(heading, getNumberOfDays(list))),
+                                        </TableCellFixedWidth>
+                                        <TableCellFixedWidth width={90} textAlign="right">
+                                            {!isHeading ? (
+                                                <Text>
+                                                    {getCalculatedDiscount(entry, getNumberOfDays(list)) > 0
+                                                        ? formatNumberAsCurrency(
+                                                              addVAT(
+                                                                  getCalculatedDiscount(entry, getNumberOfDays(list)),
+                                                              ),
+                                                          )
+                                                        : ''}
+                                                </Text>
+                                            ) : null}
+                                        </TableCellFixedWidth>
+                                        <TableCellFixedWidth width={90} textAlign="right">
+                                            {!isHeading ? (
+                                                <Text>
+                                                    {formatNumberAsCurrency(
+                                                        addVAT(getPrice(entry, getNumberOfDays(list))),
+                                                    )}
+                                                </Text>
+                                            ) : (
+                                                <Text>
+                                                    {formatNumberAsCurrency(
+                                                        addVAT(
+                                                            getEquipmentListHeadingPrice(
+                                                                heading,
+                                                                getNumberOfDays(list),
+                                                            ),
+                                                        ),
+                                                    )}
+                                                </Text>
                                             )}
-                                        </Text>
-                                    )}
-                                </TableCellFixedWidth>
+                                        </TableCellFixedWidth>
+                                    </>
+                                ) : null}
                             </TableRow>
                         </>
                     );
                 })}
             </View>
-
-            <TableRow>
-                <TableCellAutoWidth>
-                    <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
-                </TableCellAutoWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.bold}>{formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
-                </TableCellFixedWidth>
-            </TableRow>
+            {showPrices ? (
+                <>
+                    <TableRow>
+                        <TableCellAutoWidth>
+                            <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
+                        </TableCellAutoWidth>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text style={styles.bold}>
+                                {formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}
+                            </Text>
+                        </TableCellFixedWidth>
+                    </TableRow>
+                </>
+            ) : null}
         </View>
     );
 };

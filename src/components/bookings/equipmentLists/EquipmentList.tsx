@@ -427,6 +427,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     pricePlan={booking.pricePlan}
                     language={booking.language}
                     defaultLaborHourlyRate={defaultLaborHourlyRate}
+                    showPricesAsMuted={booking.fixedPrice !== null}
                     saveListEntry={saveListEntry}
                     saveListHeading={saveListHeading}
                     saveListEntriesAndHeadings={saveListEntriesAndHeadings}

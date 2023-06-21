@@ -26,6 +26,7 @@ import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
 import { Language } from '../../models/enums/Language';
 import BookingSearchCustomerModal from './BookingSearchCustomerModal';
+import PriceWithVATPreview from '../utils/PriceWithVATPreview';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
@@ -44,8 +45,9 @@ const BookingForm: React.FC<Props> = ({
 }: Props) => {
     const [validated, setValidated] = useState(false);
     const [status, setStatus] = useState(booking.status);
-    const [hoogiaIdIsRequired, setHogiaIdIsRequired] = useState((booking.invoiceAddress?.length ?? 0) === 0);
-    const [invoceAddressIsRequired, setInvoceAddressIsRequired] = useState(!booking.invoiceHogiaId);
+    const [hoogiaId, setHogiaId] = useState(booking.invoiceHogiaId?.toString());
+    const [invoiceAddress, setInvoiceAddress] = useState(booking.invoiceAddress);
+    const [fixedPrice, setFixedPrice] = useState(booking.fixedPrice?.toString());
     const [showAdvancedFields, setShowAdvancedFields] = useState(false);
     const [showCustomerSearchModal, setCustomerSearchModal] = useState(false);
 
@@ -64,6 +66,7 @@ const BookingForm: React.FC<Props> = ({
         if (
             !replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId')) &&
             !replaceEmptyStringWithNull(getValueFromForm('invoiceAddress')) &&
+            toIntOrUndefined(getValueFromForm('fixedPrice')) !== 0 &&
             isFieldRequired(Status.BOOKED)
         ) {
             form.invoiceHogiaId?.setCustomValidity('Felaktig fakturainformation');
@@ -106,6 +109,7 @@ const BookingForm: React.FC<Props> = ({
             returnalNote: getValueFromForm('returnalNote'),
             calendarBookingId: getValueFromForm('calendarBookingId'),
             language: getValueFromForm('language') as Language | undefined,
+            fixedPrice: toIntOrUndefined(getValueFromForm('fixedPrice')) ?? null,
         };
 
         handleSubmitBooking(modifiedBooking);
@@ -323,49 +327,81 @@ const BookingForm: React.FC<Props> = ({
                     </Form.Group>
                 </Col>
             </Row>
-            <h2 className="h5 mt-4">Kontaktperson</h2>
-            <hr />
             <Row>
-                <Col lg="4" md="4">
-                    <Form.Group controlId="formContactPersonName">
-                        <Form.Label>
-                            Namn
-                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
-                        </Form.Label>
-                        <Form.Control
-                            required={isFieldRequired(Status.BOOKED)}
-                            type="text"
-                            placeholder="Mats Matsson"
-                            name="contactPersonName"
-                            defaultValue={booking.contactPersonName}
-                        />
-                    </Form.Group>
+                <Col lg="9" md="9">
+                    <h2 className="h5 mt-4">Kontaktperson</h2>
+                    <hr />
+                    <Row>
+                        <Col lg="4" md="4">
+                            <Form.Group controlId="formContactPersonName">
+                                <Form.Label>
+                                    Namn
+                                    <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                                </Form.Label>
+                                <Form.Control
+                                    required={isFieldRequired(Status.BOOKED)}
+                                    type="text"
+                                    placeholder="Mats Matsson"
+                                    name="contactPersonName"
+                                    defaultValue={booking.contactPersonName}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col lg="4" md="4">
+                            <Form.Group controlId="formContactPersonEmail">
+                                <Form.Label>
+                                    Email
+                                    <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
+                                </Form.Label>
+                                <Form.Control
+                                    required={isFieldRequired(Status.BOOKED)}
+                                    type="text"
+                                    placeholder="mats.matsson@mats.se"
+                                    name="contactPersonEmail"
+                                    defaultValue={booking.contactPersonEmail}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col lg="4" md="4">
+                            <Form.Group controlId="formContactPersonPhone">
+                                <Form.Label>Telefon</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="070 000 00 00"
+                                    name="contactPersonPhone"
+                                    defaultValue={booking.contactPersonPhone}
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Row>
                 </Col>
-                <Col lg="4" md="4">
-                    <Form.Group controlId="formContactPersonEmail">
-                        <Form.Label>
-                            Email
-                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
-                        </Form.Label>
-                        <Form.Control
-                            required={isFieldRequired(Status.BOOKED)}
-                            type="text"
-                            placeholder="mats.matsson@mats.se"
-                            name="contactPersonEmail"
-                            defaultValue={booking.contactPersonEmail}
-                        />
-                    </Form.Group>
-                </Col>
-                <Col lg="4" md="4">
-                    <Form.Group controlId="formContactPersonPhone">
-                        <Form.Label>Telefon</Form.Label>
-                        <Form.Control
-                            type="text"
-                            placeholder="070 000 00 00"
-                            name="contactPersonPhone"
-                            defaultValue={booking.contactPersonPhone}
-                        />
-                    </Form.Group>
+                <Col lg="3" md="3">
+                    <h2 className="h5 mt-4">Prisalternativ</h2>
+                    <hr />
+                    <Row>
+                        <Col lg="12">
+                            <Form.Group controlId="fixedPrice">
+                                <Form.Label>Fast pris (ex. moms)</Form.Label>
+                                <InputGroup>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder=""
+                                        name="fixedPrice"
+                                        defaultValue={booking?.fixedPrice ?? undefined}
+                                        onChange={(e) => setFixedPrice(e.target.value)}
+                                    />
+                                    <InputGroup.Append>
+                                        <InputGroup.Text>kr</InputGroup.Text>
+                                    </InputGroup.Append>
+                                </InputGroup>
+                                <PriceWithVATPreview price={toIntOrUndefined(fixedPrice)} />
+                                <Form.Text className="text-muted">
+                                    Om detta fält har ett värde skriver det över summan som beräknas från
+                                    utrustningslistor och arbetstid. Detta fält ska normalt lämnas tomt.
+                                </Form.Text>
+                            </Form.Group>
+                        </Col>
+                    </Row>
                 </Col>
             </Row>
             {!booking || isNewBooking ? null : (
@@ -378,7 +414,11 @@ const BookingForm: React.FC<Props> = ({
                                 <Form.Label>
                                     Hogia ID
                                     <RequiredIndicator
-                                        required={isFieldRequired(Status.BOOKED) && hoogiaIdIsRequired}
+                                        required={
+                                            isFieldRequired(Status.BOOKED) &&
+                                            !invoiceAddress &&
+                                            !(toIntOrUndefined(fixedPrice) === 0)
+                                        }
                                     />
                                 </Form.Label>
 
@@ -386,7 +426,7 @@ const BookingForm: React.FC<Props> = ({
                                     type="number"
                                     placeholder="1234"
                                     name="invoiceHogiaId"
-                                    onChange={(e) => setInvoceAddressIsRequired(e.target.value.length === 0)}
+                                    onChange={(e) => setHogiaId(e.target.value)}
                                     defaultValue={booking.invoiceHogiaId ?? undefined}
                                     ref={hogiaField}
                                 />
@@ -405,14 +445,18 @@ const BookingForm: React.FC<Props> = ({
                                 <Form.Label>
                                     Fakturaadress
                                     <RequiredIndicator
-                                        required={isFieldRequired(Status.BOOKED) && invoceAddressIsRequired}
+                                        required={
+                                            isFieldRequired(Status.BOOKED) &&
+                                            !hoogiaId &&
+                                            !(toIntOrUndefined(fixedPrice) === 0)
+                                        }
                                     />
                                 </Form.Label>
                                 <Form.Control
                                     as="textarea"
                                     name="invoiceAddress"
                                     rows={3}
-                                    onChange={(e) => setHogiaIdIsRequired(e.target.value.length === 0)}
+                                    onChange={(e) => setInvoiceAddress(e.target.value)}
                                     defaultValue={booking.invoiceAddress}
                                     ref={invoiceAddressField}
                                 />

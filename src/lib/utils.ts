@@ -108,7 +108,7 @@ export const getPaymentStatusName = (paymentStatus: PaymentStatus): string => {
             return 'Obetald';
 
         case PaymentStatus.PAID:
-            return 'Betald';
+            return 'Skall ej faktureras';
 
         case PaymentStatus.INVOICED:
             return 'Fakturerad';

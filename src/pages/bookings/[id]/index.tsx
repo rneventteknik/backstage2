@@ -260,7 +260,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     </ConfirmModal> */}
 
                     <Button variant="secondary" onClick={() => setShowConfirmPaidModal(true)}>
-                        <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som betald
+                        <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som skall ej faktureras
                     </Button>
                     <ConfirmModal
                         show={showConfirmPaidModal}
@@ -270,10 +270,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             setShowConfirmPaidModal(false);
                         }}
                         title="Bekräfta"
-                        confirmLabel="Markera som betald"
+                        confirmLabel="Markera som skall ej faktureras"
                         confirmButtonType="primary"
                     >
-                        Vill du markera bokningen <em>{booking.name}</em> som betald?
+                        Vill du markera bokningen <em>{booking.name}</em> som skall ej faktureras?
                     </ConfirmModal>
                 </IfNotReadonly>
             </Header>
@@ -324,16 +324,39 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <strong className="flex-grow-1">Totalpris</strong>
-                                <strong>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true)))}</strong>
+                                <strong>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true, true)))}</strong>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <strong className="flex-grow-1">varav moms (25%)</strong>
                                 <strong>
                                     {formatNumberAsCurrency(
-                                        addVAT(getBookingPrice(booking, true)) - getBookingPrice(booking, true),
+                                        addVAT(getBookingPrice(booking, true, true)) -
+                                            getBookingPrice(booking, true, true),
                                     )}
                                 </strong>
                             </ListGroup.Item>
+                            {booking.fixedPrice !== null && booking.fixedPrice !== undefined ? (
+                                <>
+                                    <ListGroup.Item className="d-flex">
+                                        <strong className="flex-grow-1">Fast pris</strong>
+                                        <strong>{formatNumberAsCurrency(addVAT(booking.fixedPrice))}</strong>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <strong className="flex-grow-1">varav moms (25%)</strong>
+                                        <strong>
+                                            {formatNumberAsCurrency(addVAT(booking.fixedPrice) - booking.fixedPrice)}
+                                        </strong>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <strong className="flex-grow-1">Skillnad mot beräknat pris</strong>
+                                        <strong>
+                                            {formatNumberAsCurrency(
+                                                addVAT(booking.fixedPrice - getBookingPrice(booking, true, true)),
+                                            )}
+                                        </strong>
+                                    </ListGroup.Item>
+                                </>
+                            ) : null}
                         </ListGroup>
                     </Card>
                     <Card className="mb-3">

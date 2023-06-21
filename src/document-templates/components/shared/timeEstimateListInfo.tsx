@@ -22,8 +22,9 @@ const styles = StyleSheet.create({
 
 type Props = {
     booking: Booking;
+    showPrices: boolean;
 };
-export const TimeEstimateListInfo: React.FC<Props> = ({ booking }: Props) => {
+export const TimeEstimateListInfo: React.FC<Props> = ({ booking, showPrices }: Props) => {
     const { t } = useTextResources();
 
     return (
@@ -37,12 +38,16 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking }: Props) => {
                 <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.italic}>{t('common.time-estimate-list.table-header.count')}</Text>
                 </TableCellFixedWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.italic}>{t('common.time-estimate-list.table-header.price')}</Text>
-                </TableCellFixedWidth>
-                <TableCellFixedWidth width={180} textAlign="right">
-                    <Text style={styles.italic}>{t('common.time-estimate-list.table-header.total-price')}</Text>
-                </TableCellFixedWidth>
+                {showPrices ? (
+                    <>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text style={styles.italic}>{t('common.time-estimate-list.table-header.price')}</Text>
+                        </TableCellFixedWidth>
+                        <TableCellFixedWidth width={180} textAlign="right">
+                            <Text style={styles.italic}>{t('common.time-estimate-list.table-header.total-price')}</Text>
+                        </TableCellFixedWidth>
+                    </>
+                ) : null}
             </TableRow>
 
             <View>
@@ -56,26 +61,33 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking }: Props) => {
                                 {timeEstimate.numberOfHours} {t('common.misc.hours-unit')}
                             </Text>
                         </TableCellFixedWidth>
-                        <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{formatNumberAsCurrency(addVAT(timeEstimate.pricePerHour))}</Text>
-                        </TableCellFixedWidth>
-                        <TableCellFixedWidth width={180} textAlign="right">
-                            <Text>{formatNumberAsCurrency(addVAT(getTimeEstimatePrice(timeEstimate)))}</Text>
-                        </TableCellFixedWidth>
+                        {showPrices ? (
+                            <>
+                                <TableCellFixedWidth width={90} textAlign="right">
+                                    <Text>{formatNumberAsCurrency(addVAT(timeEstimate.pricePerHour))}</Text>
+                                </TableCellFixedWidth>
+                                <TableCellFixedWidth width={180} textAlign="right">
+                                    <Text>{formatNumberAsCurrency(addVAT(getTimeEstimatePrice(timeEstimate)))}</Text>
+                                </TableCellFixedWidth>
+                            </>
+                        ) : null}
                     </TableRow>
                 ))}
             </View>
-
-            <TableRow>
-                <TableCellAutoWidth>
-                    <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
-                </TableCellAutoWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.bold}>
-                        {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
-                    </Text>
-                </TableCellFixedWidth>
-            </TableRow>
+            {showPrices ? (
+                <>
+                    <TableRow>
+                        <TableCellAutoWidth>
+                            <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
+                        </TableCellAutoWidth>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text style={styles.bold}>
+                                {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
+                            </Text>
+                        </TableCellFixedWidth>
+                    </TableRow>
+                </>
+            ) : null}
         </View>
     );
 };
