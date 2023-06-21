@@ -187,7 +187,7 @@ const BookingForm: React.FC<Props> = ({
             </Row>
             <Row>
                 <Col lg="6">
-                    <Form.Group controlId="formLocation">
+                    <Form.Group controlId="formCustomer">
                         <Form.Label>
                             Kundnamn
                             <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
@@ -264,12 +264,8 @@ const BookingForm: React.FC<Props> = ({
             <Row>
                 <Col lg="6">
                     <Form.Group controlId="formLocation">
-                        <Form.Label>
-                            Plats
-                            <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
-                        </Form.Label>
+                        <Form.Label>Plats</Form.Label>
                         <Form.Control
-                            required={isFieldRequired(Status.BOOKED)}
                             type="text"
                             placeholder="Nya Matsalen, Nymble"
                             name="location"
