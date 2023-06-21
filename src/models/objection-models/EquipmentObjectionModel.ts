@@ -100,6 +100,7 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
 export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName {
     color?: string;
     equipment?: IEquipmentObjectionModel[];
+    isPublic: boolean;
 }
 
 export class EquipmentTagObjectionModel extends Model implements IEquipmentTagObjectionModel {
@@ -127,6 +128,7 @@ export class EquipmentTagObjectionModel extends Model implements IEquipmentTagOb
 
     color?: string;
     equipment?: EquipmentObjectionModel[];
+    isPublic!: boolean;
 }
 
 export interface IEquipmentPriceObjectionModel extends BaseObjectionModelWithName {

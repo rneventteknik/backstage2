@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Alert, Button, ButtonGroup, Table } from 'react-bootstrap';
 import useSwr from 'swr';
 import ActivityIndicator from '../../components/utils/ActivityIndicator';
+import EquipmentTagDisplay from '../../components/utils/EquipmentTagDisplay';
 import { equipmentsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { groupBy } from '../../lib/utils';
@@ -137,6 +138,11 @@ const PublicPricePage: React.FC = () => {
                                             <div>{language === 'sv' ? equipment.name : equipment.nameEN}</div>
                                             <div className="text-muted">
                                                 {language === 'sv' ? equipment.description : equipment.descriptionEN}
+                                            </div>
+                                            <div>
+                                                {equipment.tags.map((x) => (
+                                                    <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
+                                                ))}
                                             </div>
                                         </td>
                                         <PriceCells

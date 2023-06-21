@@ -19,6 +19,14 @@ const EquipmentTagEditor: React.FC<Props> = ({ entity, save }: Props) => {
                     onChange={(e) => save({ ...entity, name: e.target.value })}
                 />
             </Form.Group>
+            <Form.Group controlId="formIsPublic">
+                <Form.Check
+                    type="checkbox"
+                    label="Visa i publika prislistan"
+                    defaultChecked={entity?.isPublic ?? false}
+                    onChange={(e) => save({ ...entity, isPublic: e.target.checked })}
+                />
+            </Form.Group>
             <Form.Group controlId="formColor">
                 <Form.Label>Färg</Form.Label>
                 <Form.Control

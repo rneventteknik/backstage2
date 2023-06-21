@@ -83,10 +83,15 @@ export const fetchEquipmentsPublic = async (): Promise<EquipmentObjectionModel[]
         .where('isArchived', '<>', 1)
         .select('id', 'name', 'nameEN', 'description', 'descriptionEN')
         .withGraphFetched('prices(publicPriceInfo)')
+        .withGraphFetched('tags(publicTagInfo)')
         .withGraphFetched('equipmentPublicCategory(equipmentPublicCategoryInfo)')
         .modifiers({
             publicPriceInfo: (builder) => {
                 builder.select('id', 'name', 'pricePerUnit', 'pricePerHour', 'pricePerUnitTHS', 'pricePerHourTHS');
+            },
+
+            publicTagInfo: (builder) => {
+                builder.select('id', 'name', 'color', 'isPublic').where('isPublic', '1');
             },
 
             equipmentPublicCategoryInfo: (builder) => {

@@ -10,7 +10,11 @@ import { EquipmentCalendarRow } from '../../components/equipment/EquipmentCalend
 import { toEquipment, toEquipmentTag } from '../../lib/mappers/equipment';
 import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 import { getResponseContentOrError, onlyUniqueById } from '../../lib/utils';
-import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../models/objection-models';
+import {
+    IEquipmentObjectionModel,
+    IEquipmentPackageObjectionModel,
+    IEquipmentTagObjectionModel,
+} from '../../models/objection-models';
 import { useNotifications } from '../../lib/useNotifications';
 import { addDays, formatDateForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 import TableStyleLink from '../../components/utils/TableStyleLink';
@@ -70,7 +74,7 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
 
             case ResultType.EQUIPMENTTAG:
                 fetch('/api/equipmentTags/' + res.id)
-                    .then((apiResponse) => getResponseContentOrError<IEquipmentPackageObjectionModel>(apiResponse))
+                    .then((apiResponse) => getResponseContentOrError<IEquipmentTagObjectionModel>(apiResponse))
                     .then(toEquipmentTag)
                     .then((equipmentTag) => {
                         setEquipment((array) => [...equipmentTag.equipment, ...array].filter(onlyUniqueById));
