@@ -2,21 +2,17 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Badge, Button, ButtonGroup, Card, Col, Dropdown, ListGroup, Row } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Col, Dropdown, ListGroup, Row } from 'react-bootstrap';
 import {
     getAccountKindName,
-    getLanguageName,
-    getPaymentStatusName,
     getDefaultLaborHourlyRate,
     getPricePlanName,
     getResponseContentOrError,
-    getStatusName,
 } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
 import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
-import BookingTypeTag from '../../../components/utils/BookingTypeTag';
 import { bookingFetcher } from '../../../lib/fetchers';
 import TimeEstimateList from '../../../components/bookings/timeEstimate/TimeEstimateList';
 import TimeReportList from '../../../components/bookings/timeReport/TimeReportList';
@@ -41,18 +37,17 @@ import {
     getEquipmentListPrice,
     getTotalTimeEstimatesPrice,
 } from '../../../lib/pricingUtils';
-import { Language } from '../../../models/enums/Language';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
 import { TimeEstimate, TimeReport } from '../../../models/interfaces';
 import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/TimeEstimateAddButton';
 import TimeReportAddButton from '../../../components/bookings/timeReport/TimeReportAddButton';
-import RentalStatusTag from '../../../components/utils/RentalStatusTag';
-import { getNumberOfBookingDays, getNumberOfEventHours, toBookingViewModel } from '../../../lib/datetimeUtils';
+import { toBookingViewModel } from '../../../lib/datetimeUtils';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import MarkdownCard from '../../../components/MarkdownCard';
 import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButton';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
+import BookingInfoSection from '../../../components/bookings/BookingInfoSection';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -285,6 +280,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
             <Row className="mb-3">
                 <Col xl={8}>
+                    <BookingInfoSection booking={booking} showName={false} className="d-md-none mb-3" />
                     <TimeEstimateList
                         showContent={showTimeEstimateContent}
                         setShowContent={setShowTimeEstimateContent}
@@ -310,32 +306,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     />
                 </Col>
                 <Col xl={4}>
-                    <Card className="mb-3">
-                        <Card.Header>
-                            <div style={{ fontSize: '1.6em' }}>{booking.name}</div>
-                            <BookingTypeTag booking={booking} />
-                            <Badge variant="dark" className="ml-1">
-                                {getStatusName(booking.status)}
-                            </Badge>
-                            <RentalStatusTag booking={booking} className="ml-1" />
-                            <Badge variant="dark" className="ml-1">
-                                {getPaymentStatusName(booking.paymentStatus)}
-                            </Badge>
-                            {booking.language !== Language.SV ? (
-                                <Badge variant="dark" className="ml-1">
-                                    {getLanguageName(booking.language)}
-                                </Badge>
-                            ) : null}
-                            <div className="text-muted mt-2"> {booking.customerName}</div>
-                            <div className="text-muted">
-                                {getNumberOfBookingDays(booking)
-                                    ? `${getNumberOfBookingDays(booking)} debiterade dagar / `
-                                    : null}
-                                {getNumberOfEventHours(booking)} arbetstimmar
-                            </div>
-                            <div className="text-muted">{booking.displayUsageInterval}</div>
-                        </Card.Header>
-                    </Card>
+                    <BookingInfoSection booking={booking} className="d-none d-md-block mb-3" />
                     <Card className="mb-3">
                         <Card.Header>Prisinformation (ink. moms)</Card.Header>
                         <ListGroup variant="flush">
@@ -376,10 +347,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                 <span className="flex-grow-1">Plats</span>
                                 <span>{booking.location}</span>
                             </ListGroup.Item>
-                            {/* <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">coOwnerUsers</span>
-                                <span>{booking.coOwnerUsers}</span>
-                            </ListGroup.Item> */}
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Prisplan</span>
                                 <span>{getPricePlanName(booking.pricePlan)}</span>

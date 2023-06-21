@@ -2,12 +2,13 @@ import React from 'react';
 import { Booking, BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from './utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
-import { getStatusName } from '../lib/utils';
+import { getStatusColor, getStatusName } from '../lib/utils';
 import { Card } from 'react-bootstrap';
 import TableStyleLink from './utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import RentalStatusTag from './utils/RentalStatusTag';
 import { toBookingViewModel } from '../lib/datetimeUtils';
+import BookingStatusTag from './utils/BookingStatusTag';
 
 type Props = {
     title: string;
@@ -20,6 +21,7 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
         <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
 
+        <BookingStatusTag booking={booking} className="ml-1" />
         <BookingTypeTag booking={booking} className="ml-1" />
         <RentalStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
@@ -42,6 +44,13 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
     defaultSortAscending: true,
     hideTableFilter: true,
     hideTableCountControls: true,
+    statusColumns: [
+        {
+            key: 'status',
+            getValue: (booking: BookingViewModel) => getStatusName(booking.status),
+            getColor: (booking: BookingViewModel) => getStatusColor(booking.status),
+        },
+    ],
     columns: [
         {
             key: 'name',

@@ -36,6 +36,11 @@ export type TableConfiguration<T extends HasId | HasStringId> = {
         indentSubItems?: boolean;
         textTruncation?: boolean;
     }[];
+    statusColumns?: {
+        key: string;
+        getValue: (entity: T) => string;
+        getColor: (entity: T) => string;
+    }[];
 };
 
 type ListProps<T extends HasId | HasStringId> = {
@@ -168,6 +173,9 @@ export const TableDisplay = <T extends HasId | HasStringId>({
             <Table>
                 <thead>
                     <tr>
+                        {configuration.statusColumns?.map((p) => (
+                            <th key={p.key} className="p-0" style={{ width: 3 }}></th>
+                        ))}
                         {configuration.moveFn && sortDirection === SortDirection.Custom ? (
                             <th className="d-none d-md-table-cell" style={{ width: 10 }}></th>
                         ) : null}
@@ -330,6 +338,14 @@ const TableRow = <T extends HasId | HasStringId>({
                 ref={drop}
                 className={(isDragging ? 'text-muted ' : '') + (collectedProps.hovered ? styles.hoveredRow : '')}
             >
+                {configuration.statusColumns?.map((p) => (
+                    <td
+                        key={p.key}
+                        className={'p-0 align-middle'}
+                        style={{ backgroundColor: p.getColor(entity) }}
+                        title={p.getValue(entity)}
+                    ></td>
+                ))}
                 {showMoveControl ? (
                     <td className="pr-0 align-middle d-none d-md-table-cell" ref={drag}>
                         {isDragging ? null : <FontAwesomeIcon icon={faGripVertical} className="text-muted" />}

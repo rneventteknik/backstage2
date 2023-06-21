@@ -2,7 +2,7 @@ import React, { ChangeEvent } from 'react';
 import { BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
-import { countNullorEmpty, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
+import { countNullorEmpty, getStatusColor, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Col, Form } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
@@ -11,16 +11,16 @@ import RentalStatusTag from './utils/RentalStatusTag';
 import { formatDateForForm, validDate } from '../lib/datetimeUtils';
 import { useLocalStorageState, useLocalStorageStateForDate } from '../lib/useLocalStorageState';
 import AdvancedFilters from './AdvancedFilters';
+import BookingStatusTag from './utils/BookingStatusTag';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
         <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
 
+        <BookingStatusTag booking={booking} className="ml-1" />
         <BookingTypeTag booking={booking} className="ml-1" />
         <RentalStatusTag booking={booking} className="ml-1" />
-        <p className="text-muted mb-0">{getStatusName(booking.status)}</p>
-        <p className="text-muted mb-0 d-lg-none">{booking.customerName ?? '-'}</p>
-        <p className="text-muted mb-0 d-lg-none">{booking.ownerUser?.name ?? '-'}</p>
+        <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
     </>
 );
 
@@ -38,20 +38,25 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
     defaultSortPropertyName: 'date',
     defaultSortAscending: false,
     hideTableFilter: true,
+    statusColumns: [
+        {
+            key: 'status',
+            getValue: (booking: BookingViewModel) => getStatusName(booking.status),
+            getColor: (booking: BookingViewModel) => getStatusColor(booking.status),
+        },
+    ],
     columns: [
         {
             key: 'name',
             displayName: 'Bokning',
             getValue: (booking: BookingViewModel) => booking.name,
-            textTruncation: true,
             getContentOverride: BookingNameDisplayFn,
         },
         {
-            key: 'customerName',
-            displayName: 'Kund',
-            getValue: (booking: BookingViewModel) => booking.customerName ?? '-',
-            textTruncation: true,
-            cellHideSize: 'lg',
+            key: 'date',
+            displayName: 'Datum',
+            getValue: (booking: BookingViewModel) => booking.isoFormattedUsageStartString,
+            getContentOverride: BookingUsageIntervalDisplayFn,
         },
         {
             key: 'location',
@@ -66,13 +71,6 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             getValue: (booking: BookingViewModel) => booking.ownerUser?.name ?? '-',
             cellHideSize: 'lg',
             columnWidth: 180,
-        },
-        {
-            key: 'date',
-            displayName: 'Datum',
-            getValue: (booking: BookingViewModel) => booking.isoFormattedUsageStartString,
-            getContentOverride: BookingUsageIntervalDisplayFn,
-            columnWidth: 200,
         },
     ],
 };

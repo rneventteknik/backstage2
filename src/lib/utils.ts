@@ -189,6 +189,24 @@ export const getLanguageName = (language: Language): string => {
     }
 };
 
+// Status Colors
+//
+export const getStatusColor = (status: Status): string => {
+    switch (status) {
+        case Status.DRAFT:
+            return '#383838';
+
+        case Status.BOOKED:
+            return '#1565C0';
+
+        case Status.DONE:
+            return '#28A745';
+
+        case Status.CANCELED:
+            return '#DC3545';
+    }
+};
+
 // Check if value is a valid member of an enum
 //
 export const isMemberOfEnum = (value: number, enumObject: Record<string, unknown>): boolean =>
