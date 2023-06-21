@@ -191,8 +191,8 @@ const getUserStatistics = (bookings: BookingViewModel[]): UserStatisticViewModel
             id: parseInt(userId),
             name: reports[0]?.user?.name ?? 'N/A',
             numberOfBookings: bookingsForThisUser.length,
-            totalNumberOfBillableHours: reports.map((x) => x.actualWorkingHours).reduce(reduceSumFn, 0),
-            totalNumberOfActualHours: reports.map((x) => x.billableWorkingHours).reduce(reduceSumFn, 0),
+            totalNumberOfBillableHours: reports.map((x) => x.billableWorkingHours).reduce(reduceSumFn, 0),
+            totalNumberOfActualHours: reports.map((x) => x.actualWorkingHours).reduce(reduceSumFn, 0),
             sum: reports.map((x) => x.billableWorkingHours * x.pricePerHour).reduce(reduceSumFn, 0),
             percentTHS:
                 (bookingsForThisUser.filter((x) => x.pricePlan === PricePlan.THS).length / bookingsForThisUser.length) *
@@ -206,7 +206,14 @@ const getUserStatistics = (bookings: BookingViewModel[]): UserStatisticViewModel
 // Page
 //
 const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: bookings, error, isValidating } = useSwr('/api/bookings', bookingsFetcher);
+    const {
+        data: bookings,
+        error,
+        isValidating,
+    } = useSwr('/api/bookings', bookingsFetcher, {
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false,
+    });
 
     if (error) {
         return (
