@@ -20,8 +20,12 @@ import EquipmentTagDisplay from '../../../components/utils/EquipmentTagDisplay';
 import ChangelogCard from '../../../components/ChangelogCard';
 import MarkdownCard from '../../../components/MarkdownCard';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
-import { getPricePlanName } from '../../../lib/utils';
+import { getPricePlanName, getResponseContentOrError } from '../../../lib/utils';
 import { PricePlan } from '../../../models/enums/PricePlan';
+import { PartialDeep } from 'type-fest';
+import { toEquipment } from '../../../lib/mappers/equipment';
+import { IEquipmentObjectionModel } from '../../../models/objection-models';
+import { useNotifications } from '../../../lib/useNotifications';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -31,7 +35,14 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
     // Edit user
     //
     const router = useRouter();
-    const { data: equipment, error, isValidating } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
+    const {
+        data: equipment,
+        error,
+        isValidating,
+        mutate,
+    } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
+
+    const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
 
     if (error) {
         return (
@@ -47,6 +58,28 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
     if (isValidating || !equipment) {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
+
+    const handleSubmit = async (equipment: PartialDeep<IEquipmentObjectionModel>) => {
+        const body = { equipment: equipment };
+
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        fetch('/api/equipment/' + router.query.id, request)
+            .then((apiResponse) => getResponseContentOrError<IEquipmentObjectionModel>(apiResponse))
+            .then(toEquipment)
+            .then((equipment) => {
+                mutate(equipment, false);
+                showSaveSuccessNotification('Utrustningen');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Utrustningen');
+            });
+    };
 
     // The page itself
     //
@@ -156,6 +189,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     ) : null}
                 </Col>
                 <Col xl={8}>
+                    <MarkdownCard
+                        text={equipment.note}
+                        onSubmit={(x) => handleSubmit({ name: equipment.name, note: x })}
+                        cardTitle={'Anteckningar'}
+                    />
                     <EquipmentCalendar equipment={equipment} />
                     <EquipmentBookings equipment={equipment} />
                 </Col>

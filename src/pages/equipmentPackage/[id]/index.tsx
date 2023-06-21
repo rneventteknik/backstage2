@@ -11,10 +11,16 @@ import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { equipmentPackageFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faCoins, faEyeSlash, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
-import { getSortedList } from '../../../lib/sortIndexUtils';
+import MarkdownCard from '../../../components/MarkdownCard';
+import { getResponseContentOrError } from '../../../lib/utils';
+import { PartialDeep } from 'type-fest';
+import { IEquipmentPackageObjectionModel } from '../../../models/objection-models';
+import { useNotifications } from '../../../lib/useNotifications';
+import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
+import PackageEquipmentList from '../../../components/equipmentPackage/PackageEquipmentList';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -26,7 +32,10 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         data: equipmentPackage,
         error,
         isValidating,
+        mutate,
     } = useSwr('/api/equipmentPackage/' + router.query.id, equipmentPackageFetcher);
+
+    const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
 
     if (error) {
         return (
@@ -43,11 +52,33 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
+    const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => {
+        const body = { equipmentPackage: equipmentPackage };
+
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        fetch('/api/equipmentPackage/' + router.query.id, request)
+            .then((apiResponse) => getResponseContentOrError<IEquipmentPackageObjectionModel>(apiResponse))
+            .then(toEquipmentPackage)
+            .then((equipmentPackage) => {
+                mutate(equipmentPackage, false);
+                showSaveSuccessNotification('Utrustningspaketet');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Utrustningspaketet');
+            });
+    };
+
     // The page itself
     //
     const pageTitle = equipmentPackage?.name;
     const breadcrumbs = [
-        { link: '/equipmentPackage', displayName: 'Utrustning' },
+        { link: '/equipment', displayName: 'Utrustning' },
         { link: '/equipmentPackage', displayName: 'Utrustningspaket' },
         { link: '/equipmentPackage/' + equipmentPackage.id, displayName: pageTitle },
     ];
@@ -87,7 +118,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                                 <span>{equipmentPackage.nameEN}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Estimerade timmar</span>
+                                <span className="flex-grow-1">Estimerad arbetstid</span>
                                 <span>{equipmentPackage.estimatedHours} timmar</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
@@ -106,38 +137,14 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                     </Card>
                 </Col>
                 <Col xl={8}>
+                    <MarkdownCard
+                        text={equipmentPackage.note}
+                        onSubmit={(x) => handleSubmit({ name: equipmentPackage.name, note: x })}
+                        cardTitle={'Anteckningar'}
+                    />
                     <Card className="mb-3">
                         <Card.Header>Utrustning</Card.Header>
-                        <ListGroup variant="flush">
-                            {getSortedList(equipmentPackage.equipmentEntries).map((e) => (
-                                <ListGroup.Item key={e.id} className="d-flex">
-                                    <span className="flex-grow-1">
-                                        {e.equipment?.name}
-                                        <br />
-                                        <span className="text-muted">{e.equipment?.description}</span>
-                                    </span>
-                                    <span>
-                                        {e.isHidden ? (
-                                            <FontAwesomeIcon icon={faEyeSlash} className="mr-1" title="Gömd för kund" />
-                                        ) : null}
-                                        {e.isFree ? (
-                                            <FontAwesomeIcon icon={faCoins} className="mr-1" title="Utan pris" />
-                                        ) : null}
-                                        {e.numberOfUnits != 1 || e.numberOfHours == 0 ? (
-                                            <>{e.numberOfUnits} st</>
-                                        ) : null}
-                                        {e.numberOfUnits != 1 && e.numberOfHours != 0 ? <> / </> : null}
-                                        {e.numberOfHours > 0 ? <>{e.numberOfHours} h</> : null}
-                                    </span>
-                                </ListGroup.Item>
-                            ))}
-
-                            {equipmentPackage.equipmentEntries?.length === 0 ? (
-                                <ListGroup.Item className="text-center font-italic text-muted">
-                                    Det här paketet har ingen utrustning
-                                </ListGroup.Item>
-                            ) : null}
-                        </ListGroup>
+                        <PackageEquipmentList equipmentPackage={equipmentPackage} />
                     </Card>
                 </Col>
             </Row>

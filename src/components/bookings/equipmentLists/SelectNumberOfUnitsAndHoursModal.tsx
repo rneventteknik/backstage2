@@ -5,6 +5,7 @@ import { bookingsFetcher } from '../../../lib/fetchers';
 import { getMaximumNumberOfUnitUsed, toIntOrUndefined } from '../../../lib/utils';
 import { Status } from '../../../models/enums/Status';
 import { Equipment } from '../../../models/interfaces';
+import MarkdownCard from '../../MarkdownCard';
 import RequiredIndicator from '../../utils/RequiredIndicator';
 
 type Props = {
@@ -134,6 +135,14 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                         <Alert variant="warning">
                             All utrustning av den här typen ({title}) används redan den här tiden.
                         </Alert>
+                    ) : null}
+                    {equipment.note && equipment.note.length > 0 ? (
+                        <MarkdownCard
+                            text={equipment.note}
+                            readonly={true}
+                            cardTitle="Utrustningsanteckningar"
+                            onSubmit={() => false}
+                        />
                     ) : null}
                 </Modal.Body>
                 <Modal.Footer>

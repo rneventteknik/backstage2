@@ -59,6 +59,7 @@ import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../..
 import { toEquipment } from '../../../lib/mappers/equipment';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 import TimeEstimateModal from '../timeEstimate/TimeEstimateModal';
+import PackageInfoModal from './PackageInfoModal';
 
 type Props = {
     list: EquipmentList;
@@ -662,26 +663,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                         )
                                         .then(toEquipmentPackage)
                                         .then((equipmentPackage) => {
-                                            if (equipmentPackage.estimatedHours > 0) {
-                                                setEquipmentPackageToAdd(equipmentPackage);
-                                                setEquipmentPackageTimeEstimateToAdd({
-                                                    name:
-                                                        language === Language.SV
-                                                            ? equipmentPackage.name
-                                                            : equipmentPackage.nameEN ?? '',
-                                                    numberOfHours: equipmentPackage.estimatedHours,
-                                                    pricePerHour: defaultLaborHourlyRate,
-                                                });
-                                            } else {
-                                                addEquipmentPackage(
-                                                    equipmentPackage,
-                                                    list,
-                                                    pricePlan,
-                                                    language,
-                                                    addListHeading,
-                                                    addListEntries,
-                                                );
-                                            }
+                                            setEquipmentPackageToAdd(equipmentPackage);
                                         });
                             }
                         }}
@@ -720,6 +702,36 @@ const EquipmentListTable: React.FC<Props> = ({
                             equipment={equipmentToAdd}
                             startDatetime={getEquipmentOutDatetime(list) ?? null}
                             endDatetime={getEquipmentInDatetime(list) ?? null}
+                        />
+                    ) : null}
+                    {equipmentPackageToAdd && !equipmentPackageTimeEstimateToAdd ? (
+                        <PackageInfoModal
+                            show={!!equipmentPackageToAdd}
+                            onHide={() => setEquipmentPackageToAdd(null)}
+                            onSave={() => {
+                                if (equipmentPackageToAdd.estimatedHours > 0) {
+                                    setEquipmentPackageTimeEstimateToAdd({
+                                        name:
+                                            language === Language.SV
+                                                ? equipmentPackageToAdd.name
+                                                : equipmentPackageToAdd.nameEN ?? '',
+                                        numberOfHours: equipmentPackageToAdd.estimatedHours,
+                                        pricePerHour: defaultLaborHourlyRate,
+                                    });
+                                } else {
+                                    addEquipmentPackage(
+                                        equipmentPackageToAdd,
+                                        list,
+                                        pricePlan,
+                                        language,
+                                        addListHeading,
+                                        addListEntries,
+                                    );
+                                    setEquipmentPackageToAdd(null);
+                                }
+                            }}
+                            equipmentPackage={equipmentPackageToAdd}
+                            language={language}
                         />
                     ) : null}
                     {equipmentPackageToAdd && equipmentPackageTimeEstimateToAdd ? (
