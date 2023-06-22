@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.2.0-avocado",
+    "version": "1.2.1-avocado",
     "scripts": {
         "dev": "next",
         "build": "next build",
