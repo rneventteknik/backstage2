@@ -141,7 +141,8 @@ export const getInvoiceData = (
     ourReference: string,
     templateName: string,
     documentName: string,
-    defaultEquipmentAccount: string,
+    defaultEquipmentAccountExternal: string,
+    defaultEquipmentAccountInternal: string,
     defaultSalaryAccountExternal: string,
     defaultSalaryAccountInternal: string,
     t: (t: string) => string,
@@ -201,7 +202,10 @@ export const getInvoiceData = (
                     numberOfUnits: 1, // Packages are always singular
                     pricePerUnit: getEquipmentListHeadingPrice(heading, numberOfDays),
                     discount: 0, // Package headings does not show discounts
-                    account: defaultEquipmentAccount, // TODO: Should this be something else if all members have the same different account?
+                    account:
+                        booking.accountKind === AccountKind.EXTERNAL
+                            ? defaultEquipmentAccountExternal
+                            : defaultEquipmentAccountInternal, // TODO: Should this be something else if all members have the same different account?
                     unit: t('common.misc.count-unit-single'),
                 };
                 const packageDescriptionRow = {
@@ -218,7 +222,11 @@ export const getInvoiceData = (
                     numberOfUnits: entry.numberOfUnits,
                     pricePerUnit: getUnitPrice(entry, numberOfDays),
                     discount: getCalculatedDiscount(entry, numberOfDays),
-                    account: entry.account ?? defaultEquipmentAccount,
+                    account:
+                        entry.account ??
+                        (booking.accountKind === AccountKind.EXTERNAL
+                            ? defaultEquipmentAccountExternal
+                            : defaultEquipmentAccountInternal),
                     unit: t(entry.numberOfUnits > 1 ? 'common.misc.count-unit' : 'common.misc.count-unit-single'),
                 };
                 const invoiceRows: InvoiceRow[] = [mainRow];

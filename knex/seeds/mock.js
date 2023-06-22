@@ -1880,11 +1880,18 @@ export async function seed(knex) {
             value: '[]',
         },
         {
-            key: 'accounts.defaultEquipmentAccount',
+            key: 'accounts.defaultEquipmentAccount.external',
             note: 'Standardkonto för utrustning',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
             value: '3550',
+        },
+        {
+            key: 'accounts.defaultEquipmentAccount.internal',
+            note: 'Standardkonto för utrustning',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '4900',
         },
         {
             key: 'accounts.defaultSalaryAccount.internal',

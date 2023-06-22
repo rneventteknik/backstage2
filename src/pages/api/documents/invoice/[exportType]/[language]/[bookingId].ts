@@ -40,7 +40,14 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
         const ourReference = getGlobalSetting('invoice.ourReference', globalSettings);
         const templateName = getGlobalSetting('invoice.templateName', globalSettings);
         const documentName = getGlobalSetting('invoice.documentName', globalSettings);
-        const defaultEquipmentAccount = getGlobalSetting('accounts.defaultEquipmentAccount', globalSettings);
+        const defaultEquipmentAccountExternal = getGlobalSetting(
+            'accounts.defaultEquipmentAccount.external',
+            globalSettings,
+        );
+        const defaultEquipmentAccountInternal = getGlobalSetting(
+            'accounts.defaultEquipmentAccount.internal',
+            globalSettings,
+        );
         const defaultSalaryAccountExternal = getGlobalSetting('accounts.defaultSalaryAccount.external', globalSettings);
         const defaultSalaryAccountInternal = getGlobalSetting('accounts.defaultSalaryAccount.internal', globalSettings);
 
@@ -50,7 +57,8 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             ourReference,
             templateName,
             documentName,
-            defaultEquipmentAccount,
+            defaultEquipmentAccountExternal,
+            defaultEquipmentAccountInternal,
             defaultSalaryAccountExternal,
             defaultSalaryAccountInternal,
             t,
