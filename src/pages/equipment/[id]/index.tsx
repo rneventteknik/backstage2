@@ -178,15 +178,6 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     </Card>
 
                     <ChangelogCard changelog={equipment.changelog ?? []} />
-
-                    {equipment.note ? (
-                        <MarkdownCard
-                            text={equipment.note}
-                            onSubmit={() => false}
-                            cardTitle="Anteckningar"
-                            readonly={true}
-                        />
-                    ) : null}
                 </Col>
                 <Col xl={8}>
                     <MarkdownCard
