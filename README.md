@@ -31,13 +31,10 @@ A few environment variables are needed to get this app to run. To configure thes
 ```
 SECRET_COOKIE_PASSWORD={session cookie secret; >32 chars (mandatory, used to encrypt the session)}
 
-DB_HOST={database host name (optional, only needed when using PostgreSQL)}
-DB_USER={databse user name (optional, only needed when using PostgreSQL)}
-DB_PASS={database password (optional, only needed when using PostgreSQL)}
-DB_NAME={database name (optional, only needed when using PostgreSQL)}
-DB_SSL={true or false (optional, only needed when using PostgreSQL)}
+DATABASE_URL=postgres://{user}:{password}@{hostname}:{port}/{database-name} (optional, only needed when using PostgreSQL)
+DB_SSL={true or false} (optional, only needed when using PostgreSQL)
 
-MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay logged in. (optional, defaults to forever if not set)}
+MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay logged in.} (optional, defaults to forever if not set)
 
 CALENDAR_API_KEY={Google Calender API Key, with read-access to calendars}
 CALENDAR_ID={Google Calender ID to fetch events from}
@@ -51,7 +48,7 @@ APPLICATION_BASE_URL={Base URL of application when generating links, for example
 
 #### Branching Model
 
-We use the branching model [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). This means that we have a production branch (does not exist yet) and separate development branch called `dev`.
+We use the branching model [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). This means that we have a production branch (`main`) and separate development branch called `dev`.
 
 Our branch naming convention is based on this model and we use prefixes to indicate what type every branch has. The prefixes in use are:
 
