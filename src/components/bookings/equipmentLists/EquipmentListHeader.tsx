@@ -14,6 +14,7 @@ import {
     faRightFromBracket,
     faRightToBracket,
     faFileDownload,
+    faPen,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
@@ -37,6 +38,9 @@ import ConfirmModal from '../../utils/ConfirmModal';
 import BookingReturnalNoteModal from '../BookingReturnalNoteModal';
 import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EditEquipmentListDatesModal from './EditEquipmentListDatesModal';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import EditTextModal from '../../utils/EditTextModal';
 
 type Props = {
     list: EquipmentList;
@@ -96,6 +100,7 @@ const EquipmentListHeader: React.FC<Props> = ({
     const [showResetDatesModal, setShowResetDatesModal] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false);
     const [showEditDatesModal, setShowEditDatesModal] = useState(false);
+    const [showEditNotesModal, setShowEditNotesModal] = useState(false);
 
     // Consts to control which date edit components are shown (i.e. interval, dates or both). Note that
     // the logic for usage dates and in/out dates are seperated.
@@ -225,6 +230,17 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     pricePlan={pricePlan}
                                     language={language}
                                 />
+                                {list.notes !== undefined && list.notes !== null ? (
+                                    <Dropdown.Item onClick={() => saveList({ ...list, notes: null })}>
+                                        <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" />
+                                        Ta bort anteckning
+                                    </Dropdown.Item>
+                                ) : (
+                                    <Dropdown.Item onClick={() => saveList({ ...list, notes: '' })}>
+                                        <FontAwesomeIcon icon={faPen} className="mr-1 fa-fw" />
+                                        Lägg till anteckning
+                                    </Dropdown.Item>
+                                )}
 
                                 {list.numberOfDays === null ? (
                                     bookingStatus === Status.DRAFT ? (
@@ -445,6 +461,35 @@ const EquipmentListHeader: React.FC<Props> = ({
                             </div>
                         </Col>
                     </Row>
+                </>
+            ) : null}
+            {list.notes !== undefined && list.notes !== null ? (
+                <>
+                    <div
+                        onClick={() => (readonly ? null : setShowEditNotesModal(true))}
+                        role={readonly ? undefined : 'button'}
+                    >
+                        <div>
+                            <small>Anteckningar</small>
+                        </div>
+                        <div>
+                            {list.notes?.length === 0 ? (
+                                <p className="text-muted">Klicka här för att lägga till anteckningar.</p>
+                            ) : (
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{list.notes}</ReactMarkdown>
+                            )}
+                        </div>
+                    </div>
+                    {showEditNotesModal ? (
+                        <EditTextModal
+                            text={list.notes}
+                            onSubmit={(newNotes) => saveList({ ...list, notes: newNotes })}
+                            hide={() => setShowEditNotesModal(false)}
+                            show={showEditNotesModal}
+                            modalTitle={'Redigera'}
+                            modalConfirmText={'Spara'}
+                        />
+                    ) : null}
                 </>
             ) : null}
         </>

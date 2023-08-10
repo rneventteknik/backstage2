@@ -13,6 +13,7 @@ export interface EquipmentList extends BaseEntityWithName {
     usageEndDatetime?: Date | null;
     numberOfDays?: number | null;
     rentalStatus?: RentalStatus | null;
+    notes?: string | null;
 }
 
 export interface EquipmentListHeading extends BaseEntityWithName {
