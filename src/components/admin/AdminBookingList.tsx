@@ -19,6 +19,7 @@ import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import BookingTypeTag from '../utils/BookingTypeTag';
 import DoneIcon from '../utils/DoneIcon';
 import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
+import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
 import TableStyleLink from '../utils/TableStyleLink';
 
 type Props = {
@@ -99,6 +100,7 @@ const AdminBookingList: React.FC<Props> = ({
                 <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
 
                 <BookingTypeTag booking={booking} className="ml-1" />
+                <FixedPriceStatusTag booking={booking} className="ml-1" />
 
                 {customAccountsOnBooking.length > 0 ? (
                     <OverlayTrigger
