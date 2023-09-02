@@ -10,6 +10,7 @@ type Props = {
     modalTitle: string;
     modalHelpText?: string;
     modalConfirmText: string;
+    textarea?: boolean;
 };
 
 const EditTextModal: React.FC<Props> = ({
@@ -21,6 +22,7 @@ const EditTextModal: React.FC<Props> = ({
     modalTitle,
     modalHelpText,
     modalConfirmText,
+    textarea = true,
 }: Props) => {
     const [text, setText] = useState(defaultText ?? '');
 
@@ -39,13 +41,22 @@ const EditTextModal: React.FC<Props> = ({
                 <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Control
-                    as="textarea"
-                    name="note"
-                    rows={10}
-                    defaultValue={text}
-                    onChange={(e) => setText(e.target.value)}
-                />
+                {textarea ? (
+                    <Form.Control
+                        as="textarea"
+                        name="note"
+                        rows={10}
+                        defaultValue={text}
+                        onChange={(e) => setText(e.target.value)}
+                    />
+                ) : (
+                    <Form.Control
+                        type="text"
+                        name="note"
+                        defaultValue={text}
+                        onChange={(e) => setText(e.target.value)}
+                    />
+                )}
                 <Form.Text className="text-muted">{modalHelpText}</Form.Text>
             </Modal.Body>
             <Modal.Footer>
