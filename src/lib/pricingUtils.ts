@@ -132,7 +132,8 @@ export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 's
 export const formatTHSPrice = (price: PricedEntityWithTHS): string =>
     formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
 
-export const formatNumberAsCurrency = (number: number): string =>
+export const formatNumberAsCurrency = (number: number, showPlusIfPositive = false): string =>
+    (showPlusIfPositive && number > 0 ? '+' : '') +
     Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(number);
 
 export const getInvoiceData = (
