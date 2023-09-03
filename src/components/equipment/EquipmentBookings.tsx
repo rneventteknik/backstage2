@@ -7,7 +7,7 @@ import { bookingsFetcher } from '../../lib/fetchers';
 import { listContainsEquipment } from '../../lib/utils';
 import { RentalStatus } from '../../models/enums/RentalStatus';
 import { BookingViewModel, Equipment } from '../../models/interfaces';
-import SmallBookingTable from '../SmallBookingTable';
+import TinyBookingTable from '../TinyBookingTable';
 
 type Props = {
     equipment: Equipment;
@@ -56,17 +56,17 @@ const EquipmentBookings: React.FC<Props> = ({ equipment }: Props) => {
 
     return (
         <>
-            <SmallBookingTable
+            <TinyBookingTable
                 title={'Pågående eller utlämnade bokningar'}
                 bookings={currentBookings}
                 tableSettingsOverride={{ noResultsLabel: 'Inga pågående bokningar använder ' + equipment.name }}
             />
-            <SmallBookingTable
+            <TinyBookingTable
                 title={'Kommande bokningar'}
                 bookings={futureBookings}
                 tableSettingsOverride={{ noResultsLabel: 'Inga kommande bokningar med ' + equipment.name }}
             />
-            <SmallBookingTable
+            <TinyBookingTable
                 title={'Senaste 10 bokningarna som använt ' + equipment.name}
                 bookings={pastBookings}
                 tableSettingsOverride={{

@@ -31,7 +31,12 @@ const pageTitle = 'Löneunderlag';
 const breadcrumbs = [{ link: '/salary/', displayName: pageTitle }];
 
 const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: salaryGroups, error, isValidating, mutate } = useSwr('/api/salaryGroups', salaryGroupsFetcher);
+    const {
+        data: salaryGroups,
+        error,
+        isValidating,
+        mutate,
+    } = useSwr('/api/salaryGroups', salaryGroupsFetcher, { revalidateOnFocus: false, revalidateOnReconnect: false });
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [salaryGroupToViewId, setSalaryGroupToViewId] = useState<number | null>(null);
     const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();

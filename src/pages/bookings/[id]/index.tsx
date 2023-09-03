@@ -36,6 +36,7 @@ import {
     getBookingPrice,
     getEquipmentListPrice,
     getTotalTimeEstimatesPrice,
+    getTotalTimeReportsPrice,
 } from '../../../lib/pricingUtils';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
@@ -134,6 +135,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     ];
 
     const defaultLaborHourlyRate = getDefaultLaborHourlyRate(booking.pricePlan, globalSettings);
+
+    const timeReportExists = booking.timeReports && booking.timeReports.length > 0;
 
     return (
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
@@ -259,18 +262,57 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                 </span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
-                                <strong className="flex-grow-1">Totalpris</strong>
+                                <strong className="flex-grow-1">Estimerat pris</strong>
                                 <strong>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true, true)))}</strong>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
-                                <strong className="flex-grow-1">varav moms (25%)</strong>
-                                <strong>
+                                <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                <em>
                                     {formatNumberAsCurrency(
                                         addVAT(getBookingPrice(booking, true, true)) -
                                             getBookingPrice(booking, true, true),
                                     )}
-                                </strong>
+                                </em>
                             </ListGroup.Item>
+                            {timeReportExists ? (
+                                <>
+                                    <ListGroup.Item className="d-flex">
+                                        <span className="flex-grow-1">Faktisk personalkostnad</span>
+                                        <span>
+                                            {formatNumberAsCurrency(
+                                                addVAT(getTotalTimeReportsPrice(booking.timeReports)),
+                                            )}
+                                        </span>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <strong className="flex-grow-1">Faktiskt pris</strong>
+                                        <strong>
+                                            {formatNumberAsCurrency(addVAT(getBookingPrice(booking, false, true)))}
+                                        </strong>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                        <em>
+                                            {formatNumberAsCurrency(
+                                                addVAT(getBookingPrice(booking, false, true)) -
+                                                    getBookingPrice(booking, false, true),
+                                            )}
+                                        </em>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <span className="flex-grow-1">Skillnad mot estimerat pris</span>
+                                        <span>
+                                            {formatNumberAsCurrency(
+                                                addVAT(
+                                                    getBookingPrice(booking, false, true) -
+                                                        getBookingPrice(booking, true, true),
+                                                ),
+                                                true,
+                                            )}
+                                        </span>
+                                    </ListGroup.Item>
+                                </>
+                            ) : null}
                             {booking.fixedPrice !== null && booking.fixedPrice !== undefined ? (
                                 <>
                                     <ListGroup.Item className="d-flex">
@@ -278,19 +320,32 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                         <strong>{formatNumberAsCurrency(addVAT(booking.fixedPrice))}</strong>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
-                                        <strong className="flex-grow-1">varav moms (25%)</strong>
-                                        <strong>
+                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                        <em>
                                             {formatNumberAsCurrency(addVAT(booking.fixedPrice) - booking.fixedPrice)}
-                                        </strong>
+                                        </em>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <strong className="flex-grow-1">Skillnad mot beräknat pris</strong>
-                                        <strong>
-                                            {formatNumberAsCurrency(
-                                                addVAT(booking.fixedPrice - getBookingPrice(booking, true, true)),
-                                            )}
-                                        </strong>
-                                    </ListGroup.Item>
+                                    {timeReportExists ? (
+                                        <ListGroup.Item className="d-flex">
+                                            <span className="flex-grow-1">Skillnad mot faktiskt pris</span>
+                                            <span>
+                                                {formatNumberAsCurrency(
+                                                    addVAT(booking.fixedPrice - getBookingPrice(booking, false, true)),
+                                                    true,
+                                                )}
+                                            </span>
+                                        </ListGroup.Item>
+                                    ) : (
+                                        <ListGroup.Item className="d-flex">
+                                            <span className="flex-grow-1">Skillnad mot estimerat pris</span>
+                                            <span>
+                                                {formatNumberAsCurrency(
+                                                    addVAT(booking.fixedPrice - getBookingPrice(booking, true, true)),
+                                                    true,
+                                                )}
+                                            </span>
+                                        </ListGroup.Item>
+                                    )}
                                 </>
                             ) : null}
                         </ListGroup>

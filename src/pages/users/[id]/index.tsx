@@ -15,7 +15,7 @@ import { bookingsFetcher, userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import SmallBookingTable from '../../../components/SmallBookingTable';
+import TinyBookingTable from '../../../components/TinyBookingTable';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -164,12 +164,12 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                 </Col>
 
                 <Col xl={8}>
-                    <SmallBookingTable title="Bokningar" bookings={bookings}></SmallBookingTable>
-                    <SmallBookingTable
+                    <TinyBookingTable title="Bokningar" bookings={bookings}></TinyBookingTable>
+                    <TinyBookingTable
                         title="Favoritbokningar"
                         bookings={coOwnerBookings}
                         tableSettingsOverride={{ defaultSortAscending: false }}
-                    ></SmallBookingTable>
+                    ></TinyBookingTable>
                 </Col>
             </Row>
         </Layout>

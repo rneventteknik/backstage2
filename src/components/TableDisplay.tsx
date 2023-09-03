@@ -28,8 +28,9 @@ export type TableConfiguration<T extends HasId | HasStringId> = {
         key: string;
         displayName: string;
         getValue: (entity: T) => string | number | Date;
-        getHeadingValue?: (entity: T) => string | number | Date | null;
+        getHeadingValue?: (entity: T) => string | null;
         getContentOverride?: null | ((entity: T) => React.ReactElement | string);
+        getHeadingContentOverride?: null | ((value: string | null) => React.ReactElement | string);
         getHeaderOverride?: null | ((entityList: T[]) => React.ReactElement | string);
         disableSort?: boolean;
         columnWidth?: number;
@@ -80,11 +81,16 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     const filterString = configuration.hideTableFilter ? filterStringFromParent ?? '' : storedFilterString;
 
     const getHeadingValue = configuration.columns.find((c) => c.key === sortKey)?.getHeadingValue ?? (() => null);
+    const getHeadingContentOverride =
+        configuration.columns.find((c) => c.key === sortKey)?.getHeadingContentOverride ?? (() => null);
 
     // Set up wrapping. We do this inside the function so we can access T and simplify the typing.
     //
     type WrappedEntity = { entity: T };
-    type WrappedHeading = { heading: string | number | boolean | Date | null };
+    type WrappedHeading = {
+        heading: string | number | boolean | Date | null;
+        contentOverride: React.ReactChild | null;
+    };
     const hasEntity = (wrapperObject: WrappedEntity | WrappedHeading): wrapperObject is WrappedEntity =>
         !!wrapperObject && !!(wrapperObject as WrappedEntity).entity;
 
@@ -190,7 +196,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
         .filter((x) => notEmpty(x) && x !== '');
     differentValues.forEach((value) => {
         const index = rowsToShow.findIndex((x) => hasEntity(x) && getHeadingValue(x.entity) === value);
-        rowsToShow.splice(index, 0, { heading: value });
+        rowsToShow.splice(index, 0, { heading: value, contentOverride: getHeadingContentOverride(value) });
     });
 
     // Create the table
@@ -261,7 +267,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                                     colSpan={configuration.columns.length + (configuration.statusColumns?.length ?? 0)}
                                     className="pt-4"
                                 >
-                                    <strong>{x.heading}</strong>
+                                    {x.contentOverride === null ? <strong>{x.heading}</strong> : x.contentOverride}
                                 </td>
                             </tr>
                         ),

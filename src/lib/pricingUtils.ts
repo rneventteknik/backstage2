@@ -132,7 +132,8 @@ export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 's
 export const formatTHSPrice = (price: PricedEntityWithTHS): string =>
     formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
 
-export const formatNumberAsCurrency = (number: number): string =>
+export const formatNumberAsCurrency = (number: number, showPlusIfPositive = false): string =>
+    (showPlusIfPositive && number > 0 ? '+' : '') +
     Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(number);
 
 export const getInvoiceData = (
@@ -158,6 +159,10 @@ export const getInvoiceData = (
     });
 
     const getInvoiceRows = (booking: BookingViewModel): InvoiceRow[] => {
+        if (booking.fixedPrice !== null) {
+            return fixedPriceBookingToInvoiceRows(booking);
+        }
+
         const equipmentRows = booking.equipmentLists ? booking.equipmentLists.flatMap(equipmentListToInvoiceRows) : [];
         const laborRows = timeReportsToLaborRows(booking.timeReports);
         return [...equipmentRows, ...laborRows];
@@ -298,6 +303,24 @@ export const getInvoiceData = (
         };
 
         return [headingRow, mainRow, descriptiveRow];
+    };
+
+    const fixedPriceBookingToInvoiceRows = (booking: BookingViewModel): InvoiceRow[] => {
+        const mainRow = {
+            rowType: InvoiceRowType.ITEM,
+            text: t('hogia-invoice.price-by-agreement'),
+            indented: false,
+            numberOfUnits: 1,
+            pricePerUnit: booking.fixedPrice,
+            discount: 0,
+            account:
+                booking.accountKind === AccountKind.EXTERNAL
+                    ? defaultEquipmentAccountExternal
+                    : defaultEquipmentAccountInternal,
+            unit: t('common.misc.count-unit-single'),
+        };
+
+        return [mainRow];
     };
 
     return {

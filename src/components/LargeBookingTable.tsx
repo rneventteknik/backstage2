@@ -12,6 +12,7 @@ import { formatDateForForm, getBookingDateHeadingValue, validDate } from '../lib
 import { useLocalStorageState, useLocalStorageStateForDate } from '../lib/useLocalStorageState';
 import AdvancedFilters from './AdvancedFilters';
 import BookingStatusTag from './utils/BookingStatusTag';
+import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
@@ -20,6 +21,7 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
         <BookingStatusTag booking={booking} className="ml-1" />
         <BookingTypeTag booking={booking} className="ml-1" />
         <RentalStatusTag booking={booking} className="ml-1" />
+        <FixedPriceStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
     </>
 );

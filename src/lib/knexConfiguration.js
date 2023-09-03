@@ -12,15 +12,12 @@ const sqliteConfiguration = {
 const postgresConfiguration = {
     client: 'postgres',
     connection: {
-        host: process.env.DB_HOST,
-        user: process.env.DB_USER,
-        password: process.env.DB_PASS,
-        database: process.env.DB_NAME,
+        connectionString: process.env.DATABASE_URL,
         ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
     },
 };
 
-const postgresIsConfigured = process.env.DB_HOST || process.env.DB_USER || process.env.DB_PASS || process.env.DB_NAME;
+const postgresIsConfigured = process.env.DATABASE_URL;
 if (process.env.NODE_ENV !== 'production') {
     console.log(`[Backstage2] Using database: ${postgresIsConfigured ? 'postgres' : 'sqlite3'}`);
 }
