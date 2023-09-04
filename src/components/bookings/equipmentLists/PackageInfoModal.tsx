@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Button, Form, ListGroup, Modal } from 'react-bootstrap';
 import { Language } from '../../../models/enums/Language';
 import { EquipmentPackage } from '../../../models/interfaces';
@@ -14,6 +14,21 @@ type Props = {
 };
 
 const PackageInfoModal: React.FC<Props> = ({ show, onHide, onSave, equipmentPackage, language }: Props) => {
+    // Register an event listener to save on enter
+    //
+    useEffect(() => {
+        const eventListener = (event: KeyboardEvent) => {
+            if (event.code === 'Enter' || event.code === 'NumpadEnter') {
+                event.preventDefault();
+                onSave();
+            }
+        };
+        document.addEventListener('keydown', eventListener);
+        return () => {
+            document.removeEventListener('keydown', eventListener);
+        };
+    }, [onSave]);
+
     return (
         <Modal show={show} onHide={() => onHide()}>
             <Form>
@@ -51,7 +66,7 @@ const PackageInfoModal: React.FC<Props> = ({ show, onHide, onSave, equipmentPack
                     <Button variant="secondary" onClick={() => onHide()}>
                         Avbryt
                     </Button>
-                    <Button variant="primary" type="submit" onClick={() => onSave()}>
+                    <Button variant="primary" type="submit" onClick={() => onSave()} autoFocus>
                         Lägg till
                     </Button>
                 </Modal.Footer>
