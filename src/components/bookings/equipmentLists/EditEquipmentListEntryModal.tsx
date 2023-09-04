@@ -214,7 +214,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                 </InputGroup>
                                 <PriceWithVATPreview
                                     price={equipmentListEntryToEditViewModel?.discount}
-                                    text={'Rabatt inklusive moms: '}
+                                    text={'Rabatt per rad inklusive moms: '}
                                 />
                             </Form.Group>
                         </Col>
