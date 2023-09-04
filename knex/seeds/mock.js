@@ -2013,6 +2013,27 @@ export async function seed(knex) {
             value: ' ',
         },
         {
+            key: 'content.image.publicPriceHeaderImage',
+            note: 'Bild för header i publika prislistan, som base64-sträng.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: ' ',
+        },
+        {
+            key: 'content.public.publicPriceHeaderImageLink',
+            note: 'Länk för headers i publika prislistan, som url.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: ' ',
+        },
+        {
+            key: 'content.public.publicPriceTitle',
+            note: 'Titel för publika prislistan, som sträng. Denna styr endast flikens namn i webbläsaren, dvs titel-html-attributet.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: 'Prislista för Backstage2',
+        },
+        {
             key: 'content.environment.name',
             note: 'Namn på miljön att visa för användaren.',
             created: getVarianceDateString(-100),
