@@ -21,6 +21,7 @@ import { IEquipmentPackageObjectionModel } from '../../../models/objection-model
 import { useNotifications } from '../../../lib/useNotifications';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 import PackageEquipmentList from '../../../components/equipmentPackage/PackageEquipmentList';
+import { Role } from '../../../models/enums/Role';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -141,6 +142,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                         text={equipmentPackage.note}
                         onSubmit={(x) => handleSubmit({ name: equipmentPackage.name, note: x })}
                         cardTitle={'Anteckningar'}
+                        readonly={currentUser.role === Role.READONLY}
                     />
                     <Card className="mb-3">
                         <Card.Header>Utrustning</Card.Header>
