@@ -196,7 +196,7 @@ export const getLanguageName = (language: Language): string => {
 export const getStatusColor = (status: Status): string => {
     switch (status) {
         case Status.DRAFT:
-            return '#383838';
+            return '#75346C';
 
         case Status.BOOKED:
             return '#1565C0';
