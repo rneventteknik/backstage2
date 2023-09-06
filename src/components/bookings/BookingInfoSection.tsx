@@ -40,7 +40,7 @@ const BookingInfoSection: React.FC<Props> = ({ booking, className, showName = tr
                 <div className="text-muted mt-2"> {booking.customerName}</div>
                 <div className="text-muted">
                     {getNumberOfBookingDays(booking) ? `${getNumberOfBookingDays(booking)} debiterade dagar / ` : null}
-                    {getNumberOfEventHours(booking)} arbetstimmar
+                    {getNumberOfEventHours(booking)} fakturerade timmar
                 </div>
                 <div className="text-muted">{booking.displayUsageInterval}</div>
             </Card.Header>
