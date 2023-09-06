@@ -178,37 +178,35 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
     );
 
     const TimeReportBillableWorkingHoursDisplayFn = (timeReport: TimeReport) => (
-        <>
-            <DoubleClickToEdit
-                value={timeReport.billableWorkingHours?.toString()}
-                onUpdate={(newValue) =>
-                    updateTimeReports({
-                        ...timeReport,
-                        billableWorkingHours: toIntOrUndefined(newValue) ?? timeReport.billableWorkingHours,
-                    })
-                }
-                size="sm"
-                readonly={readonly}
-            >
-                {isNaN(timeReport.billableWorkingHours) ? (
-                    <span className="text-muted font-italic">Dubbelklicka för att lägga till en tid</span>
-                ) : (
-                    timeReport.billableWorkingHours + ' h'
-                )}
-                {timeReport.actualWorkingHours !== timeReport.billableWorkingHours ? (
-                    <OverlayTrigger
-                        overlay={
-                            <Tooltip id="1">
-                                Antalet fakturerade timmar ({timeReport.billableWorkingHours} h) skiljer sig från
-                                antalet arbetade timmar ({timeReport.actualWorkingHours} h).
-                            </Tooltip>
-                        }
-                    >
-                        <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
-                    </OverlayTrigger>
-                ) : null}
-            </DoubleClickToEdit>
-        </>
+        <DoubleClickToEdit
+            value={timeReport.billableWorkingHours?.toString()}
+            onUpdate={(newValue) =>
+                updateTimeReports({
+                    ...timeReport,
+                    billableWorkingHours: toIntOrUndefined(newValue) ?? timeReport.billableWorkingHours,
+                })
+            }
+            size="sm"
+            readonly={readonly}
+        >
+            {isNaN(timeReport.billableWorkingHours) ? (
+                <span className="text-muted font-italic">Dubbelklicka för att lägga till en tid</span>
+            ) : (
+                timeReport.billableWorkingHours + ' h'
+            )}
+            {timeReport.actualWorkingHours !== timeReport.billableWorkingHours ? (
+                <OverlayTrigger
+                    overlay={
+                        <Tooltip id="1">
+                            Antalet fakturerade timmar ({timeReport.billableWorkingHours} h) skiljer sig från antalet
+                            arbetade timmar ({timeReport.actualWorkingHours} h).
+                        </Tooltip>
+                    }
+                >
+                    <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
+                </OverlayTrigger>
+            ) : null}
+        </DoubleClickToEdit>
     );
 
     const TimeReportUserIdDisplayFn = (timeReport: TimeReport) => (
@@ -336,7 +334,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
         mutateTimeReports([...(timeReports ?? []), data]);
     };
 
-    const sumBillableHours = timeReports.reduce((sum, entry) => sum + entry.billableWorkingHours, 0);
+    const sumBillableWorkingHours = timeReports.reduce((sum, entry) => sum + entry.billableWorkingHours, 0);
     const sumActualWorkingHours = timeReports.reduce((sum, entry) => sum + entry.actualWorkingHours, 0);
 
     return (
@@ -355,11 +353,11 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 </div>
                 <p className="text-muted">
                     {formatNumberAsCurrency(addVAT(getTotalTimeReportsPrice(timeReports)))} /{' '}
-                    {sumBillableHours == sumActualWorkingHours ? (
-                        <>{sumBillableHours} h</>
+                    {sumBillableWorkingHours === sumActualWorkingHours ? (
+                        <>{sumBillableWorkingHours} h</>
                     ) : (
                         <>
-                            {sumBillableHours} h ({sumBillableHours} h fakturerade, {sumActualWorkingHours} h arbetade)
+                            {sumActualWorkingHours} arbetade timmar / {sumBillableWorkingHours} fakturerade timmar
                         </>
                     )}
                 </p>
