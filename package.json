@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.3.0-olive",
+    "version": "1.4.0-blueberry",
     "scripts": {
         "dev": "next",
         "build": "next build",
