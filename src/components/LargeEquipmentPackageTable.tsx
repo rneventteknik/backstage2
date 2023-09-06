@@ -5,11 +5,11 @@ import { countNullorEmpty, notEmpty } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Col, Form } from 'react-bootstrap';
 import TableStyleLink from './utils/TableStyleLink';
-import { useLocalStorageState } from '../lib/useLocalStorageState';
 import useSwr from 'swr';
 import { equipmentTagsFetcher } from '../lib/fetchers';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 import AdvancedFilters from './AdvancedFilters';
+import { useSessionStorageState } from '../lib/useSessionStorageState';
 
 const EquipmentPackageNameDisplayFn = (equipmentPackage: EquipmentPackage) => (
     <>
@@ -65,8 +65,8 @@ type Props = {
 const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableSettingsOverride }: Props) => {
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
-    const [searchText, setSearchText] = useLocalStorageState('large-equipment-package-table-search-text', '');
-    const [filterTags, setFilterTags] = useLocalStorageState<EquipmentTag[]>(
+    const [searchText, setSearchText] = useSessionStorageState('large-equipment-package-table-search-text', '');
+    const [filterTags, setFilterTags] = useSessionStorageState<EquipmentTag[]>(
         'large-equipment-package-table-filter-tags',
         [],
     );

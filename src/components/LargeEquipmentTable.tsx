@@ -7,7 +7,6 @@ import { Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faTags } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from './utils/TableStyleLink';
-import { useLocalStorageState } from '../lib/useLocalStorageState';
 import useSwr from 'swr';
 import { equipmentLocationsFetcher, equipmentTagsFetcher } from '../lib/fetchers';
 import { formatPrice, addVATToPriceWithTHS, formatTHSPrice, addVAT } from '../lib/pricingUtils';
@@ -15,6 +14,7 @@ import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 import { EquipmentLocation } from '../models/interfaces/EquipmentLocation';
 import { getSortedList } from '../lib/sortIndexUtils';
 import AdvancedFilters from './AdvancedFilters';
+import { useSessionStorageState } from '../lib/useSessionStorageState';
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -143,13 +143,13 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
     const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentLocationsFetcher);
 
-    const [searchText, setSearchText] = useLocalStorageState('equipment-page-search-text', '');
-    const [filterTags, setFilterTags] = useLocalStorageState<EquipmentTag[]>('equipment-page-filter-tags', []);
-    const [filterLocations, setFilterLocations] = useLocalStorageState<EquipmentLocation[]>(
+    const [searchText, setSearchText] = useSessionStorageState('equipment-page-search-text', '');
+    const [filterTags, setFilterTags] = useSessionStorageState<EquipmentTag[]>('equipment-page-filter-tags', []);
+    const [filterLocations, setFilterLocations] = useSessionStorageState<EquipmentLocation[]>(
         'equipment-page-filter-location',
         [],
     );
-    const [filterPubliclyHidden, setFilterPubliclyHidden] = useLocalStorageState(
+    const [filterPubliclyHidden, setFilterPubliclyHidden] = useSessionStorageState(
         'equipment-page-publicly-hidden',
         'all',
     );
