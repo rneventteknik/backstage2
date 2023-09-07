@@ -59,6 +59,11 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                         <Link href={'/users/' + currentUser.userId} passHref>
                             <Dropdown.Item href={'/users/' + currentUser.userId}>Profil</Dropdown.Item>
                         </Link>
+                        <Link href={'/users/' + currentUser.userId + '/time-reports'} passHref>
+                            <Dropdown.Item href={'/users/' + currentUser.userId + '/time-reports'}>
+                                Tidrapporter
+                            </Dropdown.Item>
+                        </Link>
                         <Dropdown.Item onClick={() => setShowHelpModal(true)}>Hjälp</Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item onClick={logOut}>Logga ut</Dropdown.Item>

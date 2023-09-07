@@ -79,7 +79,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                 </Card.Header>
                 <Card.Body>
                     <p className="text-danger">
-                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsrapporterna.
+                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsestimaten.
                     </p>
                     <p className="text-monospace text-muted mb-0">{error?.message}</p>
                 </Card.Body>

@@ -5,6 +5,7 @@ export {
     fetchBookingWithUser,
     fetchBookingsForUser,
     fetchBookingsForCoOwnerUser,
+    fetchBookingsForTimeReportUser,
     fetchBookingsForEquipment,
 } from './booking';
 export {

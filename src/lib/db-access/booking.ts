@@ -68,6 +68,21 @@ export const fetchBookingsForCoOwnerUser = async (userId: number): Promise<Booki
         });
 };
 
+export const fetchBookingsForTimeReportUser = async (userId: number): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .withGraphFetched('equipmentLists')
+        .withGraphFetched('timeReports.user')
+        .whereIn(
+            'id',
+            BookingObjectionModel.query()
+                .joinRelated('timeReports')
+                .where('timeReports.userId', userId)
+                .select('Booking.id'),
+        );
+};
+
 export const fetchBookingsForEquipment = async (equipmentId: number): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
