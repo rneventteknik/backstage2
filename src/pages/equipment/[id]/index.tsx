@@ -26,6 +26,7 @@ import { PartialDeep } from 'type-fest';
 import { toEquipment } from '../../../lib/mappers/equipment';
 import { IEquipmentObjectionModel } from '../../../models/objection-models';
 import { useNotifications } from '../../../lib/useNotifications';
+import { Role } from '../../../models/enums/Role';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -184,6 +185,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         text={equipment.note}
                         onSubmit={(x) => handleSubmit({ name: equipment.name, note: x })}
                         cardTitle={'Anteckningar'}
+                        readonly={currentUser.role === Role.READONLY}
                     />
                     <EquipmentCalendar equipment={equipment} />
                     <EquipmentBookings equipment={equipment} />

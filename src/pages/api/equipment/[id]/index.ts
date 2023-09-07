@@ -79,6 +79,8 @@ const handler = withSessionContext(
 
                         if (hasChanges(equipment, req.body.equipment, ['isArchived'])) {
                             await logChangeToEquipment(context.currentUser, equipmentId);
+                        } else if (req.body.equipment.tags && hasListChanges(equipment.tags, req.body.equipment.tags)) {
+                            await logChangeToEquipment(context.currentUser, equipmentId);
                         }
 
                         if (req.body.equipment.prices && hasListChanges(equipment.prices, req.body.equipment.prices)) {

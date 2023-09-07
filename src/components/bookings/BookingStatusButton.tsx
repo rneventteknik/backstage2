@@ -8,6 +8,7 @@ import { BookingType } from '../../models/enums/BookingType';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleCheck as faCircleCheckRegular, faTimesCircle, faDotCircle } from '@fortawesome/free-regular-svg-icons';
 import { faCircleCheck as faCircleCheckSolid } from '@fortawesome/free-solid-svg-icons';
+import { RentalStatus } from '../../models/enums/RentalStatus';
 
 type Props = {
     booking: Partial<Booking>;
@@ -122,6 +123,7 @@ const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
     show,
 }: BookingStatusModalProps) => {
     const timeReports = booking.timeReports;
+    const equipmentLists = booking.equipmentLists;
 
     const onSubmit = (booking: Partial<IBookingObjectionModel>) => {
         hide();
@@ -139,6 +141,13 @@ const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
                 timeReports.length === 0 ? (
                     <Alert variant="danger">
                         Den här bokningen har ingen tid rapporterad. Är du säker på att du vill klarmarkera den?
+                    </Alert>
+                ) : null}
+                {booking.status === Status.DONE &&
+                equipmentLists &&
+                equipmentLists.some((x) => x.rentalStatus === RentalStatus.OUT) ? (
+                    <Alert variant="danger">
+                        Den här bokningen har utlämnad utrustning. Är du säker på att du vill klarmarkera den?
                     </Alert>
                 ) : null}
                 <BookingForm

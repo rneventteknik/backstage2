@@ -4,7 +4,7 @@ import React, { ReactNode, useState } from 'react';
 import { Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
-import { addDays, formatDate, formatWeekDay } from '../../lib/datetimeUtils';
+import { addDays, formatDate, formatWeekDay, getWeekNumber } from '../../lib/datetimeUtils';
 import { bookingsFetcher } from '../../lib/fetchers';
 import { getMaximumNumberOfUnitUsed } from '../../lib/utils';
 import { Status } from '../../models/enums/Status';
@@ -21,8 +21,7 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
     thisWeek.setDate(thisWeek.getDate() - ((thisWeek.getDay() + 6) % 7)); // Go to last Monday
 
     // Calculate next week and some more weeks for the dropdown
-    const nextWeek = addDays(thisWeek, 7);
-    const moreWeeks = [2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => addDays(thisWeek, 7 * x));
+    const moreWeeks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => addDays(thisWeek, 7 * x));
 
     const [startDate, setStartDate] = useState(thisWeek);
 
@@ -51,11 +50,13 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                                 onChange={(e) => setStartDate(new Date(parseInt(e.target.value)))}
                                 size="sm"
                             >
-                                <option value={thisWeek.getTime()}>Denna veckan</option>
-                                <option value={nextWeek.getTime()}>Nästa vecka</option>
+                                <option value={thisWeek.getTime()}>
+                                    Denna vecka ({formatDate(thisWeek)} till {formatDate(addDays(thisWeek, 6))})
+                                </option>
                                 {moreWeeks.map((week, i) => (
                                     <option value={week.getTime()} key={i}>
-                                        {formatDate(week)} till {formatDate(addDays(week, 6))}
+                                        Vecka {getWeekNumber(week)} ({formatDate(week)} till{' '}
+                                        {formatDate(addDays(week, 6))})
                                     </option>
                                 ))}
                             </Form.Control>

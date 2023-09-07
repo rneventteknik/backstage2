@@ -109,6 +109,19 @@ export const toDatetimeOrUndefined = (datetimeString: string | null | undefined)
     return datetime;
 };
 
+// JS has no build in way to calculate week number.
+export const getWeekNumber = (date: Date) => {
+    // Make a copy of date and set time to 0
+    const temp = new Date(date);
+    temp.setHours(0, 0, 0, 0);
+    // Thursday in current week decides the year.
+    temp.setDate(temp.getDate() + 3 - ((temp.getDay() + 6) % 7));
+    // January 4 is always in week 1.
+    const week1 = new Date(temp.getFullYear(), 0, 4);
+    // Adjust to Thursday in week 1 and count number of weeks from date to week1.
+    return 1 + Math.round(((temp.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+};
+
 // Equipment lists
 //
 export const getNumberOfDays = (equipmentList: EquipmentList): number => {
