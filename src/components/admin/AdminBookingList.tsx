@@ -7,6 +7,7 @@ import {
     getSalaryStatusName,
     getStatusName,
     onlyUnique,
+    reduceSumFn,
     replaceEmptyStringWithNull,
 } from '../../lib/utils';
 import { BookingType } from '../../models/enums/BookingType';
@@ -105,8 +106,7 @@ const AdminBookingList: React.FC<Props> = ({
                 </TableStyleLink>
 
                 <BookingTypeTag booking={booking} className="mr-1" />
-                <BookingTypeTag booking={booking} className="ml-1" />
-                <FixedPriceStatusTag booking={booking} className="ml-1" />
+                <FixedPriceStatusTag booking={booking} className="mr-1" />
 
                 {customAccountsOnBooking.length > 0 ? (
                     <OverlayTrigger
@@ -187,10 +187,14 @@ const AdminBookingList: React.FC<Props> = ({
         </>
     );
 
+    const hasBillableTimeReportHours = (booking: BookingViewModel) =>
+        (booking.timeReports?.map((x) => x.billableWorkingHours).reduce(reduceSumFn, 0) ?? 0) > 0;
     const bookingSalaryStatusIsDone = (booking: BookingViewModel) => booking.salaryStatus === SalaryStatus.SENT;
     const bookingSalaryStatusDisplayFn = (booking: BookingViewModel) => (
         <>
-            {booking.status !== Status.CANCELED || booking.salaryStatus !== SalaryStatus.NOT_SENT
+            {hasBillableTimeReportHours(booking) ||
+            booking.status !== Status.CANCELED ||
+            booking.salaryStatus !== SalaryStatus.NOT_SENT
                 ? getSalaryStatusName(booking.salaryStatus)
                 : '-'}
             {bookingSalaryStatusIsDone(booking) ? <DoneIcon /> : null}
@@ -257,8 +261,8 @@ const AdminBookingList: React.FC<Props> = ({
                         x.status === Status.CANCELED ||
                         (bookingStatusIsDone(x) &&
                             (bookingRentalStatusIsDone(x) || x.bookingType === BookingType.GIG) &&
-                            bookingPaymentStatusIsDone(x) &&
-                            bookingSalaryStatusIsDone(x)),
+                            (bookingSalaryStatusIsDone(x) || !hasBillableTimeReportHours(x)) &&
+                            bookingPaymentStatusIsDone(x)),
                 ) ? (
                 <DoneIcon />
             ) : null}

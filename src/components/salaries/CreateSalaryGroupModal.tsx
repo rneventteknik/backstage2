@@ -110,7 +110,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
                 </Form.Group>
                 <Button onClick={toggleAllowAllBookings} variant="secondary" className="mr-2 mb-3">
                     <FontAwesomeIcon className="fa-fw mr-1" icon={allowAllBookings ? faLock : faLockOpen} />
-                    {allowAllBookings ? 'Lås orelevanta' : 'Lås upp orelevanta'} bokningar
+                    {allowAllBookings ? 'Lås irrelevanta' : 'Lås upp irrelevanta'} bokningar
                 </Button>
                 <Button
                     onClick={() => setHideLockedBookings((x) => !x)}

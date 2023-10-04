@@ -102,7 +102,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
                 </Form.Group>
                 <Button onClick={toggleAllowAllBookings} variant="secondary" className="mr-2 mb-3">
                     <FontAwesomeIcon className="fa-fw mr-1" icon={allowAllBookings ? faLock : faLockOpen} />
-                    {allowAllBookings ? 'Lås orelevanta' : 'Lås upp orelevanta'} bokningar
+                    {allowAllBookings ? 'Lås irrelevanta' : 'Lås upp irrelevanta'} bokningar
                 </Button>
                 <Button
                     onClick={() => setHideLockedBookings((x) => !x)}
@@ -124,9 +124,9 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
 
                 <p className="text-muted">
                     Relevanta bokningar syftar på klarmarkerade bokningar med betalningsstatus &quot;
-                    {getPaymentStatusName(PaymentStatus.NOT_PAID)}&quot;, dvs de bokningar som ska betalas och där ingen
-                    betalning är påbörjad eller slutförd. I listan nedan visas endast bokningar vars startdatum har
-                    passerats, dvs inga bokningar framåt i tiden.
+                    {getPaymentStatusName(PaymentStatus.NOT_PAID)}&quot;, dvs de bokningar som ska betalas och för vilka
+                    ingen betalning är påbörjad eller slutförd. I listan nedan visas endast bokningar vars startdatum
+                    har passerats, dvs inga bokningar framåt i tiden.
                 </p>
                 <AdminBookingList
                     bookings={bookings
