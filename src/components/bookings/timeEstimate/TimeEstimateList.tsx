@@ -317,6 +317,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                         updateTimeEstimates(timeEstimateToSend);
                     }
                 }}
+                showWizard={false}
             ></TimeEstimateModal>
         </Card>
     );

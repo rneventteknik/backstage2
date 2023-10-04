@@ -759,6 +759,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                 setEquipmentPackageToAdd(null);
                                 setEquipmentPackageTimeEstimateToAdd(null);
                             }}
+                            showWizard={false}
                         />
                     ) : null}
                 </div>
