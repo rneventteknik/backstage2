@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.4.0-blueberry",
+    "version": "1.5.0-gooseberry",
     "scripts": {
         "dev": "next",
         "build": "next build",
