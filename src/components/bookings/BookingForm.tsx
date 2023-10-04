@@ -108,6 +108,7 @@ const BookingForm: React.FC<Props> = ({
             paymentStatus: toIntOrUndefined(getValueFromForm('paymentStatus')),
             returnalNote: getValueFromForm('returnalNote'),
             calendarBookingId: getValueFromForm('calendarBookingId'),
+            driveFolderId: getValueFromForm('driveFolderId'),
             language: getValueFromForm('language') as Language | undefined,
             fixedPrice: toIntOrUndefined(getValueFromForm('fixedPrice')) ?? null,
         };
@@ -201,7 +202,7 @@ const BookingForm: React.FC<Props> = ({
                             <Form.Control
                                 required={isFieldRequired(Status.BOOKED)}
                                 type="text"
-                                placeholder="THS"
+                                placeholder="Defaultsektionen"
                                 name="customerName"
                                 defaultValue={booking.customerName}
                                 ref={customerNameField}
@@ -271,7 +272,7 @@ const BookingForm: React.FC<Props> = ({
                         <Form.Label>Plats</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Nya Matsalen, Nymble"
+                            placeholder="Nya Matsalen"
                             name="location"
                             defaultValue={booking.location}
                         />
@@ -543,6 +544,17 @@ const BookingForm: React.FC<Props> = ({
                                 />
                             </Form.Group>
                         </Col>
+                        <Col lg="4" md="4">
+                            <Form.Group controlId="driveFolderId">
+                                <Form.Label>Mapp-id</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder=""
+                                    name="driveFolderId"
+                                    defaultValue={booking?.driveFolderId}
+                                />
+                            </Form.Group>
+                        </Col>
                     </Row>
                 </>
             ) : null}
@@ -564,6 +576,7 @@ const BookingForm: React.FC<Props> = ({
             {!showAdvancedFields ? (
                 <>
                     <Form.Control type="hidden" name="calendarBookingId" defaultValue={booking?.calendarBookingId} />
+                    <Form.Control type="hidden" name="driveFolderId" defaultValue={booking?.driveFolderId} />
                     <Form.Control type="hidden" name="invoiceNumber" defaultValue={booking?.invoiceNumber} />
                     <Form.Control
                         type="hidden"

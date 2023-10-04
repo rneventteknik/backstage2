@@ -17,12 +17,12 @@ import { ISalaryGroupObjectionModel } from '../models/objection-models/SalaryGro
 import { PartialDeep } from 'type-fest';
 import { useNotifications } from '../lib/useNotifications';
 import { getResponseContentOrError } from '../lib/utils';
-import { PaymentStatus } from '../models/enums/PaymentStatus';
 import DoneIcon from '../components/utils/DoneIcon';
 import { formatDatetime } from '../lib/datetimeUtils';
 import CreateSalaryGroupModal from '../components/salaries/CreateSalaryGroupModal';
 import ViewSalaryGroupModal from '../components/salaries/ViewSalaryGroupModal';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import { SalaryStatus } from '../models/enums/SalaryStatus';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
@@ -86,15 +86,15 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             <p className="text-muted mb-0">
                 {salaryGroup.bookings?.length ?? 'N/A'} {salaryGroup.bookings?.length === 1 ? 'bokning' : 'bokningar'}
             </p>
-            <p className="text-muted mb-0 d-sm-none">{getPaymentStatusString(salaryGroup)}</p>
+            <p className="text-muted mb-0 d-sm-none">{getSalaryStatusString(salaryGroup)}</p>
             <p className="text-muted mb-0 d-lg-none">{salaryGroup.user?.name}</p>
         </div>
     );
 
-    const paymentStatusDisplayFn = (salaryGroup: SalaryGroup) => (
+    const salaryStatusDisplayFn = (salaryGroup: SalaryGroup) => (
         <>
-            {getPaymentStatusString(salaryGroup)}
-            {getPaymentStatusString(salaryGroup) === 'Betald' ? <DoneIcon /> : null}
+            {getSalaryStatusString(salaryGroup)}
+            {getSalaryStatusString(salaryGroup) === 'Skickad' ? <DoneIcon /> : null}
         </>
     );
 
@@ -111,52 +111,16 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         </>
     );
 
-    const getPaymentStatusString = (salaryGroup: SalaryGroup): string | number | Date => {
-        if (
-            salaryGroup.bookings?.every(
-                (b) =>
-                    b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
-                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
-                    b.paymentStatus === PaymentStatus.PAID,
-            )
-        ) {
-            return 'Betald';
+    const getSalaryStatusString = (salaryGroup: SalaryGroup): string | number | Date => {
+        if (salaryGroup.bookings?.every((b) => b.salaryStatus === SalaryStatus.SENT)) {
+            return 'Skickad';
         }
 
-        if (
-            salaryGroup.bookings?.some(
-                (b) =>
-                    b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
-                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
-                    b.paymentStatus === PaymentStatus.PAID,
-            )
-        ) {
-            return 'Delvis betald';
+        if (salaryGroup.bookings?.some((b) => b.salaryStatus === SalaryStatus.SENT)) {
+            return 'Delvis skickad';
         }
 
-        if (
-            salaryGroup.bookings?.every(
-                (b) =>
-                    b.paymentStatus === PaymentStatus.INVOICED ||
-                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
-                    b.paymentStatus === PaymentStatus.PAID,
-            )
-        ) {
-            return 'Fakturerad';
-        }
-
-        if (
-            salaryGroup.bookings?.some(
-                (b) =>
-                    b.paymentStatus === PaymentStatus.INVOICED ||
-                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
-                    b.paymentStatus === PaymentStatus.PAID,
-            )
-        ) {
-            return 'Delvis fakturerad';
-        }
-
-        return 'Inte fakturerad';
+        return 'Inte skickad';
     };
 
     const tableSettings: TableConfiguration<SalaryGroup> = {
@@ -174,9 +138,9 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             {
                 key: 'status',
                 displayName: 'Status',
-                getValue: (salaryGroup: SalaryGroup) => getPaymentStatusString(salaryGroup),
+                getValue: (salaryGroup: SalaryGroup) => getSalaryStatusString(salaryGroup),
                 textTruncation: true,
-                getContentOverride: paymentStatusDisplayFn,
+                getContentOverride: salaryStatusDisplayFn,
                 cellHideSize: 'sm',
             },
             {

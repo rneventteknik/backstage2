@@ -91,6 +91,7 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'invoice.comment': 'Kommentar',
         'invoice.account': 'Konto',
         'invoice.total-price-section.total-sum-ex-vat': 'Summa (exkl. moms)',
+        'invoice.total-price-section.total-sum-inc-vat': 'Summa (inkl. moms)',
         'invoice.total-price-section.vat': 'Moms (25%)',
     },
     en: {
@@ -182,6 +183,7 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'invoice.comment': 'Comment',
         'invoice.account': 'Account',
         'invoice.total-price-section.total-sum-ex-vat': 'Total amount (excl. VAT)',
+        'invoice.total-price-section.total-sum-inc-vat': 'Total amount (incl. VAT)',
         'invoice.total-price-section.vat': 'VAT (25%)',
     },
 };

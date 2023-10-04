@@ -29,6 +29,20 @@ const styles = StyleSheet.create({
         paddingBottom: 5,
         paddingTop: 0,
     },
+    tableRowCompact: {
+        paddingBottom: 2,
+        paddingTop: 2,
+        fontSize: 7,
+    },
+    tableRowWithTopBorderCompact: {
+        paddingBottom: 2,
+        paddingTop: 2,
+        fontSize: 7,
+    },
+    tableRowWithNoBorderCompact: {
+        paddingBottom: 2,
+        fontSize: 7,
+    },
 });
 
 type RowProps = {
@@ -58,23 +72,53 @@ export const InfoItem: React.FC<InfoItemProps> = ({ title, content }: InfoItemPr
 
 type TableRowProps = {
     children?: ReactNode;
+    compact?: boolean;
 };
-export const TableRow: React.FC<TableRowProps> = ({ children }: TableRowProps) => (
-    <View style={styles.tableRow}>{children}</View>
+export const TableRow: React.FC<TableRowProps> = ({ children, compact = false }: TableRowProps) => (
+    <View
+        style={{
+            ...styles.tableRow,
+            ...(compact ? styles.tableRowCompact : {}),
+        }}
+    >
+        {children}
+    </View>
 );
 
 type TableRowWithTopBorderProps = {
     children?: ReactNode;
+    compact?: boolean;
 };
 export const TableRowWithTopBorder: React.FC<TableRowWithTopBorderProps> = ({
     children,
-}: TableRowWithTopBorderProps) => <View style={styles.tableRowWithTopBorder}>{children}</View>;
+    compact = false,
+}: TableRowWithTopBorderProps) => (
+    <View
+        style={{
+            ...styles.tableRowWithTopBorder,
+            ...(compact ? styles.tableRowWithTopBorderCompact : {}),
+        }}
+    >
+        {children}
+    </View>
+);
 
 type TableRowWithNoBorderProps = {
     children?: ReactNode;
+    compact?: boolean;
 };
-export const TableRowWithNoBorder: React.FC<TableRowWithNoBorderProps> = ({ children }: TableRowWithNoBorderProps) => (
-    <View style={styles.tableRowWithNoBorder}>{children}</View>
+export const TableRowWithNoBorder: React.FC<TableRowWithNoBorderProps> = ({
+    children,
+    compact = false,
+}: TableRowWithNoBorderProps) => (
+    <View
+        style={{
+            ...styles.tableRowWithNoBorder,
+            ...(compact ? styles.tableRowWithNoBorderCompact : {}),
+        }}
+    >
+        {children}
+    </View>
 );
 
 type TableCellFixedWidthProps = {

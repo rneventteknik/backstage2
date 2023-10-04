@@ -67,6 +67,7 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
                     };
                     addTimeEstimate(timeEstimateToSend);
                 }}
+                wizardLanguage={booking.language}
             ></TimeEstimateModal>
         </>
     );

@@ -129,6 +129,10 @@ const getGlobalSettings = async (isLoggedIn = false) => {
             key: 'metadata.build.buildDate',
             value: process.env.NEXT_PUBLIC_BACKSTAGE2_BUILD_DATE ?? '-',
         },
+        {
+            key: 'config.maxSessionLength',
+            value: process.env.MAX_SESSION_LENGTH ?? '-',
+        },
     ];
 
     const globalSettings = [...settings, ...metadata];

@@ -5,13 +5,14 @@ import { fetchBookingWithUser } from '../../../../../../lib/db-access/booking';
 import { toBooking } from '../../../../../../lib/mappers/booking';
 import { withSessionContext } from '../../../../../../lib/sessionContext';
 import { getTextResource } from '../../../../../../document-templates/useTextResources';
-import { getHogiaInvoiceFileName } from '../../../../../../document-templates';
+import { getHogiaInvoiceFileName, getInvoiceDocument } from '../../../../../../document-templates';
 import { Language } from '../../../../../../models/enums/Language';
 import { toBookingViewModel } from '../../../../../../lib/datetimeUtils';
 import { fetchSettings } from '../../../../../../lib/db-access/setting';
 import { getGlobalSetting } from '../../../../../../lib/utils';
 import { getInvoiceData } from '../../../../../../lib/pricingUtils';
 import { getTextResourcesFromGlobalSettings } from '../../../../../../document-templates/utils';
+import { renderToStream } from '@react-pdf/renderer';
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     if (isNaN(Number(req.query.bookingId))) {
@@ -65,7 +66,6 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             documentLanguage === Language.EN ? 'en-SE' : 'sv-SE',
         );
 
-        res.setHeader('Content-Type', 'text/plain; charset=windows-1252');
         // If the download flag is set, tell the browser to download the file instead of showing it in a new tab.
         if (req.query.download) {
             res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
@@ -73,9 +73,15 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
         }
 
-        const content = getHogiaTxtInvoice(invoiceData, t);
-
-        res.send(content);
+        if (req.query.exportType === 'pdf') {
+            res.setHeader('Content-Type', 'application/pdf');
+            const stream = await renderToStream(getInvoiceDocument(invoiceData, documentLanguage, globalSettings));
+            stream.pipe(res);
+        } else {
+            res.setHeader('Content-Type', 'text/plain; charset=windows-1252');
+            const content = getHogiaTxtInvoice(invoiceData, t);
+            res.send(content);
+        }
     });
 });
 

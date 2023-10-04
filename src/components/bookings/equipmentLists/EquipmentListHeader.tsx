@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
+import { Alert, Button, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faAngleDown,
@@ -150,7 +150,15 @@ const EquipmentListHeader: React.FC<Props> = ({
                                         confirmLabel="Lämna ut"
                                         confirmButtonType="primary"
                                     >
-                                        Är du säker på att du vill lämna ut {list.name}?
+                                        {bookingStatus === Status.DRAFT ? (
+                                            <Alert variant="danger">
+                                                Är du säker på att du vill lämna ut utrustningslistan {list.name} trots
+                                                att bokningen är ett utkast? Utrustningslistor som lämnas ut bör höra
+                                                till bokningar som är bokade.
+                                            </Alert>
+                                        ) : (
+                                            <>Är du säker på att du vill lämna ut bokningen {list.name}?</>
+                                        )}
                                     </ConfirmModal>
                                 </>
                             ) : null}
