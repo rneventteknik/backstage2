@@ -39,6 +39,8 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
                 .list({
                     q: `\'${driveFolderId}\' in parents`,
                     fields: 'files(id, name, mimeType, modifiedTime, webViewLink)',
+                    includeItemsFromAllDrives: true,
+                    supportsAllDrives: true,
                 })
                 .then(mapDriveResponse)
                 .then((filesList) => res.status(200).json(filesList))
@@ -86,6 +88,8 @@ const createFolderAndGetIdIfNotExists = async (name: string, parentId: string) =
         .list({
             q: `\'${parentId}\' in parents`,
             fields: 'files(id, name, mimeType, modifiedTime, webViewLink)',
+            includeItemsFromAllDrives: true,
+            supportsAllDrives: true,
         })
         .then(mapDriveResponse);
 
@@ -96,7 +100,12 @@ const createFolderAndGetIdIfNotExists = async (name: string, parentId: string) =
     }
 
     const createdFolder = await driveClient.files.create({
-        requestBody: { name: name, parents: [parentId], mimeType: 'application/vnd.google-apps.folder' },
+        requestBody: {
+            name: name,
+            parents: [parentId],
+            mimeType: 'application/vnd.google-apps.folder',
+        },
+        supportsAllDrives: true,
     });
 
     if (!createdFolder.data.id) {
