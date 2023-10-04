@@ -446,6 +446,9 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
                         <Nav.Link eventKey="users">Användare</Nav.Link>
                     </Nav.Item>
                 </Nav>
+                <p className="text-muted font-italic mt-2">
+                    Statistiken nedan är presenterad exklusive moms och endast klarmarkerade bokningar är inkluderade.
+                </p>
                 <Tab.Content>
                     <Tab.Pane eventKey="equipment">
                         {statistics.map((yearlyStatistics) => (
