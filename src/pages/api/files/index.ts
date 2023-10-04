@@ -10,11 +10,7 @@ import { GaxiosResponse } from 'googleapis-common';
 import { FilesResult } from '../../../models/misc/FilesResult';
 import { getValueOrFirst } from '../../../lib/utils';
 
-const credentials = {
-    type: 'service_account',
-    private_key: process.env.DRIVE_PRIVATE_KEY,
-    client_email: process.env.DRIVE_CLIENT_EMAIL,
-};
+const credentials = JSON.parse(Buffer.from(process.env.DRIVE_CREDENTIALS ?? '', 'base64').toString());
 const scopes = ['https://www.googleapis.com/auth/drive'];
 const driveRootFolderId = process.env.DRIVE_ROOT_FOLDER_ID;
 
