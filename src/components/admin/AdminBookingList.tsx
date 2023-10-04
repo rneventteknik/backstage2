@@ -63,7 +63,7 @@ const AdminBookingList: React.FC<Props> = ({
             return 'Delvis utlämnad';
         }
 
-        if (booking.bookingType === BookingType.GIG) {
+        if (booking.bookingType === BookingType.GIG || booking.status === Status.CANCELED) {
             return '-';
         }
 
@@ -180,7 +180,9 @@ const AdminBookingList: React.FC<Props> = ({
         booking.paymentStatus === PaymentStatus.PAID_WITH_CASH;
     const bookingPaymentStatusDisplayFn = (booking: BookingViewModel) => (
         <>
-            {getPaymentStatusName(booking.paymentStatus)}
+            {booking.status !== Status.CANCELED || booking.paymentStatus !== PaymentStatus.NOT_PAID
+                ? getPaymentStatusName(booking.paymentStatus)
+                : '-'}
             {bookingPaymentStatusIsDone(booking) ? <DoneIcon /> : null}
         </>
     );
@@ -188,7 +190,9 @@ const AdminBookingList: React.FC<Props> = ({
     const bookingSalaryStatusIsDone = (booking: BookingViewModel) => booking.salaryStatus === SalaryStatus.SENT;
     const bookingSalaryStatusDisplayFn = (booking: BookingViewModel) => (
         <>
-            {getSalaryStatusName(booking.salaryStatus)}
+            {booking.status !== Status.CANCELED || booking.salaryStatus !== SalaryStatus.NOT_SENT
+                ? getSalaryStatusName(booking.salaryStatus)
+                : '-'}
             {bookingSalaryStatusIsDone(booking) ? <DoneIcon /> : null}
         </>
     );
@@ -198,7 +202,9 @@ const AdminBookingList: React.FC<Props> = ({
             throw new Error('Invalid table configuration');
         }
 
-        return (
+        return (isDisabled ? isDisabled(booking) : false) ? (
+            <></>
+        ) : (
             <div className="text-center">
                 <input
                     type="checkbox"
@@ -248,10 +254,11 @@ const AdminBookingList: React.FC<Props> = ({
                 .filter((x) => getBookingDateHeadingValue(x) === value)
                 .every(
                     (x) =>
-                        bookingStatusIsDone(x) &&
-                        (bookingRentalStatusIsDone(x) || x.bookingType === BookingType.GIG) &&
-                        bookingPaymentStatusIsDone(x) &&
-                        bookingSalaryStatusIsDone(x),
+                        x.status === Status.CANCELED ||
+                        (bookingStatusIsDone(x) &&
+                            (bookingRentalStatusIsDone(x) || x.bookingType === BookingType.GIG) &&
+                            bookingPaymentStatusIsDone(x) &&
+                            bookingSalaryStatusIsDone(x)),
                 ) ? (
                 <DoneIcon />
             ) : null}

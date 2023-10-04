@@ -46,6 +46,9 @@ const AdminOverviewPage: React.FC<Props> = ({ user: currentUser, globalSettings 
     return (
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
+            <p className="text-muted">
+                I listan nedan visas endast bokningar vars startdatum har passerats, dvs inga bokningar framåt i tiden.
+            </p>
             <AdminBookingList bookings={bookingsToShow} showHeadings={true} />
         </Layout>
     );

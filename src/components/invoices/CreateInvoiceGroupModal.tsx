@@ -6,12 +6,13 @@ import { bookingsFetcher } from '../../lib/fetchers';
 import { Button, Form, Modal } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import { Status } from '../../models/enums/Status';
-import { faCalendarDay, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PartialDeep } from 'type-fest';
 import AdminBookingList from '../admin/AdminBookingList';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { formatDatetime, toBookingViewModel } from '../../lib/datetimeUtils';
+import { getPaymentStatusName } from '../../lib/utils';
 
 type Props = {
     show: boolean;
@@ -24,24 +25,13 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
     const [selectedGroupName, setSelectedGroupName] = useState<string>(
         'Fakturaunderlagsgrupp skapad ' + formatDatetime(new Date()),
     );
-    const [allowInvoicedBookings, setAllowInvoicedBookings] = useState<boolean>(false);
-    const [allowNotDoneBookings, setAllowNotDoneBookings] = useState<boolean>(false);
+    const [allowAllBookings, setAllowAllBookings] = useState<boolean>(false);
+    const [hideLockedBookings, setHideLockedBookings] = useState<boolean>(true);
 
     const { data: bookings } = useSwr('/api/bookings', bookingsFetcher, {
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
     });
-
-    const selectLastMonth = () => {
-        const lastMonth = (new Date().getMonth() + 11) % 12;
-        setSelectedBookingIds(
-            bookings
-                ?.map(toBookingViewModel)
-                ?.filter((x) => !isDisabled(x))
-                ?.filter((x) => x.usageStartDatetime && x.usageStartDatetime.getMonth() === lastMonth)
-                .map((x) => x.id) ?? [],
-        );
-    };
 
     const toggleBookingSelection = (booking: Booking) => {
         if (selectedBookingIds.includes(booking.id)) {
@@ -57,32 +47,20 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
     };
 
     const isDisabled = (booking: Booking) => {
-        if (!allowInvoicedBookings && booking.paymentStatus !== PaymentStatus.NOT_PAID) {
-            return true;
-        }
-
-        if (!allowNotDoneBookings && booking.status !== Status.DONE) {
+        if (!allowAllBookings && (booking.paymentStatus !== PaymentStatus.NOT_PAID || booking.status !== Status.DONE)) {
             return true;
         }
 
         return false;
     };
 
-    const toggleAllowInvoicedBookings = () => {
-        setAllowInvoicedBookings((x) => !x);
+    const toggleAllowAllBookings = () => {
+        setAllowAllBookings((x) => !x);
 
         setSelectedBookingIds(
-            selectedBookingIds.filter(
-                (id) => bookings?.find((b) => b.id === id)?.paymentStatus === PaymentStatus.NOT_PAID,
-            ),
-        );
-    };
-
-    const toggleNotDoneBookings = () => {
-        setAllowNotDoneBookings((x) => !x);
-
-        setSelectedBookingIds(
-            selectedBookingIds.filter((id) => bookings?.find((b) => b.id === id)?.status === Status.DONE),
+            selectedBookingIds
+                .filter((id) => bookings?.find((b) => b.id === id)?.paymentStatus === PaymentStatus.NOT_PAID)
+                .filter((id) => bookings?.find((b) => b.id === id)?.status === Status.DONE),
         );
     };
 
@@ -122,25 +100,43 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
                         onChange={(e) => setSelectedGroupName(e.target.value)}
                     />
                 </Form.Group>
-                <Button onClick={selectLastMonth} variant="secondary" className="mr-2 mb-3">
-                    <FontAwesomeIcon className="fa-fw mr-1" icon={faCalendarDay} />
-                    Välj alla från förra månaden
+                <Button onClick={toggleAllowAllBookings} variant="secondary" className="mr-2 mb-3">
+                    <FontAwesomeIcon className="fa-fw mr-1" icon={allowAllBookings ? faLock : faLockOpen} />
+                    {allowAllBookings ? 'Lås orelevanta' : 'Lås upp orelevanta'} bokningar
                 </Button>
-                <Button onClick={toggleAllowInvoicedBookings} variant="secondary" className="mr-2 mb-3">
-                    <FontAwesomeIcon className="fa-fw mr-1" icon={allowInvoicedBookings ? faLock : faLockOpen} />
-                    {allowInvoicedBookings ? 'Lås' : 'Lås upp'} bokningar som redan är fakturerade eller betalda
+                <Button
+                    onClick={() => setHideLockedBookings((x) => !x)}
+                    variant="secondary"
+                    className="mr-2 mb-3"
+                    disabled={allowAllBookings}
+                >
+                    <FontAwesomeIcon className="fa-fw mr-1" icon={hideLockedBookings ? faEye : faEyeSlash} />
+                    {hideLockedBookings ? 'Visa låsta' : 'Dölj låsta'} bokningar
                 </Button>
-                <Button onClick={toggleNotDoneBookings} variant="secondary" className="mr-2 mb-3">
-                    <FontAwesomeIcon className="fa-fw mr-1" icon={allowNotDoneBookings ? faLock : faLockOpen} />
-                    {allowNotDoneBookings ? 'Lås' : 'Lås upp'} bokningar som inte är klara
+                <Button
+                    onClick={createGroup}
+                    variant="primary"
+                    className="mr-2 mb-3"
+                    disabled={selectedBookingIds.length === 0}
+                >
+                    Skapa Fakturaunderlagsgrupp
                 </Button>
+
+                <p className="text-muted">
+                    Relevanta bokningar syftar på klarmarkerade bokningar med betalningsstatus &quot;
+                    {getPaymentStatusName(PaymentStatus.NOT_PAID)}&quot;, dvs de bokningar som ska betalas och där ingen
+                    betalning är påbörjad eller slutförd. I listan nedan visas endast bokningar vars startdatum har
+                    passerats, dvs inga bokningar framåt i tiden.
+                </p>
                 <AdminBookingList
                     bookings={bookings
                         .map(toBookingViewModel)
-                        .filter((b) => b.status === Status.DONE || b.status === Status.BOOKED)}
+                        .filter((b) => !isDisabled(b) || !hideLockedBookings)
+                        .filter((b) => b.usageStartDatetime && b.usageStartDatetime?.getTime() < Date.now())}
                     selectedBookingIds={selectedBookingIds}
                     onToggleSelect={toggleBookingSelection}
                     isDisabled={isDisabled}
+                    showHeadings={true}
                 />
                 <Button onClick={createGroup} variant="primary" disabled={selectedBookingIds.length === 0}>
                     Skapa Fakturaunderlagsgrupp
