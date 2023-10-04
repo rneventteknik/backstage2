@@ -49,14 +49,14 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoiceRow }: InvoiceRowProps) 
     switch (invoiceRow.rowType) {
         case InvoiceRowType.HEADING:
             return (
-                <TableRowWithTopBorder>
-                    <Text style={styles.heading2}>{invoiceRow.text}</Text>
+                <TableRowWithTopBorder compact={true}>
+                    <Text style={{ ...styles.heading2, marginTop: 6 }}>{invoiceRow.text}</Text>
                 </TableRowWithTopBorder>
             );
         case InvoiceRowType.ITEM:
             const pricedInvoiceRow = invoiceRow as PricedInvoiceRow;
             return (
-                <TableRowWithTopBorder>
+                <TableRowWithTopBorder compact={true}>
                     <TableCellAutoWidth>
                         <Text>{pricedInvoiceRow.text}</Text>
                     </TableCellAutoWidth>
@@ -76,7 +76,7 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoiceRow }: InvoiceRowProps) 
             );
         case InvoiceRowType.ITEM_COMMENT:
             return (
-                <TableRowWithNoBorder>
+                <TableRowWithNoBorder compact={true}>
                     <Text style={{ color: '#999999' }}>{invoiceRow.text}</Text>
                 </TableRowWithNoBorder>
             );
@@ -93,7 +93,7 @@ const AccountRows: React.FC<AccountRowsProps> = ({ invoiceData }: AccountRowsPro
     return (
         <View>
             {Object.keys(rowsByAccount).map((key) => (
-                <TableRow key={key}>
+                <TableRow key={key} compact={true}>
                     <TableCellAutoWidth>
                         <Text>{`${t('invoice.account')}: ${key}`}</Text>
                     </TableCellAutoWidth>
@@ -121,7 +121,7 @@ const InvoiceTotalPriceSection: React.FC<InvoiceTotalPriceSectionProps> = ({
 
             <AccountRows invoiceData={invoiceData} />
 
-            <TableRow>
+            <TableRow compact={true}>
                 <TableCellAutoWidth>
                     <Text style={styles.bold}>{t('invoice.total-price-section.total-sum-ex-vat')}</Text>
                 </TableCellAutoWidth>
@@ -130,12 +130,23 @@ const InvoiceTotalPriceSection: React.FC<InvoiceTotalPriceSectionProps> = ({
                 </TableCellFixedWidth>
             </TableRow>
 
-            <TableRow>
+            <TableRow compact={true}>
                 <TableCellAutoWidth>
                     <Text>{t('invoice.total-price-section.vat')}</Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
                     <Text>{formatNumberAsCurrency(calculateTotalVAT(invoiceData))}</Text>
+                </TableCellFixedWidth>
+            </TableRow>
+
+            <TableRow compact={true}>
+                <TableCellAutoWidth>
+                    <Text style={styles.bold}>{t('invoice.total-price-section.total-sum-inc-vat')}</Text>
+                </TableCellAutoWidth>
+                <TableCellFixedWidth width={90} textAlign="right">
+                    <Text style={styles.bold}>
+                        {formatNumberAsCurrency(calculateTotalAmount(invoiceData) + calculateTotalVAT(invoiceData))}
+                    </Text>
                 </TableCellFixedWidth>
             </TableRow>
         </View>
@@ -175,7 +186,7 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({
                         </>
                     ) : null}
                     <View style={styles.flexGrow}>
-                        <TableRowWithNoBorder>
+                        <TableRowWithNoBorder compact={true}>
                             <TableCellAutoWidth>
                                 <Text style={styles.italic}>
                                     {t('common.equipment-list.table-header.specification')}
