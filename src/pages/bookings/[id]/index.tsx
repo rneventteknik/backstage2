@@ -8,6 +8,7 @@ import {
     getDefaultLaborHourlyRate,
     getPricePlanName,
     getResponseContentOrError,
+    getOperationalYear,
 } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
@@ -40,12 +41,13 @@ import {
 } from '../../../lib/pricingUtils';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
-import { toBookingViewModel } from '../../../lib/datetimeUtils';
+import { formatDateForForm, toBookingViewModel } from '../../../lib/datetimeUtils';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import MarkdownCard from '../../../components/MarkdownCard';
 import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButton';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 import BookingInfoSection from '../../../components/bookings/BookingInfoSection';
+import FilesCard from '../../../components/bookings/FilesCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -421,6 +423,13 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         cardTitle="Anteckningar"
                         readonly={readonly}
                     />
+                    <FilesCard
+                        driveFolderId={booking.driveFolderId}
+                        defaultFolderName={`${formatDateForForm(booking.usageStartDatetime, 'N/A')} ${booking.name}`}
+                        defaultParentFolder={getOperationalYear(booking.usageStartDatetime)}
+                        onSubmit={(driveFolderId) => saveBooking({ driveFolderId })}
+                    />
+
                     <MarkdownCard
                         text={booking.returnalNote}
                         onSubmit={(returnalNote) => saveBooking({ returnalNote })}

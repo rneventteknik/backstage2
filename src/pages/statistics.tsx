@@ -6,7 +6,7 @@ import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { Card, Nav, Tab } from 'react-bootstrap';
 import { bookingsFetcher } from '../lib/fetchers';
-import { groupBy, onlyUniqueById, reduceSumFn } from '../lib/utils';
+import { getOperationalYear, groupBy, onlyUniqueById, reduceSumFn } from '../lib/utils';
 import { TableLoadingPage } from '../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../components/layout/ErrorPage';
 import { TableConfiguration, TableDisplay } from '../components/TableDisplay';
@@ -35,26 +35,12 @@ type YearlyStatistics = {
     sortIndex: number;
 };
 
-const formatStatisticalYear = (year: number) => `${year % 100}/${(year % 100) + 1}`;
-
-const getStatisticalYear = (date?: Date) => {
-    if (!date) {
-        return 'N/A';
-    }
-
-    if (date.getMonth() < 6) {
-        return formatStatisticalYear(date.getFullYear() - 1);
-    }
-
-    return formatStatisticalYear(date.getFullYear());
-};
-
 // This function splits the bookings by the statistical years and uses the helper functions below to
 // calculate the different types of statistics per year (and a total).
 // calculate the different types of statistics per year (and a all-time total).
 const getStatistics = (bookings: BookingViewModel[]) => {
     // First add statistics by year
-    const bookingsByYear = groupBy(bookings, (booking) => getStatisticalYear(booking.usageStartDatetime));
+    const bookingsByYear = groupBy(bookings, (booking) => getOperationalYear(booking.usageStartDatetime));
     const yearlyStatistics: YearlyStatistics[] = [];
     for (const statisticalYear in bookingsByYear) {
         const bookingsForYear = bookingsByYear[statisticalYear];

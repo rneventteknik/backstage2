@@ -39,6 +39,10 @@ MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay log
 CALENDAR_API_KEY={Google Calender API Key, with read-access to calendars}
 CALENDAR_ID={Google Calender ID to fetch events from}
 
+DRIVE_CLIENT_EMAIL={Google Drive Service Account Email, with write-access to Google Drive}
+DRIVE_PRIVATE_KEY={Google Drive Service Account Private Key, with write-access to Google Drive}
+DRIVE_ROOT_FOLDER_ID={ID of folder which contains booking folders}
+
 SLACK_BOT_TOKEN={API token for slack bot, with chat:write access}
 SLACK_CHANNEL_ID={Slack channel to post message to}
 APPLICATION_BASE_URL={Base URL of application when generating links, for example http://localhost:3000}

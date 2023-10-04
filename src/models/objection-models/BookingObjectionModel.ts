@@ -43,6 +43,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     contactPersonPhone: string;
     contactPersonEmail: string;
     calendarBookingId: string;
+    driveFolderId: string;
     customerName: string;
     language: Language;
     fixedPrice: number | null;
@@ -159,6 +160,7 @@ export class BookingObjectionModel extends Model {
     contactPersonPhone!: string;
     contactPersonEmail!: string;
     calendarBookingId!: string;
+    driveFolderId!: string;
     customerName!: string;
     language!: Language;
     fixedPrice!: number;

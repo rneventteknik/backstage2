@@ -430,3 +430,18 @@ export const createdSortFn = (a: BaseEntity, b: BaseEntity) => {
 
     return 0;
 };
+
+const formatOperationalYear = (year: number) => `${year}-${year + 1}`;
+
+export const getOperationalYear = (date?: Date) => {
+    if (!date) {
+        return 'N/A';
+    }
+
+    if (date.getMonth() < 6) {
+        // Operational year turns over at 1st of July (month is 0 indexed)
+        return formatOperationalYear(date.getFullYear() - 1);
+    }
+
+    return formatOperationalYear(date.getFullYear());
+};
