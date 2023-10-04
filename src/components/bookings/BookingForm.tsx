@@ -201,7 +201,7 @@ const BookingForm: React.FC<Props> = ({
                             <Form.Control
                                 required={isFieldRequired(Status.BOOKED)}
                                 type="text"
-                                placeholder="THS"
+                                placeholder="Defaultsektionen"
                                 name="customerName"
                                 defaultValue={booking.customerName}
                                 ref={customerNameField}
@@ -271,7 +271,7 @@ const BookingForm: React.FC<Props> = ({
                         <Form.Label>Plats</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Nya Matsalen, Nymble"
+                            placeholder="Nya Matsalen"
                             name="location"
                             defaultValue={booking.location}
                         />
