@@ -428,6 +428,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         defaultFolderName={`${formatDateForForm(booking.usageStartDatetime, 'N/A')} ${booking.name}`}
                         defaultParentFolder={getOperationalYear(booking.usageStartDatetime)}
                         onSubmit={(driveFolderId) => saveBooking({ driveFolderId })}
+                        readonly={readonly}
                     />
 
                     <MarkdownCard

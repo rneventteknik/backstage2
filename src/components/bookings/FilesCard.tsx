@@ -29,9 +29,16 @@ type Props = {
     defaultFolderName: string;
     defaultParentFolder: string;
     onSubmit: (driveFolderId: string) => void;
+    readonly?: boolean;
 };
 
-const FilesCard: React.FC<Props> = ({ driveFolderId, defaultFolderName, defaultParentFolder, onSubmit }: Props) => {
+const FilesCard: React.FC<Props> = ({
+    driveFolderId,
+    defaultFolderName,
+    defaultParentFolder,
+    onSubmit,
+    readonly = false,
+}: Props) => {
     const [showContent, setShowContent] = useState(true);
     const { showErrorMessage } = useNotifications();
 
@@ -66,13 +73,15 @@ const FilesCard: React.FC<Props> = ({ driveFolderId, defaultFolderName, defaultP
                 <Card className="mb-3">
                     <Card.Header className="d-flex">
                         <span className="flex-grow-1">Filer</span>
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => createFolder(defaultFolderName, defaultParentFolder)}
-                        >
-                            <FontAwesomeIcon icon={faPlus} /> Skapa mapp
-                        </Button>
+                        {!readonly ? (
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => createFolder(defaultFolderName, defaultParentFolder)}
+                            >
+                                <FontAwesomeIcon icon={faPlus} /> Skapa mapp
+                            </Button>
+                        ) : null}
                     </Card.Header>
                 </Card>
             </>
