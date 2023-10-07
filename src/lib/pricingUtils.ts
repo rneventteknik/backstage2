@@ -8,7 +8,7 @@ import { InvoiceCustomer, InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoice
 import { SalaryReport, UserSalaryReport } from '../models/misc/Salary';
 import { formatDateForForm, getBookingDateDisplayValues, getNumberOfDays } from './datetimeUtils';
 import { getSortedList } from './sortIndexUtils';
-import { getTotalNumberOfHoursReported, groupBy, reduceSumFn } from './utils';
+import { getTotalNumberOfHoursReported, groupBy } from './utils';
 import currency from 'currency.js';
 
 // Calculate total price
@@ -393,7 +393,7 @@ export const calculateSalary = (
 
         const salaryLines = timeReportByUser.map((x) => {
             const hourlyWageRatio = x.booking.pricePlan === PricePlan.THS ? wageRatioThs : wageRatioExternal;
-            const hourlyWage = Math.floor(x.pricePerHour * hourlyWageRatio);
+            const hourlyWage = currency(x.pricePerHour).multiply(hourlyWageRatio).dollars();
 
             return {
                 timeReportId: x.id,
@@ -404,7 +404,7 @@ export const calculateSalary = (
                     : `${x.booking.customerName} - ${x.booking.name}`,
                 hours: x.billableWorkingHours,
                 hourlyRate: hourlyWage,
-                sum: x.billableWorkingHours * hourlyWage,
+                sum: currency(hourlyWage).multiply(x.billableWorkingHours),
             };
         });
 
@@ -412,7 +412,7 @@ export const calculateSalary = (
             userId: userId,
             user: timeReportByUser[0].user,
             salaryLines,
-            sum: salaryLines.map((x) => x.sum).reduce(reduceSumFn),
+            sum: salaryLines.map((x) => x.sum).reduce((a, b) => a.add(b), currency(0)),
         });
     }
 
