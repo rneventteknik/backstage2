@@ -203,7 +203,7 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
             {
                 key: 'amount',
                 displayName: 'Att betala (inklusive moms)',
-                getValue: (booking: Booking) => getBookingPrice(booking),
+                getValue: (booking: Booking) => getBookingPrice(booking).value,
                 textTruncation: true,
                 getContentOverride: BookingPriceDisplayFn,
                 columnWidth: 200,
@@ -245,7 +245,7 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
             {
                 key: 'amount',
                 displayName: 'Betalat (inklusive moms)',
-                getValue: (booking: Booking) => getBookingPrice(booking),
+                getValue: (booking: Booking) => getBookingPrice(booking).value,
                 textTruncation: true,
                 getContentOverride: BookingPriceDisplayFn,
                 columnWidth: 200,

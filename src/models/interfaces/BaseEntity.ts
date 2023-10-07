@@ -1,3 +1,5 @@
+import currency from 'currency.js';
+
 export interface BaseEntityWithName extends BaseEntity {
     name: string;
 }
@@ -16,12 +18,12 @@ export interface HasStringId {
 }
 
 export interface PricedEntity {
-    pricePerHour: number;
-    pricePerUnit: number;
+    pricePerHour: number | currency;
+    pricePerUnit: number | currency;
 }
 export interface PricedEntityWithTHS {
-    pricePerHour: number;
-    pricePerUnit: number;
-    pricePerHourTHS: number;
-    pricePerUnitTHS: number;
+    pricePerHour: number | currency;
+    pricePerUnit: number | currency;
+    pricePerHourTHS: number | currency;
+    pricePerUnitTHS: number | currency;
 }

@@ -31,6 +31,7 @@
         "bcryptjs": "^2.4.3",
         "better-sqlite3": "^8.0.1",
         "bootstrap": "^4.0.0",
+        "currency.js": "^2.0.4",
         "dotenv": "^16.0.0",
         "iconv-lite": "^0.6.3",
         "iron-session": "^6.0.5",

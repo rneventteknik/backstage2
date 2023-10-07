@@ -30,7 +30,7 @@ export const RentalConfirmationDocument: React.FC<Props> = ({ booking, globalSet
     const { t } = useTextResources();
 
     const showPrices = booking.fixedPrice === null;
-    const showPersonnelCosts = getTotalTimeEstimatesPrice(booking.timeEstimates) !== 0 && showPrices;
+    const showPersonnelCosts = getTotalTimeEstimatesPrice(booking.timeEstimates).value !== 0 && showPrices;
 
     return (
         <Document title={t('rental-agreement.title')}>
