@@ -224,8 +224,8 @@ export const getInvoiceData = (
                     rowType: InvoiceRowType.ITEM,
                     text: wrappedEntity.entity.name,
                     numberOfUnits: 1, // Packages are always singular
-                    pricePerUnit: getEquipmentListHeadingPrice(heading, numberOfDays).value,
-                    discount: 0, // Package headings does not show discounts
+                    pricePerUnit: getEquipmentListHeadingPrice(heading, numberOfDays),
+                    discount: currency(0), // Package headings does not show discounts
                     account:
                         booking.accountKind === AccountKind.EXTERNAL
                             ? defaultEquipmentAccountExternal
@@ -244,8 +244,8 @@ export const getInvoiceData = (
                     rowType: InvoiceRowType.ITEM,
                     text: entry.name,
                     numberOfUnits: entry.numberOfUnits,
-                    pricePerUnit: getUnitPrice(entry, numberOfDays).value,
-                    discount: getCalculatedDiscount(entry, numberOfDays).value,
+                    pricePerUnit: getUnitPrice(entry, numberOfDays),
+                    discount: getCalculatedDiscount(entry, numberOfDays),
                     account:
                         entry.account ??
                         (booking.accountKind === AccountKind.EXTERNAL
