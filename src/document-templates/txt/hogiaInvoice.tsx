@@ -32,10 +32,10 @@ export const getHogiaTxtInvoice = (invoiceData: InvoiceData, t: (key: string) =>
                         [2, invoiceRowTypeToHogiaRowTypeString(invoiceRow.rowType)],
                         [4, pricedInvoiceRow.numberOfUnits?.toString() ?? ''],
                         [5, pricedInvoiceRow.pricePerUnit?.toString().replace('.', ',') ?? ''],
-                        [6, pricedInvoiceRow.discount.toString().replace('.', ',') ?? ''],
                         [7, pricedInvoiceRow.text],
                         [8, pricedInvoiceRow.account ?? ''],
                         [12, pricedInvoiceRow.unit ?? ''],
+                        [20, pricedInvoiceRow.rowPrice?.toString() ?? ''],
                     ]);
                 case InvoiceRowType.ITEM_COMMENT:
                     return new Map([

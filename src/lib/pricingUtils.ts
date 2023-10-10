@@ -201,22 +201,22 @@ export const getInvoiceData = (
             const numberOfDays = getNumberOfDays(equipmentList);
             if (isHeading) {
                 const heading = wrappedEntity.entity as EquipmentListHeading;
+                const rowPrice = getEquipmentListHeadingPrice(heading, numberOfDays);
                 const mainRow: PricedInvoiceRow = {
                     rowType: InvoiceRowType.ITEM,
                     text: wrappedEntity.entity.name,
                     numberOfUnits: 1, // Packages are always singular
-                    pricePerUnit: getEquipmentListHeadingPrice(heading, numberOfDays),
-                    discount: 0, // Package headings does not show discounts
+                    pricePerUnit: rowPrice,
+                    rowPrice: rowPrice, // Package headings does not show discounts
                     account:
                         booking.accountKind === AccountKind.EXTERNAL
                             ? defaultEquipmentAccountExternal
                             : defaultEquipmentAccountInternal, // TODO: Should this be something else if all members have the same different account?
                     unit: t('common.misc.count-unit-single'),
                 };
-                const packageDescriptionRow = {
+                const packageDescriptionRow: InvoiceRow = {
                     rowType: InvoiceRowType.ITEM_COMMENT,
                     text: t('hogia-invoice.package-price'),
-                    indented: true,
                 };
                 return [mainRow, packageDescriptionRow];
             } else {
@@ -226,7 +226,7 @@ export const getInvoiceData = (
                     text: entry.name,
                     numberOfUnits: entry.numberOfUnits,
                     pricePerUnit: getUnitPrice(entry, numberOfDays),
-                    discount: getCalculatedDiscount(entry, numberOfDays),
+                    rowPrice: getPrice(entry, numberOfDays, true), // Row price including discount
                     account:
                         entry.account ??
                         (booking.accountKind === AccountKind.EXTERNAL
@@ -262,6 +262,13 @@ export const getInvoiceData = (
                     });
                 }
 
+                if (entry.discount) {
+                    invoiceRows.push({
+                        rowType: InvoiceRowType.ITEM_COMMENT,
+                        text: `${t('invoice.discount')}: ${getCalculatedDiscount(entry, numberOfDays)} kr`,
+                    });
+                }
+
                 return invoiceRows;
             }
         };
@@ -274,19 +281,18 @@ export const getInvoiceData = (
             return [];
         }
 
-        const headingRow = {
+        const headingRow: InvoiceRow = {
             rowType: InvoiceRowType.HEADING,
             text: t('hogia-invoice.staff-cost'),
-            indented: true,
         };
 
-        const mainRow = {
+        const mainRowPrice = getTotalTimeReportsPrice(timeReports);
+        const mainRow: PricedInvoiceRow = {
             rowType: InvoiceRowType.ITEM,
             text: t('hogia-invoice.staff-cost'),
-            indented: false,
             numberOfUnits: 1,
-            pricePerUnit: getTotalTimeReportsPrice(timeReports),
-            discount: 0,
+            pricePerUnit: mainRowPrice,
+            rowPrice: mainRowPrice,
             account:
                 booking.accountKind === AccountKind.EXTERNAL
                     ? defaultSalaryAccountExternal
@@ -294,25 +300,23 @@ export const getInvoiceData = (
             unit: t('common.misc.count-unit-single'),
         };
 
-        const descriptiveRow = {
+        const descriptiveRow: InvoiceRow = {
             rowType: InvoiceRowType.ITEM_COMMENT,
             text: `${t('hogia-invoice.number-of-hours')}: ${getTotalNumberOfHoursReported(timeReports)} ${t(
                 'common.misc.hours-unit',
             )}`,
-            indented: true,
         };
 
         return [headingRow, mainRow, descriptiveRow];
     };
 
     const fixedPriceBookingToInvoiceRows = (booking: BookingViewModel): InvoiceRow[] => {
-        const mainRow = {
+        const mainRow: PricedInvoiceRow = {
             rowType: InvoiceRowType.ITEM,
             text: t('hogia-invoice.price-by-agreement'),
-            indented: false,
             numberOfUnits: 1,
-            pricePerUnit: booking.fixedPrice,
-            discount: 0,
+            pricePerUnit: booking.fixedPrice ?? 0,
+            rowPrice: booking.fixedPrice ?? 0,
             account:
                 booking.accountKind === AccountKind.EXTERNAL
                     ? defaultEquipmentAccountExternal

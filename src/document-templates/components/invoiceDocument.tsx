@@ -31,13 +31,10 @@ const styles = StyleSheet.create({
 const getItemRows = (invoiceData: InvoiceData): PricedInvoiceRow[] =>
     invoiceData.invoiceRows.filter((invoiceRow) => invoiceRow.rowType === InvoiceRowType.ITEM) as PricedInvoiceRow[];
 
-const calculateAmount = (pricedInvoiceRow: PricedInvoiceRow): number =>
-    pricedInvoiceRow.pricePerUnit * pricedInvoiceRow.numberOfUnits;
+const calculateRowPriceSum = (invoiceRows: PricedInvoiceRow[]): number =>
+    invoiceRows.map((invoiceRow) => invoiceRow.rowPrice).reduce(reduceSumFn);
 
-const calculateAmountSum = (invoiceRows: PricedInvoiceRow[]): number =>
-    invoiceRows.map((invoiceRow) => calculateAmount(invoiceRow)).reduce(reduceSumFn);
-
-const calculateTotalAmount = (invoiceData: InvoiceData): number => calculateAmountSum(getItemRows(invoiceData));
+const calculateTotalAmount = (invoiceData: InvoiceData): number => calculateRowPriceSum(getItemRows(invoiceData));
 
 const calculateTotalVAT = (invoiceData: InvoiceData): number => calculateTotalAmount(invoiceData) * 0.25;
 
@@ -70,7 +67,7 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoiceRow }: InvoiceRowProps) 
                         <Text>{pricedInvoiceRow.account}</Text>
                     </TableCellFixedWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
-                        <Text>{formatNumberAsCurrency(calculateAmount(pricedInvoiceRow))}</Text>
+                        <Text>{formatNumberAsCurrency(pricedInvoiceRow.rowPrice)}</Text>
                     </TableCellFixedWidth>
                 </TableRowWithTopBorder>
             );
@@ -98,7 +95,7 @@ const AccountRows: React.FC<AccountRowsProps> = ({ invoiceData }: AccountRowsPro
                         <Text>{`${t('invoice.account')}: ${key}`}</Text>
                     </TableCellAutoWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
-                        <Text>{formatNumberAsCurrency(calculateAmountSum(rowsByAccount[key]))}</Text>
+                        <Text>{formatNumberAsCurrency(calculateRowPriceSum(rowsByAccount[key]))}</Text>
                     </TableCellFixedWidth>
                 </TableRow>
             ))}

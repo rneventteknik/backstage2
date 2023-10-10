@@ -31,7 +31,7 @@ export interface InvoiceRow {
 export interface PricedInvoiceRow extends InvoiceRow {
     numberOfUnits: number;
     pricePerUnit: number;
-    discount: number;
+    rowPrice: number;
     account: string;
     unit: string;
 }
