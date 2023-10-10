@@ -431,6 +431,11 @@ const BookingForm: React.FC<Props> = ({
                                     defaultValue={booking.invoiceHogiaId ?? undefined}
                                     ref={hogiaField}
                                 />
+
+                                <Form.Text className="text-muted">
+                                    Alla bokningar behöver antingen Hogia ID eller en fakturaadress, förutom utkast och
+                                    bokningar med fast pris 0 kr som inte behöver några fakturauppgifter.
+                                </Form.Text>
                             </Form.Group>
                         </Col>
                         <Col lg="6" md="6">
