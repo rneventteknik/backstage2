@@ -45,6 +45,8 @@ DRIVE_ROOT_FOLDER_ID={ID of folder which contains booking folders}
 SLACK_BOT_TOKEN={API token for slack bot, with chat:write access}
 SLACK_CHANNEL_ID={Slack channel to post message to}
 APPLICATION_BASE_URL={Base URL of application when generating links, for example http://localhost:3000}
+
+API_KEYS={JSON array of API-keys, with properties key (string), name (string) and readonly (boolean, optional), for example [{"key": "15ec21b2-6f93-11ee-b962-0242ac120002", "name": "Door sensor", "readonly": true}]} (optional)
 ```
 
 ### Version Control

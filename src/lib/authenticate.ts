@@ -5,6 +5,7 @@ import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { NextApiRequest } from 'next';
 import { fetchUserAuthById } from './db-access/userAuth';
 import { IncomingMessage } from 'http';
+import { Role } from '../models/enums/Role';
 
 export const authenticate = async (username: string, password: string): Promise<UserAuthObjectionModel | null> => {
     const user = await fetchUserAuth(username.toLowerCase());
@@ -95,4 +96,26 @@ export const getAndVerifyUser = async (req: NextApiRequest & IncomingMessage): P
 
     // User from cookie is ok, return it and do not change any cookies
     return currentUser;
+};
+
+export const getAndVerifyApiKey = async (req: NextApiRequest & IncomingMessage): Promise<CurrentUserInfo> => {
+    const apiKey = req.headers['x-api-key'];
+    const acceptedApiKeys = JSON.parse(process.env.API_KEYS ?? '[]') as {
+        key: string;
+        name: string;
+        readonly?: boolean;
+    }[];
+
+    const authInformation = acceptedApiKeys.find((x) => x.key === apiKey);
+
+    if (authInformation) {
+        return {
+            isLoggedIn: true,
+            name: authInformation.name,
+            loginDate: Date.now(),
+            role: authInformation.readonly ? Role.READONLY : Role.USER,
+            userId: undefined,
+        };
+    }
+    return { isLoggedIn: false };
 };
