@@ -2054,6 +2054,13 @@ export async function seed(knex) {
             updated: getVarianceDateString(100),
             value: '[{"key":"key","label":"Huvudnyckel","value":"På plats"},{"key":"door","label":"Dörr kontoret","value":"Öppen"}]',
         },
+        {
+            key: 'system.statusTracking.timeBeforeObsolete',
+            note: 'Tiden innan en status inte längre räknas som aktuell och en varning visas, anger i millisekunder.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '3600000',
+        },
     ]);
 
     await knex('Customer')

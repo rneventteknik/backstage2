@@ -48,7 +48,7 @@ const handler = withApiKeyContext(
                 }
 
                 const updatedStatusTrackingData = statusTrackingData.map((x) =>
-                    x.key !== statusUpdate.key ? x : { ...x, value: statusUpdate.value },
+                    x.key !== statusUpdate.key ? x : { ...x, value: statusUpdate.value, updated: new Date() },
                 );
                 statusTrackingSetting.value = JSON.stringify(updatedStatusTrackingData);
 
