@@ -14,13 +14,18 @@ type Props = {
 const StatusTrackingCard: React.FC<Props> = ({ globalSettings }: Props) => {
     try {
         const statusTracking = JSON.parse(
-            getGlobalSetting('system.statusTracking', globalSettings),
+            getGlobalSetting('system.statusTracking', globalSettings, '[]'),
         ) as StatusTrackingData;
         const timeBeforeObsolete =
-            toIntOrUndefined(getGlobalSetting('system.statusTracking.timeBeforeObsolete', globalSettings)) ?? 3600000;
+            toIntOrUndefined(getGlobalSetting('system.statusTracking.timeBeforeObsolete', globalSettings, '3600000')) ??
+            3600000;
 
         const statusIsObsolete = (status: StatusTrackingStatus) =>
             !status.updated || new Date(status.updated).getTime() + timeBeforeObsolete < Date.now();
+
+        if (statusTracking.length === 0) {
+            return null;
+        }
 
         return (
             <Card className="mb-3">
@@ -57,10 +62,14 @@ const StatusTrackingCard: React.FC<Props> = ({ globalSettings }: Props) => {
                 </ListGroup>
             </Card>
         );
-    } catch {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
         return (
             <Alert className="" variant="danger">
-                <strong>Error</strong> Invalid JSON in <code>system.statusTracking</code> setting
+                <p className="mb-0">
+                    <strong>Error</strong> Status kunde inte laddas.
+                </p>
+                <code>{error.message}</code>
             </Alert>
         );
     }
