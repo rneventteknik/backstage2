@@ -2052,7 +2052,7 @@ export async function seed(knex) {
             note: 'En lista på statusar som kan sättas via API av andra tjänster och visas i stage, i form av en JSON-array med JSON-objekt.',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
-            value: '[{"key":"key","label":"Status huvudnyckel","value":"På plats"},{"key":"door","label":"Status dörr kontoret","value":"Öppen"}]',
+            value: '[{"key":"key","label":"Huvudnyckel","value":"På plats"},{"key":"door","label":"Dörr kontoret","value":"Öppen"}]',
         },
     ]);
 
