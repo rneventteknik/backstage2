@@ -518,7 +518,7 @@ const BookingForm: React.FC<Props> = ({
                         </Col>
                         <Col lg="4" md="4">
                             <Form.Group controlId="formSalaryStatus">
-                                <Form.Label>Lönestatus</Form.Label>
+                                <Form.Label>Timarvodesstatus</Form.Label>
                                 <Form.Control as="select" name="salaryStatus" defaultValue={booking.salaryStatus}>
                                     <option value={SalaryStatus.NOT_SENT}>
                                         {getSalaryStatusName(SalaryStatus.NOT_SENT)}

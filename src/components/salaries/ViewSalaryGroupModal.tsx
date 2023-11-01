@@ -87,13 +87,13 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
         fetch('/api/salaryGroups/' + salaryGroup.id, request)
             .then(getResponseContentOrError)
             .then(() => {
-                showDeleteSuccessNotification('Löneunderlagsgruppen');
+                showDeleteSuccessNotification('Timarvodesunderlagsgruppen');
                 onMutate();
                 onHide();
             })
             .catch((error) => {
                 console.error(error);
-                showDeleteFailedNotification('Löneunderlagsgruppen');
+                showDeleteFailedNotification('Timarvodesunderlagsgruppen');
                 onMutate();
             });
     };
@@ -109,12 +109,12 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
         fetch('/api/salaryGroups/' + salaryGroup.id, request)
             .then(getResponseContentOrError)
             .then(() => {
-                showSaveSuccessNotification('Löneunderlagsgruppen');
+                showSaveSuccessNotification('Timarvodesunderlagsgruppen');
                 onMutate();
             })
             .catch((error) => {
                 console.error(error);
-                showSaveFailedNotification('Löneunderlagsgruppen');
+                showSaveFailedNotification('Timarvodesunderlagsgruppen');
                 onMutate();
             });
     };
@@ -146,7 +146,8 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                                 target="_blank"
                                 disabled={deSelectedBookingIds.length === salaryGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Exportera löneunderlag
+                                <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Exportera
+                                timarvodesunderlag
                             </Button>
 
                             <Button
@@ -156,7 +157,7 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                                 disabled={deSelectedBookingIds.length === salaryGroup.bookings?.length}
                             >
                                 <FontAwesomeIcon icon={faPaperPlane} className="mr-2 fa-fw" />
-                                Markera lön som skickad
+                                Markera timarvode som skickat
                             </Button>
 
                             <DropdownButton
@@ -167,12 +168,12 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                             >
                                 <Dropdown.Item onClick={() => setShowChangeNameModal(true)}>
                                     <FontAwesomeIcon icon={faPen} className="mr-1 fa-fw" /> Byt namn på
-                                    löneunderlagsgrupp
+                                    timarvodesunderlagsgrupp
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={() => setShowConfirmDeleteModal(true)} className="text-danger">
                                     <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort
-                                    löneunderlagsgrupp
+                                    timarvodesunderlagsgrupp
                                 </Dropdown.Item>
                             </DropdownButton>
 
@@ -211,7 +212,7 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                         confirmLabel="Ta bort"
                         confirmButtonType="danger"
                     >
-                        Är du säker på att du vill ta bort löneunderlagsgruppen {salaryGroup.name}?
+                        Är du säker på att du vill ta bort timarvodesunderlagsgruppen {salaryGroup.name}?
                     </ConfirmModal>
                 </>
             ) : null}

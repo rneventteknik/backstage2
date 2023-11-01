@@ -327,11 +327,11 @@ const AdminBookingList: React.FC<Props> = ({
             },
             {
                 key: 'salaryStatus',
-                displayName: 'Lönestatus',
+                displayName: 'Timarvodesstatus',
                 getValue: (booking: BookingViewModel) => getSalaryStatusName(booking.salaryStatus),
                 textAlignment: 'left',
                 cellHideSize: 'xl',
-                columnWidth: 110,
+                columnWidth: 130,
                 getContentOverride: bookingSalaryStatusDisplayFn,
             },
         ],

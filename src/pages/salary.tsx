@@ -27,7 +27,7 @@ import { SalaryStatus } from '../models/enums/SalaryStatus';
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
-const pageTitle = 'Löneunderlag';
+const pageTitle = 'Timarvodesunderlag';
 const breadcrumbs = [{ link: '/salary/', displayName: pageTitle }];
 
 const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
@@ -69,14 +69,14 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             .then((apiResponse) => getResponseContentOrError<ISalaryGroupObjectionModel>(apiResponse))
             .then((data) => {
                 mutate();
-                showCreateSuccessNotification('Löneunderlagsgruppen');
+                showCreateSuccessNotification('Timarvodesunderlagsgruppen');
                 if (data.id) {
                     setSalaryGroupToViewId(data.id);
                 }
             })
             .catch((error: Error) => {
                 console.error(error);
-                showCreateFailedNotification('Löneunderlagsgruppen');
+                showCreateFailedNotification('Timarvodesunderlagsgruppen');
             });
     };
 
@@ -124,13 +124,13 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
     };
 
     const tableSettings: TableConfiguration<SalaryGroup> = {
-        entityTypeDisplayName: 'Löneunderlagsgrupper',
+        entityTypeDisplayName: 'Timarvodesunderlagsgrupper',
         defaultSortPropertyName: 'created',
         defaultSortAscending: false,
         columns: [
             {
                 key: 'name',
-                displayName: 'Löneunderlagsgrupp',
+                displayName: 'Timarvodesunderlagsgrupp',
                 getValue: (salaryGroup: SalaryGroup) => salaryGroup.name,
                 textTruncation: true,
                 getContentOverride: salaryGroupNameDisplayFn,
@@ -175,7 +175,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button onClick={() => setShowCreateModal(true)}>
-                    <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Löneunderlagsgrupp
+                    <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Timarvodesunderlagsgrupp
                 </Button>
             </Header>
             <TableDisplay entities={salaryGroups ?? []} configuration={{ ...tableSettings }} />

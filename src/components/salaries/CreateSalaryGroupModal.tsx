@@ -22,7 +22,7 @@ type Props = {
 const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Props) => {
     const [selectedBookingIds, setSelectedBookingIds] = useState<number[]>([]);
     const [selectedGroupName, setSelectedGroupName] = useState<string>(
-        'Löneunderlagsgrupp skapad ' + formatDatetime(new Date()),
+        'Timarvodesunderlagsgrupp skapad ' + formatDatetime(new Date()),
     );
     const [allowAllBookings, setAllowAllBookings] = useState<boolean>(false);
     const [hideLockedBookings, setHideLockedBookings] = useState<boolean>(true);
@@ -94,7 +94,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
     return (
         <Modal show={show} onHide={() => resetAndHide()} size="xl">
             <Modal.Header closeButton>
-                <Modal.Title>Skapa Löneunderlagsgrupp</Modal.Title>
+                <Modal.Title>Skapa Timarvodesunderlagsgrupp</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form.Group controlId="formName">
@@ -146,7 +146,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
                     showHeadings={true}
                 />
                 <Button onClick={createGroup} variant="primary" disabled={selectedBookingIds.length === 0}>
-                    Skapa Löneunderlagsgrupp
+                    Skapa Timarvodesunderlagsgrupp
                 </Button>
             </Modal.Body>
         </Modal>

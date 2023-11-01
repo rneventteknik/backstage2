@@ -108,7 +108,7 @@ const sidebar: React.FC<Props> = ({ currentUser, globalSettings }: Props) => (
         <IfAdmin currentUser={currentUser}>
             <SidebarLinkGroup title="Administration">
                 <SidebarLink displayName="Översikt" link="/admin-overview" icon={faListCheck} />
-                <SidebarLink displayName="Löneunderlag" link="/salary" icon={faMoneyBillWave} />
+                <SidebarLink displayName="Timarvodesunderlag" link="/salary" icon={faMoneyBillWave} />
                 <SidebarLink displayName="Fakturaunderlag" link="/invoices" icon={faFileInvoiceDollar} />
                 <SidebarLink displayName="Inställningar" link="/settings" icon={faCog} />
             </SidebarLinkGroup>
