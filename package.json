@@ -1,6 +1,10 @@
 {
     "name": "backstage2",
     "version": "1.5.1-gooseberry",
+    "engines": {
+        "yarn": "^1.0.0",
+        "node": "^18.0.0"
+    },
     "scripts": {
         "dev": "next",
         "build": "next build",
