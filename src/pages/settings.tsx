@@ -9,6 +9,7 @@ import {
     equipmentLocationsFetcher,
     equipmentPublicCategoriesFetcher,
     equipmentTagsFetcher,
+    statusTrackingsFetcher,
 } from '../lib/fetchers';
 import BaseEntityWithNamesEditor from '../components/settings/BaseEntityWithNamesEditor';
 import EquipmentTagEditor from '../components/settings/EquipmentTagEditor';
@@ -17,6 +18,7 @@ import EquipmentPublicCategoryEditor from '../components/settings/EquipmentPubli
 import CustomerEditor from '../components/settings/CustomerEditor';
 import GeneralSettingsEditor from '../components/settings/GeneralSettingsEditor';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import StatusTrackingEditor from '../components/settings/StatusTrackingEditor';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -45,6 +47,9 @@ const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                     <Nav.Item>
                         <Nav.Link eventKey="equipmentPublicCategories">Publika Kategorier</Nav.Link>
                     </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="statusTracking">Status</Nav.Link>
+                    </Nav.Item>{' '}
                     <Nav.Item>
                         <Nav.Link eventKey="generalSettings">Systeminställningar</Nav.Link>
                     </Nav.Item>
@@ -87,6 +92,16 @@ const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                             getEditComponent={(entity, save) => (
                                 <EquipmentPublicCategoryEditor entity={entity} save={save} />
                             )}
+                            sortBySortIndex={true}
+                        />
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="statusTracking">
+                        <BaseEntityWithNamesEditor
+                            fetcher={statusTrackingsFetcher}
+                            apiUrl={'/api/statusTracking'}
+                            entityName={'statusTracking'}
+                            entityDisplayName={'Status'}
+                            getEditComponent={(entity, save) => <StatusTrackingEditor entity={entity} save={save} />}
                             sortBySortIndex={true}
                         />
                     </Tab.Pane>

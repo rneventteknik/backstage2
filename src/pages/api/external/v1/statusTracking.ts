@@ -7,10 +7,12 @@ import {
     respondWithInvalidMethodResponse,
 } from '../../../../lib/apiResponses';
 import { SessionContext, withApiKeyContext } from '../../../../lib/sessionContext';
-import { fetchSettings, updateSetting } from '../../../../lib/db-access/setting';
-import { toSetting } from '../../../../lib/mappers/setting';
 import { Role } from '../../../../models/enums/Role';
-import { StatusTrackingData } from '../../../../models/misc/StatusTrackingData';
+import {
+    fetchStatusTrackingByKey,
+    fetchStatusTrackingsPublic,
+    updateStatusTracking,
+} from '../../../../lib/db-access/statusTracking';
 
 const handler = withApiKeyContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -21,19 +23,11 @@ const handler = withApiKeyContext(
             return;
         }
 
-        const globalSettings = await fetchSettings();
-        const statusTrackingSetting = globalSettings?.find((x) => x.key == 'system.statusTracking');
-
-        if (!statusTrackingSetting || !statusTrackingSetting.value) {
-            respondWithEntityNotFoundResponse(res);
-            return;
-        }
-
-        const statusTrackingData = JSON.parse(statusTrackingSetting.value) as StatusTrackingData;
-
         switch (req.method) {
             case 'GET':
-                res.status(200).send(statusTrackingSetting?.value);
+                await fetchStatusTrackingsPublic()
+                    .then((result) => (result ? res.status(200).json(result) : respondWithEntityNotFoundResponse(res)))
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;
 
             case 'POST':
@@ -42,18 +36,19 @@ const handler = withApiKeyContext(
                     return;
                 }
 
-                if (!statusTrackingData.some((x) => x.key === statusUpdate.key)) {
+                const statusTracking = await fetchStatusTrackingByKey(statusUpdate.key.trim());
+
+                if (!statusTracking) {
                     respondWithEntityNotFoundResponse(res);
                     return;
                 }
 
-                const updatedStatusTrackingData = statusTrackingData.map((x) =>
-                    x.key !== statusUpdate.key ? x : { ...x, value: statusUpdate.value, updated: new Date() },
-                );
-                statusTrackingSetting.value = JSON.stringify(updatedStatusTrackingData);
-
-                return updateSetting(Number(toSetting(statusTrackingSetting).id), statusTrackingSetting)
-                    .then(() => res.status(200).json(updatedStatusTrackingData))
+                return updateStatusTracking(statusTracking.id, {
+                    ...statusTracking,
+                    value: statusUpdate.value,
+                    lastStatusUpdate: new Date().toISOString(),
+                })
+                    .then(() => res.status(200).json({ value: statusUpdate.value }))
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
             default:

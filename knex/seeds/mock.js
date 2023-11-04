@@ -2048,14 +2048,7 @@ export async function seed(knex) {
             value: 'danger',
         },
         {
-            key: 'system.statusTracking',
-            note: 'En lista på statusar som kan sättas via API av andra tjänster och visas i stage, i form av en JSON-array med JSON-objekt.',
-            created: getVarianceDateString(-100),
-            updated: getVarianceDateString(100),
-            value: '[{"key":"key","label":"Huvudnyckel","value":"På plats"},{"key":"door","label":"Dörr kontoret","value":"Öppen"}]',
-        },
-        {
-            key: 'system.statusTracking.timeBeforeObsolete',
+            key: 'statusTracking.timeBeforeObsolete',
             note: 'Tiden innan en status inte längre räknas som aktuell och en varning visas, anger i millisekunder.',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
