@@ -340,6 +340,7 @@ const getDateDisplayValues = (entity: HasDatetimes, hasTimeValues: boolean, loca
             locale,
         ),
         isoFormattedUsageStartString: formatDatetimeForForm(entity.usageStartDatetime),
+        isoFormattedUsageEndString: formatDatetimeForForm(entity.usageEndDatetime),
         monthYearUsageStartString: formatMonthYear(entity.usageStartDatetime),
     };
 };

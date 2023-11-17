@@ -17,6 +17,7 @@ import { getSortedList } from '../lib/sortIndexUtils';
 import { Status } from '../models/enums/Status';
 import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import AccountStatistics from '../components/statistics/AccountStatistics';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -431,6 +432,9 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
                     <Nav.Item>
                         <Nav.Link eventKey="users">Användare</Nav.Link>
                     </Nav.Item>
+                    <Nav.Item>
+                        <Nav.Link eventKey="accounts">Konton</Nav.Link>
+                    </Nav.Item>
                 </Nav>
                 <p className="text-muted font-italic mt-2">
                     Statistiken nedan är presenterad exklusive moms och endast klarmarkerade bokningar är inkluderade.
@@ -468,6 +472,9 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
                                 />
                             </Card>
                         ))}{' '}
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="accounts">
+                        <AccountStatistics bookings={bookingsViewModels} globalSettings={globalSettings} />
                     </Tab.Pane>
                 </Tab.Content>
             </Tab.Container>
