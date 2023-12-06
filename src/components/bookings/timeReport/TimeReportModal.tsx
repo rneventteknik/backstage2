@@ -17,6 +17,7 @@ type Props = {
     setTimeReport: (timeReport: Partial<TimeReport>) => void;
     defaultLaborHourlyRate: number;
     formId: string;
+    readonly?: boolean;
     onSubmit: (timeReport: ITimeReportObjectionModel) => void;
     onHide: () => void;
 };
@@ -29,6 +30,7 @@ const TimeReportModal: React.FC<Props> = ({
     defaultLaborHourlyRate,
     onSubmit,
     onHide,
+    readonly = false,
 }: Props) => {
     const { data: users } = useSwr('/api/users', usersFetcher);
 
@@ -72,7 +74,9 @@ const TimeReportModal: React.FC<Props> = ({
     return (
         <Modal show={!!timeReport} onHide={() => handleHide()} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{timeReport?.id ? 'Redigera tidrapport' : 'Ny tidrapport'}</Modal.Title>
+                <Modal.Title>
+                    {readonly ? 'Visa tidsrapport' : timeReport?.id ? 'Redigera tidrapport' : 'Ny tidrapport'}
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit} id={formId}>
@@ -87,6 +91,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     type="text"
                                     required
                                     defaultValue={timeReport?.name}
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
@@ -106,6 +111,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     defaultValue={formatDatetimeForForm(timeReport?.startDatetime)}
                                     type="datetime-local"
                                     required
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
@@ -125,6 +131,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     defaultValue={formatDatetimeForForm(timeReport?.endDatetime)}
                                     type="datetime-local"
                                     required
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
@@ -147,6 +154,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     <Form.Control
                                         type="text"
                                         required
+                                        readOnly={readonly}
                                         defaultValue={timeReport?.pricePerHour}
                                         onChange={(e) =>
                                             setTimeReport({
@@ -176,6 +184,7 @@ const TimeReportModal: React.FC<Props> = ({
                                         defaultValue={timeReport?.billableWorkingHours}
                                         placeholder={calculatedWorkingHours.toString()}
                                         type="text"
+                                        readOnly={readonly}
                                         onChange={(e) =>
                                             setTimeReport({
                                                 ...timeReport,
@@ -200,6 +209,7 @@ const TimeReportModal: React.FC<Props> = ({
                                         defaultValue={timeReport?.actualWorkingHours}
                                         placeholder={calculatedWorkingHours.toString()}
                                         type="text"
+                                        readOnly={readonly}
                                         onChange={(e) =>
                                             setTimeReport({
                                                 ...timeReport,
@@ -226,6 +236,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     as="select"
                                     defaultValue={timeReport?.userId}
                                     required
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
@@ -250,12 +261,20 @@ const TimeReportModal: React.FC<Props> = ({
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={() => handleHide()}>
-                    Avbryt
-                </Button>
-                <Button form={formId} type="submit" variant="primary">
-                    Spara
-                </Button>
+                {readonly ? (
+                    <Button variant="primary" onClick={() => handleHide()}>
+                        Stäng
+                    </Button>
+                ) : (
+                    <>
+                        <Button variant="secondary" onClick={() => handleHide()}>
+                            Avbryt
+                        </Button>
+                        <Button form={formId} type="submit" variant="primary">
+                            Spara
+                        </Button>
+                    </>
+                )}
             </Modal.Footer>
         </Modal>
     );

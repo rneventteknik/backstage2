@@ -9,9 +9,10 @@ import { Status } from '../models/enums/Status';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
 import { formatDateForForm, getBookingDateHeadingValue, validDate } from '../lib/datetimeUtils';
-import { useLocalStorageState, useLocalStorageStateForDate } from '../lib/useLocalStorageState';
 import AdvancedFilters from './AdvancedFilters';
 import BookingStatusTag from './utils/BookingStatusTag';
+import { useSessionStorageState, useSessionStorageStateForDate } from '../lib/useSessionStorageState';
+import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
@@ -20,6 +21,7 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
         <BookingStatusTag booking={booking} className="ml-1" />
         <BookingTypeTag booking={booking} className="ml-1" />
         <RentalStatusTag booking={booking} className="ml-1" />
+        <FixedPriceStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
     </>
 );
@@ -83,11 +85,11 @@ type Props = {
 };
 
 const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }: Props) => {
-    const [searchText, setSearchText] = useLocalStorageState('large-booking-table-search-text', '');
-    const [userIds, setUserIds] = useLocalStorageState<number[]>('large-booking-table-user-ids', []);
-    const [statuses, setStatuses] = useLocalStorageState<Status[]>('large-booking-table-statuses', []);
-    const [startDate, setStartDate] = useLocalStorageStateForDate('large-booking-table-start-date');
-    const [endDate, setEndDate] = useLocalStorageStateForDate('large-booking-table-end-date');
+    const [searchText, setSearchText] = useSessionStorageState('large-booking-table-search-text', '');
+    const [userIds, setUserIds] = useSessionStorageState<number[]>('large-booking-table-user-ids', []);
+    const [statuses, setStatuses] = useSessionStorageState<Status[]>('large-booking-table-statuses', []);
+    const [startDate, setStartDate] = useSessionStorageStateForDate('large-booking-table-start-date');
+    const [endDate, setEndDate] = useSessionStorageStateForDate('large-booking-table-end-date');
 
     // Generate option lists for filters
     //

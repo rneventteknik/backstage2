@@ -36,7 +36,14 @@ const getEncodedInvoices = async (id: number) => {
         const ourReference = getGlobalSetting('invoice.ourReference', globalSettings);
         const templateName = getGlobalSetting('invoice.templateName', globalSettings);
         const documentName = getGlobalSetting('invoice.documentName', globalSettings);
-        const defaultEquipmentAccount = getGlobalSetting('accounts.defaultEquipmentAccount', globalSettings);
+        const defaultEquipmentAccountExternal = getGlobalSetting(
+            'accounts.defaultEquipmentAccount.external',
+            globalSettings,
+        );
+        const defaultEquipmentAccountInternal = getGlobalSetting(
+            'accounts.defaultEquipmentAccount.internal',
+            globalSettings,
+        );
         const defaultSalaryAccountExternal = getGlobalSetting('accounts.defaultSalaryAccount.external', globalSettings);
         const defaultSalaryAccountInternal = getGlobalSetting('accounts.defaultSalaryAccount.internal', globalSettings);
         const locale = booking.language === Language.EN ? 'en-SE' : 'sv-SE';
@@ -47,7 +54,8 @@ const getEncodedInvoices = async (id: number) => {
             ourReference,
             templateName,
             documentName,
-            defaultEquipmentAccount,
+            defaultEquipmentAccountExternal,
+            defaultEquipmentAccountInternal,
             defaultSalaryAccountExternal,
             defaultSalaryAccountInternal,
             t,

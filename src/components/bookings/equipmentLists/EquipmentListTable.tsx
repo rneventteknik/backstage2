@@ -456,7 +456,11 @@ const EquipmentListTable: React.FC<Props> = ({
                 <Dropdown.Item href={'/equipment/' + entry.equipmentId} target="_blank" disabled={!entry.equipment}>
                     <FontAwesomeIcon icon={faExternalLink} className="mr-1 fa-fw" /> Öppna utrustning i ny flik
                 </Dropdown.Item>
-                {readonly ? null : (
+                {readonly ? (
+                    <Dropdown.Item onClick={() => editEntry(entry)}>
+                        <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Visa detaljer
+                    </Dropdown.Item>
+                ) : (
                     <>
                         <Dropdown.Item onClick={() => toggleHideListEntry(entry, saveListEntry)}>
                             <FontAwesomeIcon icon={entry.isHidden ? faEye : faEyeSlash} className="mr-1 fa-fw" />{' '}
@@ -759,6 +763,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                 setEquipmentPackageToAdd(null);
                                 setEquipmentPackageTimeEstimateToAdd(null);
                             }}
+                            showWizard={false}
                         />
                     ) : null}
                 </div>

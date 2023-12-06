@@ -7,6 +7,7 @@ import { getNumberOfBookingDays, getNumberOfEventHours } from '../../lib/datetim
 import BookingStatusTag from '../utils/BookingStatusTag';
 import BookingTypeTag from '../utils/BookingTypeTag';
 import RentalStatusTag from '../utils/RentalStatusTag';
+import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
 
 type Props = {
     booking: BookingViewModel;
@@ -35,10 +36,11 @@ const BookingInfoSection: React.FC<Props> = ({ booking, className, showName = tr
                         {getLanguageName(booking.language)}
                     </Badge>
                 ) : null}
+                <FixedPriceStatusTag booking={booking} className="ml-1" />
                 <div className="text-muted mt-2"> {booking.customerName}</div>
                 <div className="text-muted">
                     {getNumberOfBookingDays(booking) ? `${getNumberOfBookingDays(booking)} debiterade dagar / ` : null}
-                    {getNumberOfEventHours(booking)} arbetstimmar
+                    {getNumberOfEventHours(booking)} fakturerade timmar
                 </div>
                 <div className="text-muted">{booking.displayUsageInterval}</div>
             </Card.Header>

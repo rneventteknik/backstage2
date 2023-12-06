@@ -8,11 +8,12 @@ import {
     getDefaultLaborHourlyRate,
     getPricePlanName,
     getResponseContentOrError,
+    getOperationalYear,
 } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
-import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
+import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import { bookingFetcher } from '../../../lib/fetchers';
 import TimeEstimateList from '../../../components/bookings/timeEstimate/TimeEstimateList';
 import TimeReportList from '../../../components/bookings/timeReport/TimeReportList';
@@ -20,7 +21,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faCoins, faFileDownload, faPen } from '@fortawesome/free-solid-svg-icons';
+import { faCoins, faFileDownload, faLock, faLockOpen, faPen } from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
 import EquipmentLists from '../../../components/bookings/equipmentLists/EquipmentLists';
 import BookingStatusButton from '../../../components/bookings/BookingStatusButton';
@@ -36,15 +37,17 @@ import {
     getBookingPrice,
     getEquipmentListPrice,
     getTotalTimeEstimatesPrice,
+    getTotalTimeReportsPrice,
 } from '../../../lib/pricingUtils';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
-import { toBookingViewModel } from '../../../lib/datetimeUtils';
+import { formatDateForForm, toBookingViewModel } from '../../../lib/datetimeUtils';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import MarkdownCard from '../../../components/MarkdownCard';
 import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButton';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 import BookingInfoSection from '../../../components/bookings/BookingInfoSection';
+import FilesCard from '../../../components/bookings/FilesCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -56,6 +59,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     // Enable this when we enable the KårX feature
     // const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
     const [showConfirmPaidModal, setShowConfirmPaidModal] = useState(false);
+    const [adminEditModeOverrideEnabled, setAdminEditModeOverrideEnabled] = useState(false);
 
     // Edit booking
     //
@@ -135,21 +139,25 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
     const defaultLaborHourlyRate = getDefaultLaborHourlyRate(booking.pricePlan, globalSettings);
 
+    const readonly =
+        (currentUser.role === Role.READONLY || booking.status === Status.DONE) && !adminEditModeOverrideEnabled;
+    const timeReportExists = booking.timeReports && booking.timeReports.length > 0;
+
     return (
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
-                <IfNotReadonly currentUser={currentUser}>
-                    <IfAdmin currentUser={currentUser} or={booking.status !== Status.DONE}>
+                {!readonly ? (
+                    <>
                         <Link href={'/bookings/' + booking.id + '/edit'} passHref>
                             <Button variant="primary" href={'/bookings/' + booking.id + '/edit'}>
                                 <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                             </Button>
                         </Link>
-                    </IfAdmin>
 
-                    <BookingStatusButton booking={booking} onChange={saveBooking} />
-                    <BookingRentalStatusButton booking={booking} onChange={saveBooking} />
-                </IfNotReadonly>
+                        <BookingStatusButton booking={booking} onChange={saveBooking} />
+                        <BookingRentalStatusButton booking={booking} onChange={saveBooking} />
+                    </>
+                ) : null}
                 <Dropdown as={ButtonGroup}>
                     <Button
                         variant="secondary"
@@ -216,6 +224,18 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         Vill du markera bokningen <em>{booking.name}</em> som skall ej faktureras?
                     </ConfirmModal>
                 </IfNotReadonly>
+
+                {currentUser.role === Role.ADMIN && booking.status === Status.DONE ? (
+                    <Button variant="secondary" onClick={() => setAdminEditModeOverrideEnabled((x) => !x)}>
+                        <FontAwesomeIcon
+                            icon={adminEditModeOverrideEnabled ? faLock : faLockOpen}
+                            className="mr-1 fw"
+                        />{' '}
+                        {adminEditModeOverrideEnabled
+                            ? 'Sluta redigera klarmarkerad bokning'
+                            : 'Redigera klarmarkerad bokning'}
+                    </Button>
+                ) : null}
             </Header>
 
             <Row className="mb-3">
@@ -224,19 +244,19 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <TimeEstimateList
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                        readonly={readonly}
                         defaultLaborHourlyRate={defaultLaborHourlyRate}
                     />
                     <TimeReportList
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
                         currentUser={currentUser}
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                        readonly={readonly}
                         defaultLaborHourlyRate={defaultLaborHourlyRate}
                     />
                     <EquipmentLists
                         bookingId={booking.id}
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                        readonly={readonly}
                         globalSettings={globalSettings}
                         defaultLaborHourlyRate={defaultLaborHourlyRate}
                     />
@@ -259,18 +279,57 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                 </span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
-                                <strong className="flex-grow-1">Totalpris</strong>
+                                <strong className="flex-grow-1">Estimerat pris</strong>
                                 <strong>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true, true)))}</strong>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
-                                <strong className="flex-grow-1">varav moms (25%)</strong>
-                                <strong>
+                                <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                <em>
                                     {formatNumberAsCurrency(
                                         addVAT(getBookingPrice(booking, true, true)) -
                                             getBookingPrice(booking, true, true),
                                     )}
-                                </strong>
+                                </em>
                             </ListGroup.Item>
+                            {timeReportExists ? (
+                                <>
+                                    <ListGroup.Item className="d-flex">
+                                        <span className="flex-grow-1">Faktisk personalkostnad</span>
+                                        <span>
+                                            {formatNumberAsCurrency(
+                                                addVAT(getTotalTimeReportsPrice(booking.timeReports)),
+                                            )}
+                                        </span>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <strong className="flex-grow-1">Faktiskt pris</strong>
+                                        <strong>
+                                            {formatNumberAsCurrency(addVAT(getBookingPrice(booking, false, true)))}
+                                        </strong>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                        <em>
+                                            {formatNumberAsCurrency(
+                                                addVAT(getBookingPrice(booking, false, true)) -
+                                                    getBookingPrice(booking, false, true),
+                                            )}
+                                        </em>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <span className="flex-grow-1">Skillnad mot estimerat pris</span>
+                                        <span>
+                                            {formatNumberAsCurrency(
+                                                addVAT(
+                                                    getBookingPrice(booking, false, true) -
+                                                        getBookingPrice(booking, true, true),
+                                                ),
+                                                true,
+                                            )}
+                                        </span>
+                                    </ListGroup.Item>
+                                </>
+                            ) : null}
                             {booking.fixedPrice !== null && booking.fixedPrice !== undefined ? (
                                 <>
                                     <ListGroup.Item className="d-flex">
@@ -278,19 +337,32 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                         <strong>{formatNumberAsCurrency(addVAT(booking.fixedPrice))}</strong>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
-                                        <strong className="flex-grow-1">varav moms (25%)</strong>
-                                        <strong>
+                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                        <em>
                                             {formatNumberAsCurrency(addVAT(booking.fixedPrice) - booking.fixedPrice)}
-                                        </strong>
+                                        </em>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <strong className="flex-grow-1">Skillnad mot beräknat pris</strong>
-                                        <strong>
-                                            {formatNumberAsCurrency(
-                                                addVAT(booking.fixedPrice - getBookingPrice(booking, true, true)),
-                                            )}
-                                        </strong>
-                                    </ListGroup.Item>
+                                    {timeReportExists ? (
+                                        <ListGroup.Item className="d-flex">
+                                            <span className="flex-grow-1">Skillnad mot faktiskt pris</span>
+                                            <span>
+                                                {formatNumberAsCurrency(
+                                                    addVAT(booking.fixedPrice - getBookingPrice(booking, false, true)),
+                                                    true,
+                                                )}
+                                            </span>
+                                        </ListGroup.Item>
+                                    ) : (
+                                        <ListGroup.Item className="d-flex">
+                                            <span className="flex-grow-1">Skillnad mot estimerat pris</span>
+                                            <span>
+                                                {formatNumberAsCurrency(
+                                                    addVAT(booking.fixedPrice - getBookingPrice(booking, true, true)),
+                                                    true,
+                                                )}
+                                            </span>
+                                        </ListGroup.Item>
+                                    )}
                                 </>
                             ) : null}
                         </ListGroup>
@@ -349,13 +421,21 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         text={booking.note}
                         onSubmit={(note) => saveBooking({ note })}
                         cardTitle="Anteckningar"
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                        readonly={readonly}
                     />
+                    <FilesCard
+                        driveFolderId={booking.driveFolderId}
+                        defaultFolderName={`${formatDateForForm(booking.usageStartDatetime, 'N/A')} ${booking.name}`}
+                        defaultParentFolder={getOperationalYear(booking.usageStartDatetime)}
+                        onSubmit={(driveFolderId) => saveBooking({ driveFolderId })}
+                        readonly={readonly}
+                    />
+
                     <MarkdownCard
                         text={booking.returnalNote}
                         onSubmit={(returnalNote) => saveBooking({ returnalNote })}
                         cardTitle="Återlämningsanmärkning"
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                        readonly={readonly}
                     />
                     <ChangelogCard changelog={booking.changelog ?? []} />
                 </Col>

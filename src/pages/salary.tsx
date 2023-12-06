@@ -17,21 +17,26 @@ import { ISalaryGroupObjectionModel } from '../models/objection-models/SalaryGro
 import { PartialDeep } from 'type-fest';
 import { useNotifications } from '../lib/useNotifications';
 import { getResponseContentOrError } from '../lib/utils';
-import { PaymentStatus } from '../models/enums/PaymentStatus';
 import DoneIcon from '../components/utils/DoneIcon';
 import { formatDatetime } from '../lib/datetimeUtils';
 import CreateSalaryGroupModal from '../components/salaries/CreateSalaryGroupModal';
 import ViewSalaryGroupModal from '../components/salaries/ViewSalaryGroupModal';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import { SalaryStatus } from '../models/enums/SalaryStatus';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
-const pageTitle = 'Löneunderlag';
+const pageTitle = 'Timarvodesunderlag';
 const breadcrumbs = [{ link: '/salary/', displayName: pageTitle }];
 
 const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: salaryGroups, error, isValidating, mutate } = useSwr('/api/salaryGroups', salaryGroupsFetcher);
+    const {
+        data: salaryGroups,
+        error,
+        isValidating,
+        mutate,
+    } = useSwr('/api/salaryGroups', salaryGroupsFetcher, { revalidateOnFocus: false, revalidateOnReconnect: false });
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [salaryGroupToViewId, setSalaryGroupToViewId] = useState<number | null>(null);
     const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
@@ -64,14 +69,14 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             .then((apiResponse) => getResponseContentOrError<ISalaryGroupObjectionModel>(apiResponse))
             .then((data) => {
                 mutate();
-                showCreateSuccessNotification('Löneunderlagsgruppen');
+                showCreateSuccessNotification('Timarvodesunderlagsgruppen');
                 if (data.id) {
                     setSalaryGroupToViewId(data.id);
                 }
             })
             .catch((error: Error) => {
                 console.error(error);
-                showCreateFailedNotification('Löneunderlagsgruppen');
+                showCreateFailedNotification('Timarvodesunderlagsgruppen');
             });
     };
 
@@ -81,15 +86,15 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             <p className="text-muted mb-0">
                 {salaryGroup.bookings?.length ?? 'N/A'} {salaryGroup.bookings?.length === 1 ? 'bokning' : 'bokningar'}
             </p>
-            <p className="text-muted mb-0 d-sm-none">{getPaymentStatusString(salaryGroup)}</p>
+            <p className="text-muted mb-0 d-sm-none">{getSalaryStatusString(salaryGroup)}</p>
             <p className="text-muted mb-0 d-lg-none">{salaryGroup.user?.name}</p>
         </div>
     );
 
-    const paymentStatusDisplayFn = (salaryGroup: SalaryGroup) => (
+    const salaryStatusDisplayFn = (salaryGroup: SalaryGroup) => (
         <>
-            {getPaymentStatusString(salaryGroup)}
-            {getPaymentStatusString(salaryGroup) === 'Betald' ? <DoneIcon /> : null}
+            {getSalaryStatusString(salaryGroup)}
+            {getSalaryStatusString(salaryGroup) === 'Skickad' ? <DoneIcon /> : null}
         </>
     );
 
@@ -106,62 +111,26 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         </>
     );
 
-    const getPaymentStatusString = (salaryGroup: SalaryGroup): string | number | Date => {
-        if (
-            salaryGroup.bookings?.every(
-                (b) =>
-                    b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
-                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
-                    b.paymentStatus === PaymentStatus.PAID,
-            )
-        ) {
-            return 'Betald';
+    const getSalaryStatusString = (salaryGroup: SalaryGroup): string | number | Date => {
+        if (salaryGroup.bookings?.every((b) => b.salaryStatus === SalaryStatus.SENT)) {
+            return 'Skickad';
         }
 
-        if (
-            salaryGroup.bookings?.some(
-                (b) =>
-                    b.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
-                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
-                    b.paymentStatus === PaymentStatus.PAID,
-            )
-        ) {
-            return 'Delvis betald';
+        if (salaryGroup.bookings?.some((b) => b.salaryStatus === SalaryStatus.SENT)) {
+            return 'Delvis skickad';
         }
 
-        if (
-            salaryGroup.bookings?.every(
-                (b) =>
-                    b.paymentStatus === PaymentStatus.INVOICED ||
-                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
-                    b.paymentStatus === PaymentStatus.PAID,
-            )
-        ) {
-            return 'Fakturerad';
-        }
-
-        if (
-            salaryGroup.bookings?.some(
-                (b) =>
-                    b.paymentStatus === PaymentStatus.INVOICED ||
-                    b.paymentStatus === PaymentStatus.PAID_WITH_CASH ||
-                    b.paymentStatus === PaymentStatus.PAID,
-            )
-        ) {
-            return 'Delvis fakturerad';
-        }
-
-        return 'Inte fakturerad';
+        return 'Inte skickad';
     };
 
     const tableSettings: TableConfiguration<SalaryGroup> = {
-        entityTypeDisplayName: 'Löneunderlagsgrupper',
+        entityTypeDisplayName: 'Timarvodesunderlagsgrupper',
         defaultSortPropertyName: 'created',
         defaultSortAscending: false,
         columns: [
             {
                 key: 'name',
-                displayName: 'Löneunderlagsgrupp',
+                displayName: 'Timarvodesunderlagsgrupp',
                 getValue: (salaryGroup: SalaryGroup) => salaryGroup.name,
                 textTruncation: true,
                 getContentOverride: salaryGroupNameDisplayFn,
@@ -169,9 +138,9 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             {
                 key: 'status',
                 displayName: 'Status',
-                getValue: (salaryGroup: SalaryGroup) => getPaymentStatusString(salaryGroup),
+                getValue: (salaryGroup: SalaryGroup) => getSalaryStatusString(salaryGroup),
                 textTruncation: true,
-                getContentOverride: paymentStatusDisplayFn,
+                getContentOverride: salaryStatusDisplayFn,
                 cellHideSize: 'sm',
             },
             {
@@ -206,7 +175,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button onClick={() => setShowCreateModal(true)}>
-                    <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Löneunderlagsgrupp
+                    <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Timarvodesunderlagsgrupp
                 </Button>
             </Header>
             <TableDisplay entities={salaryGroups ?? []} configuration={{ ...tableSettings }} />

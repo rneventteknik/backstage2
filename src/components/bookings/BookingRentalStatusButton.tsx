@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Booking } from '../../models/interfaces';
 import { IBookingObjectionModel } from '../../models/objection-models';
-import { Button } from 'react-bootstrap';
+import { Alert, Button } from 'react-bootstrap';
 import { BookingType } from '../../models/enums/BookingType';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightFromBracket, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
@@ -9,6 +9,7 @@ import { RentalStatus } from '../../models/enums/RentalStatus';
 import { PartialDeep } from 'type-fest';
 import BookingReturnalNoteModal from './BookingReturnalNoteModal';
 import ConfirmModal from '../utils/ConfirmModal';
+import { Status } from '../../models/enums/Status';
 
 type Props = {
     booking: Partial<Booking>;
@@ -58,7 +59,14 @@ const BookingRentalStatusButton: React.FC<Props> = ({ booking, onChange, classNa
                     confirmLabel="Lämna ut"
                     confirmButtonType="primary"
                 >
-                    Är du säker på att du vill lämna ut bokningen {booking.name}?
+                    {booking.status === Status.DRAFT ? (
+                        <Alert variant="danger">
+                            Är du säker på att du vill lämna ut bokningen {booking.name} trots att den är ett utkast?
+                            Bokningar som lämnas ut bör vara bokade.
+                        </Alert>
+                    ) : (
+                        <>Är du säker på att du vill lämna ut bokningen {booking.name}?</>
+                    )}
                 </ConfirmModal>
             </>
         );

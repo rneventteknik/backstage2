@@ -2,7 +2,7 @@ import React, { ChangeEvent } from 'react';
 import { Button, Col, Collapse, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faRefresh } from '@fortawesome/free-solid-svg-icons';
-import { useLocalStorageState } from '../lib/useLocalStorageState';
+import { useSessionStorageState } from '../lib/useSessionStorageState';
 
 type Props = {
     handleChangeFilterString: (booking: ChangeEvent<HTMLInputElement>) => void;
@@ -19,7 +19,7 @@ const AdvancedFilters: React.FC<Props> = ({
     searchText,
     children,
 }: Props) => {
-    const [showAdvancedFilters, setShowAdvancedFilters] = useLocalStorageState('show-advanced-filters', false);
+    const [showAdvancedFilters, setShowAdvancedFilters] = useSessionStorageState('show-advanced-filters', false);
 
     return (
         <>

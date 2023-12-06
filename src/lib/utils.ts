@@ -97,10 +97,10 @@ export const getBookingTypeName = (bookingType: BookingType): string => {
 export const getSalaryStatusName = (salaryStatus: SalaryStatus): string => {
     switch (salaryStatus) {
         case SalaryStatus.NOT_SENT:
-            return 'Inte skickad';
+            return 'Inte skickat';
 
         case SalaryStatus.SENT:
-            return 'Skickad';
+            return 'Skickat';
     }
 };
 
@@ -196,7 +196,7 @@ export const getLanguageName = (language: Language): string => {
 export const getStatusColor = (status: Status): string => {
     switch (status) {
         case Status.DRAFT:
-            return '#383838';
+            return '#75346C';
 
         case Status.BOOKED:
             return '#1565C0';
@@ -429,4 +429,19 @@ export const createdSortFn = (a: BaseEntity, b: BaseEntity) => {
     }
 
     return 0;
+};
+
+const formatOperationalYear = (year: number) => `${year}-${year + 1}`;
+
+export const getOperationalYear = (date?: Date) => {
+    if (!date) {
+        return 'N/A';
+    }
+
+    if (date.getMonth() < 6) {
+        // Operational year turns over at 1st of July (month is 0 indexed)
+        return formatOperationalYear(date.getFullYear() - 1);
+    }
+
+    return formatOperationalYear(date.getFullYear());
 };

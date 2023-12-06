@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, Button, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Card, Button, DropdownButton, Dropdown, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher, usersFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
@@ -14,8 +14,9 @@ import {
     faStopwatch,
     faAdd,
     faPlus,
+    faInfoCircle,
 } from '@fortawesome/free-solid-svg-icons';
-import { TimeReport, User } from '../../../models/interfaces';
+import { TimeReport } from '../../../models/interfaces';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import Skeleton from 'react-loading-skeleton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -27,7 +28,7 @@ import {
     getTotalTimeReportsPrice,
 } from '../../../lib/pricingUtils';
 import { useNotifications } from '../../../lib/useNotifications';
-import { DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
+import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
 import {
     isFirst,
     isLast,
@@ -193,56 +194,72 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             ) : (
                 timeReport.billableWorkingHours + ' h'
             )}
+            {timeReport.actualWorkingHours !== timeReport.billableWorkingHours ? (
+                <OverlayTrigger
+                    overlay={
+                        <Tooltip id="1">
+                            Antalet fakturerade timmar ({timeReport.billableWorkingHours} h) skiljer sig från antalet
+                            arbetade timmar ({timeReport.actualWorkingHours} h).
+                        </Tooltip>
+                    }
+                >
+                    <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
+                </OverlayTrigger>
+            ) : null}
         </DoubleClickToEdit>
     );
 
     const TimeReportUserIdDisplayFn = (timeReport: TimeReport) => (
-        <DoubleClickToEditDropdown<User | undefined>
-            value={timeReport.user}
-            options={users ?? []}
-            optionLabelFn={(x) => x?.name ?? 'Ingen användare konfigurerad'}
-            optionKeyFn={(x) => x?.id.toString() ?? ''}
-            onChange={(newValue) =>
-                newValue
-                    ? updateTimeReports({
-                          ...timeReport,
-                          userId: newValue.id,
-                          user: newValue,
-                      })
-                    : null
-            }
-            readonly={readonly}
-        >
+        <>
             {timeReport.user?.name ?? (
                 <span className="text-muted font-italic">Dubbelklicka för att välja användare</span>
             )}
-            <div className="mb-0 text-muted d-md-none">{timeReport.billableWorkingHours + ' h'}</div>
+            <div className="mb-0 text-muted d-md-none">
+                {timeReport.billableWorkingHours + ' h'}{' '}
+                {timeReport.actualWorkingHours !== timeReport.billableWorkingHours ? (
+                    <OverlayTrigger
+                        overlay={
+                            <Tooltip id="1">
+                                Antalet fakturerade timmar ({timeReport.billableWorkingHours} h) skiljer sig från
+                                antalet arbetade timmar ({timeReport.actualWorkingHours} h).
+                            </Tooltip>
+                        }
+                    >
+                        <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
+                    </OverlayTrigger>
+                ) : null}
+            </div>
             <div className="mb-0 text-muted d-md-none">
                 {formatNumberAsCurrency(addVAT(getTimeReportPrice(timeReport)))}
             </div>
-        </DoubleClickToEditDropdown>
+        </>
     );
 
     const TimeReportEntryActionsDisplayFn = (entry: TimeReport) => (
-        <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
-            <Dropdown.Item
-                onClick={() => updateTimeReports(...moveItemUp(timeReports, entry))}
-                disabled={isFirst(timeReports, entry)}
-            >
-                <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
-            </Dropdown.Item>
-            <Dropdown.Item
-                onClick={() => updateTimeReports(...moveItemDown(timeReports, entry))}
-                disabled={isLast(timeReports, entry)}
-            >
-                <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item onClick={() => deleteTimeReport(entry)} className="text-danger">
-                <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
-            </Dropdown.Item>
+        <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
+            {!readonly ? (
+                <>
+                    <Dropdown.Item
+                        onClick={() => updateTimeReports(...moveItemUp(timeReports, entry))}
+                        disabled={isFirst(timeReports, entry)}
+                    >
+                        <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                        onClick={() => updateTimeReports(...moveItemDown(timeReports, entry))}
+                        disabled={isLast(timeReports, entry)}
+                    >
+                        <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={() => deleteTimeReport(entry)} className="text-danger">
+                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                    </Dropdown.Item>
+                </>
+            ) : null}
             <Dropdown.Item onClick={() => setTimeReportToEditViewModel(entry)}>
-                <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
+                <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" />{' '}
+                {readonly ? 'Visa detaljer' : 'Avancerad redigering'}
             </Dropdown.Item>
         </DropdownButton>
     );
@@ -322,6 +339,9 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
         mutateTimeReports([...(timeReports ?? []), data]);
     };
 
+    const sumBillableWorkingHours = timeReports.reduce((sum, entry) => sum + entry.billableWorkingHours, 0);
+    const sumActualWorkingHours = timeReports.reduce((sum, entry) => sum + entry.actualWorkingHours, 0);
+
     return (
         <Card className="mb-3">
             <Card.Header>
@@ -338,7 +358,13 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 </div>
                 <p className="text-muted">
                     {formatNumberAsCurrency(addVAT(getTotalTimeReportsPrice(timeReports)))} /{' '}
-                    {timeReports.reduce((sum, entry) => sum + entry.billableWorkingHours, 0)} h
+                    {sumBillableWorkingHours === sumActualWorkingHours ? (
+                        <>{sumBillableWorkingHours} h</>
+                    ) : (
+                        <>
+                            {sumActualWorkingHours} arbetade timmar / {sumBillableWorkingHours} fakturerade timmar
+                        </>
+                    )}
                 </p>
             </Card.Header>
             {showContent ? (
@@ -368,6 +394,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 defaultLaborHourlyRate={defaultLaborHourlyRate}
                 setTimeReport={setTimeReportToEditViewModel}
                 timeReport={timeReportToEditViewModel ?? undefined}
+                readonly={readonly}
                 onHide={() => {
                     setTimeReportToEditViewModel(null);
                 }}

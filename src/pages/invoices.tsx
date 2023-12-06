@@ -32,7 +32,12 @@ const pageTitle = 'Fakturaunderlag';
 const breadcrumbs = [{ link: '/invoices/', displayName: pageTitle }];
 
 const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: invoiceGroups, error, isValidating, mutate } = useSwr('/api/invoiceGroups', invoiceGroupsFetcher);
+    const {
+        data: invoiceGroups,
+        error,
+        isValidating,
+        mutate,
+    } = useSwr('/api/invoiceGroups', invoiceGroupsFetcher, { revalidateOnFocus: false, revalidateOnReconnect: false });
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [invoiceGroupToViewId, setInvoiceGroupToViewId] = useState<number | null>(null);
     const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();

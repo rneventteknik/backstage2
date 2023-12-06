@@ -454,6 +454,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                 nextId={getNextEquipmentListEntryId(list)}
                 nextSortIndex={getNextSortIndex(getEntitiesToDisplay(list))}
                 globalSettings={globalSettings}
+                readonly={readonly}
             />
         </Card>
     );

@@ -1,4 +1,4 @@
-import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -7,6 +7,7 @@ import {
     getSalaryStatusName,
     getStatusName,
     onlyUnique,
+    reduceSumFn,
     replaceEmptyStringWithNull,
 } from '../../lib/utils';
 import { BookingType } from '../../models/enums/BookingType';
@@ -18,11 +19,17 @@ import { BookingViewModel } from '../../models/interfaces';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import BookingTypeTag from '../utils/BookingTypeTag';
 import DoneIcon from '../utils/DoneIcon';
+import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
+import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
 import TableStyleLink from '../utils/TableStyleLink';
+import { getBookingDateHeadingValue } from '../../lib/datetimeUtils';
 
 type Props = {
     bookings: BookingViewModel[];
     selectedBookingIds?: number[];
+    allowEditInvoiceNumber?: boolean;
+    showHeadings?: boolean;
+    updateInvoiceNumber?: (booking: BookingViewModel, newInvoiceNumber: string) => void;
     onToggleSelect?: (booking: BookingViewModel) => void;
     isDisabled?: (booking: BookingViewModel) => boolean;
     tableSettingsOverride?: Partial<TableConfiguration<BookingViewModel>>;
@@ -31,9 +38,12 @@ type Props = {
 const AdminBookingList: React.FC<Props> = ({
     bookings,
     selectedBookingIds,
+    updateInvoiceNumber,
     onToggleSelect,
     isDisabled,
     tableSettingsOverride,
+    allowEditInvoiceNumber = false,
+    showHeadings = false,
 }: Props) => {
     // Table display functions
     //
@@ -54,12 +64,29 @@ const AdminBookingList: React.FC<Props> = ({
             return 'Delvis utlämnad';
         }
 
-        if (booking.bookingType === BookingType.GIG) {
+        if (booking.bookingType === BookingType.GIG || booking.status === Status.CANCELED) {
             return '-';
         }
 
         return 'Inte utlämnad';
     };
+
+    const bookingReferenceDisplayFn = (booking: BookingViewModel) => (
+        <>
+            <DoubleClickToEdit
+                readonly={!allowEditInvoiceNumber}
+                onUpdate={(newInvoiceNumber: string) => {
+                    if (!updateInvoiceNumber) {
+                        throw new Error('Missing updateInvoiceNumber');
+                    }
+                    updateInvoiceNumber(booking, newInvoiceNumber);
+                }}
+                value={booking.invoiceNumber}
+            >
+                {replaceEmptyStringWithNull(booking.invoiceNumber) ?? <span className="text-muted">XXXXXXX</span>}
+            </DoubleClickToEdit>
+        </>
+    );
 
     const bookingNameDisplayFn = (booking: BookingViewModel) => {
         const customAccountsOnBooking =
@@ -74,9 +101,12 @@ const AdminBookingList: React.FC<Props> = ({
 
         return (
             <>
-                <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
+                <TableStyleLink href={'/bookings/' + booking.id} className="mr-1">
+                    {booking.name}
+                </TableStyleLink>
 
-                <BookingTypeTag booking={booking} className="ml-1" />
+                <BookingTypeTag booking={booking} className="mr-1" />
+                <FixedPriceStatusTag booking={booking} className="mr-1" />
 
                 {customAccountsOnBooking.length > 0 ? (
                     <OverlayTrigger
@@ -89,7 +119,23 @@ const AdminBookingList: React.FC<Props> = ({
                             </Tooltip>
                         }
                     >
-                        <FontAwesomeIcon icon={faCircleInfo} className="ml-1" title="" />
+                        <FontAwesomeIcon icon={faCircleInfo} className="mr-1" title="" />
+                    </OverlayTrigger>
+                ) : null}
+
+                {booking.fixedPrice !== null && booking.fixedPrice > 0 && (booking.timeReports?.length ?? 0) > 0 ? (
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={
+                            <Tooltip id="1">
+                                <strong>
+                                    Denna bokning har både fast pris och tidsrapporter. Detta stödjs inte av Stage
+                                    fakturaexporter och bokningen behöver därför faktureras manuellt.
+                                </strong>
+                            </Tooltip>
+                        }
+                    >
+                        <FontAwesomeIcon icon={faWarning} className="mr-1 text-danger" title="" />
                     </OverlayTrigger>
                 ) : null}
 
@@ -101,16 +147,18 @@ const AdminBookingList: React.FC<Props> = ({
         );
     };
 
+    const bookingStatusIsDone = (booking: BookingViewModel) => booking.status === Status.DONE;
     const bookingStatusDisplayFn = (booking: BookingViewModel) => (
         <>
             {getStatusName(booking.status)}
-            {booking.status === Status.DONE ? <DoneIcon /> : null}
+            {bookingStatusIsDone(booking) ? <DoneIcon /> : null}
             <p className="mb-0 d-xl-none">{bookingRentalStatusDisplayFn(booking)}</p>
             <p className="mb-0 d-xl-none">{bookingPaymentStatusDisplayFn(booking)}</p>
             <p className="mb-0 d-xl-none">{bookingSalaryStatusDisplayFn(booking)}</p>
         </>
     );
 
+    const bookingRentalStatusIsDone = (booking: BookingViewModel) => getRentalStatusString(booking) === 'Återlämnad';
     const bookingRentalStatusDisplayFn = (booking: BookingViewModel) => (
         <>
             {getRentalStatusString(booking)}
@@ -122,25 +170,34 @@ const AdminBookingList: React.FC<Props> = ({
                 </OverlayTrigger>
             ) : null}
 
-            {getRentalStatusString(booking) === 'Återlämnad' ? <DoneIcon /> : null}
+            {bookingRentalStatusIsDone(booking) ? <DoneIcon /> : null}
         </>
     );
 
+    const bookingPaymentStatusIsDone = (booking: BookingViewModel) =>
+        booking.paymentStatus === PaymentStatus.PAID ||
+        booking.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
+        booking.paymentStatus === PaymentStatus.PAID_WITH_CASH;
     const bookingPaymentStatusDisplayFn = (booking: BookingViewModel) => (
         <>
-            {getPaymentStatusName(booking.paymentStatus)}
-            {booking.paymentStatus === PaymentStatus.PAID ||
-            booking.paymentStatus === PaymentStatus.PAID_WITH_INVOICE ||
-            booking.paymentStatus === PaymentStatus.PAID_WITH_CASH ? (
-                <DoneIcon />
-            ) : null}
+            {booking.status !== Status.CANCELED || booking.paymentStatus !== PaymentStatus.NOT_PAID
+                ? getPaymentStatusName(booking.paymentStatus)
+                : '-'}
+            {bookingPaymentStatusIsDone(booking) ? <DoneIcon /> : null}
         </>
     );
 
+    const hasBillableTimeReportHours = (booking: BookingViewModel) =>
+        (booking.timeReports?.map((x) => x.billableWorkingHours).reduce(reduceSumFn, 0) ?? 0) > 0;
+    const bookingSalaryStatusIsDone = (booking: BookingViewModel) => booking.salaryStatus === SalaryStatus.SENT;
     const bookingSalaryStatusDisplayFn = (booking: BookingViewModel) => (
         <>
-            {getSalaryStatusName(booking.salaryStatus)}
-            {booking.salaryStatus === SalaryStatus.SENT ? <DoneIcon /> : null}
+            {hasBillableTimeReportHours(booking) ||
+            booking.status !== Status.CANCELED ||
+            booking.salaryStatus !== SalaryStatus.NOT_SENT
+                ? getSalaryStatusName(booking.salaryStatus)
+                : '-'}
+            {bookingSalaryStatusIsDone(booking) ? <DoneIcon /> : null}
         </>
     );
 
@@ -149,7 +206,9 @@ const AdminBookingList: React.FC<Props> = ({
             throw new Error('Invalid table configuration');
         }
 
-        return (
+        return (isDisabled ? isDisabled(booking) : false) ? (
+            <></>
+        ) : (
             <div className="text-center">
                 <input
                     type="checkbox"
@@ -192,6 +251,24 @@ const AdminBookingList: React.FC<Props> = ({
         );
     };
 
+    const getBookingDateHeadingValueWithDoneIcon = (value: string | null) => (
+        <strong>
+            {value}{' '}
+            {bookings
+                .filter((x) => getBookingDateHeadingValue(x) === value)
+                .every(
+                    (x) =>
+                        x.status === Status.CANCELED ||
+                        (bookingStatusIsDone(x) &&
+                            (bookingRentalStatusIsDone(x) || x.bookingType === BookingType.GIG) &&
+                            (bookingSalaryStatusIsDone(x) || !hasBillableTimeReportHours(x)) &&
+                            bookingPaymentStatusIsDone(x)),
+                ) ? (
+                <DoneIcon />
+            ) : null}
+        </strong>
+    );
+
     const tableSettings: TableConfiguration<BookingViewModel> = {
         entityTypeDisplayName: 'bokningar',
         defaultSortPropertyName: 'date',
@@ -201,21 +278,23 @@ const AdminBookingList: React.FC<Props> = ({
                 key: 'reference',
                 displayName: 'Referens',
                 getValue: (booking: BookingViewModel) => booking.invoiceNumber,
+                getContentOverride: bookingReferenceDisplayFn,
                 textTruncation: true,
                 cellHideSize: 'lg',
-                columnWidth: 90,
+                columnWidth: 110,
             },
             {
                 key: 'name',
                 displayName: 'Bokning',
                 getValue: (booking: BookingViewModel) => booking.name,
-                textTruncation: true,
                 getContentOverride: bookingNameDisplayFn,
             },
             {
                 key: 'date',
                 displayName: 'Datum',
                 getValue: (booking: BookingViewModel) => booking.isoFormattedUsageStartString,
+                getHeadingValue: showHeadings ? getBookingDateHeadingValue : undefined,
+                getHeadingContentOverride: showHeadings ? getBookingDateHeadingValueWithDoneIcon : undefined,
                 cellHideSize: 'lg',
                 columnWidth: 150,
                 textAlignment: 'left',
@@ -225,7 +304,7 @@ const AdminBookingList: React.FC<Props> = ({
                 displayName: 'Bokningstatus',
                 getValue: (booking: BookingViewModel) => getStatusName(booking.status),
                 textAlignment: 'left',
-                columnWidth: 140,
+                columnWidth: 155,
                 getContentOverride: bookingStatusDisplayFn,
             },
             {
@@ -234,7 +313,7 @@ const AdminBookingList: React.FC<Props> = ({
                 getValue: (booking: BookingViewModel) => getRentalStatusString(booking),
                 textAlignment: 'left',
                 cellHideSize: 'xl',
-                columnWidth: 140,
+                columnWidth: 155,
                 getContentOverride: bookingRentalStatusDisplayFn,
             },
             {
@@ -243,16 +322,16 @@ const AdminBookingList: React.FC<Props> = ({
                 getValue: (booking: BookingViewModel) => getPaymentStatusName(booking.paymentStatus),
                 textAlignment: 'left',
                 cellHideSize: 'xl',
-                columnWidth: 140,
+                columnWidth: 155,
                 getContentOverride: bookingPaymentStatusDisplayFn,
             },
             {
                 key: 'salaryStatus',
-                displayName: 'Lönestatus',
+                displayName: 'Timarvodesstatus',
                 getValue: (booking: BookingViewModel) => getSalaryStatusName(booking.salaryStatus),
                 textAlignment: 'left',
                 cellHideSize: 'xl',
-                columnWidth: 120,
+                columnWidth: 130,
                 getContentOverride: bookingSalaryStatusDisplayFn,
             },
         ],

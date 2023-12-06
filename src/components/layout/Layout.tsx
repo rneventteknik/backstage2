@@ -7,6 +7,7 @@ import styles from './Layout.module.scss';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { getGlobalSetting } from '../../lib/utils';
+import LoggedOutModal from './LoggedOutModal';
 
 type Props = {
     children?: ReactNode;
@@ -54,6 +55,7 @@ const Layout: React.FC<Props> = ({
                 borderRadius={0}
             >
                 <section className={styles.mainContentContainer + ' p-4'}>
+                    <LoggedOutModal currentUser={currentUser} globalSettings={globalSettings} />
                     <div
                         className={fixedWidth ? styles.mainContentFixedWidth : styles.mainContent}
                         data-testid="main-content"
