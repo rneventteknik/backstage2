@@ -14,6 +14,7 @@ import {
     Stage1EqipmentInventory,
     Stage1EqipmentListEntry,
     Stage1JsonModel,
+    Stage1Salary,
 } from '../../models/misc/EquipmentImportExportModel';
 import { Status } from '../../models/enums/Status';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
@@ -31,6 +32,8 @@ import {
     IEquipmentListEntryObjectionModel,
     IEquipmentListObjectionModel,
 } from '../../models/objection-models/BookingObjectionModel';
+import { TimeReport } from '../../models/interfaces';
+import { ITimeReportObjectionModel } from '../../models/objection-models';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
@@ -53,6 +56,8 @@ const BookingJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSetti
     let bookingsToImport: Stage1Booking[] = [];
     let equipmentInJson: Stage1EqipmentListEntry[] = [];
     let equipmentInventoryInJson: Stage1EqipmentInventory[] = [];
+    let salariesInJson: Stage1Salary[] = [];
+    let salariesToImport: Stage1Salary[] = [];
 
     let jsonError: string | null = null;
 
@@ -72,6 +77,12 @@ const BookingJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSetti
         equipmentInventoryInJson = tablesInJson?.find(
             (equipment) => equipment.type == 'table' && equipment.name == 'rn_equipment_list',
         )?.data as Stage1EqipmentInventory[];
+
+        salariesInJson = tablesInJson?.find(
+            (equipment) => equipment.type == 'table' && equipment.name == 'rn_timereport',
+        )?.data as Stage1Salary[];
+
+        salariesToImport = salariesInJson.filter((x) => x.hidden !== '1');
     } catch (error) {
         jsonError = 'Error: ' + error + '.';
     }
@@ -96,8 +107,35 @@ const BookingJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSetti
                 };
                 await addEquipment(eq, newBookingId, newEquipmentlistId);
             }
+
+            addSalaries(booking, newBookingId);
         }
         setDone(true);
+    };
+
+    const addSalaries = async (booking: Stage1Booking, newBookingId: number) => {
+        const salariesForBooking = salariesToImport.filter((x) => x.event_id == booking.id);
+
+        for (const salary of salariesForBooking) {
+            const salaryToImport: Partial<TimeReport> = {
+                name: `${salary.time_note} (${salary.time_start} - ${salary.time_end})`,
+                actualWorkingHours: Number(salary.time_hours),
+                billableWorkingHours: Number(salary.time_hours),
+                pricePerHour: Number(salary.hour_price),
+                userId: 10, // TODO: Map users?
+                bookingId: newBookingId,
+            };
+
+            const addRequest = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ timeReport: salaryToImport }),
+            };
+
+            fetch('/api/bookings/' + newBookingId + '/timeReport', addRequest).then((apiResponse) =>
+                getResponseContentOrError<ITimeReportObjectionModel>(apiResponse),
+            );
+        }
     };
 
     const addBooking = async (booking: PartialDeep<Stage1Booking>) => {
@@ -220,7 +258,8 @@ const BookingJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSetti
                     {!jsonError && !importHasStarted ? (
                         <>
                             <p>Bokningar att importera: {bookingsToImport?.length} st</p>
-                            <p>Utrustning att importera: {equipmentInJson?.length} st</p>
+                            <p>Utrustningsposter att importera: {equipmentInJson?.length} st</p>
+                            <p>Lön att importera: {salariesToImport?.length} st</p>
                         </>
                     ) : null}
 

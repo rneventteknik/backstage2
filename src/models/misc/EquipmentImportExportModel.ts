@@ -9,7 +9,7 @@ export interface EquipmentImportExportModel extends IEquipmentObjectionModel {
 export interface Stage1JsonModel {
     type?: string;
     name: string;
-    data: Stage1Booking[] | Stage1EqipmentListEntry[] | Stage1EqipmentInventory[];
+    data: Stage1Booking[] | Stage1EqipmentListEntry[] | Stage1EqipmentInventory[] | Stage1Salary[];
 }
 
 export interface Stage1Booking {
@@ -50,4 +50,16 @@ export interface Stage1EqipmentInventory {
     title: string;
     price: string;
     thsprice: string;
+}
+export interface Stage1Salary {
+    time_id: string;
+    event_id: string;
+    who: string;
+    time_note: string;
+    hour_price: string;
+    time_hours: string;
+    time_start: string;
+    time_end: string;
+    time_account: string;
+    hidden: string;
 }
