@@ -18,7 +18,7 @@ import { PartialDeep } from 'type-fest';
 import { useNotifications } from '../lib/useNotifications';
 import { getResponseContentOrError } from '../lib/utils';
 import DoneIcon from '../components/utils/DoneIcon';
-import { formatDatetime } from '../lib/datetimeUtils';
+import { formatDatetime, formatDatetimeForForm } from '../lib/datetimeUtils';
 import CreateSalaryGroupModal from '../components/salaries/CreateSalaryGroupModal';
 import ViewSalaryGroupModal from '../components/salaries/ViewSalaryGroupModal';
 import { KeyValue } from '../models/interfaces/KeyValue';
@@ -98,6 +98,10 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         </>
     );
 
+    const createdDisplayFn = (salaryGroup: SalaryGroup) => (
+        <>{salaryGroup.created ? formatDatetime(salaryGroup.created) : '-'}</>
+    );
+
     const salaryGroupActionsDisplayFn = (salaryGroup: SalaryGroup) => (
         <>
             <Button
@@ -154,7 +158,8 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                 key: 'created',
                 displayName: 'Skapad',
                 getValue: (salaryGroup: SalaryGroup) =>
-                    salaryGroup.created ? formatDatetime(salaryGroup.created) : '-',
+                    salaryGroup.created ? formatDatetimeForForm(salaryGroup.created) : '-',
+                getContentOverride: createdDisplayFn,
                 textTruncation: true,
                 cellHideSize: 'xl',
                 columnWidth: 170,

@@ -21,7 +21,7 @@ import { getResponseContentOrError } from '../lib/utils';
 import ViewInvoiceGroupModal from '../components/invoices/ViewInvoiceGroupModal';
 import { PaymentStatus } from '../models/enums/PaymentStatus';
 import DoneIcon from '../components/utils/DoneIcon';
-import { formatDatetime } from '../lib/datetimeUtils';
+import { formatDatetime, formatDatetimeForForm } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import Link from 'next/link';
 
@@ -112,6 +112,10 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
         </>
     );
 
+    const createdDisplayFn = (invoiceGroup: InvoiceGroup) => (
+        <>{invoiceGroup.created ? formatDatetime(invoiceGroup.created) : '-'}</>
+    );
+
     const getPaymentStatusString = (invoiceGroup: InvoiceGroup): string | number | Date => {
         if (
             invoiceGroup.bookings?.every(
@@ -191,7 +195,8 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
                 key: 'created',
                 displayName: 'Skapad',
                 getValue: (invoiceGroup: InvoiceGroup) =>
-                    invoiceGroup.created ? formatDatetime(invoiceGroup.created) : '-',
+                    invoiceGroup.created ? formatDatetimeForForm(invoiceGroup.created) : '-',
+                getContentOverride: createdDisplayFn,
                 textTruncation: true,
                 cellHideSize: 'xl',
                 columnWidth: 170,
