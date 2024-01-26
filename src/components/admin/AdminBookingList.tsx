@@ -192,9 +192,7 @@ const AdminBookingList: React.FC<Props> = ({
     const bookingSalaryStatusIsDone = (booking: BookingViewModel) => booking.salaryStatus === SalaryStatus.SENT;
     const bookingSalaryStatusDisplayFn = (booking: BookingViewModel) => (
         <>
-            {hasBillableTimeReportHours(booking) ||
-            booking.status !== Status.CANCELED ||
-            booking.salaryStatus !== SalaryStatus.NOT_SENT
+            {hasBillableTimeReportHours(booking) || booking.salaryStatus !== SalaryStatus.NOT_SENT
                 ? getSalaryStatusName(booking.salaryStatus)
                 : '-'}
             {bookingSalaryStatusIsDone(booking) ? <DoneIcon /> : null}
