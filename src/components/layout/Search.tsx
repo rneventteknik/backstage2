@@ -159,6 +159,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     const booking = entity as unknown as IBookingObjectionModel;
                     return (
                         <small>
+                            <SplitHighlighter search={highlightText} textToHighlight={booking.customerName} /> /{' '}
                             <SplitHighlighter search={highlightText} textToHighlight={booking.contactPersonName} />
                         </small>
                     );
