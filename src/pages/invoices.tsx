@@ -35,7 +35,6 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
     const {
         data: invoiceGroups,
         error,
-        isValidating,
         mutate,
     } = useSwr('/api/invoiceGroups', invoiceGroupsFetcher, { revalidateOnFocus: false, revalidateOnReconnect: false });
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -53,7 +52,7 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
         );
     }
 
-    if ((isValidating || !invoiceGroups) && invoiceGroupToViewId === null) {
+    if (!invoiceGroups && invoiceGroupToViewId === null) {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 

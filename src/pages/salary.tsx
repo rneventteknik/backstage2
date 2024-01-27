@@ -34,7 +34,6 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
     const {
         data: salaryGroups,
         error,
-        isValidating,
         mutate,
     } = useSwr('/api/salaryGroups', salaryGroupsFetcher, { revalidateOnFocus: false, revalidateOnReconnect: false });
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -52,7 +51,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         );
     }
 
-    if ((isValidating || !salaryGroups) && salaryGroupToViewId === null) {
+    if (!salaryGroups && salaryGroupToViewId === null) {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 

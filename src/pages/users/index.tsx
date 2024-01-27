@@ -25,7 +25,7 @@ const pageTitle = 'Användare';
 const breadcrumbs = [{ link: 'users', displayName: pageTitle }];
 
 const UserListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: users, error, isValidating } = useSwr('/api/users', usersFetcher);
+    const { data: users, error } = useSwr('/api/users', usersFetcher);
 
     if (error) {
         return (
@@ -38,7 +38,7 @@ const UserListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
         );
     }
 
-    if (isValidating || !users) {
+    if (!users) {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 

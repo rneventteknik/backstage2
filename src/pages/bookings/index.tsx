@@ -24,7 +24,7 @@ const pageTitle = 'Aktiva bokningar';
 const breadcrumbs = [{ link: 'bookings', displayName: pageTitle }];
 
 const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: bookings, error, isValidating } = useSwr('/api/bookings', bookingsFetcher);
+    const { data: bookings, error } = useSwr('/api/bookings', bookingsFetcher);
 
     if (error) {
         return (
@@ -37,7 +37,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         );
     }
 
-    if (isValidating || !bookings) {
+    if (!bookings) {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
