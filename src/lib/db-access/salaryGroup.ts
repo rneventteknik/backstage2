@@ -13,6 +13,7 @@ export const fetchSalaryGroup = async (
         .findById(id)
         .withGraphFetched('user')
         .withGraphFetched('bookings')
+        .withGraphFetched('bookings.ownerUser')
         .withGraphFetched('bookings.equipmentLists.listEntries')
         .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
 };
@@ -27,6 +28,7 @@ export const fetchSalaryGroupWithSalaryInformation = async (
         .findById(id)
         .withGraphFetched('user')
         .withGraphFetched('bookings')
+        .withGraphFetched('bookings.ownerUser')
         .withGraphFetched('bookings.timeReports.user(selectPersonalInformation)')
         .modifiers({
             selectPersonalInformation(builder) {

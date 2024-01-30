@@ -12,6 +12,7 @@ export const fetchInvoiceGroup = async (
     return InvoiceGroupObjectionModel.query(trx)
         .findById(id)
         .withGraphFetched('user')
+        .withGraphFetched('bookings.ownerUser')
         .withGraphFetched('bookings.equipmentLists.listEntries')
         .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
 };
@@ -20,6 +21,7 @@ export const fetchInvoiceGroups = async (): Promise<InvoiceGroupObjectionModel[]
     ensureDatabaseIsInitialized();
     return InvoiceGroupObjectionModel.query()
         .withGraphFetched('user')
+        .withGraphFetched('bookings.ownerUser')
         .withGraphFetched('bookings.equipmentLists')
         .withGraphFetched('bookings.equipmentLists.listEntries')
         .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');

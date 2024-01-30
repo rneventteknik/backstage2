@@ -23,6 +23,7 @@ import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
 import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
 import TableStyleLink from '../utils/TableStyleLink';
 import { getBookingDateHeadingValue } from '../../lib/datetimeUtils';
+import { addVAT, formatNumberAsCurrency, getBookingPrice } from '../../lib/pricingUtils';
 
 type Props = {
     bookings: BookingViewModel[];
@@ -143,6 +144,7 @@ const AdminBookingList: React.FC<Props> = ({
                 <p className="text-muted mb-0">{booking.ownerUser?.name ?? '-'}</p>
                 <p className="text-muted mb-0 d-lg-none">{replaceEmptyStringWithNull(booking.invoiceNumber) ?? '-'}</p>
                 <p className="text-muted mb-0 d-lg-none">{booking.displayUsageStartString ?? '-'}</p>
+                <p className="text-muted mb-0">{formatNumberAsCurrency(addVAT(getBookingPrice(booking)))}</p>
             </>
         );
     };
