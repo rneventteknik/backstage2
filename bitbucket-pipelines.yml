@@ -24,7 +24,7 @@ pipelines:
         '**': #default
             - step:
                   name: Build
-                  image: node:18.18.2
+                  image: node:18
                   caches:
                       - node
                       - nextcache
