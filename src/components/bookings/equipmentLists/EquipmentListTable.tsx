@@ -676,7 +676,7 @@ const EquipmentListTable: React.FC<Props> = ({
                         <SelectNumberOfUnitsAndHoursModal
                             show={!!equipmentToAdd}
                             onHide={() => setEquipmentToAdd(null)}
-                            onSave={(numberOfUnits, numberOfHours) => {
+                            onSave={(numberOfUnits, numberOfHours, selectedPriceId) => {
                                 if (!equipmentToAdd) {
                                     throw new Error('Invalid state: Missing searchResultModelToAdd.');
                                 }
@@ -689,6 +689,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                     addListEntries,
                                     numberOfUnits,
                                     numberOfHours,
+                                    selectedPriceId,
                                 );
                                 setEquipmentToAdd(null);
                             }}
@@ -704,6 +705,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             }
                             title={language === Language.SV ? equipmentToAdd.name : equipmentToAdd.nameEN}
                             equipment={equipmentToAdd}
+                            priceplan={pricePlan}
                             startDatetime={getEquipmentOutDatetime(list) ?? null}
                             endDatetime={getEquipmentInDatetime(list) ?? null}
                         />

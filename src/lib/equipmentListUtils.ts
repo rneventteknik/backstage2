@@ -110,15 +110,18 @@ export const getDefaultListEntryFromEquipment = (
     id: number,
     sortIndex: number,
     isFree = false,
+    selectedPriceId?: number,
     override?: Partial<EquipmentListEntry>,
 ) => {
     if (!equipment.id) {
         throw new Error('Invalid equipment');
     }
 
+    const selectedPrice = equipment.prices.find((price) => price.id === selectedPriceId) ?? equipment.prices[0];
+
     const prices = isFree
         ? { pricePerHour: 0, pricePerUnit: 0 }
-        : getEquipmentListEntryPrices(equipment.prices[0], pricePlan);
+        : getEquipmentListEntryPrices(selectedPrice, pricePlan);
 
     const entry: EquipmentListEntry = {
         id: id,
@@ -156,6 +159,7 @@ const addMultipleEquipment = (
         equipment: Equipment;
         numberOfUnits?: number;
         numberOfHours?: number;
+        selectedPriceId?: number;
         isFree?: boolean;
         isHidden?: boolean;
     }[],
@@ -190,6 +194,7 @@ const addMultipleEquipment = (
             nextId,
             nextSortIndex,
             x.isFree,
+            x.selectedPriceId,
             overrides,
         );
 
@@ -210,8 +215,15 @@ export const addEquipment = (
     addListEntries: (entries: EquipmentListEntry[], listId: number | undefined, headerId?: number | undefined) => void,
     numberOfUnits?: number,
     numberOfHours?: number,
+    selectedPriceId?: number,
 ) => {
-    addMultipleEquipment([{ equipment, numberOfUnits, numberOfHours }], list, pricePlan, language, addListEntries);
+    addMultipleEquipment(
+        [{ equipment, numberOfUnits, numberOfHours, selectedPriceId }],
+        list,
+        pricePlan,
+        language,
+        addListEntries,
+    );
 };
 
 export const addEquipmentPackage = (
@@ -293,6 +305,7 @@ export const addHeadingEntry = (
             nextId,
             nextSortIndex,
             x.isFree,
+            undefined,
             overrides,
         );
 
