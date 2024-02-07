@@ -14,6 +14,7 @@ import { toEquipment } from '../../lib/mappers/equipment';
 import { BaseEntityWithName } from '../../models/interfaces/BaseEntity';
 import { SplitHighlighter } from '../utils/Highlight';
 import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
+import { toBookingViewModel } from '../../lib/datetimeUtils';
 
 enum ResultType {
     BOOKING,
@@ -129,9 +130,17 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
 
                 case ResultType.BOOKING:
                     const booking = entity as unknown as IBookingObjectionModel;
+                    const viewModel = toBookingViewModel(toBooking(booking));
                     return (
                         <small>
                             <SplitHighlighter search={highlightText} textToHighlight={booking.contactPersonName} />
+                            {booking.contactPersonName && viewModel.displayUsageInterval !== '-' ? ' / ' : ''}
+                            {viewModel.displayUsageInterval === '-' ? null : (
+                                <SplitHighlighter
+                                    search={highlightText}
+                                    textToHighlight={viewModel.monthYearUsageStartString}
+                                />
+                            )}
                         </small>
                     );
                 default:
