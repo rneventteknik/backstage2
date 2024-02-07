@@ -10,6 +10,7 @@ import { ICustomerObjectionModel } from '../objection-models/CustomerObjectionMo
 export interface SearchResult {
     bookings: IBookingObjectionModel[];
     equipment: IEquipmentObjectionModel[];
+    equipmentPackage: IEquipmentPackageObjectionModel[];
     users: IUserObjectionModel[];
 }
 

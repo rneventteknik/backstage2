@@ -26,6 +26,16 @@ export const searchBookings = async (searchString: string, count: number): Promi
             });
         })
         .withGraphFetched('equipmentLists')
+        .orWhere((builder) => {
+            searchStrings.forEach((partialSearchString) => {
+                builder.andWhere('invoiceNumber', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+            });
+        })
+        .orWhere((builder) => {
+            searchStrings.forEach((partialSearchString) => {
+                builder.andWhere('customerName', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+            });
+        })
         .orderBy('updated', 'desc')
         .limit(count);
 };
