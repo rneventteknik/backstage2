@@ -26,6 +26,7 @@ import CustomerSearch from '../../components/CustomerSearch';
 import { Customer } from '../../models/interfaces/Customer';
 import { BookingType } from '../../models/enums/BookingType';
 import { KeyValue } from '../../models/interfaces/KeyValue';
+import { Language } from '../../models/enums/Language';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
@@ -122,7 +123,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         fetch('/api/bookings', request)
             .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
             .then((data) => {
-                createDefaultEquipmentList(data.id).then(() => {
+                createDefaultEquipmentList(data).then(() => {
                     showCreateSuccessNotification('Bokningen');
                     router.push('/bookings/' + data.id);
                 });
@@ -133,9 +134,20 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             });
     };
 
-    const createDefaultEquipmentList = async (bookingId: number) => {
+    const createDefaultEquipmentList = async (booking: IBookingObjectionModel) => {
+        let name;
+        switch (booking.language) {
+            case Language.EN:
+                name = 'Equipment';
+                break;
+            case Language.SV:
+            default:
+                name = 'Utrustning';
+                break;
+        }
+
         const newEquipmentList: Partial<EquipmentListObjectionModel> = {
-            name: 'Utrustning',
+            name,
             usageStartDatetime: startDate,
             usageEndDatetime: endDate,
             numberOfDays: !startDate && !endDate ? 1 : undefined,
@@ -148,7 +160,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             body: JSON.stringify(body),
         };
 
-        return fetch('/api/bookings/' + bookingId + '/equipmentLists', request).then((apiResponse) =>
+        return fetch('/api/bookings/' + booking.id + '/equipmentLists', request).then((apiResponse) =>
             getResponseContentOrError<IEquipmentListObjectionModel>(apiResponse),
         );
     };
