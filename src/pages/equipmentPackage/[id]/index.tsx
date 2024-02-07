@@ -32,7 +32,6 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
     const {
         data: equipmentPackage,
         error,
-        isValidating,
         mutate,
     } = useSwr('/api/equipmentPackage/' + router.query.id, equipmentPackageFetcher);
 
@@ -49,7 +48,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         );
     }
 
-    if (isValidating || !equipmentPackage) {
+    if (!equipmentPackage) {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 

@@ -97,10 +97,10 @@ export const getBookingTypeName = (bookingType: BookingType): string => {
 export const getSalaryStatusName = (salaryStatus: SalaryStatus): string => {
     switch (salaryStatus) {
         case SalaryStatus.NOT_SENT:
-            return 'Inte skickad';
+            return 'Inte skickat';
 
         case SalaryStatus.SENT:
-            return 'Skickad';
+            return 'Skickat';
     }
 };
 

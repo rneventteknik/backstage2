@@ -1841,7 +1841,7 @@ export async function seed(knex) {
     const firstSalaryGroupId = await knex('SalaryGroup')
         .insert([
             {
-                name: 'Lön för mars 2021 v1',
+                name: 'Timarvode för mars 2021 v1',
                 created: '2021-04-01 13:45',
                 updated: '2021-04-01 13:45',
                 userId: firstUserId,
@@ -1895,14 +1895,14 @@ export async function seed(knex) {
         },
         {
             key: 'accounts.defaultSalaryAccount.internal',
-            note: 'Standardkonto för lön för interna evenemang',
+            note: 'Standardkonto för timarvode för interna evenemang',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
             value: '7900',
         },
         {
             key: 'accounts.defaultSalaryAccount.external',
-            note: 'Standardkonto för lön för externa evenemang',
+            note: 'Standardkonto för timarvode för externa evenemang',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
             value: '3620',
@@ -1937,21 +1937,21 @@ export async function seed(knex) {
         },
         {
             key: 'salary.rs',
-            note: 'Resultatställe på löneexporter',
+            note: 'Resultatställe på timarvodesexporter',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
             value: '81',
         },
         {
             key: 'salary.wageRatio.ths',
-            note: 'Hur stor andel av timpriset som arbetaren får som lön, som decimaltal med punkt som decimaltecken (Bokningar med prisplan THS). Exempelvis "0.5".',
+            note: 'Hur stor andel av timpriset som arbetaren får som timarvode, som decimaltal med punkt som decimaltecken (Bokningar med prisplan THS). Exempelvis "0.5".',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
             value: '0.72',
         },
         {
             key: 'salary.wageRatio.external',
-            note: 'Hur stor andel av timpriset som arbetaren får som lön, som decimaltal med punkt som decimaltecken (Bokningar med prisplan Standardpris). Exempelvis "0.6".',
+            note: 'Hur stor andel av timpriset som arbetaren får som timarvode, som decimaltal med punkt som decimaltecken (Bokningar med prisplan Standardpris). Exempelvis "0.6".',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
             value: '0.68',

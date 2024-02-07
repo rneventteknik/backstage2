@@ -60,10 +60,10 @@ const getStatusActionString = (type: Status) => {
 const getSalaryStatusActionString = (type: SalaryStatus | null) => {
     switch (type) {
         case SalaryStatus.SENT:
-            return 'markerade lön som skickad';
+            return 'markerade timarvode som skickat';
         case SalaryStatus.NOT_SENT:
         case null:
-            return 'markerade lön som inte skickad';
+            return 'markerade timarvode som inte skickat';
     }
 };
 

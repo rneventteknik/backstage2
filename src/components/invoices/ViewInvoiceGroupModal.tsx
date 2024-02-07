@@ -136,12 +136,12 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
         fetch('/api/invoiceGroups/' + invoiceGroup.id, request)
             .then(getResponseContentOrError)
             .then(() => {
-                showSaveSuccessNotification('Löneunderlagsgruppen');
+                showSaveSuccessNotification('Timarvodesunderlagsgruppen');
                 onMutate();
             })
             .catch((error) => {
                 console.error(error);
-                showSaveFailedNotification('Löneunderlagsgruppen');
+                showSaveFailedNotification('Timarvodesunderlagsgruppen');
                 onMutate();
             });
     };

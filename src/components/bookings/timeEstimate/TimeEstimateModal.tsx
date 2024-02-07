@@ -15,6 +15,7 @@ type Props = {
     setTimeEstimate: (timeEstimate: Partial<TimeEstimate>) => void;
     defaultLaborHourlyRate: number;
     formId: string;
+    readonly?: boolean;
     showWizard?: boolean;
     wizardLanguage?: Language;
     onSubmit: () => void;
@@ -28,6 +29,7 @@ const TimeEstimateModal: React.FC<Props> = ({
     defaultLaborHourlyRate,
     onSubmit,
     onHide,
+    readonly = false,
     showWizard = true,
     wizardLanguage = Language.SV,
 }: Props) => {
@@ -44,6 +46,18 @@ const TimeEstimateModal: React.FC<Props> = ({
         event.preventDefault();
         onSubmit();
         handleHide();
+    };
+
+    const getTitle = () => {
+        if (readonly) {
+            return 'Visa tidsestimat';
+        }
+
+        if (!timeEstimate?.id) {
+            return 'Nytt tidsestimat';
+        }
+
+        return 'Redigera tidsestimat';
     };
 
     const handleSubmitWizard = (event: FormEvent<HTMLFormElement>) => {
@@ -70,7 +84,7 @@ const TimeEstimateModal: React.FC<Props> = ({
     return (
         <Modal show={!!timeEstimate} onHide={() => handleHide()} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{timeEstimate?.id ? 'Redigera tidsestimat' : 'Nytt tidsestimat'}</Modal.Title>
+                <Modal.Title>{getTitle()}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {showWizard ? (
@@ -160,6 +174,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 <Form.Control
                                     type="text"
                                     required
+                                    readOnly={readonly}
                                     value={timeEstimate?.name}
                                     onChange={(e) =>
                                         setTimeEstimate({
@@ -181,6 +196,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         required
                                         value={timeEstimate?.numberOfHours}
                                         type="text"
+                                        readOnly={readonly}
                                         onChange={(e) =>
                                             setTimeEstimate({
                                                 ...timeEstimate,
@@ -204,6 +220,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                     <Form.Control
                                         type="text"
                                         required
+                                        readOnly={readonly}
                                         value={timeEstimate?.pricePerHour}
                                         onChange={(e) =>
                                             setTimeEstimate({
@@ -229,12 +246,20 @@ const TimeEstimateModal: React.FC<Props> = ({
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={() => handleHide()}>
-                    Avbryt
-                </Button>
-                <Button form={formId} type="submit" variant="primary">
-                    Spara
-                </Button>
+                {readonly ? (
+                    <Button variant="primary" onClick={() => handleHide()}>
+                        Stäng
+                    </Button>
+                ) : (
+                    <>
+                        <Button variant="secondary" onClick={() => handleHide()}>
+                            Avbryt
+                        </Button>
+                        <Button form={formId} type="submit" variant="primary">
+                            Spara
+                        </Button>
+                    </>
+                )}
             </Modal.Footer>
         </Modal>
     );

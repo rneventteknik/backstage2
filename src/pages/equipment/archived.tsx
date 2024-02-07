@@ -70,7 +70,7 @@ const breadcrumbs = [
 ];
 
 const EquipmentListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: equipment, error, isValidating } = useSwr('/api/equipment/archived', equipmentsFetcher);
+    const { data: equipment, error } = useSwr('/api/equipment/archived', equipmentsFetcher);
 
     if (error) {
         return (
@@ -83,7 +83,7 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser, globalSettings 
         );
     }
 
-    if (isValidating || !equipment) {
+    if (!equipment) {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 

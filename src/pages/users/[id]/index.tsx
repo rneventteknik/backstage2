@@ -26,7 +26,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
     // Edit user
     //
     const router = useRouter();
-    const { data: user, error, isValidating } = useSwr('/api/users/' + router.query.id, userFetcher);
+    const { data: user, error } = useSwr('/api/users/' + router.query.id, userFetcher);
     const { data: bookings } = useSwr('/api/users/' + router.query.id + '/bookings', bookingsFetcher);
     const { data: coOwnerBookings } = useSwr('/api/users/' + router.query.id + '/coOwnerBookings', bookingsFetcher);
 
@@ -41,7 +41,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         );
     }
 
-    if (isValidating || !user) {
+    if (!user) {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
