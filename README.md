@@ -1,6 +1,6 @@
 # Backstage2
 
-Backstage2 is a web app that is created by RN, for RN, and is used to keep track of all of our events.
+Backstage2 is a web app that is created by RN, for RN, and is used to keep track of all of our events. It is hosted in Heroku.
 
 ## Tech Stack
 
@@ -14,9 +14,11 @@ Our package manager of choice is [`yarn`](https://yarnpkg.com/). After cloning t
 
 `yarn seed` will seed your database with some mock data.
 
+`yarn reset-sqlite` will remove the existing sqlite database, create a new one, and seed it with data.
+
 `yarn dev` will start a local development server.
 
-`yarn type-check` will type-check all of the code using _Typescript_.
+`yarn tc` will type-check all of the code using _Typescript_.
 
 `yarn lint` will run _eslint_ on all relevant files and fix any problems it knows how to fix automatically.
 
@@ -29,29 +31,28 @@ A few environment variables are needed to get this app to run. To configure thes
 ```
 SECRET_COOKIE_PASSWORD={session cookie secret; >32 chars (mandatory, used to encrypt the session)}
 
-DB_HOST={database host name (optional, only needed when using PostgreSQL)}
-DB_USER={databse user name (optional, only needed when using PostgreSQL)}
-DB_PASS={database password (optional, only needed when using PostgreSQL)}
-DB_NAME={database name (optional, only needed when using PostgreSQL)}
-DB_SSL={true or false (optional, only needed when using PostgreSQL)}
+DATABASE_URL=postgres://{user}:{password}@{hostname}:{port}/{database-name} (optional, only needed when using PostgreSQL)
+DB_SSL={true or false} (optional, only needed when using PostgreSQL)
 
-NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS={json array with external links, where each link is an object with a title and an url attribute (optional, defaults to empty list)}
-NEXT_PUBLIC_BACKSTAGE2_BASE_URL={Base url of backstage 2, for example http://192.168.1.100:3000}
-
-NEXT_PUBLIC_SALARY_NORMAL= Salary price on the normal price list. [kr/h]
-NEXT_PUBLIC_SALARY_THS= Salary price on the discounted THS price list. [kr/h]
-
-MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay logged in. (optional, defaults to forever if not set)}
+MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay logged in.} (optional, defaults to forever if not set)
 
 CALENDAR_API_KEY={Google Calender API Key, with read-access to calendars}
 CALENDAR_ID={Google Calender ID to fetch events from}
+
+DRIVE_CREDENTIALS={Base64 encoded Google Drive Service Account credentials in JSON format. The account should have write-access to DRIVE_ROOT_FOLDER}
+DRIVE_ROOT_FOLDER_ID={ID of folder which contains booking folders}
+
+SLACK_BOT_TOKEN={API token for slack bot, with chat:write access}
+SLACK_CHANNEL_ID={Slack channel to post message to}
+APPLICATION_BASE_URL={Base URL of application when generating links, for example http://localhost:3000}
+NEXT_PUBLIC_BACKSTAGE2_BASE_URL={Base url of backstage 2, for example http://192.168.1.100:3000}
 ```
 
 ### Version Control
 
 #### Branching Model
 
-We use the branching model [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). This means that we have a production branch (does not exist yet) and separate development branch called `dev`.
+We use the branching model [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). This means that we have a production branch (`main`) and separate development branch called `dev`.
 
 Our branch naming convention is based on this model and we use prefixes to indicate what type every branch has. The prefixes in use are:
 

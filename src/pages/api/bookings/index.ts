@@ -31,9 +31,12 @@ const handler = withSessionContext(
 
                 await insertBooking(req.body.booking)
                     .then((result) => {
-                        logChangeToBooking(context.currentUser, result.id, BookingChangelogEntryType.CREATE).then(() =>
-                            res.status(200).json(result),
-                        );
+                        logChangeToBooking(
+                            context.currentUser,
+                            result.id,
+                            result.name,
+                            BookingChangelogEntryType.CREATE,
+                        ).then(() => res.status(200).json(result));
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;

@@ -1,25 +1,37 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent } from 'react';
 import { BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
-import { validDate, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
+import { countNullorEmpty, getStatusColor, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Button, Col, Collapse, Form } from 'react-bootstrap';
+import { Col, Form } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
+import { formatDateForForm, getBookingDateHeadingValue, validDate } from '../lib/datetimeUtils';
+import AdvancedFilters from './AdvancedFilters';
+import BookingStatusTag from './utils/BookingStatusTag';
+import { useSessionStorageState, useSessionStorageStateForDate } from '../lib/useSessionStorageState';
+import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
         <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
 
+        <BookingStatusTag booking={booking} className="ml-1" />
         <BookingTypeTag booking={booking} className="ml-1" />
         <RentalStatusTag booking={booking} className="ml-1" />
-        <p className="text-muted mb-0">{getStatusName(booking.status)}</p>
-        <p className="text-muted mb-0 d-lg-none">{booking.customerName ?? '-'}</p>
-        <p className="text-muted mb-0 d-lg-none">{booking.ownerUser?.name ?? '-'}</p>
+        <FixedPriceStatusTag booking={booking} className="ml-1" />
+        <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
+    </>
+);
+
+const BookingUsageIntervalDisplayFn = (booking: BookingViewModel) => (
+    <>
+        <p className="mb-0">{booking.displayUsageInterval}</p>
+        {booking.displayUsageInterval !== booking.displayEquipmentOutInterval ? (
+            <p className="text-muted mb-0">{booking.displayEquipmentOutInterval}</p>
+        ) : null}
     </>
 );
 
@@ -28,26 +40,31 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
     defaultSortPropertyName: 'date',
     defaultSortAscending: false,
     hideTableFilter: true,
+    statusColumns: [
+        {
+            key: 'status',
+            getValue: (booking: BookingViewModel) => getStatusName(booking.status),
+            getColor: (booking: BookingViewModel) => getStatusColor(booking.status),
+        },
+    ],
     columns: [
         {
             key: 'name',
             displayName: 'Bokning',
             getValue: (booking: BookingViewModel) => booking.name,
-            textTruncation: true,
             getContentOverride: BookingNameDisplayFn,
         },
         {
-            key: 'customerName',
-            displayName: 'Beställare',
-            getValue: (booking: BookingViewModel) => booking.customerName ?? '-',
-            textTruncation: true,
-            cellHideSize: 'lg',
+            key: 'date',
+            displayName: 'Datum',
+            getValue: (booking: BookingViewModel) => booking.isoFormattedUsageStartString,
+            getHeadingValue: getBookingDateHeadingValue,
+            getContentOverride: BookingUsageIntervalDisplayFn,
         },
         {
             key: 'location',
             displayName: 'Plats',
             getValue: (booking: BookingViewModel) => booking.location ?? '-',
-            textAlignment: 'center',
             cellHideSize: 'xl',
             columnWidth: 180,
         },
@@ -55,16 +72,9 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
             key: 'ownerUser',
             displayName: 'Ansvarig',
             getValue: (booking: BookingViewModel) => booking.ownerUser?.name ?? '-',
-            textAlignment: 'center',
+            getHeadingValue: (booking: BookingViewModel) => booking.ownerUser?.name ?? '-',
             cellHideSize: 'lg',
             columnWidth: 180,
-        },
-        {
-            key: 'date',
-            displayName: 'Datum',
-            getValue: (booking: BookingViewModel) => booking.displayStartDate,
-            columnWidth: 180,
-            textAlignment: 'center',
         },
     ],
 };
@@ -75,12 +85,11 @@ type Props = {
 };
 
 const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }: Props) => {
-    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-    const [searchText, setSearchText] = useState('');
-    const [userIds, setUserIds] = useState<(number | undefined)[]>([]);
-    const [statuses, setStatuses] = useState<(Status | undefined)[]>([]);
-    const [startDate, setStartDate] = useState<Date | undefined>();
-    const [endDate, setEndDate] = useState<Date | undefined>();
+    const [searchText, setSearchText] = useSessionStorageState('large-booking-table-search-text', '');
+    const [userIds, setUserIds] = useSessionStorageState<number[]>('large-booking-table-user-ids', []);
+    const [statuses, setStatuses] = useSessionStorageState<Status[]>('large-booking-table-statuses', []);
+    const [startDate, setStartDate] = useSessionStorageStateForDate('large-booking-table-start-date');
+    const [endDate, setEndDate] = useSessionStorageStateForDate('large-booking-table-end-date');
 
     // Generate option lists for filters
     //
@@ -95,6 +104,15 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
         .filter(notEmpty)
         .filter(onlyUniqueById)
         .map((user) => ({ label: user.name, value: user.id }));
+
+    // Check stored values against available values and reset stored values if they do not match available ones
+    //
+    if (userIds.some((id) => !ownerUserOptions.some((x) => x.value === id))) {
+        setUserIds([]);
+    }
+    if (statuses.some((status) => !statusOptions.some((x) => x.value === status))) {
+        setUserIds([]);
+    }
 
     // Handlers for changed bookings
     //
@@ -113,35 +131,36 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
     // Filter list. Note that the free text filter are handled by the table and not here.
     //
     const bookingsToShow = bookings
-        .filter((booking: BookingViewModel) => userIds.length === 0 || userIds.indexOf(booking.ownerUser?.id) >= 0)
+        .filter(
+            (booking: BookingViewModel) =>
+                userIds.length === 0 || (booking.ownerUser?.id && userIds.indexOf(booking.ownerUser?.id) >= 0),
+        )
         .filter((booking: BookingViewModel) => statuses.length === 0 || statuses.indexOf(booking.status) >= 0)
         .filter(
             (booking: BookingViewModel) =>
-                !startDate || !validDate(startDate) || (booking.startDate && booking.startDate > startDate),
+                !startDate ||
+                !validDate(startDate) ||
+                (booking.usageStartDatetime && booking.usageStartDatetime > startDate),
         )
         .filter(
             (booking: BookingViewModel) =>
-                !endDate || !validDate(endDate) || (booking.endDate && booking.endDate < endDate),
+                !endDate || !validDate(endDate) || (booking.usageEndDatetime && booking.usageEndDatetime < endDate),
         );
 
     return (
         <>
-            <Form.Row>
-                <Col>
-                    <Form.Group>
-                        <Form.Control type="text" placeholder="Fritextfilter" onChange={handleChangeFilterString} />
-                    </Form.Group>
-                </Col>
-                <Col md="auto">
-                    <Form.Group>
-                        <Button variant="dark" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
-                            <FontAwesomeIcon icon={faFilter} /> {showAdvancedFilters ? 'Göm' : 'Visa'} filter
-                        </Button>
-                    </Form.Group>
-                </Col>
-            </Form.Row>
-
-            <Collapse in={showAdvancedFilters}>
+            <AdvancedFilters
+                handleChangeFilterString={handleChangeFilterString}
+                searchText={searchText}
+                resetAdvancedFilters={() => {
+                    setSearchText('');
+                    setUserIds([]);
+                    setStatuses([]);
+                    setStartDate(undefined);
+                    setEndDate(undefined);
+                }}
+                activeFilterCount={countNullorEmpty(searchText, userIds, statuses, startDate, endDate)}
+            >
                 <Form.Row className="mb-2">
                     <Col md="4">
                         <Form.Group>
@@ -153,36 +172,50 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
                                 options={statusOptions}
                                 onChange={(e) => setStatuses(e.map((o) => o.value))}
                                 placeholder="Filtrera på status"
+                                selected={statuses
+                                    .map((id) => statusOptions.find((x) => x.value === id))
+                                    .filter(notEmpty)}
                             />
                         </Form.Group>
                     </Col>
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Ansvarig</Form.Label>
-                            <Typeahead<{ label: string; value: Status }>
+                            <Typeahead<{ label: string; value: number }>
                                 id="user-typeahead"
                                 multiple
                                 labelKey={(x) => x.label}
                                 options={ownerUserOptions}
                                 onChange={(e) => setUserIds(e.map((o) => o.value))}
                                 placeholder="Filtrera på ansvarig"
+                                selected={userIds
+                                    .map((id) => ownerUserOptions.find((x) => x.value === id))
+                                    .filter(notEmpty)}
                             />
                         </Form.Group>
                     </Col>
                     <Col md="2">
                         <Form.Group>
                             <Form.Label>Börjar efter</Form.Label>
-                            <Form.Control type="date" onChange={handleChangeStartDate} />
+                            <Form.Control
+                                type="date"
+                                onChange={handleChangeStartDate}
+                                value={formatDateForForm(startDate)}
+                            />
                         </Form.Group>
                     </Col>
                     <Col md="2">
                         <Form.Group>
                             <Form.Label>Slutar före</Form.Label>
-                            <Form.Control type="date" onChange={handleChangeEndDate} />
+                            <Form.Control
+                                type="date"
+                                onChange={handleChangeEndDate}
+                                value={formatDateForForm(endDate)}
+                            />
                         </Form.Group>
                     </Col>
                 </Form.Row>
-            </Collapse>
+            </AdvancedFilters>
 
             <TableDisplay
                 entities={bookingsToShow}

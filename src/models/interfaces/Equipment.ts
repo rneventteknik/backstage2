@@ -7,16 +7,18 @@ import { EquipmentPublicCategory } from './EquipmentPublicCategory';
 import { EquipmentLocation } from './EquipmentLocation';
 
 export interface Equipment extends BaseEntityWithName {
-    inventoryCount: number;
+    inventoryCount: number | null;
     nameEN: string;
     description: string;
     descriptionEN: string;
+    searchKeywords: string;
     note: string;
     image?: Image;
     publiclyHidden: boolean;
+    isArchived: boolean;
     equipmentPublicCategory?: EquipmentPublicCategory;
     equipmentLocation?: EquipmentLocation;
-    changeLog: EquipmentChangelogEntry[];
+    changelog: EquipmentChangelogEntry[];
     tags: EquipmentTag[];
     prices: EquipmentPrice[];
 }

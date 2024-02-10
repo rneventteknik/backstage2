@@ -1,6 +1,11 @@
 import { Font, StyleSheet } from '@react-pdf/renderer';
+import { getNumberOfDays } from '../lib/datetimeUtils';
 import { Booking } from '../models/interfaces';
+import { PricedEntity } from '../models/interfaces/BaseEntity';
 import { EquipmentListEntry } from '../models/interfaces/EquipmentList';
+import { addVATToPrice, formatPrice } from '../lib/pricingUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
+import { getGlobalSetting } from '../lib/utils';
 
 export const registerFonts = (): void => {
     Font.register({
@@ -49,15 +54,28 @@ export const commonStyles = StyleSheet.create({
         fontSize: 8,
         fontFamily: 'Roboto',
     },
+    row: {
+        flexDirection: 'row',
+    },
     col: {
         padding: 5,
         flexGrow: 1,
+        flexBasis: 0,
     },
     flexGrow: {
         flexGrow: 1,
     },
     marginBottom: {
-        marginBottom: 5,
+        marginBottom: '5px',
+    },
+    marginBottomLarge: {
+        marginBottom: '15px',
+    },
+    marginTop: {
+        marginTop: '5px',
+    },
+    marginTopLarge: {
+        marginTop: '15px',
     },
     bold: {
         fontWeight: 700,
@@ -79,10 +97,6 @@ export const commonStyles = StyleSheet.create({
         fontFamily: 'Open Sans',
     },
 });
-
-export const getBookingDocumentId = (booking: Booking): string => {
-    return `#${booking.created?.getFullYear()}-${booking.id}`;
-};
 
 export const formatEquipmentListEntryCount = (entry: EquipmentListEntry, t: (t: string) => string) => {
     if (entry.numberOfUnits === 1) {
@@ -106,12 +120,26 @@ export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, 
     return formatEquipmentListEntryCount(entry, t);
 };
 
-export const formatEquipmentListEntryPrice = (entry: EquipmentListEntry, t: (t: string) => string) => {
-    if (entry.pricePerHour && !entry.pricePerUnit) {
-        return `${entry.pricePerHour} kr/${t('common.misc.hours-unit')}`;
-    } else if (!entry.pricePerHour && entry.pricePerUnit) {
-        return `${entry.pricePerUnit} kr/${t('common.misc.count-unit-single')}`;
-    } else {
-        return `${entry.pricePerUnit} kr + ${entry.pricePerHour} kr/h`;
-    }
-};
+export const formatEquipmentListEntryPriceWithVAT = (entry: PricedEntity, t: (t: string) => string) =>
+    formatPrice(addVATToPrice(entry), t('common.misc.hours-unit'), t('common.misc.count-unit-single'));
+
+export const allListsAreOneDay = (booking: Booking) =>
+    booking.equipmentLists &&
+    booking.equipmentLists.length > 0 &&
+    booking.equipmentLists.every((list) => getNumberOfDays(list) === 1);
+
+export const allListsHaveSameDates = (booking: Booking) =>
+    booking.equipmentLists &&
+    booking.equipmentLists.length > 0 &&
+    booking.equipmentLists.every(
+        (list) =>
+            booking.equipmentLists &&
+            list.numberOfDays === booking.equipmentLists[0]?.numberOfDays &&
+            list.usageEndDatetime?.getTime() === booking.equipmentLists[0]?.usageEndDatetime?.getTime() &&
+            list.usageStartDatetime?.getTime() === booking.equipmentLists[0]?.usageStartDatetime?.getTime(),
+    );
+
+export const getTextResourcesFromGlobalSettings = (globalSettings: KeyValue[]) => ({
+    sv: JSON.parse(getGlobalSetting('content.documentTextResources.sv', globalSettings, '{}')),
+    en: JSON.parse(getGlobalSetting('content.documentTextResources.en', globalSettings, '{}')),
+});

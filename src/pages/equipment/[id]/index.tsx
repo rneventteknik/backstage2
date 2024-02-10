@@ -4,36 +4,78 @@ import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { equipmentFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
+import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import EquipmentCalendar from '../../../components/equipment/EquipmentCalendar';
 import EquipmentBookings from '../../../components/equipment/EquipmentBookings';
+import EquipmentTagDisplay from '../../../components/utils/EquipmentTagDisplay';
+import ChangelogCard from '../../../components/ChangelogCard';
+import MarkdownCard from '../../../components/MarkdownCard';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
+import { getPricePlanName, getResponseContentOrError } from '../../../lib/utils';
+import { PricePlan } from '../../../models/enums/PricePlan';
+import { PartialDeep } from 'type-fest';
+import { toEquipment } from '../../../lib/mappers/equipment';
+import { IEquipmentObjectionModel } from '../../../models/objection-models';
+import { useNotifications } from '../../../lib/useNotifications';
+import { Role } from '../../../models/enums/Role';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     // Edit user
     //
     const router = useRouter();
-    const { data: equipment, error, isValidating } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
+    const { data: equipment, error, mutate } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
+
+    const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
-    if (isValidating || !equipment) {
-        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} />;
+    if (!equipment) {
+        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
+
+    const handleSubmit = async (equipment: PartialDeep<IEquipmentObjectionModel>) => {
+        const body = { equipment: equipment };
+
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        fetch('/api/equipment/' + router.query.id, request)
+            .then((apiResponse) => getResponseContentOrError<IEquipmentObjectionModel>(apiResponse))
+            .then(toEquipment)
+            .then((equipment) => {
+                mutate(equipment, false);
+                showSaveSuccessNotification('Utrustningen');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Utrustningen');
+            });
+    };
 
     // The page itself
     //
@@ -44,7 +86,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href={'/equipment/' + equipment.id + '/edit'} passHref>
@@ -59,12 +101,17 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 <Col xl={4}>
                     <Card className="mb-3">
                         <Card.Header>
-                            <div style={{ fontSize: '1.6em' }}>{equipment.name}</div>
+                            <div style={{ fontSize: '1.6em' }}>
+                                {equipment.name}
+                                {equipment.isArchived ? (
+                                    <Badge variant="warning" className="ml-2">
+                                        Arkiverad
+                                    </Badge>
+                                ) : null}
+                            </div>
                             <div>
                                 {equipment.tags.map((x) => (
-                                    <Badge variant="dark" key={x.id} className="mr-1">
-                                        {x.name}
-                                    </Badge>
+                                    <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
                                 ))}
                             </div>
                             <div className="text-muted mt-2">{equipment.description}</div>
@@ -80,7 +127,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Antal</span>
-                                <span>{equipment.inventoryCount}</span>
+                                <span>{equipment.inventoryCount ?? '-'}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Plats</span>
@@ -102,17 +149,18 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </Card>
 
                     <Card className="mb-3">
-                        <Card.Header>Prissättning</Card.Header>
+                        <Card.Header>Prissättning (ink. moms)</Card.Header>
                         <ListGroup variant="flush">
                             {equipment.prices.map((p) => (
-                                <ListGroup.Item key={p.id} className="d-flex">
-                                    <span className="flex-grow-1">
-                                        {p.name}
-                                        <br />
-                                        <span className="text-muted">{p.name} (THS)</span>
+                                <ListGroup.Item key={p.id}>
+                                    <span className="d-block">{p.name}</span>
+                                    <span className="d-flex text-muted">
+                                        <span className="flex-grow-1">{getPricePlanName(PricePlan.EXTERNAL)}</span>
+                                        <span>{formatPrice(addVATToPriceWithTHS(p))}</span>
                                     </span>
-                                    <span>
-                                        {formatPrice(p)} <br /> <span className="text-muted">{formatTHSPrice(p)}</span>
+                                    <span className="d-flex text-muted">
+                                        <span className="flex-grow-1">{getPricePlanName(PricePlan.THS)}</span>
+                                        <span>{formatTHSPrice(addVATToPriceWithTHS(p))}</span>
                                     </span>
                                 </ListGroup.Item>
                             ))}
@@ -124,8 +172,16 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             ) : null}
                         </ListGroup>
                     </Card>
+
+                    <ChangelogCard changelog={equipment.changelog ?? []} />
                 </Col>
                 <Col xl={8}>
+                    <MarkdownCard
+                        text={equipment.note}
+                        onSubmit={(x) => handleSubmit({ name: equipment.name, note: x })}
+                        cardTitle={'Anteckningar'}
+                        readonly={currentUser.role === Role.READONLY}
+                    />
                     <EquipmentCalendar equipment={equipment} />
                     <EquipmentBookings equipment={equipment} />
                 </Col>

@@ -1,4 +1,4 @@
-import { BaseEntity, HasId } from '../models/interfaces/BaseEntity';
+import { BaseEntity, HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import { MemberStatus } from '../models/enums/MemberStatus';
 import { Role } from '../models/enums/Role';
 import { Status } from '../models/enums/Status';
@@ -8,10 +8,12 @@ import { BookingType } from '../models/enums/BookingType';
 import { SalaryStatus } from '../models/enums/SalaryStatus';
 import { PaymentStatus } from '../models/enums/PaymentStatus';
 import { RentalStatus } from '../models/enums/RentalStatus';
-import { Booking, BookingViewModel, Equipment } from '../models/interfaces';
+import { BookingViewModel, Equipment, TimeReport } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
 import { LoginToken } from '../models/misc/LoginToken';
+import { getEquipmentOutDatetime, getEquipmentInDatetime, addDays, addHours } from './datetimeUtils';
+import { KeyValue } from '../models/interfaces/KeyValue';
 
 // Helper functions for array operations
 //
@@ -27,50 +29,10 @@ export const onlyUniqueById = <T extends BaseEntity>(value: T, index: number, se
 
 export const notEmpty = <T>(value: T | null | undefined): value is T => value !== null && value !== undefined;
 
-export const updateItemsInArrayById = <T extends HasId>(list: T[], ...updatedItems: T[]): T[] =>
+export const updateItemsInArrayById = <T extends HasId | HasStringId>(list: T[], ...updatedItems: T[]): T[] =>
     list.map((item) => updatedItems.find((x) => x.id === item.id) ?? item);
 
-// Date formatter
-//
-const datetimeFormatOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-};
-
-export const formatDatetime = (date: Date): string => date.toLocaleString('sv-SE', datetimeFormatOptions);
-
-const dateFormatOptions: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'numeric',
-    day: 'numeric',
-};
-
-export const formatDate = (date: Date): string => date.toLocaleString('sv-SE', dateFormatOptions);
-
-export const formatNullableDate = (date: Date | null, defaultValue = '-'): string =>
-    date ? date.toLocaleString('sv-SE', dateFormatOptions) : defaultValue;
-
-// Check if value is a valid date
-//
-export const validDate = (date: Date | undefined): date is Date =>
-    !!date && date instanceof Date && !isNaN(date.getTime());
-
-export const convertToDateOrUndefined = (newDateString: string | undefined): Date | undefined => {
-    if (!newDateString) {
-        return undefined;
-    }
-
-    const date = new Date(newDateString);
-
-    if (isNaN(date.getTime())) {
-        return undefined;
-    }
-
-    return date;
-};
+export const uppercaseFirstLetter = (string: string) => string.charAt(0).toUpperCase() + string.slice(1);
 
 // Get string from status code
 //
@@ -100,13 +62,26 @@ export const getPricePlanName = (pricePlan: PricePlan): string => {
     }
 };
 
-export const getAccountKindName = (accountKind: AccountKind): string => {
+export const getAccountKindName = (accountKind: AccountKind | null): string => {
     switch (accountKind) {
         case AccountKind.EXTERNAL:
             return 'Normal';
 
         case AccountKind.INTERNAL:
             return 'Intern';
+
+        case null:
+            return '-';
+    }
+};
+
+export const getAccountKindSalaryInvoiceAccount = (accountKind: AccountKind, globalSettings: KeyValue[]): string => {
+    switch (accountKind) {
+        case AccountKind.EXTERNAL:
+            return getGlobalSetting('accounts.defaultSalaryAccount.external', globalSettings);
+
+        case AccountKind.INTERNAL:
+            return getGlobalSetting('accounts.defaultSalaryAccount.internal', globalSettings);
     }
 };
 
@@ -123,10 +98,10 @@ export const getBookingTypeName = (bookingType: BookingType): string => {
 export const getSalaryStatusName = (salaryStatus: SalaryStatus): string => {
     switch (salaryStatus) {
         case SalaryStatus.NOT_SENT:
-            return 'Inte skickad';
+            return 'Inte skickat';
 
         case SalaryStatus.SENT:
-            return 'Skickad';
+            return 'Skickat';
     }
 };
 
@@ -136,13 +111,19 @@ export const getPaymentStatusName = (paymentStatus: PaymentStatus): string => {
             return 'Obetald';
 
         case PaymentStatus.PAID:
-            return 'Betald';
+            return 'Skall ej faktureras';
 
         case PaymentStatus.INVOICED:
             return 'Fakturerad';
 
         case PaymentStatus.PAID_WITH_INVOICE:
             return 'Betald med faktura';
+
+        case PaymentStatus.READY_FOR_CASH_PAYMENT:
+            return 'Redo för KårX';
+
+        case PaymentStatus.PAID_WITH_CASH:
+            return 'Betald i KårX';
     }
 };
 
@@ -193,6 +174,9 @@ export const getRoleName = (role: Role | undefined): string => {
         case Role.READONLY:
             return 'Läsbehörighet';
 
+        case Role.CASH_PAYMENT_MANAGER:
+            return 'Betalningshanterarbehörighet';
+
         default:
             return '';
     }
@@ -208,17 +192,30 @@ export const getLanguageName = (language: Language): string => {
     }
 };
 
+// Status Colors
+//
+export const getStatusColor = (status: Status): string => {
+    switch (status) {
+        case Status.DRAFT:
+            return '#75346C';
+
+        case Status.BOOKED:
+            return '#1565C0';
+
+        case Status.DONE:
+            return '#28A745';
+
+        case Status.CANCELED:
+            return '#DC3545';
+    }
+};
+
 // Check if value is a valid member of an enum
 //
 export const isMemberOfEnum = (value: number, enumObject: Record<string, unknown>): boolean =>
     !isNaN(Number(value)) && Object.keys(enumObject).indexOf(value.toString()) >= 0;
 
-// To date or undefined
-//
-export const toDateOrUndefined = (dateString: string | undefined | null): Date | undefined =>
-    dateString ? new Date(dateString) : undefined;
-
-// Parse int woth check for undefined/null
+// Parse int with check for undefined/null
 //
 export const toIntOrUndefined = (value: string | undefined | null, forceAbsoluteValue = false): number | undefined => {
     if (value === undefined || value === null || value.length === 0) {
@@ -261,6 +258,9 @@ export const getResponseContentOrError = async <T>(res: Response): Promise<T> =>
     return res.json();
 };
 
+// Sum function
+export const reduceSumFn = (a: number | undefined | null, b: number | undefined | null) => (a ?? 0) + (b ?? 0);
+
 // Replace empty strings or strings with only whitespace with null
 //
 export const replaceEmptyStringWithNull = (s: string | undefined | null): string | null => {
@@ -275,40 +275,89 @@ export const replaceEmptyStringWithNull = (s: string | undefined | null): string
     return s;
 };
 
-export const getPricePerHour = (pricePlan: PricePlan): number | undefined => {
-    if (!process.env.NEXT_PUBLIC_SALARY_NORMAL)
-        throw new Error('Configuration missing salary for the Normal price plan');
+// Count number of null or empty values
+export const countNullorEmpty = (...values: (string | Date | number | null | boolean | undefined | unknown[])[]) =>
+    values.filter((x) => (Array.isArray(x) ? x.length > 0 : !!x)).length;
 
-    if (!process.env.NEXT_PUBLIC_SALARY_THS) throw new Error('Configuration missing salary for the THS price plan');
+// Get value or if the input is an array, the first value (useful for parsing url query params)
+//
+export const getValueOrFirst = <T>(data: T | T[]) => (Array.isArray(data) ? data[0] : data);
 
-    const pricePerHour =
-        pricePlan == PricePlan.EXTERNAL ? process.env.NEXT_PUBLIC_SALARY_NORMAL : process.env.NEXT_PUBLIC_SALARY_THS;
-
-    return toIntOrUndefined(pricePerHour);
-};
-
-export const getBookingDates = (booking: Booking) => {
-    const dates = booking.equipmentLists?.flatMap((x) => [x.usageStartDatetime, x.usageEndDatetime]).filter(validDate);
-
-    if (!dates || (dates && dates.length === 0)) {
-        return { start: undefined, end: undefined };
+export const toKeyValue = (keyValue: KeyValue): KeyValue => {
+    if (!keyValue.key || keyValue.value === undefined) {
+        throw 'Invalid key or value';
     }
 
-    const start = dates.reduce((a, b) => (a < b ? a : b));
-    const end = dates.reduce((a, b) => (a > b ? a : b));
-
-    return { start, end };
+    return {
+        key: keyValue.key,
+        value: keyValue.value,
+    };
 };
 
-export const toBookingViewModel = (booking: Booking): BookingViewModel => {
-    const { start, end } = getBookingDates(booking);
+export const getGlobalSetting = (key: string, globalSettings: KeyValue[], defaultValue?: string | null): string => {
+    const setting = globalSettings?.find((x) => x.key == key);
 
-    return { ...booking, displayStartDate: start ? formatDate(start) : '-', startDate: start, endDate: end };
+    if (setting) {
+        return setting.value;
+    }
+
+    if (defaultValue != undefined) {
+        return defaultValue;
+    }
+
+    throw new Error(`${key} cannot be found in the settings database`);
 };
 
-export const showActiveBookings = (booking: BookingViewModel) => {
-    return booking.status === Status.BOOKED || (booking.status === Status.DRAFT && booking.startDate);
+export const getDefaultLaborHourlyRate = (pricePlan: PricePlan, globalSettings: KeyValue[]): number => {
+    const LaborHourlyRateExternal = getGlobalSetting('laborHourlyRate.external', globalSettings);
+    const LaborHourlyRateTHS = getGlobalSetting('laborHourlyRate.ths', globalSettings);
+
+    const defaultLaborHourlyRate = pricePlan == PricePlan.EXTERNAL ? LaborHourlyRateExternal : LaborHourlyRateTHS;
+
+    return toIntOrUndefined(defaultLaborHourlyRate) ?? 0;
 };
+
+export const IsBookingActive = (booking: BookingViewModel) => {
+    return booking.status === Status.BOOKED || (booking.status === Status.DRAFT && booking.usageStartDatetime);
+};
+
+export const IsBookingDraftOrBooked = (booking: BookingViewModel) => {
+    return booking.status === Status.BOOKED || booking.status === Status.DRAFT;
+};
+
+export const IsBookingOut = (booking: BookingViewModel) => {
+    if (!booking.equipmentLists) {
+        throw new Error('Missing equipmentLists property');
+    }
+
+    if (booking.bookingType !== BookingType.RENTAL) {
+        return false;
+    }
+
+    return booking.equipmentLists?.some((x) => x.rentalStatus === RentalStatus.OUT);
+};
+
+export const IsBookingUpcomingRental = (booking: BookingViewModel) => {
+    if (!booking.equipmentLists) {
+        throw new Error('Missing equipmentLists property');
+    }
+
+    if (booking.bookingType !== BookingType.RENTAL) {
+        return false;
+    }
+
+    return booking.equipmentLists?.some((x) => {
+        const equipmentOutDatetime = getEquipmentOutDatetime(x);
+        return (
+            equipmentOutDatetime &&
+            equipmentOutDatetime > addHours(new Date(), -12) &&
+            equipmentOutDatetime < addDays(new Date(), 1)
+        );
+    });
+};
+
+export const getTotalNumberOfHoursReported = (timeReports: TimeReport[]) =>
+    timeReports.reduce((hours, timeReport) => hours + timeReport.billableWorkingHours, 0);
 
 // Calculate the max number of equipment used at the same time. To do this, we look
 // at the start of each equipment list and check how many equipments are used. We
@@ -318,30 +367,87 @@ export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equi
     Math.max(
         0,
         ...equipmentLists
-            .map((x) => x.equipmentOutDatetime ?? new Date(0)) // Calculate datetimes to check
+            .map((x) => getEquipmentOutDatetime(x) ?? new Date(0)) // Calculate datetimes to check
             .map((datetime) =>
                 equipmentLists
                     .filter(
                         // Find the lists which overlap the datetime
                         (list) =>
-                            list.equipmentOutDatetime &&
-                            list.equipmentOutDatetime <= datetime &&
-                            list.equipmentInDatetime &&
-                            list.equipmentInDatetime >= datetime,
+                            getEquipmentOutDatetime(list) &&
+                            (getEquipmentOutDatetime(list) ?? new Date()) <= datetime &&
+                            getEquipmentInDatetime(list) &&
+                            (getEquipmentInDatetime(list) ?? new Date()) >= datetime,
                     )
                     .reduce(
                         // Sum the equipment, first over all lists and within the lists over all entries
                         (sum, list) =>
                             sum +
-                            list.equipmentListEntries
+                            list.listEntries
                                 .filter((x) => x.equipmentId === equipment.id)
-                                .reduce((sum, x) => sum + x.numberOfUnits, 0),
+                                .reduce((sum, x) => sum + x.numberOfUnits, 0) +
+                            list.listHeadings.reduce(
+                                (sum, headingList) =>
+                                    sum +
+                                    headingList.listEntries
+                                        .filter((x) => x.equipmentId === equipment.id)
+                                        .reduce((sum, x) => sum + x.numberOfUnits, 0),
+                                0,
+                            ),
                         0,
                     ),
             ),
     );
 
+export const listContainsEquipment = (list: EquipmentList, equipment: HasId) =>
+    list.listEntries.some((entry) => entry.equipment?.id === equipment.id) ||
+    list.listHeadings.some((heading) => heading.listEntries.some((entry) => entry.equipment?.id === equipment.id));
+
+export const range = (start: number, end: number): number[] => {
+    return [...Array(end - start).keys()].map((i) => i + start);
+};
+
+export const getPartialSearchStrings = (searchString: string) =>
+    searchString
+        .trim()
+        .split(/\s+/)
+        .map((x) => '%' + x + '%');
+
+// Function to sort entitied by created date
+export const createdSortFn = (a: BaseEntity, b: BaseEntity) => {
+    if ((a.created ?? 0) < (b.created ?? 0)) {
+        return 1;
+    }
+    if ((a.created ?? 0) > (b.created ?? 0)) {
+        return -1;
+    }
+
+    // Use id for sorting as a fallback
+    if (a.id < b.id) {
+        return -1;
+    }
+    if (a.id > b.id) {
+        return 1;
+    }
+
+    return 0;
+};
+
+const formatOperationalYear = (year: number) => `${year}-${year + 1}`;
+
+export const getOperationalYear = (date?: Date) => {
+    if (!date) {
+        return 'N/A';
+    }
+
+    if (date.getMonth() < 6) {
+        // Operational year turns over at 1st of July (month is 0 indexed)
+        return formatOperationalYear(date.getFullYear() - 1);
+    }
+
+    return formatOperationalYear(date.getFullYear());
+};
+
 export const getTokenLabel = (loginToken: LoginToken) => {
     const token = loginToken.tokenId;
-    return `${token.substr(0, 2)}-${token.substr(2, 2)}-${token.substr(4, 2)}-${token.substr(6, 2)}`;
+    return `${token.substring(0, 2)}-${token.substring(2, 4)}-${token.substring(4, 6)}-${token.substring(6, 8)}`;
 };

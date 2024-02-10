@@ -2,21 +2,18 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Badge, Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, ListGroup, Row } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Col, Dropdown, ListGroup, Row } from 'react-bootstrap';
 import {
-    formatNullableDate,
     getAccountKindName,
-    getLanguageName,
-    getPaymentStatusName,
+    getDefaultLaborHourlyRate,
     getPricePlanName,
     getResponseContentOrError,
-    getStatusName,
+    getOperationalYear,
 } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
-import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
-import BookingTypeTag from '../../../components/utils/BookingTypeTag';
+import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import { bookingFetcher } from '../../../lib/fetchers';
 import TimeEstimateList from '../../../components/bookings/timeEstimate/TimeEstimateList';
 import TimeReportList from '../../../components/bookings/timeReport/TimeReportList';
@@ -24,7 +21,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faClock, faCoins, faFileDownload, faPen, faStopwatch } from '@fortawesome/free-solid-svg-icons';
+import { faCoins, faFileDownload, faLock, faLockOpen, faPen } from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
 import EquipmentLists from '../../../components/bookings/equipmentLists/EquipmentLists';
 import BookingStatusButton from '../../../components/bookings/BookingStatusButton';
@@ -33,45 +30,64 @@ import { toBooking } from '../../../lib/mappers/booking';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Status } from '../../../models/enums/Status';
 import { PaymentStatus } from '../../../models/enums/PaymentStatus';
-import BookingChangelogCard from '../../../components/bookings/BookingChangelogCard';
+import ChangelogCard from '../../../components/ChangelogCard';
 import {
+    addVAT,
     formatNumberAsCurrency,
     getBookingPrice,
-    getNumberOfBookingDays,
-    getNumberOfEventHours,
-    getUsageEndDatetime,
-    getUsageStartDatetime,
+    getEquipmentListPrice,
+    getTotalTimeEstimatesPrice,
+    getTotalTimeReportsPrice,
 } from '../../../lib/pricingUtils';
-import { Language } from '../../../models/enums/Language';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
-import { TimeEstimate, TimeReport } from '../../../models/interfaces';
-import { getNextSortIndex } from '../../../lib/sortIndexUtils';
-import TimeEstimateAddButton from '../../../components/bookings/timeEstimate/TimeEstimateAddButton';
-import TimeReportAddButton from '../../../components/bookings/timeReport/TimeReportAddButton';
-import RentalStatusTag from '../../../components/utils/RentalStatusTag';
+import { formatDateForForm, toBookingViewModel } from '../../../lib/datetimeUtils';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
+import MarkdownCard from '../../../components/MarkdownCard';
+import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButton';
+import ConfirmModal from '../../../components/utils/ConfirmModal';
+import BookingInfoSection from '../../../components/bookings/BookingInfoSection';
+import FilesCard from '../../../components/bookings/FilesCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
-    const [showTimeEstimateContent, setShowTimeEstimateContent] = useState(false);
-    const [showTimeReportContent, setShowTimeReportContent] = useState(false);
+
+    // Enable this when we enable the KårX feature
+    // const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
+    const [showConfirmPaidModal, setShowConfirmPaidModal] = useState(false);
+    const [adminEditModeOverrideEnabled, setAdminEditModeOverrideEnabled] = useState(false);
 
     // Edit booking
     //
     const router = useRouter();
-    const { data: booking, error, mutate } = useSwr('/api/bookings/' + router.query.id, bookingFetcher);
+    const { data, error, mutate } = useSwr('/api/bookings/' + router.query.id, bookingFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
-    if (!booking) {
-        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser}></TwoColLoadingPage>;
+    if (!data) {
+        return (
+            <TwoColLoadingPage
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            ></TwoColLoadingPage>
+        );
     }
+
+    const booking = toBookingViewModel(data);
 
     const saveBooking = async (booking: PartialDeep<IBookingObjectionModel>) => {
         const body = { booking: { ...booking, id: router.query.id } };
@@ -95,6 +111,24 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             });
     };
 
+    const updateBookingPaymentStatus = async (paymentStatus: PaymentStatus) => {
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+        };
+
+        fetch('/api/bookings/paymentStatus/' + router.query.id + '?status=' + paymentStatus, request)
+            .then((apiResponse) => getResponseContentOrError(apiResponse))
+            .then(() => {
+                mutate();
+                showSaveSuccessNotification('Bokningen');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Bokningen');
+            });
+    };
+
     // The page itself
     //
     const pageTitle = booking?.name;
@@ -103,131 +137,238 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
         { link: '/bookings/' + booking.id, displayName: pageTitle },
     ];
 
-    const mutateTimeEstimates = (updatedTimeEstimates: TimeEstimate[]) => {
-        if (!booking) {
-            throw new Error('Invalid booking');
-        }
-        mutate({ ...booking, timeEstimates: updatedTimeEstimates }, false);
-    };
+    const defaultLaborHourlyRate = getDefaultLaborHourlyRate(booking.pricePlan, globalSettings);
 
-    const mutateTimeReports = (updatedTimeReports: TimeReport[]) => {
-        if (!booking) {
-            throw new Error('Invalid booking');
-        }
-        mutate({ ...booking, timeReports: updatedTimeReports }, false);
-    };
-
-    const onAddTimeEstimate = async (timeEstimate: TimeEstimate) => {
-        setShowTimeEstimateContent(true);
-        mutateTimeEstimates([...(booking.timeEstimates ?? []), timeEstimate]);
-    };
-
-    const onAddTimeReport = async (timeReport: TimeReport) => {
-        setShowTimeReportContent(true);
-        mutateTimeReports([...(booking.timeReports ?? []), timeReport]);
-    };
+    const readonly =
+        (currentUser.role === Role.READONLY || booking.status === Status.DONE) && !adminEditModeOverrideEnabled;
+    const timeReportExists = booking.timeReports && booking.timeReports.length > 0;
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
-                <IfNotReadonly currentUser={currentUser}>
-                    <IfAdmin currentUser={currentUser} or={booking.status !== Status.DONE}>
+                {!readonly ? (
+                    <>
                         <Link href={'/bookings/' + booking.id + '/edit'} passHref>
                             <Button variant="primary" href={'/bookings/' + booking.id + '/edit'}>
                                 <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                             </Button>
                         </Link>
-                    </IfAdmin>
 
-                    <BookingStatusButton booking={booking} onChange={saveBooking} />
-                    <BookingRentalStatusButton booking={booking} onChange={saveBooking} />
-                </IfNotReadonly>
+                        <BookingStatusButton booking={booking} onChange={saveBooking} />
+                        <BookingRentalStatusButton booking={booking} onChange={saveBooking} />
+                    </>
+                ) : null}
                 <Dropdown as={ButtonGroup}>
                     <Button
-                        variant="dark"
+                        variant="secondary"
                         href={`/api/documents/price-estimate/${booking.language}/${booking.id}`}
                         target="_blank"
                     >
                         <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning
                     </Button>
 
-                    <Dropdown.Toggle split variant="dark" id="dropdown-split-basic" />
+                    <Dropdown.Toggle split variant="secondary" id="dropdown-split-basic" />
 
                     <Dropdown.Menu>
                         <Dropdown.Item href={'/api/documents/packing-list/sv/' + booking.id} target="_blank">
                             <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Packlista
                         </Dropdown.Item>
+                        <Dropdown.Item
+                            href={`/api/documents/rental-agreement/${booking.language}/` + booking.id}
+                            target="_blank"
+                        >
+                            <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Hyresavtal
+                        </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
-                <IfNotReadonly currentUser={currentUser}>
-                    <TimeReportAddButton
-                        booking={booking}
-                        disabled={booking.status === Status.DONE}
-                        sortIndex={getNextSortIndex(booking.timeEstimates ?? [])}
-                        onAdd={onAddTimeReport}
-                        currentUser={currentUser}
-                        variant="dark"
+                <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="secondary" />
+                <IfNotReadonly
+                    currentUser={currentUser}
+                    and={booking.status === Status.DONE && booking.paymentStatus === PaymentStatus.NOT_PAID}
+                >
+                    {/*
+
+                    Note: Enable this code once pating is KårX is available
+                    
+                    <Button variant="secondary" onClick={() => setShowConfirmReadyForCashPaymentModal(true)}>
+                        <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Skicka till KårX för betalning
+                    </Button>
+                    <ConfirmModal
+                        show={showConfirmReadyForCashPaymentModal}
+                        onHide={() => setShowConfirmReadyForCashPaymentModal(false)}
+                        onConfirm={() => {
+                            updateBookingPaymentStatus(PaymentStatus.READY_FOR_CASH_PAYMENT);
+                            setShowConfirmReadyForCashPaymentModal(false);
+                        }}
+                        title="Bekräfta"
+                        confirmLabel="Markera som redo att betalas i KårX"
+                        confirmButtonType="primary"
                     >
-                        <FontAwesomeIcon icon={faStopwatch} className="mr-1" />
-                        Rapportera tid
-                    </TimeReportAddButton>
+                        Vill du markera bokningen <em>{booking.name}</em> som redo att betalas i KårX?
+                    </ConfirmModal> */}
+
+                    <Button variant="secondary" onClick={() => setShowConfirmPaidModal(true)}>
+                        <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som skall ej faktureras
+                    </Button>
+                    <ConfirmModal
+                        show={showConfirmPaidModal}
+                        onHide={() => setShowConfirmPaidModal(false)}
+                        onConfirm={() => {
+                            updateBookingPaymentStatus(PaymentStatus.PAID);
+                            setShowConfirmPaidModal(false);
+                        }}
+                        title="Bekräfta"
+                        confirmLabel="Markera som skall ej faktureras"
+                        confirmButtonType="primary"
+                    >
+                        Vill du markera bokningen <em>{booking.name}</em> som skall ej faktureras?
+                    </ConfirmModal>
                 </IfNotReadonly>
-                <IfNotReadonly currentUser={currentUser}>
-                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer">
-                        <Dropdown.Item
-                            onClick={() => saveBooking({ paymentStatus: PaymentStatus.PAID })}
-                            disabled={
-                                booking.paymentStatus === PaymentStatus.PAID ||
-                                booking.paymentStatus === PaymentStatus.PAID_WITH_INVOICE
-                            }
-                        >
-                            <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som betald
-                        </Dropdown.Item>
-                        <TimeEstimateAddButton
-                            booking={booking}
-                            disabled={booking.status === Status.DONE}
-                            sortIndex={getNextSortIndex(booking.timeEstimates ?? [])}
-                            onAdd={onAddTimeEstimate}
-                            buttonType="dropdown"
-                        >
-                            <FontAwesomeIcon icon={faClock} className="mr-1 fw" />
-                            Lägg till tidsuppskattning
-                        </TimeEstimateAddButton>
-                    </DropdownButton>
-                </IfNotReadonly>
+
+                {currentUser.role === Role.ADMIN && booking.status === Status.DONE ? (
+                    <Button variant="secondary" onClick={() => setAdminEditModeOverrideEnabled((x) => !x)}>
+                        <FontAwesomeIcon
+                            icon={adminEditModeOverrideEnabled ? faLock : faLockOpen}
+                            className="mr-1 fw"
+                        />{' '}
+                        {adminEditModeOverrideEnabled
+                            ? 'Sluta redigera klarmarkerad bokning'
+                            : 'Redigera klarmarkerad bokning'}
+                    </Button>
+                ) : null}
             </Header>
 
             <Row className="mb-3">
+                <Col xl={8}>
+                    <BookingInfoSection booking={booking} showName={false} className="d-xl-none mb-3" />
+                    <TimeEstimateList
+                        bookingId={booking.id}
+                        pricePlan={booking.pricePlan}
+                        readonly={readonly}
+                        defaultLaborHourlyRate={defaultLaborHourlyRate}
+                    />
+                    <TimeReportList
+                        bookingId={booking.id}
+                        pricePlan={booking.pricePlan}
+                        currentUser={currentUser}
+                        readonly={readonly}
+                        defaultLaborHourlyRate={defaultLaborHourlyRate}
+                    />
+                    <EquipmentLists
+                        bookingId={booking.id}
+                        readonly={readonly}
+                        globalSettings={globalSettings}
+                        defaultLaborHourlyRate={defaultLaborHourlyRate}
+                    />
+                </Col>
                 <Col xl={4}>
+                    <BookingInfoSection booking={booking} className="d-none d-xl-block mb-3" />
                     <Card className="mb-3">
-                        <Card.Header>
-                            <div style={{ fontSize: '1.6em' }}>{booking.name}</div>
-                            <BookingTypeTag booking={booking} />
-                            <Badge variant="dark" className="ml-1">
-                                {getStatusName(booking.status)}
-                            </Badge>
-                            <RentalStatusTag booking={booking} className="ml-1" />
-                            <Badge variant="dark" className="ml-1">
-                                {getPaymentStatusName(booking.paymentStatus)}
-                            </Badge>
-                            {booking.language !== Language.SV ? (
-                                <Badge variant="dark" className="ml-1">
-                                    {getLanguageName(booking.language)}
-                                </Badge>
+                        <Card.Header>Prisinformation (ink. moms)</Card.Header>
+                        <ListGroup variant="flush">
+                            {booking.equipmentLists?.map((list) => (
+                                <ListGroup.Item className="d-flex" key={list.id}>
+                                    <span className="flex-grow-1">{list.name}</span>
+                                    <span>{formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}</span>
+                                </ListGroup.Item>
+                            ))}
+                            <ListGroup.Item className="d-flex">
+                                <span className="flex-grow-1">Estimerad personalkostnad</span>
+                                <span>
+                                    {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
+                                </span>
+                            </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
+                                <strong className="flex-grow-1">Estimerat pris</strong>
+                                <strong>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true, true)))}</strong>
+                            </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
+                                <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                <em>
+                                    {formatNumberAsCurrency(
+                                        addVAT(getBookingPrice(booking, true, true)) -
+                                            getBookingPrice(booking, true, true),
+                                    )}
+                                </em>
+                            </ListGroup.Item>
+                            {timeReportExists ? (
+                                <>
+                                    <ListGroup.Item className="d-flex">
+                                        <span className="flex-grow-1">Faktisk personalkostnad</span>
+                                        <span>
+                                            {formatNumberAsCurrency(
+                                                addVAT(getTotalTimeReportsPrice(booking.timeReports)),
+                                            )}
+                                        </span>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <strong className="flex-grow-1">Faktiskt pris</strong>
+                                        <strong>
+                                            {formatNumberAsCurrency(addVAT(getBookingPrice(booking, false, true)))}
+                                        </strong>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                        <em>
+                                            {formatNumberAsCurrency(
+                                                addVAT(getBookingPrice(booking, false, true)) -
+                                                    getBookingPrice(booking, false, true),
+                                            )}
+                                        </em>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <span className="flex-grow-1">Skillnad mot estimerat pris</span>
+                                        <span>
+                                            {formatNumberAsCurrency(
+                                                addVAT(
+                                                    getBookingPrice(booking, false, true) -
+                                                        getBookingPrice(booking, true, true),
+                                                ),
+                                                true,
+                                            )}
+                                        </span>
+                                    </ListGroup.Item>
+                                </>
                             ) : null}
-                            <div className="text-muted mt-2"> {booking.customerName}</div>
-                            <div className="text-muted">
-                                {getNumberOfBookingDays(booking) ?? 0} dagar / {getNumberOfEventHours(booking)} h /{' '}
-                                {formatNumberAsCurrency(getBookingPrice(booking))}
-                            </div>
-                            {getUsageStartDatetime(booking) || getUsageEndDatetime(booking) ? (
-                                <div className="text-muted">
-                                    {formatNullableDate(getUsageStartDatetime(booking), 'N/A')} -{' '}
-                                    {formatNullableDate(getUsageEndDatetime(booking), 'N/A')}
-                                </div>
+                            {booking.fixedPrice !== null && booking.fixedPrice !== undefined ? (
+                                <>
+                                    <ListGroup.Item className="d-flex">
+                                        <strong className="flex-grow-1">Fast pris</strong>
+                                        <strong>{formatNumberAsCurrency(addVAT(booking.fixedPrice))}</strong>
+                                    </ListGroup.Item>
+                                    <ListGroup.Item className="d-flex">
+                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                        <em>
+                                            {formatNumberAsCurrency(addVAT(booking.fixedPrice) - booking.fixedPrice)}
+                                        </em>
+                                    </ListGroup.Item>
+                                    {timeReportExists ? (
+                                        <ListGroup.Item className="d-flex">
+                                            <span className="flex-grow-1">Skillnad mot faktiskt pris</span>
+                                            <span>
+                                                {formatNumberAsCurrency(
+                                                    addVAT(booking.fixedPrice - getBookingPrice(booking, false, true)),
+                                                    true,
+                                                )}
+                                            </span>
+                                        </ListGroup.Item>
+                                    ) : (
+                                        <ListGroup.Item className="d-flex">
+                                            <span className="flex-grow-1">Skillnad mot estimerat pris</span>
+                                            <span>
+                                                {formatNumberAsCurrency(
+                                                    addVAT(booking.fixedPrice - getBookingPrice(booking, true, true)),
+                                                    true,
+                                                )}
+                                            </span>
+                                        </ListGroup.Item>
+                                    )}
+                                </>
                             ) : null}
-                        </Card.Header>
-
+                        </ListGroup>
+                    </Card>
+                    <Card className="mb-3">
+                        <Card.Header>Bokningsinformation</Card.Header>
                         <ListGroup variant="flush">
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Ansvarig</span>
@@ -237,10 +378,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                 <span className="flex-grow-1">Plats</span>
                                 <span>{booking.location}</span>
                             </ListGroup.Item>
-                            {/* <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">coOwnerUsers</span>
-                                <span>{booking.coOwnerUsers}</span>
-                            </ListGroup.Item> */}
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Prisplan</span>
                                 <span>{getPricePlanName(booking.pricePlan)}</span>
@@ -259,7 +396,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
-
                     <Card className="mb-3">
                         <Card.Header>Fakturainformation</Card.Header>
                         <ListGroup variant="flush">
@@ -281,43 +417,27 @@ const BookingPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
+                    <MarkdownCard
+                        text={booking.note}
+                        onSubmit={(note) => saveBooking({ note })}
+                        cardTitle="Anteckningar"
+                        readonly={readonly}
+                    />
+                    <FilesCard
+                        driveFolderId={booking.driveFolderId}
+                        defaultFolderName={`${formatDateForForm(booking.usageStartDatetime, 'N/A')} ${booking.name}`}
+                        defaultParentFolder={getOperationalYear(booking.usageStartDatetime)}
+                        onSubmit={(driveFolderId) => saveBooking({ driveFolderId })}
+                        readonly={readonly}
+                    />
 
-                    <Card className="mb-3">
-                        <Card.Header>Anteckningar</Card.Header>
-                        <ListGroup variant="flush">
-                            <ListGroup.Item>
-                                <div className="mb-1">Anteckning</div>
-                                <div className="text-muted">{booking.note}</div>
-                            </ListGroup.Item>
-                            <ListGroup.Item>
-                                <div className="mb-1">Återlämningsanmärkning</div>
-                                <div className="text-muted">{booking.returnalNote}</div>
-                            </ListGroup.Item>
-                        </ListGroup>
-                    </Card>
-
-                    <BookingChangelogCard changelog={booking.changelog ?? []} />
-                </Col>
-                <Col xl={8}>
-                    <TimeEstimateList
-                        showContent={showTimeEstimateContent}
-                        setShowContent={setShowTimeEstimateContent}
-                        bookingId={booking.id}
-                        pricePlan={booking.pricePlan}
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
+                    <MarkdownCard
+                        text={booking.returnalNote}
+                        onSubmit={(returnalNote) => saveBooking({ returnalNote })}
+                        cardTitle="Återlämningsanmärkning"
+                        readonly={readonly}
                     />
-                    <TimeReportList
-                        showContent={showTimeReportContent}
-                        setShowContent={setShowTimeReportContent}
-                        bookingId={booking.id}
-                        pricePlan={booking.pricePlan}
-                        currentUser={currentUser}
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
-                    />
-                    <EquipmentLists
-                        bookingId={booking.id}
-                        readonly={currentUser.role === Role.READONLY || booking.status === Status.DONE}
-                    />
+                    <ChangelogCard changelog={booking.changelog ?? []} />
                 </Col>
             </Row>
         </Layout>

@@ -4,6 +4,7 @@ import { User } from '../../models/interfaces';
 import { IUserObjectionModel } from '../../models/objection-models/UserObjectionModel';
 import { MemberStatus } from '../../models/enums/MemberStatus';
 import { getMemberStatusName } from '../../lib/utils';
+import RequiredIndicator from '../utils/RequiredIndicator';
 
 type Props = {
     handleSubmitUser: (user: IUserObjectionModel) => void;
@@ -41,7 +42,6 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
             clearingNumber: form.clearingNumber.value,
             bankName: form.bankName.value,
             homeAddress: form.homeAddress.value,
-            zipCode: form.zipCode.value,
         };
 
         handleSubmitUser(modifiedUser);
@@ -52,7 +52,10 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
             <Row>
                 <Col lg="6">
                     <Form.Group controlId="formName">
-                        <Form.Label>Namn</Form.Label>
+                        <Form.Label>
+                            Namn
+                            <RequiredIndicator />
+                        </Form.Label>
                         <Form.Control
                             required
                             type="text"
@@ -65,7 +68,10 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                 </Col>
                 <Col lg="3">
                     <Form.Group controlId="formNameTag">
-                        <Form.Label>Tagg</Form.Label>
+                        <Form.Label>
+                            Tagg
+                            <RequiredIndicator />
+                        </Form.Label>
                         <Form.Control
                             required
                             type="text"
@@ -77,7 +83,10 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                 </Col>
                 <Col lg="3">
                     <Form.Group controlId="formMemberStatus">
-                        <Form.Label>Medlemsstatus</Form.Label>
+                        <Form.Label>
+                            Medlemsstatus
+                            <RequiredIndicator />
+                        </Form.Label>
                         <Form.Control
                             as="select"
                             name="memberStatus"
@@ -96,12 +105,15 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                 </Col>
             </Row>
 
-            <h6>Kontaktuppgifter</h6>
+            <h2 className="h5 mt-4">Kontaktuppgifter</h2>
             <hr />
             <Row>
                 <Col lg="3">
                     <Form.Group controlId="formEmailAddress">
-                        <Form.Label>Emailadress</Form.Label>
+                        <Form.Label>
+                            Emailadress
+                            <RequiredIndicator />
+                        </Form.Label>
                         <Form.Control
                             required
                             type="email"
@@ -130,7 +142,7 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                 </Col>
             </Row>
 
-            <h6>Bankuppgifter</h6>
+            <h2 className="h5 mt-4">Bankuppgifter</h2>
             <hr />
             <Row>
                 <Col lg="3">
@@ -161,16 +173,16 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                         <Form.Control type="text" name="bankName" defaultValue={user?.bankName} />
                     </Form.Group>
                 </Col>
-                <Col lg="3">
+                <Col lg="12">
                     <Form.Group controlId="formHomeAddress">
-                        <Form.Label>Hemadress</Form.Label>
-                        <Form.Control type="text" name="homeAddress" defaultValue={user?.homeAddress} />
-                    </Form.Group>
-                </Col>
-                <Col lg="3">
-                    <Form.Group controlId="formZipCode">
-                        <Form.Label>Postnummer</Form.Label>
-                        <Form.Control type="text" name="zipCode" defaultValue={user?.zipCode} />
+                        <Form.Label>Adress</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            name="homeAddress"
+                            defaultValue={user?.homeAddress}
+                            placeholder={'Hemvägen 2\n123 45 Ort'}
+                            rows={2}
+                        />
                     </Form.Group>
                 </Col>
             </Row>

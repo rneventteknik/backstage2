@@ -1,8 +1,11 @@
 import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
-import { toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
+import { Badge, Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
+import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
+import { idSortFn } from '../../lib/sortIndexUtils';
+import { getPricePlanName, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
+import { PricePlan } from '../../models/enums/PricePlan';
 import { EquipmentPrice } from '../../models/interfaces';
 import { HasId } from '../../models/interfaces/BaseEntity';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
@@ -44,6 +47,11 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
     const PriceEntryNameDisplayFn = (price: EquipmentPrice) => (
         <>
             <p className="mb-0">
+                {price.id === Math.min(...prices.map((x) => x.id)) && prices.length > 1 ? (
+                    <Badge variant="dark" className="mb-2">
+                        Standardvärde
+                    </Badge>
+                ) : null}
                 <Form.Control
                     type="text"
                     defaultValue={price.name}
@@ -82,6 +90,9 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     <InputGroup.Text>kr/h</InputGroup.Text>
                 </InputGroup.Append>
             </InputGroup>
+            <p className="text-muted text-left mt-1 mb-0 small">
+                Pris ink. moms: {formatPrice(addVATToPriceWithTHS(price))}
+            </p>
         </>
     );
 
@@ -109,6 +120,9 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     <InputGroup.Text>kr/h</InputGroup.Text>
                 </InputGroup.Append>
             </InputGroup>
+            <p className="text-muted text-left mt-1 mb-0 small">
+                Pris ink. moms: {formatTHSPrice(addVATToPriceWithTHS(price))}
+            </p>
         </>
     );
 
@@ -126,10 +140,9 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
     //
     const tableSettings: TableConfiguration<EquipmentPrice> = {
         entityTypeDisplayName: '',
-        defaultSortPropertyName: 'name',
-        defaultSortAscending: true,
         hideTableFilter: true,
         hideTableCountControls: true,
+        customSortFn: idSortFn,
         noResultsLabel: 'Inga priser konfigurerade',
         columns: [
             {
@@ -140,21 +153,21 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
             },
             {
                 key: 'price',
-                displayName: 'Pris',
+                displayName: `${getPricePlanName(PricePlan.EXTERNAL)} (ex. moms)`,
                 disableSort: true,
                 getValue: (entry: EquipmentPrice) => entry.pricePerUnit + ' ' + entry.pricePerHour,
                 getContentOverride: PriceEntryPriceDisplayFn,
                 textAlignment: 'center',
-                columnWidth: 170,
+                columnWidth: 210,
             },
             {
                 key: 'ThsPrice',
-                displayName: 'Pris (THS)',
+                displayName: `${getPricePlanName(PricePlan.THS)} (ex. moms)`,
                 disableSort: true,
                 getValue: (entry: EquipmentPrice) => entry.pricePerUnitTHS + ' ' + entry.pricePerHourTHS,
                 getContentOverride: PriceEntryThsPriceDisplayFn,
                 textAlignment: 'center',
-                columnWidth: 170,
+                columnWidth: 210,
             },
             {
                 key: 'actions',

@@ -1,21 +1,40 @@
 import { AccountKind } from '../../models/enums/AccountKind';
 import { BookingType } from '../../models/enums/BookingType';
+import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { Status } from '../../models/enums/Status';
 import { BookingObjectionModel } from '../../models/objection-models';
 import { EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
-import { isMemberOfEnum } from '../utils';
+import { getPartialSearchStrings, isMemberOfEnum } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchBookings = async (searchString: string, count: number): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    const modifiedSearchString = '%' + searchString + '%';
+    const searchStrings = getPartialSearchStrings(searchString);
 
     return BookingObjectionModel.query()
-        .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
-        .orWhere('contactPersonName', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+        .where((builder) => {
+            searchStrings.forEach((partialSearchString) => {
+                builder.andWhere('name', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+            });
+        })
+        .orWhere((builder) => {
+            searchStrings.forEach((partialSearchString) => {
+                builder.andWhere('contactPersonName', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+            });
+        })
+        .orWhere((builder) => {
+            searchStrings.forEach((partialSearchString) => {
+                builder.andWhere('invoiceNumber', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+            });
+        })
+        .orWhere((builder) => {
+            searchStrings.forEach((partialSearchString) => {
+                builder.andWhere('customerName', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+            });
+        })
         .orderBy('updated', 'desc')
         .limit(count);
 };
@@ -23,13 +42,40 @@ export const searchBookings = async (searchString: string, count: number): Promi
 export const fetchBookings = async (): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query().withGraphFetched('ownerUser').withGraphFetched('equipmentLists');
+    return BookingObjectionModel.query()
+        .withGraphFetched('ownerUser')
+        .withGraphFetched('timeReports.user')
+        .withGraphFetched('equipmentLists.listEntries.equipment')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment');
 };
 
 export const fetchBookingsForUser = async (userId: number): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query().where('ownerUserId', userId).withGraphFetched('equipmentLists');
+    return BookingObjectionModel.query()
+        .where('ownerUserId', userId)
+        .withGraphFetched('equipmentLists')
+        .withGraphFetched('changelog(changelogInfo)')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(25);
+            },
+        });
+};
+
+export const fetchBookingsForCoOwnerUser = async (userId: number): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .withGraphFetched('equipmentLists')
+        .joinRelated('coOwnerUsers')
+        .where('coOwnerUsers.id', userId)
+        .withGraphFetched('changelog(changelogInfo)')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(25);
+            },
+        });
 };
 
 export const fetchBookingsForEquipment = async (equipmentId: number): Promise<BookingObjectionModel[]> => {
@@ -39,11 +85,42 @@ export const fetchBookingsForEquipment = async (equipmentId: number): Promise<Bo
         .whereIn(
             'id',
             BookingObjectionModel.query()
-                .joinRelated('equipmentLists.equipmentListEntries')
-                .where('equipmentLists:equipmentListEntries.equipmentId', equipmentId)
-                .select('booking.id'),
+                .joinRelated('equipmentLists.listEntries')
+                .where('equipmentLists:listEntries.equipmentId', equipmentId)
+                .select('Booking.id'),
         )
-        .withGraphFetched('equipmentLists');
+        .orWhereIn(
+            'id',
+            BookingObjectionModel.query()
+                .joinRelated('equipmentLists.listHeadings.listEntries')
+                .where('equipmentLists:listHeadings:listEntries.equipmentId', equipmentId)
+                .select('Booking.id'),
+        )
+        .withGraphFetched('equipmentLists')
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('equipmentLists.listEntries.equipment')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment');
+};
+
+export const fetchBookingsReadyForCashPayment = async (): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .where('Booking.paymentStatus', PaymentStatus.READY_FOR_CASH_PAYMENT)
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries')
+        .withGraphFetched('timeReports');
+};
+
+export const fetchBookingsPaidWithCash = async (): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .where('Booking.paymentStatus', PaymentStatus.PAID_WITH_CASH)
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries')
+        .withGraphFetched('timeReports');
 };
 
 export const fetchBooking = async (id: number): Promise<BookingObjectionModel> => {
@@ -60,21 +137,25 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
     return BookingObjectionModel.query()
         .where('id', id)
         .withGraphFetched('ownerUser')
-        .withGraphFetched('equipmentLists.equipmentListEntries')
-        .withGraphFetched('equipmentLists.equipmentListEntries.equipment.prices')
-        .withGraphFetched('equipmentLists.equipmentListEntries.equipmentPrice')
+        .withGraphFetched('coOwnerUsers')
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('equipmentLists.listEntries.equipment.prices')
+        .withGraphFetched('equipmentLists.listEntries.equipmentPrice')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.prices')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipmentPrice')
         .withGraphFetched('timeEstimates')
         .withGraphFetched('timeReports.user')
         .withGraphFetched('changelog(changelogInfo)')
         .modifiers({
             changelogInfo: (builder) => {
-                builder.orderBy('updated', 'desc').limit(50);
+                builder.orderBy('updated', 'desc').limit(250);
             },
         })
         .modifyGraph('equipmentLists', (builder) => {
             builder.orderBy('sortIndex');
         })
-        .modifyGraph('equipmentLists.equipmentListEntries', (builder) => {
+        .modifyGraph('equipmentLists.listEntries', (builder) => {
             builder.orderBy('sortIndex');
         })
         .then((bookings) => bookings[0]);
@@ -86,12 +167,14 @@ export const fetchBookingWithEquipmentLists = async (id: number): Promise<Bookin
     return BookingObjectionModel.query()
         .where('id', id)
         .withGraphFetched('ownerUser')
-        .withGraphFetched('equipmentLists.equipmentListEntries.equipment.equipmentLocation')
+        .withGraphFetched('coOwnerUsers')
+        .withGraphFetched('equipmentLists.listEntries.equipment.equipmentLocation')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.equipmentLocation')
         .withGraphFetched('timeEstimates')
         .withGraphFetched('changelog(changelogInfo)')
         .modifiers({
             changelogInfo: (builder) => {
-                builder.orderBy('updated', 'desc').limit(50);
+                builder.orderBy('updated', 'desc').limit(250);
             },
         })
         .then((bookings) => bookings[0]);
@@ -107,13 +190,16 @@ export const fetchFirstBookingByCalendarBookingId = async (
         .then((bookings) => bookings[0]);
 };
 
-export const updateBooking = async (id: number, booking: BookingObjectionModel): Promise<BookingObjectionModel> => {
+export const updateBooking = async (
+    id: number,
+    booking: Partial<BookingObjectionModel>,
+): Promise<BookingObjectionModel> => {
     ensureDatabaseIsInitialized();
 
     const existingDatabaseModel = await BookingObjectionModel.query()
         .findById(id)
         .orderBy('id')
-        .withGraphFetched('equipmentLists.equipmentListEntries');
+        .withGraphFetched('equipmentLists.listEntries');
 
     // EquipmentLists.
     if (booking.equipmentLists !== undefined) {
@@ -160,10 +246,22 @@ export const deleteBooking = async (id: number): Promise<boolean> => {
 export const validateBookingObjectionModel = (booking: BookingObjectionModel): boolean => {
     if (!booking) return false;
 
-    if (booking.bookingType !== undefined && !isMemberOfEnum(booking.bookingType, BookingType)) return false;
-    if (booking.status !== undefined && !isMemberOfEnum(booking.status, Status)) return false;
-    if (booking.pricePlan !== undefined && !isMemberOfEnum(booking.pricePlan, PricePlan)) return false;
-    if (booking.accountKind !== undefined && !isMemberOfEnum(booking.accountKind, AccountKind)) return false;
+    if (
+        booking.bookingType !== undefined &&
+        booking.bookingType !== null &&
+        !isMemberOfEnum(booking.bookingType, BookingType)
+    )
+        return false;
+    if (booking.status !== undefined && booking.status !== null && !isMemberOfEnum(booking.status, Status))
+        return false;
+    if (booking.pricePlan !== undefined && booking.pricePlan !== null && !isMemberOfEnum(booking.pricePlan, PricePlan))
+        return false;
+    if (
+        booking.accountKind !== undefined &&
+        booking.accountKind !== null &&
+        !isMemberOfEnum(booking.accountKind, AccountKind)
+    )
+        return false;
 
     return true;
 };
@@ -177,13 +275,34 @@ export const fetchBookingsWithEquipmentInInterval = async (
     ensureDatabaseIsInitialized();
 
     let query = BookingObjectionModel.query()
-        .withGraphJoined('equipmentLists.equipmentListEntries')
-        .where('equipmentLists:equipmentListEntries.equipmentId', equipmentId);
+        .withGraphJoined('equipmentLists.listEntries')
+        .withGraphJoined('equipmentLists.listHeadings.listEntries')
+        .where((builder) =>
+            builder
+                .where('equipmentLists:listEntries.equipmentId', equipmentId)
+                .orWhere('equipmentLists:listHeadings:listEntries.equipmentId', equipmentId),
+        );
 
     if (endDatetime && startDatetime) {
         query = query
-            .where('equipmentLists.equipmentOutDatetime', '<=', endDatetime.toISOString())
-            .where('equipmentLists.equipmentInDatetime', '>=', startDatetime.toISOString());
+            .andWhere((builder) =>
+                builder
+                    .where('equipmentLists.equipmentOutDatetime', '<=', endDatetime.toISOString())
+                    .orWhere((builder) =>
+                        builder
+                            .whereNull('equipmentLists.equipmentOutDatetime')
+                            .andWhere('equipmentLists.usageStartDatetime', '<=', endDatetime.toISOString()),
+                    ),
+            )
+            .andWhere((builder) =>
+                builder
+                    .where('equipmentLists.equipmentInDatetime', '>=', startDatetime.toISOString())
+                    .orWhere((builder) =>
+                        builder
+                            .whereNull('equipmentLists.equipmentInDatetime')
+                            .andWhere('equipmentLists.usageEndDatetime', '>=', startDatetime.toISOString()),
+                    ),
+            );
     }
 
     if (ignoreEquipmentListId) {
@@ -191,4 +310,25 @@ export const fetchBookingsWithEquipmentInInterval = async (
     }
 
     return query.select();
+};
+
+export const registerUserAsCoOwnerForBooking = async (
+    userId: number,
+    bookingId: number,
+): Promise<BookingObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    await BookingObjectionModel.relatedQuery('coOwnerUsers').for(bookingId).relate(userId);
+
+    return fetchBookingWithUser(bookingId);
+};
+export const unRegisterUserAsCoOwnerForBooking = async (
+    userId: number,
+    bookingId: number,
+): Promise<BookingObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    await BookingObjectionModel.relatedQuery('coOwnerUsers').for(bookingId).findById(userId).unrelate();
+
+    return fetchBookingWithUser(bookingId);
 };

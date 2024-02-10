@@ -1,5 +1,4 @@
 import { BaseEntityWithName } from './BaseEntity';
-import { AccountKind } from '../enums/AccountKind';
 import { User } from './User';
 
 export interface TimeReport extends BaseEntityWithName {
@@ -10,7 +9,6 @@ export interface TimeReport extends BaseEntityWithName {
     startDatetime?: Date;
     endDatetime?: Date;
     pricePerHour: number;
-    accountKind: AccountKind;
     bookingId: number;
     sortIndex: number;
 }

@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Button, DropdownButton, Dropdown } from 'react-bootstrap';
 import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
 import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
-import { getResponseContentOrError } from '../../../lib/utils';
+import { getResponseContentOrError, toIntOrUndefined, updateItemsInArrayById } from '../../../lib/utils';
 import { toTimeEstimate } from '../../../lib/mappers/timeEstimate';
 import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';
@@ -17,24 +17,42 @@ import {
     faTrashCan,
     faClock,
     faPlus,
+    faGears,
 } from '@fortawesome/free-solid-svg-icons';
-import { formatNumberAsCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
+import {
+    addVAT,
+    formatNumberAsCurrency,
+    getTimeEstimatePrice,
+    getTotalTimeEstimatesPrice,
+} from '../../../lib/pricingUtils';
 import Skeleton from 'react-loading-skeleton';
-import { getNextSortIndex, sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import {
+    getNextSortIndex,
+    isFirst,
+    isLast,
+    moveItemDown,
+    moveItemToItem,
+    moveItemUp,
+    sortIndexSortFn,
+} from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from './TimeEstimateAddButton';
+import TimeEstimateModal from './TimeEstimateModal';
 
 type Props = {
     bookingId: number;
     pricePlan: number;
     readonly: boolean;
-    showContent: boolean;
-    setShowContent: (bool: boolean) => void;
+    defaultLaborHourlyRate: number;
 };
 
-const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, setShowContent }: Props) => {
+const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHourlyRate }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
-    const { showSaveFailedNotification, showDeleteFailedNotification } = useNotifications();
+    const [timeEstimateToEditViewModel, setTimeEstimateToEditViewModel] = useState<Partial<TimeEstimate> | null>(null);
+    const [showContent, setShowContent] = useState(false);
+
+    const { showSaveSuccessNotification, showSaveFailedNotification, showDeleteFailedNotification } =
+        useNotifications();
 
     // Extract the lists
     //
@@ -75,23 +93,30 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
         return <Skeleton height={200} className="mb-3" />;
     }
 
-    const updateTimeEstimate = (timeEstimate: TimeEstimate) => {
-        const filteredTimeEstimates = timeEstimates?.map((x) => (x.id !== timeEstimate.id ? x : timeEstimate));
+    const updateTimeEstimates = (...updatedTimeEstimates: TimeEstimate[]) => {
+        mutateTimeEstimates(updateItemsInArrayById(timeEstimates, ...updatedTimeEstimates));
 
-        mutateTimeEstimates(filteredTimeEstimates);
-
-        const body = { timeEstimate: timeEstimate };
-        const request = {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-        fetch('/api/bookings/' + timeEstimate.bookingId + '/timeEstimate/' + timeEstimate.id, request)
-            .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
-            .then(toTimeEstimate)
+        Promise.all(
+            updatedTimeEstimates.map(async (timeEstimate) => {
+                const body = { timeEstimate: timeEstimate };
+                const request = {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body),
+                };
+                return fetch('/api/bookings/' + timeEstimate.bookingId + '/timeEstimate/' + timeEstimate.id, request)
+                    .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
+                    .then(toTimeEstimate);
+            }),
+        )
+            .then(() => {
+                showSaveSuccessNotification('Tidsestimatet');
+                mutate();
+            })
             .catch((error: Error) => {
                 console.error(error);
-                showSaveFailedNotification('Tidsuppskattningen');
+                showSaveFailedNotification('Tidsestimatet');
+                mutate();
             });
     };
 
@@ -108,7 +133,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
             .then(getResponseContentOrError)
             .catch((error) => {
                 console.error(error);
-                showDeleteFailedNotification('Tidsuppskattningen');
+                showDeleteFailedNotification('Tidsestimatet');
             });
     };
 
@@ -116,7 +141,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
         <DoubleClickToEdit
             value={timeEstimate.name}
             onUpdate={(newValue) =>
-                updateTimeEstimate({
+                updateTimeEstimates({
                     ...timeEstimate,
                     name: newValue && newValue.length > 0 ? newValue : timeEstimate.name,
                 })
@@ -136,58 +161,65 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
         <DoubleClickToEdit
             value={timeEstimate.numberOfHours?.toString()}
             onUpdate={(newValue) =>
-                updateTimeEstimate({
+                updateTimeEstimates({
                     ...timeEstimate,
-                    numberOfHours: isNaN(parseInt(newValue)) ? 0 : parseInt(newValue),
+                    numberOfHours: toIntOrUndefined(newValue) ?? timeEstimate.numberOfHours,
                 })
             }
             size="sm"
             readonly={readonly}
         >
-            {timeEstimate.numberOfHours ? (
-                timeEstimate.numberOfHours + ' h'
-            ) : (
+            {isNaN(timeEstimate.numberOfHours) ? (
                 <span className="text-muted font-italic">Dubbelklicka för att lägga till en tid</span>
+            ) : (
+                timeEstimate.numberOfHours + ' h'
             )}
         </DoubleClickToEdit>
     );
 
-    const TimeEstimatePricePerHourDisplayFn = (timeEstimate: TimeEstimate) => (
-        <DoubleClickToEdit
-            value={timeEstimate.pricePerHour?.toString()}
-            onUpdate={(newValue) =>
-                updateTimeEstimate({
-                    ...timeEstimate,
-                    pricePerHour: isNaN(parseInt(newValue)) ? 0 : parseInt(newValue),
-                })
-            }
-            size="sm"
-            readonly={readonly}
-        >
-            {timeEstimate.pricePerHour} kr/h
-        </DoubleClickToEdit>
-    );
-
     const TimeEstimateTotalPriceDisplayFn = (entry: TimeEstimate) => {
-        return <em>{formatNumberAsCurrency(getTimeEstimatePrice(entry))}</em>;
+        return <em>{formatNumberAsCurrency(addVAT(getTimeEstimatePrice(entry)))}</em>;
     };
 
     const TimeEstimateEntryActionsDisplayFn = (entry: TimeEstimate) => {
         return (
-            <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
-                <Dropdown.Item onClick={() => deleteTimeEstimate(entry)} className="text-danger">
-                    <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+            <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
+                {!readonly ? (
+                    <>
+                        <Dropdown.Item
+                            onClick={() => updateTimeEstimates(...moveItemUp(timeEstimates, entry))}
+                            disabled={isFirst(timeEstimates, entry)}
+                        >
+                            <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            onClick={() => updateTimeEstimates(...moveItemDown(timeEstimates, entry))}
+                            disabled={isLast(timeEstimates, entry)}
+                        >
+                            <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item onClick={() => deleteTimeEstimate(entry)} className="text-danger">
+                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                        </Dropdown.Item>
+                    </>
+                ) : null}
+                <Dropdown.Item onClick={() => setTimeEstimateToEditViewModel(entry)}>
+                    <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" />{' '}
+                    {readonly ? 'Visa detaljer' : 'Avancerad redigering'}
                 </Dropdown.Item>
             </DropdownButton>
         );
     };
 
     const sortFn = (a: TimeEstimate, b: TimeEstimate) => sortIndexSortFn(a, b);
+    const moveFn = (a: TimeEstimate, b: TimeEstimate) => updateTimeEstimates(...moveItemToItem(timeEstimates, a, b));
 
     const tableSettings: TableConfiguration<TimeEstimate> = {
         entityTypeDisplayName: '',
         defaultSortAscending: true,
         customSortFn: sortFn,
+        moveFn: readonly ? undefined : moveFn,
         hideTableFilter: true,
         hideTableCountControls: true,
         columns: [
@@ -199,24 +231,16 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
             },
             {
                 key: 'count',
-                displayName: 'Antal',
+                displayName: 'Timmar',
                 getValue: (timeEstimate: TimeEstimate) => timeEstimate.numberOfHours + ' h',
                 getContentOverride: TimeEstimateNumberOfHoursDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 150,
             },
             {
-                key: 'price',
-                displayName: 'A pris',
-                getValue: (timeEstimate: TimeEstimate) => timeEstimate.pricePerHour + ' kr/h',
-                getContentOverride: TimeEstimatePricePerHourDisplayFn,
-                columnWidth: 140,
-                textAlignment: 'right',
-            },
-            {
                 key: 'sum',
                 displayName: 'Summa',
-                getValue: (timeEstimate: TimeEstimate) => getTimeEstimatePrice(timeEstimate),
+                getValue: (timeEstimate: TimeEstimate) => addVAT(getTimeEstimatePrice(timeEstimate)),
                 getContentOverride: TimeEstimateTotalPriceDisplayFn,
                 columnWidth: 90,
                 textAlignment: 'right',
@@ -233,10 +257,6 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
         ],
     };
 
-    if (!timeEstimates.length) {
-        return null;
-    }
-
     const onAdd = async (data: TimeEstimate) => {
         setShowContent(true);
         mutateTimeEstimates([...(timeEstimates ?? []), data]);
@@ -248,7 +268,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
                 <div className="d-flex">
                     <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
                         <FontAwesomeIcon className="mr-2" icon={faClock} />
-                        Tidsuppskattning
+                        Tidsestimat
                     </div>
                     <div className="d-flex">
                         <Button className="mr-2" variant="" onClick={() => setShowContent(!showContent)}>
@@ -257,27 +277,54 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, showContent, s
                     </div>
                 </div>
                 <p className="text-muted">
-                    {timeEstimates.reduce((sum: number, entry: TimeEstimate) => sum + entry.numberOfHours, 0)} h /{' '}
-                    {formatNumberAsCurrency(getTotalTimeEstimatesPrice(timeEstimates))}
+                    {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(timeEstimates)))} /{' '}
+                    {timeEstimates.reduce((sum: number, entry: TimeEstimate) => sum + entry.numberOfHours, 0)} h
                 </p>
             </Card.Header>
             {showContent ? (
                 <>
-                    <TableDisplay entities={timeEstimates} configuration={tableSettings} />
-                    <TimeEstimateAddButton
-                        booking={booking}
-                        disabled={readonly}
-                        sortIndex={getNextSortIndex(timeEstimates)}
-                        onAdd={onAdd}
-                        variant="secondary"
-                        size="sm"
-                        buttonType="button"
-                    >
-                        <FontAwesomeIcon icon={faPlus} className="mr-1" />
-                        Ny rad
-                    </TimeEstimateAddButton>
+                    <TableDisplay entities={timeEstimates} configuration={tableSettings} tableId="time-estimate-list" />
+                    {readonly ? null : (
+                        <TimeEstimateAddButton
+                            booking={booking}
+                            disabled={readonly}
+                            sortIndex={getNextSortIndex(timeEstimates)}
+                            onAdd={onAdd}
+                            variant="secondary"
+                            size="sm"
+                            defaultLaborHourlyRate={defaultLaborHourlyRate}
+                        >
+                            <FontAwesomeIcon icon={faPlus} className="mr-1" />
+                            Nytt tidsestimat
+                        </TimeEstimateAddButton>
+                    )}
                 </>
             ) : null}
+            <TimeEstimateModal
+                formId="form-edit-timeEstimate-modal"
+                defaultLaborHourlyRate={defaultLaborHourlyRate}
+                setTimeEstimate={setTimeEstimateToEditViewModel}
+                timeEstimate={timeEstimateToEditViewModel ?? undefined}
+                onHide={() => {
+                    setTimeEstimateToEditViewModel(null);
+                }}
+                readonly={readonly}
+                onSubmit={() => {
+                    if (timeEstimateToEditViewModel?.id) {
+                        const timeEstimateToSend: TimeEstimate = {
+                            ...timeEstimateToEditViewModel,
+                            id: timeEstimateToEditViewModel.id,
+                            bookingId: booking.id,
+                            numberOfHours: timeEstimateToEditViewModel?.numberOfHours ?? 0,
+                            pricePerHour: timeEstimateToEditViewModel?.pricePerHour ?? 0,
+                            name: timeEstimateToEditViewModel?.name ?? '',
+                            sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
+                        };
+                        updateTimeEstimates(timeEstimateToSend);
+                    }
+                }}
+                showWizard={false}
+            ></TimeEstimateModal>
         </Card>
     );
 };

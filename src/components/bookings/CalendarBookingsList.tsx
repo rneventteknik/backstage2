@@ -4,10 +4,13 @@ import useSwr from 'swr';
 import { faExclamationCircle, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Skeleton from 'react-loading-skeleton';
-import { formatDatetime, getResponseContentOrError } from '../../lib/utils';
+import { getResponseContentOrError } from '../../lib/utils';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import { CalendarResult } from '../../models/misc/CalendarResult';
 import Link from 'next/link';
+import { formatDatetime } from '../../lib/datetimeUtils';
+import TurndownService from 'turndown';
+import PreserveTextNewlines from '../utils/PreserveTextNewlines';
 
 type Props = {
     onSelect: (x: CalendarResult) => void;
@@ -19,6 +22,7 @@ interface CalendarResultViewModel extends CalendarResult {
 }
 
 const dateWithoutTimeRegEx = /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/;
+const turndownService = new TurndownService();
 
 const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) => {
     const { data: list, error } = useSwr('/api/calendar', (url) =>
@@ -37,6 +41,7 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
                             ? calenderResult.end
                             : formatDatetime(new Date(calenderResult.end))
                         : '-',
+                    description: turndownService.turndown(calenderResult.description ?? ''),
                 })),
             ),
     );
@@ -71,7 +76,9 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
             <div className="text-muted mb-0 d-lg-none">
                 {calendarResult?.displayStartDate + ' till ' + calendarResult?.displayEndDate}
             </div>
-            <div className="text-muted mb-0">{calendarResult.description}</div>
+            <div className="text-muted mb-0">
+                <PreserveTextNewlines>{calendarResult.description}</PreserveTextNewlines>
+            </div>
         </>
     );
 
@@ -151,7 +158,7 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
                 getValue: () => '',
                 getContentOverride: CalendarResultActionsDisplayFn,
                 disableSort: true,
-                columnWidth: 175,
+                columnWidth: 190,
                 textAlignment: 'center',
             },
         ],

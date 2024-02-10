@@ -9,7 +9,7 @@ import {
     respondWithInvalidDataResponse,
     respondWithInvalidMethodResponse,
 } from '../../../../lib/apiResponses';
-import { getHashedPassword } from '../../../../lib/authenticate';
+import { authenticateById, getHashedPassword } from '../../../../lib/authenticate';
 import {
     deleteUserAuth,
     insertUserAuth,
@@ -66,6 +66,17 @@ const handler = withSessionContext(
                     return;
                 }
 
+                // Verify password
+                if (
+                    !(await authenticateById(
+                        context.currentUser.userId,
+                        req.body.changePasswordRequest.existingPassword,
+                    ))
+                ) {
+                    respondWithAccessDeniedResponse(res);
+                    return;
+                }
+
                 if (!validateUserAuthObjectionModel(req.body.changePasswordRequest)) {
                     respondWithInvalidDataResponse(res);
                     return;
@@ -80,6 +91,17 @@ const handler = withSessionContext(
 
             case 'PUT':
                 if (context.currentUser.role != Role.ADMIN && context.currentUser.userId != userId) {
+                    respondWithAccessDeniedResponse(res);
+                    return;
+                }
+
+                // Verify password
+                if (
+                    !(await authenticateById(
+                        context.currentUser.userId,
+                        req.body.changePasswordRequest.existingPassword,
+                    ))
+                ) {
                     respondWithAccessDeniedResponse(res);
                     return;
                 }

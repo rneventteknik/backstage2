@@ -11,8 +11,8 @@ import { toUser } from '../../../lib/mappers/user';
 import { useNotifications } from '../../../lib/useNotifications';
 import { IUserObjectionModel } from '../../../models/objection-models/UserObjectionModel';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
-import { IfAdmin } from '../../../components/utils/IfAdmin';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
+import { IfAdmin, IfNotAdmin } from '../../../components/utils/IfAdmin';
 import { Role } from '../../../models/enums/Role';
 import Header from '../../../components/layout/Header';
 import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
@@ -20,12 +20,14 @@ import { userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faKey, faLock, faSave, faTrashCan, faUserPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ConfirmModal from '../../../components/utils/ConfirmModal';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteAuthModal, setShowDeleteAuthModal] = useState(false);
     const [showEditAuthModal, setShowEditAuthModal] = useState(false);
@@ -51,11 +53,18 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     });
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !user) {
-        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
+        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const handleSubmit = async (user: IUserObjectionModel) => {
@@ -115,12 +124,12 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             .then((data) => {
                 mutate({ ...user, username: data.username }, false);
                 showSaveSuccessNotification('Inloggningsuppgifterna');
+                setShowEditAuthModal(false);
             })
             .catch((error: Error) => {
                 console.error(error);
                 showSaveFailedNotification('Inloggningsuppgifterna');
-            })
-            .finally(() => setShowEditAuthModal(false));
+            });
     };
 
     // Delete user auth
@@ -155,76 +164,74 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editUserForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara användare
                 </Button>
-                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
-                    {user.username ? (
-                        <>
-                            <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
-                                <FontAwesomeIcon icon={faUserPen} className="mr-1 fa-fw" /> Redigera
-                                inloggningsuppgifter
-                            </Dropdown.Item>
-                            <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
-                                <Dropdown.Divider />
-                                <Dropdown.Item onClick={() => setShowDeleteAuthModal(true)} className="text-danger">
-                                    <FontAwesomeIcon icon={faLock} className="mr-1 fa-fw" /> Ta bort
+
+                <IfNotAdmin currentUser={currentUser}>
+                    <Button variant="secondary" onClick={() => setShowEditAuthModal(true)}>
+                        <FontAwesomeIcon icon={faUserPen} className="mr-1 fa-fw" /> Redigera inloggningsuppgifter
+                    </Button>
+                </IfNotAdmin>
+
+                <IfAdmin currentUser={currentUser}>
+                    <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                        {user.username ? (
+                            <>
+                                <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
+                                    <FontAwesomeIcon icon={faUserPen} className="mr-1 fa-fw" /> Redigera
                                     inloggningsuppgifter
                                 </Dropdown.Item>
-                            </IfAdmin>
-                        </>
-                    ) : (
-                        <>
-                            <IfAdmin currentUser={currentUser}>
+                                <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
+                                    <Dropdown.Divider />
+                                    <Dropdown.Item onClick={() => setShowDeleteAuthModal(true)} className="text-danger">
+                                        <FontAwesomeIcon icon={faLock} className="mr-1 fa-fw" /> Ta bort
+                                        inloggningsuppgifter
+                                    </Dropdown.Item>
+                                </IfAdmin>
+                            </>
+                        ) : (
+                            <>
                                 <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
                                     <FontAwesomeIcon icon={faKey} className="mr-1 fa-fw" /> Skapa inloggningsuppgifter
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
-                            </IfAdmin>
-                        </>
-                    )}
-                    <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
-                        <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort användare
-                        </Dropdown.Item>
-                    </IfAdmin>
-                </DropdownButton>
+                            </>
+                        )}
+                        <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
+                            <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
+                                <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort användare
+                            </Dropdown.Item>
+                        </IfAdmin>
+                    </DropdownButton>
+                </IfAdmin>
             </Header>
 
             <UserForm user={user} handleSubmitUser={handleSubmit} formId="editUserForm" />
 
             {/* Here comes the three modals used on this page */}
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Bekräfta</Modal.Title>
-                </Modal.Header>
-                <Modal.Body> Vill du verkligen ta bort användaren {user.name}?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={() => setShowDeleteModal(false)}>
-                        Avbryt
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteUser()}>
-                        Ta bort
-                    </Button>
-                </Modal.Footer>
-            </Modal>
 
-            <Modal show={showDeleteAuthModal} onHide={() => setShowDeleteAuthModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Bekräfta</Modal.Title>
-                </Modal.Header>
-                <Modal.Body> Vill du verkligen ta bort inloggningsuppgifterna för användaren {user.name}?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={() => setShowDeleteAuthModal(false)}>
-                        Avbryt
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteUserAuth()}>
-                        Ta bort
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <ConfirmModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                title="Bekräfta"
+                confirmLabel="Ta bort"
+                onConfirm={deleteUser}
+            >
+                Vill du verkligen ta bort användaren {user.name}?
+            </ConfirmModal>
+
+            <ConfirmModal
+                show={showDeleteAuthModal}
+                onHide={() => setShowDeleteAuthModal(false)}
+                title="Bekräfta"
+                confirmLabel="Ta bort"
+                onConfirm={deleteUserAuth}
+            >
+                Vill du verkligen ta bort inloggningsuppgifterna för användaren {user.name}?
+            </ConfirmModal>
 
             <Modal show={showEditAuthModal} onHide={() => setShowEditAuthModal(false)}>
                 <Modal.Header closeButton>
@@ -241,7 +248,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     />
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="dark" onClick={() => setShowEditAuthModal(false)}>
+                    <Button variant="secondary" onClick={() => setShowEditAuthModal(false)}>
                         Avbryt
                     </Button>
                     <Button variant="primary" form="editUserAuthForm" type="submit">

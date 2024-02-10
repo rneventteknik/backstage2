@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Layout from '../../components/layout/Layout';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { Button, Card } from 'react-bootstrap';
 import { useRouter } from 'next/router';
@@ -12,12 +11,14 @@ import { faBan, faCheck, faKey } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useNotifications } from '../../lib/useNotifications';
 import { LoginToken } from '../../models/misc/LoginToken';
+import { KeyValue } from '../../models/interfaces/KeyValue';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const ApproveLoginTokenPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const ApproveLoginTokenPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const [status, setStatus] = useState<'approved' | 'denied' | null>(null);
 
     const router = useRouter();
@@ -56,11 +57,11 @@ const ApproveLoginTokenPage: React.FC<Props> = ({ user: currentUser }: Props) =>
     const denyToken = () => setStatus('denied');
 
     if (isValidating || !token) {
-        return <TextLoadingPage fixedWidth={false} currentUser={currentUser} />;
+        return <TextLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     return (
-        <Layout title="Godkänn inloggning" fixedWidth={true} currentUser={currentUser}>
+        <Layout title="Godkänn inloggning" fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Card className="mb-3">
                 <Card.Header>Godkänn inloggning</Card.Header>
                 <Card.Body>

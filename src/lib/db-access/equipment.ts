@@ -3,36 +3,71 @@ import {
     EquipmentPriceObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
+import { getPartialSearchStrings } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchEquipment = async (searchString: string, count: number): Promise<EquipmentObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    const modifiedSearchString = '%' + searchString + '%';
+    const searchStrings = getPartialSearchStrings(searchString);
 
     return EquipmentObjectionModel.query()
-        .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
-        .orWhere('nameEN', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
-        .orderBy('updated', 'desc')
+        .where('isArchived', '<>', 1)
+        .andWhere((builder) =>
+            builder
+                .where((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere('name', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+                    });
+                })
+                .orWhere((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere('nameEN', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+                    });
+                })
+                .orWhere((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere(
+                            'searchKeywords',
+                            getCaseInsensitiveComparisonKeyword(),
+                            partialSearchString,
+                        );
+                    });
+                }),
+        )
         .withGraphFetched('tags')
         .limit(count);
 };
 
-export const fetchEquipment = async (id: number): Promise<EquipmentObjectionModel | undefined> => {
+export const fetchEquipment = async (id: number): Promise<EquipmentObjectionModel> => {
     ensureDatabaseIsInitialized();
 
     return EquipmentObjectionModel.query()
-        .findById(id)
+        .where('id', id)
         .withGraphFetched('tags')
         .withGraphFetched('equipmentPublicCategory')
         .withGraphFetched('equipmentLocation')
         .withGraphFetched('prices')
-        .withGraphFetched('changeLog');
+        .withGraphFetched('changelog(changelogInfo)')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(250);
+            },
+        })
+        .then((equipment) => equipment[0]);
 };
 
-export const fetchEquipments = async (): Promise<EquipmentObjectionModel[]> => {
+export const fetchEquipments = async (fetchArchived = false): Promise<EquipmentObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return EquipmentObjectionModel.query()
+    let query = EquipmentObjectionModel.query();
+
+    if (fetchArchived) {
+        query = query.where('isArchived', '<>', 0);
+    } else {
+        query = query.where('isArchived', '<>', 1);
+    }
+
+    return query
         .withGraphFetched('prices')
         .withGraphFetched('tags')
         .withGraphFetched('equipmentPublicCategory')
@@ -45,12 +80,18 @@ export const fetchEquipmentsPublic = async (): Promise<EquipmentObjectionModel[]
     ensureDatabaseIsInitialized();
     return EquipmentObjectionModel.query()
         .where('publiclyHidden', '<>', 1)
+        .where('isArchived', '<>', 1)
         .select('id', 'name', 'nameEN', 'description', 'descriptionEN')
         .withGraphFetched('prices(publicPriceInfo)')
+        .withGraphFetched('tags(publicTagInfo)')
         .withGraphFetched('equipmentPublicCategory(equipmentPublicCategoryInfo)')
         .modifiers({
             publicPriceInfo: (builder) => {
                 builder.select('id', 'name', 'pricePerUnit', 'pricePerHour', 'pricePerUnitTHS', 'pricePerHourTHS');
+            },
+
+            publicTagInfo: (builder) => {
+                builder.select('id', 'name', 'color', 'isPublic').where('isPublic', '1');
             },
 
             equipmentPublicCategoryInfo: (builder) => {

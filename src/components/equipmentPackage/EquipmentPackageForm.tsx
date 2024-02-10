@@ -1,5 +1,5 @@
 import React, { FormEvent, useState, useEffect } from 'react';
-import { Button, Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../models/objection-models';
 import { EquipmentTag } from '../../models/interfaces';
@@ -11,6 +11,8 @@ import EquipmentSearch from '../EquipmentSearch';
 import { equipmentTagsFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
+import { fixSortIndexUniqueness, getNextSortIndex, moveItemToItem, sortIndexSortFn } from '../../lib/sortIndexUtils';
+import { updateItemsInArrayById } from '../../lib/utils';
 
 type Props = {
     handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => void;
@@ -43,10 +45,16 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         const equipmentPackageEntry: EquipmentPackageEntry = {
             id: nextId, // This id is only used in the client, it is striped before sending to the server
             numberOfUnits: 1,
+            numberOfHours: 0,
+            isFree: false,
+            isHidden: false,
             equipment: toEquipment(equipment),
             equipmentId: equipment.id,
+            sortIndex: getNextSortIndex(selectedEquipmentPackageEntries),
         };
-        setSelectedEquipmentPackageEntries([...selectedEquipmentPackageEntries, equipmentPackageEntry]);
+        setSelectedEquipmentPackageEntries(
+            fixSortIndexUniqueness([...selectedEquipmentPackageEntries, equipmentPackageEntry]),
+        );
     };
 
     const deleteEquipment = (equipmentPackageEntry: EquipmentPackageEntry) => {
@@ -56,15 +64,52 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
     };
 
     const EquipmentPackageNumberOfUnitsDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
-        <Form.Control
-            required
-            type="text"
-            size="sm"
-            name={'equipmentPackageNumberOfUnits-' + equipmentPackageEntry.id}
-            defaultValue={equipmentPackageEntry.numberOfUnits}
-            onChange={(e) => {
-                equipmentPackageEntry.numberOfUnits = parseInt(e.target.value);
-            }}
+        <InputGroup className="mb-1" size="sm">
+            <Form.Control
+                required
+                type="text"
+                name={'equipmentPackageNumberOfUnits-' + equipmentPackageEntry.id}
+                defaultValue={equipmentPackageEntry.numberOfUnits}
+                onChange={(e) => {
+                    equipmentPackageEntry.numberOfUnits = parseInt(e.target.value);
+                }}
+            />
+            <InputGroup.Append>
+                <InputGroup.Text>st</InputGroup.Text>
+            </InputGroup.Append>
+        </InputGroup>
+    );
+
+    const EquipmentPackageNumberOfHoursDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
+        <InputGroup className="mb-1" size="sm">
+            <Form.Control
+                required
+                type="text"
+                name={'equipmentPackageNumberOfHours-' + equipmentPackageEntry.id}
+                defaultValue={equipmentPackageEntry.numberOfHours}
+                onChange={(e) => {
+                    equipmentPackageEntry.numberOfHours = parseInt(e.target.value);
+                }}
+            />
+            <InputGroup.Append>
+                <InputGroup.Text>h</InputGroup.Text>
+            </InputGroup.Append>
+        </InputGroup>
+    );
+
+    const EquipmentPackageIsFreeDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
+        <Form.Check
+            type="checkbox"
+            defaultChecked={equipmentPackageEntry.isFree}
+            onChange={(e) => (equipmentPackageEntry.isFree = e.target.checked)}
+        />
+    );
+
+    const EquipmentPackageIsHiddenDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
+        <Form.Check
+            type="checkbox"
+            defaultChecked={equipmentPackageEntry.isHidden}
+            onChange={(e) => (equipmentPackageEntry.isHidden = e.target.checked)}
         />
     );
 
@@ -80,10 +125,19 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         </Button>
     );
 
+    const moveFn = (a: EquipmentPackageEntry, b: EquipmentPackageEntry) =>
+        setSelectedEquipmentPackageEntries(
+            updateItemsInArrayById(
+                selectedEquipmentPackageEntries,
+                ...moveItemToItem(selectedEquipmentPackageEntries, a, b),
+            ),
+        );
+
     const equipmentTableSettings: TableConfiguration<EquipmentPackageEntry> = {
         entityTypeDisplayName: '',
         noResultsLabel: 'Ingen utrustning konfigurerad',
-        defaultSortPropertyName: 'name',
+        customSortFn: sortIndexSortFn,
+        moveFn: moveFn,
         defaultSortAscending: true,
         hideTableCountControls: true,
         hideTableFilter: true,
@@ -94,10 +148,35 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                 getValue: (equipmentPackageEntry: EquipmentPackageEntry) => equipmentPackageEntry.equipment?.name ?? '',
             },
             {
+                key: 'isFree',
+                displayName: 'Utan pris',
+                getValue: (equipmentPackageEntry: EquipmentPackageEntry) =>
+                    equipmentPackageEntry.isFree ? 'true' : 'false',
+                getContentOverride: EquipmentPackageIsFreeDisplayFn,
+                columnWidth: 100,
+                textAlignment: 'center',
+            },
+            {
+                key: 'isHidden',
+                displayName: 'Göm för kund',
+                getValue: (equipmentPackageEntry: EquipmentPackageEntry) =>
+                    equipmentPackageEntry.isHidden ? 'true' : 'false',
+                getContentOverride: EquipmentPackageIsHiddenDisplayFn,
+                columnWidth: 140,
+                textAlignment: 'center',
+            },
+            {
                 key: 'number',
                 displayName: 'Antal',
                 getValue: (equipmentPackageEntry: EquipmentPackageEntry) => equipmentPackageEntry.numberOfUnits,
                 getContentOverride: EquipmentPackageNumberOfUnitsDisplayFn,
+                columnWidth: 140,
+            },
+            {
+                key: 'hours',
+                displayName: 'Antal timmar',
+                getValue: (equipmentPackageEntry: EquipmentPackageEntry) => equipmentPackageEntry.numberOfUnits,
+                getContentOverride: EquipmentPackageNumberOfHoursDisplayFn,
                 columnWidth: 140,
             },
             {
@@ -123,7 +202,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             return;
         }
 
-        const modifiedEquipmentPackage: PartialDeep<IEquipmentPackageObjectionModel> = {
+        const modifiedEquipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true }> = {
             id: equipmentPackage?.id,
             created: equipmentPackage?.created?.toString(),
             updated: equipmentPackage?.updated?.toString(),
@@ -131,11 +210,16 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             image: equipmentPackage?.image,
 
             name: form.equipmentPackageName.value,
+            nameEN: form.equipmentPackageNameEN.value,
+            description: form.description.value,
+            descriptionEN: form.descriptionEN.value,
+            addAsHeading: form.addAsHeading?.value === 'true' ?? false,
 
             tags: selectedTags.map((x) => ({
                 ...x,
                 created: x.created?.toString(),
                 updated: x.updated?.toString(),
+                equipment: undefined,
             })),
 
             equipmentEntries: selectedEquipmentPackageEntries.map((x) => ({
@@ -168,29 +252,87 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                         />
                     </Form.Group>
                 </Col>
+                <Col lg="6">
+                    <Form.Group controlId="formDescription">
+                        <Form.Label>Beskrivning</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            placeholder=""
+                            name="description"
+                            defaultValue={equipmentPackage?.description}
+                        />
+                    </Form.Group>
+                </Col>
+            </Row>
+
+            <h2 className="h5 mt-4">Översättningar</h2>
+            <hr />
+            <Row>
+                <Col lg="6">
+                    <Form.Group controlId="formNameEN">
+                        <Form.Label>Namn (engelska)</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Large Audio package"
+                            name="equipmentPackageNameEN"
+                            defaultValue={equipmentPackage?.nameEN}
+                        />
+                    </Form.Group>
+                </Col>
+                <Col lg="6">
+                    <Form.Group controlId="formDescriptionEN">
+                        <Form.Label>Beskrivning (engelska)</Form.Label>
+                        <Form.Control
+                            as="textarea"
+                            placeholder=""
+                            name="descriptionEN"
+                            defaultValue={equipmentPackage?.descriptionEN}
+                        />
+                    </Form.Group>
+                </Col>
             </Row>
 
             {!equipmentPackage ? null : (
                 <>
-                    <h6>Inkluderad utrustning</h6>
-                    <div className="mb-3 mt-3">
-                        <TableDisplay
-                            entities={selectedEquipmentPackageEntries}
-                            configuration={equipmentTableSettings}
-                        />
-                    </div>
-                    <div className="mb-3">
-                        <EquipmentSearch
-                            placeholder="Lägg till utrustning"
-                            includePackages={false}
-                            id="equipment-search"
-                            onSelect={(x) => addEquipment(x as unknown as IEquipmentObjectionModel)}
-                        />
-                    </div>
+                    <Row>
+                        <Col>
+                            <Form.Group controlId="includedEquipment">
+                                <h2 className="h5 mt-4">Inkluderad utrustning</h2>
+                                <hr />
+                                <div className="mb-3 mt-3">
+                                    <TableDisplay
+                                        entities={selectedEquipmentPackageEntries}
+                                        configuration={equipmentTableSettings}
+                                    />
+                                </div>
+                                <div className="mb-3">
+                                    <EquipmentSearch
+                                        placeholder="Lägg till utrustning"
+                                        includePackages={false}
+                                        id="equipment-search"
+                                        onSelect={(x) => addEquipment(x as unknown as IEquipmentObjectionModel)}
+                                    />
+                                </div>
+                            </Form.Group>
+                        </Col>
+                    </Row>
 
-                    <h6>Övriga inställningar</h6>
+                    <h2 className="h5 mt-4">Övriga inställningar</h2>
                     <hr />
                     <Row>
+                        <Col lg="3">
+                            <Form.Group controlId="formAddAsHeading">
+                                <Form.Label>Pakettyp</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    name="addAsHeading"
+                                    defaultValue={equipmentPackage?.addAsHeading ? 'true' : 'false'}
+                                >
+                                    <option value={'false'}>Lägg till rader individuellt</option>
+                                    <option value={'true'}>Lägg till rader med paketet som rubrik</option>
+                                </Form.Control>
+                            </Form.Group>
+                        </Col>
                         <Col lg="3">
                             <Form.Group controlId="formInventoryCount">
                                 <Form.Label>Estimerade arbetstimmar</Form.Label>

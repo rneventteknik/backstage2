@@ -29,7 +29,7 @@ export interface Booking extends BaseEntityWithName {
     invoiceTag: string;
     invoiceNumber: string;
     pricePlan: PricePlan;
-    accountKind: AccountKind;
+    accountKind: AccountKind | null;
     note: string;
     returnalNote: string;
     location: string;
@@ -37,12 +37,23 @@ export interface Booking extends BaseEntityWithName {
     contactPersonPhone: string;
     contactPersonEmail: string;
     calendarBookingId: string;
+    driveFolderId: string;
     customerName: string;
     language: Language;
+    fixedPrice: number | null;
 }
 
 export interface BookingViewModel extends Booking {
-    displayStartDate: string;
-    startDate?: Date;
-    endDate?: Date;
+    equipmentOutDatetime?: Date;
+    equipmentInDatetime?: Date;
+    usageStartDatetime?: Date;
+    usageEndDatetime?: Date;
+    displayEquipmentOutString: string;
+    displayEquipmentInString: string;
+    displayUsageStartString: string;
+    displayUsageEndString: string;
+    displayUsageInterval: string;
+    displayEquipmentOutInterval: string;
+    isoFormattedUsageStartString: string;
+    monthYearUsageStartString: string;
 }

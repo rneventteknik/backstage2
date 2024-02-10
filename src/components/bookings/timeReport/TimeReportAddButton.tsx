@@ -1,51 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
-import { formatDatetime, getPricePerHour, getResponseContentOrError } from '../../../lib/utils';
 import { toTimeReport } from '../../../lib/mappers/timeReport';
 import { TimeReport } from '../../../models/interfaces/TimeReport';
 import { useNotifications } from '../../../lib/useNotifications';
-import { Booking } from '../../../models/interfaces';
+import { BookingViewModel } from '../../../models/interfaces';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
+import { getResponseContentOrError } from '../../../lib/utils';
+import TimeReportModal from './TimeReportModal';
 
 type Props = {
-    booking: Booking;
+    booking: BookingViewModel;
     disabled: boolean;
-    sortIndex: number;
-    onAdd: (data: TimeReport) => void;
+    onAdd: (timeReport: TimeReport) => void;
     currentUser: CurrentUserInfo;
+    defaultLaborHourlyRate: number;
 };
 
 const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>> = ({
     booking,
     onAdd,
-    sortIndex,
     currentUser,
     children,
+    defaultLaborHourlyRate,
     ...rest
 }: Props & React.ComponentProps<typeof Button>) => {
     const { showCreateFailedNotification } = useNotifications();
+    const [timeReport, setTimeReport] = useState<Partial<TimeReport> | undefined>(undefined);
 
-    const addEmptyTimeReport = async () => {
+    const addTimeReport = (timeReport: ITimeReportObjectionModel) => {
         if (!currentUser.userId) {
             showCreateFailedNotification('Tidrapporten');
             return;
         }
-
-        const pricePerHour = getPricePerHour(booking.pricePlan);
-
-        const timeReport: ITimeReportObjectionModel = {
-            bookingId: booking.id,
-            billableWorkingHours: 0,
-            actualWorkingHours: 0,
-            userId: currentUser.userId,
-            startDatetime: formatDatetime(new Date()),
-            endDatetime: formatDatetime(new Date()),
-            pricePerHour: pricePerHour ?? 0,
-            name: '',
-            accountKind: booking.accountKind,
-            sortIndex: sortIndex,
-        };
 
         const body = { timeReport: timeReport };
 
@@ -58,8 +45,8 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
         fetch('/api/bookings/' + booking.id + '/timeReport', request)
             .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
             .then(toTimeReport)
-            .then((data) => {
-                onAdd(data);
+            .then((timeReport) => {
+                onAdd(timeReport);
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -68,9 +55,36 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
     };
 
     return (
-        <Button onClick={addEmptyTimeReport} {...rest}>
-            {children}
-        </Button>
+        <>
+            <Button
+                onClick={() => {
+                    const currentDateRounded = new Date();
+                    currentDateRounded.setMinutes(0, 0, 0);
+                    setTimeReport({
+                        startDatetime: booking.usageStartDatetime ?? currentDateRounded,
+                        endDatetime: booking.usageEndDatetime ?? currentDateRounded,
+                        userId: currentUser.userId,
+                        pricePerHour: defaultLaborHourlyRate,
+                    });
+                }}
+                {...rest}
+            >
+                {children}
+            </Button>
+            <TimeReportModal
+                formId="form-add-timeReport-modal"
+                booking={booking}
+                defaultLaborHourlyRate={defaultLaborHourlyRate}
+                timeReport={timeReport}
+                setTimeReport={setTimeReport}
+                onHide={() => {
+                    setTimeReport(undefined);
+                }}
+                onSubmit={(timeReport) => {
+                    addTimeReport(timeReport);
+                }}
+            ></TimeReportModal>
+        </>
     );
 };
 

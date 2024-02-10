@@ -8,17 +8,21 @@ import styles from './Sidebar.module.scss';
 import {
     faArchive,
     faCalendarDay,
+    faChartPie,
+    faCog,
     faCube,
     faExternalLinkAlt,
     faFileInvoiceDollar,
     faHome,
-    faInfoCircle,
+    faListCheck,
     faMoneyBillWave,
     faUsers,
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { IfAdmin } from '../utils/IfAdmin';
+import { KeyValue } from '../../models/interfaces/KeyValue';
+import { getGlobalSetting } from '../../lib/utils';
 
 // Component for a single link
 //
@@ -61,13 +65,11 @@ const SidebarLinkGroup: React.FC<SidebarLinkGroupProps> = ({ children, title }: 
 
 // External links
 //
-const getExternalLinksFromEnv = () => {
+const getExternalLinksFromGlobalSettings = (globalSettings: KeyValue[]) => {
     try {
         type LinkObject = { title: string; url: string };
-        const links = (
-            process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS
-                ? JSON.parse(process.env.NEXT_PUBLIC_BACKSTAGE2_EXTERNAL_LINKS)
-                : []
+        const links = JSON.parse(
+            getGlobalSetting('content.sidebarExternalLinks', globalSettings, '[]'),
         ) as LinkObject[];
 
         if (links.length === 0) {
@@ -80,7 +82,7 @@ const getExternalLinksFromEnv = () => {
     } catch {
         return (
             <Alert className="mx-4 p-3" variant="danger">
-                <strong>Error</strong> Invalid JSON
+                <strong>Error</strong> Invalid JSON in <code>content.sidebarExternalLinks</code> setting
             </Alert>
         );
     }
@@ -90,34 +92,33 @@ const getExternalLinksFromEnv = () => {
 //
 type Props = {
     currentUser: CurrentUserInfo;
+    globalSettings: KeyValue[];
 };
-const sidebar: React.FC<Props> = ({ currentUser }: Props) => (
-    <div className={styles.container + ' pt-2'}>
+const sidebar: React.FC<Props> = ({ currentUser, globalSettings }: Props) => (
+    <div className={styles.container + ' pt-2 pb-4'}>
         <SidebarLinkGroup>
             <SidebarLink displayName="Hem" link="/" icon={faHome} exactMatch={true} />
             <SidebarLink displayName="Aktiva bokningar" link="/bookings" icon={faCalendarDay} />
-            <SidebarLink displayName="Alla bokingar" link="/archive" icon={faArchive} />
+            <SidebarLink displayName="Alla bokningar" link="/archive" icon={faArchive} />
             <SidebarLink displayName="Utrustning" link="/equipment" icon={faCube} />
             <SidebarLink displayName="Användare" link="/users" icon={faUsers} />
-            <SidebarLink displayName="Hjälp" link="/about" icon={faInfoCircle} />
+            <SidebarLink displayName="Statistik" link="/statistics" icon={faChartPie} />
         </SidebarLinkGroup>
 
         <IfAdmin currentUser={currentUser}>
             <SidebarLinkGroup title="Administration">
-                <SidebarLink displayName="Löner" link="/salary" icon={faMoneyBillWave} />
-                <SidebarLink displayName="Fakturor" link="/invoices" icon={faFileInvoiceDollar} />
+                <SidebarLink displayName="Översikt" link="/admin-overview" icon={faListCheck} />
+                <SidebarLink displayName="Timarvodesunderlag" link="/salary" icon={faMoneyBillWave} />
+                <SidebarLink displayName="Fakturaunderlag" link="/invoices" icon={faFileInvoiceDollar} />
+                <SidebarLink displayName="Inställningar" link="/settings" icon={faCog} />
             </SidebarLinkGroup>
         </IfAdmin>
 
-        {getExternalLinksFromEnv() ? (
-            <SidebarLinkGroup title="Externa länkar">{getExternalLinksFromEnv()}</SidebarLinkGroup>
+        {getExternalLinksFromGlobalSettings(globalSettings) ? (
+            <SidebarLinkGroup title="Externa länkar">
+                {getExternalLinksFromGlobalSettings(globalSettings)}
+            </SidebarLinkGroup>
         ) : null}
-
-        <div className={styles.debugInfo}>
-            <small className="text-muted">
-                <p>{process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION}</p>
-            </small>
-        </div>
     </div>
 );
 

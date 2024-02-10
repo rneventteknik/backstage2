@@ -1,11 +1,21 @@
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
-import { commonStyles, formatEquipmentListEntryCountOrHours, formatEquipmentListEntryPrice } from '../../utils';
-import { EquipmentList } from '../../../models/interfaces/EquipmentList';
-import { formatNumberAsCurrency, getPrice, getNumberOfDays, getEquipmentListPrice } from '../../../lib/pricingUtils';
+import { commonStyles, formatEquipmentListEntryCountOrHours, formatEquipmentListEntryPriceWithVAT } from '../../utils';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
+import {
+    formatNumberAsCurrency,
+    getPrice,
+    getEquipmentListPrice,
+    getEquipmentListHeadingPrice,
+    getCalculatedDiscount,
+    addVAT,
+} from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
-import { formatDatetime } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
+import { getNumberOfDays } from '../../../lib/datetimeUtils';
+import { Booking } from '../../../models/interfaces';
+import { EquipmentListDateInfo } from './equipmentListDateInfo';
+import { getSortedList } from '../../../lib/sortIndexUtils';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -17,18 +27,27 @@ const styles = StyleSheet.create({
 
 type Props = {
     list: EquipmentList;
+    booking: Booking;
+    showPrices: boolean;
 };
-export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
+export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }: Props) => {
     const { t } = useTextResources();
+
+    const wrapEntity = (entity: EquipmentListEntry | EquipmentListHeading, typeIdentifier: 'E' | 'H') => ({
+        typeIdentifier,
+        entity,
+        id: typeIdentifier + entity.id,
+        sortIndex: entity.sortIndex,
+    });
+    const sortedListEntriesAndHeadings = getSortedList([
+        ...list.listEntries.filter((x) => !x.isHidden).map((x) => wrapEntity(x, 'E')),
+        ...list.listHeadings.map((x) => wrapEntity(x, 'H')),
+    ]);
 
     return (
         <View style={styles.equipmentListSection}>
             <Text style={styles.heading}>{list.name}</Text>
-            <Text style={styles.italic}>
-                {list.usageStartDatetime ? formatDatetime(list.usageStartDatetime) : '-'} to{' '}
-                {list.usageEndDatetime ? formatDatetime(list.usageEndDatetime) : '-'} ({getNumberOfDays(list)}{' '}
-                {t('common.misc.days-unit')})
-            </Text>
+            <EquipmentListDateInfo list={list} booking={booking} />
 
             <TableRow>
                 <TableCellAutoWidth>
@@ -37,48 +56,114 @@ export const EquipmentListInfo: React.FC<Props> = ({ list }: Props) => {
                 <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.italic}>{t('common.equipment-list.table-header.count')}</Text>
                 </TableCellFixedWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.italic}>{t('common.equipment-list.table-header.price')}</Text>
-                </TableCellFixedWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.italic}>{t('common.equipment-list.table-header.discount')}</Text>
-                </TableCellFixedWidth>
-                <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.italic}>{t('common.equipment-list.table-header.total-price')}</Text>
-                </TableCellFixedWidth>
+                {showPrices ? (
+                    <>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text style={styles.italic}>{t('common.equipment-list.table-header.price')}</Text>
+                        </TableCellFixedWidth>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text style={styles.italic}>{t('common.equipment-list.table-header.discount')}</Text>
+                        </TableCellFixedWidth>
+                        <TableCellFixedWidth width={90} textAlign="right">
+                            <Text style={styles.italic}>{t('common.equipment-list.table-header.total-price')}</Text>
+                        </TableCellFixedWidth>
+                    </>
+                ) : null}
             </TableRow>
 
             <View>
-                {list.equipmentListEntries.map((entry) => (
-                    <TableRow key={entry.id}>
+                {sortedListEntriesAndHeadings.map((wrappedEntry) => {
+                    const entry = wrappedEntry.entity as EquipmentListEntry;
+                    const heading = wrappedEntry.entity as EquipmentListHeading;
+                    const isHeading = wrappedEntry.typeIdentifier === 'H';
+                    return (
+                        <>
+                            <TableRow key={wrappedEntry.id + wrappedEntry.typeIdentifier}>
+                                <TableCellAutoWidth>
+                                    <Text>{wrappedEntry.entity.name}</Text>
+                                    <Text style={{ color: '#999999' }}>{wrappedEntry.entity.description}</Text>
+                                </TableCellAutoWidth>
+                                <TableCellFixedWidth width={90} textAlign="right">
+                                    {!isHeading ? (
+                                        <Text>{formatEquipmentListEntryCountOrHours(entry, t)}</Text>
+                                    ) : (
+                                        <Text>1 {t('common.misc.count-unit-single')}</Text>
+                                    )}
+                                </TableCellFixedWidth>
+                                {showPrices ? (
+                                    <>
+                                        <TableCellFixedWidth width={90} textAlign="right">
+                                            {!isHeading ? (
+                                                <Text>{formatEquipmentListEntryPriceWithVAT(entry, t)}</Text>
+                                            ) : (
+                                                <Text>
+                                                    {formatEquipmentListEntryPriceWithVAT(
+                                                        {
+                                                            pricePerUnit: getEquipmentListHeadingPrice(
+                                                                heading,
+                                                                getNumberOfDays(list),
+                                                            ),
+                                                            pricePerHour: 0,
+                                                        },
+                                                        t,
+                                                    )}
+                                                </Text>
+                                            )}
+                                        </TableCellFixedWidth>
+                                        <TableCellFixedWidth width={90} textAlign="right">
+                                            {!isHeading ? (
+                                                <Text>
+                                                    {getCalculatedDiscount(entry, getNumberOfDays(list)) > 0
+                                                        ? formatNumberAsCurrency(
+                                                              addVAT(
+                                                                  getCalculatedDiscount(entry, getNumberOfDays(list)),
+                                                              ),
+                                                          )
+                                                        : ''}
+                                                </Text>
+                                            ) : null}
+                                        </TableCellFixedWidth>
+                                        <TableCellFixedWidth width={90} textAlign="right">
+                                            {!isHeading ? (
+                                                <Text>
+                                                    {formatNumberAsCurrency(
+                                                        addVAT(getPrice(entry, getNumberOfDays(list))),
+                                                    )}
+                                                </Text>
+                                            ) : (
+                                                <Text>
+                                                    {formatNumberAsCurrency(
+                                                        addVAT(
+                                                            getEquipmentListHeadingPrice(
+                                                                heading,
+                                                                getNumberOfDays(list),
+                                                            ),
+                                                        ),
+                                                    )}
+                                                </Text>
+                                            )}
+                                        </TableCellFixedWidth>
+                                    </>
+                                ) : null}
+                            </TableRow>
+                        </>
+                    );
+                })}
+            </View>
+            {showPrices ? (
+                <>
+                    <TableRow>
                         <TableCellAutoWidth>
-                            <Text>{entry.name}</Text>
-                            <Text style={{ color: '#999999' }}>{entry.description}</Text>
+                            <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
                         </TableCellAutoWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{formatEquipmentListEntryCountOrHours(entry, t)}</Text>
-                        </TableCellFixedWidth>
-                        <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{formatEquipmentListEntryPrice(entry, t)}</Text>
-                        </TableCellFixedWidth>
-                        <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{entry.discount > 0 ? formatNumberAsCurrency(entry.discount) : ''}</Text>
-                        </TableCellFixedWidth>
-                        <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>{formatNumberAsCurrency(getPrice(entry, getNumberOfDays(list)))}</Text>
+                            <Text style={styles.bold}>
+                                {formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}
+                            </Text>
                         </TableCellFixedWidth>
                     </TableRow>
-                ))}
-            </View>
-
-            <TableRow>
-                <TableCellAutoWidth>
-                    <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
-                </TableCellAutoWidth>
-                <TableCellFixedWidth width={40} textAlign="right">
-                    <Text style={styles.bold}>{formatNumberAsCurrency(getEquipmentListPrice(list))}</Text>
-                </TableCellFixedWidth>
-            </TableRow>
+                </>
+            ) : null}
         </View>
     );
 };

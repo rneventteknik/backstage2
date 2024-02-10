@@ -6,7 +6,9 @@ import { SessionContext, withSessionContext } from '../../../../lib/sessionConte
 
 const handler = withSessionContext(
     async (_req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
-        const sealedToken = Array.isArray(_req.query.sealedToken) ? _req.query.sealedToken[0] : _req.query.sealedToken;
+        const sealedToken = Array.isArray(_req.query.sealedToken)
+            ? _req.query.sealedToken[0]
+            : _req.query.sealedToken ?? '';
         const token = await unsealLoginToken(sealedToken);
         const currentUserId = context.currentUser.userId;
 

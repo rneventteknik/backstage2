@@ -4,12 +4,13 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import { Equipment, EquipmentTag } from '../../models/interfaces';
 import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../models/objection-models';
 import useSwr from 'swr';
-import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher } from '../../lib/fetchers';
+import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher, equipmentLocationsFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';
 import PricesEditor from './PricesEditor';
 import { toEquipmentPriceObjectionModel } from '../../lib/mappers/equipment';
 import { toIntOrUndefined } from '../../lib/utils';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
+import { getSortedList } from '../../lib/sortIndexUtils';
 
 type Props = {
     handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel>) => void;
@@ -29,7 +30,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
         equipmentPublicCategoriesFetcher,
     );
 
-    const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentPublicCategoriesFetcher);
+    const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentLocationsFetcher);
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -67,7 +68,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
         const getValueFromForm = (key: string): string | undefined => form[key]?.value;
 
-        const modifiedEquipment: PartialDeep<IEquipmentObjectionModel> = {
+        const modifiedEquipment: PartialDeep<IEquipmentObjectionModel, { recurseIntoArrays: true }> = {
             id: equipment?.id,
 
             image: equipment?.image,
@@ -76,17 +77,19 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
             description: getValueFromForm('description'),
             nameEN: getValueFromForm('equipmentNameEN'),
             descriptionEN: getValueFromForm('descriptionEN'),
+            searchKeywords: getValueFromForm('searchKeywords'),
 
             tags: selectedTags.map((x) => ({
                 ...x,
                 created: x.created?.toString(),
                 updated: x.updated?.toString(),
+                equipment: undefined,
             })),
             prices: prices.map((x) => toEquipmentPriceObjectionModel(x)),
             equipmentPublicCategoryId: toIntOrUndefined(getValueFromForm('publicCategory')) ?? null,
             equipmentLocationId: toIntOrUndefined(getValueFromForm('equipmentLocation')) ?? null,
 
-            inventoryCount: toIntOrUndefined(getValueFromForm('inventoryCount')) ?? 1,
+            inventoryCount: toIntOrUndefined(getValueFromForm('inventoryCount')) ?? null,
             publiclyHidden: getValueFromForm('publiclyHidden') === 'true',
             note: getValueFromForm('note'),
         };
@@ -122,7 +125,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                 </Col>
             </Row>
 
-            <h6>Översättningar</h6>
+            <h2 className="h5 mt-4">Översättningar</h2>
             <hr />
             <Row>
                 <Col lg="6">
@@ -152,7 +155,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
             {!equipment ? null : (
                 <>
-                    <h6>Prissättning</h6>
+                    <h2 className="h5 mt-4">Prissättning</h2>
                     <hr />
                     <Row>
                         <Col lg="12">
@@ -162,22 +165,24 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         </Col>
                     </Row>
 
-                    <h6>Övriga inställningar</h6>
+                    <h2 className="h5 mt-4">Övriga inställningar</h2>
                     <hr />
                     <Row>
-                        <Col lg="3">
-                            <Form.Group controlId="formInventoryCount">
-                                <Form.Label>Antal i inventarie</Form.Label>
-                                <FormNumberFieldWithoutScroll
-                                    required
-                                    type="number"
-                                    placeholder="15"
-                                    name="inventoryCount"
-                                    defaultValue={equipment?.inventoryCount}
+                        <Col lg="6">
+                            <Form.Group>
+                                <Form.Label>Söktermer</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="MDHX, MD-HX"
+                                    name="searchKeywords"
+                                    defaultValue={equipment?.searchKeywords}
                                 />
+                                <Form.Text className="text-muted">
+                                    Dessa termer visas inte, men används vid sökning (utöver namnen).
+                                </Form.Text>
                             </Form.Group>
                         </Col>
-                        <Col lg="9">
+                        <Col lg="6">
                             <Form.Group>
                                 <Form.Label>Taggar</Form.Label>
                                 <Typeahead<EquipmentTag>
@@ -189,6 +194,20 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     placeholder="Taggar"
                                     defaultSelected={equipment.tags ?? []}
                                 />
+                            </Form.Group>
+                        </Col>
+                        <Col lg="3">
+                            <Form.Group controlId="formInventoryCount">
+                                <Form.Label>Antal i inventarie</Form.Label>
+                                <FormNumberFieldWithoutScroll
+                                    type="number"
+                                    placeholder=""
+                                    name="inventoryCount"
+                                    defaultValue={equipment?.inventoryCount ?? undefined}
+                                />
+                                <Form.Text className="text-muted">
+                                    Lämna detta fält tomt för att stänga av inventariestatus.
+                                </Form.Text>
                             </Form.Group>
                         </Col>
                         <Col lg="3">
@@ -213,7 +232,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     defaultValue={equipment?.equipmentPublicCategory?.id}
                                 >
                                     <option value={undefined}>Ingen kategori</option>
-                                    {equipmentPublicCategories?.map((x) => (
+                                    {getSortedList(equipmentPublicCategories ?? []).map((x) => (
                                         <option
                                             key={x.id}
                                             value={x.id}
@@ -233,7 +252,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 <Form.Label>Plats</Form.Label>
                                 <Form.Control as="select" name="equipmentLocation">
                                     <option value={undefined}>Okänd plats</option>
-                                    {equipmentLocations?.map((x) => (
+                                    {getSortedList(equipmentLocations ?? []).map((x) => (
                                         <option
                                             key={x.id}
                                             value={x.id}

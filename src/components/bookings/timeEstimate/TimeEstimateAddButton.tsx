@@ -1,52 +1,32 @@
-import React, { ReactNode } from 'react';
-import { Button, Dropdown } from 'react-bootstrap';
+import React, { ReactNode, useState } from 'react';
+import { Button } from 'react-bootstrap';
 import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
-import { getPricePerHour, getResponseContentOrError } from '../../../lib/utils';
-import { toTimeEstimate } from '../../../lib/mappers/timeEstimate';
 import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Booking } from '../../../models/interfaces';
+import TimeEstimateModal from './TimeEstimateModal';
+import { getNextSortIndex } from '../../../lib/sortIndexUtils';
+import { addTimeEstimateApiCall } from '../../../lib/equipmentListUtils';
 
 type Props = {
     booking: Booking;
-    sortIndex: number;
     onAdd: (data: TimeEstimate) => void;
-    buttonType: 'dropdown' | 'button';
     children?: ReactNode;
+    defaultLaborHourlyRate: number;
 };
 
 const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button>> = ({
     booking,
     onAdd,
-    sortIndex,
-    buttonType,
     children,
+    defaultLaborHourlyRate,
     ...rest
 }: Props & React.ComponentProps<typeof Button>) => {
     const { showCreateFailedNotification } = useNotifications();
+    const [timeEstimateViewModel, setTimeEstimateViewModel] = useState<Partial<TimeEstimate> | undefined>(undefined);
 
-    const addEmptyTimeEstimate = async () => {
-        const pricePerHour = getPricePerHour(booking.pricePlan);
-
-        const timeEstimate: ITimeEstimateObjectionModel = {
-            bookingId: booking.id,
-            numberOfHours: 0,
-            pricePerHour: pricePerHour ?? 0,
-            name: '',
-            sortIndex: sortIndex,
-        };
-
-        const body = { timeEstimate: timeEstimate };
-
-        const request = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-
-        fetch('/api/bookings/' + booking.id + '/timeEstimate', request)
-            .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
-            .then(toTimeEstimate)
+    const addTimeEstimate = async (timeEstimate: ITimeEstimateObjectionModel) => {
+        addTimeEstimateApiCall(timeEstimate, booking.id)
             .then((data) => {
                 onAdd(data);
             })
@@ -56,12 +36,40 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
             });
     };
 
-    return buttonType === 'dropdown' ? (
-        <Dropdown.Item onClick={addEmptyTimeEstimate}>{children}</Dropdown.Item>
-    ) : (
-        <Button {...rest} onClick={addEmptyTimeEstimate}>
-            {children}
-        </Button>
+    return (
+        <>
+            <Button
+                {...rest}
+                onClick={() => {
+                    setTimeEstimateViewModel({
+                        pricePerHour: defaultLaborHourlyRate,
+                    });
+                }}
+            >
+                {children}
+            </Button>
+            <TimeEstimateModal
+                formId="form-add-time-estimate-modal"
+                defaultLaborHourlyRate={defaultLaborHourlyRate}
+                timeEstimate={timeEstimateViewModel}
+                setTimeEstimate={setTimeEstimateViewModel}
+                onHide={() => {
+                    setTimeEstimateViewModel(undefined);
+                }}
+                onSubmit={() => {
+                    const timeEstimateToSend: ITimeEstimateObjectionModel = {
+                        id: timeEstimateViewModel?.id,
+                        bookingId: booking.id,
+                        numberOfHours: timeEstimateViewModel?.numberOfHours ?? 0,
+                        pricePerHour: timeEstimateViewModel?.pricePerHour ?? 0,
+                        name: timeEstimateViewModel?.name ?? '',
+                        sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
+                    };
+                    addTimeEstimate(timeEstimateToSend);
+                }}
+                wizardLanguage={booking.language}
+            ></TimeEstimateModal>
+        </>
     );
 };
 

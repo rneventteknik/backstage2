@@ -5,11 +5,15 @@ import React, { ReactNode, useState } from 'react';
 import Sidebar from './Sidebar';
 import styles from './Layout.module.scss';
 import { SkeletonTheme } from 'react-loading-skeleton';
+import { KeyValue } from '../../models/interfaces/KeyValue';
+import { getGlobalSetting } from '../../lib/utils';
+import LoggedOutModal from './LoggedOutModal';
 
 type Props = {
     children?: ReactNode;
     title?: string;
     currentUser: CurrentUserInfo;
+    globalSettings: KeyValue[];
     fixedWidth?: boolean;
 };
 
@@ -18,6 +22,7 @@ const Layout: React.FC<Props> = ({
     title = 'This is the default title',
     fixedWidth = false,
     currentUser,
+    globalSettings,
 }: Props) => {
     const [sidebarIsToggled, setSidebarIsToggled] = useState(false);
     const toggleSidebar = () => setSidebarIsToggled(!sidebarIsToggled);
@@ -28,12 +33,20 @@ const Layout: React.FC<Props> = ({
                 <title>{title} | Backstage2</title>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                <link
+                    rel="icon"
+                    type="image/png"
+                    sizes="16x16"
+                    href={getGlobalSetting('content.image.favIcon', globalSettings, '')}
+                />
             </Head>
 
-            <Topbar currentUser={currentUser} toggleSidebar={toggleSidebar} />
+            <Topbar currentUser={currentUser} globalSettings={globalSettings} toggleSidebar={toggleSidebar} />
 
             <aside className={styles.sidebar}>
-                <Sidebar currentUser={currentUser} />
+                <div className={styles.sidebarContentContainer}>
+                    <Sidebar currentUser={currentUser} globalSettings={globalSettings} />
+                </div>
             </aside>
 
             <SkeletonTheme
@@ -42,6 +55,7 @@ const Layout: React.FC<Props> = ({
                 borderRadius={0}
             >
                 <section className={styles.mainContentContainer + ' p-4'}>
+                    <LoggedOutModal currentUser={currentUser} globalSettings={globalSettings} />
                     <div
                         className={fixedWidth ? styles.mainContentFixedWidth : styles.mainContent}
                         data-testid="main-content"
@@ -49,7 +63,7 @@ const Layout: React.FC<Props> = ({
                         {children}
 
                         <footer className={styles.footer + ' text-center font-italic text-muted'}>
-                            <small>Backstage2 - 2021</small>
+                            <small>Backstage2</small>
                         </footer>
                     </div>
                 </section>

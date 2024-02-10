@@ -9,10 +9,18 @@ export interface EquipmentPackage extends BaseEntityWithName {
     estimatedHours: number;
     tags: EquipmentTag[];
     equipmentEntries: EquipmentPackageEntry[];
+    nameEN?: string;
+    description?: string;
+    descriptionEN?: string;
+    addAsHeading: boolean;
 }
 
 export interface EquipmentPackageEntry extends BaseEntity {
     equipmentId: number;
     equipment?: Equipment;
     numberOfUnits: number;
+    numberOfHours: number;
+    sortIndex: number;
+    isHidden: boolean;
+    isFree: boolean;
 }

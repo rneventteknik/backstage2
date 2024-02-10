@@ -14,13 +14,17 @@ import NotificationsContainer from '../components/layout/NotificationsContainer'
 //
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 config.autoAddCss = false;
 
 export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
     return (
-        <Provider>
-            <NotificationsContainer />
-            <Component {...pageProps} />
-        </Provider>
+        <DndProvider backend={HTML5Backend}>
+            <Provider>
+                <NotificationsContainer />
+                <Component {...pageProps} />
+            </Provider>
+        </DndProvider>
     );
 }

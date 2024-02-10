@@ -1,158 +1,53 @@
-import React, { ChangeEvent, useState } from 'react';
+import React from 'react';
 import Layout from '../../components/layout/Layout';
-import { Equipment, EquipmentTag } from '../../models/interfaces';
 import useSwr from 'swr';
-import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import Link from 'next/link';
-import { Badge, Button, Col, Collapse, Dropdown, DropdownButton, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
-import { faAdd, faCubes, faEyeSlash, faFileImport, faFilter, faTags } from '@fortawesome/free-solid-svg-icons';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
+import {
+    faAdd,
+    faArchive,
+    faCalendarXmark,
+    faCubes,
+    faFileExport,
+    faFileImport,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Typeahead } from 'react-bootstrap-typeahead';
 import Header from '../../components/layout/Header';
 import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
-import { equipmentTagsFetcher, equipmentsFetcher } from '../../lib/fetchers';
-import TableStyleLink from '../../components/utils/TableStyleLink';
+import { equipmentsFetcher } from '../../lib/fetchers';
 import { ErrorPage } from '../../components/layout/ErrorPage';
-import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { IfAdmin, IfNotReadonly } from '../../components/utils/IfAdmin';
-
-const EquipmentNameDisplayFn = (equipment: Equipment) => (
-    <>
-        <TableStyleLink href={'equipment/' + equipment.id}>{equipment.name}</TableStyleLink>
-        {equipment.publiclyHidden ? (
-            <span className="small text-muted ml-1">
-                <FontAwesomeIcon icon={faEyeSlash} title="Gömd i den publika prislistan"></FontAwesomeIcon>
-            </span>
-        ) : null}
-        {equipment.tags.map((x) => (
-            <Badge variant="dark" key={x.id} className="ml-1">
-                {x.name}
-            </Badge>
-        ))}
-        <div className="text-muted mb-0">{equipment.description}</div>
-        <div className="text-muted mb-0 d-md-none">{equipment.inventoryCount + ' st'}</div>
-    </>
-);
-
-const EquipmentPriceDisplayFn = (equipment: Equipment) => {
-    switch (equipment.prices.length) {
-        case 0:
-            return '-';
-        case 1:
-            return (
-                <>
-                    {formatPrice(equipment.prices[0])}
-                    <br />
-                    {formatTHSPrice(equipment.prices[0])}
-                </>
-            );
-        default:
-            return (
-                <OverlayTrigger
-                    placement="left"
-                    overlay={
-                        <Tooltip id="1">
-                            <small>
-                                {equipment.prices.map((p) => (
-                                    <p key={p.id}>
-                                        <h2 style={{ fontSize: '1em' }}>{p.name}</h2>
-                                        {formatPrice(p)}
-                                        <br />
-                                        {formatTHSPrice(p)}
-                                    </p>
-                                ))}
-                            </small>
-                        </Tooltip>
-                    }
-                >
-                    <span className="font-italic">
-                        <FontAwesomeIcon icon={faTags}></FontAwesomeIcon>
-                    </span>
-                </OverlayTrigger>
-            );
-    }
-};
-
-const tableSettings: TableConfiguration<Equipment> = {
-    entityTypeDisplayName: '',
-    defaultSortPropertyName: 'name',
-    defaultSortAscending: true,
-    hideTableFilter: true,
-    columns: [
-        {
-            key: 'name',
-            displayName: 'Utrustning',
-            getValue: (equipment: Equipment) => equipment.name + ' ' + equipment.description,
-            getContentOverride: EquipmentNameDisplayFn,
-        },
-        {
-            key: 'count',
-            displayName: 'Antal',
-            getValue: (equipment: Equipment) => equipment.inventoryCount,
-            getContentOverride: (equipment: Equipment) => equipment.inventoryCount + ' st',
-            textAlignment: 'center',
-            cellHideSize: 'md',
-            columnWidth: 120,
-        },
-        {
-            key: 'price',
-            displayName: 'Pris',
-            getValue: () => '',
-            disableSort: true,
-            getContentOverride: EquipmentPriceDisplayFn,
-            columnWidth: 120,
-            textAlignment: 'center',
-        },
-    ],
-};
+import { KeyValue } from '../../models/interfaces/KeyValue';
+import LargeEquipmentTable from '../../components/LargeEquipmentTable';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Utrustning';
 const breadcrumbs = [{ link: 'equipment', displayName: pageTitle }];
 
-const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
-    const { data: equipment, error, isValidating } = useSwr('/api/equipment', equipmentsFetcher);
-    const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
-
-    const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
-    const [searchText, setSearchText] = useState('');
-    const [filterTags, setFilterTags] = useState<EquipmentTag[]>([]);
-    const [filterPubliclyHidden, setFilterPubliclyHidden] = useState('all');
+const EquipmentListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
+    const { data: equipment, error } = useSwr('/api/equipment', equipmentsFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
-    }
-
-    if (isValidating || !equipment) {
-        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} />;
-    }
-
-    // Handlers for changed bookings
-    //
-    const handleChangeFilterString = (booking: ChangeEvent<HTMLInputElement>) => {
-        setSearchText(booking.target.value);
-    };
-
-    // Filter list. Note that the free text filter are handled by the table and not here.
-    //
-    const equipmentToShow = equipment
-        .filter(
-            (equipment: Equipment) =>
-                filterTags.length === 0 || filterTags.every((tag) => equipment.tags.some((x) => x.id === tag.id)),
-        )
-        .filter(
-            (equipment: Equipment) =>
-                filterPubliclyHidden === 'all' ||
-                (filterPubliclyHidden === 'true' && equipment.publiclyHidden) ||
-                (filterPubliclyHidden === 'false' && !equipment.publiclyHidden),
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
         );
+    }
+
+    if (!equipment) {
+        return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
+    }
 
     return (
-        <Layout title={pageTitle} currentUser={currentUser}>
+        <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/equipment/new" passHref>
@@ -162,70 +57,39 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                     </Link>
                 </IfNotReadonly>
                 <Link href="/equipmentPackage" passHref>
-                    <Button variant="dark" as="span">
-                        <FontAwesomeIcon icon={faCubes} className="mr-1" /> Visa utrustningpaket
+                    <Button variant="secondary" as="span">
+                        <FontAwesomeIcon icon={faCubes} className="mr-1" /> Visa utrustningspaket
                     </Button>
                 </Link>
-                <IfAdmin currentUser={currentUser}>
-                    <DropdownButton id="mer-dropdown-button" variant="dark" title="Mer" className="d-inline-block ml-2">
+                <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer" className="d-inline-block">
+                    <Link href="/equipment/compare-availability" passHref>
+                        <Dropdown.Item href={'/equipment/compare-availability'}>
+                            <FontAwesomeIcon icon={faCalendarXmark} className="mr-1 fa-fw" /> Jämför tillgänglighet
+                        </Dropdown.Item>
+                    </Link>
+                    <Link href="/equipment/archived" passHref>
+                        <Dropdown.Item href={'/equipment/archived'}>
+                            <FontAwesomeIcon icon={faArchive} className="mr-1 fa-fw" /> Visa arkiverad utrustning
+                        </Dropdown.Item>
+                    </Link>
+                    <IfAdmin currentUser={currentUser}>
+                        <Dropdown.Divider />
                         <Link href="/equipment/json-import" passHref>
                             <Dropdown.Item href={'/equipment/json-import'}>
                                 <FontAwesomeIcon icon={faFileImport} className="mr-1 fa-fw" /> Importera utrustning från
                                 JSON
                             </Dropdown.Item>
                         </Link>
-                    </DropdownButton>
-                </IfAdmin>
+                        <Link href="/equipment/json-export" passHref>
+                            <Dropdown.Item href={'/equipment/json-export'}>
+                                <FontAwesomeIcon icon={faFileExport} className="mr-1 fa-fw" /> Exportera utrustning till
+                                JSON
+                            </Dropdown.Item>
+                        </Link>
+                    </IfAdmin>
+                </DropdownButton>
             </Header>
-
-            <Form.Row>
-                <Col>
-                    <Form.Group>
-                        <Form.Control type="text" placeholder="Fritextfilter" onChange={handleChangeFilterString} />
-                    </Form.Group>
-                </Col>
-                <Col md="auto">
-                    <Form.Group>
-                        <Button variant="dark" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
-                            <FontAwesomeIcon icon={faFilter} /> {showAdvancedFilters ? 'Göm' : 'Visa'} filter
-                        </Button>
-                    </Form.Group>
-                </Col>
-            </Form.Row>
-
-            <Collapse in={showAdvancedFilters}>
-                <Form.Row className="mb-2">
-                    <Col md="4">
-                        <Form.Group>
-                            <Form.Label>Taggar</Form.Label>
-                            <Typeahead<EquipmentTag>
-                                id="tags-typeahead"
-                                multiple
-                                labelKey={(x) => x.name}
-                                options={equipmentTags ?? []}
-                                onChange={(e) => setFilterTags(e)}
-                                placeholder="Filtrera på taggar"
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col md="4">
-                        <Form.Group>
-                            <Form.Label>Publika prislistan</Form.Label>
-                            <Form.Control
-                                as="select"
-                                name="publiclyHidden"
-                                onChange={(e) => setFilterPubliclyHidden(e.target.value)}
-                            >
-                                <option value="all">Visa alla</option>
-                                <option value="false">Synlig i publika prislistan</option>
-                                <option value="true">Gömd</option>
-                            </Form.Control>
-                        </Form.Group>
-                    </Col>
-                </Form.Row>
-            </Collapse>
-
-            <TableDisplay entities={equipmentToShow} configuration={tableSettings} filterString={searchText} />
+            <LargeEquipmentTable equipment={equipment} />
         </Layout>
     );
 };

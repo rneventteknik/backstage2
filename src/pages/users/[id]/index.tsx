@@ -5,7 +5,7 @@ import { useRouter } from 'next/router';
 import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { getMemberStatusName, getRoleName } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
 import UserDisplay from '../../../components/utils/UserDisplay';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
@@ -15,25 +15,34 @@ import { bookingsFetcher, userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import SmallBookingTable from '../../../components/SmallBookingTable';
+import TinyBookingTable from '../../../components/TinyBookingTable';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     // Edit user
     //
     const router = useRouter();
-    const { data: user, error, isValidating } = useSwr('/api/users/' + router.query.id, userFetcher);
+    const { data: user, error } = useSwr('/api/users/' + router.query.id, userFetcher);
     const { data: bookings } = useSwr('/api/users/' + router.query.id + '/bookings', bookingsFetcher);
+    const { data: coOwnerBookings } = useSwr('/api/users/' + router.query.id + '/coOwnerBookings', bookingsFetcher);
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
-    if (isValidating || !user) {
-        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} />;
+    if (!user) {
+        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     // The page itself
@@ -45,7 +54,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
                     <Link href={'/users/' + user.id + '/edit'} passHref>
@@ -118,8 +127,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                             user.bankAccount ||
                             user.clearingNumber ||
                             user.bankName ||
-                            user.homeAddress ||
-                            user.zipCode ? (
+                            user.homeAddress ? (
                                 <ListGroup variant="flush">
                                     <ListGroup.Item className="d-flex">
                                         <span className="flex-grow-1">Personnummer</span>
@@ -137,13 +145,13 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                         <span className="flex-grow-1">Banknamn</span>
                                         <span>{user.bankName}</span>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Hemadress</span>
-                                        <span>{user.homeAddress}</span>
-                                    </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Postnummer</span>
-                                        <span>{user.zipCode}</span>
+                                    <ListGroup.Item>
+                                        <div className="mb-1">Adress</div>
+                                        <div className="text-muted">
+                                            {user.homeAddress?.split('\n').map((addressLine, i) => (
+                                                <div key={i}>{addressLine}</div>
+                                            ))}
+                                        </div>
                                     </ListGroup.Item>
                                 </ListGroup>
                             ) : (
@@ -156,7 +164,12 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                 </Col>
 
                 <Col xl={8}>
-                    <SmallBookingTable title="Bokningar" bookings={bookings}></SmallBookingTable>
+                    <TinyBookingTable title="Bokningar" bookings={bookings}></TinyBookingTable>
+                    <TinyBookingTable
+                        title="Favoritbokningar"
+                        bookings={coOwnerBookings}
+                        tableSettingsOverride={{ defaultSortAscending: false }}
+                    ></TinyBookingTable>
                 </Col>
             </Row>
         </Layout>

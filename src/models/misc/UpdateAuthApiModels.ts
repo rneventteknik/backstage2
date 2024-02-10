@@ -5,6 +5,7 @@ export interface UpdateAuthRequest {
     role: Role;
     username: string;
     password: string;
+    existingPassword: string;
 }
 
 export interface UpdateAuthResponse {

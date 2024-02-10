@@ -4,6 +4,7 @@ import {
     EquipmentPackageObjectionModel,
 } from '../../models/objection-models/EquipmentPackageObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
+import { getPartialSearchStrings } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
 export const searchEquipmentPackage = async (
@@ -12,10 +13,22 @@ export const searchEquipmentPackage = async (
 ): Promise<EquipmentPackageObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    const modifiedSearchString = '%' + searchString + '%';
+    const searchStrings = getPartialSearchStrings(searchString);
 
     return EquipmentPackageObjectionModel.query()
-        .where('name', getCaseInsensitiveComparisonKeyword(), modifiedSearchString)
+        .andWhere((builder) =>
+            builder
+                .where((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere('name', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+                    });
+                })
+                .orWhere((innerBuilder) => {
+                    searchStrings.forEach((partialSearchString) => {
+                        innerBuilder.andWhere('nameEN', getCaseInsensitiveComparisonKeyword(), partialSearchString);
+                    });
+                }),
+        )
         .orderBy('updated', 'desc')
         .withGraphFetched('tags')
         .limit(count);
@@ -95,7 +108,7 @@ export const updateEquipmentPackage = async (
             });
         }
 
-        EquipmentPackageObjectionModel.query(trx).patchAndFetchById(
+        await EquipmentPackageObjectionModel.query(trx).patchAndFetchById(
             id,
             withUpdatedDate(removeIdAndDates(equipmentPackage)),
         );

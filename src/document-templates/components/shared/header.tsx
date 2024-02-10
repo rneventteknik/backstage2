@@ -1,5 +1,7 @@
-import { View, Text, StyleSheet } from '@react-pdf/renderer';
+import { View, Text, StyleSheet, Image } from '@react-pdf/renderer';
 import React from 'react';
+import { getGlobalSetting } from '../../../lib/utils';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 import { commonStyles } from '../../utils';
 
 const styles = StyleSheet.create({
@@ -8,26 +10,44 @@ const styles = StyleSheet.create({
         padding: 5,
         marginTop: 5,
         borderBottom: '1px solid black',
-        fontSize: 12,
+        fontSize: 14,
         fontFamily: 'Open Sans',
         flexDirection: 'row',
+        alignItems: 'center',
+    },
+    titleContainer: {
+        flexGrow: 1,
+        marginBottom: 3,
     },
     title: {
-        flexGrow: 1,
         fontWeight: 'bold',
+    },
+    subTitle: {
+        fontWeight: 'light',
     },
     aside: {
         fontWeight: 'light',
+    },
+    image: {
+        height: '20pt',
     },
 });
 
 type Props = {
     title: string;
-    documentId: string;
+    subTitle: string;
+    globalSettings: KeyValue[];
 };
-export const Header: React.FC<Props> = ({ title, documentId }: Props) => (
-    <View style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.aside}>{documentId}</Text>
-    </View>
-);
+export const Header: React.FC<Props> = ({ title, subTitle, globalSettings }: Props) => {
+    const imageSrc = getGlobalSetting('content.image.documentHeaderImage', globalSettings, '').trim();
+    return (
+        <View style={styles.header}>
+            <View style={styles.titleContainer}>
+                <Text style={styles.title}>{title}</Text>
+                <Text style={styles.subTitle}>{subTitle}</Text>
+            </View>
+            <Text style={styles.aside}></Text>
+            {imageSrc ? <Image style={styles.image} src={imageSrc} /> : null}
+        </View>
+    );
+};

@@ -3,6 +3,7 @@ import { Form } from 'react-bootstrap';
 import { UpdateAuthRequest } from '../../models/misc/UpdateAuthApiModels';
 import { Role } from '../../models/enums/Role';
 import { getRoleName } from '../../lib/utils';
+import RequiredIndicator from '../utils/RequiredIndicator';
 
 type Props = {
     handleSubmit: (changePasswordRequest: UpdateAuthRequest) => void;
@@ -40,8 +41,9 @@ const UserAuthForm: React.FC<Props> = ({
         const modifiedUserAuth: UpdateAuthRequest = {
             userId: userId,
             username: form.username.value,
-            role: form.role?.value,
+            role: form.userRole?.value,
             password: form.password.value,
+            existingPassword: form.existingPassword.value,
         };
 
         handleSubmitUser(modifiedUserAuth);
@@ -50,33 +52,53 @@ const UserAuthForm: React.FC<Props> = ({
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
             <Form.Group controlId="formUsername">
-                <Form.Label>Användarnamn</Form.Label>
+                <Form.Label>
+                    Användarnamn
+                    <RequiredIndicator />
+                </Form.Label>
                 <Form.Control required type="text" name="username" defaultValue={previousUserName} />
                 <Form.Text className="text-muted">Användarnamnet måste vara unikt.</Form.Text>
             </Form.Group>
             {!hideRoleInput ? (
                 <Form.Group controlId="formRole">
-                    <Form.Label>Behörighet</Form.Label>
+                    <Form.Label>
+                        Behörighet
+                        <RequiredIndicator />
+                    </Form.Label>
                     <Form.Control
                         as="select"
-                        name="role"
+                        name="userRole"
                         defaultValue={previousRole ?? Role.USER}
                         disabled={hideRoleInput}
                     >
                         <option value={Role.ADMIN}> {getRoleName(Role.ADMIN)}</option>
                         <option value={Role.USER}> {getRoleName(Role.USER)}</option>
                         <option value={Role.READONLY}> {getRoleName(Role.READONLY)}</option>
+                        <option value={Role.CASH_PAYMENT_MANAGER}> {getRoleName(Role.CASH_PAYMENT_MANAGER)}</option>
                     </Form.Control>
                 </Form.Group>
             ) : null}
             <Form.Group controlId="formPassword">
-                <Form.Label>Lösenord</Form.Label>
-                <Form.Control type="password" name="password" />
-                <Form.Text className="text-muted">Lämnas fältet tomt kommer inte lösenordet att bytas.</Form.Text>
+                <Form.Label>Nytt Lösenord</Form.Label>
+                <Form.Control type="password" name="password" autoComplete="off" />
+                <Form.Text className="text-muted">
+                    Max 72 tecken. Lämnas fältet tomt kommer inte lösenordet att bytas.
+                </Form.Text>
             </Form.Group>
             <Form.Group controlId="formConfirmPassword">
-                <Form.Label>Bekräfta lösenordet</Form.Label>
-                <Form.Control type="password" name="confirmPassword" />
+                <Form.Label>Bekräfta det nya lösenordet</Form.Label>
+                <Form.Control type="password" name="confirmPassword" autoComplete="off" />
+            </Form.Group>
+            <hr />
+            <Form.Group controlId="formPassword">
+                <Form.Label>
+                    Ditt nuvarande lösenord
+                    <RequiredIndicator />
+                </Form.Label>
+                <Form.Control type="password" name="existingPassword" autoComplete="off" />
+                <Form.Text className="text-muted">
+                    Bekräfta din identitet genom att ange ditt nuvarande lösenord.
+                </Form.Text>
             </Form.Group>
         </Form>
     );

@@ -9,7 +9,24 @@ import { sealData, unsealData } from 'iron-session';
 import { LoginToken } from '../models/misc/LoginToken';
 
 export const authenticate = async (username: string, password: string): Promise<UserAuthObjectionModel | null> => {
-    const user = await fetchUserAuth(username);
+    const user = await fetchUserAuth(username.toLowerCase());
+
+    if (!user) {
+        return null;
+    }
+
+    return bcrypt.compare(password, user.hashedPassword).then((isAuthenticated) => (isAuthenticated ? user : null));
+};
+
+export const authenticateById = async (
+    userId: number | undefined,
+    password: string,
+): Promise<UserAuthObjectionModel | null> => {
+    if (userId == undefined) {
+        return null;
+    }
+
+    const user = await fetchUserAuthById(userId);
 
     if (!user) {
         return null;

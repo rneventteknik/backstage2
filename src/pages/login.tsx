@@ -5,6 +5,10 @@ import { useUser } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import LoginTokenButton from '../components/LoginTokenButton';
 import LineWithContent from '../components/utils/LineWithContent';
+import { getGlobalSetting, getValueOrFirst } from '../lib/utils';
+import { KeyValue } from '../models/interfaces/KeyValue';
+import Head from 'next/head';
+import EnvironmentTypeTag from '../components/utils/EnvironmentTypeTag';
 
 const containerStyle = {
     margin: 'auto',
@@ -17,8 +21,9 @@ const containerStyle = {
 // Redirect to '/' if the user is already logged in
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUser(undefined, undefined, '/');
+type Props = { globalSettings: KeyValue[] };
 
-const LoginPage: React.FC = () => {
+const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const [showWrongPasswordError, setShowWrongPasswordError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
     const [waitingForResponse, setWaitingForResponse] = useState(false);
@@ -33,6 +38,16 @@ const LoginPage: React.FC = () => {
             usernameFieldRef.current.focus();
         }
     }, [usernameFieldRef]);
+
+    const getRedirectUrl = () => {
+        const url = getValueOrFirst(Router.query.redirectUrl);
+
+        if (!url || url.startsWith('/api/') || url.startsWith('/_next/')) {
+            return '/';
+        }
+
+        return url;
+    };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -57,11 +72,12 @@ const LoginPage: React.FC = () => {
             })
             .then((data) => data as CurrentUserInfo)
             .then((user) => {
-                if (!user.isLoggedIn) {
+                if (user.isLoggedIn) {
+                    Router.push(getRedirectUrl());
+                } else {
                     setShowWrongPasswordError(true);
                 }
                 setWaitingForResponse(false);
-                Router.push('/');
             })
             .catch((error) => {
                 console.error('An unexpected error happened:', error);
@@ -75,7 +91,23 @@ const LoginPage: React.FC = () => {
 
     return (
         <div style={containerStyle}>
-            <h1>Backstage2</h1>
+            <Head>
+                <title>Login | Backstage2</title>
+                <meta charSet="utf-8" />
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                <link
+                    rel="icon"
+                    type="image/png"
+                    sizes="16x16"
+                    href={getGlobalSetting('content.image.favIcon', globalSettings, '')}
+                />
+            </Head>
+            <h1>
+                Backstage2
+                <span style={{ fontSize: '0.6em', position: 'relative', top: '-3px' }} className="ml-2">
+                    <EnvironmentTypeTag globalSettings={globalSettings} />
+                </span>
+            </h1>
             <Form action="/api/users/login" method="post" onSubmit={handleSubmit}>
                 <FormGroup>
                     <FormControl
@@ -91,6 +123,7 @@ const LoginPage: React.FC = () => {
                         type="password"
                         placeholder="Lösenord"
                         name="password"
+                        autoComplete="off"
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </FormGroup>

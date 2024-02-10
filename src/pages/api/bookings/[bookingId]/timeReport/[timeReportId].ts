@@ -13,9 +13,9 @@ import {
     respondWithEntityNotFoundResponse,
     respondWithAccessDeniedResponse,
 } from '../../../../../lib/apiResponses';
-import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
-import { logChangeToBooking, BookingChangelogEntryType } from '../../../../../lib/changelogUtils';
+import { logChangeToBooking, BookingChangelogEntryType, hasChanges } from '../../../../../lib/changelogUtils';
+import { TimeReportObjectionModel } from '../../../../../models/objection-models/TimeReportObjectionModel';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -27,7 +27,7 @@ const handler = withSessionContext(
             return;
         }
 
-        const booking = await fetchBooking(bookingId).then(toBooking);
+        const booking = await fetchBooking(bookingId);
 
         switch (req.method) {
             case 'GET':
@@ -45,7 +45,14 @@ const handler = withSessionContext(
                     return;
                 }
                 await deleteTimeReport(timeReportId)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        logChangeToBooking(
+                            context.currentUser,
+                            bookingId,
+                            booking.name,
+                            BookingChangelogEntryType.TIMEREPORT,
+                        ).then(() => res.status(200).json(result));
+                    })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;
 
@@ -63,10 +70,20 @@ const handler = withSessionContext(
                 }
 
                 await updateTimeReport(timeReportId, req.body.timeReport)
-                    .then((result) => {
-                        logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.TIMEREPORT).then(
-                            () => res.status(200).json(result),
-                        );
+                    .then(async (result) => {
+                        const newTimeReport = req.body.equipmentList as TimeReportObjectionModel;
+                        const existingTimeReport = booking.timeReports?.find((l) => l.id === newTimeReport.id);
+
+                        if (!existingTimeReport || hasChanges(existingTimeReport, newTimeReport)) {
+                            await logChangeToBooking(
+                                context.currentUser,
+                                bookingId,
+                                booking.name,
+                                BookingChangelogEntryType.TIMEREPORT,
+                            );
+                        }
+
+                        res.status(200).json(result);
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;

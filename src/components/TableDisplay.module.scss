@@ -1,8 +1,18 @@
 @import '../style/variables';
 
 .truncated {
-    overflow-x: hidden;
+    overflow-x: clip;
     text-overflow: ellipsis;
     white-space: nowrap;
     max-width: 1px;
+}
+
+.hoveredRow {
+    border-top-width: 4px;
+    border-top-style: solid;
+    border-top-color: $backstage-color-5;
+}
+
+.headingRow {
+    background-color: $backstage-color-2;
 }

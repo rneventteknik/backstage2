@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Button, Card, Form, Modal, OverlayTrigger, Tab, Tooltip } from 'react-bootstrap';
+import { Badge, Button, Card, Form, Modal, OverlayTrigger, Tab, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClone, faSync } from '@fortawesome/free-solid-svg-icons';
-import { EquipmentList, EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { useNotifications } from '../../../lib/useNotifications';
 import BookingSearch from '../../BookingSearch';
 import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
@@ -18,7 +18,14 @@ import { Language } from '../../../models/enums/Language';
 type Props = {
     show: boolean;
     onHide: () => void;
-    onImport: (EquipmentListEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[]) => void;
+    onImport: (
+        listEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[],
+        listHeadings: {
+            name: string;
+            description: string;
+            listEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[];
+        }[],
+    ) => void;
     pricePlan: PricePlan | undefined;
     language: Language | undefined;
 };
@@ -27,9 +34,11 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
     const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
     const [selectedEquipmentList, setSelectedEquipmentList] = useState<EquipmentList | null>(null);
     const [selectedEquipmentListEntryIds, setSelectedEquipmentListEntryIds] = useState<number[]>([]);
+    const [selectedEquipmentListHeadingIds, setSelectedEquipmentListHeadingIds] = useState<number[]>([]);
     const [resetNames, setResetNames] = useState<boolean>(true);
     const [resetPrices, setResetPrices] = useState<boolean>(true);
     const [resetManualPrices, setResetManualPrices] = useState<boolean>(true);
+    const [resetManualAccounts, setResetManualAccounts] = useState<boolean>(true);
 
     const { showErrorMessage } = useNotifications();
 
@@ -59,6 +68,10 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
     };
 
     const toggleEquipmentListEntrySelection = (entry: EquipmentListEntry) => {
+        if (entry.equipment?.isArchived) {
+            return;
+        }
+
         const checked = selectedEquipmentListEntryIds.some((x) => x === entry.id);
 
         setSelectedEquipmentListEntryIds(
@@ -68,44 +81,84 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
         );
     };
 
+    const toggleEquipmentListHeadingSelection = (heading: EquipmentListHeading) => {
+        if (heading.listEntries.some((x) => x.equipment?.isArchived)) {
+            return;
+        }
+
+        const checked = selectedEquipmentListHeadingIds.some((x) => x === heading.id);
+
+        setSelectedEquipmentListHeadingIds(
+            checked
+                ? selectedEquipmentListHeadingIds.filter((x) => x !== heading.id)
+                : [...selectedEquipmentListHeadingIds, heading.id],
+        );
+    };
+
+    const mapEquipmentListEntry = (x: EquipmentListEntry) => {
+        const entry: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'> = {
+            equipmentId: x.equipmentId,
+            equipment: x.equipment,
+            equipmentPrice: x.equipmentPrice,
+            numberOfUnits: x.numberOfUnits,
+            numberOfHours: x.numberOfHours,
+            discount: x.discount,
+
+            name: x.name,
+            description: x.description,
+
+            pricePerHour: x.pricePerHour,
+            pricePerUnit: x.pricePerUnit,
+            isHidden: x.isHidden,
+            account: x.account,
+        };
+
+        if (resetNames && x.equipment) {
+            entry.name = getEquipmentName(x.equipment) ?? '';
+            entry.description = getEquipmentDescription(x.equipment) ?? '';
+        }
+
+        if (resetPrices) {
+            if (x.equipmentPrice) {
+                entry.pricePerUnit = getEquipmentListEntryPrices(x.equipmentPrice).pricePerUnit;
+                entry.pricePerHour = getEquipmentListEntryPrices(x.equipmentPrice).pricePerHour;
+            } else if (resetManualPrices && x.equipment && x.equipment.prices.length > 0) {
+                entry.pricePerUnit = getEquipmentListEntryPrices(x.equipment.prices[0]).pricePerUnit;
+                entry.pricePerHour = getEquipmentListEntryPrices(x.equipment.prices[0]).pricePerHour;
+            }
+        }
+
+        if (resetManualAccounts) {
+            entry.account = null;
+        }
+
+        return entry;
+    };
+
+    const mapEquipmentListHeading = (x: EquipmentListHeading) => {
+        const heading: {
+            name: string;
+            description: string;
+            listEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[];
+        } = {
+            name: x.name,
+            description: x.description,
+            listEntries: x.listEntries.map((entry) => mapEquipmentListEntry(entry)),
+        };
+
+        return heading;
+    };
+
     const importEquipment = () => {
-        const equipmentListEntries = getSortedList(selectedEquipmentList?.equipmentListEntries ?? [])
+        const listEntries = getSortedList(selectedEquipmentList?.listEntries ?? [])
             .filter((x) => selectedEquipmentListEntryIds.some((id) => x.id === id))
-            .map((x) => {
-                const entry: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'> = {
-                    equipmentId: x.equipmentId,
-                    equipment: x.equipment,
-                    equipmentPrice: x.equipmentPrice,
-                    numberOfUnits: x.numberOfUnits,
-                    numberOfHours: x.numberOfHours,
-                    discount: x.discount,
+            .map(mapEquipmentListEntry);
 
-                    name: x.name,
-                    description: x.description,
+        const listHeadings = getSortedList(selectedEquipmentList?.listHeadings ?? [])
+            .filter((x) => selectedEquipmentListHeadingIds.some((id) => x.id === id))
+            .map(mapEquipmentListHeading);
 
-                    pricePerHour: x.pricePerHour,
-                    pricePerUnit: x.pricePerUnit,
-                };
-
-                if (resetNames && x.equipment) {
-                    entry.name = getEquipmentName(x.equipment) ?? '';
-                    entry.description = getEquipmentDescription(x.equipment) ?? '';
-                }
-
-                if (resetPrices) {
-                    if (x.equipmentPrice) {
-                        entry.pricePerUnit = getEquipmentListEntryPrices(x.equipmentPrice).pricePerUnit;
-                        entry.pricePerHour = getEquipmentListEntryPrices(x.equipmentPrice).pricePerHour;
-                    } else if (resetManualPrices && x.equipment && x.equipment.prices.length > 0) {
-                        entry.pricePerUnit = getEquipmentListEntryPrices(x.equipment.prices[0]).pricePerUnit;
-                        entry.pricePerHour = getEquipmentListEntryPrices(x.equipment.prices[0]).pricePerHour;
-                    }
-                }
-
-                return entry;
-            });
-
-        onImport(equipmentListEntries);
+        onImport(listEntries, listHeadings);
 
         resetAndHide();
     };
@@ -139,118 +192,256 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
     const getEquipmentDescription = (equipment: Equipment | undefined) =>
         language === Language.SV ? equipment?.description : equipment?.descriptionEN;
 
+    const isDisabled = (entry: EquipmentListEntry) => entry.equipment?.isArchived;
+
+    interface ViewModel {
+        type: 'E' | 'H';
+        entity: EquipmentListEntry | EquipmentListHeading;
+        id: string;
+        sortIndex: number;
+        isSubEntry: boolean;
+    }
+    const getViewModel = (
+        entity: EquipmentListEntry | EquipmentListHeading,
+        type: 'E' | 'H',
+        isSubEntry = false,
+    ): ViewModel => ({
+        type: type,
+        entity: entity,
+        id: type + entity.id,
+        sortIndex: entity.sortIndex,
+        isSubEntry,
+    });
+    const viewModelIsHeading = (viewModel: ViewModel) => viewModel.type === 'H';
+    const getEquipmentListEntryFromViewModel = (viewModel: ViewModel) => {
+        if (viewModel.type !== 'E') {
+            throw new Error('Invalid view model');
+        }
+        return viewModel.entity as EquipmentListEntry;
+    };
+    const getEquipmentListHeadingFromViewModel = (viewModel: ViewModel) => {
+        if (viewModel.type !== 'H') {
+            throw new Error('Invalid view model');
+        }
+        return viewModel.entity as EquipmentListHeading;
+    };
+
+    const getEntitiesToDisplay = () => {
+        if (!selectedEquipmentList) {
+            return [];
+        }
+
+        return [
+            ...selectedEquipmentList.listEntries.map((x) => getViewModel(x, 'E')),
+            ...selectedEquipmentList.listHeadings.map((x) => getViewModel(x, 'H')),
+        ];
+    };
+    const getSubEntitiesToDisplay = () => {
+        if (!selectedEquipmentList) {
+            return [];
+        }
+
+        return selectedEquipmentList.listHeadings.map((x) => ({
+            parentId: 'H' + x.id,
+            entities: x.listEntries.map((e) => getViewModel(e, 'E', true)),
+        }));
+    };
+
     // Table display functions
     //
-    const EquipmentListEntrySelectionDisplayFn = (entry: EquipmentListEntry) => (
-        <div className="text-center">
-            <input
-                type="checkbox"
-                checked={selectedEquipmentListEntryIds.some((x) => x === entry.id)}
-                onChange={() => toggleEquipmentListEntrySelection(entry)}
-            />
-        </div>
-    );
+    const EquipmentListEntrySelectionDisplayFn = (viewModel: ViewModel) => {
+        if (viewModel.isSubEntry) {
+            return '';
+        }
 
-    const EquipmentListEntryNameDisplayFn = (entry: EquipmentListEntry) => (
-        <div onClick={() => toggleEquipmentListEntrySelection(entry)}>
-            <div className="mb-0">
-                {entry.name}
-                {resetNames && entry.name != getEquipmentName(entry.equipment) ? (
-                    <OverlayTrigger
-                        placement="right"
-                        overlay={
-                            <Tooltip id="1">
-                                Namnet kommer att återställas till <em>{getEquipmentName(entry.equipment)}</em>
-                            </Tooltip>
-                        }
-                    >
-                        <FontAwesomeIcon icon={faSync} className="ml-1" />
-                    </OverlayTrigger>
-                ) : null}
+        if (viewModelIsHeading(viewModel)) {
+            const heading = getEquipmentListHeadingFromViewModel(viewModel);
+
+            return (
+                <div className="text-center">
+                    <input
+                        type="checkbox"
+                        checked={selectedEquipmentListHeadingIds.some((x) => x === heading.id)}
+                        disabled={heading.listEntries.some((x) => isDisabled(x))}
+                        onChange={() => toggleEquipmentListHeadingSelection(heading)}
+                    />
+                </div>
+            );
+        }
+
+        const entry = getEquipmentListEntryFromViewModel(viewModel);
+
+        return (
+            <div className="text-center">
+                <input
+                    type="checkbox"
+                    checked={selectedEquipmentListEntryIds.some((x) => x === entry.id)}
+                    disabled={isDisabled(entry)}
+                    onChange={() => toggleEquipmentListEntrySelection(entry)}
+                />
             </div>
-            <div className="mb-0">
-                <span className="text-muted">
-                    {entry.description}
-                    {resetNames && entry.description != getEquipmentDescription(entry.equipment) ? (
+        );
+    };
+
+    const EquipmentListEntryNameDisplayFn = (viewModel: ViewModel) => {
+        if (viewModelIsHeading(viewModel)) {
+            const heading = getEquipmentListHeadingFromViewModel(viewModel);
+            return <div onClick={() => toggleEquipmentListHeadingSelection(heading)}>{heading.name}</div>;
+        }
+
+        const entry = getEquipmentListEntryFromViewModel(viewModel);
+
+        return (
+            <div onClick={() => (viewModel.isSubEntry ? null : toggleEquipmentListEntrySelection(entry))}>
+                <div className="mb-0">
+                    {entry.name}
+                    {resetNames && entry.name != getEquipmentName(entry.equipment) && !isDisabled(entry) ? (
                         <OverlayTrigger
                             placement="right"
                             overlay={
                                 <Tooltip id="1">
-                                    Beskrivningen kommer återställas till{' '}
-                                    <em>{getEquipmentDescription(entry.equipment)}</em>
+                                    Namnet kommer att återställas till <em>{getEquipmentName(entry.equipment)}</em>
                                 </Tooltip>
                             }
                         >
                             <FontAwesomeIcon icon={faSync} className="ml-1" />
                         </OverlayTrigger>
                     ) : null}
-                </span>
+                    {entry.equipment?.isArchived ? (
+                        <Badge variant="warning" className="ml-2">
+                            Arkiverad
+                        </Badge>
+                    ) : null}
+                </div>
+                <div className="mb-0">
+                    <span className="text-muted">
+                        {entry.description}
+                        {resetNames &&
+                        entry.description != getEquipmentDescription(entry.equipment) &&
+                        !isDisabled(entry) ? (
+                            <OverlayTrigger
+                                placement="right"
+                                overlay={
+                                    <Tooltip id="1">
+                                        Beskrivningen kommer återställas till{' '}
+                                        <em>{getEquipmentDescription(entry.equipment)}</em>
+                                    </Tooltip>
+                                }
+                            >
+                                <FontAwesomeIcon icon={faSync} className="ml-1" />
+                            </OverlayTrigger>
+                        ) : null}
+                    </span>
+                </div>
             </div>
-        </div>
-    );
+        );
+    };
 
-    const EquipmentListEntryNumberOfUnitsDisplayFn = (entry: EquipmentListEntry) => (
-        <span>{entry.numberOfUnits} st</span>
-    );
+    const EquipmentListEntryNumberOfUnitsDisplayFn = (viewModel: ViewModel) => {
+        if (viewModelIsHeading(viewModel)) {
+            return '';
+        }
 
-    const EquipmentListEntryNumberOfHoursDisplayFn = (entry: EquipmentListEntry) =>
-        entry.numberOfHours ? <span>{entry.numberOfHours} h</span> : '-';
+        const entry = getEquipmentListEntryFromViewModel(viewModel);
 
-    const EquipmentListEntryDiscountDisplayFn = (entry: EquipmentListEntry) =>
-        entry.discount ? <span className="text-danger">{formatNumberAsCurrency(entry.discount)}</span> : '-';
+        return <span>{entry.numberOfUnits} st</span>;
+    };
 
-    const EquipmentListEntryPriceDisplayFn = (entry: EquipmentListEntry) => (
-        <>
-            {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
-            {resetPrices &&
-            entry.equipment &&
-            entry.equipmentPrice &&
-            (entry.pricePerHour != getEquipmentListEntryPrices(entry.equipmentPrice).pricePerHour ||
-                entry.pricePerUnit != getEquipmentListEntryPrices(entry.equipmentPrice).pricePerUnit) ? (
-                <OverlayTrigger
-                    placement="right"
-                    overlay={
-                        <Tooltip id="1">
-                            Priset kommer återställas till:
-                            <br />
-                            <em>{formatPrice(getEquipmentListEntryPrices(entry.equipmentPrice))}</em>
-                        </Tooltip>
-                    }
-                >
-                    <FontAwesomeIcon icon={faSync} className="ml-1" />
-                </OverlayTrigger>
-            ) : null}
-            {resetPrices &&
-            resetManualPrices &&
-            entry.equipment &&
-            !entry.equipmentPrice &&
-            entry.equipment.prices.length > 0 ? (
-                <OverlayTrigger
-                    placement="right"
-                    overlay={
-                        <Tooltip id="1">
-                            Det manuella priset kommer återställas till
-                            <br />
-                            <em>
-                                {entry.equipment.prices[0].name}:{' '}
-                                {formatPrice(getEquipmentListEntryPrices(entry.equipment.prices[0]))}
-                            </em>
-                        </Tooltip>
-                    }
-                >
-                    <FontAwesomeIcon icon={faSync} className="ml-1" />
-                </OverlayTrigger>
-            ) : null}
-            {entry.equipment && entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
-                <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
-            ) : null}
-            {!entry.equipmentPrice ? <p className="text-muted mb-0 font-italic">Manuellt pris</p> : null}
-        </>
-    );
+    const EquipmentListEntryNumberOfHoursDisplayFn = (viewModel: ViewModel) => {
+        if (viewModelIsHeading(viewModel)) {
+            return '';
+        }
+
+        const entry = getEquipmentListEntryFromViewModel(viewModel);
+
+        return entry.numberOfHours ? <span>{entry.numberOfHours} h</span> : '-';
+    };
+
+    const EquipmentListEntryDiscountDisplayFn = (viewModel: ViewModel) => {
+        if (viewModelIsHeading(viewModel)) {
+            return '';
+        }
+
+        const entry = getEquipmentListEntryFromViewModel(viewModel);
+
+        return entry.discount ? <span className="text-danger">{formatNumberAsCurrency(entry.discount)}</span> : '-';
+    };
+
+    const EquipmentListEntryPriceDisplayFn = (viewModel: ViewModel) => {
+        if (viewModelIsHeading(viewModel)) {
+            return '';
+        }
+
+        const entry = getEquipmentListEntryFromViewModel(viewModel);
+
+        return (
+            <>
+                {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
+                {resetPrices &&
+                entry.equipment &&
+                entry.equipmentPrice &&
+                (entry.pricePerHour != getEquipmentListEntryPrices(entry.equipmentPrice).pricePerHour ||
+                    entry.pricePerUnit != getEquipmentListEntryPrices(entry.equipmentPrice).pricePerUnit) &&
+                !isDisabled(entry) ? (
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={
+                            <Tooltip id="1">
+                                Priset kommer återställas till:
+                                <br />
+                                <em>{formatPrice(getEquipmentListEntryPrices(entry.equipmentPrice))}</em>
+                            </Tooltip>
+                        }
+                    >
+                        <FontAwesomeIcon icon={faSync} className="ml-1" />
+                    </OverlayTrigger>
+                ) : null}
+                {resetPrices &&
+                resetManualPrices &&
+                entry.equipment &&
+                !entry.equipmentPrice &&
+                entry.equipment.prices.length > 0 ? (
+                    <OverlayTrigger
+                        placement="right"
+                        overlay={
+                            <Tooltip id="1">
+                                Det manuella priset kommer återställas till
+                                <br />
+                                <em>
+                                    {entry.equipment.prices[0].name}:{' '}
+                                    {formatPrice(getEquipmentListEntryPrices(entry.equipment.prices[0]))}
+                                </em>
+                            </Tooltip>
+                        }
+                    >
+                        <FontAwesomeIcon icon={faSync} className="ml-1" />
+                    </OverlayTrigger>
+                ) : null}
+                {entry.equipment && entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
+                    <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
+                ) : null}
+                {!entry.equipmentPrice ? <p className="text-muted mb-0 font-italic">Manuellt pris</p> : null}
+
+                {entry.account ? (
+                    <p className="text-muted mb-0">
+                        Konto: {entry.account}{' '}
+                        {resetManualAccounts ? (
+                            <OverlayTrigger
+                                placement="right"
+                                overlay={<Tooltip id="1">Det manuella kontot kommer tas bort</Tooltip>}
+                            >
+                                <FontAwesomeIcon icon={faSync} className="ml-1" />
+                            </OverlayTrigger>
+                        ) : null}
+                    </p>
+                ) : null}
+            </>
+        );
+    };
 
     // Table settings
     //
-    const tableSettings: TableConfiguration<EquipmentListEntry> = {
+    const tableSettings: TableConfiguration<ViewModel> = {
         entityTypeDisplayName: '',
         customSortFn: sortIndexSortFn,
         hideTableFilter: true,
@@ -266,13 +457,14 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
             {
                 key: 'name',
                 displayName: 'Utrustning',
-                getValue: (entry: EquipmentListEntry) => entry.name + ' ' + entry.description,
+                getValue: (viewModel: ViewModel) => viewModel.entity.name + ' ' + viewModel.entity.description,
                 getContentOverride: EquipmentListEntryNameDisplayFn,
             },
             {
                 key: 'count',
                 displayName: 'Antal',
-                getValue: (entry: EquipmentListEntry) => entry.numberOfUnits,
+                getValue: (viewModel: ViewModel) =>
+                    viewModelIsHeading(viewModel) ? '' : getEquipmentListEntryFromViewModel(viewModel).numberOfUnits,
                 getContentOverride: EquipmentListEntryNumberOfUnitsDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 80,
@@ -280,7 +472,8 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
             {
                 key: 'hours',
                 displayName: 'Timmar',
-                getValue: (entry: EquipmentListEntry) => entry.numberOfHours,
+                getValue: (viewModel: ViewModel) =>
+                    viewModelIsHeading(viewModel) ? '' : getEquipmentListEntryFromViewModel(viewModel).numberOfHours,
                 getContentOverride: EquipmentListEntryNumberOfHoursDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 100,
@@ -288,7 +481,8 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
             {
                 key: 'discount',
                 displayName: 'Rabatt',
-                getValue: (entry: EquipmentListEntry) => entry.discount,
+                getValue: (viewModel: ViewModel) =>
+                    viewModelIsHeading(viewModel) ? '' : getEquipmentListEntryFromViewModel(viewModel).discount,
                 getContentOverride: EquipmentListEntryDiscountDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 100,
@@ -389,7 +583,8 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                     <div className="table-responsive">
                                         <TableDisplay
                                             configuration={tableSettings}
-                                            entities={selectedEquipmentList.equipmentListEntries}
+                                            entities={getEntitiesToDisplay()}
+                                            subEntities={getSubEntitiesToDisplay()}
                                         />
                                     </div>
 
@@ -418,17 +613,29 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                             disabled={!resetPrices}
                                         />
                                     </Form.Group>
+                                    <Form.Group controlId="resetManualAccounts">
+                                        <Form.Check
+                                            type="checkbox"
+                                            label="Återställ anpassade konton"
+                                            checked={resetManualAccounts}
+                                            onChange={() => setResetManualAccounts(!resetManualAccounts)}
+                                        />
+                                    </Form.Group>
                                 </>
                             ) : null}
 
                             <Button
                                 variant="primary"
-                                disabled={!selectedEquipmentList || selectedEquipmentListEntryIds.length === 0}
+                                disabled={
+                                    !selectedEquipmentList ||
+                                    (selectedEquipmentListEntryIds.length === 0 &&
+                                        selectedEquipmentListHeadingIds.length === 0)
+                                }
                                 className="mb-3"
                                 onClick={() => importEquipment()}
                             >
                                 <FontAwesomeIcon icon={faClone} className="mr-1" /> Lägg till utrustning (
-                                {selectedEquipmentListEntryIds.length} st)
+                                {selectedEquipmentListEntryIds.length + selectedEquipmentListHeadingIds.length} st)
                             </Button>
                         </Tab.Pane>
                     </Tab.Content>

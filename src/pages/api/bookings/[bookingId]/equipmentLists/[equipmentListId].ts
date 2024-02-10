@@ -2,20 +2,27 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { Role } from '../../../../../models/enums/Role';
 import {
     respondWithAccessDeniedResponse,
+    respondWithCustomErrorMessage,
     respondWithEntityNotFoundResponse,
     respondWithInvalidMethodResponse,
 } from '../../../../../lib/apiResponses';
 import {
     deleteEquipmentList,
-    fetchBooking,
     fetchEquipmentList,
     updateEquipmentList,
     validateEquipmentListObjectionModel,
 } from '../../../../../lib/db-access';
 import { SessionContext, withSessionContext } from '../../../../../lib/sessionContext';
-import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
-import { BookingChangelogEntryType, logChangeToBooking } from '../../../../../lib/changelogUtils';
+import {
+    BookingChangelogEntryType,
+    hasChanges,
+    hasListChanges,
+    logChangeToBooking,
+    logRentalStatusChangeToBooking,
+} from '../../../../../lib/changelogUtils';
+import { EquipmentListObjectionModel } from '../../../../../models/objection-models/BookingObjectionModel';
+import { fetchBookingWithEquipmentLists } from '../../../../../lib/db-access/booking';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -27,7 +34,12 @@ const handler = withSessionContext(
             return;
         }
 
-        const booking = await fetchBooking(bookingId).then(toBooking);
+        const booking = await fetchBookingWithEquipmentLists(bookingId);
+
+        if (!booking.equipmentLists.some((list) => list.id === equipmentListId)) {
+            respondWithEntityNotFoundResponse(res);
+            return;
+        }
 
         switch (req.method) {
             case 'GET':
@@ -45,6 +57,18 @@ const handler = withSessionContext(
                     respondWithAccessDeniedResponse(res);
                     return;
                 }
+
+                if (booking.equipmentLists.length === 1) {
+                    respondWithCustomErrorMessage(res, 'At least one list is required.');
+                    return;
+                }
+
+                await logChangeToBooking(
+                    context.currentUser,
+                    bookingId,
+                    booking.name,
+                    BookingChangelogEntryType.EQUIPMENTLIST,
+                );
 
                 await deleteEquipmentList(equipmentListId)
                     .then((result) => res.status(200).json(result))
@@ -67,12 +91,45 @@ const handler = withSessionContext(
                 }
 
                 await updateEquipmentList(equipmentListId, req.body.equipmentList)
-                    .then((result) => {
-                        logChangeToBooking(
-                            context.currentUser,
-                            bookingId,
-                            BookingChangelogEntryType.EQUIPMENTLIST,
-                        ).then(() => res.status(200).json(result));
+                    .then(async (result) => {
+                        const newList = req.body.equipmentList as EquipmentListObjectionModel;
+                        const existingList = booking.equipmentLists?.find((l) => l.id === newList.id);
+
+                        const hasChangesInListHeadings =
+                            !existingList ||
+                            hasListChanges(existingList.listHeadings, newList.listHeadings) ||
+                            existingList.listHeadings.some((existingHeading) => {
+                                const newHeading = newList.listHeadings.find((x) => x.id === existingHeading.id);
+
+                                return hasListChanges(existingHeading.listEntries, newHeading?.listEntries);
+                            });
+
+                        if (
+                            !existingList ||
+                            hasChanges(existingList, newList, ['rentalStatus']) ||
+                            hasListChanges(existingList.listEntries, newList.listEntries) ||
+                            hasChangesInListHeadings
+                        ) {
+                            await logChangeToBooking(
+                                context.currentUser,
+                                bookingId,
+                                booking.name,
+                                BookingChangelogEntryType.EQUIPMENTLIST,
+                            );
+                        }
+
+                        // Check if the rental status has changed
+                        if (newList.rentalStatus !== undefined && newList.rentalStatus !== existingList?.rentalStatus) {
+                            await logRentalStatusChangeToBooking(
+                                context.currentUser,
+                                bookingId,
+                                booking.name,
+                                newList.name ?? existingList?.name,
+                                newList.rentalStatus ?? null,
+                            );
+                        }
+
+                        res.status(200).json(result);
                     })
                     .catch((error) => res.status(500).json({ statusCode: 500, message: error.message }));
 

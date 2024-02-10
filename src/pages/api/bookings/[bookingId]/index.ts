@@ -5,18 +5,36 @@ import {
     respondWithEntityNotFoundResponse,
     respondWithInvalidMethodResponse,
 } from '../../../../lib/apiResponses';
-import { BookingChangelogEntryType, logChangeToBooking } from '../../../../lib/changelogUtils';
+import {
+    BookingChangelogEntryType,
+    hasChanges,
+    hasListChanges,
+    logBookingDeletion,
+    logChangeToBooking,
+    logOwnerUserChangeToBooking,
+    logPaymentStatusChangeToBooking,
+    logRentalStatusChangeToBooking,
+    logSalaryStatusChangeToBooking,
+    logStatusChangeToBooking,
+} from '../../../../lib/changelogUtils';
+import { fetchUser } from '../../../../lib/db-access';
 import {
     deleteBooking,
     validateBookingObjectionModel,
     updateBooking,
     fetchBookingWithUser,
-    fetchBooking,
+    fetchBookingWithEquipmentLists,
 } from '../../../../lib/db-access/booking';
-import { toBooking } from '../../../../lib/mappers/booking';
 import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
+import { PaymentStatus } from '../../../../models/enums/PaymentStatus';
 import { Role } from '../../../../models/enums/Role';
 import { Status } from '../../../../models/enums/Status';
+import { CurrentUserInfo } from '../../../../models/misc/CurrentUserInfo';
+import {
+    BookingObjectionModel,
+    EquipmentListObjectionModel,
+    IBookingObjectionModel,
+} from '../../../../models/objection-models/BookingObjectionModel';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -27,7 +45,7 @@ const handler = withSessionContext(
             return;
         }
 
-        const booking = await fetchBooking(bookingId).then(toBooking);
+        const booking = await fetchBookingWithEquipmentLists(bookingId);
 
         switch (req.method) {
             case 'GET':
@@ -47,7 +65,10 @@ const handler = withSessionContext(
                 }
 
                 await deleteBooking(bookingId)
-                    .then((result) => res.status(200).json(result))
+                    .then((result) => {
+                        logBookingDeletion(context.currentUser, booking.id, booking.name);
+                        res.status(200).json(result);
+                    })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
                 break;
@@ -66,29 +87,13 @@ const handler = withSessionContext(
                     return;
                 }
 
-                await updateBooking(bookingId, req.body.booking)
-                    .then((result) => {
-                        const newStatus =
-                            booking.status !== req.body.booking.status ? req.body.booking.status : undefined;
+                const updatedBooking = await performAutomaticActions(booking, req.body.booking);
 
-                        logChangeToBooking(
-                            context.currentUser,
-                            bookingId,
-                            newStatus !== undefined
-                                ? BookingChangelogEntryType.STATUS
-                                : BookingChangelogEntryType.BOOKING,
-                            newStatus,
-                        )
-                            .then(() =>
-                                req.body.booking.equipmentLists // Special case: If the equipment lists are modified as a child to the booking, log that as well
-                                    ? logChangeToBooking(
-                                          context.currentUser,
-                                          bookingId,
-                                          BookingChangelogEntryType.EQUIPMENTLIST,
-                                      )
-                                    : null,
-                            )
-                            .then(() => res.status(200).json(result));
+                await updateBooking(bookingId, updatedBooking)
+                    .then(async (result) => {
+                        await logChangesToBooking(booking, updatedBooking, context.currentUser);
+
+                        res.status(200).json(result);
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
 
@@ -99,5 +104,107 @@ const handler = withSessionContext(
         }
     },
 );
+
+const performAutomaticActions = async (
+    booking: IBookingObjectionModel,
+    newBooking: Partial<BookingObjectionModel>,
+): Promise<Partial<BookingObjectionModel>> => {
+    // Booking is set to done
+    if (newBooking.status === Status.DONE && booking.status !== Status.DONE) {
+        // Check if there is a fixed price which is 0, and the payments status is not paid (and it was not changed manually)
+        if (
+            newBooking.fixedPrice === 0 &&
+            booking.paymentStatus === PaymentStatus.NOT_PAID &&
+            newBooking.paymentStatus === PaymentStatus.NOT_PAID
+        ) {
+            return { ...newBooking, paymentStatus: PaymentStatus.PAID };
+        }
+    }
+
+    return newBooking;
+};
+
+const logChangesToBooking = async (
+    booking: IBookingObjectionModel,
+    newBooking: Partial<BookingObjectionModel>,
+    currentUser: CurrentUserInfo,
+) => {
+    const bookingId = booking.id;
+
+    // General changes
+    if (hasChanges(booking, newBooking, ['status', 'salaryStatus', 'ownerUserId'])) {
+        await logChangeToBooking(currentUser, bookingId, booking.name);
+    }
+
+    // Check for status changes
+    const newStatus = booking.status !== newBooking.status ? newBooking.status : undefined;
+
+    if (newStatus !== null && newStatus !== undefined) {
+        await logStatusChangeToBooking(currentUser, bookingId, booking.name, newStatus);
+    }
+
+    // Check for salary changes
+    const newSalaryStatus = booking.salaryStatus !== newBooking.salaryStatus ? newBooking.salaryStatus : undefined;
+
+    if (newSalaryStatus !== undefined) {
+        await logSalaryStatusChangeToBooking(currentUser, bookingId, booking.name, newSalaryStatus);
+    }
+
+    // Check for payment status changes
+    const newPaymentStatus = booking.paymentStatus !== newBooking.paymentStatus ? newBooking.paymentStatus : undefined;
+
+    if (newPaymentStatus !== null && newPaymentStatus !== undefined) {
+        await logPaymentStatusChangeToBooking(currentUser, bookingId, booking.name, newPaymentStatus);
+    }
+
+    // Check for owner changes
+    const newOwnerUserId = booking.ownerUser?.id !== newBooking.ownerUserId ? newBooking.ownerUserId : undefined;
+
+    if (newOwnerUserId !== undefined) {
+        const newOwnerUser = await fetchUser(newOwnerUserId);
+        if (!newOwnerUser) {
+            throw new Error('Invalid Owner User');
+        }
+        await logOwnerUserChangeToBooking(
+            currentUser,
+            bookingId,
+            booking.name,
+            booking.ownerUser?.name ?? null,
+            newOwnerUser?.name,
+        );
+    }
+
+    // Check for equipment lists changes
+    if (
+        newBooking.equipmentLists &&
+        hasListChanges(booking.equipmentLists, newBooking.equipmentLists, ['rentalStatus'])
+    ) {
+        logChangeToBooking(currentUser, bookingId, booking.name, BookingChangelogEntryType.EQUIPMENTLIST);
+    }
+
+    // Check for equipment-list rental status changes
+    if (newBooking.equipmentLists) {
+        const newEquipmentLists = newBooking.equipmentLists as EquipmentListObjectionModel[];
+        const getExistingEquipmentListWithId = (id: number) => {
+            return booking.equipmentLists?.find((l) => l.id === id);
+        };
+
+        const listsWithRentalStatusChanges = newEquipmentLists.filter(
+            (list) =>
+                list.rentalStatus !== undefined &&
+                list.rentalStatus !== getExistingEquipmentListWithId(list.id)?.rentalStatus,
+        );
+
+        listsWithRentalStatusChanges.forEach((list) =>
+            logRentalStatusChangeToBooking(
+                currentUser,
+                bookingId,
+                booking.name,
+                list.name ?? getExistingEquipmentListWithId(list.id)?.name,
+                list.rentalStatus ?? null,
+            ),
+        );
+    }
+};
 
 export default handler;

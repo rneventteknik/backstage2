@@ -3,7 +3,7 @@ import Layout from '../../components/layout/Layout';
 import { useRouter } from 'next/router';
 import { Button } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IEquipmentPackageObjectionModel } from '../../models/objection-models';
 import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 import EquipmentPackageForm from '../../components/equipmentPackage/EquipmentPackageForm';
@@ -13,12 +13,13 @@ import { PartialDeep } from 'type-fest';
 import { Role } from '../../models/enums/Role';
 import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { KeyValue } from '../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const router = useRouter();
     const pageTitle = 'Nytt utrustningspaket';
 
@@ -46,7 +47,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     };
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentPackageForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till utrustningspaket

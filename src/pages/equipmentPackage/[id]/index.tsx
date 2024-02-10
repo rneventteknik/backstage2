@@ -4,7 +4,7 @@ import useSwr from 'swr';
 import { useRouter } from 'next/router';
 import { Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import Header from '../../../components/layout/Header';
@@ -13,40 +13,78 @@ import { equipmentPackageFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
+import MarkdownCard from '../../../components/MarkdownCard';
+import { getResponseContentOrError } from '../../../lib/utils';
+import { PartialDeep } from 'type-fest';
+import { IEquipmentPackageObjectionModel } from '../../../models/objection-models';
+import { useNotifications } from '../../../lib/useNotifications';
+import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
+import PackageEquipmentList from '../../../components/equipmentPackage/PackageEquipmentList';
+import { Role } from '../../../models/enums/Role';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl();
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
-    // Edit user
-    //
+const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const router = useRouter();
     const {
         data: equipmentPackage,
         error,
-        isValidating,
+        mutate,
     } = useSwr('/api/equipmentPackage/' + router.query.id, equipmentPackageFetcher);
 
+    const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
+
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
-    if (isValidating || !equipmentPackage) {
-        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} />;
+    if (!equipmentPackage) {
+        return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
+
+    const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => {
+        const body = { equipmentPackage: equipmentPackage };
+
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        fetch('/api/equipmentPackage/' + router.query.id, request)
+            .then((apiResponse) => getResponseContentOrError<IEquipmentPackageObjectionModel>(apiResponse))
+            .then(toEquipmentPackage)
+            .then((equipmentPackage) => {
+                mutate(equipmentPackage, false);
+                showSaveSuccessNotification('Utrustningspaketet');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Utrustningspaketet');
+            });
+    };
 
     // The page itself
     //
     const pageTitle = equipmentPackage?.name;
     const breadcrumbs = [
-        { link: '/equipmentPackage', displayName: 'Utrustning' },
+        { link: '/equipment', displayName: 'Utrustning' },
         { link: '/equipmentPackage', displayName: 'Utrustningspaket' },
         { link: '/equipmentPackage/' + equipmentPackage.id, displayName: pageTitle },
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href={'/equipmentPackage/' + equipmentPackage.id + '/edit'} passHref>
@@ -76,32 +114,38 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
                                 <span>{equipmentPackage.name}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Estimerade timmar</span>
+                                <span className="flex-grow-1">Engelskt namn</span>
+                                <span>{equipmentPackage.nameEN}</span>
+                            </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
+                                <span className="flex-grow-1">Estimerad arbetstid</span>
                                 <span>{equipmentPackage.estimatedHours} timmar</span>
+                            </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
+                                <span className="flex-grow-1">Pakettyp</span>
+                                <span>{equipmentPackage.addAsHeading ? 'Rubrik med rader' : 'Individuella rader'}</span>
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                <div className="mb-1">Beskrivning</div>
+                                <div className="text-muted">{equipmentPackage.description}</div>
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                <div className="mb-1">Engelsk beskrivning</div>
+                                <div className="text-muted">{equipmentPackage.descriptionEN}</div>
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
-
+                </Col>
+                <Col xl={8}>
+                    <MarkdownCard
+                        text={equipmentPackage.note}
+                        onSubmit={(x) => handleSubmit({ name: equipmentPackage.name, note: x })}
+                        cardTitle={'Anteckningar'}
+                        readonly={currentUser.role === Role.READONLY}
+                    />
                     <Card className="mb-3">
                         <Card.Header>Utrustning</Card.Header>
-                        <ListGroup variant="flush">
-                            {equipmentPackage.equipmentEntries.map((e) => (
-                                <ListGroup.Item key={e.id} className="d-flex">
-                                    <span className="flex-grow-1">
-                                        {e.equipment?.name}
-                                        <br />
-                                        <span className="text-muted">{e.equipment?.description}</span>
-                                    </span>
-                                    <span>{e.numberOfUnits} st</span>
-                                </ListGroup.Item>
-                            ))}
-
-                            {equipmentPackage.equipmentEntries?.length === 0 ? (
-                                <ListGroup.Item className="text-center font-italic text-muted">
-                                    Det här paketet har ingen utrustning
-                                </ListGroup.Item>
-                            ) : null}
-                        </ListGroup>
+                        <PackageEquipmentList equipmentPackage={equipmentPackage} />
                     </Card>
                 </Col>
             </Row>
@@ -109,4 +153,4 @@ const UserPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     );
 };
 
-export default UserPage;
+export default EquipmentPackagePage;

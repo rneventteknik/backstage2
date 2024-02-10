@@ -1,10 +1,14 @@
-import { toEquipment, toEquipmentPublicCategory, toEquipmentTag } from './mappers/equipment';
+import { toEquipment, toEquipmentLocation, toEquipmentPublicCategory, toEquipmentTag } from './mappers/equipment';
 import { toEquipmentPackage } from './mappers/equipmentPackage';
 import { toUser } from './mappers/user';
 import { toTimeReport } from './mappers/timeReport';
 import { toTimeEstimate } from './mappers/timeEstimate';
 import { getResponseContentOrError } from './utils';
 import { toBooking, toEquipmentList } from './mappers/booking';
+import { toInvoiceGroup } from './mappers/invoiceGroup';
+import { toSetting } from './mappers/setting';
+import { toSalaryGroup } from './mappers/salaryGroup';
+import { toCustomer } from './mappers/customer';
 
 // Since all fetchers follow the same pattern we have these two helper functions to
 // generate a fetcher for a specified mapper.
@@ -35,6 +39,9 @@ export const equipmentTagsFetcher = generateListFetcher(toEquipmentTag);
 export const equipmentPublicCategoryFetcher = generateFetcher(toEquipmentPublicCategory);
 export const equipmentPublicCategoriesFetcher = generateListFetcher(toEquipmentPublicCategory);
 
+export const equipmentLocationFetcher = generateFetcher(toEquipmentLocation);
+export const equipmentLocationsFetcher = generateListFetcher(toEquipmentLocation);
+
 export const equipmentListFetcher = generateFetcher(toEquipmentList);
 export const equipmentListsFetcher = generateListFetcher(toEquipmentList);
 
@@ -49,5 +56,17 @@ export const timeReportsFetcher = generateListFetcher(toTimeReport);
 
 export const timeEstimateFetcher = generateFetcher(toTimeEstimate);
 export const timeEstimatesFetcher = generateListFetcher(toTimeEstimate);
+
+export const invoiceGroupFetcher = generateFetcher(toInvoiceGroup);
+export const invoiceGroupsFetcher = generateListFetcher(toInvoiceGroup);
+
+export const settingFetcher = generateFetcher(toSetting);
+export const settingsFetcher = generateListFetcher(toSetting);
+
+export const salaryGroupFetcher = generateFetcher(toSalaryGroup);
+export const salaryGroupsFetcher = generateListFetcher(toSalaryGroup);
+
+export const customerFetcher = generateFetcher(toCustomer);
+export const customersFetcher = generateListFetcher(toCustomer);
 
 export const genericFetcher = generateFetcher((x) => x);

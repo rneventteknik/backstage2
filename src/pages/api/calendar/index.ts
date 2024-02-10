@@ -3,13 +3,40 @@ import { GaxiosResponse } from 'googleapis-common';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { respondWithCustomErrorMessage, respondWithInvalidMethodResponse } from '../../../lib/apiResponses';
 import { fetchFirstBookingByCalendarBookingId } from '../../../lib/db-access/booking';
+import { fetchSettings } from '../../../lib/db-access/setting';
 import { withSessionContext } from '../../../lib/sessionContext';
+import { getGlobalSetting } from '../../../lib/utils';
 import { CalendarResult } from '../../../models/misc/CalendarResult';
 
 const calendarClient = calendar({
     version: 'v3',
     auth: process.env.CALENDAR_API_KEY,
 });
+
+const filterCalendarEvents = async (events: CalendarResult[] | null) => {
+    if (!events) {
+        return null;
+    }
+
+    const globalSettings = await fetchSettings();
+    const keywordBlackList: string[] = JSON.parse(
+        getGlobalSetting('googleCalendar.keywordBlackList', globalSettings, '[]'),
+    );
+
+    const filter = (event: CalendarResult) => {
+        if (
+            keywordBlackList &&
+            keywordBlackList.length > 0 &&
+            keywordBlackList.some((bannedKeyword) => event.name?.toLowerCase().includes(bannedKeyword.toLowerCase()))
+        ) {
+            return false;
+        }
+
+        return true;
+    };
+
+    return events.filter(filter);
+};
 
 const mapCalendarResponse = (res: GaxiosResponse<calendar_v3.Schema$Events>): Promise<CalendarResult[] | null> => {
     if (!res.data.items) {
@@ -40,11 +67,12 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
                 .list({
                     calendarId: process.env.CALENDAR_ID,
                     timeMin: new Date().toISOString(),
-                    maxResults: 50,
+                    maxResults: 135,
                     singleEvents: true,
                     orderBy: 'startTime',
                 })
                 .then(mapCalendarResponse)
+                .then(filterCalendarEvents)
                 .then((result) => res.status(200).json(result))
                 .catch((error) => respondWithCustomErrorMessage(res, error.message));
 

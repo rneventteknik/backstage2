@@ -11,7 +11,7 @@ export const fetchUserAuth = async (username: string): Promise<UserAuthObjection
     ensureDatabaseIsInitialized();
 
     return UserAuthObjectionModel.query()
-        .where('username', username)
+        .where('username', username.toLowerCase())
         .withGraphFetched('user')
         .then((users) => users[0]);
 };
@@ -37,11 +37,17 @@ export const updateUserAuth = async (
 ): Promise<UserAuthObjectionModel> => {
     ensureDatabaseIsInitialized();
 
+    // Ensure lowercase username
+    user.username = user.username?.toLowerCase();
+
     return UserAuthObjectionModel.query().patchAndFetchById(id, user);
 };
 
 export const insertUserAuth = async (user: UserAuthObjectionModel): Promise<UserAuthObjectionModel> => {
     ensureDatabaseIsInitialized();
+
+    // Ensure lowercase username
+    user.username = user.username.toLowerCase();
 
     return UserAuthObjectionModel.query().insert(user);
 };

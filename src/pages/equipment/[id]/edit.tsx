@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import { IEquipmentObjectionModel } from '../../../models/objection-models';
 import { toEquipment } from '../../../lib/mappers/equipment';
 import EquipmentForm from '../../../components/equipment/EquipmentForm';
@@ -16,15 +16,19 @@ import { equipmentFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { PartialDeep } from 'type-fest';
 import { Role } from '../../../models/enums/Role';
-import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faBoxesPacking, faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ConfirmModal from '../../../components/utils/ConfirmModal';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showArchiveModal, setShowArchiveModal] = useState(false);
+    const [showUnarchiveModal, setShowUnarchiveModal] = useState(false);
 
     const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage } = useNotifications();
 
@@ -42,11 +46,18 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     });
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !equipment) {
-        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
+        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const handleSubmit = async (equipment: PartialDeep<IEquipmentObjectionModel>) => {
@@ -72,7 +83,32 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
             });
     };
 
-    // Delete equipment handler
+    // Archive-equipment handler
+    //
+    const setArchiveStatusForEquipment = (status: boolean) => {
+        setShowDeleteModal(false);
+
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ equipment: { id: equipment.id, name: equipment.name, isArchived: status } }),
+        };
+
+        fetch('/api/equipment/' + router.query.id, request)
+            .then((apiResponse) => getResponseContentOrError<IEquipmentObjectionModel>(apiResponse))
+            .then(toEquipment)
+            .then((equipment) => {
+                mutate(equipment, false);
+                showSaveSuccessNotification('Utrustningen');
+                router.push('/equipment/' + equipment.id);
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Utrustningen');
+            });
+    };
+
+    // Delete-equipment handler
     //
     const deleteEquipment = () => {
         setShowDeleteModal(false);
@@ -101,34 +137,69 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser }: Props) => {
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara utrustning
                 </Button>
                 <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                    {equipment.isArchived ? (
+                        <Dropdown.Item onClick={() => setShowUnarchiveModal(true)} className="text-warning">
+                            <FontAwesomeIcon icon={faBoxesPacking} className="mr-1 fa-fw" />
+                            Avarkivera utrustning
+                        </Dropdown.Item>
+                    ) : (
+                        <Dropdown.Item onClick={() => setShowArchiveModal(true)} className="text-warning">
+                            <FontAwesomeIcon icon={faBoxesPacking} className="mr-1 fa-fw" />
+                            Arkivera utrustning
+                        </Dropdown.Item>
+                    )}
                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort utrustning
+                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" />
+                        Ta bort utrustning
                     </Dropdown.Item>
                 </DropdownButton>
             </Header>
 
             <EquipmentForm equipment={equipment} handleSubmitEquipment={handleSubmit} formId="editEquipmentForm" />
 
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Bekräfta</Modal.Title>
-                </Modal.Header>
-                <Modal.Body> Vill du verkligen ta bort utrustningen {equipment.name}?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={() => setShowDeleteModal(false)}>
-                        Avbryt
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteEquipment()}>
-                        Ta bort
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <ConfirmModal
+                show={showArchiveModal}
+                onHide={() => setShowArchiveModal(false)}
+                onConfirm={() => {
+                    setShowArchiveModal(false);
+                    setArchiveStatusForEquipment(true);
+                }}
+                title="Bekräfta"
+                confirmLabel="Arkivera"
+            >
+                Vill du verkligen arkivera utrustningen {equipment.name}?
+            </ConfirmModal>
+
+            <ConfirmModal
+                show={showUnarchiveModal}
+                onHide={() => setShowUnarchiveModal(false)}
+                onConfirm={() => {
+                    setShowUnarchiveModal(false);
+                    setArchiveStatusForEquipment(false);
+                }}
+                title="Bekräfta"
+            >
+                Vill du verkligen markera utrustningen {equipment.name} som inte längre arkiverad?
+            </ConfirmModal>
+
+            <ConfirmModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                onConfirm={() => {
+                    setShowDeleteModal(false);
+                    deleteEquipment();
+                }}
+                title="Bekräfta"
+                confirmLabel="Ta bort"
+            >
+                Vill du verkligen arkivera utrustningen {equipment.name}?
+            </ConfirmModal>
         </Layout>
     );
 };

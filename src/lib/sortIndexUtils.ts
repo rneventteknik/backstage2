@@ -1,11 +1,13 @@
-import { HasId } from '../models/interfaces/BaseEntity';
+import { HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import { updateItemsInArrayById } from './utils';
 
-export interface HasSortIndex extends HasId {
+export interface HasSortIndex {
     sortIndex: number;
 }
 
-export const sortIndexSortFn = (a: HasSortIndex, b: HasSortIndex) => {
+type Sortable = HasSortIndex & (HasId | HasStringId);
+
+export const sortIndexSortFn = (a: Sortable, b: Sortable) => {
     if ((a.sortIndex ?? 0) < (b.sortIndex ?? 0)) {
         return -1;
     }
@@ -14,6 +16,10 @@ export const sortIndexSortFn = (a: HasSortIndex, b: HasSortIndex) => {
     }
 
     // Use id for sorting as a fallback
+    return idSortFn(a, b);
+};
+
+export const idSortFn = (a: HasId | HasStringId, b: HasId | HasStringId) => {
     if (a.id < b.id) {
         return -1;
     }
@@ -24,9 +30,9 @@ export const sortIndexSortFn = (a: HasSortIndex, b: HasSortIndex) => {
     return 0;
 };
 
-export const getSortedList = <T extends HasSortIndex>(list: T[]) => [...list].sort(sortIndexSortFn);
+export const getSortedList = <T extends Sortable>(list: T[]) => [...list].sort(sortIndexSortFn);
 
-export const getPreviousItem = <T extends HasSortIndex>(list: T[], item: T): T | null => {
+export const getPreviousItem = <T extends Sortable>(list: T[], item: T): T | null => {
     const sortedList = getSortedList(list);
 
     const index = sortedList.findIndex((x) => x.id === item.id);
@@ -38,7 +44,7 @@ export const getPreviousItem = <T extends HasSortIndex>(list: T[], item: T): T |
     return sortedList[index - 1];
 };
 
-export const getNextItem = <T extends HasSortIndex>(list: T[], item: T): T | null => {
+export const getNextItem = <T extends Sortable>(list: T[], item: T): T | null => {
     const sortedList = getSortedList(list);
 
     const index = sortedList.findIndex((x) => x.id === item.id);
@@ -50,12 +56,12 @@ export const getNextItem = <T extends HasSortIndex>(list: T[], item: T): T | nul
     return sortedList[index + 1];
 };
 
-export const isFirst = <T extends HasSortIndex>(list: T[], item: T): boolean => getPreviousItem(list, item) === null;
+export const isFirst = <T extends Sortable>(list: T[], item: T): boolean => getPreviousItem(list, item) === null;
 
-export const isLast = <T extends HasSortIndex>(list: T[], item: T): boolean => getNextItem(list, item) === null;
+export const isLast = <T extends Sortable>(list: T[], item: T): boolean => getNextItem(list, item) === null;
 
 // Note: This function only returns the modified items, not the whole list
-export const moveItemUp = <T extends HasSortIndex>(list: T[], item: T): T[] => {
+export const moveItemUp = <T extends Sortable>(list: T[], item: T): T[] => {
     if (!list || !item || !list.some((x) => x.id === item.id)) {
         throw new Error('Invalid parameters');
     }
@@ -80,7 +86,7 @@ export const moveItemUp = <T extends HasSortIndex>(list: T[], item: T): T[] => {
 };
 
 // Note: This function only returns the modified items, not the whole list
-export const moveItemDown = <T extends HasSortIndex>(list: T[], item: T): T[] => {
+export const moveItemDown = <T extends Sortable>(list: T[], item: T): T[] => {
     if (!list || !item || !list.some((x) => x.id === item.id)) {
         throw new Error('Invalid parameters');
     }
@@ -104,7 +110,25 @@ export const moveItemDown = <T extends HasSortIndex>(list: T[], item: T): T[] =>
     ];
 };
 
-export const getNextSortIndex = <T extends HasSortIndex>(list: T[]): number => {
+export const moveItemToItem = <T extends Sortable>(list: T[], item: T, target: T): T[] => {
+    if (!list || !item || !target || !list.some((x) => x.id === item.id) || !list.some((x) => x.id === target.id)) {
+        throw new Error('Invalid parameters');
+    }
+
+    if (item.id === target.id) {
+        return [];
+    }
+
+    const sortedList = getSortedList(list.filter((x) => x.id !== item.id));
+    const targetIndex = sortedList.findIndex((x) => x.id === target.id);
+
+    sortedList.splice(targetIndex, 0, item);
+
+    // Reset sort index
+    return resetSortIndexes(sortedList);
+};
+
+export const getNextSortIndex = <T extends Sortable>(list: T[]): number => {
     if (!list) {
         throw new Error('Invalid list');
     }
@@ -116,10 +140,12 @@ export const getNextSortIndex = <T extends HasSortIndex>(list: T[]): number => {
     return (getSortedList(list)[list.length - 1].sortIndex ?? 0) + 10;
 };
 
-export const checkSortIndexUniqueness = <T extends HasSortIndex>(list: T[]): boolean =>
+export const checkSortIndexUniqueness = <T extends Sortable>(list: T[]): boolean =>
     !list.some((entity) => list.some((x) => x.sortIndex === entity.sortIndex && x.id !== entity.id));
 
-export const fixSortIndexUniqueness = <T extends HasSortIndex>(list: T[]): T[] => {
+export const fixSortIndexUniqueness = <T extends Sortable>(list: T[]): T[] => resetSortIndexes(getSortedList(list));
+
+export const resetSortIndexes = <T extends Sortable>(list: T[]): T[] => {
     let sortIndex = 0;
-    return getSortedList(list).map((x) => ({ ...x, sortIndex: (sortIndex += 10) }));
+    return list.map((x) => ({ ...x, sortIndex: (sortIndex += 10) }));
 };

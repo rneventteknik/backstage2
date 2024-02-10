@@ -1,40 +1,30 @@
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarXmark, faCheck, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
-import { Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import React, { ReactNode, useState } from 'react';
+import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
+import { addDays, formatDate, formatWeekDay, getWeekNumber } from '../../lib/datetimeUtils';
 import { bookingsFetcher } from '../../lib/fetchers';
-import { formatDate, getMaximumNumberOfUnitUsed } from '../../lib/utils';
+import { getMaximumNumberOfUnitUsed } from '../../lib/utils';
 import { Status } from '../../models/enums/Status';
 import { Equipment } from '../../models/interfaces';
 import styles from './EquipmentCalendar.module.scss';
+import Link from 'next/link';
 
 type Props = {
     equipment: Equipment;
 };
 
 const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
-    const dayOffsets = [0, 1, 2, 3, 4, 5, 6];
-    const dayLabels = ['Mån', 'Tis', 'Ons', 'Tors', 'Fre', 'Lör', 'Sön'];
-
     const thisWeek = new Date();
     thisWeek.setHours(0, 0, 0, 0); // Reset time part
     thisWeek.setDate(thisWeek.getDate() - ((thisWeek.getDay() + 6) % 7)); // Go to last Monday
 
     // Calculate next week and some more weeks for the dropdown
-    const nextWeek = addDays(thisWeek, 7);
-    const moreWeeks = [2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => addDays(thisWeek, 7 * x));
+    const moreWeeks = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((x) => addDays(thisWeek, 7 * x));
 
     const [startDate, setStartDate] = useState(thisWeek);
-
-    // Based on the selected start date, calculate the dates to show in the view
-    const days = dayOffsets.map((x) => ({
-        startDatetime: addDays(startDate, x),
-        endDatetime: addDays(startDate, x + 1),
-        label: dayLabels[x],
-        secondaryLabel: formatDate(addDays(startDate, x)),
-    }));
 
     if (!equipment) {
         return <Skeleton height={120}></Skeleton>;
@@ -46,7 +36,12 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                 <Card.Header>
                     <div className="d-flex">
                         <div className="flex-grow-1">
-                            Tillgänglighet<div className="text-muted">Minsta tillgängliga antal per dag</div>
+                            Tillgänglighet
+                            <div className="text-muted">
+                                {equipment.inventoryCount === null
+                                    ? 'Antal utlämnade'
+                                    : 'Minsta tillgängliga antal per dag'}
+                            </div>
                         </div>
                         <div>
                             <Form.Control
@@ -56,32 +51,83 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                                 onChange={(e) => setStartDate(new Date(parseInt(e.target.value)))}
                                 size="sm"
                             >
-                                <option value={thisWeek.getTime()}>Denna veckan</option>
-                                <option value={nextWeek.getTime()}>Nästa vecka</option>
+                                <option value={thisWeek.getTime()}>
+                                    Denna vecka ({formatDate(thisWeek)} till {formatDate(addDays(thisWeek, 6))})
+                                </option>
                                 {moreWeeks.map((week, i) => (
                                     <option value={week.getTime()} key={i}>
-                                        {formatDate(week)} till {formatDate(addDays(week, 6))}
+                                        Vecka {getWeekNumber(week)} ({formatDate(week)} till{' '}
+                                        {formatDate(addDays(week, 6))})
                                     </option>
                                 ))}
                             </Form.Control>
                         </div>
+                        <div>
+                            <Link href={'/equipment/compare-availability/?equipmentId=' + equipment.id} passHref>
+                                <Button
+                                    href={'/equipment/compare-availability/?equipmentId=' + equipment.id}
+                                    size="sm"
+                                    variant="secondary"
+                                    className="ml-2"
+                                >
+                                    <FontAwesomeIcon icon={faCalendarXmark} className="mr-1 fa-fw" /> Jämför
+                                    tillgänglighet
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
                 </Card.Header>
-                <div className="d-flex">
-                    {days.map((d) => (
-                        <div className={styles.statusContainer} key={d.label}>
-                            <EquipmentCalendarDay
-                                equipment={equipment}
-                                label={d.label}
-                                secondaryLabel={d.secondaryLabel}
-                                startDatetime={d.startDatetime}
-                                endDatetime={d.endDatetime}
-                            />
-                        </div>
-                    ))}
-                </div>
+                <EquipmentCalendarRow equipment={equipment} startDate={startDate} numberOfDays={7} />
             </Card>
         </>
+    );
+};
+
+type EquipmentCalendarRowProps = {
+    equipment: Equipment;
+    startDate: Date;
+    numberOfDays: number;
+    highlightCriteria?: (date: Date) => boolean;
+    children?: ReactNode;
+};
+
+export const EquipmentCalendarRow: React.FC<EquipmentCalendarRowProps> = ({
+    equipment,
+    children,
+    startDate,
+    numberOfDays,
+    highlightCriteria,
+}: EquipmentCalendarRowProps) => {
+    const dayOffsets = [...Array(numberOfDays).keys()];
+
+    // Based on the selected start date, calculate the dates to show in the view
+    const days = dayOffsets.map((x) => ({
+        startDatetime: addDays(startDate, x),
+        endDatetime: addDays(startDate, x + 1),
+        label: formatWeekDay(addDays(startDate, x)),
+        secondaryLabel: formatDate(addDays(startDate, x)),
+    }));
+
+    if (!equipment) {
+        return null;
+    }
+
+    return (
+        <div className="d-flex">
+            {children ? <div className={styles.labelContainer + ' p-2 align-middle'}>{children}</div> : null}
+            {days.map((d) => (
+                <div className={styles.statusContainer} key={d.startDatetime.getTime() + '-' + equipment.id}>
+                    <EquipmentCalendarDay
+                        equipment={equipment}
+                        label={d.label}
+                        secondaryLabel={d.secondaryLabel}
+                        startDatetime={d.startDatetime}
+                        endDatetime={d.endDatetime}
+                        highlightCriteria={highlightCriteria}
+                    />
+                </div>
+            ))}
+        </div>
     );
 };
 
@@ -91,6 +137,7 @@ type EquipmentCalendarDayProps = {
     secondaryLabel: string;
     startDatetime: Date;
     endDatetime: Date;
+    highlightCriteria?: (date: Date) => boolean;
 };
 
 const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
@@ -99,6 +146,7 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
     endDatetime,
     label,
     secondaryLabel,
+    highlightCriteria,
 }: EquipmentCalendarDayProps) => {
     const { data, error, isValidating } = useSwr(
         '/api/conflict-detection/booking-with-equipment?equipmentId=' +
@@ -110,12 +158,23 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
         bookingsFetcher,
     );
 
-    if (isValidating && !equipment) {
-        return <Skeleton height={80} />;
+    if (isValidating && !data) {
+        return (
+            <div className="flex-grow-1">
+                <Skeleton height={78.4} />
+            </div>
+        );
     }
 
-    if (error) {
-        return <span className="text-danger">Fel!</span>;
+    if (error && !data) {
+        return (
+            <div className="p-2 flex-grow-1 text-danger">
+                <div className="text-center mb-2">Fel</div>
+                <div className="text-center py-2">
+                    <FontAwesomeIcon icon={faExclamationTriangle} size="lg" />
+                </div>
+            </div>
+        );
     }
 
     // Filter bookings
@@ -128,6 +187,10 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
     const getClassName = () => {
         if (maxNumberOfUnitsUsed === 0) {
             return styles.allAvailable;
+        }
+
+        if (equipment.inventoryCount === null) {
+            return styles.someAvailable + ' text-dark';
         }
 
         if (maxNumberOfUnitsUsed > 0 && maxNumberOfUnitsUsed < equipment.inventoryCount) {
@@ -145,8 +208,16 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
         return null;
     };
 
+    const getHightlightClassName = () => {
+        if (highlightCriteria && highlightCriteria(startDatetime)) {
+            return styles.highlighted;
+        }
+
+        return '';
+    };
+
     return (
-        <div className={'p-2 flex-grow-1 ' + getClassName()}>
+        <div className={'p-2 flex-grow-1 ' + getClassName() + ' ' + getHightlightClassName()}>
             <div
                 className={
                     'text-center mb-2' +
@@ -161,7 +232,16 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
 
             <div className="text-center py-2">
                 {maxNumberOfUnitsUsed === 0 ? (
-                    <FontAwesomeIcon icon={faCheck} size="lg" />
+                    <OverlayTrigger
+                        placement="left"
+                        overlay={
+                            <Tooltip id="1">
+                                <strong>Alla {equipment.inventoryCount} st tillgängliga</strong>
+                            </Tooltip>
+                        }
+                    >
+                        <FontAwesomeIcon icon={faCheck} size="lg" />
+                    </OverlayTrigger>
                 ) : (
                     <OverlayTrigger
                         placement="left"
@@ -174,9 +254,10 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
                                             {booking.equipmentLists
                                                 ?.map(
                                                     (list) =>
-                                                        `${list.name} (${list.equipmentListEntries
-                                                            .filter((x) => x.equipmentId === equipment.id)
-                                                            .reduce((sum, x) => sum + x.numberOfUnits, 0)} st)`,
+                                                        `${list.name} (${getMaximumNumberOfUnitUsed(
+                                                            [list],
+                                                            equipment,
+                                                        )} st)`,
                                                 )
                                                 ?.join(', ')}
                                         </div>
@@ -185,20 +266,18 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
                             </Tooltip>
                         }
                     >
-                        <span>
-                            {equipment.inventoryCount - maxNumberOfUnitsUsed}&nbsp;/&nbsp;{equipment.inventoryCount}
-                        </span>
+                        {equipment.inventoryCount != null ? (
+                            <span>
+                                {equipment.inventoryCount - maxNumberOfUnitsUsed}&nbsp;/&nbsp;{equipment.inventoryCount}
+                            </span>
+                        ) : (
+                            <span>{maxNumberOfUnitsUsed} ute</span>
+                        )}
                     </OverlayTrigger>
                 )}
             </div>
         </div>
     );
-};
-
-const addDays = (date: Date, days: number) => {
-    const dateCopy = new Date(date);
-    dateCopy.setDate(dateCopy.getDate() + days);
-    return dateCopy;
 };
 
 export default EquipmentCalendar;

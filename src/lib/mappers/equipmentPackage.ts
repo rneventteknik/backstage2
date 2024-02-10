@@ -1,10 +1,10 @@
-import { toDateOrUndefined } from '../utils';
 import {
     IEquipmentPackageEntryObjectionModel,
     IEquipmentPackageObjectionModel,
 } from '../../models/objection-models/EquipmentPackageObjectionModel';
 import { EquipmentPackage, EquipmentPackageEntry } from '../../models/interfaces/EquipmentPackage';
 import { toEquipment, toEquipmentTag } from './equipment';
+import { toDatetimeOrUndefined } from '../datetimeUtils';
 
 export const toEquipmentPackage = (objectionModel: IEquipmentPackageObjectionModel): EquipmentPackage => {
     if (!objectionModel.id) {
@@ -19,8 +19,8 @@ export const toEquipmentPackage = (objectionModel: IEquipmentPackageObjectionMod
         equipmentEntries: objectionModel.equipmentEntries
             ? objectionModel.equipmentEntries.map(toEquipmentPackageEntry)
             : [],
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
 
@@ -35,7 +35,7 @@ export const toEquipmentPackageEntry = (
         ...objectionModel,
         id: objectionModel.id,
         equipment: objectionModel.equipment ? toEquipment(objectionModel.equipment) : undefined,
-        updated: toDateOrUndefined(objectionModel.updated),
-        created: toDateOrUndefined(objectionModel.created),
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };

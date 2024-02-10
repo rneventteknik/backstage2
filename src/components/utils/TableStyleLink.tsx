@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import React, { ReactNode } from 'react';
+import React, { AnchorHTMLAttributes, ReactNode } from 'react';
 import styles from './TableStyleLink.module.scss';
 
 type Props = {
@@ -8,9 +8,16 @@ type Props = {
     className?: string;
 };
 
-const TableStyleLink: React.FC<Props> = ({ href, children, className }: Props) => (
+const TableStyleLink: React.FC<Props & AnchorHTMLAttributes<HTMLAnchorElement>> = ({
+    href,
+    children,
+    className,
+    ...props
+}: Props & AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <Link href={href}>
-        <a className={className + ' ' + styles.link}>{children}</a>
+        <a className={className + ' ' + styles.link} {...props}>
+            {children}
+        </a>
     </Link>
 );
 

@@ -19,10 +19,10 @@ export const IfAdmin: React.FC<Props> = ({ children, currentUser, or, and }: Pro
 };
 
 export const IfNotAdmin: React.FC<Props> = ({ children, currentUser, or, and }: Props) => {
-    if ((currentUser.role === Role.ADMIN || (or ?? false)) && (and ?? true)) {
-        return null;
-    } else {
+    if ((currentUser.role !== Role.ADMIN || (or ?? false)) && (and ?? true)) {
         return <>{children}</>;
+    } else {
+        return null;
     }
 };
 
@@ -35,9 +35,25 @@ export const IfReadonly: React.FC<Props> = ({ children, currentUser, or, and }: 
 };
 
 export const IfNotReadonly: React.FC<Props> = ({ children, currentUser, or, and }: Props) => {
-    if ((currentUser.role === Role.READONLY || (or ?? false)) && (and ?? true)) {
-        return null;
-    } else {
+    if ((currentUser.role !== Role.READONLY || (or ?? false)) && (and ?? true)) {
         return <>{children}</>;
+    } else {
+        return null;
+    }
+};
+
+export const IfCashPaymentManager: React.FC<Props> = ({ children, currentUser, or, and }: Props) => {
+    if ((currentUser.role === Role.CASH_PAYMENT_MANAGER || (or ?? false)) && (and ?? true)) {
+        return <>{children}</>;
+    } else {
+        return null;
+    }
+};
+
+export const IfNotCashPaymentManager: React.FC<Props> = ({ children, currentUser, or, and }: Props) => {
+    if ((currentUser.role !== Role.CASH_PAYMENT_MANAGER || (or ?? false)) && (and ?? true)) {
+        return <>{children}</>;
+    } else {
+        return null;
     }
 };

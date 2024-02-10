@@ -48,10 +48,11 @@ const handler = withSessionContext(
                 }
 
                 await insertEquipmentList(req.body.equipmentList, bookingId)
-                    .then((result) => {
-                        logChangeToBooking(
+                    .then(async (result) => {
+                        await logChangeToBooking(
                             context.currentUser,
                             bookingId,
+                            booking.name,
                             BookingChangelogEntryType.EQUIPMENTLIST,
                         ).then(() => res.status(200).json(result));
                     })

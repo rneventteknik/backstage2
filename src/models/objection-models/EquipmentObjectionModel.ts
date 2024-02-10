@@ -1,27 +1,28 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { Model, RelationMappingsThunk } from 'objection';
-import { BaseObjectionModelWithName, BaseChangeLogObjectionModel } from '.';
-import { IUserObjectionModel, UserObjectionModel } from './UserObjectionModel';
+import { BaseObjectionModelWithName } from '.';
 
 export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     id: number;
     name: string;
     created?: string;
     updated?: string;
-    inventoryCount: number;
+    inventoryCount: number | null;
     nameEN: string;
     description: string;
     descriptionEN: string;
+    searchKeywords: string;
     note: string;
     image: unknown; // TODO Add images
     publiclyHidden: boolean;
+    isArchived: boolean;
     equipmentPublicCategoryId?: number | null;
     equipmentPublicCategory?: IEquipmentPublicCategoryObjectionModel;
     equipmentLocationId?: number | null;
     equipmentLocation?: IEquipmentLocationObjectionModel;
     tags?: IEquipmentTagObjectionModel[];
     prices?: IEquipmentPriceObjectionModel[];
-    changeLog?: IEquipmentChangelogEntryObjectionModel[];
+    changelog?: IEquipmentChangelogEntryObjectionModel[];
 }
 
 export class EquipmentObjectionModel extends Model implements IEquipmentObjectionModel {
@@ -48,7 +49,7 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
                 to: 'EquipmentPrice.equipmentId',
             },
         },
-        changeLog: {
+        changelog: {
             relation: Model.HasManyRelation,
             modelClass: EquipmentChangelogEntryObjectionModel,
             join: {
@@ -82,27 +83,52 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
     nameEN!: string;
     description!: string;
     descriptionEN!: string;
+    searchKeywords!: string;
     note!: string;
     image!: unknown; // TODO Add images
     publiclyHidden!: boolean;
+    isArchived!: boolean;
 
     equipmentPublicCategoryId?: number;
     equipmentPublicCategory?: EquipmentPublicCategoryObjectionModel;
 
     tags?: EquipmentTagObjectionModel[];
     prices?: EquipmentPriceObjectionModel[];
-    changeLog?: EquipmentChangelogEntryObjectionModel[];
+    changelog?: EquipmentChangelogEntryObjectionModel[];
 }
 
-export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName {}
+export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName {
+    color?: string;
+    equipment?: IEquipmentObjectionModel[];
+    isPublic: boolean;
+}
 
 export class EquipmentTagObjectionModel extends Model implements IEquipmentTagObjectionModel {
     static tableName = 'EquipmentTag';
+
+    static relationMappings: RelationMappingsThunk = () => ({
+        equipment: {
+            relation: Model.ManyToManyRelation,
+            modelClass: EquipmentObjectionModel,
+            join: {
+                from: 'EquipmentTag.id',
+                through: {
+                    from: 'EquipmentTagEquipment.equipmentTagId',
+                    to: 'EquipmentTagEquipment.equipmentId',
+                },
+                to: 'Equipment.id',
+            },
+        },
+    });
 
     id!: number;
     name!: string;
     created?: string;
     updated?: string;
+
+    color?: string;
+    equipment?: EquipmentObjectionModel[];
+    isPublic!: boolean;
 }
 
 export interface IEquipmentPriceObjectionModel extends BaseObjectionModelWithName {
@@ -159,42 +185,20 @@ export class EquipmentLocationObjectionModel extends Model implements IEquipment
     sortIndex!: number;
 }
 
-export interface IEquipmentChangelogEntryObjectionModel
-    extends BaseChangeLogObjectionModel,
-        BaseObjectionModelWithName {}
+export interface IEquipmentChangelogEntryObjectionModel extends BaseObjectionModelWithName {
+    id: number;
+    name: string;
+    created: string;
+    updated: string;
+    equipmentId: number;
+}
 
 export class EquipmentChangelogEntryObjectionModel extends Model implements IEquipmentChangelogEntryObjectionModel {
     static tableName = 'EquipmentChangelogEntry';
 
-    static relationMappings: RelationMappingsThunk = () => ({
-        user: {
-            relation: Model.HasOneRelation,
-            modelClass: UserObjectionModel,
-            filter: (query) =>
-                query.select(
-                    'id',
-                    'name',
-                    'created',
-                    'updated',
-                    'memberStatus',
-                    'nameTag',
-                    'phoneNumber',
-                    'slackId',
-                    'emailAddress',
-                ),
-            join: {
-                from: 'EquipmentChangelogEntry.userId',
-                to: 'User.id',
-            },
-        },
-    });
-
     id!: number;
     name!: string;
-    created?: string;
-    updated?: string;
-    timestamp!: string;
-    description!: string;
-
-    user?: IUserObjectionModel;
+    created!: string;
+    updated!: string;
+    equipmentId!: number;
 }

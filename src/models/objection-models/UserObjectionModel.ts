@@ -19,7 +19,6 @@ export interface IUserObjectionModel extends BaseObjectionModelWithName {
     clearingNumber?: string;
     bankAccount?: string;
     homeAddress?: string;
-    zipCode?: string;
 
     bookings?: IBookingObjectionModel[];
     userAuth?: IUserAuthObjectionModel;
@@ -46,6 +45,18 @@ export class UserObjectionModel extends Model implements IUserObjectionModel {
                 to: 'UserAuth.userId',
             },
         },
+        coOwnerBookings: {
+            relation: Model.ManyToManyRelation,
+            modelClass: BookingObjectionModel,
+            join: {
+                from: 'User.id',
+                through: {
+                    from: 'CoOwner.userId',
+                    to: 'CoOwner.bookingId',
+                },
+                to: 'Booking.id',
+            },
+        },
     });
 
     id?: number;
@@ -61,7 +72,6 @@ export class UserObjectionModel extends Model implements IUserObjectionModel {
     clearingNumber!: string;
     bankAccount!: string;
     homeAddress!: string;
-    zipCode!: string;
     emailAddress!: string;
 
     bookings?: BookingObjectionModel[];

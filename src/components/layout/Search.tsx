@@ -5,18 +5,26 @@ import { SearchResult } from '../../models/misc/SearchResult';
 import { groupBy, getResponseContentOrError } from '../../lib/utils';
 import styles from './Search.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarDay, faCube, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { IEquipmentObjectionModel, IBookingObjectionModel, IUserObjectionModel } from '../../models/objection-models';
+import { faCalendarDay, faCube, faCubes, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import {
+    IEquipmentObjectionModel,
+    IBookingObjectionModel,
+    IUserObjectionModel,
+    IEquipmentPackageObjectionModel,
+} from '../../models/objection-models';
 import { useNotifications } from '../../lib/useNotifications';
 import { toUser } from '../../lib/mappers/user';
 import { toBooking } from '../../lib/mappers/booking';
 import { toEquipment } from '../../lib/mappers/equipment';
-import { Badge } from 'react-bootstrap';
 import { BaseEntityWithName } from '../../models/interfaces/BaseEntity';
+import { SplitHighlighter } from '../utils/Highlight';
+import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
+import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 
 enum ResultType {
     BOOKING,
     EQUIPMENT,
+    EQUIPMENT_PACKAGE,
     USER,
 }
 interface SearchResultViewModel extends BaseEntityWithName {
@@ -76,6 +84,13 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                 })),
             )
             .concat(
+                results.equipmentPackage.map((equipmentPackage) => ({
+                    type: ResultType.EQUIPMENT_PACKAGE,
+                    url: '/equipmentPackage/' + equipmentPackage.id,
+                    ...toEquipmentPackage(equipmentPackage),
+                })),
+            )
+            .concat(
                 results.users.map((user) => ({
                     type: ResultType.USER,
                     url: '/users/' + user.id,
@@ -110,8 +125,8 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     const user = entity as unknown as IUserObjectionModel;
                     return (
                         <small>
-                            <Typeahead.Highlighter search={highlightText}>{user.nameTag}</Typeahead.Highlighter> /{' '}
-                            <Typeahead.Highlighter search={highlightText}>{user.emailAddress}</Typeahead.Highlighter>
+                            <SplitHighlighter search={highlightText} textToHighlight={user.nameTag} /> /{' '}
+                            <SplitHighlighter search={highlightText} textToHighlight={user.emailAddress} />
                         </small>
                     );
 
@@ -119,13 +134,23 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     const equipment = entity as unknown as IEquipmentObjectionModel;
                     return (
                         <small>
-                            <Typeahead.Highlighter search={highlightText}>{equipment.nameEN}</Typeahead.Highlighter>{' '}
+                            <SplitHighlighter search={highlightText} textToHighlight={equipment.nameEN} />{' '}
                             {equipment.tags?.map((x) => (
-                                <>
-                                    <Badge key={x.id} variant="dark">
-                                        {x.name}
-                                    </Badge>{' '}
-                                </>
+                                <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
+                            ))}
+                        </small>
+                    );
+
+                case ResultType.EQUIPMENT_PACKAGE:
+                    const equipmentPackage = entity as unknown as IEquipmentPackageObjectionModel;
+                    return (
+                        <small>
+                            <SplitHighlighter
+                                search={highlightText}
+                                textToHighlight={equipmentPackage.nameEN || equipmentPackage.name}
+                            />{' '}
+                            {equipmentPackage.tags?.map((x) => (
+                                <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
                             ))}
                         </small>
                     );
@@ -134,9 +159,8 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     const booking = entity as unknown as IBookingObjectionModel;
                     return (
                         <small>
-                            <Typeahead.Highlighter search={highlightText}>
-                                {booking.contactPersonName}
-                            </Typeahead.Highlighter>
+                            <SplitHighlighter search={highlightText} textToHighlight={booking.customerName} /> /{' '}
+                            <SplitHighlighter search={highlightText} textToHighlight={booking.contactPersonName} />
                         </small>
                     );
                 default:
@@ -156,7 +180,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                             position={entity.index}
                             className={styles.dropdownItem}
                         >
-                            <Typeahead.Highlighter search={state.text}>{entity.name}</Typeahead.Highlighter>
+                            <SplitHighlighter search={state.text} textToHighlight={entity.name} />
                             <div>{getDescription(entity, state.text)}</div>
                         </Typeahead.MenuItem>
                     ))
@@ -196,6 +220,14 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
 
                 <Typeahead.Menu.Divider />
                 <ResultSection heading="Utrustning" icon={faCube} results={res[ResultType.EQUIPMENT]} state={state} />
+
+                <Typeahead.Menu.Divider />
+                <ResultSection
+                    heading="Utrustningspaket"
+                    icon={faCubes}
+                    results={res[ResultType.EQUIPMENT_PACKAGE]}
+                    state={state}
+                ></ResultSection>
 
                 <Typeahead.Menu.Divider />
                 <ResultSection heading="Användare" icon={faUser} results={res[ResultType.USER]} state={state} />

@@ -43,9 +43,12 @@ const handler = withSessionContext(
                 }
                 await insertTimeReport(req.body.timeReport)
                     .then((result) => {
-                        logChangeToBooking(context.currentUser, bookingId, BookingChangelogEntryType.TIMEREPORT).then(
-                            () => res.status(200).json(result),
-                        );
+                        logChangeToBooking(
+                            context.currentUser,
+                            bookingId,
+                            booking.name,
+                            BookingChangelogEntryType.TIMEREPORT,
+                        ).then(() => res.status(200).json(result));
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
                 break;

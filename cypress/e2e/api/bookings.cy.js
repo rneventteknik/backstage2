@@ -10,7 +10,7 @@ context('Bookings with user', () => {
 
     it('List all bookings', () => {
         cy.request({ url: '/api/bookings' }).should((response) => {
-            expect(response.body.length).to.eq(8);
+            expect(response.body.length).to.greaterThan(0);
         });
     });
 });

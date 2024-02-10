@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { useUserWithDefaultAccessControl } from '../../../lib/useUser';
+import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import { IEquipmentPackageObjectionModel } from '../../../models/objection-models';
 import { useNotifications } from '../../../lib/useNotifications';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
@@ -18,12 +18,14 @@ import { PartialDeep } from 'type-fest';
 import { Role } from '../../../models/enums/Role';
 import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import ConfirmModal from '../../../components/utils/ConfirmModal';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessControl(Role.USER);
-type Props = { user: CurrentUserInfo };
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
+type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
-const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => {
+const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage } = useNotifications();
@@ -42,11 +44,18 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     });
 
     if (error) {
-        return <ErrorPage errorMessage={error.message} fixedWidth={true} currentUser={currentUser} />;
+        return (
+            <ErrorPage
+                errorMessage={error.message}
+                fixedWidth={true}
+                currentUser={currentUser}
+                globalSettings={globalSettings}
+            />
+        );
     }
 
     if (isValidating || !equipmentPackage) {
-        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} />;
+        return <FormLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
     const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => {
@@ -95,24 +104,19 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
     //
     const pageTitle = equipmentPackage?.name;
     const breadcrumbs = [
-        { link: '/equipmentPackage', displayName: 'Utrustning' },
+        { link: '/equipment', displayName: 'Utrustning' },
         { link: '/equipmentPackage', displayName: 'Utrustningspaket' },
         { link: '/equipmentPackage/' + equipmentPackage.id, displayName: pageTitle },
         { link: '/equipmentPackage/' + equipmentPackage.id + '/edit', displayName: 'Redigera' },
     ];
 
     return (
-        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser}>
+        <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentPackageForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara utrustningspaket
                 </Button>
-                <DropdownButton
-                    id="dropdown-basic-button"
-                    className="d-inline-block ml-2"
-                    variant="secondary"
-                    title="Mer"
-                >
+                <DropdownButton id="dropdown-basic-button" className="d-inline-block" variant="secondary" title="Mer">
                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
                         <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort utrustningspaket
                     </Dropdown.Item>
@@ -125,20 +129,15 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser }: Props) => 
                 formId="editEquipmentPackageForm"
             />
 
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Bekräfta</Modal.Title>
-                </Modal.Header>
-                <Modal.Body> Vill du verkligen ta bort utrustningspaketet {equipmentPackage.name}?</Modal.Body>
-                <Modal.Footer>
-                    <Button variant="primary" onClick={() => setShowDeleteModal(false)}>
-                        Avbryt
-                    </Button>
-                    <Button variant="danger" onClick={() => deleteEquipmentPackage()}>
-                        Ta bort
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <ConfirmModal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                title="Bekräfta"
+                confirmLabel="Ta bort"
+                onConfirm={deleteEquipmentPackage}
+            >
+                Vill du verkligen ta bort utrustningspaketet {equipmentPackage.name}?
+            </ConfirmModal>
         </Layout>
     );
 };
