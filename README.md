@@ -44,7 +44,6 @@ DRIVE_ROOT_FOLDER_ID={ID of folder which contains booking folders}
 
 SLACK_BOT_TOKEN={API token for slack bot, with chat:write access}
 SLACK_CHANNEL_ID={Slack channel to post message to}
-APPLICATION_BASE_URL={Base URL of application when generating links, for example http://localhost:3000}
 NEXT_PUBLIC_BACKSTAGE2_BASE_URL={Base url of backstage 2, for example http://192.168.1.100:3000}
 ```
 
