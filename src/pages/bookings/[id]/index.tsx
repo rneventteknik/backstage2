@@ -289,16 +289,19 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     </Button>
                 ) : null}
 
-                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
-                    {booking.status !== Status.CANCELED ? (
-                        <Dropdown.Item onClick={() => setShowCancelModal(true)}>
-                            <FontAwesomeIcon icon={faTimesCircle} className="mr-1" /> Ställ in bokningen
+                {!readonly ? (
+                    <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                        {booking.status !== Status.CANCELED && booking.status !== Status.DONE ? (
+                            <Dropdown.Item onClick={() => setShowCancelModal(true)}>
+                                <FontAwesomeIcon icon={faTimesCircle} className="mr-1" /> Ställ in bokningen
+                            </Dropdown.Item>
+                        ) : null}
+                        <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
+                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort bokningen
                         </Dropdown.Item>
-                    ) : null}
-                    <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort bokningen
-                    </Dropdown.Item>
-                </DropdownButton>
+                    </DropdownButton>
+                ) : null}
+
                 <ConfirmModal
                     show={showCancelModal}
                     onHide={() => setShowCancelModal(false)}
