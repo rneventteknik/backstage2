@@ -482,6 +482,9 @@ export const toggleHideListEntry = (
     saveListEntry({ ...entry, isHidden: !entry.isHidden });
 };
 
+export const getDefaultEquipmentListName = (language: Language) =>
+    language === Language.EN ? 'Equipment' : 'Utrustning';
+
 // Functions to call the API
 //
 

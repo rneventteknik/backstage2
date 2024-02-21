@@ -57,7 +57,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
-                    <Link href={'/users/' + user.id + '/edit'} passHref>
+                    <Link href={'/users/' + user.id + '/edit'} passHref legacyBehavior>
                         <Button variant="primary" href={'/users/' + user.id + '/edit'}>
                             <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>
@@ -148,9 +148,9 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                     <ListGroup.Item>
                                         <div className="mb-1">Adress</div>
                                         <div className="text-muted">
-                                            {user.homeAddress?.split('\n').map((addressLine, i) => (
-                                                <div key={i}>{addressLine}</div>
-                                            ))}
+                                            {user.homeAddress
+                                                ?.split('\n')
+                                                .map((addressLine, i) => <div key={i}>{addressLine}</div>)}
                                         </div>
                                     </ListGroup.Item>
                                 </ListGroup>

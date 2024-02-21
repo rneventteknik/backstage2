@@ -102,9 +102,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                                     value={numberOfUnits}
                                     onChange={(e) => setNumberOfUnits(e.target.value)}
                                 />
-                                <InputGroup.Append>
-                                    <InputGroup.Text>st</InputGroup.Text>
-                                </InputGroup.Append>
+                                <InputGroup.Text>st</InputGroup.Text>
                             </InputGroup>
                             <Form.Text className="text-muted">{getDescription()}</Form.Text>
                         </Form.Group>
@@ -122,9 +120,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                                     value={numberOfHours}
                                     onChange={(e) => setNumberOfHours(e.target.value)}
                                 />
-                                <InputGroup.Append>
-                                    <InputGroup.Text>h</InputGroup.Text>
-                                </InputGroup.Append>
+                                <InputGroup.Text>h</InputGroup.Text>
                             </InputGroup>
                         </Form.Group>
                     ) : null}

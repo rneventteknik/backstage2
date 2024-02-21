@@ -49,9 +49,7 @@ export const PackingListDocument: React.FC<Props> = ({
                     <View style={styles.flexGrow}>
                         {getSortedList(booking.equipmentLists ?? [])
                             ?.filter((l) => equipmentListId === undefined || equipmentListId === l.id)
-                            .map((l) => (
-                                <EquipmentListPackingInfo list={l} booking={booking} key={l.id} />
-                            ))}
+                            .map((l) => <EquipmentListPackingInfo list={l} booking={booking} key={l.id} />)}
                     </View>
                 </MainContent>
 
