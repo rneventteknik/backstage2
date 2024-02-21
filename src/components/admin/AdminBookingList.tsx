@@ -48,7 +48,7 @@ const AdminBookingList: React.FC<Props> = ({
 }: Props) => {
     // Table display functions
     //
-    const getRentalStatusString = (booking: BookingViewModel): string | number | Date => {
+    const getRentalStatusString = (booking: BookingViewModel): string => {
         if (booking.equipmentLists?.every((l) => l.rentalStatus === RentalStatus.RETURNED)) {
             return 'Återlämnad';
         }

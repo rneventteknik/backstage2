@@ -27,7 +27,7 @@ export type TableConfiguration<T extends HasId | HasStringId> = {
     columns: {
         key: string;
         displayName: string;
-        getValue: (entity: T) => string | number | Date;
+        getValue: (entity: T) => string | number;
         getHeadingValue?: (entity: T) => string | null;
         getContentOverride?: null | ((entity: T) => React.ReactElement | string);
         getHeadingContentOverride?: null | ((value: string | null) => React.ReactElement | string);
@@ -70,8 +70,8 @@ export const TableDisplay = <T extends HasId | HasStringId>({
         configuration.customSortFn
             ? SortDirection.Custom
             : configuration.defaultSortAscending
-            ? SortDirection.Ascending
-            : SortDirection.Descending,
+              ? SortDirection.Ascending
+              : SortDirection.Descending,
     );
     const [storedFilterString, setFilterString] = React.useState<string>('');
     const [viewCount, setViewCount] = React.useState(200);
@@ -260,14 +260,16 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                             />
                         ) : (
                             <tr key={'heading-' + x.heading} className={styles.headingRow}>
-                                {configuration.statusColumns?.map((p) => (
-                                    <td key={p.key} className={'p-0'}></td>
-                                ))}
+                                {configuration.statusColumns?.map((p) => <td key={p.key} className={'p-0'}></td>)}
                                 <td
                                     colSpan={configuration.columns.length + (configuration.statusColumns?.length ?? 0)}
                                     className="pt-4"
                                 >
-                                    {x.contentOverride === null ? <strong>{x.heading}</strong> : x.contentOverride}
+                                    {x.contentOverride === null ? (
+                                        <strong>{x.heading?.toString()}</strong>
+                                    ) : (
+                                        x.contentOverride
+                                    )}
                                 </td>
                             </tr>
                         ),
@@ -423,7 +425,7 @@ const TableRow = <T extends HasId | HasStringId>({
                             ' align-middle'
                         }
                     >
-                        {p.getContentOverride ? p.getContentOverride(entity) : p.getValue(entity)}
+                        {p.getContentOverride ? p.getContentOverride(entity) : p.getValue(entity).toString()}
                     </td>
                 ))}
             </tr>

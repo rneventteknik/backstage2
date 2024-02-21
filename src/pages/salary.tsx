@@ -114,7 +114,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         </>
     );
 
-    const getSalaryStatusString = (salaryGroup: SalaryGroup): string | number | Date => {
+    const getSalaryStatusString = (salaryGroup: SalaryGroup): string => {
         if (salaryGroup.bookings?.every((b) => b.salaryStatus === SalaryStatus.SENT)) {
             return 'Skickad';
         }

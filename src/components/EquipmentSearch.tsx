@@ -132,9 +132,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 </div>
                 <div>
                     <small>
-                        {typedEntity.tags?.map((x) => (
-                            <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
-                        ))}
+                        {typedEntity.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
                     </small>
                 </div>
             </>
