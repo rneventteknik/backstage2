@@ -18,6 +18,7 @@ import {
     faClock,
     faPlus,
     faGears,
+    faClone,
 } from '@fortawesome/free-solid-svg-icons';
 import {
     addVAT,
@@ -37,6 +38,8 @@ import {
 } from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from './TimeEstimateAddButton';
 import TimeEstimateModal from './TimeEstimateModal';
+import { addTimeEstimateApiCall } from '../../../lib/equipmentListUtils';
+import ConfirmModal from '../../utils/ConfirmModal';
 
 type Props = {
     bookingId: number;
@@ -50,6 +53,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
 
     const [timeEstimateToEditViewModel, setTimeEstimateToEditViewModel] = useState<Partial<TimeEstimate> | null>(null);
     const [showContent, setShowContent] = useState(false);
+    const [timeEstimateToDelete, setTimeEstimateToDelete] = useState<TimeEstimate | null>(null);
 
     const { showSaveSuccessNotification, showSaveFailedNotification, showDeleteFailedNotification } =
         useNotifications();
@@ -137,6 +141,17 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
             });
     };
 
+    const duplicateTimeEstimate = (timeEstimate: TimeEstimate) => {
+        const timeEstimateToSend: ITimeEstimateObjectionModel = {
+            bookingId: booking.id,
+            numberOfHours: timeEstimate?.numberOfHours,
+            pricePerHour: timeEstimate?.pricePerHour,
+            name: timeEstimate?.name,
+            sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
+        };
+        addTimeEstimateApiCall(timeEstimateToSend, booking.id).then((timeEstimate) => onAdd(timeEstimate));
+    };
+
     const TimeEstimateNameDisplayFn = (timeEstimate: TimeEstimate) => (
         <DoubleClickToEdit
             value={timeEstimate.name}
@@ -199,8 +214,11 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                             <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
                         </Dropdown.Item>
                         <Dropdown.Divider />
-                        <Dropdown.Item onClick={() => deleteTimeEstimate(entry)} className="text-danger">
+                        <Dropdown.Item onClick={() => setTimeEstimateToDelete(entry)} className="text-danger">
                             <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                        </Dropdown.Item>
+                        <Dropdown.Item onClick={() => duplicateTimeEstimate(entry)}>
+                            <FontAwesomeIcon icon={faClone} className="mr-1 fa-fw" /> Duplicera
                         </Dropdown.Item>
                     </>
                 ) : null}
@@ -288,7 +306,6 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                         <TimeEstimateAddButton
                             booking={booking}
                             disabled={readonly}
-                            sortIndex={getNextSortIndex(timeEstimates)}
                             onAdd={onAdd}
                             variant="secondary"
                             size="sm"
@@ -325,6 +342,23 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                 }}
                 showWizard={false}
             ></TimeEstimateModal>
+            <ConfirmModal
+                show={timeEstimateToDelete !== null}
+                onHide={() => setTimeEstimateToDelete(null)}
+                onConfirm={() => {
+                    if (!timeEstimateToDelete) {
+                        throw new Error('Invalid state');
+                    }
+
+                    deleteTimeEstimate(timeEstimateToDelete);
+                    setTimeEstimateToDelete(null);
+                }}
+                title="Bekräfta"
+                confirmLabel="Ta bort"
+                confirmButtonType="danger"
+            >
+                Är du säker på att du vill ta bort tidsestimatet {timeEstimateToDelete?.name}?
+            </ConfirmModal>
         </Card>
     );
 };
