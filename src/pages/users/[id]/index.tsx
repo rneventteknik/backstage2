@@ -13,7 +13,7 @@ import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { bookingsFetcher, userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faStopwatch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TinyBookingTable from '../../../components/TinyBookingTable';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
@@ -63,6 +63,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         </Button>
                     </Link>
                 </IfAdmin>
+                <Link href={'/users/' + user.id + '/time-reports'} passHref>
+                    <Button variant="secondary" href={'/users/' + user.id + '/time-reports'}>
+                        <FontAwesomeIcon icon={faStopwatch} className="mr-1" /> Visa tidrapporter
+                    </Button>
+                </Link>
             </Header>
 
             <Row className="mb-3">
