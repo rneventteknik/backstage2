@@ -2,7 +2,7 @@
     "name": "backstage2",
     "version": "1.6.1-plum",
     "engines": {
-        "yarn": "^1.0.0",
+        "yarn": "^4.1.0",
         "node": "^18.0.0"
     },
     "scripts": {
@@ -93,5 +93,6 @@
     },
     "resolutions": {
         "strip-ansi": "6.0.1"
-    }
+    },
+    "packageManager": "yarn@4.1.0"
 }
