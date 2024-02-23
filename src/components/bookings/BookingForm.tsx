@@ -99,8 +99,8 @@ const BookingForm: React.FC<Props> = ({
             invoiceHogiaId: !!replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId'))
                 ? parseInt(replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId')) ?? '0')
                 : isNewBooking
-                ? undefined
-                : null,
+                  ? undefined
+                  : null,
             invoiceAddress: getValueFromForm('invoiceAddress'),
             invoiceTag: getValueFromForm('invoiceTag'),
             invoiceNumber: getValueFromForm('invoiceNumber'),

@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { Modal, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { Modal, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { usersFetcher } from '../../../lib/fetchers';
 import { toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
@@ -80,7 +80,7 @@ const TimeReportModal: React.FC<Props> = ({
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit} id={formId}>
-                    <Row>
+                    <Form.Row>
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>
@@ -141,9 +141,9 @@ const TimeReportModal: React.FC<Props> = ({
                                 />
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
                     <hr />
-                    <Row>
+                    <Form.Row>
                         <Col md={4} xs={6}>
                             <Form.Group>
                                 <Form.Label>
@@ -163,9 +163,7 @@ const TimeReportModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>kr/h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>kr/h</InputGroup.Text>
                                 </InputGroup>
                                 <PriceWithVATPreview price={timeReport?.pricePerHour} />
                                 {timeReport?.pricePerHour !== defaultLaborHourlyRate ? (
@@ -192,9 +190,7 @@ const TimeReportModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                                 <Form.Text className="text-muted">
                                     Lämna fältet tomt för att beräknas från datum och tid.
@@ -217,9 +213,7 @@ const TimeReportModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                                 <Form.Text className="text-muted">
                                     Lämna fältet tomt för att beräknas från datum och tid.
@@ -253,7 +247,7 @@ const TimeReportModal: React.FC<Props> = ({
                                 </Form.Control>
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
                     <span className="text-muted">
                         Tidrapporter används för att fakturera kunden för arbetad tid. Vill du skapa en prisuppskattning
                         med personalkostnad i, använd tidsestimat istället.

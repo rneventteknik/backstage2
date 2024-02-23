@@ -115,7 +115,7 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
         <>{invoiceGroup.created ? formatDatetime(invoiceGroup.created) : '-'}</>
     );
 
-    const getPaymentStatusString = (invoiceGroup: InvoiceGroup): string | number | Date => {
+    const getPaymentStatusString = (invoiceGroup: InvoiceGroup): string => {
         if (
             invoiceGroup.bookings?.every(
                 (b) =>

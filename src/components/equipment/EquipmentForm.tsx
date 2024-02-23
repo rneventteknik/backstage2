@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Col, Form } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Equipment, EquipmentTag } from '../../models/interfaces';
 import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../models/objection-models';
@@ -99,7 +99,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
-            <Row>
+            <Form.Row>
                 <Col lg="6">
                     <Form.Group controlId="formName">
                         <Form.Label>Namn</Form.Label>
@@ -123,11 +123,11 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         />
                     </Form.Group>
                 </Col>
-            </Row>
+            </Form.Row>
 
             <h2 className="h5 mt-4">Översättningar</h2>
             <hr />
-            <Row>
+            <Form.Row>
                 <Col lg="6">
                     <Form.Group controlId="formNameEN">
                         <Form.Label>Namn (engelska)</Form.Label>
@@ -151,23 +151,23 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         />
                     </Form.Group>
                 </Col>
-            </Row>
+            </Form.Row>
 
             {!equipment ? null : (
                 <>
                     <h2 className="h5 mt-4">Prissättning</h2>
                     <hr />
-                    <Row>
+                    <Form.Row>
                         <Col lg="12">
                             <Form.Group controlId="formPrices">
                                 <PricesEditor prices={prices} onChange={setPrices} />
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
 
                     <h2 className="h5 mt-4">Övriga inställningar</h2>
                     <hr />
-                    <Row>
+                    <Form.Row>
                         <Col lg="6">
                             <Form.Group>
                                 <Form.Label>Söktermer</Form.Label>
@@ -279,7 +279,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 />
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
                 </>
             )}
         </Form>

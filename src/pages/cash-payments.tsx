@@ -285,7 +285,7 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
                             <UserDisplay user={currentUser} />
                         </Dropdown.Item>
                         <IfNotCashPaymentManager currentUser={currentUser}>
-                            <Link href={'/'} passHref>
+                            <Link href={'/'} passHref legacyBehavior>
                                 <Dropdown.Item href={'/'}>Tillbaka till Backstage2</Dropdown.Item>
                             </Link>
                         </IfNotCashPaymentManager>

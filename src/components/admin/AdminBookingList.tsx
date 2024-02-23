@@ -48,7 +48,7 @@ const AdminBookingList: React.FC<Props> = ({
 }: Props) => {
     // Table display functions
     //
-    const getRentalStatusString = (booking: BookingViewModel): string | number | Date => {
+    const getRentalStatusString = (booking: BookingViewModel): string => {
         if (booking.equipmentLists?.every((l) => l.rentalStatus === RentalStatus.RETURNED)) {
             return 'Återlämnad';
         }
@@ -130,7 +130,7 @@ const AdminBookingList: React.FC<Props> = ({
                         overlay={
                             <Tooltip id="1">
                                 <strong>
-                                    Denna bokning har både fast pris och tidsrapporter. Detta stödjs inte av Stage
+                                    Denna bokning har både fast pris och tidrapporter. Detta stödjs inte av Stage
                                     fakturaexporter och bokningen behöver därför faktureras manuellt.
                                 </strong>
                             </Tooltip>

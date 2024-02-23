@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Modal, Row, Col, Form, InputGroup, Button, Card } from 'react-bootstrap';
+import { Modal, Col, Form, InputGroup, Button, Card } from 'react-bootstrap';
 import { toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import RequiredIndicator from '../../utils/RequiredIndicator';
@@ -164,7 +164,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                 ) : null}
 
                 <Form onSubmit={handleSubmit} id={formId}>
-                    <Row>
+                    <Form.Row>
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>
@@ -204,9 +204,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                             </Form.Group>
                         </Col>
@@ -229,9 +227,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>kr/h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>kr/h</InputGroup.Text>
                                 </InputGroup>
                                 <PriceWithVATPreview price={timeEstimate?.pricePerHour} />
                                 {timeEstimate?.pricePerHour !== defaultLaborHourlyRate ? (
@@ -242,7 +238,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 ) : null}
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
                 </Form>
             </Modal.Body>
             <Modal.Footer>

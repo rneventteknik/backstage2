@@ -376,22 +376,9 @@ export const calculateSalary = (
             throw new Error('Invalid data, user information is mandatory');
         }
 
-        const salaryLines = timeReportByUser.map((x) => {
-            const hourlyWageRatio = x.booking.pricePlan === PricePlan.THS ? wageRatioThs : wageRatioExternal;
-            const hourlyWage = Math.floor(x.pricePerHour * hourlyWageRatio);
-
-            return {
-                timeReportId: x.id,
-                dimension1: rs,
-                date: formatDateForForm(x?.startDatetime),
-                name: x.name
-                    ? `${x.booking.customerName} - ${x.booking.name} (${x.name})`
-                    : `${x.booking.customerName} - ${x.booking.name}`,
-                hours: x.billableWorkingHours,
-                hourlyRate: hourlyWage,
-                sum: x.billableWorkingHours * hourlyWage,
-            };
-        });
+        const salaryLines = timeReportByUser.map((x) =>
+            getSalaryForTimeReport(x, x.booking, rs, wageRatioExternal, wageRatioThs),
+        );
 
         salaryReportSections.push({
             userId: userId,
@@ -402,4 +389,27 @@ export const calculateSalary = (
     }
 
     return salaryReportSections;
+};
+
+export const getSalaryForTimeReport = (
+    x: TimeReport,
+    booking: Booking,
+    rs: string,
+    wageRatioExternal: number,
+    wageRatioThs: number,
+) => {
+    const hourlyWageRatio = booking.pricePlan === PricePlan.THS ? wageRatioThs : wageRatioExternal;
+    const hourlyWage = Math.floor(x.pricePerHour * hourlyWageRatio);
+
+    return {
+        timeReportId: x.id,
+        dimension1: rs,
+        date: formatDateForForm(x?.startDatetime),
+        name: x.name
+            ? `${booking.customerName} - ${booking.name} (${x.name})`
+            : `${booking.customerName} - ${booking.name}`,
+        hours: x.billableWorkingHours,
+        hourlyRate: hourlyWage,
+        sum: x.billableWorkingHours * hourlyWage,
+    };
 };

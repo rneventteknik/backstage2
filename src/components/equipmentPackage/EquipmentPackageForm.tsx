@@ -74,9 +74,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                     equipmentPackageEntry.numberOfUnits = parseInt(e.target.value);
                 }}
             />
-            <InputGroup.Append>
-                <InputGroup.Text>st</InputGroup.Text>
-            </InputGroup.Append>
+            <InputGroup.Text>st</InputGroup.Text>
         </InputGroup>
     );
 
@@ -91,9 +89,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                     equipmentPackageEntry.numberOfHours = parseInt(e.target.value);
                 }}
             />
-            <InputGroup.Append>
-                <InputGroup.Text>h</InputGroup.Text>
-            </InputGroup.Append>
+            <InputGroup.Text>h</InputGroup.Text>
         </InputGroup>
     );
 

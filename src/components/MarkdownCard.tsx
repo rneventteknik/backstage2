@@ -42,14 +42,16 @@ const MarkdownCard: React.FC<Props> = ({ text, onSubmit, cardTitle, editModelTit
                     </Card.Body>
                 ) : null}
             </Card>
-            <EditTextModal
-                text={text}
-                onSubmit={onSubmit}
-                hide={() => setShowEditTextModal(false)}
-                show={showEditTextModal}
-                modalTitle={editModelTitle ?? 'Redigera'}
-                modalConfirmText={'Spara'}
-            />
+            {showEditTextModal ? (
+                <EditTextModal
+                    text={text}
+                    onSubmit={onSubmit}
+                    hide={() => setShowEditTextModal(false)}
+                    show={showEditTextModal}
+                    modalTitle={editModelTitle ?? 'Redigera'}
+                    modalConfirmText={'Spara'}
+                />
+            ) : null}
         </>
     );
 };

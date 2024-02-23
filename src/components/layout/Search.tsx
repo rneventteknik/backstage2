@@ -135,9 +135,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     return (
                         <small>
                             <SplitHighlighter search={highlightText} textToHighlight={equipment.nameEN} />{' '}
-                            {equipment.tags?.map((x) => (
-                                <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
-                            ))}
+                            {equipment.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
                         </small>
                     );
 
