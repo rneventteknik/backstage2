@@ -97,10 +97,10 @@ export const getBookingTypeName = (bookingType: BookingType): string => {
 export const getSalaryStatusName = (salaryStatus: SalaryStatus): string => {
     switch (salaryStatus) {
         case SalaryStatus.NOT_SENT:
-            return 'Inte skickad';
+            return 'Inte skickat';
 
         case SalaryStatus.SENT:
-            return 'Skickad';
+            return 'Skickat';
     }
 };
 
@@ -238,15 +238,18 @@ export const toIntOrUndefined = (value: string | undefined | null, forceAbsolute
 // which each contain an array of the corresponding elements form the array.
 //
 export const groupBy = <T, K extends string | number>(array: T[], keyFn: (entity: T) => K): Record<K, T[]> =>
-    array.reduce((res, entity) => {
-        if (!res.hasOwnProperty(keyFn(entity))) {
-            res[keyFn(entity)] = [];
-        }
+    array.reduce(
+        (res, entity) => {
+            if (!res.hasOwnProperty(keyFn(entity))) {
+                res[keyFn(entity)] = [];
+            }
 
-        res[keyFn(entity)].push(entity);
+            res[keyFn(entity)].push(entity);
 
-        return res;
-    }, {} as Record<K, T[]>);
+            return res;
+        },
+        {} as Record<K, T[]>,
+    );
 
 // Handle api responses in fetch calls
 //

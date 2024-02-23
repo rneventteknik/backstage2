@@ -211,14 +211,7 @@ const getUserStatistics = (bookings: BookingViewModel[]): UserStatisticViewModel
 // Page
 //
 const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const {
-        data: bookings,
-        error,
-        isValidating,
-    } = useSwr('/api/bookings', bookingsFetcher, {
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-    });
+    const { data: bookings, error } = useSwr('/api/bookings', bookingsFetcher);
 
     if (error) {
         return (
@@ -231,7 +224,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
         );
     }
 
-    if (isValidating || !bookings) {
+    if (!bookings) {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../../components/layout/Layout';
 import { Card, Form } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
@@ -19,23 +19,49 @@ import { useNotifications } from '../../lib/useNotifications';
 import { addDays, formatDateForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 import TableStyleLink from '../../components/utils/TableStyleLink';
 import { KeyValue } from '../../models/interfaces/KeyValue';
+import { useRouter } from 'next/router';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Jämför tillgänglighet';
-const breadcrumbs = [
-    { link: '/equipment', displayName: 'Utrustning' },
-    { link: '/equipment/compare-availability', displayName: pageTitle },
-];
 
 const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const defaultDate = new Date();
     defaultDate.setHours(0, 0, 0, 0);
 
     const [equipment, setEquipment] = useState<Equipment[]>([]);
+    const [primaryEquipment, setPrimaryEquipment] = useState<Equipment | null>(null);
     const [selectedDate, setSelectedDate] = useState(defaultDate);
     const { showErrorMessage } = useNotifications();
+    const router = useRouter();
+
+    // If there is an equipment id in the query, use it as the primary equipment
+    useEffect(() => {
+        if (router.query.equipmentId) {
+            fetch('/api/equipment/' + router.query.equipmentId)
+                .then((apiResponse) => getResponseContentOrError<IEquipmentObjectionModel>(apiResponse))
+                .then(toEquipment)
+                .then((equipment) => {
+                    setPrimaryEquipment(equipment);
+                })
+                .catch((error: Error) => {
+                    console.error(error);
+                });
+        }
+    }, [router.query.equipmentId]);
+
+    // Breadcrumbs differ depending on if there is a primary equipment or not
+    const breadcrumbs = primaryEquipment
+        ? [
+              { link: '/equipment', displayName: 'Utrustning' },
+              { link: '/equipment/' + router.query.equipmentId, displayName: primaryEquipment?.name },
+              { link: '/equipment/compare-availability', displayName: pageTitle },
+          ]
+        : [
+              { link: '/equipment', displayName: 'Utrustning' },
+              { link: '/equipment/compare-availability', displayName: pageTitle },
+          ];
 
     const addFromSearch = (res: SearchResultViewModel) => {
         switch (res.type) {
@@ -44,7 +70,9 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
                     .then((apiResponse) => getResponseContentOrError<IEquipmentObjectionModel>(apiResponse))
                     .then(toEquipment)
                     .then((equipment) => {
-                        setEquipment((array) => [equipment, ...array].filter(onlyUniqueById));
+                        setEquipment((array) =>
+                            [equipment, ...array].filter(onlyUniqueById).filter((x) => x.id !== primaryEquipment?.id),
+                        );
                     })
                     .catch((error: Error) => {
                         console.error(error);
@@ -63,7 +91,9 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
                                     .map((e) => e.equipment)
                                     .filter((e) => e) as Equipment[]),
                                 ...array,
-                            ].filter(onlyUniqueById),
+                            ]
+                                .filter(onlyUniqueById)
+                                .filter((x) => x.id !== primaryEquipment?.id),
                         );
                     })
                     .catch((error: Error) => {
@@ -77,7 +107,11 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
                     .then((apiResponse) => getResponseContentOrError<IEquipmentTagObjectionModel>(apiResponse))
                     .then(toEquipmentTag)
                     .then((equipmentTag) => {
-                        setEquipment((array) => [...equipmentTag.equipment, ...array].filter(onlyUniqueById));
+                        setEquipment((array) =>
+                            [...equipmentTag.equipment, ...array]
+                                .filter(onlyUniqueById)
+                                .filter((x) => x.id !== primaryEquipment?.id),
+                        );
                     })
                     .catch((error: Error) => {
                         console.error(error);
@@ -88,7 +122,10 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
     };
     return (
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
-            <Header title={pageTitle} breadcrumbs={breadcrumbs} />
+            <Header
+                title={primaryEquipment ? `${pageTitle} (${primaryEquipment.name})` : pageTitle}
+                breadcrumbs={breadcrumbs}
+            />
 
             <Card className="mb-3">
                 <Card.Header className="d-flex">
@@ -114,6 +151,20 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
                     </div>
                 </Card.Header>
                 <div className="table-responsive">
+                    {primaryEquipment ? (
+                        <EquipmentCalendarRow
+                            equipment={primaryEquipment}
+                            startDate={addDays(selectedDate, -4)}
+                            numberOfDays={9}
+                            highlightCriteria={(date) => date.getTime() === selectedDate.getTime()}
+                        >
+                            <div>
+                                <TableStyleLink href={'/equipment/' + primaryEquipment.id} target="_blank">
+                                    {primaryEquipment.name}
+                                </TableStyleLink>
+                            </div>
+                        </EquipmentCalendarRow>
+                    ) : null}
                     {equipment.map((e) => (
                         <EquipmentCalendarRow
                             equipment={e}

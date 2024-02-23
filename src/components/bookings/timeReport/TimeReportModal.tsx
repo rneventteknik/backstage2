@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { Modal, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { Modal, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { usersFetcher } from '../../../lib/fetchers';
 import { toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
@@ -17,6 +17,7 @@ type Props = {
     setTimeReport: (timeReport: Partial<TimeReport>) => void;
     defaultLaborHourlyRate: number;
     formId: string;
+    readonly?: boolean;
     onSubmit: (timeReport: ITimeReportObjectionModel) => void;
     onHide: () => void;
 };
@@ -29,6 +30,7 @@ const TimeReportModal: React.FC<Props> = ({
     defaultLaborHourlyRate,
     onSubmit,
     onHide,
+    readonly = false,
 }: Props) => {
     const { data: users } = useSwr('/api/users', usersFetcher);
 
@@ -72,11 +74,13 @@ const TimeReportModal: React.FC<Props> = ({
     return (
         <Modal show={!!timeReport} onHide={() => handleHide()} size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{timeReport?.id ? 'Redigera tidrapport' : 'Ny tidrapport'}</Modal.Title>
+                <Modal.Title>
+                    {readonly ? 'Visa tidsrapport' : timeReport?.id ? 'Redigera tidrapport' : 'Ny tidrapport'}
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit} id={formId}>
-                    <Row>
+                    <Form.Row>
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>
@@ -87,6 +91,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     type="text"
                                     required
                                     defaultValue={timeReport?.name}
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
@@ -106,6 +111,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     defaultValue={formatDatetimeForForm(timeReport?.startDatetime)}
                                     type="datetime-local"
                                     required
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
@@ -125,6 +131,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     defaultValue={formatDatetimeForForm(timeReport?.endDatetime)}
                                     type="datetime-local"
                                     required
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
@@ -134,9 +141,9 @@ const TimeReportModal: React.FC<Props> = ({
                                 />
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
                     <hr />
-                    <Row>
+                    <Form.Row>
                         <Col md={4} xs={6}>
                             <Form.Group>
                                 <Form.Label>
@@ -147,6 +154,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     <Form.Control
                                         type="text"
                                         required
+                                        readOnly={readonly}
                                         defaultValue={timeReport?.pricePerHour}
                                         onChange={(e) =>
                                             setTimeReport({
@@ -155,9 +163,7 @@ const TimeReportModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>kr/h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>kr/h</InputGroup.Text>
                                 </InputGroup>
                                 <PriceWithVATPreview price={timeReport?.pricePerHour} />
                                 {timeReport?.pricePerHour !== defaultLaborHourlyRate ? (
@@ -176,6 +182,7 @@ const TimeReportModal: React.FC<Props> = ({
                                         defaultValue={timeReport?.billableWorkingHours}
                                         placeholder={calculatedWorkingHours.toString()}
                                         type="text"
+                                        readOnly={readonly}
                                         onChange={(e) =>
                                             setTimeReport({
                                                 ...timeReport,
@@ -183,9 +190,7 @@ const TimeReportModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                                 <Form.Text className="text-muted">
                                     Lämna fältet tomt för att beräknas från datum och tid.
@@ -200,6 +205,7 @@ const TimeReportModal: React.FC<Props> = ({
                                         defaultValue={timeReport?.actualWorkingHours}
                                         placeholder={calculatedWorkingHours.toString()}
                                         type="text"
+                                        readOnly={readonly}
                                         onChange={(e) =>
                                             setTimeReport({
                                                 ...timeReport,
@@ -207,9 +213,7 @@ const TimeReportModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                                 <Form.Text className="text-muted">
                                     Lämna fältet tomt för att beräknas från datum och tid.
@@ -226,6 +230,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     as="select"
                                     defaultValue={timeReport?.userId}
                                     required
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
@@ -242,7 +247,7 @@ const TimeReportModal: React.FC<Props> = ({
                                 </Form.Control>
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
                     <span className="text-muted">
                         Tidrapporter används för att fakturera kunden för arbetad tid. Vill du skapa en prisuppskattning
                         med personalkostnad i, använd tidsestimat istället.
@@ -250,12 +255,20 @@ const TimeReportModal: React.FC<Props> = ({
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="secondary" onClick={() => handleHide()}>
-                    Avbryt
-                </Button>
-                <Button form={formId} type="submit" variant="primary">
-                    Spara
-                </Button>
+                {readonly ? (
+                    <Button variant="primary" onClick={() => handleHide()}>
+                        Stäng
+                    </Button>
+                ) : (
+                    <>
+                        <Button variant="secondary" onClick={() => handleHide()}>
+                            Avbryt
+                        </Button>
+                        <Button form={formId} type="submit" variant="primary">
+                            Spara
+                        </Button>
+                    </>
+                )}
             </Modal.Footer>
         </Modal>
     );

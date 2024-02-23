@@ -26,6 +26,7 @@ type Props = {
     nextId: number;
     nextSortIndex: number;
     globalSettings: KeyValue[];
+    readonly?: boolean;
 };
 
 type Account = {
@@ -44,6 +45,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
     nextSortIndex,
     onSave,
     globalSettings,
+    readonly = false,
 }: Props) => {
     const invoiceAccounts: Account[] = JSON.parse(getGlobalSetting('accounts.availableAccounts', globalSettings, '[]'));
     return (
@@ -60,6 +62,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                 <Form.Control
                                     type="text"
                                     value={equipmentListEntryToEditViewModel?.name}
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setEquipmentListEntryToEditViewModel({
                                             ...equipmentListEntryToEditViewModel,
@@ -77,6 +80,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         type="number"
                                         min="0"
                                         value={equipmentListEntryToEditViewModel?.numberOfUnits ?? ''}
+                                        readOnly={readonly}
                                         onChange={(e) =>
                                             setEquipmentListEntryToEditViewModel({
                                                 ...equipmentListEntryToEditViewModel,
@@ -84,9 +88,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>st</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>st</InputGroup.Text>
                                 </InputGroup>
                             </Form.Group>
                         </Col>
@@ -98,6 +100,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         type="number"
                                         min="0"
                                         value={equipmentListEntryToEditViewModel.numberOfHours ?? ''}
+                                        readOnly={readonly}
                                         onChange={(e) =>
                                             setEquipmentListEntryToEditViewModel({
                                                 ...equipmentListEntryToEditViewModel,
@@ -105,9 +108,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                             </Form.Group>
                         </Col>
@@ -120,7 +121,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
 
                                     <Form.Control
                                         as="select"
-                                        disabled={!equipmentListEntryToEditViewModel.equipment}
+                                        disabled={!equipmentListEntryToEditViewModel.equipment || readonly}
                                         defaultValue={equipmentListEntryToEditViewModel.equipmentPrice?.id}
                                         onChange={(e) => {
                                             const newEquipmentPrice =
@@ -151,7 +152,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         <Form.Control
                                             type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
                                             min="0"
-                                            disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
+                                            disabled={!!equipmentListEntryToEditViewModel.equipmentPrice || readonly}
                                             value={equipmentListEntryToEditViewModel?.pricePerUnit ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
@@ -160,9 +161,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                                 })
                                             }
                                         />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>kr/st</InputGroup.Text>
-                                        </InputGroup.Append>
+                                        <InputGroup.Text>kr/st</InputGroup.Text>
                                     </InputGroup>
                                     <PriceWithVATPreview price={equipmentListEntryToEditViewModel?.pricePerUnit} />
                                 </Form.Group>
@@ -174,7 +173,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         <Form.Control
                                             type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
                                             min="0"
-                                            disabled={!!equipmentListEntryToEditViewModel.equipmentPrice}
+                                            disabled={!!equipmentListEntryToEditViewModel.equipmentPrice || readonly}
                                             value={equipmentListEntryToEditViewModel?.pricePerHour ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
@@ -183,9 +182,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                                 })
                                             }
                                         />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>kr/h</InputGroup.Text>
-                                        </InputGroup.Append>
+                                        <InputGroup.Text>kr/h</InputGroup.Text>
                                     </InputGroup>
                                     <PriceWithVATPreview price={equipmentListEntryToEditViewModel?.pricePerHour} />
                                 </Form.Group>
@@ -201,6 +198,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         type="number"
                                         min="0"
                                         value={equipmentListEntryToEditViewModel?.discount ?? ''}
+                                        readOnly={readonly}
                                         onChange={(e) =>
                                             setEquipmentListEntryToEditViewModel({
                                                 ...equipmentListEntryToEditViewModel,
@@ -208,9 +206,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>kr</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>kr</InputGroup.Text>
                                 </InputGroup>
                                 <PriceWithVATPreview
                                     price={equipmentListEntryToEditViewModel?.discount}
@@ -226,6 +222,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     options={invoiceAccounts}
                                     defaultInputValue={equipmentListEntryToEditViewModel.account ?? ''}
                                     labelKey="accountNumber"
+                                    disabled={readonly}
                                     renderMenuItemChildren={(option) => {
                                         return (
                                             <>
@@ -261,6 +258,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                 <Form.Control
                                     as="textarea"
                                     value={equipmentListEntryToEditViewModel?.description}
+                                    readOnly={readonly}
                                     onChange={(e) =>
                                         setEquipmentListEntryToEditViewModel({
                                             ...equipmentListEntryToEditViewModel,
@@ -278,59 +276,69 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                 Den här raden är länkad till utrustningen{' '}
                                 <em>{equipmentListEntryToEditViewModel.equipment.name}</em>.{' '}
                             </span>
-                            <a
-                                href="#"
-                                className="text-danger"
-                                onClick={() =>
-                                    setEquipmentListEntryToEditViewModel({
-                                        ...equipmentListEntryToEditViewModel,
-                                        equipment: undefined,
-                                        equipmentId: undefined,
-                                        equipmentPrice: undefined,
-                                    })
-                                }
-                            >
-                                Ta bort koppling
-                            </a>
+                            {!readonly ? (
+                                <a
+                                    href="#"
+                                    className="text-danger"
+                                    onClick={() =>
+                                        setEquipmentListEntryToEditViewModel({
+                                            ...equipmentListEntryToEditViewModel,
+                                            equipment: undefined,
+                                            equipmentId: undefined,
+                                            equipmentPrice: undefined,
+                                        })
+                                    }
+                                >
+                                    Ta bort koppling
+                                </a>
+                            ) : null}
                         </p>
                     ) : null}
                 </Modal.Body>
             ) : null}
             <Modal.Footer>
-                <Button variant="secondary" onClick={() => setEquipmentListEntryToEditViewModel(null)}>
-                    Avbryt
-                </Button>
-                <Button
-                    variant="primary"
-                    disabled={!equipmentListEntryToEditViewModel?.name}
-                    onClick={() => {
-                        if (!equipmentListEntryToEditViewModel) {
-                            throw new Error('Invalid equipmentListEntryToEditViewModel');
-                        }
+                {readonly ? (
+                    <Button variant="primary" onClick={() => setEquipmentListEntryToEditViewModel(null)}>
+                        Stäng
+                    </Button>
+                ) : (
+                    <>
+                        <Button variant="secondary" onClick={() => setEquipmentListEntryToEditViewModel(null)}>
+                            Avbryt
+                        </Button>
+                        <Button
+                            variant="primary"
+                            disabled={!equipmentListEntryToEditViewModel?.name}
+                            onClick={() => {
+                                if (!equipmentListEntryToEditViewModel) {
+                                    throw new Error('Invalid equipmentListEntryToEditViewModel');
+                                }
 
-                        // Since we are editing a partial model we need to set default values to any properties without value before saving
-                        const entryToSave: EquipmentListEntry = {
-                            id: equipmentListEntryToEditViewModel.id ?? nextId,
-                            sortIndex: equipmentListEntryToEditViewModel.sortIndex ?? nextSortIndex,
-                            equipment: equipmentListEntryToEditViewModel.equipment,
-                            equipmentId: equipmentListEntryToEditViewModel.equipmentId,
-                            name: equipmentListEntryToEditViewModel.name ?? '',
-                            description: equipmentListEntryToEditViewModel.description ?? '',
-                            numberOfUnits: Math.abs(equipmentListEntryToEditViewModel.numberOfUnits ?? 1),
-                            numberOfHours: Math.abs(equipmentListEntryToEditViewModel.numberOfHours ?? 0),
-                            pricePerUnit: Math.abs(equipmentListEntryToEditViewModel.pricePerUnit ?? 0),
-                            pricePerHour: Math.abs(equipmentListEntryToEditViewModel.pricePerHour ?? 0),
-                            equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
-                            discount: Math.abs(equipmentListEntryToEditViewModel.discount ?? 0),
-                            isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
-                            account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),
-                        };
+                                // Since we are editing a partial model we need to set default values to any properties without value before saving
+                                const entryToSave: EquipmentListEntry = {
+                                    id: equipmentListEntryToEditViewModel.id ?? nextId,
+                                    sortIndex: equipmentListEntryToEditViewModel.sortIndex ?? nextSortIndex,
+                                    equipment: equipmentListEntryToEditViewModel.equipment,
+                                    equipmentId: equipmentListEntryToEditViewModel.equipmentId,
+                                    name: equipmentListEntryToEditViewModel.name ?? '',
+                                    description: equipmentListEntryToEditViewModel.description ?? '',
+                                    numberOfUnits: Math.abs(equipmentListEntryToEditViewModel.numberOfUnits ?? 1),
+                                    numberOfHours: Math.abs(equipmentListEntryToEditViewModel.numberOfHours ?? 0),
+                                    pricePerUnit: Math.abs(equipmentListEntryToEditViewModel.pricePerUnit ?? 0),
+                                    pricePerHour: Math.abs(equipmentListEntryToEditViewModel.pricePerHour ?? 0),
+                                    equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
+                                    discount: Math.abs(equipmentListEntryToEditViewModel.discount ?? 0),
+                                    isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
+                                    account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),
+                                };
 
-                        onSave(entryToSave, !equipmentListEntryToEditViewModel.id);
-                    }}
-                >
-                    Spara
-                </Button>
+                                onSave(entryToSave, !equipmentListEntryToEditViewModel.id);
+                            }}
+                        >
+                            Spara
+                        </Button>
+                    </>
+                )}
             </Modal.Footer>
         </Modal>
     );

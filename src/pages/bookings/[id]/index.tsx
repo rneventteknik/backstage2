@@ -150,7 +150,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 {!readonly ? (
                     <>
-                        <Link href={'/bookings/' + booking.id + '/edit'} passHref>
+                        <Link href={'/bookings/' + booking.id + '/edit'} passHref legacyBehavior>
                             <Button variant="primary" href={'/bookings/' + booking.id + '/edit'}>
                                 <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                             </Button>

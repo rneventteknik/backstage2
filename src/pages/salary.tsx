@@ -18,7 +18,7 @@ import { PartialDeep } from 'type-fest';
 import { useNotifications } from '../lib/useNotifications';
 import { getResponseContentOrError } from '../lib/utils';
 import DoneIcon from '../components/utils/DoneIcon';
-import { formatDatetime } from '../lib/datetimeUtils';
+import { formatDatetime, formatDatetimeForForm } from '../lib/datetimeUtils';
 import CreateSalaryGroupModal from '../components/salaries/CreateSalaryGroupModal';
 import ViewSalaryGroupModal from '../components/salaries/ViewSalaryGroupModal';
 import { KeyValue } from '../models/interfaces/KeyValue';
@@ -27,14 +27,13 @@ import { SalaryStatus } from '../models/enums/SalaryStatus';
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
-const pageTitle = 'Löneunderlag';
+const pageTitle = 'Timarvodesunderlag';
 const breadcrumbs = [{ link: '/salary/', displayName: pageTitle }];
 
 const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const {
         data: salaryGroups,
         error,
-        isValidating,
         mutate,
     } = useSwr('/api/salaryGroups', salaryGroupsFetcher, { revalidateOnFocus: false, revalidateOnReconnect: false });
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -52,7 +51,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         );
     }
 
-    if ((isValidating || !salaryGroups) && salaryGroupToViewId === null) {
+    if (!salaryGroups && salaryGroupToViewId === null) {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
@@ -69,14 +68,14 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             .then((apiResponse) => getResponseContentOrError<ISalaryGroupObjectionModel>(apiResponse))
             .then((data) => {
                 mutate();
-                showCreateSuccessNotification('Löneunderlagsgruppen');
+                showCreateSuccessNotification('Timarvodesunderlagsgruppen');
                 if (data.id) {
                     setSalaryGroupToViewId(data.id);
                 }
             })
             .catch((error: Error) => {
                 console.error(error);
-                showCreateFailedNotification('Löneunderlagsgruppen');
+                showCreateFailedNotification('Timarvodesunderlagsgruppen');
             });
     };
 
@@ -98,6 +97,10 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         </>
     );
 
+    const createdDisplayFn = (salaryGroup: SalaryGroup) => (
+        <>{salaryGroup.created ? formatDatetime(salaryGroup.created) : '-'}</>
+    );
+
     const salaryGroupActionsDisplayFn = (salaryGroup: SalaryGroup) => (
         <>
             <Button
@@ -111,7 +114,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         </>
     );
 
-    const getSalaryStatusString = (salaryGroup: SalaryGroup): string | number | Date => {
+    const getSalaryStatusString = (salaryGroup: SalaryGroup): string => {
         if (salaryGroup.bookings?.every((b) => b.salaryStatus === SalaryStatus.SENT)) {
             return 'Skickad';
         }
@@ -124,13 +127,13 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
     };
 
     const tableSettings: TableConfiguration<SalaryGroup> = {
-        entityTypeDisplayName: 'Löneunderlagsgrupper',
+        entityTypeDisplayName: 'Timarvodesunderlagsgrupper',
         defaultSortPropertyName: 'created',
         defaultSortAscending: false,
         columns: [
             {
                 key: 'name',
-                displayName: 'Löneunderlagsgrupp',
+                displayName: 'Timarvodesunderlagsgrupp',
                 getValue: (salaryGroup: SalaryGroup) => salaryGroup.name,
                 textTruncation: true,
                 getContentOverride: salaryGroupNameDisplayFn,
@@ -154,7 +157,8 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                 key: 'created',
                 displayName: 'Skapad',
                 getValue: (salaryGroup: SalaryGroup) =>
-                    salaryGroup.created ? formatDatetime(salaryGroup.created) : '-',
+                    salaryGroup.created ? formatDatetimeForForm(salaryGroup.created) : '-',
+                getContentOverride: createdDisplayFn,
                 textTruncation: true,
                 cellHideSize: 'xl',
                 columnWidth: 170,
@@ -175,7 +179,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button onClick={() => setShowCreateModal(true)}>
-                    <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Löneunderlagsgrupp
+                    <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Timarvodesunderlagsgrupp
                 </Button>
             </Header>
             <TableDisplay entities={salaryGroups ?? []} configuration={{ ...tableSettings }} />

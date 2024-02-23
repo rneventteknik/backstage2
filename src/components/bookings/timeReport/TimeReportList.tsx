@@ -40,6 +40,7 @@ import {
 import { formatDatetime, toBookingViewModel } from '../../../lib/datetimeUtils';
 import TimeReportAddButton from './TimeReportAddButton';
 import TimeReportModal from './TimeReportModal';
+import TimeReportHourDisplay from '../../utils/TimeReportHourDisplay';
 
 type Props = {
     bookingId: number;
@@ -84,7 +85,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 </Card.Header>
                 <Card.Body>
                     <p className="text-danger">
-                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsrapporterna.
+                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidrapporterna.
                     </p>
                     <p className="text-monospace text-muted mb-0">{error?.message}</p>
                 </Card.Body>
@@ -189,23 +190,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             size="sm"
             readonly={readonly}
         >
-            {isNaN(timeReport.billableWorkingHours) ? (
-                <span className="text-muted font-italic">Dubbelklicka för att lägga till en tid</span>
-            ) : (
-                timeReport.billableWorkingHours + ' h'
-            )}
-            {timeReport.actualWorkingHours !== timeReport.billableWorkingHours ? (
-                <OverlayTrigger
-                    overlay={
-                        <Tooltip id="1">
-                            Antalet fakturerade timmar ({timeReport.billableWorkingHours} h) skiljer sig från antalet
-                            arbetade timmar ({timeReport.actualWorkingHours} h).
-                        </Tooltip>
-                    }
-                >
-                    <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
-                </OverlayTrigger>
-            ) : null}
+            <TimeReportHourDisplay timeReport={timeReport} />
         </DoubleClickToEdit>
     );
 
@@ -236,25 +221,30 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
     );
 
     const TimeReportEntryActionsDisplayFn = (entry: TimeReport) => (
-        <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
-            <Dropdown.Item
-                onClick={() => updateTimeReports(...moveItemUp(timeReports, entry))}
-                disabled={isFirst(timeReports, entry)}
-            >
-                <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
-            </Dropdown.Item>
-            <Dropdown.Item
-                onClick={() => updateTimeReports(...moveItemDown(timeReports, entry))}
-                disabled={isLast(timeReports, entry)}
-            >
-                <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
-            </Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Item onClick={() => deleteTimeReport(entry)} className="text-danger">
-                <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
-            </Dropdown.Item>
+        <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
+            {!readonly ? (
+                <>
+                    <Dropdown.Item
+                        onClick={() => updateTimeReports(...moveItemUp(timeReports, entry))}
+                        disabled={isFirst(timeReports, entry)}
+                    >
+                        <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+                    </Dropdown.Item>
+                    <Dropdown.Item
+                        onClick={() => updateTimeReports(...moveItemDown(timeReports, entry))}
+                        disabled={isLast(timeReports, entry)}
+                    >
+                        <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={() => deleteTimeReport(entry)} className="text-danger">
+                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                    </Dropdown.Item>
+                </>
+            ) : null}
             <Dropdown.Item onClick={() => setTimeReportToEditViewModel(entry)}>
-                <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
+                <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" />{' '}
+                {readonly ? 'Visa detaljer' : 'Avancerad redigering'}
             </Dropdown.Item>
         </DropdownButton>
     );
@@ -389,6 +379,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 defaultLaborHourlyRate={defaultLaborHourlyRate}
                 setTimeReport={setTimeReportToEditViewModel}
                 timeReport={timeReportToEditViewModel ?? undefined}
+                readonly={readonly}
                 onHide={() => {
                     setTimeReportToEditViewModel(null);
                 }}

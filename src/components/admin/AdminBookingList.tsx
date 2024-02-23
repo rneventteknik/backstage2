@@ -23,6 +23,7 @@ import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
 import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
 import TableStyleLink from '../utils/TableStyleLink';
 import { getBookingDateHeadingValue } from '../../lib/datetimeUtils';
+import { addVAT, formatNumberAsCurrency, getBookingPrice } from '../../lib/pricingUtils';
 
 type Props = {
     bookings: BookingViewModel[];
@@ -47,7 +48,7 @@ const AdminBookingList: React.FC<Props> = ({
 }: Props) => {
     // Table display functions
     //
-    const getRentalStatusString = (booking: BookingViewModel): string | number | Date => {
+    const getRentalStatusString = (booking: BookingViewModel): string => {
         if (booking.equipmentLists?.every((l) => l.rentalStatus === RentalStatus.RETURNED)) {
             return 'Återlämnad';
         }
@@ -129,7 +130,7 @@ const AdminBookingList: React.FC<Props> = ({
                         overlay={
                             <Tooltip id="1">
                                 <strong>
-                                    Denna bokning har både fast pris och tidsrapporter. Detta stödjs inte av Stage
+                                    Denna bokning har både fast pris och tidrapporter. Detta stödjs inte av Stage
                                     fakturaexporter och bokningen behöver därför faktureras manuellt.
                                 </strong>
                             </Tooltip>
@@ -143,6 +144,7 @@ const AdminBookingList: React.FC<Props> = ({
                 <p className="text-muted mb-0">{booking.ownerUser?.name ?? '-'}</p>
                 <p className="text-muted mb-0 d-lg-none">{replaceEmptyStringWithNull(booking.invoiceNumber) ?? '-'}</p>
                 <p className="text-muted mb-0 d-lg-none">{booking.displayUsageStartString ?? '-'}</p>
+                <p className="text-muted mb-0">{formatNumberAsCurrency(addVAT(getBookingPrice(booking)))}</p>
             </>
         );
     };
@@ -192,9 +194,7 @@ const AdminBookingList: React.FC<Props> = ({
     const bookingSalaryStatusIsDone = (booking: BookingViewModel) => booking.salaryStatus === SalaryStatus.SENT;
     const bookingSalaryStatusDisplayFn = (booking: BookingViewModel) => (
         <>
-            {hasBillableTimeReportHours(booking) ||
-            booking.status !== Status.CANCELED ||
-            booking.salaryStatus !== SalaryStatus.NOT_SENT
+            {hasBillableTimeReportHours(booking) || booking.salaryStatus !== SalaryStatus.NOT_SENT
                 ? getSalaryStatusName(booking.salaryStatus)
                 : '-'}
             {bookingSalaryStatusIsDone(booking) ? <DoneIcon /> : null}
@@ -327,11 +327,11 @@ const AdminBookingList: React.FC<Props> = ({
             },
             {
                 key: 'salaryStatus',
-                displayName: 'Lönestatus',
+                displayName: 'Timarvodesstatus',
                 getValue: (booking: BookingViewModel) => getSalaryStatusName(booking.salaryStatus),
                 textAlignment: 'left',
                 cellHideSize: 'xl',
-                columnWidth: 110,
+                columnWidth: 130,
                 getContentOverride: bookingSalaryStatusDisplayFn,
             },
         ],

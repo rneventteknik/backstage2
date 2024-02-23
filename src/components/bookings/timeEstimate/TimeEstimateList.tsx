@@ -79,7 +79,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                 </Card.Header>
                 <Card.Body>
                     <p className="text-danger">
-                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsrapporterna.
+                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsestimaten.
                     </p>
                     <p className="text-monospace text-muted mb-0">{error?.message}</p>
                 </Card.Body>
@@ -183,25 +183,30 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
 
     const TimeEstimateEntryActionsDisplayFn = (entry: TimeEstimate) => {
         return (
-            <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm" disabled={readonly}>
-                <Dropdown.Item
-                    onClick={() => updateTimeEstimates(...moveItemUp(timeEstimates, entry))}
-                    disabled={isFirst(timeEstimates, entry)}
-                >
-                    <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
-                </Dropdown.Item>
-                <Dropdown.Item
-                    onClick={() => updateTimeEstimates(...moveItemDown(timeEstimates, entry))}
-                    disabled={isLast(timeEstimates, entry)}
-                >
-                    <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
-                </Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item onClick={() => deleteTimeEstimate(entry)} className="text-danger">
-                    <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
-                </Dropdown.Item>
+            <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
+                {!readonly ? (
+                    <>
+                        <Dropdown.Item
+                            onClick={() => updateTimeEstimates(...moveItemUp(timeEstimates, entry))}
+                            disabled={isFirst(timeEstimates, entry)}
+                        >
+                            <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            onClick={() => updateTimeEstimates(...moveItemDown(timeEstimates, entry))}
+                            disabled={isLast(timeEstimates, entry)}
+                        >
+                            <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+                        </Dropdown.Item>
+                        <Dropdown.Divider />
+                        <Dropdown.Item onClick={() => deleteTimeEstimate(entry)} className="text-danger">
+                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                        </Dropdown.Item>
+                    </>
+                ) : null}
                 <Dropdown.Item onClick={() => setTimeEstimateToEditViewModel(entry)}>
-                    <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
+                    <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" />{' '}
+                    {readonly ? 'Visa detaljer' : 'Avancerad redigering'}
                 </Dropdown.Item>
             </DropdownButton>
         );
@@ -303,6 +308,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                 onHide={() => {
                     setTimeEstimateToEditViewModel(null);
                 }}
+                readonly={readonly}
                 onSubmit={() => {
                     if (timeEstimateToEditViewModel?.id) {
                         const timeEstimateToSend: TimeEstimate = {

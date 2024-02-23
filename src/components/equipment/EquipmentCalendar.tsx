@@ -1,7 +1,7 @@
-import { faCheck, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarXmark, faCheck, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { ReactNode, useState } from 'react';
-import { Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { addDays, formatDate, formatWeekDay, getWeekNumber } from '../../lib/datetimeUtils';
@@ -10,6 +10,7 @@ import { getMaximumNumberOfUnitUsed } from '../../lib/utils';
 import { Status } from '../../models/enums/Status';
 import { Equipment } from '../../models/interfaces';
 import styles from './EquipmentCalendar.module.scss';
+import Link from 'next/link';
 
 type Props = {
     equipment: Equipment;
@@ -60,6 +61,19 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                                     </option>
                                 ))}
                             </Form.Control>
+                        </div>
+                        <div>
+                            <Link href={'/equipment/compare-availability/?equipmentId=' + equipment.id} passHref>
+                                <Button
+                                    href={'/equipment/compare-availability/?equipmentId=' + equipment.id}
+                                    size="sm"
+                                    variant="secondary"
+                                    className="ml-2"
+                                >
+                                    <FontAwesomeIcon icon={faCalendarXmark} className="mr-1 fa-fw" /> Jämför
+                                    tillgänglighet
+                                </Button>
+                            </Link>
                         </div>
                     </div>
                 </Card.Header>
