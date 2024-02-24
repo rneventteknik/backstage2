@@ -22,8 +22,6 @@ Our package manager of choice is [`yarn`](https://yarnpkg.com/). After cloning t
 
 `yarn lint` will run _eslint_ on all relevant files and fix any problems it knows how to fix automatically.
 
-`yarn test` will run all cypress tests. This requires a server to be running at `localhost:3000` with a fresh seed. Make sure to run `yarn seed` before.
-
 ### Environment Variables
 
 A few environment variables are needed to get this app to run. To configure these, the file `.env.local` can be added to this folder. It should contain the following:
