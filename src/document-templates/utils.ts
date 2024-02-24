@@ -121,7 +121,7 @@ export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, 
 };
 
 export const formatEquipmentListEntryPriceWithVAT = (entry: PricedEntity, t: (t: string) => string) =>
-    formatPrice(addVATToPrice(entry), t('common.misc.hours-unit'), t('common.misc.count-unit-single'));
+    formatPrice(addVATToPrice(entry), true, t('common.misc.hours-unit'), t('common.misc.count-unit-single'));
 
 export const allListsAreOneDay = (booking: Booking) =>
     booking.equipmentLists &&

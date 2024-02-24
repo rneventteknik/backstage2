@@ -93,6 +93,15 @@ export const getPeersOfViewModel = (viewModel: EquipmentListEntityViewModel, lis
 //
 
 export const getEquipmentListEntryPrices = (equipmentPrice: EquipmentPrice, pricePlan: PricePlan) => {
+    if (equipmentPrice.id < 0) {
+        return {
+            pricePerHour:
+                (pricePlan === PricePlan.EXTERNAL ? equipmentPrice?.pricePerHour : equipmentPrice?.pricePerHourTHS) ?? 0,
+            pricePerUnit:
+                (pricePlan === PricePlan.EXTERNAL ? equipmentPrice?.pricePerUnit : equipmentPrice?.pricePerUnitTHS) ?? 0,
+            equipmentPrice: null
+        };
+    }
     return {
         pricePerHour:
             (pricePlan === PricePlan.EXTERNAL ? equipmentPrice?.pricePerHour : equipmentPrice?.pricePerHourTHS) ?? 0,

@@ -36,7 +36,7 @@ export interface EquipmentListEntry extends BaseEntityWithName {
 
     pricePerUnit: number;
     pricePerHour: number;
-    equipmentPrice?: EquipmentPrice;
+    equipmentPrice?: EquipmentPrice | null;
     discount: number;
     isHidden: boolean;
     account: string | null;

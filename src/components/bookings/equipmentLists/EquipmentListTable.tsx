@@ -314,17 +314,25 @@ const EquipmentListTable: React.FC<Props> = ({
             pricePerUnitTHS: entry.pricePerUnit,
             pricePerHourTHS: entry.pricePerHour,
         };
+        const zeroPriceDropdownValue: EquipmentPrice = {
+            id: -2,
+            name: 'Gratis',
+            pricePerUnit: 0,
+            pricePerHour: 0,
+            pricePerUnitTHS: 0,
+            pricePerHourTHS: 0,
+        };
         return entry.equipment && entry.equipment.prices.length ? (
             <span className={showPricesAsMuted ? 'text-muted' : ''}>
                 <DoubleClickToEditDropdown<EquipmentPrice>
                     options={
-                        entry.equipmentPrice
-                            ? entry.equipment.prices
-                            : [customPriceDropdownValue, ...entry.equipment.prices]
+                        entry.equipmentPrice || (entry.pricePerHour == 0 && entry.pricePerUnit == 0)
+                            ? [...entry.equipment.prices, zeroPriceDropdownValue]
+                            : [customPriceDropdownValue, ...entry.equipment.prices, zeroPriceDropdownValue]
                     }
                     value={entry.equipmentPrice ?? customPriceDropdownValue}
-                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(x))}`}
-                    optionKeyFn={(x) => x.id.toString()}
+                    optionLabelFn={(x) => `${x.name} (${priceDisplayFn(addVATToPriceWithTHS(x), false)})`}
+                    optionKeyFn={(x) => x.id?.toString()}
                     onChange={(newPrice) =>
                         newPrice && newPrice.id != -1
                             ? saveListEntry({ ...entry, ...getEquipmentListEntryPrices(newPrice, pricePlan) })

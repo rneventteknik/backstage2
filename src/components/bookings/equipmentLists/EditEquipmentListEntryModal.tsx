@@ -18,7 +18,7 @@ type Props = {
     getEquipmentListEntryPrices: (equipmentPrice: EquipmentPrice) => {
         pricePerHour: number;
         pricePerUnit: number;
-        equipmentPrice: EquipmentPrice;
+        equipmentPrice: EquipmentPrice | null;
     };
     equipmentListEntryToEditViewModel: Partial<EquipmentListEntry> | null;
     setEquipmentListEntryToEditViewModel: React.Dispatch<React.SetStateAction<Partial<EquipmentListEntry> | null>>;
