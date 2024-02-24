@@ -17,9 +17,10 @@ import EquipmentPublicCategoryEditor from '../components/settings/EquipmentPubli
 import CustomerEditor from '../components/settings/CustomerEditor';
 import GeneralSettingsEditor from '../components/settings/GeneralSettingsEditor';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import { Role } from '../models/enums/Role';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Inställningar';
 const breadcrumbs = [{ link: 'settings', displayName: pageTitle }];
