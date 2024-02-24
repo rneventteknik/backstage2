@@ -49,7 +49,7 @@ APPLICATION_BASE_URL={Base URL of application when generating links, for example
 
 #### Branching Model
 
-We use the branching model [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). This means that we have a production branch (`main`) and separate development branch called `dev`.
+We use a branching model based on [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). We have on branch (`main`) where both production and development are based on.
 
 Our branch naming convention is based on this model and we use prefixes to indicate what type every branch has. The prefixes in use are:
 
