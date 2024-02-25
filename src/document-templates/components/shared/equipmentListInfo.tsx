@@ -113,7 +113,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                         <TableCellFixedWidth width={90} textAlign="right">
                                             {!isHeading ? (
                                                 <Text>
-                                                    {getCalculatedDiscount(entry, getNumberOfDays(list)) > 0
+                                                    {getCalculatedDiscount(entry, getNumberOfDays(list)).value > 0
                                                         ? formatNumberAsCurrency(
                                                               addVAT(
                                                                   getCalculatedDiscount(entry, getNumberOfDays(list)),

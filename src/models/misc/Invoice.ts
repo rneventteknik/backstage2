@@ -1,3 +1,4 @@
+import currency from 'currency.js';
 import { BookingType } from '../../models/enums/BookingType';
 
 export interface InvoiceData {
@@ -30,8 +31,8 @@ export interface InvoiceRow {
 
 export interface PricedInvoiceRow extends InvoiceRow {
     numberOfUnits: number;
-    pricePerUnit: number;
-    rowPrice: number;
+    pricePerUnit: currency;
+    rowPrice: currency;
     account: string;
     unit: string;
 }

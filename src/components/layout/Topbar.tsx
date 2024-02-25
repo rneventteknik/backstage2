@@ -38,7 +38,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                     <FontAwesomeIcon icon={faBars} size="lg" />
                 </Button>
                 <div className={styles.branding}>
-                    <Link href="/" passHref>
+                    <Link href="/" passHref legacyBehavior>
                         <Navbar.Brand as="a" href="/">
                             Backstage2 <EnvironmentTypeTag globalSettings={globalSettings} />
                         </Navbar.Brand>
@@ -56,8 +56,13 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                         <Dropdown.Item disabled={true}>
                             <UserDisplay user={currentUser} />
                         </Dropdown.Item>
-                        <Link href={'/users/' + currentUser.userId} passHref>
+                        <Link href={'/users/' + currentUser.userId} passHref legacyBehavior>
                             <Dropdown.Item href={'/users/' + currentUser.userId}>Profil</Dropdown.Item>
+                        </Link>
+                        <Link href={'/users/' + currentUser.userId + '/time-reports'} passHref>
+                            <Dropdown.Item href={'/users/' + currentUser.userId + '/time-reports'}>
+                                Tidrapporter
+                            </Dropdown.Item>
                         </Link>
                         <Dropdown.Item onClick={() => setShowHelpModal(true)}>Hjälp</Dropdown.Item>
                         <Dropdown.Divider />
