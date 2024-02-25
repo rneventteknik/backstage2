@@ -13,7 +13,7 @@ import {
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
-import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
+import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import { bookingFetcher } from '../../../lib/fetchers';
 import TimeEstimateList from '../../../components/bookings/timeEstimate/TimeEstimateList';
 import TimeReportList from '../../../components/bookings/timeReport/TimeReportList';
@@ -218,19 +218,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         >
                             <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Hyresavtal
                         </Dropdown.Item>
-                        <IfAdmin currentUser={currentUser}>
-                            <Dropdown.Divider />
-                            <Dropdown.Item href={`/api/documents/invoice/pdf/sv/${booking.id}`} target="_blank">
-                                <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Fakturaunderlag (PDF)
-                            </Dropdown.Item>
-                            <Dropdown.Item
-                                href={`/api/documents/invoice/txt/sv/${booking.id}?download=true`}
-                                target="_blank"
-                            >
-                                <FontAwesomeIcon icon={faFileText} className="mr-1 fa-fw" /> Fakturaunderlag (Hogia
-                                import)
-                            </Dropdown.Item>
-                        </IfAdmin>
+                        <Dropdown.Divider />
+                        <Dropdown.Item href={`/api/documents/invoice/pdf/sv/${booking.id}`} target="_blank">
+                            <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Fakturaunderlag (PDF)
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            href={`/api/documents/invoice/txt/sv/${booking.id}?download=true`}
+                            target="_blank"
+                        >
+                            <FontAwesomeIcon icon={faFileText} className="mr-1 fa-fw" /> Fakturaunderlag (Hogia import)
+                        </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
                 <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="secondary" />
