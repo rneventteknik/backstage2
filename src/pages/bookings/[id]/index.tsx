@@ -38,6 +38,7 @@ import {
     getEquipmentListPrice,
     getTotalTimeEstimatesPrice,
     getTotalTimeReportsPrice,
+    getVAT,
 } from '../../../lib/pricingUtils';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
@@ -48,6 +49,7 @@ import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButto
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 import BookingInfoSection from '../../../components/bookings/BookingInfoSection';
 import FilesCard from '../../../components/bookings/FilesCard';
+import currency from 'currency.js';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -284,12 +286,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <em className="flex-grow-1 pl-4">varav moms (25%)</em>
-                                <em>
-                                    {formatNumberAsCurrency(
-                                        addVAT(getBookingPrice(booking, true, true)) -
-                                            getBookingPrice(booking, true, true),
-                                    )}
-                                </em>
+                                <em>{formatNumberAsCurrency(getVAT(getBookingPrice(booking, true, true)))}</em>
                             </ListGroup.Item>
                             {timeReportExists ? (
                                 <>
@@ -309,20 +306,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
                                         <em className="flex-grow-1 pl-4">varav moms (25%)</em>
-                                        <em>
-                                            {formatNumberAsCurrency(
-                                                addVAT(getBookingPrice(booking, false, true)) -
-                                                    getBookingPrice(booking, false, true),
-                                            )}
-                                        </em>
+                                        <em>{formatNumberAsCurrency(getVAT(getBookingPrice(booking, false, true)))}</em>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
                                         <span className="flex-grow-1">Skillnad mot estimerad personalkostnad</span>
                                         <span>
                                             {formatNumberAsCurrency(
                                                 addVAT(
-                                                    getBookingPrice(booking, false, true) -
+                                                    getBookingPrice(booking, false, true).subtract(
                                                         getBookingPrice(booking, true, true),
+                                                    ),
                                                 ),
                                                 true,
                                             )}
@@ -338,9 +331,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
                                         <em className="flex-grow-1 pl-4">varav moms (25%)</em>
-                                        <em>
-                                            {formatNumberAsCurrency(addVAT(booking.fixedPrice) - booking.fixedPrice)}
-                                        </em>
+                                        <em>{formatNumberAsCurrency(getVAT(booking.fixedPrice))}</em>
                                     </ListGroup.Item>
                                     {timeReportExists ? (
                                         <ListGroup.Item className="d-flex">
@@ -349,7 +340,11 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                             </span>
                                             <span>
                                                 {formatNumberAsCurrency(
-                                                    addVAT(booking.fixedPrice - getBookingPrice(booking, false, true)),
+                                                    addVAT(
+                                                        currency(booking.fixedPrice).subtract(
+                                                            getBookingPrice(booking, false, true),
+                                                        ),
+                                                    ),
                                                     true,
                                                 )}
                                             </span>
@@ -361,7 +356,11 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                             </span>
                                             <span>
                                                 {formatNumberAsCurrency(
-                                                    addVAT(booking.fixedPrice - getBookingPrice(booking, true, true)),
+                                                    addVAT(
+                                                        currency(booking.fixedPrice).subtract(
+                                                            getBookingPrice(booking, true, true),
+                                                        ),
+                                                    ),
                                                     true,
                                                 )}
                                             </span>

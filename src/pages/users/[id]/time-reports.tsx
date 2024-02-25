@@ -14,12 +14,13 @@ import { TableConfiguration, TableDisplay } from '../../../components/TableDispl
 import { BookingViewModel, TimeReport } from '../../../models/interfaces';
 import TableStyleLink from '../../../components/utils/TableStyleLink';
 import { getBookingDateHeadingValue, getFormattedInterval, toBookingViewModel } from '../../../lib/datetimeUtils';
-import { getGlobalSetting, groupBy, reduceSumFn } from '../../../lib/utils';
+import { getGlobalSetting, groupBy } from '../../../lib/utils';
 import { getSortedList } from '../../../lib/sortIndexUtils';
 import { formatNumberAsCurrency, getSalaryForTimeReport } from '../../../lib/pricingUtils';
 import { SalaryStatus } from '../../../models/enums/SalaryStatus';
 import TimeReportHourDisplay from '../../../components/utils/TimeReportHourDisplay';
 import DoneIcon from '../../../components/utils/DoneIcon';
+import currency from 'currency.js';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -29,7 +30,7 @@ interface TimeReportViewModel extends TimeReport {
     booking: BookingViewModel;
     displayWorkingInterval: string;
     hourlyRate: number;
-    salarySum: number;
+    salarySum: currency;
 }
 
 type MonthlyTimeReports = {
@@ -177,7 +178,7 @@ const TimeReportsPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             {
                 key: 'summa',
                 displayName: 'Summa',
-                getValue: (timeReport: TimeReportViewModel) => timeReport.salarySum,
+                getValue: (timeReport: TimeReportViewModel) => timeReport.salarySum.value,
                 getContentOverride: TimeReportSumDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 120,
@@ -218,7 +219,7 @@ const TimeReportsPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                     <Card.Footer>
                         Totalt timarvode för perioden:{' '}
                         {formatNumberAsCurrency(
-                            timeReportMonth.timeReports.map((x) => x.salarySum).reduce(reduceSumFn),
+                            timeReportMonth.timeReports.map((x) => x.salarySum).reduce((a, b) => a.add(b), currency(0)),
                         )}
                     </Card.Footer>
                 </Card>

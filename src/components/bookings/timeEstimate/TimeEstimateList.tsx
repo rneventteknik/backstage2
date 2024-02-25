@@ -240,7 +240,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
             {
                 key: 'sum',
                 displayName: 'Summa',
-                getValue: (timeEstimate: TimeEstimate) => addVAT(getTimeEstimatePrice(timeEstimate)),
+                getValue: (timeEstimate: TimeEstimate) => addVAT(getTimeEstimatePrice(timeEstimate)).value,
                 getContentOverride: TimeEstimateTotalPriceDisplayFn,
                 columnWidth: 90,
                 textAlignment: 'right',

@@ -8,101 +8,120 @@ import { InvoiceCustomer, InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoice
 import { SalaryReport, UserSalaryReport } from '../models/misc/Salary';
 import { formatDateForForm, getBookingDateDisplayValues, getNumberOfDays } from './datetimeUtils';
 import { getSortedList } from './sortIndexUtils';
-import { getTotalNumberOfHoursReported, groupBy, reduceSumFn } from './utils';
+import { getTotalNumberOfHoursReported, groupBy } from './utils';
+import currency from 'currency.js';
 
 // Calculate total price
 //
-export const getPrice = (entry: EquipmentListEntry, numberOfDays: number, withDiscount = true): number => {
-    if (entry.isHidden) {
-        return 0;
+export const getPrice = (entry: EquipmentListEntry, numberOfDays: number, withDiscount = true): currency => {
+    const fullPrice = getUnitPrice(entry, numberOfDays).multiply(entry.numberOfUnits);
+
+    if (!withDiscount) {
+        return fullPrice;
     }
 
-    const fullPrice = entry.numberOfUnits * getUnitPrice(entry, numberOfDays);
-    return Math.max(0, withDiscount ? fullPrice - entry.discount : fullPrice);
-};
-
-export const getUnitPrice = (entry: EquipmentListEntry, numberOfDays: number): number => {
-    if (entry.isHidden) {
-        return 0;
+    if (fullPrice.subtract(entry.discount).value < 0) {
+        return currency(0);
     }
 
-    return getTimePrice(entry) + entry.pricePerUnit + getExtraDaysPrice(entry, numberOfDays);
+    return fullPrice.subtract(entry.discount);
 };
 
-export const getTimePrice = (entry: EquipmentListEntry): number => {
+export const getUnitPrice = (entry: EquipmentListEntry, numberOfDays: number): currency => {
     if (entry.isHidden) {
-        return 0;
+        return currency(0);
     }
 
-    return entry.numberOfHours * entry.pricePerHour;
+    return getTimePrice(entry).add(entry.pricePerUnit).add(getExtraDaysPrice(entry, numberOfDays));
 };
 
-export const getExtraDaysPrice = (entry: EquipmentListEntry, numberOfTotalDays: number): number => {
+export const getTimePrice = (entry: EquipmentListEntry): currency => {
     if (entry.isHidden) {
-        return 0;
+        return currency(0);
     }
 
-    return entry.pricePerUnit * (numberOfTotalDays - 1) * 0.25;
+    return currency(entry.pricePerHour).multiply(entry.numberOfHours);
 };
 
-// The database can contain a discount value larger than the linetotal
-export const getCalculatedDiscount = (entry: EquipmentListEntry, numberOfDays: number): number => {
+export const getExtraDaysPrice = (entry: EquipmentListEntry, numberOfTotalDays: number): currency => {
+    if (entry.isHidden) {
+        return currency(0);
+    }
+
+    return currency(entry.pricePerUnit)
+        .multiply(numberOfTotalDays - 1)
+        .multiply(0.25);
+};
+
+export const getCalculatedDiscount = (entry: EquipmentListEntry, numberOfDays: number): currency => {
     const priceWithoutDiscount = getPrice(entry, numberOfDays, false);
-    return Math.min(priceWithoutDiscount, entry.discount);
+
+    // The database can contain a discount value larger than the linetotal
+    if (priceWithoutDiscount.value < entry.discount) {
+        return priceWithoutDiscount;
+    }
+
+    return currency(entry.discount);
 };
 
-export const getEquipmentListHeadingPrice = (heading: EquipmentListHeading, numberOfDays: number): number => {
-    return heading.listEntries.reduce((sum, e) => sum + getPrice(e, numberOfDays), 0);
+export const getEquipmentListHeadingPrice = (heading: EquipmentListHeading, numberOfDays: number): currency => {
+    return heading.listEntries.reduce((sum, e) => sum.add(getPrice(e, numberOfDays)), currency(0));
 };
 
-export const getEquipmentListPrice = (list: EquipmentList): number => {
-    return (
-        list.listEntries.reduce((sum, e) => sum + getPrice(e, getNumberOfDays(list)), 0) +
-        list.listHeadings.reduce((sum, h) => sum + getEquipmentListHeadingPrice(h, getNumberOfDays(list)), 0)
-    );
+export const getEquipmentListPrice = (list: EquipmentList): currency => {
+    return list.listEntries
+        .reduce((sum, e) => sum.add(getPrice(e, getNumberOfDays(list))), currency(0))
+        .add(
+            list.listHeadings.reduce(
+                (sum, h) => sum.add(getEquipmentListHeadingPrice(h, getNumberOfDays(list))),
+                currency(0),
+            ),
+        );
 };
 
-export const getTimeEstimatePrice = (timeEstimate: TimeEstimate): number => {
-    return (timeEstimate.numberOfHours ?? 0) * (timeEstimate.pricePerHour ?? 0);
+export const getTimeEstimatePrice = (timeEstimate: TimeEstimate): currency => {
+    return currency(timeEstimate.pricePerHour ?? 0).multiply(timeEstimate.numberOfHours ?? 0);
 };
 
-export const getTotalTimeEstimatesPrice = (timeEstimates: TimeEstimate[] | undefined): number => {
+export const getTotalTimeEstimatesPrice = (timeEstimates: TimeEstimate[] | undefined): currency => {
     if (!timeEstimates) {
-        return 0;
+        return currency(0);
     }
 
-    return timeEstimates?.reduce((sum, l) => sum + getTimeEstimatePrice(l), 0) ?? 0;
+    return timeEstimates?.reduce((sum, l) => sum.add(getTimeEstimatePrice(l)), currency(0)) ?? currency(0);
 };
 
-export const getTimeReportPrice = (timeReport: TimeReport): number => {
-    return (timeReport.billableWorkingHours ?? 0) * (timeReport.pricePerHour ?? 0);
+export const getTimeReportPrice = (timeReport: TimeReport): currency => {
+    return currency(timeReport.pricePerHour ?? 0).multiply(timeReport.billableWorkingHours ?? 0);
 };
 
-export const getTotalTimeReportsPrice = (timeReports: TimeReport[] | undefined): number => {
+export const getTotalTimeReportsPrice = (timeReports: TimeReport[] | undefined): currency => {
     if (!timeReports) {
-        return 0;
+        return currency(0);
     }
 
-    return timeReports?.reduce((sum, l) => sum + getTimeReportPrice(l), 0) ?? 0;
+    return timeReports?.reduce((sum, l) => sum.add(getTimeReportPrice(l)), currency(0)) ?? currency(0);
 };
 
-export const getBookingPrice = (booking: Booking, forceEstimatedTime = false, forceNoFixedPrice = false): number => {
+export const getBookingPrice = (booking: Booking, forceEstimatedTime = false, forceNoFixedPrice = false): currency => {
     if (!forceNoFixedPrice && booking.fixedPrice !== null && booking.fixedPrice !== undefined) {
-        return booking.fixedPrice;
+        return currency(booking.fixedPrice);
     }
 
-    const equipmentPrice = booking.equipmentLists?.reduce((sum, l) => sum + getEquipmentListPrice(l), 0) ?? 0;
+    const equipmentPrice =
+        booking.equipmentLists?.reduce((sum, l) => sum.add(getEquipmentListPrice(l)), currency(0)) ?? currency(0);
     const timeEstimatePrice = getTotalTimeEstimatesPrice(booking.timeEstimates);
     const timeReportsPrice = getTotalTimeReportsPrice(booking.timeReports);
 
     if (!forceEstimatedTime && booking.timeReports && booking.timeReports.length > 0) {
-        return equipmentPrice + timeReportsPrice;
+        return equipmentPrice.add(timeReportsPrice);
     }
 
-    return equipmentPrice + timeEstimatePrice;
+    return equipmentPrice.add(timeEstimatePrice);
 };
 
-export const addVAT = (price: number): number => 1.25 * price;
+export const addVAT = (price: currency | number): currency => currency(price).add(getVAT(price));
+export const getVAT = (price: currency | number): currency => currency(price).multiply(0.25);
 
 export const addVATToPrice = (price: PricedEntity): PricedEntity => ({
     pricePerHour: addVAT(price.pricePerHour),
@@ -132,9 +151,9 @@ export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 's
 export const formatTHSPrice = (price: PricedEntityWithTHS): string =>
     formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
 
-export const formatNumberAsCurrency = (number: number, showPlusIfPositive = false): string =>
-    (showPlusIfPositive && number > 0 ? '+' : '') +
-    Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(number);
+export const formatNumberAsCurrency = (number: number | currency, showPlusIfPositive = false): string =>
+    (showPlusIfPositive && currency(number).value > 0 ? '+' : '') +
+    Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(currency(number).value);
 
 export const getInvoiceData = (
     booking: BookingViewModel,
@@ -240,7 +259,7 @@ export const getInvoiceData = (
                 if ((numberOfDays > 1 || entry.numberOfHours) && entry.pricePerUnit) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('hogia-invoice.start-cost')}: ${entry.pricePerUnit} kr`,
+                        text: `${t('hogia-invoice.start-cost')}: ${formatNumberAsCurrency(entry.pricePerUnit)}`,
                     });
                 }
 
@@ -250,7 +269,7 @@ export const getInvoiceData = (
                         rowType: InvoiceRowType.ITEM_COMMENT,
                         text: `${numberOfDays - 1} ${t(
                             numberOfDays - 1 > 1 ? 'hogia-invoice.day-cost' : 'hogia-invoice.day-cost-single',
-                        )}: ${getExtraDaysPrice(entry, numberOfDays)} kr`,
+                        )}: ${formatNumberAsCurrency(getExtraDaysPrice(entry, numberOfDays))}`,
                     });
                 }
 
@@ -258,14 +277,14 @@ export const getInvoiceData = (
                 if (entry.numberOfHours) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${getTimePrice(entry)} kr`,
+                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${formatNumberAsCurrency(getTimePrice(entry))}`,
                     });
                 }
 
                 if (entry.discount) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('invoice.discount')}: ${getCalculatedDiscount(entry, numberOfDays)} kr`,
+                        text: `${t('invoice.discount')}: ${formatNumberAsCurrency(getCalculatedDiscount(entry, numberOfDays))}`,
                     });
                 }
 
@@ -315,8 +334,8 @@ export const getInvoiceData = (
             rowType: InvoiceRowType.ITEM,
             text: t('hogia-invoice.price-by-agreement'),
             numberOfUnits: 1,
-            pricePerUnit: booking.fixedPrice ?? 0,
-            rowPrice: booking.fixedPrice ?? 0,
+            pricePerUnit: currency(booking.fixedPrice ?? 0),
+            rowPrice: currency(booking.fixedPrice ?? 0),
             account:
                 booking.accountKind === AccountKind.EXTERNAL
                     ? defaultEquipmentAccountExternal
@@ -384,7 +403,7 @@ export const calculateSalary = (
             userId: userId,
             user: timeReportByUser[0].user,
             salaryLines,
-            sum: salaryLines.map((x) => x.sum).reduce(reduceSumFn),
+            sum: salaryLines.map((x) => x.sum).reduce((a, b) => a.add(b), currency(0)),
         });
     }
 
@@ -399,7 +418,7 @@ export const getSalaryForTimeReport = (
     wageRatioThs: number,
 ) => {
     const hourlyWageRatio = booking.pricePlan === PricePlan.THS ? wageRatioThs : wageRatioExternal;
-    const hourlyWage = Math.floor(x.pricePerHour * hourlyWageRatio);
+    const hourlyWage = currency(x.pricePerHour).multiply(hourlyWageRatio).dollars();
 
     return {
         timeReportId: x.id,
@@ -410,6 +429,6 @@ export const getSalaryForTimeReport = (
             : `${booking.customerName} - ${booking.name}`,
         hours: x.billableWorkingHours,
         hourlyRate: hourlyWage,
-        sum: x.billableWorkingHours * hourlyWage,
+        sum: currency(hourlyWage).multiply(x.billableWorkingHours),
     };
 };

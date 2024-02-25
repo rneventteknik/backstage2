@@ -9,7 +9,7 @@ import { useTextResources } from '../useTextResources';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../../models/misc/Invoice';
 import { InvoiceInfo } from './invoiceInfo';
-import { groupBy, reduceSumFn } from '../../lib/utils';
+import { groupBy } from '../../lib/utils';
 import {
     TableCellAutoWidth,
     TableCellFixedWidth,
@@ -17,7 +17,8 @@ import {
     TableRowWithNoBorder,
     TableRowWithTopBorder,
 } from './shared/utils';
-import { formatNumberAsCurrency } from '../../lib/pricingUtils';
+import { formatNumberAsCurrency, getVAT } from '../../lib/pricingUtils';
+import currency from 'currency.js';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -31,12 +32,12 @@ const styles = StyleSheet.create({
 const getItemRows = (invoiceData: InvoiceData): PricedInvoiceRow[] =>
     invoiceData.invoiceRows.filter((invoiceRow) => invoiceRow.rowType === InvoiceRowType.ITEM) as PricedInvoiceRow[];
 
-const calculateRowPriceSum = (invoiceRows: PricedInvoiceRow[]): number =>
-    invoiceRows.map((invoiceRow) => invoiceRow.rowPrice).reduce(reduceSumFn);
+const calculateRowPriceSum = (invoiceRows: PricedInvoiceRow[]): currency =>
+    invoiceRows.map((invoiceRow) => invoiceRow.rowPrice).reduce((a, b) => a.add(b), currency(0));
 
-const calculateTotalAmount = (invoiceData: InvoiceData): number => calculateRowPriceSum(getItemRows(invoiceData));
+const calculateTotalAmount = (invoiceData: InvoiceData): currency => calculateRowPriceSum(getItemRows(invoiceData));
 
-const calculateTotalVAT = (invoiceData: InvoiceData): number => calculateTotalAmount(invoiceData) * 0.25;
+const calculateTotalVAT = (invoiceData: InvoiceData): currency => getVAT(calculateTotalAmount(invoiceData));
 
 type InvoiceRowProps = {
     invoiceRow: InvoiceRow;
@@ -142,7 +143,7 @@ const InvoiceTotalPriceSection: React.FC<InvoiceTotalPriceSectionProps> = ({
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.bold}>
-                        {formatNumberAsCurrency(calculateTotalAmount(invoiceData) + calculateTotalVAT(invoiceData))}
+                        {formatNumberAsCurrency(calculateTotalAmount(invoiceData).add(calculateTotalVAT(invoiceData)))}
                     </Text>
                 </TableCellFixedWidth>
             </TableRow>
