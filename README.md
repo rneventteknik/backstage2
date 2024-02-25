@@ -45,6 +45,10 @@ DRIVE_ROOT_FOLDER_ID={ID of folder which contains booking folders}
 SLACK_BOT_TOKEN={API token for slack bot, with chat:write access}
 SLACK_CHANNEL_ID={Slack channel to post message to}
 APPLICATION_BASE_URL={Base URL of application when generating links, for example http://localhost:3000}
+
+NEXT_PUBLIC_MQTT_BROKER_URL={wss://hostname:port}
+NEXT_PUBLIC_MQTT_BROKER_USER={Username to the mqtt broker}
+NEXT_PUBLIC_MQTT_BROKER_PASS={Passowrd to the mqtt broker}
 ```
 
 ### Version Control

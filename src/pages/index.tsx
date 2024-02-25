@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { IfNotReadonly } from '../components/utils/IfAdmin';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import DoorAndKeyStatus from '../components/DoorAndKeytatus';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -93,6 +94,12 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                                 </ListGroup.Item>
                             ))}
                         </ListGroup>
+                    </Card>
+                    <Card>
+                        <Card.Header className="d-flex">
+                            <span className="flex-grow-1">Dörr och nyckelstatus</span>
+                            <DoorAndKeyStatus></DoorAndKeyStatus>
+                        </Card.Header>
                     </Card>
                 </Col>
             </Row>
