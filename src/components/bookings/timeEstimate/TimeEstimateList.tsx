@@ -79,7 +79,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                 </Card.Header>
                 <Card.Body>
                     <p className="text-danger">
-                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsrapporterna.
+                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsestimaten.
                     </p>
                     <p className="text-monospace text-muted mb-0">{error?.message}</p>
                 </Card.Body>
@@ -240,7 +240,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
             {
                 key: 'sum',
                 displayName: 'Summa',
-                getValue: (timeEstimate: TimeEstimate) => addVAT(getTimeEstimatePrice(timeEstimate)),
+                getValue: (timeEstimate: TimeEstimate) => addVAT(getTimeEstimatePrice(timeEstimate)).value,
                 getContentOverride: TimeEstimateTotalPriceDisplayFn,
                 columnWidth: 90,
                 textAlignment: 'right',
