@@ -357,7 +357,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                     ) : (
                                         <ListGroup.Item className="d-flex">
                                             <span className="flex-grow-1">
-                                                Skillnad mot pris med Skillnad mot estimerad personalkostnad
+                                                Skillnad mot pris med estimerad personalkostnad
                                             </span>
                                             <span>
                                                 {formatNumberAsCurrency(
