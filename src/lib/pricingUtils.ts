@@ -259,7 +259,7 @@ export const getInvoiceData = (
                 if ((numberOfDays > 1 || entry.numberOfHours) && entry.pricePerUnit) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('hogia-invoice.start-cost')}: ${entry.pricePerUnit} kr`,
+                        text: `${t('hogia-invoice.start-cost')}: ${formatNumberAsCurrency(entry.pricePerUnit)}`,
                     });
                 }
 
@@ -269,7 +269,7 @@ export const getInvoiceData = (
                         rowType: InvoiceRowType.ITEM_COMMENT,
                         text: `${numberOfDays - 1} ${t(
                             numberOfDays - 1 > 1 ? 'hogia-invoice.day-cost' : 'hogia-invoice.day-cost-single',
-                        )}: ${getExtraDaysPrice(entry, numberOfDays)} kr`,
+                        )}: ${formatNumberAsCurrency(getExtraDaysPrice(entry, numberOfDays))}`,
                     });
                 }
 
@@ -277,14 +277,14 @@ export const getInvoiceData = (
                 if (entry.numberOfHours) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${getTimePrice(entry)} kr`,
+                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${formatNumberAsCurrency(getTimePrice(entry))}`,
                     });
                 }
 
                 if (entry.discount) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('invoice.discount')}: ${getCalculatedDiscount(entry, numberOfDays)} kr`,
+                        text: `${t('invoice.discount')}: ${formatNumberAsCurrency(getCalculatedDiscount(entry, numberOfDays))}`,
                     });
                 }
 
