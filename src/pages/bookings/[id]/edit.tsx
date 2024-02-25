@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
@@ -15,9 +15,8 @@ import Header from '../../../components/layout/Header';
 import { FormLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import { Role } from '../../../models/enums/Role';
-import { faSave, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faSave } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import ConfirmModal from '../../../components/utils/ConfirmModal';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -25,9 +24,7 @@ export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.U
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
 const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-    const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage } = useNotifications();
+    const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
 
     // Edit booking
     //
@@ -80,25 +77,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             });
     };
 
-    // Delete booking handler
-    //
-    const deleteBooking = () => {
-        setShowDeleteModal(false);
-
-        const request = {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-        };
-
-        fetch('/api/bookings/' + booking?.id, request)
-            .then(getResponseContentOrError)
-            .then(() => router.push('/bookings/'))
-            .catch((error) => {
-                console.error(error);
-                showGeneralDangerMessage('Fel!', 'Bokningen kunde inte tas bort');
-            });
-    };
-
     // The page itself
     //
     const pageTitle = booking?.name;
@@ -114,24 +92,9 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 <Button variant="primary" form="editBookingForm" type="submit">
                     <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara bokning
                 </Button>
-                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
-                    <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort bokning
-                    </Dropdown.Item>
-                </DropdownButton>
             </Header>
 
             <BookingForm booking={booking} handleSubmitBooking={handleSubmit} formId="editBookingForm" />
-
-            <ConfirmModal
-                show={showDeleteModal}
-                onHide={() => setShowDeleteModal(false)}
-                title="Bekräfta"
-                confirmLabel="Ta bort"
-                onConfirm={deleteBooking}
-            >
-                Vill du verkligen ta bort bokningen {booking.name}?
-            </ConfirmModal>
         </Layout>
     );
 };

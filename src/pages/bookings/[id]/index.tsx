@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, ButtonGroup, Card, Col, Dropdown, ListGroup, Row } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, ListGroup, Row } from 'react-bootstrap';
 import {
     getAccountKindName,
     getDefaultLaborHourlyRate,
@@ -13,7 +13,7 @@ import {
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Link from 'next/link';
-import { IfNotReadonly } from '../../../components/utils/IfAdmin';
+import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
 import { bookingFetcher } from '../../../lib/fetchers';
 import TimeEstimateList from '../../../components/bookings/timeEstimate/TimeEstimateList';
 import TimeReportList from '../../../components/bookings/timeReport/TimeReportList';
@@ -21,7 +21,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faCoins, faFileDownload, faLock, faLockOpen, faPen } from '@fortawesome/free-solid-svg-icons';
+import {
+    faCoins,
+    faFileDownload,
+    faFilePdf,
+    faFileText,
+    faLock,
+    faLockOpen,
+    faPen,
+    faTimesCircle,
+    faTrashCan,
+} from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
 import EquipmentLists from '../../../components/bookings/equipmentLists/EquipmentLists';
 import BookingStatusButton from '../../../components/bookings/BookingStatusButton';
@@ -56,12 +66,14 @@ export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
 const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
+    const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage } = useNotifications();
 
     // Enable this when we enable the KårX feature
     // const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
     const [showConfirmPaidModal, setShowConfirmPaidModal] = useState(false);
     const [adminEditModeOverrideEnabled, setAdminEditModeOverrideEnabled] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
 
     // Edit booking
     //
@@ -131,6 +143,32 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             });
     };
 
+    // Cancel booking handler
+    //
+    const cancelBooking = () => {
+        saveBooking({ status: Status.CANCELED });
+        setShowCancelModal(false);
+    };
+
+    // Delete booking handler
+    //
+    const deleteBooking = () => {
+        setShowDeleteModal(false);
+
+        const request = {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+        };
+
+        fetch('/api/bookings/' + booking?.id, request)
+            .then(getResponseContentOrError)
+            .then(() => router.push('/bookings/'))
+            .catch((error) => {
+                console.error(error);
+                showGeneralDangerMessage('Fel!', 'Bokningen kunde inte tas bort');
+            });
+    };
+
     // The page itself
     //
     const pageTitle = booking?.name;
@@ -161,26 +199,45 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     </>
                 ) : null}
                 <Dropdown as={ButtonGroup}>
-                    <Button
-                        variant="secondary"
-                        href={`/api/documents/price-estimate/${booking.language}/${booking.id}`}
-                        target="_blank"
-                    >
-                        <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Prisuppskattning
-                    </Button>
-
-                    <Dropdown.Toggle split variant="secondary" id="dropdown-split-basic" />
+                    <Dropdown.Toggle variant="secondary" id="dropdown-split-basic">
+                        <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" />
+                        Exportera
+                    </Dropdown.Toggle>
 
                     <Dropdown.Menu>
-                        <Dropdown.Item href={'/api/documents/packing-list/sv/' + booking.id} target="_blank">
-                            <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Packlista
-                        </Dropdown.Item>
                         <Dropdown.Item
-                            href={`/api/documents/rental-agreement/${booking.language}/` + booking.id}
+                            href={`/api/documents/price-estimate/${booking.language}/${booking.id}`}
                             target="_blank"
                         >
-                            <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Hyresavtal
+                            <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Prisuppskattning
                         </Dropdown.Item>
+                        <Dropdown.Item href={`/api/documents/packing-list/sv/${booking.id}`} target="_blank">
+                            <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Packlista
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            href={`/api/documents/rental-agreement/${booking.language}/${booking.id}`}
+                            target="_blank"
+                        >
+                            <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Hyresavtal
+                        </Dropdown.Item>
+                        <IfAdmin currentUser={currentUser}>
+                            <Dropdown.Divider />
+                        </IfAdmin>
+                        <Dropdown.Item
+                            href={`/api/documents/invoice/pdf/${booking.language}/${booking.id}`}
+                            target="_blank"
+                        >
+                            <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Fakturaunderlag (PDF)
+                        </Dropdown.Item>
+                        <IfAdmin currentUser={currentUser}>
+                            <Dropdown.Item
+                                href={`/api/documents/invoice/txt/${booking.language}/${booking.id}?download=true`}
+                                target="_blank"
+                            >
+                                <FontAwesomeIcon icon={faFileText} className="mr-1 fa-fw" /> Fakturaunderlag (Hogia
+                                import)
+                            </Dropdown.Item>
+                        </IfAdmin>
                     </Dropdown.Menu>
                 </Dropdown>
                 <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="secondary" />
@@ -238,6 +295,42 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             : 'Redigera klarmarkerad bokning'}
                     </Button>
                 ) : null}
+
+                {!readonly ? (
+                    <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                        {booking.status !== Status.CANCELED && booking.status !== Status.DONE ? (
+                            <Dropdown.Item onClick={() => setShowCancelModal(true)}>
+                                <FontAwesomeIcon icon={faTimesCircle} className="mr-1" /> Ställ in bokningen
+                            </Dropdown.Item>
+                        ) : null}
+                        <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
+                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort bokningen
+                        </Dropdown.Item>
+                    </DropdownButton>
+                ) : null}
+
+                <ConfirmModal
+                    show={showCancelModal}
+                    onHide={() => setShowCancelModal(false)}
+                    title="Bekräfta"
+                    confirmLabel="Ställ in"
+                    confirmButtonType="primary"
+                    onConfirm={cancelBooking}
+                >
+                    Vill du verkligen ställa in bokningen {booking.name}?
+                </ConfirmModal>
+                <ConfirmModal
+                    show={showDeleteModal}
+                    onHide={() => setShowDeleteModal(false)}
+                    title="Bekräfta"
+                    confirmLabel="Ta bort"
+                    onConfirm={deleteBooking}
+                >
+                    <p>Vill du verkligen ta bort bokningen {booking.name}?</p>
+                    <p className="mb-0">
+                        Om bokningen inte skapats av misstag kan det vara lämpligare att ställa in den istället.
+                    </p>
+                </ConfirmModal>
             </Header>
 
             <Row className="mb-3">
