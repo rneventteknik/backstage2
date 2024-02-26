@@ -164,12 +164,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                             <SplitHighlighter search={highlightText} textToHighlight={booking.customerName} /> /{' '}
                             <SplitHighlighter search={highlightText} textToHighlight={booking.contactPersonName} />
                             {booking.contactPersonName && viewModel.displayUsageInterval !== '-' ? ' / ' : ''}
-                            {viewModel.displayUsageInterval === '-' ? null : (
-                                <SplitHighlighter
-                                    search={highlightText}
-                                    textToHighlight={viewModel.monthYearUsageStartString}
-                                />
-                            )}
+                            {viewModel.displayUsageInterval === '-' ? null : viewModel.monthYearUsageStartString}
                         </small>
                     );
                 default:
