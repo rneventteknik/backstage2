@@ -25,6 +25,7 @@ export const searchBookings = async (searchString: string, count: number): Promi
                 builder.andWhere('contactPersonName', getCaseInsensitiveComparisonKeyword(), partialSearchString);
             });
         })
+        .withGraphFetched('equipmentLists')
         .orWhere((builder) => {
             searchStrings.forEach((partialSearchString) => {
                 builder.andWhere('invoiceNumber', getCaseInsensitiveComparisonKeyword(), partialSearchString);
