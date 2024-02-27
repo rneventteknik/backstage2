@@ -137,11 +137,14 @@ export const addVATToPriceWithTHS = (price: PricedEntityWithTHS): PricedEntityWi
 // Format price
 //
 export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 'st'): string => {
-    if (!price.pricePerHour && !price.pricePerUnit) {
+    const pricePerHourAsCurrency = currency(price.pricePerHour);
+    const pricePerUnitAsCurrency = currency(price.pricePerUnit);
+
+    if (!pricePerHourAsCurrency.value && !pricePerUnitAsCurrency.value) {
         return `-`;
-    } else if (price.pricePerHour && !price.pricePerUnit) {
+    } else if (pricePerHourAsCurrency.value && !pricePerUnitAsCurrency.value) {
         return `${formatNumberAsCurrency(price.pricePerHour)}/${hoursUnit}`;
-    } else if (!price.pricePerHour && price.pricePerUnit) {
+    } else if (!pricePerHourAsCurrency.value && pricePerUnitAsCurrency.value) {
         return `${formatNumberAsCurrency(price.pricePerUnit)}/${unitsUnit}`;
     } else {
         return `${formatNumberAsCurrency(price.pricePerUnit)} + ${formatNumberAsCurrency(price.pricePerHour)}/h`;
@@ -277,14 +280,18 @@ export const getInvoiceData = (
                 if (entry.numberOfHours) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${formatNumberAsCurrency(getTimePrice(entry))}`,
+                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${formatNumberAsCurrency(
+                            getTimePrice(entry),
+                        )}`,
                     });
                 }
 
                 if (entry.discount) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('invoice.discount')}: ${formatNumberAsCurrency(getCalculatedDiscount(entry, numberOfDays))}`,
+                        text: `${t('invoice.discount')}: ${formatNumberAsCurrency(
+                            getCalculatedDiscount(entry, numberOfDays),
+                        )}`,
                     });
                 }
 
