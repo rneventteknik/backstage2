@@ -3,12 +3,12 @@ import React from 'react';
 import { commonStyles, formatEquipmentListEntryCountOrHours, formatEquipmentListEntryPriceWithVAT } from '../../utils';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import {
-    formatNumberAsCurrency,
     getPrice,
     getEquipmentListPrice,
     getEquipmentListHeadingPrice,
     getCalculatedDiscount,
     addVAT,
+    formatCurrency,
 } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { useTextResources } from '../../useTextResources';
@@ -16,6 +16,7 @@ import { getNumberOfDays } from '../../../lib/datetimeUtils';
 import { Booking } from '../../../models/interfaces';
 import { EquipmentListDateInfo } from './equipmentListDateInfo';
 import { getSortedList } from '../../../lib/sortIndexUtils';
+import currency from 'currency.js';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -58,13 +59,13 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                 </TableCellFixedWidth>
                 {showPrices ? (
                     <>
-                        <TableCellFixedWidth width={90} textAlign="right">
+                        <TableCellFixedWidth width={110} textAlign="right">
                             <Text style={styles.italic}>{t('common.equipment-list.table-header.price')}</Text>
                         </TableCellFixedWidth>
-                        <TableCellFixedWidth width={90} textAlign="right">
+                        <TableCellFixedWidth width={80} textAlign="right">
                             <Text style={styles.italic}>{t('common.equipment-list.table-header.discount')}</Text>
                         </TableCellFixedWidth>
-                        <TableCellFixedWidth width={90} textAlign="right">
+                        <TableCellFixedWidth width={80} textAlign="right">
                             <Text style={styles.italic}>{t('common.equipment-list.table-header.total-price')}</Text>
                         </TableCellFixedWidth>
                     </>
@@ -80,8 +81,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                         <>
                             <TableRow key={wrappedEntry.id + wrappedEntry.typeIdentifier}>
                                 <TableCellAutoWidth>
-                                    <Text>{wrappedEntry.entity.name}</Text>
-                                    <Text style={{ color: '#999999' }}>{wrappedEntry.entity.description}</Text>
+                                    <Text>{wrappedEntry.entity.description}</Text>
                                 </TableCellAutoWidth>
                                 <TableCellFixedWidth width={90} textAlign="right">
                                     {!isHeading ? (
@@ -92,7 +92,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                 </TableCellFixedWidth>
                                 {showPrices ? (
                                     <>
-                                        <TableCellFixedWidth width={90} textAlign="right">
+                                        <TableCellFixedWidth width={110} textAlign="right">
                                             {!isHeading ? (
                                                 <Text>{formatEquipmentListEntryPriceWithVAT(entry, t)}</Text>
                                             ) : (
@@ -103,18 +103,18 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                                                 heading,
                                                                 getNumberOfDays(list),
                                                             ),
-                                                            pricePerHour: 0,
+                                                            pricePerHour: currency(0),
                                                         },
                                                         t,
                                                     )}
                                                 </Text>
                                             )}
                                         </TableCellFixedWidth>
-                                        <TableCellFixedWidth width={90} textAlign="right">
+                                        <TableCellFixedWidth width={80} textAlign="right">
                                             {!isHeading ? (
                                                 <Text>
                                                     {getCalculatedDiscount(entry, getNumberOfDays(list)).value > 0
-                                                        ? formatNumberAsCurrency(
+                                                        ? formatCurrency(
                                                               addVAT(
                                                                   getCalculatedDiscount(entry, getNumberOfDays(list)),
                                                               ),
@@ -123,16 +123,14 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                                 </Text>
                                             ) : null}
                                         </TableCellFixedWidth>
-                                        <TableCellFixedWidth width={90} textAlign="right">
+                                        <TableCellFixedWidth width={80} textAlign="right">
                                             {!isHeading ? (
                                                 <Text>
-                                                    {formatNumberAsCurrency(
-                                                        addVAT(getPrice(entry, getNumberOfDays(list))),
-                                                    )}
+                                                    {formatCurrency(addVAT(getPrice(entry, getNumberOfDays(list))))}
                                                 </Text>
                                             ) : (
                                                 <Text>
-                                                    {formatNumberAsCurrency(
+                                                    {formatCurrency(
                                                         addVAT(
                                                             getEquipmentListHeadingPrice(
                                                                 heading,
@@ -157,9 +155,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                             <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
                         </TableCellAutoWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
-                            <Text style={styles.bold}>
-                                {formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}
-                            </Text>
+                            <Text style={styles.bold}>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
                         </TableCellFixedWidth>
                     </TableRow>
                 </>

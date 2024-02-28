@@ -6,14 +6,13 @@ import EquipmentTagDisplay from '../../components/utils/EquipmentTagDisplay';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { getGlobalSetting, groupBy, replaceEmptyStringWithNull } from '../../lib/utils';
 import { IEquipmentObjectionModel } from '../../models/objection-models';
-import {
-    IEquipmentPriceObjectionModel,
-    IEquipmentPublicCategoryObjectionModel,
-} from '../../models/objection-models/EquipmentObjectionModel';
+import { IEquipmentPublicCategoryObjectionModel } from '../../models/objection-models/EquipmentObjectionModel';
 import { getGlobalSettings } from '../../lib/useUser';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import Image from 'next/image';
 import Link from 'next/link';
+import { toEquipmentPrice } from '../../lib/mappers/equipment';
+import { EquipmentPrice } from '../../models/interfaces';
 
 const containerStyle: React.CSSProperties = {
     margin: 'auto',
@@ -37,7 +36,7 @@ const logoContainerStyle: React.CSSProperties = {
 const pageTitle = 'Prislista';
 
 type PriceCellsProps = {
-    price: IEquipmentPriceObjectionModel;
+    price: EquipmentPrice;
     showWithVat: boolean;
     showThsPrice: boolean;
     hidePriceType?: boolean;
@@ -191,7 +190,7 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
                                             </td>
                                             {equipment.prices ? (
                                                 <PriceCells
-                                                    price={equipment.prices[0]}
+                                                    price={toEquipmentPrice(equipment.prices[0])}
                                                     hidePriceType={equipment.prices.length === 1}
                                                     showWithVat={includeVat}
                                                     showThsPrice={showThsPrice}
@@ -202,7 +201,7 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
                                             equipment.prices.slice(1).map((price) => (
                                                 <tr key={`equipment-${equipment.id}-price-${price.id}`}>
                                                     <PriceCells
-                                                        price={price}
+                                                        price={toEquipmentPrice(price)}
                                                         showWithVat={includeVat}
                                                         showThsPrice={showThsPrice}
                                                     ></PriceCells>

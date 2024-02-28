@@ -7,6 +7,7 @@ import { Booking } from '../../../models/interfaces';
 import TimeEstimateModal from './TimeEstimateModal';
 import { getNextSortIndex } from '../../../lib/sortIndexUtils';
 import { addTimeEstimateApiCall } from '../../../lib/equipmentListUtils';
+import currency from 'currency.js';
 
 type Props = {
     booking: Booking;
@@ -42,7 +43,7 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
                 {...rest}
                 onClick={() => {
                     setTimeEstimateViewModel({
-                        pricePerHour: defaultLaborHourlyRate,
+                        pricePerHour: currency(defaultLaborHourlyRate),
                     });
                 }}
             >
@@ -61,7 +62,7 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
                         id: timeEstimateViewModel?.id,
                         bookingId: booking.id,
                         numberOfHours: timeEstimateViewModel?.numberOfHours ?? 0,
-                        pricePerHour: timeEstimateViewModel?.pricePerHour ?? 0,
+                        pricePerHour: timeEstimateViewModel?.pricePerHour?.value ?? 0,
                         name: timeEstimateViewModel?.name ?? '',
                         sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
                     };

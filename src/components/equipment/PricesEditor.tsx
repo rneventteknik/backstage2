@@ -4,12 +4,13 @@ import React from 'react';
 import { Badge, Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { idSortFn } from '../../lib/sortIndexUtils';
-import { getPricePlanName, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
+import { getPricePlanName, updateItemsInArrayById } from '../../lib/utils';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { EquipmentPrice } from '../../models/interfaces';
 import { HasId } from '../../models/interfaces/BaseEntity';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
+import currency from 'currency.js';
 
 type Props = {
     prices: EquipmentPrice[];
@@ -25,10 +26,10 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
         return {
             id: nextId,
             name: prices.length > 0 ? 'Pris ' + (prices.length + 1) : 'Standardpris',
-            pricePerUnit: 0,
-            pricePerHour: 0,
-            pricePerUnitTHS: 0,
-            pricePerHourTHS: 0,
+            pricePerUnit: currency(0),
+            pricePerHour: currency(0),
+            pricePerUnitTHS: currency(0),
+            pricePerHourTHS: currency(0),
         };
     };
 
@@ -73,7 +74,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     type="number"
                     min="0"
                     defaultValue={price?.pricePerUnit ? price?.pricePerUnit?.toString() : ''}
-                    onChange={(e) => updatePrice({ ...price, pricePerUnit: toIntOrUndefined(e.target.value) ?? 0 })}
+                    onChange={(e) => updatePrice({ ...price, pricePerUnit: currency(e.target.value) })}
                 />
                 <InputGroup.Text>kr/st</InputGroup.Text>
             </InputGroup>
@@ -82,7 +83,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     type="number"
                     min="0"
                     defaultValue={price?.pricePerHour ? price?.pricePerHour?.toString() : ''}
-                    onChange={(e) => updatePrice({ ...price, pricePerHour: toIntOrUndefined(e.target.value) ?? 0 })}
+                    onChange={(e) => updatePrice({ ...price, pricePerHour: currency(e.target.value) })}
                 />
                 <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>
@@ -99,7 +100,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     type="number"
                     min="0"
                     defaultValue={price?.pricePerUnitTHS ? price?.pricePerUnitTHS?.toString() : ''}
-                    onChange={(e) => updatePrice({ ...price, pricePerUnitTHS: toIntOrUndefined(e.target.value) ?? 0 })}
+                    onChange={(e) => updatePrice({ ...price, pricePerUnitTHS: currency(e.target.value) })}
                 />
                 <InputGroup.Text>kr/st</InputGroup.Text>
             </InputGroup>
@@ -108,7 +109,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     type="number"
                     min="0"
                     defaultValue={price?.pricePerHourTHS ? price?.pricePerHourTHS?.toString() : ''}
-                    onChange={(e) => updatePrice({ ...price, pricePerHourTHS: toIntOrUndefined(e.target.value) ?? 0 })}
+                    onChange={(e) => updatePrice({ ...price, pricePerHourTHS: currency(e.target.value) })}
                 />
                 <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>

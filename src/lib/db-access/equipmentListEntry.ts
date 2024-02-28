@@ -116,6 +116,13 @@ export const validateEquipmentListEntryObjectionModel = (
     ) {
         return false;
     }
+
+    if (
+        equipmentListEntry.discount !== undefined &&
+        (isNaN(equipmentListEntry.discount) || equipmentListEntry.discount < 0)
+    ) {
+        return false;
+    }
     // Both relations (heading and list) cannot be null.
     if (
         equipmentListEntry.equipmentListId === null &&

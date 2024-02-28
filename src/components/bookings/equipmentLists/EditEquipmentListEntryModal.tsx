@@ -10,14 +10,16 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import RequiredIndicator from '../../utils/RequiredIndicator';
+import { PricedEntityWithTHS } from '../../../models/interfaces/BaseEntity';
+import currency from 'currency.js';
 
 type Props = {
     show: boolean;
     onHide: () => void;
-    priceDisplayFn: (price: EquipmentPrice) => string;
+    priceDisplayFn: (price: PricedEntityWithTHS) => string;
     getEquipmentListEntryPrices: (equipmentPrice: EquipmentPrice) => {
-        pricePerHour: number;
-        pricePerUnit: number;
+        pricePerHour: currency;
+        pricePerUnit: currency;
         equipmentPrice: EquipmentPrice;
     };
     equipmentListEntryToEditViewModel: Partial<EquipmentListEntry> | null;
@@ -153,11 +155,11 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
                                             min="0"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice || readonly}
-                                            value={equipmentListEntryToEditViewModel?.pricePerUnit ?? ''}
+                                            value={equipmentListEntryToEditViewModel?.pricePerUnit?.value ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
-                                                    pricePerUnit: toIntOrUndefined(e.target.value, true),
+                                                    pricePerUnit: currency(e.target.value),
                                                 })
                                             }
                                         />
@@ -174,11 +176,11 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
                                             min="0"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice || readonly}
-                                            value={equipmentListEntryToEditViewModel?.pricePerHour ?? ''}
+                                            value={equipmentListEntryToEditViewModel?.pricePerHour?.value ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
-                                                    pricePerHour: toIntOrUndefined(e.target.value, true),
+                                                    pricePerHour: currency(e.target.value),
                                                 })
                                             }
                                         />
@@ -197,12 +199,12 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     <FormNumberFieldWithoutScroll
                                         type="number"
                                         min="0"
-                                        value={equipmentListEntryToEditViewModel?.discount ?? ''}
+                                        value={equipmentListEntryToEditViewModel?.discount?.value ?? ''}
                                         readOnly={readonly}
                                         onChange={(e) =>
                                             setEquipmentListEntryToEditViewModel({
                                                 ...equipmentListEntryToEditViewModel,
-                                                discount: toIntOrUndefined(e.target.value, true),
+                                                discount: currency(e.target.value),
                                             })
                                         }
                                     />
@@ -322,12 +324,12 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     equipmentId: equipmentListEntryToEditViewModel.equipmentId,
                                     name: equipmentListEntryToEditViewModel.name ?? '',
                                     description: equipmentListEntryToEditViewModel.description ?? '',
-                                    numberOfUnits: Math.abs(equipmentListEntryToEditViewModel.numberOfUnits ?? 1),
-                                    numberOfHours: Math.abs(equipmentListEntryToEditViewModel.numberOfHours ?? 0),
-                                    pricePerUnit: Math.abs(equipmentListEntryToEditViewModel.pricePerUnit ?? 0),
-                                    pricePerHour: Math.abs(equipmentListEntryToEditViewModel.pricePerHour ?? 0),
+                                    numberOfUnits: equipmentListEntryToEditViewModel.numberOfUnits ?? 1,
+                                    numberOfHours: equipmentListEntryToEditViewModel.numberOfHours ?? 0,
+                                    pricePerUnit: equipmentListEntryToEditViewModel.pricePerUnit ?? currency(0),
+                                    pricePerHour: equipmentListEntryToEditViewModel.pricePerHour ?? currency(0),
+                                    discount: equipmentListEntryToEditViewModel.discount ?? currency(0),
                                     equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
-                                    discount: Math.abs(equipmentListEntryToEditViewModel.discount ?? 0),
                                     isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
                                     account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),
                                 };

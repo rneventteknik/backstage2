@@ -10,6 +10,7 @@ import { formatDatetimeForForm } from '../../../lib/datetimeUtils';
 import { getNextSortIndex } from '../../../lib/sortIndexUtils';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
 import { formatNumberAsCurrency } from '../../../lib/pricingUtils';
+import currency from 'currency.js';
 
 type Props = {
     booking: BookingViewModel;
@@ -62,7 +63,7 @@ const TimeReportModal: React.FC<Props> = ({
             userId: userId,
             startDatetime: timeReport?.startDatetime?.toISOString() ?? '',
             endDatetime: timeReport?.endDatetime?.toISOString() ?? '',
-            pricePerHour: timeReport?.pricePerHour ?? 0,
+            pricePerHour: timeReport?.pricePerHour?.value ?? 0,
             name: timeReport?.name ?? '',
             sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
         };
@@ -155,18 +156,18 @@ const TimeReportModal: React.FC<Props> = ({
                                         type="text"
                                         required
                                         readOnly={readonly}
-                                        defaultValue={timeReport?.pricePerHour}
+                                        defaultValue={timeReport?.pricePerHour?.value}
                                         onChange={(e) =>
                                             setTimeReport({
                                                 ...timeReport,
-                                                pricePerHour: toIntOrUndefined(e.target.value),
+                                                pricePerHour: currency(e.target.value),
                                             })
                                         }
                                     />
                                     <InputGroup.Text>kr/h</InputGroup.Text>
                                 </InputGroup>
                                 <PriceWithVATPreview price={timeReport?.pricePerHour} />
-                                {timeReport?.pricePerHour !== defaultLaborHourlyRate ? (
+                                {timeReport?.pricePerHour?.value !== defaultLaborHourlyRate ? (
                                     <Form.Text className="text-muted">
                                         Standardpris för detta evenemang är:{' '}
                                         {formatNumberAsCurrency(defaultLaborHourlyRate)}/h

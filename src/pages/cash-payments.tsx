@@ -15,7 +15,7 @@ import TableStyleLink from '../components/utils/TableStyleLink';
 import UserDisplay from '../components/utils/UserDisplay';
 import UserIcon from '../components/utils/UserIcon';
 import { bookingsFetcher } from '../lib/fetchers';
-import { addVAT, formatNumberAsCurrency, getBookingPrice } from '../lib/pricingUtils';
+import { addVAT, formatCurrency, getBookingPrice } from '../lib/pricingUtils';
 import { useNotifications } from '../lib/useNotifications';
 import { useUser } from '../lib/useUser';
 import { getGlobalSetting, getResponseContentOrError } from '../lib/utils';
@@ -144,7 +144,7 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
     const BookingPriceDisplayFn = (booking: Booking) => (
         <>
             <span style={{ fontSize: '1.2em' }} className="text-monospace">
-                {formatNumberAsCurrency(addVAT(getBookingPrice(booking)))}
+                {formatCurrency(addVAT(getBookingPrice(booking)))}
             </span>
         </>
     );

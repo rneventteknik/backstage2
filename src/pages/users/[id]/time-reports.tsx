@@ -16,7 +16,7 @@ import TableStyleLink from '../../../components/utils/TableStyleLink';
 import { getBookingDateHeadingValue, getFormattedInterval, toBookingViewModel } from '../../../lib/datetimeUtils';
 import { getGlobalSetting, groupBy } from '../../../lib/utils';
 import { getSortedList } from '../../../lib/sortIndexUtils';
-import { formatNumberAsCurrency, getSalaryForTimeReport } from '../../../lib/pricingUtils';
+import { formatCurrency, formatNumberAsCurrency, getSalaryForTimeReport } from '../../../lib/pricingUtils';
 import { SalaryStatus } from '../../../models/enums/SalaryStatus';
 import TimeReportHourDisplay from '../../../components/utils/TimeReportHourDisplay';
 import DoneIcon from '../../../components/utils/DoneIcon';
@@ -126,7 +126,7 @@ const TimeReportsPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
 
     const TimeReportHourlyRateDisplayFn = (timeReport: TimeReportViewModel) =>
         formatNumberAsCurrency(timeReport.hourlyRate);
-    const TimeReportSumDisplayFn = (timeReport: TimeReportViewModel) => formatNumberAsCurrency(timeReport.salarySum);
+    const TimeReportSumDisplayFn = (timeReport: TimeReportViewModel) => formatCurrency(timeReport.salarySum);
     const TimeReportSentDisplayFn = (timeReport: TimeReportViewModel) =>
         timeReport.booking.salaryStatus === SalaryStatus.SENT ? <DoneIcon /> : <></>;
 
@@ -218,7 +218,7 @@ const TimeReportsPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                     <TableDisplay entities={timeReportMonth.timeReports} configuration={tableSettings} />
                     <Card.Footer>
                         Totalt timarvode för perioden:{' '}
-                        {formatNumberAsCurrency(
+                        {formatCurrency(
                             timeReportMonth.timeReports.map((x) => x.salarySum).reduce((a, b) => a.add(b), currency(0)),
                         )}
                     </Card.Footer>

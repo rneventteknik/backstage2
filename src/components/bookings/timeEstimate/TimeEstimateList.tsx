@@ -19,12 +19,7 @@ import {
     faPlus,
     faGears,
 } from '@fortawesome/free-solid-svg-icons';
-import {
-    addVAT,
-    formatNumberAsCurrency,
-    getTimeEstimatePrice,
-    getTotalTimeEstimatesPrice,
-} from '../../../lib/pricingUtils';
+import { addVAT, formatCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
 import Skeleton from 'react-loading-skeleton';
 import {
     getNextSortIndex,
@@ -37,6 +32,7 @@ import {
 } from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from './TimeEstimateAddButton';
 import TimeEstimateModal from './TimeEstimateModal';
+import currency from 'currency.js';
 
 type Props = {
     bookingId: number;
@@ -178,7 +174,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
     );
 
     const TimeEstimateTotalPriceDisplayFn = (entry: TimeEstimate) => {
-        return <em>{formatNumberAsCurrency(addVAT(getTimeEstimatePrice(entry)))}</em>;
+        return <em>{formatCurrency(addVAT(getTimeEstimatePrice(entry)))}</em>;
     };
 
     const TimeEstimateEntryActionsDisplayFn = (entry: TimeEstimate) => {
@@ -277,7 +273,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                     </div>
                 </div>
                 <p className="text-muted">
-                    {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(timeEstimates)))} /{' '}
+                    {formatCurrency(addVAT(getTotalTimeEstimatesPrice(timeEstimates)))} /{' '}
                     {timeEstimates.reduce((sum: number, entry: TimeEstimate) => sum + entry.numberOfHours, 0)} h
                 </p>
             </Card.Header>
@@ -316,7 +312,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                             id: timeEstimateToEditViewModel.id,
                             bookingId: booking.id,
                             numberOfHours: timeEstimateToEditViewModel?.numberOfHours ?? 0,
-                            pricePerHour: timeEstimateToEditViewModel?.pricePerHour ?? 0,
+                            pricePerHour: timeEstimateToEditViewModel?.pricePerHour ?? currency(0),
                             name: timeEstimateToEditViewModel?.name ?? '',
                             sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
                         };

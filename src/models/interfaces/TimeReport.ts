@@ -1,3 +1,4 @@
+import currency from 'currency.js';
 import { BaseEntityWithName } from './BaseEntity';
 import { User } from './User';
 
@@ -8,7 +9,7 @@ export interface TimeReport extends BaseEntityWithName {
     billableWorkingHours: number;
     startDatetime?: Date;
     endDatetime?: Date;
-    pricePerHour: number;
+    pricePerHour: currency;
     bookingId: number;
     sortIndex: number;
 }

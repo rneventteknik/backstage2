@@ -9,7 +9,7 @@ import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils'
 import { toBooking } from '../../../lib/mappers/booking';
 import { IBookingObjectionModel } from '../../../models/objection-models';
 import { getSortedList, sortIndexSortFn } from '../../../lib/sortIndexUtils';
-import { formatNumberAsCurrency, formatPrice } from '../../../lib/pricingUtils';
+import { formatCurrency, formatPrice } from '../../../lib/pricingUtils';
 import { Booking, Equipment, EquipmentPrice } from '../../../models/interfaces';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
@@ -364,7 +364,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
 
-        return entry.discount ? <span className="text-danger">{formatNumberAsCurrency(entry.discount)}</span> : '-';
+        return entry.discount ? <span className="text-danger">{formatCurrency(entry.discount)}</span> : '-';
     };
 
     const EquipmentListEntryPriceDisplayFn = (viewModel: ViewModel) => {
@@ -376,7 +376,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
 
         return (
             <>
-                {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
+                {formatPrice(entry)}
                 {resetPrices &&
                 entry.equipment &&
                 entry.equipmentPrice &&
@@ -482,7 +482,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                 key: 'discount',
                 displayName: 'Rabatt',
                 getValue: (viewModel: ViewModel) =>
-                    viewModelIsHeading(viewModel) ? '' : getEquipmentListEntryFromViewModel(viewModel).discount,
+                    viewModelIsHeading(viewModel) ? '' : getEquipmentListEntryFromViewModel(viewModel).discount.value,
                 getContentOverride: EquipmentListEntryDiscountDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 100,
