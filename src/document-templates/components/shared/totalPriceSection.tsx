@@ -60,9 +60,7 @@ export const TotalPriceSection: React.FC<Props> = ({
                             <Text>{t('common.total-price-section.time-estimate-sum')}</Text>
                         </TableCellAutoWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>
-                                {formatCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
-                            </Text>
+                            <Text>{formatCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}</Text>
                         </TableCellFixedWidth>
                     </TableRow>
                 ) : null}

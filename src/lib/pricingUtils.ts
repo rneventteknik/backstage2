@@ -1,7 +1,7 @@
 import { PricePlan } from '../models/enums/PricePlan';
 import { AccountKind } from '../models/enums/AccountKind';
 import { Booking, BookingViewModel, TimeEstimate, TimeReport } from '../models/interfaces';
-import { PricedEntity, PricedEntityCurrency, PricedEntityWithTHS, PricedEntityWithTHSCurrency } from '../models/interfaces/BaseEntity';
+import { PricedEntityCurrency, PricedEntityWithTHSCurrency } from '../models/interfaces/BaseEntity';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../models/interfaces/EquipmentList';
 import { SalaryGroup } from '../models/interfaces/SalaryGroup';
 import { InvoiceCustomer, InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../models/misc/Invoice';
@@ -152,12 +152,11 @@ export const formatTHSPrice = (price: PricedEntityWithTHSCurrency): string =>
     formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
 
 export const formatNumberAsCurrency = (number: number, showPlusIfPositive = false): string =>
-    formatCurrency(currency(number), showPlusIfPositive)
+    formatCurrency(currency(number), showPlusIfPositive);
 
 export const formatCurrency = (number: currency, showPlusIfPositive = false): string =>
     (showPlusIfPositive && number.value > 0 ? '+' : '') +
     Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(number.value);
-
 
 export const getInvoiceData = (
     booking: BookingViewModel,
@@ -290,9 +289,7 @@ export const getInvoiceData = (
                 if (entry.discount) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('invoice.discount')}: ${formatCurrency(
-                            getCalculatedDiscount(entry, numberOfDays),
-                        )}`,
+                        text: `${t('invoice.discount')}: ${formatCurrency(getCalculatedDiscount(entry, numberOfDays))}`,
                     });
                 }
 

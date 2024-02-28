@@ -324,7 +324,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             : [customPriceDropdownValue, ...entry.equipment.prices]
                     }
                     value={entry.equipmentPrice ?? customPriceDropdownValue}
-                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS((x)))}`}
+                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(x))}`}
                     optionKeyFn={(x) => x.id.toString()}
                     onChange={(newPrice) =>
                         newPrice && newPrice.id != -1
@@ -338,16 +338,14 @@ const EquipmentListTable: React.FC<Props> = ({
                     }
                     readonly={readonly}
                 >
-                    {formatPrice(addVATToPrice((entry)))}
+                    {formatPrice(addVATToPrice(entry))}
                     {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
                         <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
                     ) : null}
                 </DoubleClickToEditDropdown>
             </span>
         ) : (
-            <span className={showPricesAsMuted ? 'text-muted' : ''}>
-                {formatPrice(addVATToPrice((entry)))}
-            </span>
+            <span className={showPricesAsMuted ? 'text-muted' : ''}>{formatPrice(addVATToPrice(entry))}</span>
         );
     };
 

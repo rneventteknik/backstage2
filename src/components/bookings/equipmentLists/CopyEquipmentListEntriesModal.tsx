@@ -376,7 +376,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
 
         return (
             <>
-                {formatPrice((entry))}
+                {formatPrice(entry)}
                 {resetPrices &&
                 entry.equipment &&
                 entry.equipmentPrice &&
@@ -389,7 +389,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                             <Tooltip id="1">
                                 Priset kommer återställas till:
                                 <br />
-                                <em>{formatPrice((getEquipmentListEntryPrices(entry.equipmentPrice)))}</em>
+                                <em>{formatPrice(getEquipmentListEntryPrices(entry.equipmentPrice))}</em>
                             </Tooltip>
                         }
                     >
@@ -409,7 +409,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                 <br />
                                 <em>
                                     {entry.equipment.prices[0].name}:{' '}
-                                    {formatPrice((getEquipmentListEntryPrices(entry.equipment.prices[0])))}
+                                    {formatPrice(getEquipmentListEntryPrices(entry.equipment.prices[0]))}
                                 </em>
                             </Tooltip>
                         }

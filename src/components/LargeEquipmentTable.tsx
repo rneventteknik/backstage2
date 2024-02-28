@@ -49,9 +49,9 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
             }
             return (
                 <>
-                    {formatPrice(addVATToPriceWithTHS((equipment.prices[0])))}
+                    {formatPrice(addVATToPriceWithTHS(equipment.prices[0]))}
                     <br />
-                    {formatTHSPrice(addVATToPriceWithTHS((equipment.prices[0])))}
+                    {formatTHSPrice(addVATToPriceWithTHS(equipment.prices[0]))}
                 </>
             );
         default:
@@ -64,9 +64,9 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
                                 {equipment.prices.map((p) => (
                                     <p key={p.id}>
                                         <h2 style={{ fontSize: '1em' }}>{p.name}</h2>
-                                        {formatPrice(addVATToPriceWithTHS((p)))}
+                                        {formatPrice(addVATToPriceWithTHS(p))}
                                         <br />
-                                        {formatTHSPrice(addVATToPriceWithTHS((p)))}
+                                        {formatTHSPrice(addVATToPriceWithTHS(p))}
                                     </p>
                                 ))}
                             </small>
@@ -121,10 +121,10 @@ const tableSettings: TableConfiguration<Equipment> = {
             getValue: (equipment: Equipment) =>
                 equipment.prices && equipment.prices.length === 1
                     ? addVAT(
-                          equipment.prices[0].pricePerHour.add(
-                              equipment.prices[0].pricePerUnit).add(
-                              equipment.prices[0].pricePerHourTHS).add(
-                              equipment.prices[0].pricePerUnitTHS),
+                          equipment.prices[0].pricePerHour
+                              .add(equipment.prices[0].pricePerUnit)
+                              .add(equipment.prices[0].pricePerHourTHS)
+                              .add(equipment.prices[0].pricePerUnitTHS),
                       ).divide(4).value
                     : -Infinity,
             getContentOverride: EquipmentPriceDisplayFn,

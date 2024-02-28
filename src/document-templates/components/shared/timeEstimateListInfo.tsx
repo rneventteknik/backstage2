@@ -1,12 +1,7 @@
 import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles } from '../../utils';
-import {
-    getTimeEstimatePrice,
-    getTotalTimeEstimatesPrice,
-    addVAT,
-    formatCurrency,
-} from '../../../lib/pricingUtils';
+import { getTimeEstimatePrice, getTotalTimeEstimatesPrice, addVAT, formatCurrency } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { useTextResources } from '../../useTextResources';
 import { Booking } from '../../../models/interfaces';

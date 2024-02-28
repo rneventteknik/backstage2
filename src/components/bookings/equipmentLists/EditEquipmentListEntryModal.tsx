@@ -141,7 +141,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         <option value={undefined}>Anpassat pris</option>
                                         {equipmentListEntryToEditViewModel.equipment?.prices?.map((x) => (
                                             <option key={x.id.toString()} value={x.id.toString()}>
-                                                {x.name} {priceDisplayFn((x))}
+                                                {x.name} {priceDisplayFn(x)}
                                             </option>
                                         ))}
                                     </Form.Control>
@@ -326,9 +326,15 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     description: equipmentListEntryToEditViewModel.description ?? '',
                                     numberOfUnits: Math.abs(equipmentListEntryToEditViewModel.numberOfUnits ?? 1),
                                     numberOfHours: Math.abs(equipmentListEntryToEditViewModel.numberOfHours ?? 0),
-                                    pricePerUnit: currency(Math.abs(equipmentListEntryToEditViewModel.pricePerUnit?.value ?? 0)),
-                                    pricePerHour: currency(Math.abs(equipmentListEntryToEditViewModel.pricePerHour?.value ?? 0)),
-                                    discount: currency(Math.abs(equipmentListEntryToEditViewModel.discount?.value ?? 0)),
+                                    pricePerUnit: currency(
+                                        Math.abs(equipmentListEntryToEditViewModel.pricePerUnit?.value ?? 0),
+                                    ),
+                                    pricePerHour: currency(
+                                        Math.abs(equipmentListEntryToEditViewModel.pricePerHour?.value ?? 0),
+                                    ),
+                                    discount: currency(
+                                        Math.abs(equipmentListEntryToEditViewModel.discount?.value ?? 0),
+                                    ),
                                     equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
                                     isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
                                     account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),

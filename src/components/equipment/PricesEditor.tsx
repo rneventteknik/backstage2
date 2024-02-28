@@ -88,7 +88,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                 <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>
             <p className="text-muted text-left mt-1 mb-0 small">
-                Pris ink. moms: {formatPrice(addVATToPriceWithTHS((price)))}
+                Pris ink. moms: {formatPrice(addVATToPriceWithTHS(price))}
             </p>
         </>
     );
@@ -109,12 +109,12 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     type="number"
                     min="0"
                     defaultValue={price?.pricePerHourTHS ? price?.pricePerHourTHS?.toString() : ''}
-                    onChange={(e) => updatePrice({ ...price, pricePerHourTHS: currency(e.target.value)})}
+                    onChange={(e) => updatePrice({ ...price, pricePerHourTHS: currency(e.target.value) })}
                 />
                 <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>
             <p className="text-muted text-left mt-1 mb-0 small">
-                Pris ink. moms: {formatTHSPrice(addVATToPriceWithTHS((price)))}
+                Pris ink. moms: {formatTHSPrice(addVATToPriceWithTHS(price))}
             </p>
         </>
     );

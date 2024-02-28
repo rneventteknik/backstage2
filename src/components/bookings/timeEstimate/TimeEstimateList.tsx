@@ -19,12 +19,7 @@ import {
     faPlus,
     faGears,
 } from '@fortawesome/free-solid-svg-icons';
-import {
-    addVAT,
-    formatCurrency,
-    getTimeEstimatePrice,
-    getTotalTimeEstimatesPrice,
-} from '../../../lib/pricingUtils';
+import { addVAT, formatCurrency, getTimeEstimatePrice, getTotalTimeEstimatesPrice } from '../../../lib/pricingUtils';
 import Skeleton from 'react-loading-skeleton';
 import {
     getNextSortIndex,

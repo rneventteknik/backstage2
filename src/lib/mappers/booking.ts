@@ -165,6 +165,6 @@ export const toEquipmentListEntryObjectionModel = (
         equipmentPriceId: clientModel.equipmentPrice?.id ?? null,
         pricePerHour: clientModel.pricePerHour?.value,
         pricePerUnit: clientModel.pricePerUnit?.value,
-        discount: clientModel.discount?.value
+        discount: clientModel.discount?.value,
     };
 };

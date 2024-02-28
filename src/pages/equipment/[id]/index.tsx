@@ -156,11 +156,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                     <span className="d-block">{p.name}</span>
                                     <span className="d-flex text-muted">
                                         <span className="flex-grow-1">{getPricePlanName(PricePlan.EXTERNAL)}</span>
-                                        <span>{formatPrice(addVATToPriceWithTHS((p)))}</span>
+                                        <span>{formatPrice(addVATToPriceWithTHS(p))}</span>
                                     </span>
                                     <span className="d-flex text-muted">
                                         <span className="flex-grow-1">{getPricePlanName(PricePlan.THS)}</span>
-                                        <span>{formatTHSPrice(addVATToPriceWithTHS((p)))}</span>
+                                        <span>{formatTHSPrice(addVATToPriceWithTHS(p))}</span>
                                     </span>
                                 </ListGroup.Item>
                             ))}

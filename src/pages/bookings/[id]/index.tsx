@@ -369,9 +369,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             ))}
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Estimerad personalkostnad</span>
-                                <span>
-                                    {formatCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
-                                </span>
+                                <span>{formatCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}</span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <strong className="flex-grow-1">Pris med estimerad personalkostnad</strong>
@@ -386,16 +384,12 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                     <ListGroup.Item className="d-flex">
                                         <span className="flex-grow-1">Faktisk personalkostnad</span>
                                         <span>
-                                            {formatCurrency(
-                                                addVAT(getTotalTimeReportsPrice(booking.timeReports)),
-                                            )}
+                                            {formatCurrency(addVAT(getTotalTimeReportsPrice(booking.timeReports)))}
                                         </span>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
                                         <strong className="flex-grow-1">Pris med faktisk personalkostnad</strong>
-                                        <strong>
-                                            {formatCurrency(addVAT(getBookingPrice(booking, false, true)))}
-                                        </strong>
+                                        <strong>{formatCurrency(addVAT(getBookingPrice(booking, false, true)))}</strong>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
                                         <em className="flex-grow-1 pl-4">varav moms (25%)</em>
