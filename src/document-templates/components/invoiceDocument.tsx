@@ -17,7 +17,7 @@ import {
     TableRowWithNoBorder,
     TableRowWithTopBorder,
 } from './shared/utils';
-import { formatNumberAsCurrency, getVAT } from '../../lib/pricingUtils';
+import { formatCurrency, getVAT } from '../../lib/pricingUtils';
 import currency from 'currency.js';
 
 const styles = StyleSheet.create({
@@ -62,13 +62,13 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoiceRow }: InvoiceRowProps) 
                         <Text>{`${pricedInvoiceRow.numberOfUnits}${pricedInvoiceRow.unit}`}</Text>
                     </TableCellFixedWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
-                        <Text>{formatNumberAsCurrency(pricedInvoiceRow.pricePerUnit)}</Text>
+                        <Text>{formatCurrency(pricedInvoiceRow.pricePerUnit)}</Text>
                     </TableCellFixedWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
                         <Text>{pricedInvoiceRow.account}</Text>
                     </TableCellFixedWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
-                        <Text>{formatNumberAsCurrency(pricedInvoiceRow.rowPrice)}</Text>
+                        <Text>{formatCurrency(pricedInvoiceRow.rowPrice)}</Text>
                     </TableCellFixedWidth>
                 </TableRowWithTopBorder>
             );
@@ -96,7 +96,7 @@ const AccountRows: React.FC<AccountRowsProps> = ({ invoiceData }: AccountRowsPro
                         <Text>{`${t('invoice.account')}: ${key}`}</Text>
                     </TableCellAutoWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
-                        <Text>{formatNumberAsCurrency(calculateRowPriceSum(rowsByAccount[key]))}</Text>
+                        <Text>{formatCurrency(calculateRowPriceSum(rowsByAccount[key]))}</Text>
                     </TableCellFixedWidth>
                 </TableRow>
             ))}
@@ -124,7 +124,7 @@ const InvoiceTotalPriceSection: React.FC<InvoiceTotalPriceSectionProps> = ({
                     <Text style={styles.bold}>{t('invoice.total-price-section.total-sum-ex-vat')}</Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.bold}>{formatNumberAsCurrency(calculateTotalAmount(invoiceData))}</Text>
+                    <Text style={styles.bold}>{formatCurrency(calculateTotalAmount(invoiceData))}</Text>
                 </TableCellFixedWidth>
             </TableRow>
 
@@ -133,7 +133,7 @@ const InvoiceTotalPriceSection: React.FC<InvoiceTotalPriceSectionProps> = ({
                     <Text>{t('invoice.total-price-section.vat')}</Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
-                    <Text>{formatNumberAsCurrency(calculateTotalVAT(invoiceData))}</Text>
+                    <Text>{formatCurrency(calculateTotalVAT(invoiceData))}</Text>
                 </TableCellFixedWidth>
             </TableRow>
 
@@ -143,7 +143,7 @@ const InvoiceTotalPriceSection: React.FC<InvoiceTotalPriceSectionProps> = ({
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.bold}>
-                        {formatNumberAsCurrency(calculateTotalAmount(invoiceData).add(calculateTotalVAT(invoiceData)))}
+                        {formatCurrency(calculateTotalAmount(invoiceData).add(calculateTotalVAT(invoiceData)))}
                     </Text>
                 </TableCellFixedWidth>
             </TableRow>

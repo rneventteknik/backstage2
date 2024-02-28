@@ -2,7 +2,7 @@ import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Badge, Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
-import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
+import { addVATToPriceWithTHS, convertPriceToCurrencyWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { idSortFn } from '../../lib/sortIndexUtils';
 import { getPricePlanName, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
 import { PricePlan } from '../../models/enums/PricePlan';
@@ -87,7 +87,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                 <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>
             <p className="text-muted text-left mt-1 mb-0 small">
-                Pris ink. moms: {formatPrice(addVATToPriceWithTHS(price))}
+                Pris ink. moms: {formatPrice(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(price)))}
             </p>
         </>
     );
@@ -113,7 +113,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                 <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>
             <p className="text-muted text-left mt-1 mb-0 small">
-                Pris ink. moms: {formatTHSPrice(addVATToPriceWithTHS(price))}
+                Pris ink. moms: {formatTHSPrice(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(price)))}
             </p>
         </>
     );

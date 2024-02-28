@@ -43,7 +43,7 @@ import { PaymentStatus } from '../../../models/enums/PaymentStatus';
 import ChangelogCard from '../../../components/ChangelogCard';
 import {
     addVAT,
-    formatNumberAsCurrency,
+    formatCurrency,
     getBookingPrice,
     getEquipmentListPrice,
     getTotalTimeEstimatesPrice,
@@ -364,29 +364,29 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             {booking.equipmentLists?.map((list) => (
                                 <ListGroup.Item className="d-flex" key={list.id}>
                                     <span className="flex-grow-1">{list.name}</span>
-                                    <span>{formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}</span>
+                                    <span>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</span>
                                 </ListGroup.Item>
                             ))}
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Estimerad personalkostnad</span>
                                 <span>
-                                    {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
+                                    {formatCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
                                 </span>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <strong className="flex-grow-1">Pris med estimerad personalkostnad</strong>
-                                <strong>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true, true)))}</strong>
+                                <strong>{formatCurrency(addVAT(getBookingPrice(booking, true, true)))}</strong>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <em className="flex-grow-1 pl-4">varav moms (25%)</em>
-                                <em>{formatNumberAsCurrency(getVAT(getBookingPrice(booking, true, true)))}</em>
+                                <em>{formatCurrency(getVAT(getBookingPrice(booking, true, true)))}</em>
                             </ListGroup.Item>
                             {timeReportExists ? (
                                 <>
                                     <ListGroup.Item className="d-flex">
                                         <span className="flex-grow-1">Faktisk personalkostnad</span>
                                         <span>
-                                            {formatNumberAsCurrency(
+                                            {formatCurrency(
                                                 addVAT(getTotalTimeReportsPrice(booking.timeReports)),
                                             )}
                                         </span>
@@ -394,17 +394,17 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                     <ListGroup.Item className="d-flex">
                                         <strong className="flex-grow-1">Pris med faktisk personalkostnad</strong>
                                         <strong>
-                                            {formatNumberAsCurrency(addVAT(getBookingPrice(booking, false, true)))}
+                                            {formatCurrency(addVAT(getBookingPrice(booking, false, true)))}
                                         </strong>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
                                         <em className="flex-grow-1 pl-4">varav moms (25%)</em>
-                                        <em>{formatNumberAsCurrency(getVAT(getBookingPrice(booking, false, true)))}</em>
+                                        <em>{formatCurrency(getVAT(getBookingPrice(booking, false, true)))}</em>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
                                         <span className="flex-grow-1">Skillnad mot estimerad personalkostnad</span>
                                         <span>
-                                            {formatNumberAsCurrency(
+                                            {formatCurrency(
                                                 addVAT(
                                                     getBookingPrice(booking, false, true).subtract(
                                                         getBookingPrice(booking, true, true),
@@ -420,11 +420,11 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                 <>
                                     <ListGroup.Item className="d-flex">
                                         <strong className="flex-grow-1">Fast pris</strong>
-                                        <strong>{formatNumberAsCurrency(addVAT(booking.fixedPrice))}</strong>
+                                        <strong>{formatCurrency(addVAT(booking.fixedPrice))}</strong>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
                                         <em className="flex-grow-1 pl-4">varav moms (25%)</em>
-                                        <em>{formatNumberAsCurrency(getVAT(booking.fixedPrice))}</em>
+                                        <em>{formatCurrency(getVAT(booking.fixedPrice))}</em>
                                     </ListGroup.Item>
                                     {timeReportExists ? (
                                         <ListGroup.Item className="d-flex">
@@ -432,7 +432,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                                 Skillnad mot pris med faktisk personalkostnad
                                             </span>
                                             <span>
-                                                {formatNumberAsCurrency(
+                                                {formatCurrency(
                                                     addVAT(
                                                         currency(booking.fixedPrice).subtract(
                                                             getBookingPrice(booking, false, true),
@@ -448,7 +448,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                                 Skillnad mot pris med estimerad personalkostnad
                                             </span>
                                             <span>
-                                                {formatNumberAsCurrency(
+                                                {formatCurrency(
                                                     addVAT(
                                                         currency(booking.fixedPrice).subtract(
                                                             getBookingPrice(booking, true, true),

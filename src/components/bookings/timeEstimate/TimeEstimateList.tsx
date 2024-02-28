@@ -21,7 +21,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {
     addVAT,
-    formatNumberAsCurrency,
+    formatCurrency,
     getTimeEstimatePrice,
     getTotalTimeEstimatesPrice,
 } from '../../../lib/pricingUtils';
@@ -178,7 +178,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
     );
 
     const TimeEstimateTotalPriceDisplayFn = (entry: TimeEstimate) => {
-        return <em>{formatNumberAsCurrency(addVAT(getTimeEstimatePrice(entry)))}</em>;
+        return <em>{formatCurrency(addVAT(getTimeEstimatePrice(entry)))}</em>;
     };
 
     const TimeEstimateEntryActionsDisplayFn = (entry: TimeEstimate) => {
@@ -277,7 +277,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                     </div>
                 </div>
                 <p className="text-muted">
-                    {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(timeEstimates)))} /{' '}
+                    {formatCurrency(addVAT(getTotalTimeEstimatesPrice(timeEstimates)))} /{' '}
                     {timeEstimates.reduce((sum: number, entry: TimeEstimate) => sum + entry.numberOfHours, 0)} h
                 </p>
             </Card.Header>

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { fetchEquipmentPublicCategoriesPublic, fetchEquipmentsPublic } from '../../lib/db-access';
 import { Button, ButtonGroup, Table } from 'react-bootstrap';
 import EquipmentTagDisplay from '../../components/utils/EquipmentTagDisplay';
-import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
+import { addVATToPriceWithTHS, convertPriceToCurrencyWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { getGlobalSetting, groupBy, replaceEmptyStringWithNull } from '../../lib/utils';
 import { IEquipmentObjectionModel } from '../../models/objection-models';
 import {
@@ -62,8 +62,8 @@ const PriceCells: React.FC<PriceCellsProps> = ({ price, hidePriceType, showWithV
             <td>{hidePriceType ? null : price.name}</td>
             <td>
                 {showThsPrice
-                    ? formatTHSPrice(showWithVat ? addVATToPriceWithTHS(price) : price)
-                    : formatPrice(showWithVat ? addVATToPriceWithTHS(price) : price)}
+                    ? formatTHSPrice(showWithVat ? addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(price)) : convertPriceToCurrencyWithTHS(price))
+                    : formatPrice(showWithVat ? addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(price)) : convertPriceToCurrencyWithTHS(price))}
             </td>
         </>
     ) : (

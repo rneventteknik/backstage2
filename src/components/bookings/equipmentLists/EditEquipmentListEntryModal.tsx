@@ -10,11 +10,13 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import RequiredIndicator from '../../utils/RequiredIndicator';
+import { PricedEntityWithTHSCurrency } from '../../../models/interfaces/BaseEntity';
+import { convertPriceToCurrencyWithTHS } from '../../../lib/pricingUtils';
 
 type Props = {
     show: boolean;
     onHide: () => void;
-    priceDisplayFn: (price: EquipmentPrice) => string;
+    priceDisplayFn: (price: PricedEntityWithTHSCurrency) => string;
     getEquipmentListEntryPrices: (equipmentPrice: EquipmentPrice) => {
         pricePerHour: number;
         pricePerUnit: number;
@@ -139,7 +141,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         <option value={undefined}>Anpassat pris</option>
                                         {equipmentListEntryToEditViewModel.equipment?.prices?.map((x) => (
                                             <option key={x.id.toString()} value={x.id.toString()}>
-                                                {x.name} {priceDisplayFn(x)}
+                                                {x.name} {priceDisplayFn(convertPriceToCurrencyWithTHS(x))}
                                             </option>
                                         ))}
                                     </Form.Control>

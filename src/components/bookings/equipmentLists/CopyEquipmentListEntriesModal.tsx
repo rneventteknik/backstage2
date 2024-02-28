@@ -9,7 +9,7 @@ import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils'
 import { toBooking } from '../../../lib/mappers/booking';
 import { IBookingObjectionModel } from '../../../models/objection-models';
 import { getSortedList, sortIndexSortFn } from '../../../lib/sortIndexUtils';
-import { formatNumberAsCurrency, formatPrice } from '../../../lib/pricingUtils';
+import { convertPriceToCurrency, formatNumberAsCurrency, formatPrice } from '../../../lib/pricingUtils';
 import { Booking, Equipment, EquipmentPrice } from '../../../models/interfaces';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
@@ -376,7 +376,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
 
         return (
             <>
-                {formatPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit })}
+                {formatPrice(convertPriceToCurrency(entry))}
                 {resetPrices &&
                 entry.equipment &&
                 entry.equipmentPrice &&
@@ -389,7 +389,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                             <Tooltip id="1">
                                 Priset kommer återställas till:
                                 <br />
-                                <em>{formatPrice(getEquipmentListEntryPrices(entry.equipmentPrice))}</em>
+                                <em>{formatPrice(convertPriceToCurrency(getEquipmentListEntryPrices(entry.equipmentPrice)))}</em>
                             </Tooltip>
                         }
                     >
@@ -409,7 +409,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                 <br />
                                 <em>
                                     {entry.equipment.prices[0].name}:{' '}
-                                    {formatPrice(getEquipmentListEntryPrices(entry.equipment.prices[0]))}
+                                    {formatPrice(convertPriceToCurrency(getEquipmentListEntryPrices(entry.equipment.prices[0])))}
                                 </em>
                             </Tooltip>
                         }

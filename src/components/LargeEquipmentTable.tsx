@@ -9,7 +9,7 @@ import { faEyeSlash, faTags } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from './utils/TableStyleLink';
 import useSwr from 'swr';
 import { equipmentLocationsFetcher, equipmentTagsFetcher } from '../lib/fetchers';
-import { formatPrice, addVATToPriceWithTHS, formatTHSPrice, addVAT } from '../lib/pricingUtils';
+import { formatPrice, addVATToPriceWithTHS, formatTHSPrice, addVAT, convertPriceToCurrencyWithTHS } from '../lib/pricingUtils';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 import { EquipmentLocation } from '../models/interfaces/EquipmentLocation';
 import { getSortedList } from '../lib/sortIndexUtils';
@@ -49,9 +49,9 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
             }
             return (
                 <>
-                    {formatPrice(addVATToPriceWithTHS(equipment.prices[0]))}
+                    {formatPrice(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(equipment.prices[0])))}
                     <br />
-                    {formatTHSPrice(addVATToPriceWithTHS(equipment.prices[0]))}
+                    {formatTHSPrice(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(equipment.prices[0])))}
                 </>
             );
         default:
@@ -64,9 +64,9 @@ const EquipmentPriceDisplayFn = (equipment: Equipment) => {
                                 {equipment.prices.map((p) => (
                                     <p key={p.id}>
                                         <h2 style={{ fontSize: '1em' }}>{p.name}</h2>
-                                        {formatPrice(addVATToPriceWithTHS(p))}
+                                        {formatPrice(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(p)))}
                                         <br />
-                                        {formatTHSPrice(addVATToPriceWithTHS(p))}
+                                        {formatTHSPrice(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(p)))}
                                     </p>
                                 ))}
                             </small>

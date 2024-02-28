@@ -11,7 +11,7 @@ import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { equipmentFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
+import { addVATToPriceWithTHS, convertPriceToCurrencyWithTHS, formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 import EquipmentCalendar from '../../../components/equipment/EquipmentCalendar';
@@ -156,11 +156,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                     <span className="d-block">{p.name}</span>
                                     <span className="d-flex text-muted">
                                         <span className="flex-grow-1">{getPricePlanName(PricePlan.EXTERNAL)}</span>
-                                        <span>{formatPrice(addVATToPriceWithTHS(p))}</span>
+                                        <span>{formatPrice(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(p)))}</span>
                                     </span>
                                     <span className="d-flex text-muted">
                                         <span className="flex-grow-1">{getPricePlanName(PricePlan.THS)}</span>
-                                        <span>{formatTHSPrice(addVATToPriceWithTHS(p))}</span>
+                                        <span>{formatTHSPrice(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(p)))}</span>
                                     </span>
                                 </ListGroup.Item>
                             ))}

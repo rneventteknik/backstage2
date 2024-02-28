@@ -23,7 +23,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toTimeReport } from '../../../lib/mappers/timeReport';
 import {
     addVAT,
-    formatNumberAsCurrency,
+    formatCurrency,
     getTimeReportPrice,
     getTotalTimeReportsPrice,
 } from '../../../lib/pricingUtils';
@@ -215,7 +215,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 ) : null}
             </div>
             <div className="mb-0 text-muted d-md-none">
-                {formatNumberAsCurrency(addVAT(getTimeReportPrice(timeReport)))}
+                {formatCurrency(addVAT(getTimeReportPrice(timeReport)))}
             </div>
         </>
     );
@@ -253,12 +253,12 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
         const getPricePerHourIfNotDefault = (timeReport: TimeReport) => {
             return timeReport.pricePerHour === defaultLaborHourlyRate
                 ? ''
-                : formatNumberAsCurrency(addVAT(timeReport.pricePerHour)) + '/h';
+                : formatCurrency(addVAT(timeReport.pricePerHour)) + '/h';
         };
 
         return (
             <>
-                {formatNumberAsCurrency(addVAT(getTimeReportPrice(entry)))}
+                {formatCurrency(addVAT(getTimeReportPrice(entry)))}
                 <div className="text-muted font-italic mb-0">{getPricePerHourIfNotDefault(entry)}</div>
             </>
         );
@@ -301,7 +301,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             {
                 key: 'sum',
                 displayName: 'Summa',
-                getValue: (timeReport: TimeReport) => formatNumberAsCurrency(addVAT(getTimeReportPrice(timeReport))),
+                getValue: (timeReport: TimeReport) => formatCurrency(addVAT(getTimeReportPrice(timeReport))),
                 getContentOverride: TimeReportSumDisplayFn,
                 textAlignment: 'right',
                 columnWidth: 20,
@@ -342,7 +342,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                     </div>
                 </div>
                 <p className="text-muted">
-                    {formatNumberAsCurrency(addVAT(getTotalTimeReportsPrice(timeReports)))} /{' '}
+                    {formatCurrency(addVAT(getTotalTimeReportsPrice(timeReports)))} /{' '}
                     {sumBillableWorkingHours === sumActualWorkingHours ? (
                         <>{sumBillableWorkingHours} h</>
                     ) : (

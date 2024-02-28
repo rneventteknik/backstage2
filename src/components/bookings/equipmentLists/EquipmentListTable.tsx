@@ -24,7 +24,9 @@ import {
     addVAT,
     addVATToPrice,
     addVATToPriceWithTHS,
-    formatNumberAsCurrency,
+    convertPriceToCurrency,
+    convertPriceToCurrencyWithTHS,
+    formatCurrency,
     formatPrice,
     formatTHSPrice,
     getCalculatedDiscount,
@@ -324,7 +326,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             : [customPriceDropdownValue, ...entry.equipment.prices]
                     }
                     value={entry.equipmentPrice ?? customPriceDropdownValue}
-                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(x))}`}
+                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(x)))}`}
                     optionKeyFn={(x) => x.id.toString()}
                     onChange={(newPrice) =>
                         newPrice && newPrice.id != -1
@@ -338,7 +340,7 @@ const EquipmentListTable: React.FC<Props> = ({
                     }
                     readonly={readonly}
                 >
-                    {formatPrice(addVATToPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit }))}
+                    {formatPrice(addVATToPrice(convertPriceToCurrency(entry)))}
                     {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
                         <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
                     ) : null}
@@ -346,7 +348,7 @@ const EquipmentListTable: React.FC<Props> = ({
             </span>
         ) : (
             <span className={showPricesAsMuted ? 'text-muted' : ''}>
-                {formatPrice(addVATToPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit }))}
+                {formatPrice(addVATToPrice(convertPriceToCurrency(entry)))}
             </span>
         );
     };
@@ -357,9 +359,9 @@ const EquipmentListTable: React.FC<Props> = ({
         }
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
-        const priceWithoutDiscount = formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list), false)));
-        const discount = formatNumberAsCurrency(addVAT(getCalculatedDiscount(entry, getNumberOfDays(list))));
-        const priceWithDiscount = formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list))));
+        const priceWithoutDiscount = formatCurrency(addVAT(getPrice(entry, getNumberOfDays(list), false)));
+        const discount = formatCurrency(addVAT(getCalculatedDiscount(entry, getNumberOfDays(list))));
+        const priceWithDiscount = formatCurrency(addVAT(getPrice(entry, getNumberOfDays(list))));
 
         return (
             <em className={showPricesAsMuted ? 'text-muted' : ''}>

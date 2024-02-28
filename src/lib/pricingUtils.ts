@@ -1,7 +1,7 @@
 import { PricePlan } from '../models/enums/PricePlan';
 import { AccountKind } from '../models/enums/AccountKind';
 import { Booking, BookingViewModel, TimeEstimate, TimeReport } from '../models/interfaces';
-import { PricedEntity, PricedEntityWithTHS } from '../models/interfaces/BaseEntity';
+import { PricedEntity, PricedEntityCurrency, PricedEntityWithTHS, PricedEntityWithTHSCurrency } from '../models/interfaces/BaseEntity';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../models/interfaces/EquipmentList';
 import { SalaryGroup } from '../models/interfaces/SalaryGroup';
 import { InvoiceCustomer, InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../models/misc/Invoice';
@@ -123,40 +123,52 @@ export const getBookingPrice = (booking: Booking, forceEstimatedTime = false, fo
 export const addVAT = (price: currency | number): currency => currency(price).add(getVAT(price));
 export const getVAT = (price: currency | number): currency => currency(price).multiply(0.25);
 
-export const addVATToPrice = (price: PricedEntity): PricedEntity => ({
+export const addVATToPrice = (price: PricedEntityCurrency): PricedEntityCurrency => ({
     pricePerHour: addVAT(price.pricePerHour),
     pricePerUnit: addVAT(price.pricePerUnit),
 });
-export const addVATToPriceWithTHS = (price: PricedEntityWithTHS): PricedEntityWithTHS => ({
+export const addVATToPriceWithTHS = (price: PricedEntityWithTHSCurrency): PricedEntityWithTHSCurrency => ({
     pricePerHour: addVAT(price.pricePerHour),
     pricePerUnit: addVAT(price.pricePerUnit),
     pricePerHourTHS: addVAT(price.pricePerHourTHS),
     pricePerUnitTHS: addVAT(price.pricePerUnitTHS),
 });
 
+export const convertPriceToCurrency = (price: PricedEntity): PricedEntityCurrency => ({
+    pricePerHour: currency(price.pricePerHour),
+    pricePerUnit: currency(price.pricePerUnit),
+});
+export const convertPriceToCurrencyWithTHS = (price: PricedEntityWithTHS): PricedEntityWithTHSCurrency => ({
+    pricePerHour: currency(price.pricePerHour),
+    pricePerUnit: currency(price.pricePerUnit),
+    pricePerHourTHS: currency(price.pricePerHourTHS),
+    pricePerUnitTHS: currency(price.pricePerUnitTHS),
+});
+
 // Format price
 //
-export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 'st'): string => {
-    const pricePerHourAsCurrency = currency(price.pricePerHour);
-    const pricePerUnitAsCurrency = currency(price.pricePerUnit);
-
-    if (!pricePerHourAsCurrency.value && !pricePerUnitAsCurrency.value) {
+export const formatPrice = (price: PricedEntityCurrency, hoursUnit = 'h', unitsUnit = 'st'): string => {
+    if (!price.pricePerHour.value && !price.pricePerUnit.value) {
         return `-`;
-    } else if (pricePerHourAsCurrency.value && !pricePerUnitAsCurrency.value) {
-        return `${formatNumberAsCurrency(price.pricePerHour)}/${hoursUnit}`;
-    } else if (!pricePerHourAsCurrency.value && pricePerUnitAsCurrency.value) {
-        return `${formatNumberAsCurrency(price.pricePerUnit)}/${unitsUnit}`;
+    } else if (price.pricePerHour.value && !price.pricePerUnit.value) {
+        return `${formatCurrency(price.pricePerHour)}/${hoursUnit}`;
+    } else if (!price.pricePerHour.value && price.pricePerUnit.value) {
+        return `${formatCurrency(price.pricePerUnit)}/${unitsUnit}`;
     } else {
-        return `${formatNumberAsCurrency(price.pricePerUnit)} + ${formatNumberAsCurrency(price.pricePerHour)}/h`;
+        return `${formatCurrency(price.pricePerUnit)} + ${formatCurrency(price.pricePerHour)}/h`;
     }
 };
 
-export const formatTHSPrice = (price: PricedEntityWithTHS): string =>
+export const formatTHSPrice = (price: PricedEntityWithTHSCurrency): string =>
     formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
 
-export const formatNumberAsCurrency = (number: number | currency, showPlusIfPositive = false): string =>
-    (showPlusIfPositive && currency(number).value > 0 ? '+' : '') +
-    Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(currency(number).value);
+export const formatNumberAsCurrency = (number: number, showPlusIfPositive = false): string =>
+    formatCurrency(currency(number), showPlusIfPositive)
+
+export const formatCurrency = (number: currency, showPlusIfPositive = false): string =>
+    (showPlusIfPositive && number.value > 0 ? '+' : '') +
+    Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(number.value);
+
 
 export const getInvoiceData = (
     booking: BookingViewModel,
@@ -272,7 +284,7 @@ export const getInvoiceData = (
                         rowType: InvoiceRowType.ITEM_COMMENT,
                         text: `${numberOfDays - 1} ${t(
                             numberOfDays - 1 > 1 ? 'hogia-invoice.day-cost' : 'hogia-invoice.day-cost-single',
-                        )}: ${formatNumberAsCurrency(getExtraDaysPrice(entry, numberOfDays))}`,
+                        )}: ${formatCurrency(getExtraDaysPrice(entry, numberOfDays))}`,
                     });
                 }
 
@@ -280,7 +292,7 @@ export const getInvoiceData = (
                 if (entry.numberOfHours) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${formatNumberAsCurrency(
+                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${formatCurrency(
                             getTimePrice(entry),
                         )}`,
                     });
@@ -289,7 +301,7 @@ export const getInvoiceData = (
                 if (entry.discount) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('invoice.discount')}: ${formatNumberAsCurrency(
+                        text: `${t('invoice.discount')}: ${formatCurrency(
                             getCalculatedDiscount(entry, numberOfDays),
                         )}`,
                     });

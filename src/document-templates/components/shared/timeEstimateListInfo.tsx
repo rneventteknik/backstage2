@@ -2,10 +2,10 @@ import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles } from '../../utils';
 import {
-    formatNumberAsCurrency,
     getTimeEstimatePrice,
     getTotalTimeEstimatesPrice,
     addVAT,
+    formatCurrency,
 } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { useTextResources } from '../../useTextResources';
@@ -64,10 +64,10 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking, showPrices }: P
                         {showPrices ? (
                             <>
                                 <TableCellFixedWidth width={90} textAlign="right">
-                                    <Text>{formatNumberAsCurrency(addVAT(timeEstimate.pricePerHour))}</Text>
+                                    <Text>{formatCurrency(addVAT(timeEstimate.pricePerHour))}</Text>
                                 </TableCellFixedWidth>
                                 <TableCellFixedWidth width={180} textAlign="right">
-                                    <Text>{formatNumberAsCurrency(addVAT(getTimeEstimatePrice(timeEstimate)))}</Text>
+                                    <Text>{formatCurrency(addVAT(getTimeEstimatePrice(timeEstimate)))}</Text>
                                 </TableCellFixedWidth>
                             </>
                         ) : null}
@@ -82,7 +82,7 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking, showPrices }: P
                         </TableCellAutoWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
                             <Text style={styles.bold}>
-                                {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
+                                {formatCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
                             </Text>
                         </TableCellFixedWidth>
                     </TableRow>
