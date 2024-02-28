@@ -19,6 +19,7 @@ import { getNextSortIndex, moveItemUp, moveItemDown, getSortedList } from './sor
 import { ITimeEstimateObjectionModel } from '../models/objection-models';
 import { toTimeEstimate } from './mappers/timeEstimate';
 import { EquipmentPackageEntry } from '../models/interfaces/EquipmentPackage';
+import currency from 'currency.js';
 
 // EquipmentListEntityViewModel and helpers
 //
@@ -117,7 +118,7 @@ export const getDefaultListEntryFromEquipment = (
     }
 
     const prices = isFree
-        ? { pricePerHour: 0, pricePerUnit: 0 }
+        ? { pricePerHour: currency(0), pricePerUnit: currency(0) }
         : getEquipmentListEntryPrices(equipment.prices[0], pricePlan);
 
     const entry: EquipmentListEntry = {
@@ -126,10 +127,10 @@ export const getDefaultListEntryFromEquipment = (
         equipment: equipment,
         equipmentId: equipment.id,
         numberOfUnits: 1,
-        numberOfHours: prices.pricePerHour > 0 ? 1 : 0,
+        numberOfHours: prices.pricePerHour.value > 0 ? 1 : 0,
         name: language === Language.SV ? equipment.name : equipment.nameEN,
         description: language === Language.SV ? equipment.description : equipment.descriptionEN,
-        discount: 0,
+        discount: currency(0),
         isHidden: false,
         account: null,
         ...prices,

@@ -8,6 +8,7 @@ import { BookingViewModel } from '../../../models/interfaces';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { getResponseContentOrError } from '../../../lib/utils';
 import TimeReportModal from './TimeReportModal';
+import currency from 'currency.js';
 
 type Props = {
     booking: BookingViewModel;
@@ -64,7 +65,7 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
                         startDatetime: booking.usageStartDatetime ?? currentDateRounded,
                         endDatetime: booking.usageEndDatetime ?? currentDateRounded,
                         userId: currentUser.userId,
-                        pricePerHour: defaultLaborHourlyRate,
+                        pricePerHour: currency(defaultLaborHourlyRate),
                     });
                 }}
                 {...rest}

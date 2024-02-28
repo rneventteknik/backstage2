@@ -1,9 +1,10 @@
 import React from 'react';
 import { Form } from 'react-bootstrap';
 import { addVAT, formatCurrency } from '../../lib/pricingUtils';
+import currency from 'currency.js';
 
 type Props = {
-    price: number | null | undefined;
+    price: currency | null | undefined;
     text?: string;
 };
 

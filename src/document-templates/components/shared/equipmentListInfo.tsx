@@ -8,7 +8,6 @@ import {
     getEquipmentListHeadingPrice,
     getCalculatedDiscount,
     addVAT,
-    convertPriceToCurrency,
     formatCurrency,
 } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
@@ -95,7 +94,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                     <>
                                         <TableCellFixedWidth width={90} textAlign="right">
                                             {!isHeading ? (
-                                                <Text>{formatEquipmentListEntryPriceWithVAT(convertPriceToCurrency(entry), t)}</Text>
+                                                <Text>{formatEquipmentListEntryPriceWithVAT((entry), t)}</Text>
                                             ) : (
                                                 <Text>
                                                     {formatEquipmentListEntryPriceWithVAT(

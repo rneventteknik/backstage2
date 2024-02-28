@@ -57,7 +57,7 @@ export const getCalculatedDiscount = (entry: EquipmentListEntry, numberOfDays: n
     const priceWithoutDiscount = getPrice(entry, numberOfDays, false);
 
     // The database can contain a discount value larger than the linetotal
-    if (priceWithoutDiscount.value < entry.discount) {
+    if (priceWithoutDiscount.value < entry.discount.value) {
         return priceWithoutDiscount;
     }
 
@@ -132,17 +132,6 @@ export const addVATToPriceWithTHS = (price: PricedEntityWithTHSCurrency): Priced
     pricePerUnit: addVAT(price.pricePerUnit),
     pricePerHourTHS: addVAT(price.pricePerHourTHS),
     pricePerUnitTHS: addVAT(price.pricePerUnitTHS),
-});
-
-export const convertPriceToCurrency = (price: PricedEntity): PricedEntityCurrency => ({
-    pricePerHour: currency(price.pricePerHour),
-    pricePerUnit: currency(price.pricePerUnit),
-});
-export const convertPriceToCurrencyWithTHS = (price: PricedEntityWithTHS): PricedEntityWithTHSCurrency => ({
-    pricePerHour: currency(price.pricePerHour),
-    pricePerUnit: currency(price.pricePerUnit),
-    pricePerHourTHS: currency(price.pricePerHourTHS),
-    pricePerUnitTHS: currency(price.pricePerUnitTHS),
 });
 
 // Format price
@@ -274,7 +263,7 @@ export const getInvoiceData = (
                 if ((numberOfDays > 1 || entry.numberOfHours) && entry.pricePerUnit) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('hogia-invoice.start-cost')}: ${formatNumberAsCurrency(entry.pricePerUnit)}`,
+                        text: `${t('hogia-invoice.start-cost')}: ${formatCurrency(entry.pricePerUnit)}`,
                     });
                 }
 

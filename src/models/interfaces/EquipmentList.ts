@@ -1,3 +1,4 @@
+import currency from 'currency.js';
 import { EquipmentPrice } from '.';
 import { RentalStatus } from '../enums/RentalStatus';
 import { BaseEntityWithName } from './BaseEntity';
@@ -34,10 +35,10 @@ export interface EquipmentListEntry extends BaseEntityWithName {
     numberOfUnits: number;
     numberOfHours: number;
 
-    pricePerUnit: number;
-    pricePerHour: number;
+    pricePerUnit: currency;
+    pricePerHour: currency;
     equipmentPrice?: EquipmentPrice;
-    discount: number;
+    discount: currency;
     isHidden: boolean;
     account: string | null;
 

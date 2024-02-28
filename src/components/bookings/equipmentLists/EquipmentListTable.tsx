@@ -24,8 +24,6 @@ import {
     addVAT,
     addVATToPrice,
     addVATToPriceWithTHS,
-    convertPriceToCurrency,
-    convertPriceToCurrencyWithTHS,
     formatCurrency,
     formatPrice,
     formatTHSPrice,
@@ -252,7 +250,7 @@ const EquipmentListTable: React.FC<Props> = ({
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
 
-        const valueIsRelevant = entry.pricePerUnit !== 0 || !entry.pricePerHour;
+        const valueIsRelevant = entry.pricePerUnit.value !== 0 || !entry.pricePerHour;
 
         if (!valueIsRelevant && entry.numberOfUnits === 1) {
             return <span className="text-muted">{entry.numberOfUnits} st</span>;
@@ -278,7 +276,7 @@ const EquipmentListTable: React.FC<Props> = ({
         }
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
-        const valueIsRelevant = entry.pricePerHour !== 0;
+        const valueIsRelevant = entry.pricePerHour.value !== 0;
 
         if (!valueIsRelevant && entry.numberOfHours === 0) {
             return <></>;
@@ -326,7 +324,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             : [customPriceDropdownValue, ...entry.equipment.prices]
                     }
                     value={entry.equipmentPrice ?? customPriceDropdownValue}
-                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(convertPriceToCurrencyWithTHS(x)))}`}
+                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS((x)))}`}
                     optionKeyFn={(x) => x.id.toString()}
                     onChange={(newPrice) =>
                         newPrice && newPrice.id != -1
@@ -340,7 +338,7 @@ const EquipmentListTable: React.FC<Props> = ({
                     }
                     readonly={readonly}
                 >
-                    {formatPrice(addVATToPrice(convertPriceToCurrency(entry)))}
+                    {formatPrice(addVATToPrice((entry)))}
                     {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
                         <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
                     ) : null}
@@ -348,7 +346,7 @@ const EquipmentListTable: React.FC<Props> = ({
             </span>
         ) : (
             <span className={showPricesAsMuted ? 'text-muted' : ''}>
-                {formatPrice(addVATToPrice(convertPriceToCurrency(entry)))}
+                {formatPrice(addVATToPrice((entry)))}
             </span>
         );
     };
@@ -365,7 +363,7 @@ const EquipmentListTable: React.FC<Props> = ({
 
         return (
             <em className={showPricesAsMuted ? 'text-muted' : ''}>
-                {entry.discount > 0 ? (
+                {entry.discount.value > 0 ? (
                     <OverlayTrigger
                         placement="right"
                         overlay={
@@ -723,7 +721,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                                 ? equipmentPackageToAdd.name
                                                 : equipmentPackageToAdd.nameEN ?? '',
                                         numberOfHours: equipmentPackageToAdd.estimatedHours,
-                                        pricePerHour: defaultLaborHourlyRate,
+                                        pricePerHour: currency(defaultLaborHourlyRate),
                                     });
                                 } else {
                                     addEquipmentPackage(

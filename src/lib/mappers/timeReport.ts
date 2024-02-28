@@ -1,3 +1,4 @@
+import currency from 'currency.js';
 import { TimeReport } from '../../models/interfaces';
 import { ITimeReportObjectionModel } from '../../models/objection-models/TimeReportObjectionModel';
 import { toDatetimeOrUndefined } from '../datetimeUtils';
@@ -11,6 +12,7 @@ export const toTimeReport = (objectionModel: ITimeReportObjectionModel): TimeRep
     return {
         ...objectionModel,
         id: objectionModel.id,
+        pricePerHour: currency(objectionModel.pricePerHour),
         updated: toDatetimeOrUndefined(objectionModel.updated),
         created: toDatetimeOrUndefined(objectionModel.created),
         startDatetime: toDatetimeOrUndefined(objectionModel.startDatetime),

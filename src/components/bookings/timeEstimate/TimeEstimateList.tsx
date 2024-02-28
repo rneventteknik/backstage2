@@ -37,6 +37,7 @@ import {
 } from '../../../lib/sortIndexUtils';
 import TimeEstimateAddButton from './TimeEstimateAddButton';
 import TimeEstimateModal from './TimeEstimateModal';
+import currency from 'currency.js';
 
 type Props = {
     bookingId: number;
@@ -316,7 +317,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                             id: timeEstimateToEditViewModel.id,
                             bookingId: booking.id,
                             numberOfHours: timeEstimateToEditViewModel?.numberOfHours ?? 0,
-                            pricePerHour: timeEstimateToEditViewModel?.pricePerHour ?? 0,
+                            pricePerHour: timeEstimateToEditViewModel?.pricePerHour ?? currency(0),
                             name: timeEstimateToEditViewModel?.name ?? '',
                             sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
                         };

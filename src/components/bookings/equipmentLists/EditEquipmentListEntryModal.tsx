@@ -11,15 +11,15 @@ import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import RequiredIndicator from '../../utils/RequiredIndicator';
 import { PricedEntityWithTHSCurrency } from '../../../models/interfaces/BaseEntity';
-import { convertPriceToCurrencyWithTHS } from '../../../lib/pricingUtils';
+import currency from 'currency.js';
 
 type Props = {
     show: boolean;
     onHide: () => void;
     priceDisplayFn: (price: PricedEntityWithTHSCurrency) => string;
     getEquipmentListEntryPrices: (equipmentPrice: EquipmentPrice) => {
-        pricePerHour: number;
-        pricePerUnit: number;
+        pricePerHour: currency;
+        pricePerUnit: currency;
         equipmentPrice: EquipmentPrice;
     };
     equipmentListEntryToEditViewModel: Partial<EquipmentListEntry> | null;
@@ -141,7 +141,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         <option value={undefined}>Anpassat pris</option>
                                         {equipmentListEntryToEditViewModel.equipment?.prices?.map((x) => (
                                             <option key={x.id.toString()} value={x.id.toString()}>
-                                                {x.name} {priceDisplayFn(convertPriceToCurrencyWithTHS(x))}
+                                                {x.name} {priceDisplayFn((x))}
                                             </option>
                                         ))}
                                     </Form.Control>
@@ -155,11 +155,11 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
                                             min="0"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice || readonly}
-                                            value={equipmentListEntryToEditViewModel?.pricePerUnit ?? ''}
+                                            value={equipmentListEntryToEditViewModel?.pricePerUnit?.value ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
-                                                    pricePerUnit: toIntOrUndefined(e.target.value, true),
+                                                    pricePerUnit: currency(e.target.value),
                                                 })
                                             }
                                         />
@@ -176,11 +176,11 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             type={!equipmentListEntryToEditViewModel.equipmentPrice ? 'number' : 'text'}
                                             min="0"
                                             disabled={!!equipmentListEntryToEditViewModel.equipmentPrice || readonly}
-                                            value={equipmentListEntryToEditViewModel?.pricePerHour ?? ''}
+                                            value={equipmentListEntryToEditViewModel?.pricePerHour?.value ?? ''}
                                             onChange={(e) =>
                                                 setEquipmentListEntryToEditViewModel({
                                                     ...equipmentListEntryToEditViewModel,
-                                                    pricePerHour: toIntOrUndefined(e.target.value, true),
+                                                    pricePerHour: currency(e.target.value),
                                                 })
                                             }
                                         />
@@ -199,12 +199,12 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     <FormNumberFieldWithoutScroll
                                         type="number"
                                         min="0"
-                                        value={equipmentListEntryToEditViewModel?.discount ?? ''}
+                                        value={equipmentListEntryToEditViewModel?.discount?.value ?? ''}
                                         readOnly={readonly}
                                         onChange={(e) =>
                                             setEquipmentListEntryToEditViewModel({
                                                 ...equipmentListEntryToEditViewModel,
-                                                discount: toIntOrUndefined(e.target.value, true),
+                                                discount: currency(e.target.value),
                                             })
                                         }
                                     />
@@ -326,10 +326,10 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     description: equipmentListEntryToEditViewModel.description ?? '',
                                     numberOfUnits: Math.abs(equipmentListEntryToEditViewModel.numberOfUnits ?? 1),
                                     numberOfHours: Math.abs(equipmentListEntryToEditViewModel.numberOfHours ?? 0),
-                                    pricePerUnit: Math.abs(equipmentListEntryToEditViewModel.pricePerUnit ?? 0),
-                                    pricePerHour: Math.abs(equipmentListEntryToEditViewModel.pricePerHour ?? 0),
+                                    pricePerUnit: currency(Math.abs(equipmentListEntryToEditViewModel.pricePerUnit?.value ?? 0)),
+                                    pricePerHour: currency(Math.abs(equipmentListEntryToEditViewModel.pricePerHour?.value ?? 0)),
+                                    discount: currency(Math.abs(equipmentListEntryToEditViewModel.discount?.value ?? 0)),
                                     equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
-                                    discount: Math.abs(equipmentListEntryToEditViewModel.discount ?? 0),
                                     isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
                                     account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),
                                 };

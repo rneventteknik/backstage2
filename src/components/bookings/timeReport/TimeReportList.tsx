@@ -251,7 +251,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
 
     const TimeReportSumDisplayFn = (entry: TimeReport) => {
         const getPricePerHourIfNotDefault = (timeReport: TimeReport) => {
-            return timeReport.pricePerHour === defaultLaborHourlyRate
+            return timeReport.pricePerHour.value === defaultLaborHourlyRate
                 ? ''
                 : formatCurrency(addVAT(timeReport.pricePerHour)) + '/h';
         };
