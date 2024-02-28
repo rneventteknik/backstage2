@@ -324,17 +324,11 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     equipmentId: equipmentListEntryToEditViewModel.equipmentId,
                                     name: equipmentListEntryToEditViewModel.name ?? '',
                                     description: equipmentListEntryToEditViewModel.description ?? '',
-                                    numberOfUnits: Math.abs(equipmentListEntryToEditViewModel.numberOfUnits ?? 1),
-                                    numberOfHours: Math.abs(equipmentListEntryToEditViewModel.numberOfHours ?? 0),
-                                    pricePerUnit: currency(
-                                        Math.abs(equipmentListEntryToEditViewModel.pricePerUnit?.value ?? 0),
-                                    ),
-                                    pricePerHour: currency(
-                                        Math.abs(equipmentListEntryToEditViewModel.pricePerHour?.value ?? 0),
-                                    ),
-                                    discount: currency(
-                                        Math.abs(equipmentListEntryToEditViewModel.discount?.value ?? 0),
-                                    ),
+                                    numberOfUnits: equipmentListEntryToEditViewModel.numberOfUnits ?? 1,
+                                    numberOfHours: equipmentListEntryToEditViewModel.numberOfHours ?? 0,
+                                    pricePerUnit: equipmentListEntryToEditViewModel.pricePerUnit ?? currency(0),
+                                    pricePerHour: equipmentListEntryToEditViewModel.pricePerHour ?? currency(0),
+                                    discount: equipmentListEntryToEditViewModel.discount ?? currency(0),
                                     equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
                                     isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
                                     account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),
