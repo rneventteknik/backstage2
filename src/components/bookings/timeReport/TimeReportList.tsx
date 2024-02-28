@@ -297,7 +297,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 getValue: (timeReport: TimeReport) => formatCurrency(addVAT(getTimeReportPrice(timeReport))),
                 getContentOverride: TimeReportSumDisplayFn,
                 textAlignment: 'right',
-                columnWidth: 20,
+                columnWidth: 90,
                 cellHideSize: 'md',
             },
             {

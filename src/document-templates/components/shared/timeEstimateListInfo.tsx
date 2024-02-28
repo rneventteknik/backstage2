@@ -35,10 +35,10 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking, showPrices }: P
                 </TableCellFixedWidth>
                 {showPrices ? (
                     <>
-                        <TableCellFixedWidth width={90} textAlign="right">
+                        <TableCellFixedWidth width={110} textAlign="right">
                             <Text style={styles.italic}>{t('common.time-estimate-list.table-header.price')}</Text>
                         </TableCellFixedWidth>
-                        <TableCellFixedWidth width={180} textAlign="right">
+                        <TableCellFixedWidth width={160} textAlign="right">
                             <Text style={styles.italic}>{t('common.time-estimate-list.table-header.total-price')}</Text>
                         </TableCellFixedWidth>
                     </>
@@ -58,10 +58,10 @@ export const TimeEstimateListInfo: React.FC<Props> = ({ booking, showPrices }: P
                         </TableCellFixedWidth>
                         {showPrices ? (
                             <>
-                                <TableCellFixedWidth width={90} textAlign="right">
+                                <TableCellFixedWidth width={110} textAlign="right">
                                     <Text>{formatCurrency(addVAT(timeEstimate.pricePerHour))}</Text>
                                 </TableCellFixedWidth>
-                                <TableCellFixedWidth width={180} textAlign="right">
+                                <TableCellFixedWidth width={160} textAlign="right">
                                     <Text>{formatCurrency(addVAT(getTimeEstimatePrice(timeEstimate)))}</Text>
                                 </TableCellFixedWidth>
                             </>
