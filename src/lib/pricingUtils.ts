@@ -1,7 +1,7 @@
 import { PricePlan } from '../models/enums/PricePlan';
 import { AccountKind } from '../models/enums/AccountKind';
 import { Booking, BookingViewModel, TimeEstimate, TimeReport } from '../models/interfaces';
-import { PricedEntityCurrency, PricedEntityWithTHSCurrency } from '../models/interfaces/BaseEntity';
+import { PricedEntity, PricedEntityWithTHS } from '../models/interfaces/BaseEntity';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../models/interfaces/EquipmentList';
 import { SalaryGroup } from '../models/interfaces/SalaryGroup';
 import { InvoiceCustomer, InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../models/misc/Invoice';
@@ -123,11 +123,11 @@ export const getBookingPrice = (booking: Booking, forceEstimatedTime = false, fo
 export const addVAT = (price: currency | number): currency => currency(price).add(getVAT(price));
 export const getVAT = (price: currency | number): currency => currency(price).multiply(0.25);
 
-export const addVATToPrice = (price: PricedEntityCurrency): PricedEntityCurrency => ({
+export const addVATToPrice = (price: PricedEntity): PricedEntity => ({
     pricePerHour: addVAT(price.pricePerHour),
     pricePerUnit: addVAT(price.pricePerUnit),
 });
-export const addVATToPriceWithTHS = (price: PricedEntityWithTHSCurrency): PricedEntityWithTHSCurrency => ({
+export const addVATToPriceWithTHS = (price: PricedEntityWithTHS): PricedEntityWithTHS => ({
     pricePerHour: addVAT(price.pricePerHour),
     pricePerUnit: addVAT(price.pricePerUnit),
     pricePerHourTHS: addVAT(price.pricePerHourTHS),
@@ -136,7 +136,7 @@ export const addVATToPriceWithTHS = (price: PricedEntityWithTHSCurrency): Priced
 
 // Format price
 //
-export const formatPrice = (price: PricedEntityCurrency, hoursUnit = 'h', unitsUnit = 'st'): string => {
+export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 'st'): string => {
     if (!price.pricePerHour.value && !price.pricePerUnit.value) {
         return `-`;
     } else if (price.pricePerHour.value && !price.pricePerUnit.value) {
@@ -148,7 +148,7 @@ export const formatPrice = (price: PricedEntityCurrency, hoursUnit = 'h', unitsU
     }
 };
 
-export const formatTHSPrice = (price: PricedEntityWithTHSCurrency): string =>
+export const formatTHSPrice = (price: PricedEntityWithTHS): string =>
     formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
 
 export const formatNumberAsCurrency = (number: number, showPlusIfPositive = false): string =>

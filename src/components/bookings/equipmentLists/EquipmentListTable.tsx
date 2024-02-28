@@ -250,7 +250,7 @@ const EquipmentListTable: React.FC<Props> = ({
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
 
-        const valueIsRelevant = entry.pricePerUnit.value !== 0 || !entry.pricePerHour;
+        const valueIsRelevant = entry.pricePerUnit.value !== 0 || entry.pricePerHour.value === 0;
 
         if (!valueIsRelevant && entry.numberOfUnits === 1) {
             return <span className="text-muted">{entry.numberOfUnits} st</span>;

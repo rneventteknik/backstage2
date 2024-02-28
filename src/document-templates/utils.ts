@@ -1,7 +1,7 @@
 import { Font, StyleSheet } from '@react-pdf/renderer';
 import { getNumberOfDays } from '../lib/datetimeUtils';
 import { Booking } from '../models/interfaces';
-import { PricedEntityCurrency } from '../models/interfaces/BaseEntity';
+import { PricedEntity } from '../models/interfaces/BaseEntity';
 import { EquipmentListEntry } from '../models/interfaces/EquipmentList';
 import { addVATToPrice, formatPrice } from '../lib/pricingUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
@@ -120,7 +120,7 @@ export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, 
     return formatEquipmentListEntryCount(entry, t);
 };
 
-export const formatEquipmentListEntryPriceWithVAT = (entry: PricedEntityCurrency, t: (t: string) => string) =>
+export const formatEquipmentListEntryPriceWithVAT = (entry: PricedEntity, t: (t: string) => string) =>
     formatPrice(addVATToPrice(entry), t('common.misc.hours-unit'), t('common.misc.count-unit-single'));
 
 export const allListsAreOneDay = (booking: Booking) =>

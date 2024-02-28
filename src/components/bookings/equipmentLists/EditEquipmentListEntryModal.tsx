@@ -10,13 +10,13 @@ import { Typeahead } from 'react-bootstrap-typeahead';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import RequiredIndicator from '../../utils/RequiredIndicator';
-import { PricedEntityWithTHSCurrency } from '../../../models/interfaces/BaseEntity';
+import { PricedEntityWithTHS } from '../../../models/interfaces/BaseEntity';
 import currency from 'currency.js';
 
 type Props = {
     show: boolean;
     onHide: () => void;
-    priceDisplayFn: (price: PricedEntityWithTHSCurrency) => string;
+    priceDisplayFn: (price: PricedEntityWithTHS) => string;
     getEquipmentListEntryPrices: (equipmentPrice: EquipmentPrice) => {
         pricePerHour: currency;
         pricePerUnit: currency;
