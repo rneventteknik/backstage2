@@ -194,13 +194,17 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({
                                 <Text style={styles.italic}>{t('common.equipment-list.table-header.count')}</Text>
                             </TableCellFixedWidth>
                             <TableCellFixedWidth width={90} textAlign="right">
-                                <Text style={styles.italic}>{t('common.equipment-list.table-header.price-ex-vat')}</Text>
+                                <Text style={styles.italic}>
+                                    {t('common.equipment-list.table-header.price-ex-vat')}
+                                </Text>
                             </TableCellFixedWidth>
                             <TableCellFixedWidth width={90} textAlign="right">
                                 <Text style={styles.italic}>{t('invoice.account')}</Text>
                             </TableCellFixedWidth>
                             <TableCellFixedWidth width={90} textAlign="right">
-                                <Text style={styles.italic}>{t('common.equipment-list.table-header.total-price-ex-vat')}</Text>
+                                <Text style={styles.italic}>
+                                    {t('common.equipment-list.table-header.total-price-ex-vat')}
+                                </Text>
                             </TableCellFixedWidth>
                         </TableRowWithNoBorder>
                         {invoiceData.invoiceRows.map((invoiceRow, index) => (
