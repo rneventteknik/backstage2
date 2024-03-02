@@ -24,7 +24,7 @@ export const getHogiaTxtInvoice = (invoiceData: InvoiceData, t: (key: string) =>
         };
 
         const getRowFormat = (): Map<number, string> => {
-            const currencyFormatOptions = { decimal: ',', symbol: '', separator: '' };
+            const currencyFormatOptions = { decimal: ',', symbol: '', separator: '' }
             switch (invoiceRow.rowType) {
                 case InvoiceRowType.ITEM:
                     const pricedInvoiceRow = invoiceRow as PricedInvoiceRow;
