@@ -68,3 +68,5 @@ export const salaryGroupsFetcher = generateListFetcher(toSalaryGroup);
 
 export const customerFetcher = generateFetcher(toCustomer);
 export const customersFetcher = generateListFetcher(toCustomer);
+
+export const genericFetcher = generateFetcher((x) => x);

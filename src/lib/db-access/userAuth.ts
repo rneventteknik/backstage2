@@ -16,17 +16,29 @@ export const fetchUserAuth = async (username: string): Promise<UserAuthObjection
         .then((users) => users[0]);
 };
 
+export const fetchUserAuthByLoginToken = async (loginToken: string): Promise<UserAuthObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    return UserAuthObjectionModel.query()
+        .where('loginToken', loginToken)
+        .withGraphFetched('user')
+        .then((users) => users[0]);
+};
+
 export const fetchUserAuthById = async (id: number): Promise<UserAuthObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
     return UserAuthObjectionModel.query().findById(id).withGraphFetched('user');
 };
 
-export const updateUserAuth = async (id: number, user: UserAuthObjectionModel): Promise<UserAuthObjectionModel> => {
+export const updateUserAuth = async (
+    id: number,
+    user: Partial<UserAuthObjectionModel>,
+): Promise<UserAuthObjectionModel> => {
     ensureDatabaseIsInitialized();
 
     // Ensure lowercase username
-    user.username = user.username.toLowerCase();
+    user.username = user.username?.toLowerCase();
 
     return UserAuthObjectionModel.query().patchAndFetchById(id, user);
 };

@@ -11,6 +11,7 @@ import { RentalStatus } from '../models/enums/RentalStatus';
 import { BookingViewModel, Equipment, TimeReport } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
+import { LoginToken } from '../models/misc/LoginToken';
 import { getEquipmentOutDatetime, getEquipmentInDatetime, addDays, addHours } from './datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 
@@ -447,4 +448,9 @@ export const getOperationalYear = (date?: Date) => {
     }
 
     return formatOperationalYear(date.getFullYear());
+};
+
+export const getTokenLabel = (loginToken: LoginToken) => {
+    const token = loginToken.tokenId;
+    return `${token.substring(0, 2)}-${token.substring(2, 4)}-${token.substring(4, 6)}-${token.substring(6, 8)}`;
 };

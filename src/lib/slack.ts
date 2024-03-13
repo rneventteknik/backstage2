@@ -19,7 +19,7 @@ export const sendSlackMessage = async (message: string) => {
 };
 
 export const sendSlackMessageForBooking = async (message: string, bookingId: number, bookingName: string) => {
-    const bookingUrl = process.env.APPLICATION_BASE_URL + '/bookings/' + bookingId;
+    const bookingUrl = process.env.NEXT_PUBLIC_BACKSTAGE2_BASE_URL + '/bookings/' + bookingId;
     const formattedMessage = `<${bookingUrl}|${bookingName}> - ${message}`;
 
     sendSlackMessage(formattedMessage);

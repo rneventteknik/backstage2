@@ -83,6 +83,9 @@ export interface IUserAuthObjectionModel {
     username: string;
     role: number;
     hashedPassword: string;
+    loginToken?: string | null;
+    loginTokenIp?: string | null;
+    loginTokenExpirationDate?: string | null;
     user?: IUserObjectionModel;
 }
 
@@ -117,5 +120,8 @@ export class UserAuthObjectionModel extends Model implements IUserAuthObjectionM
     username!: string;
     role!: number;
     hashedPassword!: string;
+    loginToken?: string | null;
+    loginTokenIp?: string | null;
+    loginTokenExpirationDate?: string | null;
     user?: UserObjectionModel;
 }
