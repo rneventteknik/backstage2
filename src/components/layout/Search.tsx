@@ -5,8 +5,13 @@ import { SearchResult } from '../../models/misc/SearchResult';
 import { groupBy, getResponseContentOrError } from '../../lib/utils';
 import styles from './Search.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendarDay, faCube, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { IEquipmentObjectionModel, IBookingObjectionModel, IUserObjectionModel } from '../../models/objection-models';
+import { faCalendarDay, faCube, faCubes, faUser, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import {
+    IEquipmentObjectionModel,
+    IBookingObjectionModel,
+    IUserObjectionModel,
+    IEquipmentPackageObjectionModel,
+} from '../../models/objection-models';
 import { useNotifications } from '../../lib/useNotifications';
 import { toUser } from '../../lib/mappers/user';
 import { toBooking } from '../../lib/mappers/booking';
@@ -14,10 +19,13 @@ import { toEquipment } from '../../lib/mappers/equipment';
 import { BaseEntityWithName } from '../../models/interfaces/BaseEntity';
 import { SplitHighlighter } from '../utils/Highlight';
 import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
+import { toBookingViewModel } from '../../lib/datetimeUtils';
+import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 
 enum ResultType {
     BOOKING,
     EQUIPMENT,
+    EQUIPMENT_PACKAGE,
     USER,
 }
 interface SearchResultViewModel extends BaseEntityWithName {
@@ -77,6 +85,13 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                 })),
             )
             .concat(
+                results.equipmentPackage.map((equipmentPackage) => ({
+                    type: ResultType.EQUIPMENT_PACKAGE,
+                    url: '/equipmentPackage/' + equipmentPackage.id,
+                    ...toEquipmentPackage(equipmentPackage),
+                })),
+            )
+            .concat(
                 results.users.map((user) => ({
                     type: ResultType.USER,
                     url: '/users/' + user.id,
@@ -121,7 +136,19 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     return (
                         <small>
                             <SplitHighlighter search={highlightText} textToHighlight={equipment.nameEN} />{' '}
-                            {equipment.tags?.map((x) => (
+                            {equipment.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
+                        </small>
+                    );
+
+                case ResultType.EQUIPMENT_PACKAGE:
+                    const equipmentPackage = entity as unknown as IEquipmentPackageObjectionModel;
+                    return (
+                        <small>
+                            <SplitHighlighter
+                                search={highlightText}
+                                textToHighlight={equipmentPackage.nameEN || equipmentPackage.name}
+                            />{' '}
+                            {equipmentPackage.tags?.map((x) => (
                                 <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
                             ))}
                         </small>
@@ -129,9 +156,13 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
 
                 case ResultType.BOOKING:
                     const booking = entity as unknown as IBookingObjectionModel;
+                    const viewModel = toBookingViewModel(toBooking(booking));
                     return (
                         <small>
+                            <SplitHighlighter search={highlightText} textToHighlight={booking.customerName} /> /{' '}
                             <SplitHighlighter search={highlightText} textToHighlight={booking.contactPersonName} />
+                            {booking.contactPersonName && viewModel.displayUsageInterval !== '-' ? ' / ' : ''}
+                            {viewModel.displayUsageInterval === '-' ? null : viewModel.monthYearUsageStartString}
                         </small>
                     );
                 default:
@@ -191,6 +222,14 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
 
                 <Typeahead.Menu.Divider />
                 <ResultSection heading="Utrustning" icon={faCube} results={res[ResultType.EQUIPMENT]} state={state} />
+
+                <Typeahead.Menu.Divider />
+                <ResultSection
+                    heading="Utrustningspaket"
+                    icon={faCubes}
+                    results={res[ResultType.EQUIPMENT_PACKAGE]}
+                    state={state}
+                ></ResultSection>
 
                 <Typeahead.Menu.Divider />
                 <ResultSection heading="Användare" icon={faUser} results={res[ResultType.USER]} state={state} />

@@ -44,6 +44,7 @@ import TimeReportAddButton from './TimeReportAddButton';
 import TimeReportModal from './TimeReportModal';
 import { addTimeReportApiCall } from '../../../lib/equipmentListUtils';
 import ConfirmModal from '../../utils/ConfirmModal';
+import TimeReportHourDisplay from '../../utils/TimeReportHourDisplay';
 
 type Props = {
     bookingId: number;
@@ -89,7 +90,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 </Card.Header>
                 <Card.Body>
                     <p className="text-danger">
-                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsrapporterna.
+                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidrapporterna.
                     </p>
                     <p className="text-monospace text-muted mb-0">{error?.message}</p>
                 </Card.Body>
@@ -209,23 +210,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             size="sm"
             readonly={readonly}
         >
-            {isNaN(timeReport.billableWorkingHours) ? (
-                <span className="text-muted font-italic">Dubbelklicka för att lägga till en tid</span>
-            ) : (
-                timeReport.billableWorkingHours + ' h'
-            )}
-            {timeReport.actualWorkingHours !== timeReport.billableWorkingHours ? (
-                <OverlayTrigger
-                    overlay={
-                        <Tooltip id="1">
-                            Antalet fakturerade timmar ({timeReport.billableWorkingHours} h) skiljer sig från antalet
-                            arbetade timmar ({timeReport.actualWorkingHours} h).
-                        </Tooltip>
-                    }
-                >
-                    <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
-                </OverlayTrigger>
-            ) : null}
+            <TimeReportHourDisplay timeReport={timeReport} />
         </DoubleClickToEdit>
     );
 

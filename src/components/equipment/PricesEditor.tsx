@@ -75,9 +75,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     defaultValue={price?.pricePerUnit ? price?.pricePerUnit?.toString() : ''}
                     onChange={(e) => updatePrice({ ...price, pricePerUnit: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
-                <InputGroup.Append>
-                    <InputGroup.Text>kr/st</InputGroup.Text>
-                </InputGroup.Append>
+                <InputGroup.Text>kr/st</InputGroup.Text>
             </InputGroup>
             <InputGroup>
                 <FormNumberFieldWithoutScroll
@@ -86,9 +84,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     defaultValue={price?.pricePerHour ? price?.pricePerHour?.toString() : ''}
                     onChange={(e) => updatePrice({ ...price, pricePerHour: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
-                <InputGroup.Append>
-                    <InputGroup.Text>kr/h</InputGroup.Text>
-                </InputGroup.Append>
+                <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>
             <p className="text-muted text-left mt-1 mb-0 small">
                 Pris ink. moms: {formatPrice(addVATToPriceWithTHS(price))}
@@ -105,9 +101,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     defaultValue={price?.pricePerUnitTHS ? price?.pricePerUnitTHS?.toString() : ''}
                     onChange={(e) => updatePrice({ ...price, pricePerUnitTHS: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
-                <InputGroup.Append>
-                    <InputGroup.Text>kr/st</InputGroup.Text>
-                </InputGroup.Append>
+                <InputGroup.Text>kr/st</InputGroup.Text>
             </InputGroup>
             <InputGroup>
                 <FormNumberFieldWithoutScroll
@@ -116,9 +110,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                     defaultValue={price?.pricePerHourTHS ? price?.pricePerHourTHS?.toString() : ''}
                     onChange={(e) => updatePrice({ ...price, pricePerHourTHS: toIntOrUndefined(e.target.value) ?? 0 })}
                 />
-                <InputGroup.Append>
-                    <InputGroup.Text>kr/h</InputGroup.Text>
-                </InputGroup.Append>
+                <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>
             <p className="text-muted text-left mt-1 mb-0 small">
                 Pris ink. moms: {formatTHSPrice(addVATToPriceWithTHS(price))}

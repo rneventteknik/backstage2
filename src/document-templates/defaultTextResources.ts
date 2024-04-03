@@ -18,8 +18,10 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.equipment-list.table-header.specification': 'Specifikation',
         'common.equipment-list.table-header.count': 'Antal',
         'common.equipment-list.table-header.price': 'á pris',
+        'common.equipment-list.table-header.price-ex-vat': 'á pris (exkl. moms)',
         'common.equipment-list.table-header.discount': 'Rabatt',
         'common.equipment-list.table-header.total-price': 'Belopp',
+        'common.equipment-list.table-header.total-price-ex-vat': 'Belopp (exkl. moms)',
         'common.equipment-list.total': 'Total',
 
         // Time Estimate list
@@ -110,8 +112,10 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.equipment-list.table-header.specification': 'Item',
         'common.equipment-list.table-header.count': 'Count',
         'common.equipment-list.table-header.price': 'Price',
+        'common.equipment-list.table-header.price-ex-vat': 'Price (excl. VAT)',
         'common.equipment-list.table-header.discount': 'Discount',
         'common.equipment-list.table-header.total-price': 'Amount',
+        'common.equipment-list.table-header.total-price-ex-vat': 'Amount (excl. VAT)',
         'common.equipment-list.total': 'Total',
 
         // Time Estimate list

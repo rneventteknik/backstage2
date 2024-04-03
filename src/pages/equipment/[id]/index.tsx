@@ -36,12 +36,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
     // Edit user
     //
     const router = useRouter();
-    const {
-        data: equipment,
-        error,
-        isValidating,
-        mutate,
-    } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
+    const { data: equipment, error, mutate } = useSwr('/api/equipment/' + router.query.id, equipmentFetcher);
 
     const { showSaveSuccessNotification, showSaveFailedNotification } = useNotifications();
 
@@ -56,7 +51,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         );
     }
 
-    if (isValidating || !equipment) {
+    if (!equipment) {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
@@ -94,7 +89,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/equipment/' + equipment.id + '/edit'} passHref>
+                    <Link href={'/equipment/' + equipment.id + '/edit'} passHref legacyBehavior>
                         <Button variant="primary" href={'/equipment/' + equipment.id + '/edit'}>
                             <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>

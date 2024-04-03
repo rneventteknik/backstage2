@@ -125,7 +125,7 @@ const tableSettings: TableConfiguration<Equipment> = {
                               equipment.prices[0].pricePerUnit +
                               equipment.prices[0].pricePerHourTHS +
                               equipment.prices[0].pricePerUnitTHS,
-                      ) / 4
+                      ).divide(4).value
                     : -Infinity,
             getContentOverride: EquipmentPriceDisplayFn,
             columnWidth: 120,
