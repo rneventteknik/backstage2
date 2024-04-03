@@ -111,14 +111,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                             defaultValue={equipment?.name}
                         />
                         <Form.Text className="text-muted">
-                            Nomenklatur:
-                            <span className="text-monospace"> `utrustningstyp` `modell` </span>
-                            <span className="font-weight-bold">(</span>
-                            <span className="text-monospace">`internt namn`</span>
-                            <span className="font-weight-bold">, </span>
-                            <span className="text-monospace">`teknisk specifikation`</span>
-                            <span className="font-weight-bold">)</span>
-                            <br />
+                            Nomenklatur: &lt;utrustningstyp&gt; &lt;modell&gt; (&lt;internt namn&gt;, &lt;teknisk specifikation&gt;).
                             Komponenter av namnet som ej är tillämpbart kan utelämnas.
                         </Form.Text>
                     </Form.Group>
