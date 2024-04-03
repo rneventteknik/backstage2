@@ -71,7 +71,7 @@ export const getHogiaTxtInvoice = (invoiceData: InvoiceData, t: (key: string) =>
             )}: ${invoiceData.name} ${invoiceData.dates}`,
         ];
         if (invoiceData.invoiceTag) {
-            invoiceCommentLines.push(`${t('invoice.invoiceTag')}: ${invoiceData.invoiceTag}`);
+            invoiceCommentLines.push(`${t('invoice.tag')}: ${invoiceData.invoiceTag}`);
         }
         invoiceCommentLines.push(
             `${t('hogia-invoice.general-information')} ${
