@@ -163,7 +163,6 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             name: timeReport.name,
             sortIndex: getNextSortIndex(booking.timeReports ?? []),
         };
-        addTimeReportApiCall(timeReportToSend, booking.id);
         addTimeReportApiCall(timeReportToSend, booking.id).then((timeReport) => onAdd(timeReport));
     };
 
