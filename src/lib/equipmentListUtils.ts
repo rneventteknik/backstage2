@@ -16,9 +16,10 @@ import {
 } from './mappers/booking';
 import { getResponseContentOrError } from './utils';
 import { getNextSortIndex, moveItemUp, moveItemDown, getSortedList } from './sortIndexUtils';
-import { ITimeEstimateObjectionModel } from '../models/objection-models';
+import { ITimeEstimateObjectionModel, ITimeReportObjectionModel } from '../models/objection-models';
 import { toTimeEstimate } from './mappers/timeEstimate';
 import { EquipmentPackageEntry } from '../models/interfaces/EquipmentPackage';
+import { toTimeReport } from './mappers/timeReport';
 
 // EquipmentListEntityViewModel and helpers
 //
@@ -627,4 +628,18 @@ export const addTimeEstimateApiCall = async (timeEstimate: ITimeEstimateObjectio
     return fetch(`/api/bookings/${bookingId}/timeEstimate`, request)
         .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
         .then(toTimeEstimate);
+};
+
+export const addTimeReportApiCall = async (timeReport: ITimeReportObjectionModel, bookingId: number) => {
+    const body = { timeReport: timeReport };
+
+    const request = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    };
+
+    return fetch(`/api/bookings/${bookingId}/timeReport`, request)
+        .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
+        .then(toTimeReport);
 };

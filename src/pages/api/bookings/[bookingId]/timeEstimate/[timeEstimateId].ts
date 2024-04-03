@@ -45,8 +45,8 @@ const handler = withSessionContext(
                     return;
                 }
                 await deleteTimeEstimate(timeEstimateId)
-                    .then((result) => {
-                        logChangeToBooking(
+                    .then(async (result) => {
+                        await logChangeToBooking(
                             context.currentUser,
                             bookingId,
                             booking.name,

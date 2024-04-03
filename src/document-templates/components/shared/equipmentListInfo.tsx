@@ -10,7 +10,13 @@ import {
     getCalculatedDiscount,
     addVAT,
 } from '../../../lib/pricingUtils';
-import { TableRow, TableCellAutoWidth, TableCellFixedWidth, TableRowWithNoBorder, TableRowWithTopBorder } from './utils';
+import {
+    TableRow,
+    TableCellAutoWidth,
+    TableCellFixedWidth,
+    TableRowWithNoBorder,
+    TableRowWithTopBorder,
+} from './utils';
 import { useTextResources } from '../../useTextResources';
 import { getNumberOfDays } from '../../../lib/datetimeUtils';
 import { Booking } from '../../../models/interfaces';
@@ -148,7 +154,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                 ) : null}
                             </TableRowWithTopBorder>
                             <TableRowWithNoBorder>
-                            <TableCellAutoWidth>
+                                <TableCellAutoWidth>
                                     <Text style={{ color: '#999999' }}>{wrappedEntry.entity.description}</Text>
                                 </TableCellAutoWidth>
                             </TableRowWithNoBorder>

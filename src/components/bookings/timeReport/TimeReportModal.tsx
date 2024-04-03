@@ -64,7 +64,7 @@ const TimeReportModal: React.FC<Props> = ({
             endDatetime: timeReport?.endDatetime?.toISOString() ?? '',
             pricePerHour: timeReport?.pricePerHour ?? 0,
             name: timeReport?.name ?? '',
-            sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
+            sortIndex: getNextSortIndex(booking.timeReports ?? []),
         };
 
         onSubmit(timeReportToSend);
