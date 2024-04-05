@@ -136,12 +136,17 @@ export const addVATToPriceWithTHS = (price: PricedEntityWithTHS): PricedEntityWi
 
 // Format price
 //
-export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 'st'): string => {
+export const formatPrice = (
+    price: PricedEntity,
+    returnDashIfZero = true,
+    hoursUnit = 'h',
+    unitsUnit = 'st',
+): string => {
     const pricePerHourAsCurrency = currency(price.pricePerHour);
     const pricePerUnitAsCurrency = currency(price.pricePerUnit);
 
     if (!pricePerHourAsCurrency.value && !pricePerUnitAsCurrency.value) {
-        return `-`;
+        return returnDashIfZero ? `-` : formatNumberAsCurrency(0);
     } else if (pricePerHourAsCurrency.value && !pricePerUnitAsCurrency.value) {
         return `${formatNumberAsCurrency(price.pricePerHour)}/${hoursUnit}`;
     } else if (!pricePerHourAsCurrency.value && pricePerUnitAsCurrency.value) {
@@ -151,8 +156,8 @@ export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 's
     }
 };
 
-export const formatTHSPrice = (price: PricedEntityWithTHS): string =>
-    formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
+export const formatTHSPrice = (price: PricedEntityWithTHS, returnDashIfZero = true): string =>
+    formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS }, returnDashIfZero);
 
 export const formatNumberAsCurrency = (number: number | currency, showPlusIfPositive = false): string =>
     (showPlusIfPositive && currency(number).value > 0 ? '+' : '') +

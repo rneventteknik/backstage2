@@ -111,8 +111,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                             defaultValue={equipment?.name}
                         />
                         <Form.Text className="text-muted">
-                            Nomenklatur: &lt;utrustningstyp&gt; &lt;modell&gt; (&lt;internt namn&gt;, &lt;teknisk specifikation&gt;).
-                            Komponenter av namnet som ej är tillämpbart kan utelämnas.
+                            Nomenklatur: &lt;utrustningstyp&gt; &lt;modell&gt; (&lt;internt namn&gt;, &lt;teknisk
+                            specifikation&gt;). Komponenter av namnet som ej är tillämpbart kan utelämnas.
                         </Form.Text>
                     </Form.Group>
                 </Col>
