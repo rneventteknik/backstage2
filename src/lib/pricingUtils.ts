@@ -286,7 +286,7 @@ export const getInvoiceData = (
                     });
                 }
 
-                if (entry.discount) {
+                if (entry.discount.value) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
                         text: `${t('invoice.discount')}: ${formatCurrency(getCalculatedDiscount(entry, numberOfDays))}`,
