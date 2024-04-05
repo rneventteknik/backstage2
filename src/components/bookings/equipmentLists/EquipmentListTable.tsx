@@ -14,6 +14,8 @@ import {
     faEyeSlash,
     faEye,
     faDollarSign,
+    fa0,
+    faPercent,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
@@ -324,7 +326,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             : [customPriceDropdownValue, ...entry.equipment.prices]
                     }
                     value={entry.equipmentPrice ?? customPriceDropdownValue}
-                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(x))}`}
+                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(x), false)}`}
                     optionKeyFn={(x) => x.id.toString()}
                     onChange={(newPrice) =>
                         newPrice && newPrice.id != -1
@@ -466,6 +468,23 @@ const EquipmentListTable: React.FC<Props> = ({
                         <Dropdown.Item onClick={() => toggleHideListEntry(entry, saveListEntry)}>
                             <FontAwesomeIcon icon={entry.isHidden ? faEye : faEyeSlash} className="mr-1 fa-fw" />{' '}
                             {entry.isHidden ? 'Sluta dölja rad för kund' : 'Dölj rad för kund'}
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            onClick={() =>
+                                saveListEntry({ ...entry, equipmentPrice: undefined, pricePerUnit: 0, pricePerHour: 0 })
+                            }
+                        >
+                            <FontAwesomeIcon icon={fa0} className="mr-1 fa-fw" /> Sätt anpassat pris till 0
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            onClick={() =>
+                                saveListEntry({
+                                    ...entry,
+                                    discount: getPrice(entry, getNumberOfDays(list), false).value,
+                                })
+                            }
+                        >
+                            <FontAwesomeIcon icon={faPercent} className="mr-1 fa-fw" /> Sätt rabatt till 100%
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => editEntry(entry)}>
                             <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
