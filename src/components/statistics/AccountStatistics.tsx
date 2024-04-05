@@ -30,21 +30,22 @@ type YearlyStatistic = {
 type AccountStatistic = {
     label: string;
     id: number;
-    january: AccountMonthStatistic;
-    february: AccountMonthStatistic;
-    march: AccountMonthStatistic;
-    april: AccountMonthStatistic;
-    may: AccountMonthStatistic;
-    june: AccountMonthStatistic;
-    july: AccountMonthStatistic;
-    august: AccountMonthStatistic;
-    september: AccountMonthStatistic;
-    october: AccountMonthStatistic;
-    november: AccountMonthStatistic;
-    december: AccountMonthStatistic;
+    january: AccountSumStatistic;
+    february: AccountSumStatistic;
+    march: AccountSumStatistic;
+    april: AccountSumStatistic;
+    may: AccountSumStatistic;
+    june: AccountSumStatistic;
+    july: AccountSumStatistic;
+    august: AccountSumStatistic;
+    september: AccountSumStatistic;
+    october: AccountSumStatistic;
+    november: AccountSumStatistic;
+    december: AccountSumStatistic;
+    yearTotal: AccountSumStatistic;
 };
 
-type AccountMonthStatistic = {
+type AccountSumStatistic = {
     sum: number;
     invoiceRows: PricedInvoiceRowWithBooking[];
 };
@@ -75,7 +76,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
     // Table display helpers
     //
     const getStatisticDisplayFn = (
-        month:
+        column:
             | 'january'
             | 'february'
             | 'march'
@@ -87,14 +88,15 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
             | 'september'
             | 'october'
             | 'november'
-            | 'december',
+            | 'december'
+            | 'yearTotal',
     ) => {
         const statisticDisplayFn = (model: AccountStatistic) =>
-            model[month].sum === 0 ? (
+            model[column].sum === 0 ? (
                 <span className="text-muted">{formatNumberAsCurrency(0)}</span>
             ) : (
-                <span onClick={() => setDetailsInvoiceRows(model[month].invoiceRows)} role="button">
-                    {formatNumberAsCurrency(model[month].sum)}
+                <span onClick={() => setDetailsInvoiceRows(model[column].invoiceRows)} role="button">
+                    {formatNumberAsCurrency(model[column].sum)}
                 </span>
             );
 
@@ -210,6 +212,14 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 getContentOverride: getStatisticDisplayFn('june'),
                 textAlignment: 'right',
             },
+            {
+                key: 'total',
+                displayName: 'Total',
+                columnWidth: 90,
+                getValue: (model: AccountStatistic) => model.yearTotal.sum,
+                getContentOverride: getStatisticDisplayFn('yearTotal'),
+                textAlignment: 'right',
+            },
         ],
     };
 
@@ -280,30 +290,38 @@ const getAccountsForInvoiceRows = (invoiceRows: PricedInvoiceRowWithBooking[]): 
         accountStatistics.push({
             label: account,
             id: accountStatistics.length + 1,
-            january: getAccountForMonth(invoiceRowsForAccount, 0),
-            february: getAccountForMonth(invoiceRowsForAccount, 1),
-            march: getAccountForMonth(invoiceRowsForAccount, 2),
-            april: getAccountForMonth(invoiceRowsForAccount, 3),
-            may: getAccountForMonth(invoiceRowsForAccount, 4),
-            june: getAccountForMonth(invoiceRowsForAccount, 5),
-            july: getAccountForMonth(invoiceRowsForAccount, 6),
-            august: getAccountForMonth(invoiceRowsForAccount, 7),
-            september: getAccountForMonth(invoiceRowsForAccount, 8),
-            october: getAccountForMonth(invoiceRowsForAccount, 9),
-            november: getAccountForMonth(invoiceRowsForAccount, 10),
-            december: getAccountForMonth(invoiceRowsForAccount, 11),
+            january: getAccountSumForMonth(invoiceRowsForAccount, 0),
+            february: getAccountSumForMonth(invoiceRowsForAccount, 1),
+            march: getAccountSumForMonth(invoiceRowsForAccount, 2),
+            april: getAccountSumForMonth(invoiceRowsForAccount, 3),
+            may: getAccountSumForMonth(invoiceRowsForAccount, 4),
+            june: getAccountSumForMonth(invoiceRowsForAccount, 5),
+            july: getAccountSumForMonth(invoiceRowsForAccount, 6),
+            august: getAccountSumForMonth(invoiceRowsForAccount, 7),
+            september: getAccountSumForMonth(invoiceRowsForAccount, 8),
+            october: getAccountSumForMonth(invoiceRowsForAccount, 9),
+            november: getAccountSumForMonth(invoiceRowsForAccount, 10),
+            december: getAccountSumForMonth(invoiceRowsForAccount, 11),
+            yearTotal: getYearTotal(invoiceRowsForAccount),
         });
     }
 
     return accountStatistics;
 };
 
-const getAccountForMonth = (invoiceRows: PricedInvoiceRowWithBooking[], month: number) => {
+const getAccountSumForMonth = (invoiceRows: PricedInvoiceRowWithBooking[], month: number) => {
     const invoiceRowsForMonth = invoiceRows.filter((x) => x.booking.usageStartDatetime?.getMonth() === month);
 
     return {
         sum: invoiceRowsForMonth.map((x) => x.rowPrice).reduce(reduceSumFn, 0),
         invoiceRows: invoiceRowsForMonth,
+    };
+};
+
+const getYearTotal = (invoiceRows: PricedInvoiceRowWithBooking[]) => {
+    return {
+        sum: invoiceRows.map((x) => x.rowPrice).reduce(reduceSumFn, 0),
+        invoiceRows: invoiceRows,
     };
 };
 
