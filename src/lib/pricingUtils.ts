@@ -180,16 +180,36 @@ export const getInvoiceData = (
         phone: booking.contactPersonPhone,
     });
 
-    const getInvoiceRows = (booking: BookingViewModel): InvoiceRow[] => {
-        if (booking.fixedPrice !== null) {
-            return fixedPriceBookingToInvoiceRows(booking);
-        }
-
-        const equipmentRows = booking.equipmentLists ? booking.equipmentLists.flatMap(equipmentListToInvoiceRows) : [];
-        const laborRows = timeReportsToLaborRows(booking.timeReports);
-        return [...equipmentRows, ...laborRows];
+    return {
+        documentName: `${documentName}${booking.invoiceNumber ? ' ' + booking.invoiceNumber : ''}`,
+        name: booking.name,
+        dates: getBookingDateDisplayValues(booking, locale).displayUsageInterval,
+        invoiceTag: booking.invoiceTag,
+        invoiceNumber: booking.invoiceNumber,
+        dimension1: dimension1,
+        templateName: templateName,
+        bookingType: booking.bookingType,
+        ourReference: ourReference,
+        customer: getInvoiceCustomer(booking),
+        invoiceRows: getInvoiceRows(
+            booking,
+            defaultEquipmentAccountExternal,
+            defaultEquipmentAccountInternal,
+            defaultSalaryAccountExternal,
+            defaultSalaryAccountInternal,
+            t,
+        ),
     };
+};
 
+export const getInvoiceRows = (
+    booking: BookingViewModel,
+    defaultEquipmentAccountExternal: string,
+    defaultEquipmentAccountInternal: string,
+    defaultSalaryAccountExternal: string,
+    defaultSalaryAccountInternal: string,
+    t: (t: string) => string,
+): InvoiceRow[] => {
     const equipmentListToInvoiceRows = (equipmentList: EquipmentList): InvoiceRow[] => {
         const listHeadingRow: InvoiceRow = {
             rowType: InvoiceRowType.HEADING,
@@ -235,6 +255,7 @@ export const getInvoiceData = (
                             ? defaultEquipmentAccountExternal
                             : defaultEquipmentAccountInternal, // TODO: Should this be something else if all members have the same different account?
                     unit: t('common.misc.count-unit-single'),
+                    sourceId: wrappedEntity.id,
                 };
                 const packageDescriptionRow: InvoiceRow = {
                     rowType: InvoiceRowType.ITEM_COMMENT,
@@ -255,6 +276,7 @@ export const getInvoiceData = (
                             ? defaultEquipmentAccountExternal
                             : defaultEquipmentAccountInternal),
                     unit: t(entry.numberOfUnits > 1 ? 'common.misc.count-unit' : 'common.misc.count-unit-single'),
+                    sourceId: wrappedEntity.id,
                 };
                 const invoiceRows: InvoiceRow[] = [mainRow];
 
@@ -324,6 +346,7 @@ export const getInvoiceData = (
                     ? defaultSalaryAccountExternal
                     : defaultSalaryAccountInternal,
             unit: t('common.misc.count-unit-single'),
+            sourceId: 'T' + timeReports[0].id,
         };
 
         const descriptiveRow: InvoiceRow = {
@@ -348,24 +371,19 @@ export const getInvoiceData = (
                     ? defaultEquipmentAccountExternal
                     : defaultEquipmentAccountInternal,
             unit: t('common.misc.count-unit-single'),
+            sourceId: 'B' + booking.id,
         };
 
         return [mainRow];
     };
 
-    return {
-        documentName: `${documentName}${booking.invoiceNumber ? ' ' + booking.invoiceNumber : ''}`,
-        name: booking.name,
-        dates: getBookingDateDisplayValues(booking, locale).displayUsageInterval,
-        invoiceTag: booking.invoiceTag,
-        invoiceNumber: booking.invoiceNumber,
-        dimension1: dimension1,
-        templateName: templateName,
-        bookingType: booking.bookingType,
-        ourReference: ourReference,
-        customer: getInvoiceCustomer(booking),
-        invoiceRows: getInvoiceRows(booking),
-    };
+    if (booking.fixedPrice !== null) {
+        return fixedPriceBookingToInvoiceRows(booking);
+    }
+
+    const equipmentRows = booking.equipmentLists ? booking.equipmentLists.flatMap(equipmentListToInvoiceRows) : [];
+    const laborRows = timeReportsToLaborRows(booking.timeReports);
+    return [...equipmentRows, ...laborRows];
 };
 
 // Salary calculations
