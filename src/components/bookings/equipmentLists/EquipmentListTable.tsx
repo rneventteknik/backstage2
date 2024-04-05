@@ -60,6 +60,7 @@ import { toEquipment } from '../../../lib/mappers/equipment';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 import TimeEstimateModal from '../timeEstimate/TimeEstimateModal';
 import PackageInfoModal from './PackageInfoModal';
+import currency from 'currency.js';
 
 type Props = {
     list: EquipmentList;
@@ -610,9 +611,9 @@ const EquipmentListTable: React.FC<Props> = ({
                         viewModelIsHeading(viewModel)
                             ? getEquipmentListHeadingFromViewModel(viewModel)
                                   .listEntries.map((x) => getPrice(x, getNumberOfDays(list)))
-                                  .reduce(reduceSumFn, 0)
+                                  .reduce((a, b) => a.add(b), currency(0))
                             : getPrice(getEquipmentListEntryFromViewModel(viewModel), getNumberOfDays(list)),
-                    ),
+                    ).value,
                 getContentOverride: EquipmentListEntryTotalPriceDisplayFn,
                 columnWidth: 90,
                 textAlignment: 'right',
@@ -676,7 +677,7 @@ const EquipmentListTable: React.FC<Props> = ({
                         <SelectNumberOfUnitsAndHoursModal
                             show={!!equipmentToAdd}
                             onHide={() => setEquipmentToAdd(null)}
-                            onSave={(numberOfUnits, numberOfHours) => {
+                            onSave={(numberOfUnits, numberOfHours, selectedPriceId) => {
                                 if (!equipmentToAdd) {
                                     throw new Error('Invalid state: Missing searchResultModelToAdd.');
                                 }
@@ -689,6 +690,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                     addListEntries,
                                     numberOfUnits,
                                     numberOfHours,
+                                    selectedPriceId,
                                 );
                                 setEquipmentToAdd(null);
                             }}
@@ -704,6 +706,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             }
                             title={language === Language.SV ? equipmentToAdd.name : equipmentToAdd.nameEN}
                             equipment={equipmentToAdd}
+                            priceplan={pricePlan}
                             startDatetime={getEquipmentOutDatetime(list) ?? null}
                             endDatetime={getEquipmentInDatetime(list) ?? null}
                         />

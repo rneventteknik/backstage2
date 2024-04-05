@@ -88,9 +88,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>st</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>st</InputGroup.Text>
                                 </InputGroup>
                             </Form.Group>
                         </Col>
@@ -110,9 +108,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                             </Form.Group>
                         </Col>
@@ -165,9 +161,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                                 })
                                             }
                                         />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>kr/st</InputGroup.Text>
-                                        </InputGroup.Append>
+                                        <InputGroup.Text>kr/st</InputGroup.Text>
                                     </InputGroup>
                                     <PriceWithVATPreview price={equipmentListEntryToEditViewModel?.pricePerUnit} />
                                 </Form.Group>
@@ -188,9 +182,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                                 })
                                             }
                                         />
-                                        <InputGroup.Append>
-                                            <InputGroup.Text>kr/h</InputGroup.Text>
-                                        </InputGroup.Append>
+                                        <InputGroup.Text>kr/h</InputGroup.Text>
                                     </InputGroup>
                                     <PriceWithVATPreview price={equipmentListEntryToEditViewModel?.pricePerHour} />
                                 </Form.Group>
@@ -214,9 +206,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>kr</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>kr</InputGroup.Text>
                                 </InputGroup>
                                 <PriceWithVATPreview
                                     price={equipmentListEntryToEditViewModel?.discount}

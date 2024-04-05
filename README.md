@@ -22,8 +22,6 @@ Our package manager of choice is [`yarn`](https://yarnpkg.com/). After cloning t
 
 `yarn lint` will run _eslint_ on all relevant files and fix any problems it knows how to fix automatically.
 
-`yarn test` will run all cypress tests. This requires a server to be running at `localhost:3000` with a fresh seed. Make sure to run `yarn seed` before.
-
 ### Environment Variables
 
 A few environment variables are needed to get this app to run. To configure these, the file `.env.local` can be added to this folder. It should contain the following:
@@ -51,9 +49,9 @@ APPLICATION_BASE_URL={Base URL of application when generating links, for example
 
 #### Branching Model
 
-We use the branching model [Gitflow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow). This means that we have a production branch (`main`) and separate development branch called `dev`.
+Most development should happen on branches based on `main`.
 
-Our branch naming convention is based on this model and we use prefixes to indicate what type every branch has. The prefixes in use are:
+We use prefixes to indicate what kind of changes every branch contains. The prefixes in use are:
 
 -   `feature/` for regular feature branches
 -   `bugfix/` for bugfix branches

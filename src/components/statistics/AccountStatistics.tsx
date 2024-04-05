@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BookingViewModel } from '../../models/interfaces';
 import { KeyValue } from '../../models/interfaces/KeyValue';
-import { getGlobalSetting, getOperationalYear, groupBy, reduceSumFn } from '../../lib/utils';
+import { getGlobalSetting, getOperationalYear, groupBy } from '../../lib/utils';
 import { Card, Modal } from 'react-bootstrap';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import { formatNumberAsCurrency, getInvoiceRows } from '../../lib/pricingUtils';
@@ -10,6 +10,7 @@ import { getSortedList } from '../../lib/sortIndexUtils';
 import TableStyleLink from '../utils/TableStyleLink';
 import { getTextResource } from '../../document-templates/useTextResources';
 import { getTextResourcesFromGlobalSettings } from '../../document-templates/utils';
+import currency from 'currency.js';
 
 type Props = {
     bookings: BookingViewModel[];
@@ -46,7 +47,7 @@ type AccountStatistic = {
 };
 
 type AccountSumStatistic = {
-    sum: number;
+    sum: currency;
     invoiceRows: PricedInvoiceRowWithBooking[];
 };
 
@@ -92,7 +93,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
             | 'yearTotal',
     ) => {
         const statisticDisplayFn = (model: AccountStatistic) =>
-            model[column].sum === 0 ? (
+            model[column].sum.value === 0 ? (
                 <span className="text-muted">{formatNumberAsCurrency(0)}</span>
             ) : (
                 <span onClick={() => setDetailsInvoiceRows(model[column].invoiceRows)} role="button">
@@ -120,7 +121,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'july',
                 displayName: 'Jul',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.july.sum,
+                getValue: (model: AccountStatistic) => model.july.sum.value,
                 getContentOverride: getStatisticDisplayFn('july'),
                 textAlignment: 'right',
             },
@@ -128,7 +129,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'august',
                 displayName: 'Aug',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.august.sum,
+                getValue: (model: AccountStatistic) => model.august.sum.value,
                 getContentOverride: getStatisticDisplayFn('august'),
                 textAlignment: 'right',
             },
@@ -136,7 +137,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'september',
                 displayName: 'Sep',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.september.sum,
+                getValue: (model: AccountStatistic) => model.september.sum.value,
                 getContentOverride: getStatisticDisplayFn('september'),
                 textAlignment: 'right',
             },
@@ -144,7 +145,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'october',
                 displayName: 'Oct',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.october.sum,
+                getValue: (model: AccountStatistic) => model.october.sum.value,
                 getContentOverride: getStatisticDisplayFn('october'),
                 textAlignment: 'right',
             },
@@ -152,7 +153,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'november',
                 displayName: 'Nov',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.november.sum,
+                getValue: (model: AccountStatistic) => model.november.sum.value,
                 getContentOverride: getStatisticDisplayFn('november'),
                 textAlignment: 'right',
             },
@@ -160,7 +161,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'december',
                 displayName: 'Dec',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.december.sum,
+                getValue: (model: AccountStatistic) => model.december.sum.value,
                 getContentOverride: getStatisticDisplayFn('december'),
                 textAlignment: 'right',
             },
@@ -168,7 +169,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'january',
                 displayName: 'Jan',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.january.sum,
+                getValue: (model: AccountStatistic) => model.january.sum.value,
                 getContentOverride: getStatisticDisplayFn('january'),
                 textAlignment: 'right',
             },
@@ -176,7 +177,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'february',
                 displayName: 'Feb',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.february.sum,
+                getValue: (model: AccountStatistic) => model.february.sum.value,
                 getContentOverride: getStatisticDisplayFn('february'),
                 textAlignment: 'right',
             },
@@ -184,7 +185,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'march',
                 displayName: 'Mar',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.march.sum,
+                getValue: (model: AccountStatistic) => model.march.sum.value,
                 getContentOverride: getStatisticDisplayFn('march'),
                 textAlignment: 'right',
             },
@@ -192,7 +193,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'april',
                 displayName: 'Apr',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.april.sum,
+                getValue: (model: AccountStatistic) => model.april.sum.value,
                 getContentOverride: getStatisticDisplayFn('april'),
                 textAlignment: 'right',
             },
@@ -200,7 +201,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'may',
                 displayName: 'Maj',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.may.sum,
+                getValue: (model: AccountStatistic) => model.may.sum.value,
                 getContentOverride: getStatisticDisplayFn('may'),
                 textAlignment: 'right',
             },
@@ -208,7 +209,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'june',
                 displayName: 'Jun',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.june.sum,
+                getValue: (model: AccountStatistic) => model.june.sum.value,
                 getContentOverride: getStatisticDisplayFn('june'),
                 textAlignment: 'right',
             },
@@ -216,7 +217,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 key: 'total',
                 displayName: 'Total',
                 columnWidth: 90,
-                getValue: (model: AccountStatistic) => model.yearTotal.sum,
+                getValue: (model: AccountStatistic) => model.yearTotal.sum.value,
                 getContentOverride: getStatisticDisplayFn('yearTotal'),
                 textAlignment: 'right',
             },
@@ -313,14 +314,14 @@ const getAccountSumForMonth = (invoiceRows: PricedInvoiceRowWithBooking[], month
     const invoiceRowsForMonth = invoiceRows.filter((x) => x.booking.usageStartDatetime?.getMonth() === month);
 
     return {
-        sum: invoiceRowsForMonth.map((x) => x.rowPrice).reduce(reduceSumFn, 0),
+        sum: invoiceRowsForMonth.map((x) => x.rowPrice).reduce((a, b) => a.add(b), currency(0)),
         invoiceRows: invoiceRowsForMonth,
     };
 };
 
 const getYearTotal = (invoiceRows: PricedInvoiceRowWithBooking[]) => {
     return {
-        sum: invoiceRows.map((x) => x.rowPrice).reduce(reduceSumFn, 0),
+        sum: invoiceRows.map((x) => x.rowPrice).reduce((a, b) => a.add(b), currency(0)),
         invoiceRows: invoiceRows,
     };
 };
@@ -378,7 +379,7 @@ const AccountStatisticDetailsModal: React.FC<AccountStatisticDetailsModalProps> 
             {
                 key: 'amount',
                 displayName: 'Summa',
-                getValue: (model: PricedInvoiceRowWithBooking) => model.rowPrice,
+                getValue: (model: PricedInvoiceRowWithBooking) => model.rowPrice.value,
                 getContentOverride: (model: PricedInvoiceRowWithBooking) => formatNumberAsCurrency(model.rowPrice),
                 textAlignment: 'right',
                 columnWidth: 140,

@@ -15,6 +15,7 @@ import {
     faAdd,
     faPlus,
     faInfoCircle,
+    faClone,
 } from '@fortawesome/free-solid-svg-icons';
 import { TimeReport } from '../../../models/interfaces';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
@@ -30,6 +31,7 @@ import {
 import { useNotifications } from '../../../lib/useNotifications';
 import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
 import {
+    getNextSortIndex,
     isFirst,
     isLast,
     moveItemDown,
@@ -40,6 +42,9 @@ import {
 import { formatDatetime, toBookingViewModel } from '../../../lib/datetimeUtils';
 import TimeReportAddButton from './TimeReportAddButton';
 import TimeReportModal from './TimeReportModal';
+import { addTimeReportApiCall } from '../../../lib/equipmentListUtils';
+import ConfirmModal from '../../utils/ConfirmModal';
+import TimeReportHourDisplay from '../../utils/TimeReportHourDisplay';
 
 type Props = {
     bookingId: number;
@@ -55,6 +60,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
 
     const [timeReportToEditViewModel, setTimeReportToEditViewModel] = useState<Partial<TimeReport> | null>(null);
     const [showContent, setShowContent] = useState(false);
+    const [timeReportToDelete, setTimeReportToDelete] = useState<TimeReport | null>(null);
 
     const { showSaveSuccessNotification, showSaveFailedNotification, showDeleteFailedNotification } =
         useNotifications();
@@ -84,7 +90,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 </Card.Header>
                 <Card.Body>
                     <p className="text-danger">
-                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsrapporterna.
+                        <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidrapporterna.
                     </p>
                     <p className="text-monospace text-muted mb-0">{error?.message}</p>
                 </Card.Body>
@@ -146,6 +152,21 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             });
     };
 
+    const duplicateTimeReport = (timeReport: TimeReport) => {
+        const timeReportToSend: ITimeReportObjectionModel = {
+            bookingId: timeReport.bookingId,
+            billableWorkingHours: timeReport.billableWorkingHours,
+            actualWorkingHours: timeReport.actualWorkingHours,
+            userId: timeReport.userId,
+            startDatetime: timeReport.startDatetime?.toISOString(),
+            endDatetime: timeReport.endDatetime?.toISOString(),
+            pricePerHour: timeReport.pricePerHour,
+            name: timeReport.name,
+            sortIndex: getNextSortIndex(booking.timeReports ?? []),
+        };
+        addTimeReportApiCall(timeReportToSend, booking.id).then((timeReport) => onAdd(timeReport));
+    };
+
     const TimeReportSpecificationDisplayFn = (timeReport: TimeReport) => (
         <>
             <DoubleClickToEdit
@@ -189,23 +210,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             size="sm"
             readonly={readonly}
         >
-            {isNaN(timeReport.billableWorkingHours) ? (
-                <span className="text-muted font-italic">Dubbelklicka för att lägga till en tid</span>
-            ) : (
-                timeReport.billableWorkingHours + ' h'
-            )}
-            {timeReport.actualWorkingHours !== timeReport.billableWorkingHours ? (
-                <OverlayTrigger
-                    overlay={
-                        <Tooltip id="1">
-                            Antalet fakturerade timmar ({timeReport.billableWorkingHours} h) skiljer sig från antalet
-                            arbetade timmar ({timeReport.actualWorkingHours} h).
-                        </Tooltip>
-                    }
-                >
-                    <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
-                </OverlayTrigger>
-            ) : null}
+            <TimeReportHourDisplay timeReport={timeReport} />
         </DoubleClickToEdit>
     );
 
@@ -252,8 +257,11 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                         <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
                     </Dropdown.Item>
                     <Dropdown.Divider />
-                    <Dropdown.Item onClick={() => deleteTimeReport(entry)} className="text-danger">
+                    <Dropdown.Item onClick={() => setTimeReportToDelete(entry)} className="text-danger">
                         <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={() => duplicateTimeReport(entry)}>
+                        <FontAwesomeIcon icon={faClone} className="mr-1 fa-fw" /> Duplicera
                     </Dropdown.Item>
                 </>
             ) : null}
@@ -406,6 +414,24 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                     updateTimeReports(tr);
                 }}
             ></TimeReportModal>
+            <ConfirmModal
+                show={timeReportToDelete !== null}
+                onHide={() => setTimeReportToDelete(null)}
+                onConfirm={() => {
+                    if (!timeReportToDelete) {
+                        throw new Error('Invalid state');
+                    }
+
+                    deleteTimeReport(timeReportToDelete);
+                    setTimeReportToDelete(null);
+                }}
+                title="Bekräfta"
+                confirmLabel="Ta bort"
+                confirmButtonType="danger"
+            >
+                Är du säker på att du vill ta bort tidrapporten {timeReportToDelete?.name} för{' '}
+                {timeReportToDelete?.user?.name}?
+            </ConfirmModal>
         </Card>
     );
 };

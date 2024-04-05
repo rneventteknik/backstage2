@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Button, Form, InputGroup, Modal } from 'react-bootstrap';
+import { Alert, Button, Card, Form, InputGroup, ListGroup, Modal } from 'react-bootstrap';
 import useSwr from 'swr';
 import { bookingsFetcher } from '../../../lib/fetchers';
 import { getMaximumNumberOfUnitUsed, toIntOrUndefined } from '../../../lib/utils';
@@ -7,15 +7,18 @@ import { Status } from '../../../models/enums/Status';
 import { Equipment } from '../../../models/interfaces';
 import MarkdownCard from '../../MarkdownCard';
 import RequiredIndicator from '../../utils/RequiredIndicator';
+import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
+import { PricePlan } from '../../../models/enums/PricePlan';
 
 type Props = {
     show: boolean;
     onHide: () => void;
-    onSave: (numberOfUnits: number, hours: number) => void;
+    onSave: (numberOfUnits: number, hours: number, selectedPriceId?: number) => void;
     showNumberOfUnits: boolean;
     showNumberOfHours: boolean;
     title: string;
     equipment: Equipment;
+    priceplan: PricePlan;
     startDatetime: Date | null;
     endDatetime: Date | null;
 };
@@ -28,11 +31,13 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
     showNumberOfHours,
     title,
     equipment,
+    priceplan,
     startDatetime,
     endDatetime,
 }: Props) => {
     const [numberOfUnits, setNumberOfUnits] = useState<string>('1');
     const [numberOfHours, setNumberOfHours] = useState<string>(showNumberOfHours ? '1' : '0');
+    const [selectedPriceId, setSelectedPriceId] = useState<number>(equipment.prices[0].id);
 
     const numberOfUnitsRef = useRef<HTMLInputElement>(null);
     const numberOfHoursRef = useRef<HTMLInputElement>(null);
@@ -102,9 +107,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                                     value={numberOfUnits}
                                     onChange={(e) => setNumberOfUnits(e.target.value)}
                                 />
-                                <InputGroup.Append>
-                                    <InputGroup.Text>st</InputGroup.Text>
-                                </InputGroup.Append>
+                                <InputGroup.Text>st</InputGroup.Text>
                             </InputGroup>
                             <Form.Text className="text-muted">{getDescription()}</Form.Text>
                         </Form.Group>
@@ -122,11 +125,37 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                                     value={numberOfHours}
                                     onChange={(e) => setNumberOfHours(e.target.value)}
                                 />
-                                <InputGroup.Append>
-                                    <InputGroup.Text>h</InputGroup.Text>
-                                </InputGroup.Append>
+                                <InputGroup.Text>h</InputGroup.Text>
                             </InputGroup>
                         </Form.Group>
+                    ) : null}
+                    {equipment.prices && equipment.prices.length > 0 ? (
+                        <Card className="mb-3">
+                            <Card.Header>Prissättning (ink. moms)</Card.Header>
+                            <ListGroup variant="flush">
+                                {equipment.prices.map((p) => (
+                                    <ListGroup.Item key={p.id}>
+                                        <div className="d-flex flex-row align-items-center">
+                                            <label htmlFor={'price-' + p.id} className="flex-grow-1 m-0">
+                                                <span className="d-block">{p.name}</span>
+                                                <span className="text-muted">
+                                                    {priceplan === PricePlan.EXTERNAL
+                                                        ? formatPrice(addVATToPriceWithTHS(p))
+                                                        : formatTHSPrice(addVATToPriceWithTHS(p))}
+                                                </span>
+                                            </label>
+                                            <Form.Check
+                                                type="radio"
+                                                id={'price-' + p.id}
+                                                name="price"
+                                                onChange={() => setSelectedPriceId(p.id)}
+                                                checked={selectedPriceId === p.id}
+                                            />
+                                        </div>
+                                    </ListGroup.Item>
+                                ))}
+                            </ListGroup>
+                        </Card>
                     ) : null}
                     {startDatetime &&
                     endDatetime &&
@@ -164,7 +193,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                                 throw new Error('Invalid state.');
                             }
 
-                            onSave(numberOfUnitsNumber, numberOfHoursNumber);
+                            onSave(numberOfUnitsNumber, numberOfHoursNumber, selectedPriceId);
                         }}
                     >
                         Lägg till

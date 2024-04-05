@@ -117,7 +117,10 @@ const EquipmentListHeader: React.FC<Props> = ({
                     <DoubleClickToEdit
                         value={list.name}
                         onUpdate={(newValue: string) =>
-                            saveList({ ...list, name: newValue && newValue.length > 0 ? newValue : list.name })
+                            saveList({
+                                ...list,
+                                name: newValue && newValue.trim().length > 0 ? newValue.trim() : list.name,
+                            })
                         }
                         readonly={readonly}
                     >

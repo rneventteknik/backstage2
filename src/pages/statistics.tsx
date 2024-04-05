@@ -18,6 +18,7 @@ import { Status } from '../models/enums/Status';
 import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import AccountStatistics from '../components/statistics/AccountStatistics';
+import currency from 'currency.js';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -110,7 +111,7 @@ const getEquipmentStatistics = (bookings: BookingViewModel[]): EquipmentStatisti
             sum: entries
                 .filter((x) => x.booking.fixedPrice === null)
                 .map((x) => getPrice(x, getNumberOfDays(x.list)))
-                .reduce(reduceSumFn, 0),
+                .reduce((a, b) => a.add(b), currency(0)).value,
             percentTHS:
                 (bookingsForThisEquipment.filter((x) => x.pricePlan === PricePlan.THS).length /
                     bookingsForThisEquipment.length) *
@@ -126,7 +127,7 @@ const getEquipmentStatistics = (bookings: BookingViewModel[]): EquipmentStatisti
             numberOfBookings: fixedPriceBookings.length,
             totalNumberOfUnitDays: null,
             totalNumberOfUnitHours: null,
-            sum: bookings.map((x) => x.fixedPrice ?? 0).reduce(reduceSumFn, 0),
+            sum: bookings.map((x) => currency(x.fixedPrice ?? 0)).reduce((a, b) => a.add(b), currency(0)).value,
             percentTHS: (bookings.filter((x) => x.pricePlan === PricePlan.THS).length / bookings.length) * 100,
         });
     }
@@ -160,7 +161,7 @@ const getCustomerStatistics = (bookings: BookingViewModel[]): CustomerStatisticV
             totalNumberOfHours: bookings
                 .flatMap((booking) => booking.timeReports?.flatMap((x) => x.billableWorkingHours) ?? [])
                 .reduce(reduceSumFn, 0),
-            sum: bookings.map((x) => getBookingPrice(x)).reduce(reduceSumFn, 0),
+            sum: bookings.map((x) => getBookingPrice(x)).reduce((a, b) => a.add(b), currency(0)).value,
             percentTHS: (bookings.filter((x) => x.pricePlan === PricePlan.THS).length / bookings.length) * 100,
         });
     }
@@ -196,7 +197,9 @@ const getUserStatistics = (bookings: BookingViewModel[]): UserStatisticViewModel
             numberOfBookings: bookingsForThisUser.length,
             totalNumberOfBillableHours: reports.map((x) => x.billableWorkingHours).reduce(reduceSumFn, 0),
             totalNumberOfActualHours: reports.map((x) => x.actualWorkingHours).reduce(reduceSumFn, 0),
-            sum: reports.map((x) => x.billableWorkingHours * x.pricePerHour).reduce(reduceSumFn, 0),
+            sum: reports
+                .map((x) => currency(x.billableWorkingHours).multiply(x.pricePerHour))
+                .reduce((a, b) => a.add(b), currency(0)).value,
             percentTHS:
                 (bookingsForThisUser.filter((x) => x.pricePlan === PricePlan.THS).length / bookingsForThisUser.length) *
                 100,
@@ -209,14 +212,7 @@ const getUserStatistics = (bookings: BookingViewModel[]): UserStatisticViewModel
 // Page
 //
 const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const {
-        data: bookings,
-        error,
-        isValidating,
-    } = useSwr('/api/bookings', bookingsFetcher, {
-        revalidateOnFocus: false,
-        revalidateOnReconnect: false,
-    });
+    const { data: bookings, error } = useSwr('/api/bookings', bookingsFetcher);
 
     if (error) {
         return (
@@ -229,7 +225,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
         );
     }
 
-    if (isValidating || !bookings) {
+    if (!bookings) {
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 

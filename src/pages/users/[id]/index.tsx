@@ -13,7 +13,7 @@ import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
 import { bookingsFetcher, userFetcher } from '../../../lib/fetchers';
 import { ErrorPage } from '../../../components/layout/ErrorPage';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faStopwatch } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TinyBookingTable from '../../../components/TinyBookingTable';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
@@ -26,7 +26,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
     // Edit user
     //
     const router = useRouter();
-    const { data: user, error, isValidating } = useSwr('/api/users/' + router.query.id, userFetcher);
+    const { data: user, error } = useSwr('/api/users/' + router.query.id, userFetcher);
     const { data: bookings } = useSwr('/api/users/' + router.query.id + '/bookings', bookingsFetcher);
     const { data: coOwnerBookings } = useSwr('/api/users/' + router.query.id + '/coOwnerBookings', bookingsFetcher);
 
@@ -41,7 +41,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         );
     }
 
-    if (isValidating || !user) {
+    if (!user) {
         return <TwoColLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
@@ -57,12 +57,17 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
-                    <Link href={'/users/' + user.id + '/edit'} passHref>
+                    <Link href={'/users/' + user.id + '/edit'} passHref legacyBehavior>
                         <Button variant="primary" href={'/users/' + user.id + '/edit'}>
                             <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>
                     </Link>
                 </IfAdmin>
+                <Link href={'/users/' + user.id + '/time-reports'} passHref>
+                    <Button variant="secondary" href={'/users/' + user.id + '/time-reports'}>
+                        <FontAwesomeIcon icon={faStopwatch} className="mr-1" /> Visa tidrapporter
+                    </Button>
+                </Link>
             </Header>
 
             <Row className="mb-3">
@@ -148,9 +153,9 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                     <ListGroup.Item>
                                         <div className="mb-1">Adress</div>
                                         <div className="text-muted">
-                                            {user.homeAddress?.split('\n').map((addressLine, i) => (
-                                                <div key={i}>{addressLine}</div>
-                                            ))}
+                                            {user.homeAddress
+                                                ?.split('\n')
+                                                .map((addressLine, i) => <div key={i}>{addressLine}</div>)}
                                         </div>
                                     </ListGroup.Item>
                                 </ListGroup>

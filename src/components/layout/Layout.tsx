@@ -30,7 +30,7 @@ const Layout: React.FC<Props> = ({
     return (
         <div className={styles.container} data-sidebar-toggle-status={sidebarIsToggled}>
             <Head>
-                <title>{title} | Backstage2</title>
+                <title>{`${title} | Backstage2`}</title>
                 <meta charSet="utf-8" />
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
                 <link

@@ -123,6 +123,7 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
                             height={35}
                             width={285}
                             role="button"
+                            alt="Logo"
                         />
                     </Link>
                 </div>

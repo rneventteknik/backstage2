@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { Button } from 'react-bootstrap';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
-import { toTimeReport } from '../../../lib/mappers/timeReport';
 import { TimeReport } from '../../../models/interfaces/TimeReport';
 import { useNotifications } from '../../../lib/useNotifications';
 import { BookingViewModel } from '../../../models/interfaces';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
-import { getResponseContentOrError } from '../../../lib/utils';
 import TimeReportModal from './TimeReportModal';
+import { addTimeReportApiCall } from '../../../lib/equipmentListUtils';
 
 type Props = {
     booking: BookingViewModel;
@@ -29,24 +28,9 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
     const [timeReport, setTimeReport] = useState<Partial<TimeReport> | undefined>(undefined);
 
     const addTimeReport = (timeReport: ITimeReportObjectionModel) => {
-        if (!currentUser.userId) {
-            showCreateFailedNotification('Tidrapporten');
-            return;
-        }
-
-        const body = { timeReport: timeReport };
-
-        const request = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-
-        fetch('/api/bookings/' + booking.id + '/timeReport', request)
-            .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
-            .then(toTimeReport)
-            .then((timeReport) => {
-                onAdd(timeReport);
+        addTimeReportApiCall(timeReport, booking.id)
+            .then((data) => {
+                onAdd(data);
             })
             .catch((error: Error) => {
                 console.error(error);
