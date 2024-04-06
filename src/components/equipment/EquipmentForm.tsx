@@ -106,10 +106,14 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Form.Control
                             required
                             type="text"
-                            placeholder="Behringer X32 Mixerbord"
+                            placeholder="Projektor Optoma EH460 (Short Throw, 1080p)"
                             name="equipmentName"
                             defaultValue={equipment?.name}
                         />
+                        <Form.Text className="text-muted">
+                            Nomenklatur: &lt;utrustningstyp&gt; &lt;modell&gt; (&lt;internt namn&gt;, &lt;teknisk
+                            specifikation&gt;). Komponenter av namnet som ej är tillämpbart kan utelämnas.
+                        </Form.Text>
                     </Form.Group>
                 </Col>
                 <Col lg="6">
@@ -134,7 +138,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Form.Control
                             required
                             type="text"
-                            placeholder="Behringer X32 Mixer"
+                            placeholder="Projector Optoma EH460 (Short Throw, 1080p)"
                             name="equipmentNameEN"
                             defaultValue={equipment?.nameEN}
                         />
