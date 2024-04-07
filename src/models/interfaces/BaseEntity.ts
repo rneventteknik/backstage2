@@ -18,12 +18,12 @@ export interface HasStringId {
 }
 
 export interface PricedEntity {
-    pricePerHour: number | currency;
-    pricePerUnit: number | currency;
+    pricePerHour: currency;
+    pricePerUnit: currency;
 }
 export interface PricedEntityWithTHS {
-    pricePerHour: number | currency;
-    pricePerUnit: number | currency;
-    pricePerHourTHS: number | currency;
-    pricePerUnitTHS: number | currency;
+    pricePerHour: currency;
+    pricePerUnit: currency;
+    pricePerHourTHS: currency;
+    pricePerUnitTHS: currency;
 }

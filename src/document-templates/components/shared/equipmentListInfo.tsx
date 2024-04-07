@@ -3,12 +3,12 @@ import React from 'react';
 import { commonStyles, formatEquipmentListEntryCountOrHours, formatEquipmentListEntryPriceWithVAT } from '../../utils';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import {
-    formatNumberAsCurrency,
     getPrice,
     getEquipmentListPrice,
     getEquipmentListHeadingPrice,
     getCalculatedDiscount,
     addVAT,
+    formatCurrency,
 } from '../../../lib/pricingUtils';
 import {
     TableRow,
@@ -22,6 +22,7 @@ import { getNumberOfDays } from '../../../lib/datetimeUtils';
 import { Booking } from '../../../models/interfaces';
 import { EquipmentListDateInfo } from './equipmentListDateInfo';
 import { getSortedList } from '../../../lib/sortIndexUtils';
+import currency from 'currency.js';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -110,7 +111,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                                                 heading,
                                                                 getNumberOfDays(list),
                                                             ),
-                                                            pricePerHour: 0,
+                                                            pricePerHour: currency(0),
                                                         },
                                                         t,
                                                     )}
@@ -121,7 +122,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                             {!isHeading ? (
                                                 <Text>
                                                     {getCalculatedDiscount(entry, getNumberOfDays(list)).value > 0
-                                                        ? formatNumberAsCurrency(
+                                                        ? formatCurrency(
                                                               addVAT(
                                                                   getCalculatedDiscount(entry, getNumberOfDays(list)),
                                                               ),
@@ -133,13 +134,11 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                         <TableCellFixedWidth width={80} textAlign="right">
                                             {!isHeading ? (
                                                 <Text>
-                                                    {formatNumberAsCurrency(
-                                                        addVAT(getPrice(entry, getNumberOfDays(list))),
-                                                    )}
+                                                    {formatCurrency(addVAT(getPrice(entry, getNumberOfDays(list))))}
                                                 </Text>
                                             ) : (
                                                 <Text>
-                                                    {formatNumberAsCurrency(
+                                                    {formatCurrency(
                                                         addVAT(
                                                             getEquipmentListHeadingPrice(
                                                                 heading,
@@ -169,9 +168,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                             <Text style={styles.bold}>{t('common.equipment-list.total')}</Text>
                         </TableCellAutoWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
-                            <Text style={styles.bold}>
-                                {formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}
-                            </Text>
+                            <Text style={styles.bold}>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
                         </TableCellFixedWidth>
                     </TableRow>
                 </>

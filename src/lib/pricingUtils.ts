@@ -57,7 +57,7 @@ export const getCalculatedDiscount = (entry: EquipmentListEntry, numberOfDays: n
     const priceWithoutDiscount = getPrice(entry, numberOfDays, false);
 
     // The database can contain a discount value larger than the linetotal
-    if (priceWithoutDiscount.value < entry.discount) {
+    if (priceWithoutDiscount.value < entry.discount.value) {
         return priceWithoutDiscount;
     }
 
@@ -142,26 +142,26 @@ export const formatPrice = (
     hoursUnit = 'h',
     unitsUnit = 'st',
 ): string => {
-    const pricePerHourAsCurrency = currency(price.pricePerHour);
-    const pricePerUnitAsCurrency = currency(price.pricePerUnit);
-
-    if (!pricePerHourAsCurrency.value && !pricePerUnitAsCurrency.value) {
+    if (!price.pricePerHour.value && !price.pricePerUnit.value) {
         return returnDashIfZero ? `-` : formatNumberAsCurrency(0);
-    } else if (pricePerHourAsCurrency.value && !pricePerUnitAsCurrency.value) {
-        return `${formatNumberAsCurrency(price.pricePerHour)}/${hoursUnit}`;
-    } else if (!pricePerHourAsCurrency.value && pricePerUnitAsCurrency.value) {
-        return `${formatNumberAsCurrency(price.pricePerUnit)}/${unitsUnit}`;
+    } else if (price.pricePerHour.value && !price.pricePerUnit.value) {
+        return `${formatCurrency(price.pricePerHour)}/${hoursUnit}`;
+    } else if (!price.pricePerHour.value && price.pricePerUnit.value) {
+        return `${formatCurrency(price.pricePerUnit)}/${unitsUnit}`;
     } else {
-        return `${formatNumberAsCurrency(price.pricePerUnit)} + ${formatNumberAsCurrency(price.pricePerHour)}/h`;
+        return `${formatCurrency(price.pricePerUnit)} + ${formatCurrency(price.pricePerHour)}/h`;
     }
 };
 
 export const formatTHSPrice = (price: PricedEntityWithTHS, returnDashIfZero = true): string =>
     formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS }, returnDashIfZero);
 
-export const formatNumberAsCurrency = (number: number | currency, showPlusIfPositive = false): string =>
-    (showPlusIfPositive && currency(number).value > 0 ? '+' : '') +
-    Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(currency(number).value);
+export const formatNumberAsCurrency = (number: number, showPlusIfPositive = false): string =>
+    formatCurrency(currency(number), showPlusIfPositive);
+
+export const formatCurrency = (number: currency, showPlusIfPositive = false): string =>
+    (showPlusIfPositive && number.value > 0 ? '+' : '') +
+    Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK' }).format(number.value);
 
 export const getInvoiceData = (
     booking: BookingViewModel,
@@ -289,7 +289,7 @@ export const getInvoiceRows = (
                 if ((numberOfDays > 1 || entry.numberOfHours) && entry.pricePerUnit) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('hogia-invoice.start-cost')}: ${formatNumberAsCurrency(entry.pricePerUnit)}`,
+                        text: `${t('hogia-invoice.start-cost')}: ${formatCurrency(entry.pricePerUnit)}`,
                     });
                 }
 
@@ -299,7 +299,7 @@ export const getInvoiceRows = (
                         rowType: InvoiceRowType.ITEM_COMMENT,
                         text: `${numberOfDays - 1} ${t(
                             numberOfDays - 1 > 1 ? 'hogia-invoice.day-cost' : 'hogia-invoice.day-cost-single',
-                        )}: ${formatNumberAsCurrency(getExtraDaysPrice(entry, numberOfDays))}`,
+                        )}: ${formatCurrency(getExtraDaysPrice(entry, numberOfDays))}`,
                     });
                 }
 
@@ -307,18 +307,16 @@ export const getInvoiceRows = (
                 if (entry.numberOfHours) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${formatNumberAsCurrency(
+                        text: `${entry.numberOfHours} ${t('common.misc.hours-unit')}: ${formatCurrency(
                             getTimePrice(entry),
                         )}`,
                     });
                 }
 
-                if (entry.discount) {
+                if (entry.discount.value) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('invoice.discount')}: ${formatNumberAsCurrency(
-                            getCalculatedDiscount(entry, numberOfDays),
-                        )}`,
+                        text: `${t('invoice.discount')}: ${formatCurrency(getCalculatedDiscount(entry, numberOfDays))}`,
                     });
                 }
 

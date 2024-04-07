@@ -338,7 +338,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
         const timeEstimateToSend: ITimeEstimateObjectionModel = {
             bookingId: booking.id,
             numberOfHours: timeEstimate.numberOfHours ?? 0,
-            pricePerHour: timeEstimate.pricePerHour ?? defaultLaborHourlyRate,
+            pricePerHour: timeEstimate.pricePerHour?.value ?? defaultLaborHourlyRate,
             name: timeEstimate.name ?? '',
             sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
         };

@@ -8,27 +8,25 @@ import { withApiKeyContext } from '../../../../../lib/sessionContext';
 import { fetchUserByNameTagForExternalApi } from '../../../../../lib/db-access/user';
 import { getValueOrFirst } from '../../../../../lib/utils';
 
-const handler = withApiKeyContext(
-    async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
-        const userTag = getValueOrFirst(req.query.nameTag) ?? '';
+const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+    const userTag = getValueOrFirst(req.query.nameTag) ?? '';
 
-        if (userTag.length === 0) {
-            respondWithEntityNotFoundResponse(res);
+    if (userTag.length === 0) {
+        respondWithEntityNotFoundResponse(res);
+        return;
+    }
+
+    switch (req.method) {
+        case 'GET':
+            await fetchUserByNameTagForExternalApi(userTag)
+                .then((result) => (result ? res.status(200).json(result) : respondWithEntityNotFoundResponse(res)))
+                .catch((error) => respondWithCustomErrorMessage(res, error.message));
+
             return;
-        }
 
-        switch (req.method) {
-            case 'GET':
-                await fetchUserByNameTagForExternalApi(userTag)
-                    .then((result) => (result ? res.status(200).json(result) : respondWithEntityNotFoundResponse(res)))
-                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
-
-                return;
-
-            default:
-                respondWithInvalidMethodResponse(res);
-        }
-    },
-);
+        default:
+            respondWithInvalidMethodResponse(res);
+    }
+});
 
 export default handler;

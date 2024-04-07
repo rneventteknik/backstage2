@@ -11,6 +11,7 @@ import { EquipmentChangelogEntry } from '../../models/interfaces/ChangeLogEntry'
 import { EquipmentPublicCategory } from '../../models/interfaces/EquipmentPublicCategory';
 import { EquipmentLocation } from '../../models/interfaces/EquipmentLocation';
 import { toDatetimeOrUndefined } from '../datetimeUtils';
+import currency from 'currency.js';
 
 export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment => {
     if (!objectionModel.id) {
@@ -57,6 +58,10 @@ export const toEquipmentPrice = (objectionModel: IEquipmentPriceObjectionModel):
     return {
         ...objectionModel,
         id: objectionModel.id,
+        pricePerHour: currency(objectionModel.pricePerHour),
+        pricePerUnit: currency(objectionModel.pricePerUnit),
+        pricePerHourTHS: currency(objectionModel.pricePerHourTHS),
+        pricePerUnitTHS: currency(objectionModel.pricePerUnitTHS),
         updated: toDatetimeOrUndefined(objectionModel.updated),
         created: toDatetimeOrUndefined(objectionModel.created),
     };
@@ -112,6 +117,10 @@ export const toEquipmentPriceObjectionModel = (clientModel: EquipmentPrice): Par
 
     return {
         ...clientModel,
+        pricePerHour: clientModel.pricePerHour.value,
+        pricePerUnit: clientModel.pricePerUnit.value,
+        pricePerHourTHS: clientModel.pricePerHourTHS.value,
+        pricePerUnitTHS: clientModel.pricePerUnitTHS.value,
         created: undefined,
         updated: undefined,
     };

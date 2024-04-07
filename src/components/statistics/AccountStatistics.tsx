@@ -4,7 +4,7 @@ import { KeyValue } from '../../models/interfaces/KeyValue';
 import { getGlobalSetting, getOperationalYear, groupBy } from '../../lib/utils';
 import { Card, Modal } from 'react-bootstrap';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
-import { formatNumberAsCurrency, getInvoiceRows } from '../../lib/pricingUtils';
+import { formatCurrency, formatNumberAsCurrency, getInvoiceRows } from '../../lib/pricingUtils';
 import { InvoiceRowType, PricedInvoiceRow } from '../../models/misc/Invoice';
 import { getSortedList } from '../../lib/sortIndexUtils';
 import TableStyleLink from '../utils/TableStyleLink';
@@ -97,7 +97,7 @@ const AccountStatistics: React.FC<Props> = ({ bookings, globalSettings }: Props)
                 <span className="text-muted">{formatNumberAsCurrency(0)}</span>
             ) : (
                 <span onClick={() => setDetailsInvoiceRows(model[column].invoiceRows)} role="button">
-                    {formatNumberAsCurrency(model[column].sum)}
+                    {formatCurrency(model[column].sum)}
                 </span>
             );
 
@@ -380,7 +380,7 @@ const AccountStatisticDetailsModal: React.FC<AccountStatisticDetailsModalProps> 
                 key: 'amount',
                 displayName: 'Summa',
                 getValue: (model: PricedInvoiceRowWithBooking) => model.rowPrice.value,
-                getContentOverride: (model: PricedInvoiceRowWithBooking) => formatNumberAsCurrency(model.rowPrice),
+                getContentOverride: (model: PricedInvoiceRowWithBooking) => formatCurrency(model.rowPrice),
                 textAlignment: 'right',
                 columnWidth: 140,
             },

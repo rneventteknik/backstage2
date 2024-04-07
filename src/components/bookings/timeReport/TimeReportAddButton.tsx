@@ -6,6 +6,7 @@ import { useNotifications } from '../../../lib/useNotifications';
 import { BookingViewModel } from '../../../models/interfaces';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import TimeReportModal from './TimeReportModal';
+import currency from 'currency.js';
 import { addTimeReportApiCall } from '../../../lib/equipmentListUtils';
 
 type Props = {
@@ -48,7 +49,7 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
                         startDatetime: booking.usageStartDatetime ?? currentDateRounded,
                         endDatetime: booking.usageEndDatetime ?? currentDateRounded,
                         userId: currentUser.userId,
-                        pricePerHour: defaultLaborHourlyRate,
+                        pricePerHour: currency(defaultLaborHourlyRate),
                     });
                 }}
                 {...rest}
