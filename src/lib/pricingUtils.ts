@@ -136,9 +136,14 @@ export const addVATToPriceWithTHS = (price: PricedEntityWithTHS): PricedEntityWi
 
 // Format price
 //
-export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 'st'): string => {
+export const formatPrice = (
+    price: PricedEntity,
+    returnDashIfZero = true,
+    hoursUnit = 'h',
+    unitsUnit = 'st',
+): string => {
     if (!price.pricePerHour.value && !price.pricePerUnit.value) {
-        return `-`;
+        return returnDashIfZero ? `-` : formatNumberAsCurrency(0);
     } else if (price.pricePerHour.value && !price.pricePerUnit.value) {
         return `${formatCurrency(price.pricePerHour)}/${hoursUnit}`;
     } else if (!price.pricePerHour.value && price.pricePerUnit.value) {
@@ -148,8 +153,8 @@ export const formatPrice = (price: PricedEntity, hoursUnit = 'h', unitsUnit = 's
     }
 };
 
-export const formatTHSPrice = (price: PricedEntityWithTHS): string =>
-    formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS });
+export const formatTHSPrice = (price: PricedEntityWithTHS, returnDashIfZero = true): string =>
+    formatPrice({ pricePerHour: price.pricePerHourTHS, pricePerUnit: price.pricePerUnitTHS }, returnDashIfZero);
 
 export const formatNumberAsCurrency = (number: number, showPlusIfPositive = false): string =>
     formatCurrency(currency(number), showPlusIfPositive);
@@ -180,16 +185,36 @@ export const getInvoiceData = (
         phone: booking.contactPersonPhone,
     });
 
-    const getInvoiceRows = (booking: BookingViewModel): InvoiceRow[] => {
-        if (booking.fixedPrice !== null) {
-            return fixedPriceBookingToInvoiceRows(booking);
-        }
-
-        const equipmentRows = booking.equipmentLists ? booking.equipmentLists.flatMap(equipmentListToInvoiceRows) : [];
-        const laborRows = timeReportsToLaborRows(booking.timeReports);
-        return [...equipmentRows, ...laborRows];
+    return {
+        documentName: `${documentName}${booking.invoiceNumber ? ' ' + booking.invoiceNumber : ''}`,
+        name: booking.name,
+        dates: getBookingDateDisplayValues(booking, locale).displayUsageInterval,
+        invoiceTag: booking.invoiceTag,
+        invoiceNumber: booking.invoiceNumber,
+        dimension1: dimension1,
+        templateName: templateName,
+        bookingType: booking.bookingType,
+        ourReference: ourReference,
+        customer: getInvoiceCustomer(booking),
+        invoiceRows: getInvoiceRows(
+            booking,
+            defaultEquipmentAccountExternal,
+            defaultEquipmentAccountInternal,
+            defaultSalaryAccountExternal,
+            defaultSalaryAccountInternal,
+            t,
+        ),
     };
+};
 
+export const getInvoiceRows = (
+    booking: BookingViewModel,
+    defaultEquipmentAccountExternal: string,
+    defaultEquipmentAccountInternal: string,
+    defaultSalaryAccountExternal: string,
+    defaultSalaryAccountInternal: string,
+    t: (t: string) => string,
+): InvoiceRow[] => {
     const equipmentListToInvoiceRows = (equipmentList: EquipmentList): InvoiceRow[] => {
         const listHeadingRow: InvoiceRow = {
             rowType: InvoiceRowType.HEADING,
@@ -235,6 +260,7 @@ export const getInvoiceData = (
                             ? defaultEquipmentAccountExternal
                             : defaultEquipmentAccountInternal, // TODO: Should this be something else if all members have the same different account?
                     unit: t('common.misc.count-unit-single'),
+                    sourceId: wrappedEntity.id,
                 };
                 const packageDescriptionRow: InvoiceRow = {
                     rowType: InvoiceRowType.ITEM_COMMENT,
@@ -255,6 +281,7 @@ export const getInvoiceData = (
                             ? defaultEquipmentAccountExternal
                             : defaultEquipmentAccountInternal),
                     unit: t(entry.numberOfUnits > 1 ? 'common.misc.count-unit' : 'common.misc.count-unit-single'),
+                    sourceId: wrappedEntity.id,
                 };
                 const invoiceRows: InvoiceRow[] = [mainRow];
 
@@ -322,6 +349,7 @@ export const getInvoiceData = (
                     ? defaultSalaryAccountExternal
                     : defaultSalaryAccountInternal,
             unit: t('common.misc.count-unit-single'),
+            sourceId: 'T' + timeReports[0].id,
         };
 
         const descriptiveRow: InvoiceRow = {
@@ -346,24 +374,19 @@ export const getInvoiceData = (
                     ? defaultEquipmentAccountExternal
                     : defaultEquipmentAccountInternal,
             unit: t('common.misc.count-unit-single'),
+            sourceId: 'B' + booking.id,
         };
 
         return [mainRow];
     };
 
-    return {
-        documentName: `${documentName}${booking.invoiceNumber ? ' ' + booking.invoiceNumber : ''}`,
-        name: booking.name,
-        dates: getBookingDateDisplayValues(booking, locale).displayUsageInterval,
-        invoiceTag: booking.invoiceTag,
-        invoiceNumber: booking.invoiceNumber,
-        dimension1: dimension1,
-        templateName: templateName,
-        bookingType: booking.bookingType,
-        ourReference: ourReference,
-        customer: getInvoiceCustomer(booking),
-        invoiceRows: getInvoiceRows(booking),
-    };
+    if (booking.fixedPrice !== null) {
+        return fixedPriceBookingToInvoiceRows(booking);
+    }
+
+    const equipmentRows = booking.equipmentLists ? booking.equipmentLists.flatMap(equipmentListToInvoiceRows) : [];
+    const laborRows = timeReportsToLaborRows(booking.timeReports);
+    return [...equipmentRows, ...laborRows];
 };
 
 // Salary calculations

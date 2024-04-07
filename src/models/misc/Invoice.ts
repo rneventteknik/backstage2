@@ -35,6 +35,7 @@ export interface PricedInvoiceRow extends InvoiceRow {
     rowPrice: currency;
     account: string;
     unit: string;
+    sourceId: string;
 }
 
 export enum InvoiceRowType {
