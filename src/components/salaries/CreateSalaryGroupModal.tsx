@@ -127,7 +127,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
                     className="mr-2 mb-3"
                     disabled={selectedBookingIds.length === 0}
                 >
-                    Skapa Löneunderlagsgrupp
+                    Skapa Timarvodesunderlagsgrupp
                 </Button>
 
                 <p className="text-muted">
