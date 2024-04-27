@@ -37,7 +37,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
 }: Props) => {
     const [numberOfUnits, setNumberOfUnits] = useState<string>('1');
     const [numberOfHours, setNumberOfHours] = useState<string>(showNumberOfHours ? '1' : '0');
-    const [selectedPriceId, setSelectedPriceId] = useState<number>(equipment.prices[0].id);
+    const [selectedPriceId, setSelectedPriceId] = useState<number>(equipment.prices[0]?.id);
 
     const numberOfUnitsRef = useRef<HTMLInputElement>(null);
     const numberOfHoursRef = useRef<HTMLInputElement>(null);
