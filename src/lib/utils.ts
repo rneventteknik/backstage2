@@ -448,3 +448,22 @@ export const getOperationalYear = (date?: Date) => {
 
     return formatOperationalYear(date.getFullYear());
 };
+
+export const hasSufficientAccess = (role: Role | null | undefined, requiredRole: Role | null) => {
+    switch (requiredRole) {
+        case Role.ADMIN:
+            return role === Role.ADMIN;
+
+        case Role.USER:
+            return role === Role.USER || role === Role.ADMIN;
+
+        case Role.READONLY:
+            return role === Role.READONLY || role === Role.USER || role === Role.ADMIN;
+
+        case Role.CASH_PAYMENT_MANAGER:
+            return role === Role.CASH_PAYMENT_MANAGER || role === Role.USER || role === Role.ADMIN;
+
+        case null:
+            return true;
+    }
+};

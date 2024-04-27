@@ -10,9 +10,10 @@ import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScr
 type Props = {
     entity: Customer;
     save: (x: Customer) => void;
+    readOnly?: boolean;
 };
 
-const CustomerEditor: React.FC<Props> = ({ entity, save }: Props) => {
+const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Props) => {
     return (
         <>
             <Form.Group controlId="formName">
@@ -21,6 +22,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save }: Props) => {
                     required
                     type="text"
                     defaultValue={entity?.name}
+                    readOnly={readOnly}
                     onChange={(e) => save({ ...entity, name: e.target.value })}
                 />
             </Form.Group>
@@ -30,6 +32,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save }: Props) => {
                     type="number"
                     min="0"
                     value={entity.invoiceHogiaId ?? undefined}
+                    readOnly={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,
@@ -43,6 +46,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save }: Props) => {
                 <Form.Control
                     as="textarea"
                     rows={3}
+                    readOnly={readOnly}
                     onChange={(e) => save({ ...entity, invoiceAddress: e.target.value })}
                     defaultValue={entity.invoiceAddress ?? ''}
                 />
@@ -54,6 +58,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save }: Props) => {
                     as="select"
                     name="pricePlan"
                     defaultValue={entity.pricePlan ?? ''}
+                    readOnly={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,
@@ -73,6 +78,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save }: Props) => {
                     as="select"
                     name="accountKind"
                     defaultValue={entity.accountKind ?? ''}
+                    readOnly={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,
@@ -92,6 +98,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save }: Props) => {
                     as="select"
                     name="language"
                     defaultValue={entity.language ?? Language.SV}
+                    readOnly={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,

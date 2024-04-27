@@ -20,7 +20,7 @@ import { KeyValue } from '../models/interfaces/KeyValue';
 import { Role } from '../models/enums/Role';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
+export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const pageTitle = 'Inställningar';
 const breadcrumbs = [{ link: 'settings', displayName: pageTitle }];
@@ -28,6 +28,8 @@ const breadcrumbs = [{ link: 'settings', displayName: pageTitle }];
 // Page
 //
 const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
+    const readonly = currentUser.role !== Role.ADMIN;
+
     return (
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
@@ -57,7 +59,10 @@ const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                             apiUrl={'/api/customers'}
                             entityName={'customer'}
                             entityDisplayName={'Kund'}
-                            getEditComponent={(entity, save) => <CustomerEditor entity={entity} save={save} />}
+                            getEditComponent={(entity, save, readOnly) => (
+                                <CustomerEditor entity={entity} save={save} readOnly={readOnly} />
+                            )}
+                            readonly={readonly}
                         />
                     </Tab.Pane>
                     <Tab.Pane eventKey="equipmentTags">
@@ -66,7 +71,10 @@ const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                             apiUrl={'/api/equipmentTags'}
                             entityName={'equipmentTag'}
                             entityDisplayName={'Tagg'}
-                            getEditComponent={(entity, save) => <EquipmentTagEditor entity={entity} save={save} />}
+                            getEditComponent={(entity, save, readOnly) => (
+                                <EquipmentTagEditor entity={entity} save={save} readOnly={readOnly} />
+                            )}
+                            readonly={readonly}
                         />
                     </Tab.Pane>
                     <Tab.Pane eventKey="equipmentLocations">
@@ -75,8 +83,11 @@ const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                             apiUrl={'/api/equipmentLocations'}
                             entityName={'equipmentLocation'}
                             entityDisplayName={'Plats'}
-                            getEditComponent={(entity, save) => <EquipmentLocationEditor entity={entity} save={save} />}
+                            getEditComponent={(entity, save, readOnly) => (
+                                <EquipmentLocationEditor entity={entity} save={save} readOnly={readOnly} />
+                            )}
                             sortBySortIndex={true}
+                            readonly={readonly}
                         />
                     </Tab.Pane>
                     <Tab.Pane eventKey="equipmentPublicCategories">
@@ -85,14 +96,15 @@ const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                             apiUrl={'/api/equipmentPublicCategories'}
                             entityName={'equipmentPublicCategory'}
                             entityDisplayName={'Publik Kategori'}
-                            getEditComponent={(entity, save) => (
-                                <EquipmentPublicCategoryEditor entity={entity} save={save} />
+                            getEditComponent={(entity, save, readOnly) => (
+                                <EquipmentPublicCategoryEditor entity={entity} save={save} readOnly={readOnly} />
                             )}
+                            readonly={readonly}
                             sortBySortIndex={true}
                         />
                     </Tab.Pane>
                     <Tab.Pane eventKey="generalSettings">
-                        <GeneralSettingsEditor />
+                        <GeneralSettingsEditor readonly={readonly} />
                     </Tab.Pane>
                 </Tab.Content>
             </Tab.Container>
