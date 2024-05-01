@@ -9,56 +9,56 @@ const DoorAndKeyStatus: React.FC = () => {
     const mqttConnection = useRef<mqtt.MqttClient | null>(null);
 
     useEffect(() => {
-        if (
-            !process.env.NEXT_PUBLIC_MQTT_BROKER_URL ||
-            !process.env.NEXT_PUBLIC_MQTT_BROKER_USER ||
-            !process.env.NEXT_PUBLIC_MQTT_BROKER_PASS
-        ) {
-            throw 'Missing mqtt broker environmen variables';
-        }
+        fetch('api/auth/mqtt-credentials').then(async (response) => {
+            const credentials = await response.json();
 
-        const mqttOptions: mqtt.IClientOptions = {
-            username: process.env.NEXT_PUBLIC_MQTT_BROKER_USER,
-            password: process.env.NEXT_PUBLIC_MQTT_BROKER_PASS,
-        };
+            if (!credentials.username || !credentials.password || !process.env.NEXT_PUBLIC_MQTT_BROKER_URL) {
+                throw 'Missing required mqtt broker parameters';
+            }
 
-        if (mqttConnection.current === null) {
-            mqttConnection.current = mqtt.connect(process.env.NEXT_PUBLIC_MQTT_BROKER_URL, mqttOptions);
-        }
+            const mqttOptions: mqtt.IClientOptions = {
+                username: credentials.username,
+                password: credentials.password,
+            };
 
-        mqttConnection.current.on('connect', () => {
-            mqttConnection.current?.subscribe(['rn/nymble/3/door', 'rn/nymble/3/spånk/key'], (error) => {
-                if (error) {
-                    console.error('Error subscribing', error);
+            if (mqttConnection.current === null) {
+                mqttConnection.current = mqtt.connect(process.env.NEXT_PUBLIC_MQTT_BROKER_URL, mqttOptions);
+            }
+
+            mqttConnection.current.on('connect', () => {
+                mqttConnection.current?.subscribe(['rn/nymble/3/door', 'rn/nymble/3/spånk/key'], (error) => {
+                    if (error) {
+                        console.error('Error subscribing', error);
+                    }
+                });
+            });
+
+            mqttConnection.current.on('error', (error) => {
+                console.error('Mqtt connection error', error);
+            });
+
+            mqttConnection.current.on('message', (topic, message) => {
+                try {
+                    const msg = JSON.parse(message.toString());
+
+                    if (topic === 'rn/nymble/3/door') {
+                        if (msg.hasOwnProperty('status')) {
+                            setArmed(msg['status']);
+                        } else if (msg.hasOwnProperty('event')) {
+                            setArmed(msg['event']);
+                        }
+                    }
+                    if (topic === 'rn/nymble/3/spånk/key') {
+                        if (msg.hasOwnProperty('status')) {
+                            setKeyInPlace(msg['status']);
+                        } else if (msg.hasOwnProperty('event')) {
+                            setKeyInPlace(msg['event']);
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Non json message received', error);
                 }
             });
-        });
-
-        mqttConnection.current.on('error', (error) => {
-            console.error('Mqtt connection error', error);
-        });
-
-        mqttConnection.current.on('message', (topic, message) => {
-            try {
-                const msg = JSON.parse(message.toString());
-
-                if (topic === 'rn/nymble/3/door') {
-                    if (msg.hasOwnProperty('status')) {
-                        setArmed(msg['status']);
-                    } else if (msg.hasOwnProperty('event')) {
-                        setArmed(msg['event']);
-                    }
-                }
-                if (topic === 'rn/nymble/3/spånk/key') {
-                    if (msg.hasOwnProperty('status')) {
-                        setKeyInPlace(msg['status']);
-                    } else if (msg.hasOwnProperty('event')) {
-                        setKeyInPlace(msg['event']);
-                    }
-                }
-            } catch (error) {
-                console.warn('Non json message received', error);
-            }
         });
 
         return () => {
@@ -96,12 +96,14 @@ const DoorAndKeyStatus: React.FC = () => {
         <div>
             <FontAwesomeIcon
                 id="keyStatusIcon"
+                titleId="key-status-icon"
                 className="m-1"
                 icon={getKeyIconAndText(KeyInPlace).icon}
                 title={getKeyIconAndText(KeyInPlace).text}
             ></FontAwesomeIcon>
             <FontAwesomeIcon
                 id="doorStatusIcon"
+                titleId="door-status-icon"
                 className="m-1"
                 icon={getArmedIconAndText(Armed).icon}
                 title={getArmedIconAndText(Armed).text}
