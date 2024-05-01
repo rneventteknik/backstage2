@@ -25,6 +25,7 @@ export const searchBookings = async (searchString: string, count: number): Promi
                 builder.andWhere('contactPersonName', getCaseInsensitiveComparisonKeyword(), partialSearchString);
             });
         })
+        .withGraphFetched('equipmentLists')
         .orWhere((builder) => {
             searchStrings.forEach((partialSearchString) => {
                 builder.andWhere('invoiceNumber', getCaseInsensitiveComparisonKeyword(), partialSearchString);
@@ -76,6 +77,21 @@ export const fetchBookingsForCoOwnerUser = async (userId: number): Promise<Booki
                 builder.orderBy('updated', 'desc').limit(25);
             },
         });
+};
+
+export const fetchBookingsForTimeReportUser = async (userId: number): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .withGraphFetched('equipmentLists')
+        .withGraphFetched('timeReports.user')
+        .whereIn(
+            'id',
+            BookingObjectionModel.query()
+                .joinRelated('timeReports')
+                .where('timeReports.userId', userId)
+                .select('Booking.id'),
+        );
 };
 
 export const fetchBookingsForEquipment = async (equipmentId: number): Promise<BookingObjectionModel[]> => {

@@ -2,11 +2,12 @@ import { View, Text, StyleSheet } from '@react-pdf/renderer';
 import React from 'react';
 import { commonStyles } from '../../utils';
 import {
-    formatNumberAsCurrency,
     getEquipmentListPrice,
     getBookingPrice,
     getTotalTimeEstimatesPrice,
     addVAT,
+    getVAT,
+    formatCurrency,
 } from '../../../lib/pricingUtils';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { Booking } from '../../../models/interfaces';
@@ -48,7 +49,7 @@ export const TotalPriceSection: React.FC<Props> = ({
                                   <Text>{list.name}</Text>
                               </TableCellAutoWidth>
                               <TableCellFixedWidth width={90} textAlign="right">
-                                  <Text>{formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
+                                  <Text>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
                               </TableCellFixedWidth>
                           </TableRow>
                       ))
@@ -59,9 +60,7 @@ export const TotalPriceSection: React.FC<Props> = ({
                             <Text>{t('common.total-price-section.time-estimate-sum')}</Text>
                         </TableCellAutoWidth>
                         <TableCellFixedWidth width={90} textAlign="right">
-                            <Text>
-                                {formatNumberAsCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}
-                            </Text>
+                            <Text>{formatCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}</Text>
                         </TableCellFixedWidth>
                     </TableRow>
                 ) : null}
@@ -78,7 +77,7 @@ export const TotalPriceSection: React.FC<Props> = ({
                     </Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.bold}>{formatNumberAsCurrency(addVAT(getBookingPrice(booking, true)))}</Text>
+                    <Text style={styles.bold}>{formatCurrency(addVAT(getBookingPrice(booking, true)))}</Text>
                 </TableCellFixedWidth>
             </TableRow>
 
@@ -87,11 +86,7 @@ export const TotalPriceSection: React.FC<Props> = ({
                     <Text style={styles.bold}>{t('common.total-price-section.vat')}</Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.bold}>
-                        {formatNumberAsCurrency(
-                            addVAT(getBookingPrice(booking, true)) - getBookingPrice(booking, true),
-                        )}
-                    </Text>
+                    <Text style={styles.bold}>{formatCurrency(getVAT(getBookingPrice(booking, true)))}</Text>
                 </TableCellFixedWidth>
             </TableRow>
         </View>

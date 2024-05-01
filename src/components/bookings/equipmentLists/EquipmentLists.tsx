@@ -23,6 +23,7 @@ import {
 } from '../../../lib/sortIndexUtils';
 import EquipmentListDisplay from './EquipmentList';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
+import { getDefaultEquipmentListName } from '../../../lib/equipmentListUtils';
 
 type Props = {
     bookingId: number;
@@ -89,7 +90,7 @@ const EquipmentLists: React.FC<Props> = ({ bookingId, readonly, defaultLaborHour
         const listToCopyDatesFrom = equipmentLists.find((list) => isLast(equipmentLists, list));
 
         const newEquipmentList: Partial<EquipmentListObjectionModel> = {
-            name: 'Utrustning',
+            name: getDefaultEquipmentListName(booking.language),
             sortIndex: equipmentLists ? getNextSortIndex(equipmentLists) : 10,
             equipmentInDatetime: listToCopyDatesFrom?.equipmentInDatetime?.toISOString(),
             equipmentOutDatetime: listToCopyDatesFrom?.equipmentOutDatetime?.toISOString(),

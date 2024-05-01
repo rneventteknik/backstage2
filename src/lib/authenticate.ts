@@ -96,3 +96,24 @@ export const getAndVerifyUser = async (req: NextApiRequest & IncomingMessage): P
     // User from cookie is ok, return it and do not change any cookies
     return currentUser;
 };
+
+export const getAndVerifyApiKey = async (req: NextApiRequest & IncomingMessage): Promise<CurrentUserInfo> => {
+    const apiKey = req.headers['x-api-key'];
+    const acceptedApiKeys = JSON.parse(process.env.API_KEYS ?? '[]') as {
+        key: string;
+        name: string;
+    }[];
+
+    const authInformation = acceptedApiKeys.find((x) => x.key === apiKey);
+
+    if (authInformation) {
+        return {
+            isLoggedIn: true,
+            name: authInformation.name,
+            loginDate: Date.now(),
+            role: undefined,
+            userId: undefined,
+        };
+    }
+    return { isLoggedIn: false };
+};

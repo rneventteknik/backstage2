@@ -7,7 +7,7 @@ import { MainContent } from './shared/mainContent';
 import { SalaryReport } from '../../models/misc/Salary';
 import { Footer } from './shared/footer';
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth, Col, InfoItem } from './shared/utils';
-import { formatNumberAsCurrency } from '../../lib/pricingUtils';
+import { formatCurrency, formatNumberAsCurrency } from '../../lib/pricingUtils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 
 type Props = {
@@ -94,7 +94,7 @@ export const SalaryReportDocument: React.FC<Props> = ({ salaryReport, globalSett
                                         <Text>{formatNumberAsCurrency(line.hourlyRate)}</Text>
                                     </TableCellFixedWidth>
                                     <TableCellFixedWidth width={70} textAlign="right">
-                                        <Text>{formatNumberAsCurrency(line.sum)}</Text>
+                                        <Text>{formatCurrency(line.sum)}</Text>
                                     </TableCellFixedWidth>
                                 </TableRow>
                             ))}
@@ -104,7 +104,7 @@ export const SalaryReportDocument: React.FC<Props> = ({ salaryReport, globalSett
                                     <Text style={styles.bold}>Totalt att betala SEK</Text>
                                 </TableCellAutoWidth>
                                 <TableCellFixedWidth width={90} textAlign="right">
-                                    <Text style={styles.bold}>{formatNumberAsCurrency(userSalaryReport.sum)}</Text>
+                                    <Text style={styles.bold}>{formatCurrency(userSalaryReport.sum)}</Text>
                                 </TableCellFixedWidth>
                             </TableRow>
                         </View>

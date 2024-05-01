@@ -14,10 +14,8 @@ const TableStyleLink: React.FC<Props & AnchorHTMLAttributes<HTMLAnchorElement>> 
     className,
     ...props
 }: Props & AnchorHTMLAttributes<HTMLAnchorElement>) => (
-    <Link href={href}>
-        <a className={className + ' ' + styles.link} {...props}>
-            {children}
-        </a>
+    <Link href={href} className={className + ' ' + styles.link} {...props}>
+        {children}
     </Link>
 );
 

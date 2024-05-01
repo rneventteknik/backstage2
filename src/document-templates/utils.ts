@@ -12,7 +12,7 @@ export const registerFonts = (): void => {
         family: 'Roboto',
         fonts: [
             { src: 'assets/fonts/roboto/Roboto-Regular.ttf' },
-            { src: 'assets/fonts/roboto/Roboto-Italic.ttf', fontStyle: 'italic', fontWeight: '' },
+            { src: 'assets/fonts/roboto/Roboto-Italic.ttf', fontStyle: 'italic', fontWeight: 'normal' },
             { src: 'assets/fonts/roboto/Roboto-Thin.ttf', fontWeight: 'thin' },
             { src: 'assets/fonts/roboto/Roboto-ThinItalic.ttf', fontStyle: 'italic', fontWeight: 'thin' },
             { src: 'assets/fonts/roboto/Roboto-Light.ttf', fontWeight: 'light' },
@@ -121,7 +121,7 @@ export const formatEquipmentListEntryCountOrHours = (entry: EquipmentListEntry, 
 };
 
 export const formatEquipmentListEntryPriceWithVAT = (entry: PricedEntity, t: (t: string) => string) =>
-    formatPrice(addVATToPrice(entry), t('common.misc.hours-unit'), t('common.misc.count-unit-single'));
+    formatPrice(addVATToPrice(entry), true, t('common.misc.hours-unit'), t('common.misc.count-unit-single'));
 
 export const allListsAreOneDay = (booking: Booking) =>
     booking.equipmentLists &&

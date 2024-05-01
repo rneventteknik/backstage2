@@ -1,8 +1,9 @@
+import currency from 'currency.js';
 import { BaseEntityWithName } from './BaseEntity';
 
 export interface EquipmentPrice extends BaseEntityWithName {
-    pricePerUnit: number;
-    pricePerHour: number;
-    pricePerUnitTHS: number;
-    pricePerHourTHS: number;
+    pricePerUnit: currency;
+    pricePerHour: currency;
+    pricePerUnitTHS: currency;
+    pricePerHourTHS: currency;
 }

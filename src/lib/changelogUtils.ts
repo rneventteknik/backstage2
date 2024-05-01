@@ -16,7 +16,7 @@ import {
     updateEquipmentChangelogEntry,
     insertEquipmentChangelogEntry,
 } from './db-access/equipmentChangelogEntry';
-import { sendSlackMessageForBooking } from './slack';
+import { sendSlackDMForBooking, sendSlackMessageForBooking } from './slack';
 
 // Bookings
 //
@@ -142,6 +142,8 @@ export const logStatusChangeToBooking = (
     const message = `${user.name} ${getStatusActionString(newStatus)}.`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
+    sendSlackDMForBooking(message, bookingId, bookingName, user);
+
     return addChangelogToBooking(message, bookingId, 0);
 };
 
@@ -180,6 +182,8 @@ export const logRentalStatusChangeToBooking = (
     const message = `${user.name} ${getRentalStatusActionString(newStatus)} ${equipmentListName}.`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
+    sendSlackDMForBooking(message, bookingId, bookingName, user);
+
     return addChangelogToBooking(message, bookingId, 0);
 };
 

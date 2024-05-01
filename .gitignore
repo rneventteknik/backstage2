@@ -1,5 +1,6 @@
 dev.sqlite3
 .vscode
+.yarn
 
 tsconfig.tsbuildinfo
 

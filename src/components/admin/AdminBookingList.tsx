@@ -23,7 +23,8 @@ import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
 import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
 import TableStyleLink from '../utils/TableStyleLink';
 import { getBookingDateHeadingValue } from '../../lib/datetimeUtils';
-import { addVAT, formatNumberAsCurrency, getBookingPrice } from '../../lib/pricingUtils';
+import { addVAT, formatCurrency, getBookingPrice } from '../../lib/pricingUtils';
+import CancelledIcon from '../utils/CancelledIcon';
 
 type Props = {
     bookings: BookingViewModel[];
@@ -48,7 +49,7 @@ const AdminBookingList: React.FC<Props> = ({
 }: Props) => {
     // Table display functions
     //
-    const getRentalStatusString = (booking: BookingViewModel): string | number | Date => {
+    const getRentalStatusString = (booking: BookingViewModel): string => {
         if (booking.equipmentLists?.every((l) => l.rentalStatus === RentalStatus.RETURNED)) {
             return 'Återlämnad';
         }
@@ -130,7 +131,7 @@ const AdminBookingList: React.FC<Props> = ({
                         overlay={
                             <Tooltip id="1">
                                 <strong>
-                                    Denna bokning har både fast pris och tidsrapporter. Detta stödjs inte av Stage
+                                    Denna bokning har både fast pris och tidrapporter. Detta stödjs inte av Stage
                                     fakturaexporter och bokningen behöver därför faktureras manuellt.
                                 </strong>
                             </Tooltip>
@@ -144,16 +145,18 @@ const AdminBookingList: React.FC<Props> = ({
                 <p className="text-muted mb-0">{booking.ownerUser?.name ?? '-'}</p>
                 <p className="text-muted mb-0 d-lg-none">{replaceEmptyStringWithNull(booking.invoiceNumber) ?? '-'}</p>
                 <p className="text-muted mb-0 d-lg-none">{booking.displayUsageStartString ?? '-'}</p>
-                <p className="text-muted mb-0">{formatNumberAsCurrency(addVAT(getBookingPrice(booking)))}</p>
+                <p className="text-muted mb-0">{formatCurrency(addVAT(getBookingPrice(booking)))}</p>
             </>
         );
     };
 
     const bookingStatusIsDone = (booking: BookingViewModel) => booking.status === Status.DONE;
+    const bookingStatusIsCancelled = (booking: BookingViewModel) => booking.status === Status.CANCELED;
     const bookingStatusDisplayFn = (booking: BookingViewModel) => (
         <>
             {getStatusName(booking.status)}
             {bookingStatusIsDone(booking) ? <DoneIcon /> : null}
+            {bookingStatusIsCancelled(booking) ? <CancelledIcon /> : null}
             <p className="mb-0 d-xl-none">{bookingRentalStatusDisplayFn(booking)}</p>
             <p className="mb-0 d-xl-none">{bookingPaymentStatusDisplayFn(booking)}</p>
             <p className="mb-0 d-xl-none">{bookingSalaryStatusDisplayFn(booking)}</p>

@@ -89,7 +89,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/equipment/' + equipment.id + '/edit'} passHref>
+                    <Link href={'/equipment/' + equipment.id + '/edit'} passHref legacyBehavior>
                         <Button variant="primary" href={'/equipment/' + equipment.id + '/edit'}>
                             <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>

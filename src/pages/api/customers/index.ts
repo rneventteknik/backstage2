@@ -13,7 +13,7 @@ const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<Promise<void> | void> => {
         switch (req.method) {
             case 'POST':
-                if (context.currentUser.role == Role.READONLY) {
+                if (context.currentUser.role != Role.ADMIN) {
                     respondWithAccessDeniedResponse(res);
                     return;
                 }

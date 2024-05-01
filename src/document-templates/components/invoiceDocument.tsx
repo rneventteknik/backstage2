@@ -9,7 +9,7 @@ import { useTextResources } from '../useTextResources';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../../models/misc/Invoice';
 import { InvoiceInfo } from './invoiceInfo';
-import { groupBy, reduceSumFn } from '../../lib/utils';
+import { groupBy } from '../../lib/utils';
 import {
     TableCellAutoWidth,
     TableCellFixedWidth,
@@ -17,7 +17,8 @@ import {
     TableRowWithNoBorder,
     TableRowWithTopBorder,
 } from './shared/utils';
-import { formatNumberAsCurrency } from '../../lib/pricingUtils';
+import { formatCurrency, getVAT } from '../../lib/pricingUtils';
+import currency from 'currency.js';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -31,12 +32,12 @@ const styles = StyleSheet.create({
 const getItemRows = (invoiceData: InvoiceData): PricedInvoiceRow[] =>
     invoiceData.invoiceRows.filter((invoiceRow) => invoiceRow.rowType === InvoiceRowType.ITEM) as PricedInvoiceRow[];
 
-const calculateRowPriceSum = (invoiceRows: PricedInvoiceRow[]): number =>
-    invoiceRows.map((invoiceRow) => invoiceRow.rowPrice).reduce(reduceSumFn);
+const calculateRowPriceSum = (invoiceRows: PricedInvoiceRow[]): currency =>
+    invoiceRows.map((invoiceRow) => invoiceRow.rowPrice).reduce((a, b) => a.add(b), currency(0));
 
-const calculateTotalAmount = (invoiceData: InvoiceData): number => calculateRowPriceSum(getItemRows(invoiceData));
+const calculateTotalAmount = (invoiceData: InvoiceData): currency => calculateRowPriceSum(getItemRows(invoiceData));
 
-const calculateTotalVAT = (invoiceData: InvoiceData): number => calculateTotalAmount(invoiceData) * 0.25;
+const calculateTotalVAT = (invoiceData: InvoiceData): currency => getVAT(calculateTotalAmount(invoiceData));
 
 type InvoiceRowProps = {
     invoiceRow: InvoiceRow;
@@ -61,13 +62,13 @@ const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoiceRow }: InvoiceRowProps) 
                         <Text>{`${pricedInvoiceRow.numberOfUnits}${pricedInvoiceRow.unit}`}</Text>
                     </TableCellFixedWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
-                        <Text>{formatNumberAsCurrency(pricedInvoiceRow.pricePerUnit)}</Text>
+                        <Text>{formatCurrency(pricedInvoiceRow.pricePerUnit)}</Text>
                     </TableCellFixedWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
                         <Text>{pricedInvoiceRow.account}</Text>
                     </TableCellFixedWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
-                        <Text>{formatNumberAsCurrency(pricedInvoiceRow.rowPrice)}</Text>
+                        <Text>{formatCurrency(pricedInvoiceRow.rowPrice)}</Text>
                     </TableCellFixedWidth>
                 </TableRowWithTopBorder>
             );
@@ -95,7 +96,7 @@ const AccountRows: React.FC<AccountRowsProps> = ({ invoiceData }: AccountRowsPro
                         <Text>{`${t('invoice.account')}: ${key}`}</Text>
                     </TableCellAutoWidth>
                     <TableCellFixedWidth width={90} textAlign="right">
-                        <Text>{formatNumberAsCurrency(calculateRowPriceSum(rowsByAccount[key]))}</Text>
+                        <Text>{formatCurrency(calculateRowPriceSum(rowsByAccount[key]))}</Text>
                     </TableCellFixedWidth>
                 </TableRow>
             ))}
@@ -123,7 +124,7 @@ const InvoiceTotalPriceSection: React.FC<InvoiceTotalPriceSectionProps> = ({
                     <Text style={styles.bold}>{t('invoice.total-price-section.total-sum-ex-vat')}</Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
-                    <Text style={styles.bold}>{formatNumberAsCurrency(calculateTotalAmount(invoiceData))}</Text>
+                    <Text style={styles.bold}>{formatCurrency(calculateTotalAmount(invoiceData))}</Text>
                 </TableCellFixedWidth>
             </TableRow>
 
@@ -132,7 +133,7 @@ const InvoiceTotalPriceSection: React.FC<InvoiceTotalPriceSectionProps> = ({
                     <Text>{t('invoice.total-price-section.vat')}</Text>
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
-                    <Text>{formatNumberAsCurrency(calculateTotalVAT(invoiceData))}</Text>
+                    <Text>{formatCurrency(calculateTotalVAT(invoiceData))}</Text>
                 </TableCellFixedWidth>
             </TableRow>
 
@@ -142,7 +143,7 @@ const InvoiceTotalPriceSection: React.FC<InvoiceTotalPriceSectionProps> = ({
                 </TableCellAutoWidth>
                 <TableCellFixedWidth width={90} textAlign="right">
                     <Text style={styles.bold}>
-                        {formatNumberAsCurrency(calculateTotalAmount(invoiceData) + calculateTotalVAT(invoiceData))}
+                        {formatCurrency(calculateTotalAmount(invoiceData).add(calculateTotalVAT(invoiceData)))}
                     </Text>
                 </TableCellFixedWidth>
             </TableRow>
@@ -193,13 +194,17 @@ export const InvoiceDocument: React.FC<InvoiceDocumentProps> = ({
                                 <Text style={styles.italic}>{t('common.equipment-list.table-header.count')}</Text>
                             </TableCellFixedWidth>
                             <TableCellFixedWidth width={90} textAlign="right">
-                                <Text style={styles.italic}>{t('common.equipment-list.table-header.price')}</Text>
+                                <Text style={styles.italic}>
+                                    {t('common.equipment-list.table-header.price-ex-vat')}
+                                </Text>
                             </TableCellFixedWidth>
                             <TableCellFixedWidth width={90} textAlign="right">
                                 <Text style={styles.italic}>{t('invoice.account')}</Text>
                             </TableCellFixedWidth>
                             <TableCellFixedWidth width={90} textAlign="right">
-                                <Text style={styles.italic}>{t('common.equipment-list.table-header.total-price')}</Text>
+                                <Text style={styles.italic}>
+                                    {t('common.equipment-list.table-header.total-price-ex-vat')}
+                                </Text>
                             </TableCellFixedWidth>
                         </TableRowWithNoBorder>
                         {invoiceData.invoiceRows.map((invoiceRow, index) => (

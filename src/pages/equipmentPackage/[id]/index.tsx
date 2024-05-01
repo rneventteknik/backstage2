@@ -87,7 +87,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/equipmentPackage/' + equipmentPackage.id + '/edit'} passHref>
+                    <Link href={'/equipmentPackage/' + equipmentPackage.id + '/edit'} passHref legacyBehavior>
                         <Button variant="primary" href={'/equipmentPackage/' + equipmentPackage.id + '/edit'}>
                             <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>

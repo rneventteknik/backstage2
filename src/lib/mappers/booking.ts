@@ -14,6 +14,7 @@ import { toTimeEstimate } from './timeEstimate';
 import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 import { toTimeReport } from './timeReport';
 import { toDatetimeOrUndefined } from '../datetimeUtils';
+import currency from 'currency.js';
 
 export const toBooking = (objectionModel: IBookingObjectionModel): Booking => {
     if (!objectionModel.id) {
@@ -82,6 +83,9 @@ export const toEquipmentListEntry = (objectionModel: IEquipmentListEntryObjectio
         equipment: objectionModel.equipment ? toEquipment(objectionModel.equipment) : undefined,
         equipmentId: objectionModel.equipmentId,
         equipmentPrice: objectionModel.equipmentPrice ? toEquipmentPrice(objectionModel.equipmentPrice) : undefined,
+        pricePerHour: currency(objectionModel.pricePerHour),
+        pricePerUnit: currency(objectionModel.pricePerUnit),
+        discount: currency(objectionModel.discount),
         updated: toDatetimeOrUndefined(objectionModel.updated),
         created: toDatetimeOrUndefined(objectionModel.created),
     };
@@ -159,5 +163,8 @@ export const toEquipmentListEntryObjectionModel = (
         equipmentId: clientModel.equipment?.id,
         equipmentPrice: undefined,
         equipmentPriceId: clientModel.equipmentPrice?.id ?? null,
+        pricePerHour: clientModel.pricePerHour?.value,
+        pricePerUnit: clientModel.pricePerUnit?.value,
+        discount: clientModel.discount?.value,
     };
 };

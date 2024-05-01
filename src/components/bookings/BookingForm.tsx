@@ -27,6 +27,7 @@ import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScr
 import { Language } from '../../models/enums/Language';
 import BookingSearchCustomerModal from './BookingSearchCustomerModal';
 import PriceWithVATPreview from '../utils/PriceWithVATPreview';
+import currency from 'currency.js';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
@@ -99,8 +100,8 @@ const BookingForm: React.FC<Props> = ({
             invoiceHogiaId: !!replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId'))
                 ? parseInt(replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId')) ?? '0')
                 : isNewBooking
-                ? undefined
-                : null,
+                  ? undefined
+                  : null,
             invoiceAddress: getValueFromForm('invoiceAddress'),
             invoiceTag: getValueFromForm('invoiceTag'),
             invoiceNumber: getValueFromForm('invoiceNumber'),
@@ -395,7 +396,7 @@ const BookingForm: React.FC<Props> = ({
                                         <InputGroup.Text>kr</InputGroup.Text>
                                     </InputGroup.Append>
                                 </InputGroup>
-                                <PriceWithVATPreview price={toIntOrUndefined(fixedPrice)} />
+                                <PriceWithVATPreview price={currency(fixedPrice ?? 0)} />
                                 <Form.Text className="text-muted">
                                     Om detta fält har ett värde skriver det över summan som beräknas från
                                     utrustningslistor och arbetstid. Detta fält ska normalt lämnas tomt.

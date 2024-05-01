@@ -1,7 +1,7 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { respondWithAccessDeniedResponse } from './apiResponses';
-import { getAndVerifyUser } from './authenticate';
+import { getAndVerifyApiKey, getAndVerifyUser } from './authenticate';
 import { withApiSession } from './session';
 import { IncomingMessage } from 'http';
 import { Role } from '../models/enums/Role';
@@ -27,6 +27,23 @@ export const withSessionContext = (
         }
 
         if (!hasSufficientAccess(currentUser.role, requiredRole)) {
+            respondWithAccessDeniedResponse(res);
+            return;
+        }
+
+        return handler(req, res, { currentUser: currentUser });
+    };
+
+    return withApiSession(internalHandler);
+};
+
+export const withApiKeyContext = (
+    handler: (req: NextApiRequest & IncomingMessage, res: NextApiResponse, context: SessionContext) => void,
+): NextApiHandler => {
+    const internalHandler = async (req: NextApiRequest & IncomingMessage, res: NextApiResponse) => {
+        const currentUser = await getAndVerifyApiKey(req);
+
+        if (!currentUser.isLoggedIn) {
             respondWithAccessDeniedResponse(res);
             return;
         }

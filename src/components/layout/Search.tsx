@@ -19,6 +19,7 @@ import { toEquipment } from '../../lib/mappers/equipment';
 import { BaseEntityWithName } from '../../models/interfaces/BaseEntity';
 import { SplitHighlighter } from '../utils/Highlight';
 import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
+import { toBookingViewModel } from '../../lib/datetimeUtils';
 import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 
 enum ResultType {
@@ -135,9 +136,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     return (
                         <small>
                             <SplitHighlighter search={highlightText} textToHighlight={equipment.nameEN} />{' '}
-                            {equipment.tags?.map((x) => (
-                                <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
-                            ))}
+                            {equipment.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
                         </small>
                     );
 
@@ -157,10 +156,13 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
 
                 case ResultType.BOOKING:
                     const booking = entity as unknown as IBookingObjectionModel;
+                    const viewModel = toBookingViewModel(toBooking(booking));
                     return (
                         <small>
                             <SplitHighlighter search={highlightText} textToHighlight={booking.customerName} /> /{' '}
                             <SplitHighlighter search={highlightText} textToHighlight={booking.contactPersonName} />
+                            {booking.contactPersonName && viewModel.displayUsageInterval !== '-' ? ' / ' : ''}
+                            {viewModel.displayUsageInterval === '-' ? null : viewModel.monthYearUsageStartString}
                         </small>
                     );
                 default:

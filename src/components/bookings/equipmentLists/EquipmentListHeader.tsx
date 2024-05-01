@@ -18,7 +18,7 @@ import {
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
 import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
-import { addVAT, formatNumberAsCurrency, getEquipmentListPrice } from '../../../lib/pricingUtils';
+import { addVAT, formatCurrency, getEquipmentListPrice } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import {
     formatDatetime,
@@ -117,7 +117,10 @@ const EquipmentListHeader: React.FC<Props> = ({
                     <DoubleClickToEdit
                         value={list.name}
                         onUpdate={(newValue: string) =>
-                            saveList({ ...list, name: newValue && newValue.length > 0 ? newValue : list.name })
+                            saveList({
+                                ...list,
+                                name: newValue && newValue.trim().length > 0 ? newValue.trim() : list.name,
+                            })
                         }
                         readonly={readonly}
                     >
@@ -340,7 +343,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                 </div>
             </div>
             <p className="text-muted">
-                {formatNumberAsCurrency(addVAT(getEquipmentListPrice(list)))}
+                {formatCurrency(addVAT(getEquipmentListPrice(list)))}
                 {getNumberOfDays(list) && getNumberOfEquipmentOutDays(list) ? (
                     <>
                         {' '}

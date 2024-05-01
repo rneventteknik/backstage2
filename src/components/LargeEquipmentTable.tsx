@@ -121,11 +121,11 @@ const tableSettings: TableConfiguration<Equipment> = {
             getValue: (equipment: Equipment) =>
                 equipment.prices && equipment.prices.length === 1
                     ? addVAT(
-                          equipment.prices[0].pricePerHour +
-                              equipment.prices[0].pricePerUnit +
-                              equipment.prices[0].pricePerHourTHS +
-                              equipment.prices[0].pricePerUnitTHS,
-                      ) / 4
+                          equipment.prices[0].pricePerHour
+                              .add(equipment.prices[0].pricePerUnit)
+                              .add(equipment.prices[0].pricePerHourTHS)
+                              .add(equipment.prices[0].pricePerUnitTHS),
+                      ).divide(4).value
                     : -Infinity,
             getContentOverride: EquipmentPriceDisplayFn,
             columnWidth: 120,

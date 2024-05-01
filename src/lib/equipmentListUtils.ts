@@ -16,9 +16,11 @@ import {
 } from './mappers/booking';
 import { getResponseContentOrError } from './utils';
 import { getNextSortIndex, moveItemUp, moveItemDown, getSortedList } from './sortIndexUtils';
-import { ITimeEstimateObjectionModel } from '../models/objection-models';
+import { ITimeEstimateObjectionModel, ITimeReportObjectionModel } from '../models/objection-models';
 import { toTimeEstimate } from './mappers/timeEstimate';
 import { EquipmentPackageEntry } from '../models/interfaces/EquipmentPackage';
+import currency from 'currency.js';
+import { toTimeReport } from './mappers/timeReport';
 
 // EquipmentListEntityViewModel and helpers
 //
@@ -110,15 +112,18 @@ export const getDefaultListEntryFromEquipment = (
     id: number,
     sortIndex: number,
     isFree = false,
+    selectedPriceId?: number,
     override?: Partial<EquipmentListEntry>,
 ) => {
     if (!equipment.id) {
         throw new Error('Invalid equipment');
     }
 
+    const selectedPrice = equipment.prices.find((price) => price.id === selectedPriceId) ?? equipment.prices[0];
+
     const prices = isFree
-        ? { pricePerHour: 0, pricePerUnit: 0 }
-        : getEquipmentListEntryPrices(equipment.prices[0], pricePlan);
+        ? { pricePerHour: currency(0), pricePerUnit: currency(0) }
+        : getEquipmentListEntryPrices(selectedPrice, pricePlan);
 
     const entry: EquipmentListEntry = {
         id: id,
@@ -126,10 +131,10 @@ export const getDefaultListEntryFromEquipment = (
         equipment: equipment,
         equipmentId: equipment.id,
         numberOfUnits: 1,
-        numberOfHours: prices.pricePerHour > 0 ? 1 : 0,
+        numberOfHours: prices.pricePerHour.value > 0 ? 1 : 0,
         name: language === Language.SV ? equipment.name : equipment.nameEN,
         description: language === Language.SV ? equipment.description : equipment.descriptionEN,
-        discount: 0,
+        discount: currency(0),
         isHidden: false,
         account: null,
         ...prices,
@@ -156,6 +161,7 @@ const addMultipleEquipment = (
         equipment: Equipment;
         numberOfUnits?: number;
         numberOfHours?: number;
+        selectedPriceId?: number;
         isFree?: boolean;
         isHidden?: boolean;
     }[],
@@ -190,6 +196,7 @@ const addMultipleEquipment = (
             nextId,
             nextSortIndex,
             x.isFree,
+            x.selectedPriceId,
             overrides,
         );
 
@@ -210,8 +217,15 @@ export const addEquipment = (
     addListEntries: (entries: EquipmentListEntry[], listId: number | undefined, headerId?: number | undefined) => void,
     numberOfUnits?: number,
     numberOfHours?: number,
+    selectedPriceId?: number,
 ) => {
-    addMultipleEquipment([{ equipment, numberOfUnits, numberOfHours }], list, pricePlan, language, addListEntries);
+    addMultipleEquipment(
+        [{ equipment, numberOfUnits, numberOfHours, selectedPriceId }],
+        list,
+        pricePlan,
+        language,
+        addListEntries,
+    );
 };
 
 export const addEquipmentPackage = (
@@ -293,6 +307,7 @@ export const addHeadingEntry = (
             nextId,
             nextSortIndex,
             x.isFree,
+            undefined,
             overrides,
         );
 
@@ -482,6 +497,9 @@ export const toggleHideListEntry = (
     saveListEntry({ ...entry, isHidden: !entry.isHidden });
 };
 
+export const getDefaultEquipmentListName = (language: Language) =>
+    language === Language.EN ? 'Equipment' : 'Utrustning';
+
 // Functions to call the API
 //
 
@@ -611,4 +629,18 @@ export const addTimeEstimateApiCall = async (timeEstimate: ITimeEstimateObjectio
     return fetch(`/api/bookings/${bookingId}/timeEstimate`, request)
         .then((apiResponse) => getResponseContentOrError<ITimeEstimateObjectionModel>(apiResponse))
         .then(toTimeEstimate);
+};
+
+export const addTimeReportApiCall = async (timeReport: ITimeReportObjectionModel, bookingId: number) => {
+    const body = { timeReport: timeReport };
+
+    const request = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+    };
+
+    return fetch(`/api/bookings/${bookingId}/timeReport`, request)
+        .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
+        .then(toTimeReport);
 };

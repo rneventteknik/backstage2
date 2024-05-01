@@ -26,7 +26,7 @@ import CustomerSearch from '../../components/CustomerSearch';
 import { Customer } from '../../models/interfaces/Customer';
 import { BookingType } from '../../models/enums/BookingType';
 import { KeyValue } from '../../models/interfaces/KeyValue';
-import { Language } from '../../models/enums/Language';
+import { getDefaultEquipmentListName } from '../../lib/equipmentListUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
@@ -135,19 +135,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     };
 
     const createDefaultEquipmentList = async (booking: IBookingObjectionModel) => {
-        let name;
-        switch (booking.language) {
-            case Language.EN:
-                name = 'Equipment';
-                break;
-            case Language.SV:
-            default:
-                name = 'Utrustning';
-                break;
-        }
-
         const newEquipmentList: Partial<EquipmentListObjectionModel> = {
-            name,
+            name: getDefaultEquipmentListName(booking.language),
             usageStartDatetime: startDate,
             usageEndDatetime: endDate,
             numberOfDays: !startDate && !endDate ? 1 : undefined,

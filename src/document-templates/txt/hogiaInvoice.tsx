@@ -24,6 +24,7 @@ export const getHogiaTxtInvoice = (invoiceData: InvoiceData, t: (key: string) =>
         };
 
         const getRowFormat = (): Map<number, string> => {
+            const currencyFormatOptions = { decimal: ',', symbol: '', separator: '' };
             switch (invoiceRow.rowType) {
                 case InvoiceRowType.ITEM:
                     const pricedInvoiceRow = invoiceRow as PricedInvoiceRow;
@@ -31,11 +32,11 @@ export const getHogiaTxtInvoice = (invoiceData: InvoiceData, t: (key: string) =>
                         [1, 'Fakturarad'],
                         [2, invoiceRowTypeToHogiaRowTypeString(invoiceRow.rowType)],
                         [4, pricedInvoiceRow.numberOfUnits?.toString() ?? ''],
-                        [5, pricedInvoiceRow.pricePerUnit?.toString().replace('.', ',') ?? ''],
+                        [5, pricedInvoiceRow.pricePerUnit?.format(currencyFormatOptions) ?? ''],
                         [7, pricedInvoiceRow.text],
                         [8, pricedInvoiceRow.account ?? ''],
                         [12, pricedInvoiceRow.unit ?? ''],
-                        [20, pricedInvoiceRow.rowPrice?.toString() ?? ''],
+                        [20, pricedInvoiceRow.rowPrice?.format(currencyFormatOptions) ?? ''],
                     ]);
                 case InvoiceRowType.ITEM_COMMENT:
                     return new Map([
@@ -70,7 +71,7 @@ export const getHogiaTxtInvoice = (invoiceData: InvoiceData, t: (key: string) =>
             )}: ${invoiceData.name} ${invoiceData.dates}`,
         ];
         if (invoiceData.invoiceTag) {
-            invoiceCommentLines.push(`${t('invoice.invoiceTag')}: ${invoiceData.invoiceTag}`);
+            invoiceCommentLines.push(`${t('invoice.tag')}: ${invoiceData.invoiceTag}`);
         }
         invoiceCommentLines.push(
             `${t('hogia-invoice.general-information')} ${

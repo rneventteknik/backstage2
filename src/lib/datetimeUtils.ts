@@ -275,7 +275,7 @@ export const getDisplayEndDatetime = (endDatetime: Date | null | undefined, hasT
     return addDays(endDatetime, -1);
 };
 
-const getFormattedInterval = (
+export const getFormattedInterval = (
     start: Date | null | undefined,
     end: Date | null | undefined,
     hasTimeValues: boolean,
@@ -340,6 +340,7 @@ const getDateDisplayValues = (entity: HasDatetimes, hasTimeValues: boolean, loca
             locale,
         ),
         isoFormattedUsageStartString: formatDatetimeForForm(entity.usageStartDatetime),
+        isoFormattedUsageEndString: formatDatetimeForForm(entity.usageEndDatetime),
         monthYearUsageStartString: formatMonthYear(entity.usageStartDatetime),
     };
 };

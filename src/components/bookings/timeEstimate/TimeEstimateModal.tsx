@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Modal, Row, Col, Form, InputGroup, Button, Card } from 'react-bootstrap';
+import { Modal, Col, Form, InputGroup, Button, Card } from 'react-bootstrap';
 import { toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import RequiredIndicator from '../../utils/RequiredIndicator';
@@ -9,6 +9,7 @@ import { Language } from '../../../models/enums/Language';
 import { useLocalStorageState } from '../../../lib/useLocalStorageState';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp } from '@fortawesome/free-solid-svg-icons';
+import currency from 'currency.js';
 
 type Props = {
     timeEstimate?: Partial<TimeEstimate>;
@@ -77,7 +78,7 @@ const TimeEstimateModal: React.FC<Props> = ({
         setTimeEstimate({
             name: name,
             numberOfHours: numberOfTechnicians * (startHour < endHour ? endHour - startHour : endHour - startHour + 24),
-            pricePerHour: defaultLaborHourlyRate,
+            pricePerHour: currency(defaultLaborHourlyRate),
         });
     };
 
@@ -164,7 +165,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                 ) : null}
 
                 <Form onSubmit={handleSubmit} id={formId}>
-                    <Row>
+                    <Form.Row>
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>
@@ -204,9 +205,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                             </Form.Group>
                         </Col>
@@ -221,20 +220,18 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         type="text"
                                         required
                                         readOnly={readonly}
-                                        value={timeEstimate?.pricePerHour}
+                                        value={timeEstimate?.pricePerHour?.value}
                                         onChange={(e) =>
                                             setTimeEstimate({
                                                 ...timeEstimate,
-                                                pricePerHour: toIntOrUndefined(e.target.value),
+                                                pricePerHour: currency(e.target.value),
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>kr/h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>kr/h</InputGroup.Text>
                                 </InputGroup>
                                 <PriceWithVATPreview price={timeEstimate?.pricePerHour} />
-                                {timeEstimate?.pricePerHour !== defaultLaborHourlyRate ? (
+                                {timeEstimate?.pricePerHour?.value !== defaultLaborHourlyRate ? (
                                     <Form.Text className="text-muted">
                                         Standardpris för detta evenemang är:{' '}
                                         {formatNumberAsCurrency(defaultLaborHourlyRate)}/h
@@ -242,7 +239,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 ) : null}
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
                 </Form>
             </Modal.Body>
             <Modal.Footer>

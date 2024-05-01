@@ -39,7 +39,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ displayName, link, icon, exac
 
     return (
         <Nav.Item className={[isActive ? styles.activeNavItem : undefined, styles.link].join(' ')}>
-            <Link href={link} passHref>
+            <Link href={link} passHref legacyBehavior>
                 <Nav.Link as="a" href={link}>
                     <FontAwesomeIcon className="fa-fw" icon={icon} />
                     <span className="ml-3">{displayName}</span>

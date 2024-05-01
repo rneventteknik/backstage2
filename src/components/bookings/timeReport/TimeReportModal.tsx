@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { Modal, Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { Modal, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { usersFetcher } from '../../../lib/fetchers';
 import { toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
@@ -10,6 +10,7 @@ import { formatDatetimeForForm } from '../../../lib/datetimeUtils';
 import { getNextSortIndex } from '../../../lib/sortIndexUtils';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
 import { formatNumberAsCurrency } from '../../../lib/pricingUtils';
+import currency from 'currency.js';
 
 type Props = {
     booking: BookingViewModel;
@@ -62,9 +63,9 @@ const TimeReportModal: React.FC<Props> = ({
             userId: userId,
             startDatetime: timeReport?.startDatetime?.toISOString() ?? '',
             endDatetime: timeReport?.endDatetime?.toISOString() ?? '',
-            pricePerHour: timeReport?.pricePerHour ?? 0,
+            pricePerHour: timeReport?.pricePerHour?.value ?? 0,
             name: timeReport?.name ?? '',
-            sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
+            sortIndex: getNextSortIndex(booking.timeReports ?? []),
         };
 
         onSubmit(timeReportToSend);
@@ -80,7 +81,7 @@ const TimeReportModal: React.FC<Props> = ({
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit} id={formId}>
-                    <Row>
+                    <Form.Row>
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>
@@ -141,9 +142,9 @@ const TimeReportModal: React.FC<Props> = ({
                                 />
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
                     <hr />
-                    <Row>
+                    <Form.Row>
                         <Col md={4} xs={6}>
                             <Form.Group>
                                 <Form.Label>
@@ -155,20 +156,18 @@ const TimeReportModal: React.FC<Props> = ({
                                         type="text"
                                         required
                                         readOnly={readonly}
-                                        defaultValue={timeReport?.pricePerHour}
+                                        defaultValue={timeReport?.pricePerHour?.value}
                                         onChange={(e) =>
                                             setTimeReport({
                                                 ...timeReport,
-                                                pricePerHour: toIntOrUndefined(e.target.value),
+                                                pricePerHour: currency(e.target.value),
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>kr/h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>kr/h</InputGroup.Text>
                                 </InputGroup>
                                 <PriceWithVATPreview price={timeReport?.pricePerHour} />
-                                {timeReport?.pricePerHour !== defaultLaborHourlyRate ? (
+                                {timeReport?.pricePerHour?.value !== defaultLaborHourlyRate ? (
                                     <Form.Text className="text-muted">
                                         Standardpris för detta evenemang är:{' '}
                                         {formatNumberAsCurrency(defaultLaborHourlyRate)}/h
@@ -192,9 +191,7 @@ const TimeReportModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                                 <Form.Text className="text-muted">
                                     Lämna fältet tomt för att beräknas från datum och tid.
@@ -217,9 +214,7 @@ const TimeReportModal: React.FC<Props> = ({
                                             })
                                         }
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>h</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                                 <Form.Text className="text-muted">
                                     Lämna fältet tomt för att beräknas från datum och tid.
@@ -253,7 +248,7 @@ const TimeReportModal: React.FC<Props> = ({
                                 </Form.Control>
                             </Form.Group>
                         </Col>
-                    </Row>
+                    </Form.Row>
                     <span className="text-muted">
                         Tidrapporter används för att fakturera kunden för arbetad tid. Vill du skapa en prisuppskattning
                         med personalkostnad i, använd tidsestimat istället.

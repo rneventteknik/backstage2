@@ -1,3 +1,4 @@
+import currency from 'currency.js';
 import { User } from '../interfaces';
 
 export interface SalaryReport {
@@ -9,7 +10,7 @@ export interface UserSalaryReport {
     userId: string;
     user: User;
     salaryLines: SalaryLine[];
-    sum: number;
+    sum: currency;
 }
 
 export interface SalaryLine {
@@ -18,6 +19,6 @@ export interface SalaryLine {
     name: string;
     hours: number;
     hourlyRate: number;
-    sum: number;
+    sum: currency;
     timeReportId: number;
 }

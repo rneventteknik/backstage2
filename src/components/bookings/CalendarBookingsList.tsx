@@ -107,7 +107,7 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
                         Visa i Google Calender <FontAwesomeIcon icon={faExternalLinkAlt} />
                     </Dropdown.Item>
                     {calendarResult.existingBookingId ? (
-                        <Link href={'/bookings/' + calendarResult.existingBookingId} passHref>
+                        <Link href={'/bookings/' + calendarResult.existingBookingId} passHref legacyBehavior>
                             <Dropdown.Item href={'/bookings/' + calendarResult.existingBookingId}>
                                 Öppna bokning
                             </Dropdown.Item>

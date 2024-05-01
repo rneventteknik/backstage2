@@ -42,8 +42,8 @@ const handler = withSessionContext(
                     return;
                 }
                 await insertTimeEstimate(req.body.timeEstimate)
-                    .then((result) => {
-                        logChangeToBooking(
+                    .then(async (result) => {
+                        await logChangeToBooking(
                             context.currentUser,
                             bookingId,
                             booking.name,

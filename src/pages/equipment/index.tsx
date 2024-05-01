@@ -62,25 +62,25 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser, globalSettings 
                     </Button>
                 </Link>
                 <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer" className="d-inline-block">
-                    <Link href="/equipment/compare-availability" passHref>
+                    <Link href="/equipment/compare-availability" passHref legacyBehavior>
                         <Dropdown.Item href={'/equipment/compare-availability'}>
                             <FontAwesomeIcon icon={faCalendarXmark} className="mr-1 fa-fw" /> Jämför tillgänglighet
                         </Dropdown.Item>
                     </Link>
-                    <Link href="/equipment/archived" passHref>
+                    <Link href="/equipment/archived" passHref legacyBehavior>
                         <Dropdown.Item href={'/equipment/archived'}>
                             <FontAwesomeIcon icon={faArchive} className="mr-1 fa-fw" /> Visa arkiverad utrustning
                         </Dropdown.Item>
                     </Link>
                     <IfAdmin currentUser={currentUser}>
                         <Dropdown.Divider />
-                        <Link href="/equipment/json-import" passHref>
+                        <Link href="/equipment/json-import" passHref legacyBehavior>
                             <Dropdown.Item href={'/equipment/json-import'}>
                                 <FontAwesomeIcon icon={faFileImport} className="mr-1 fa-fw" /> Importera utrustning från
                                 JSON
                             </Dropdown.Item>
                         </Link>
-                        <Link href="/equipment/json-export" passHref>
+                        <Link href="/equipment/json-export" passHref legacyBehavior>
                             <Dropdown.Item href={'/equipment/json-export'}>
                                 <FontAwesomeIcon icon={faFileExport} className="mr-1 fa-fw" /> Exportera utrustning till
                                 JSON

@@ -14,6 +14,8 @@ import {
     faEyeSlash,
     faEye,
     faDollarSign,
+    fa0,
+    faPercent,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
@@ -24,7 +26,7 @@ import {
     addVAT,
     addVATToPrice,
     addVATToPriceWithTHS,
-    formatNumberAsCurrency,
+    formatCurrency,
     formatPrice,
     formatTHSPrice,
     getCalculatedDiscount,
@@ -60,6 +62,7 @@ import { toEquipment } from '../../../lib/mappers/equipment';
 import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 import TimeEstimateModal from '../timeEstimate/TimeEstimateModal';
 import PackageInfoModal from './PackageInfoModal';
+import currency from 'currency.js';
 
 type Props = {
     list: EquipmentList;
@@ -249,7 +252,7 @@ const EquipmentListTable: React.FC<Props> = ({
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
 
-        const valueIsRelevant = entry.pricePerUnit !== 0 || !entry.pricePerHour;
+        const valueIsRelevant = entry.pricePerUnit.value !== 0 || entry.pricePerHour.value === 0;
 
         if (!valueIsRelevant && entry.numberOfUnits === 1) {
             return <span className="text-muted">{entry.numberOfUnits} st</span>;
@@ -275,7 +278,7 @@ const EquipmentListTable: React.FC<Props> = ({
         }
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
-        const valueIsRelevant = entry.pricePerHour !== 0;
+        const valueIsRelevant = entry.pricePerHour.value !== 0;
 
         if (!valueIsRelevant && entry.numberOfHours === 0) {
             return <></>;
@@ -323,7 +326,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             : [customPriceDropdownValue, ...entry.equipment.prices]
                     }
                     value={entry.equipmentPrice ?? customPriceDropdownValue}
-                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(x))}`}
+                    optionLabelFn={(x) => `${x.name} ${priceDisplayFn(addVATToPriceWithTHS(x), false)}`}
                     optionKeyFn={(x) => x.id.toString()}
                     onChange={(newPrice) =>
                         newPrice && newPrice.id != -1
@@ -337,16 +340,14 @@ const EquipmentListTable: React.FC<Props> = ({
                     }
                     readonly={readonly}
                 >
-                    {formatPrice(addVATToPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit }))}
+                    {formatPrice(addVATToPrice(entry))}
                     {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
                         <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
                     ) : null}
                 </DoubleClickToEditDropdown>
             </span>
         ) : (
-            <span className={showPricesAsMuted ? 'text-muted' : ''}>
-                {formatPrice(addVATToPrice({ pricePerHour: entry.pricePerHour, pricePerUnit: entry.pricePerUnit }))}
-            </span>
+            <span className={showPricesAsMuted ? 'text-muted' : ''}>{formatPrice(addVATToPrice(entry))}</span>
         );
     };
 
@@ -356,13 +357,13 @@ const EquipmentListTable: React.FC<Props> = ({
         }
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
-        const priceWithoutDiscount = formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list), false)));
-        const discount = formatNumberAsCurrency(addVAT(getCalculatedDiscount(entry, getNumberOfDays(list))));
-        const priceWithDiscount = formatNumberAsCurrency(addVAT(getPrice(entry, getNumberOfDays(list))));
+        const priceWithoutDiscount = formatCurrency(addVAT(getPrice(entry, getNumberOfDays(list), false)));
+        const discount = formatCurrency(addVAT(getCalculatedDiscount(entry, getNumberOfDays(list))));
+        const priceWithDiscount = formatCurrency(addVAT(getPrice(entry, getNumberOfDays(list))));
 
         return (
             <em className={showPricesAsMuted ? 'text-muted' : ''}>
-                {entry.discount > 0 ? (
+                {entry.discount.value > 0 ? (
                     <OverlayTrigger
                         placement="right"
                         overlay={
@@ -465,6 +466,28 @@ const EquipmentListTable: React.FC<Props> = ({
                         <Dropdown.Item onClick={() => toggleHideListEntry(entry, saveListEntry)}>
                             <FontAwesomeIcon icon={entry.isHidden ? faEye : faEyeSlash} className="mr-1 fa-fw" />{' '}
                             {entry.isHidden ? 'Sluta dölja rad för kund' : 'Dölj rad för kund'}
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            onClick={() =>
+                                saveListEntry({
+                                    ...entry,
+                                    equipmentPrice: undefined,
+                                    pricePerUnit: currency(0),
+                                    pricePerHour: currency(0),
+                                })
+                            }
+                        >
+                            <FontAwesomeIcon icon={fa0} className="mr-1 fa-fw" /> Sätt anpassat pris till 0
+                        </Dropdown.Item>
+                        <Dropdown.Item
+                            onClick={() =>
+                                saveListEntry({
+                                    ...entry,
+                                    discount: getPrice(entry, getNumberOfDays(list), false),
+                                })
+                            }
+                        >
+                            <FontAwesomeIcon icon={faPercent} className="mr-1 fa-fw" /> Sätt rabatt till 100%
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => editEntry(entry)}>
                             <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
@@ -610,9 +633,9 @@ const EquipmentListTable: React.FC<Props> = ({
                         viewModelIsHeading(viewModel)
                             ? getEquipmentListHeadingFromViewModel(viewModel)
                                   .listEntries.map((x) => getPrice(x, getNumberOfDays(list)))
-                                  .reduce(reduceSumFn, 0)
+                                  .reduce((a, b) => a.add(b), currency(0))
                             : getPrice(getEquipmentListEntryFromViewModel(viewModel), getNumberOfDays(list)),
-                    ),
+                    ).value,
                 getContentOverride: EquipmentListEntryTotalPriceDisplayFn,
                 columnWidth: 90,
                 textAlignment: 'right',
@@ -676,7 +699,7 @@ const EquipmentListTable: React.FC<Props> = ({
                         <SelectNumberOfUnitsAndHoursModal
                             show={!!equipmentToAdd}
                             onHide={() => setEquipmentToAdd(null)}
-                            onSave={(numberOfUnits, numberOfHours) => {
+                            onSave={(numberOfUnits, numberOfHours, selectedPriceId) => {
                                 if (!equipmentToAdd) {
                                     throw new Error('Invalid state: Missing searchResultModelToAdd.');
                                 }
@@ -689,6 +712,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                     addListEntries,
                                     numberOfUnits,
                                     numberOfHours,
+                                    selectedPriceId,
                                 );
                                 setEquipmentToAdd(null);
                             }}
@@ -704,6 +728,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             }
                             title={language === Language.SV ? equipmentToAdd.name : equipmentToAdd.nameEN}
                             equipment={equipmentToAdd}
+                            priceplan={pricePlan}
                             startDatetime={getEquipmentOutDatetime(list) ?? null}
                             endDatetime={getEquipmentInDatetime(list) ?? null}
                         />
@@ -720,7 +745,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                                 ? equipmentPackageToAdd.name
                                                 : equipmentPackageToAdd.nameEN ?? '',
                                         numberOfHours: equipmentPackageToAdd.estimatedHours,
-                                        pricePerHour: defaultLaborHourlyRate,
+                                        pricePerHour: currency(defaultLaborHourlyRate),
                                     });
                                 } else {
                                     addEquipmentPackage(
