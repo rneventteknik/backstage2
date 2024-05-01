@@ -24,6 +24,7 @@ import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
 import TableStyleLink from '../utils/TableStyleLink';
 import { getBookingDateHeadingValue } from '../../lib/datetimeUtils';
 import { addVAT, formatCurrency, getBookingPrice } from '../../lib/pricingUtils';
+import CancelledIcon from '../utils/CancelledIcon';
 
 type Props = {
     bookings: BookingViewModel[];
@@ -150,10 +151,12 @@ const AdminBookingList: React.FC<Props> = ({
     };
 
     const bookingStatusIsDone = (booking: BookingViewModel) => booking.status === Status.DONE;
+    const bookingStatusIsCancelled = (booking: BookingViewModel) => booking.status === Status.CANCELED;
     const bookingStatusDisplayFn = (booking: BookingViewModel) => (
         <>
             {getStatusName(booking.status)}
             {bookingStatusIsDone(booking) ? <DoneIcon /> : null}
+            {bookingStatusIsCancelled(booking) ? <CancelledIcon /> : null}
             <p className="mb-0 d-xl-none">{bookingRentalStatusDisplayFn(booking)}</p>
             <p className="mb-0 d-xl-none">{bookingPaymentStatusDisplayFn(booking)}</p>
             <p className="mb-0 d-xl-none">{bookingSalaryStatusDisplayFn(booking)}</p>
