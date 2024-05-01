@@ -39,16 +39,14 @@ const EquipmentBookings: React.FC<Props> = ({ equipment }: Props) => {
             x.equipmentInDatetime.getTime() > Date.now() &&
             !bookingHasNonReturnedListWithEquipment(x),
     );
-    const pastBookings = bookingViewModels
-        .filter(
-            (x) =>
-                x.equipmentOutDatetime &&
-                x.equipmentInDatetime &&
-                x.equipmentOutDatetime.getTime() < Date.now() &&
-                x.equipmentInDatetime.getTime() < Date.now() &&
-                !bookingHasNonReturnedListWithEquipment(x),
-        )
-        .slice(0, 10);
+    const pastBookings = bookingViewModels.filter(
+        (x) =>
+            x.equipmentOutDatetime &&
+            x.equipmentInDatetime &&
+            x.equipmentOutDatetime.getTime() < Date.now() &&
+            x.equipmentInDatetime.getTime() < Date.now() &&
+            !bookingHasNonReturnedListWithEquipment(x),
+    );
 
     if (!equipment || !bookings) {
         return <Skeleton height={120}></Skeleton>;
@@ -67,7 +65,7 @@ const EquipmentBookings: React.FC<Props> = ({ equipment }: Props) => {
                 tableSettingsOverride={{ noResultsLabel: 'Inga kommande bokningar med ' + equipment.name }}
             />
             <TinyBookingTable
-                title={'Senaste 10 bokningarna som använt ' + equipment.name}
+                title={'Tidigare bokningar'}
                 bookings={pastBookings}
                 tableSettingsOverride={{
                     defaultSortAscending: false,
