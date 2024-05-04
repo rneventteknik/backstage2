@@ -37,6 +37,11 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
         }
     };
 
+    const startEditing= () => {
+        setTrackedValue(value ?? '');
+        setIsEditing(true)
+    }
+
     if (readonly) {
         return <span>{children}</span>;
     }
@@ -49,7 +54,7 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
                 title={doubleClickToEditHelpText}
                 tabIndex={0}
                 onDoubleClick={() => setIsEditing(true)}
-                onFocus={() => setIsEditing(true)}
+                onFocus={() => startEditing()}
             >
                 {children}
             </span>
@@ -71,51 +76,6 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
             onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.select()}
             autoFocus
         />
-    );
-};
-
-type DoubleClickToEditDatetimeProps = {
-    value?: Date | null;
-    onUpdate: (x: Date | undefined) => void;
-    size?: 'sm' | 'lg' | undefined;
-    readonly?: boolean;
-    className?: string;
-    placeholder?: string;
-    min?: string;
-    max?: string;
-};
-
-export const DoubleClickToEditDatetime: React.FC<DoubleClickToEditDatetimeProps> = ({
-    value,
-    onUpdate,
-    size,
-    readonly,
-    className,
-    placeholder = 'N/A',
-    min,
-    max,
-}: DoubleClickToEditDatetimeProps) => {
-    return (
-        <DoubleClickToEdit
-            inputType="datetime-local"
-            value={value ? formatDatetimeForForm(value) : ''}
-            onUpdate={(newValue) => onUpdate(toDatetimeOrUndefined(newValue))}
-            size={size}
-            readonly={readonly}
-            className={className}
-            min={min}
-            max={max}
-        >
-            <div className="mb-3">
-                {value ? (
-                    formatDatetime(value)
-                ) : (
-                    <span className="text-muted" title="Dubbelklicka för att konfigurera">
-                        {placeholder}
-                    </span>
-                )}
-            </div>
-        </DoubleClickToEdit>
     );
 };
 
