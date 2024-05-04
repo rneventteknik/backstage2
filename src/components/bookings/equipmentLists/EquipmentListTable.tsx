@@ -21,7 +21,7 @@ import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../.
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
 import { toIntOrUndefined, reduceSumFn, getResponseContentOrError } from '../../../lib/utils';
 import EquipmentSearch, { ResultType } from '../../EquipmentSearch';
-import { DoubleClickToEdit, DoubleClickToEditDropdown } from '../../utils/DoubleClickToEdit';
+import { ClickToEdit, ClickToEditDropdown } from '../../utils/DoubleClickToEdit';
 import {
     addVAT,
     addVATToPrice,
@@ -123,7 +123,7 @@ const EquipmentListTable: React.FC<Props> = ({
             return (
                 <>
                     <div className="mb-0">
-                        <DoubleClickToEdit
+                        <ClickToEdit
                             value={heading.name}
                             onUpdate={(newValue) =>
                                 saveListHeading({
@@ -138,10 +138,10 @@ const EquipmentListTable: React.FC<Props> = ({
                             <span className="text-muted ml-2">
                                 ({heading.listEntries.length} {heading.listEntries.length === 1 ? 'del' : 'delar'})
                             </span>
-                        </DoubleClickToEdit>
+                        </ClickToEdit>
                     </div>
                     <div className="mb-0 text-muted">
-                        <DoubleClickToEdit
+                        <ClickToEdit
                             value={heading.description}
                             onUpdate={(newValue) =>
                                 saveListHeading({
@@ -159,7 +159,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                     {readonly ? null : 'Dubbelklicka för att lägga till en beskrivning'}
                                 </span>
                             )}{' '}
-                        </DoubleClickToEdit>
+                        </ClickToEdit>
                     </div>
                 </>
             );
@@ -170,7 +170,7 @@ const EquipmentListTable: React.FC<Props> = ({
         return (
             <>
                 <div className={'mb-0' + (entry.isHidden ? ' text-muted' : '')}>
-                    <DoubleClickToEdit
+                    <ClickToEdit
                         value={entry.name}
                         onUpdate={(newValue) =>
                             saveListEntry({ ...entry, name: newValue && newValue.length > 0 ? newValue : entry.name })
@@ -219,10 +219,10 @@ const EquipmentListTable: React.FC<Props> = ({
                                 <FontAwesomeIcon icon={faDollarSign} className="ml-1" title="" />
                             </OverlayTrigger>
                         ) : null}
-                    </DoubleClickToEdit>
+                    </ClickToEdit>
                 </div>
                 <div className="mb-0">
-                    <DoubleClickToEdit
+                    <ClickToEdit
                         value={entry.description}
                         onUpdate={(newValue) => saveListEntry({ ...entry, description: newValue })}
                         size="sm"
@@ -235,7 +235,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                 {readonly ? null : 'Dubbelklicka för att lägga till en beskrivning'}
                             </span>
                         )}
-                    </DoubleClickToEdit>
+                    </ClickToEdit>
                 </div>
 
                 <div className="mb-0 text-muted d-md-none">{EquipmentListEntryNumberOfHoursDisplayFn(viewModel)}</div>
@@ -259,7 +259,7 @@ const EquipmentListTable: React.FC<Props> = ({
         }
 
         return (
-            <DoubleClickToEdit
+            <ClickToEdit
                 value={entry.numberOfUnits?.toString()}
                 onUpdate={(newValue) =>
                     saveListEntry({ ...entry, numberOfUnits: toIntOrUndefined(newValue, true) ?? 0 })
@@ -268,7 +268,7 @@ const EquipmentListTable: React.FC<Props> = ({
                 readonly={readonly}
             >
                 <span className={valueIsRelevant ? '' : 'text-muted'}>{entry.numberOfUnits} st</span>
-            </DoubleClickToEdit>
+            </ClickToEdit>
         );
     };
 
@@ -285,7 +285,7 @@ const EquipmentListTable: React.FC<Props> = ({
         }
 
         return (
-            <DoubleClickToEdit
+            <ClickToEdit
                 value={entry.numberOfHours.toString()}
                 onUpdate={(newValue) =>
                     saveListEntry({ ...entry, numberOfHours: toIntOrUndefined(newValue, true) ?? 0 })
@@ -294,7 +294,7 @@ const EquipmentListTable: React.FC<Props> = ({
                 readonly={readonly}
             >
                 <span className={valueIsRelevant ? '' : 'text-muted'}>{entry.numberOfHours} h</span>
-            </DoubleClickToEdit>
+            </ClickToEdit>
         );
     };
 
@@ -319,7 +319,7 @@ const EquipmentListTable: React.FC<Props> = ({
         };
         return entry.equipment && entry.equipment.prices.length ? (
             <span className={showPricesAsMuted ? 'text-muted' : ''}>
-                <DoubleClickToEditDropdown<EquipmentPrice>
+                <ClickToEditDropdown<EquipmentPrice>
                     options={
                         entry.equipmentPrice
                             ? entry.equipment.prices
@@ -344,7 +344,7 @@ const EquipmentListTable: React.FC<Props> = ({
                     {entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
                         <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
                     ) : null}
-                </DoubleClickToEditDropdown>
+                </ClickToEditDropdown>
             </span>
         ) : (
             <span className={showPricesAsMuted ? 'text-muted' : ''}>{formatPrice(addVATToPrice(entry))}</span>

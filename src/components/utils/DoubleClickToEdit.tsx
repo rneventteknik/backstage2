@@ -1,10 +1,9 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { formatDatetime, formatDatetimeForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 
-const doubleClickToEditHelpText = 'Dubbelklicka för att redigera';
+const doubleClickToEditHelpText = 'Klicka för att redigera';
 
-type DoubleClickToEditProps = {
+type ClickToEditProps = {
     children?: ReactNode;
     value?: string;
     size?: 'sm' | 'lg' | undefined;
@@ -16,7 +15,7 @@ type DoubleClickToEditProps = {
     max?: string;
 };
 
-export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
+export const ClickToEdit: React.FC<ClickToEditProps> = ({
     value,
     onUpdate,
     size,
@@ -26,7 +25,7 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
     className,
     min,
     max,
-}: DoubleClickToEditProps) => {
+}: ClickToEditProps) => {
     const [trackedValue, setTrackedValue] = useState(value ?? '');
     const [isEditing, setIsEditing] = useState(false);
 
@@ -37,10 +36,10 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
         }
     };
 
-    const startEditing= () => {
+    const startEditing = () => {
         setTrackedValue(value ?? '');
-        setIsEditing(true)
-    }
+        setIsEditing(true);
+    };
 
     if (readonly) {
         return <span>{children}</span>;
@@ -79,7 +78,7 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
     );
 };
 
-type DoubleClickToEditDropdownProps<T> = {
+type ClickToEditDropdownProps<T> = {
     children?: ReactNode;
     options: T[];
     optionLabelFn: (option: T) => string;
@@ -91,7 +90,7 @@ type DoubleClickToEditDropdownProps<T> = {
     readonly?: boolean;
 };
 
-export const DoubleClickToEditDropdown = <T,>({
+export const ClickToEditDropdown = <T,>({
     value,
     options,
     optionLabelFn,
@@ -101,7 +100,7 @@ export const DoubleClickToEditDropdown = <T,>({
     size,
     children,
     readonly,
-}: DoubleClickToEditDropdownProps<T>): React.ReactElement => {
+}: ClickToEditDropdownProps<T>): React.ReactElement => {
     const [selectedKey, setSelectedKey] = useState(optionKeyFn(value));
     const [isEditing, setIsEditing] = useState(false);
 

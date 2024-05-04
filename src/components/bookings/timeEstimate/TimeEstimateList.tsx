@@ -8,7 +8,7 @@ import { getResponseContentOrError, toIntOrUndefined, updateItemsInArrayById } f
 import { toTimeEstimate } from '../../../lib/mappers/timeEstimate';
 import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';
-import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
+import { ClickToEdit } from '../../utils/DoubleClickToEdit';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faAngleDown,
@@ -149,7 +149,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
     };
 
     const TimeEstimateNameDisplayFn = (timeEstimate: TimeEstimate) => (
-        <DoubleClickToEdit
+        <ClickToEdit
             value={timeEstimate.name}
             onUpdate={(newValue) =>
                 updateTimeEstimates({
@@ -165,11 +165,11 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
             ) : (
                 <span className="text-muted font-italic">Dubbelklicka för att lägga till en beskrivning</span>
             )}
-        </DoubleClickToEdit>
+        </ClickToEdit>
     );
 
     const TimeEstimateNumberOfHoursDisplayFn = (timeEstimate: TimeEstimate) => (
-        <DoubleClickToEdit
+        <ClickToEdit
             value={timeEstimate.numberOfHours?.toString()}
             onUpdate={(newValue) =>
                 updateTimeEstimates({
@@ -185,7 +185,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
             ) : (
                 timeEstimate.numberOfHours + ' h'
             )}
-        </DoubleClickToEdit>
+        </ClickToEdit>
     );
 
     const TimeEstimateTotalPriceDisplayFn = (entry: TimeEstimate) => {

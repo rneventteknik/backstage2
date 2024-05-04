@@ -19,7 +19,7 @@ import { BookingViewModel } from '../../models/interfaces';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import BookingTypeTag from '../utils/BookingTypeTag';
 import DoneIcon from '../utils/DoneIcon';
-import { DoubleClickToEdit } from '../utils/DoubleClickToEdit';
+import { ClickToEdit } from '../utils/DoubleClickToEdit';
 import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
 import TableStyleLink from '../utils/TableStyleLink';
 import { getBookingDateHeadingValue } from '../../lib/datetimeUtils';
@@ -75,7 +75,7 @@ const AdminBookingList: React.FC<Props> = ({
 
     const bookingReferenceDisplayFn = (booking: BookingViewModel) => (
         <>
-            <DoubleClickToEdit
+            <ClickToEdit
                 readonly={!allowEditInvoiceNumber}
                 onUpdate={(newInvoiceNumber: string) => {
                     if (!updateInvoiceNumber) {
@@ -86,7 +86,7 @@ const AdminBookingList: React.FC<Props> = ({
                 value={booking.invoiceNumber}
             >
                 {replaceEmptyStringWithNull(booking.invoiceNumber) ?? <span className="text-muted">XXXXXXX</span>}
-            </DoubleClickToEdit>
+            </ClickToEdit>
         </>
     );
 

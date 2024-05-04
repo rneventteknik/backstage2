@@ -24,7 +24,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toTimeReport } from '../../../lib/mappers/timeReport';
 import { addVAT, formatCurrency, getTimeReportPrice, getTotalTimeReportsPrice } from '../../../lib/pricingUtils';
 import { useNotifications } from '../../../lib/useNotifications';
-import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
+import { ClickToEdit } from '../../utils/DoubleClickToEdit';
 import {
     getNextSortIndex,
     isFirst,
@@ -164,7 +164,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
 
     const TimeReportSpecificationDisplayFn = (timeReport: TimeReport) => (
         <>
-            <DoubleClickToEdit
+            <ClickToEdit
                 value={timeReport.name}
                 onUpdate={(newValue) =>
                     updateTimeReports({
@@ -180,7 +180,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 ) : (
                     <span className="text-muted font-italic">Dubbelklicka för att lägga till en beskrivning</span>
                 )}
-            </DoubleClickToEdit>
+            </ClickToEdit>
             {readonly ? (
                 <p className="text-muted">
                     {formatDatetime(timeReport.startDatetime)} - {formatDatetime(timeReport.endDatetime)}
@@ -194,7 +194,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
     );
 
     const TimeReportBillableWorkingHoursDisplayFn = (timeReport: TimeReport) => (
-        <DoubleClickToEdit
+        <ClickToEdit
             value={timeReport.billableWorkingHours?.toString()}
             onUpdate={(newValue) =>
                 updateTimeReports({
@@ -206,7 +206,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             readonly={readonly}
         >
             <TimeReportHourDisplay timeReport={timeReport} />
-        </DoubleClickToEdit>
+        </ClickToEdit>
     );
 
     const TimeReportUserIdDisplayFn = (timeReport: TimeReport) => (
