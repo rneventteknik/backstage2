@@ -5,7 +5,7 @@ import { getAndVerifyApiKey, getAndVerifyUser } from './authenticate';
 import { withApiSession } from './session';
 import { IncomingMessage } from 'http';
 import { Role } from '../models/enums/Role';
-import { hasSufficientAccess } from './useUser';
+import { hasSufficientAccess } from './utils';
 
 export interface SessionContext {
     currentUser: CurrentUserInfo;

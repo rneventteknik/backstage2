@@ -6,7 +6,7 @@ import { getAndVerifyUser } from './authenticate';
 import { IncomingMessage } from 'http';
 import { fetchSettings } from './db-access/setting';
 import { KeyValue } from '../models/interfaces/KeyValue';
-import { toKeyValue } from './utils';
+import { hasSufficientAccess, toKeyValue } from './utils';
 
 // This function returns the current user. Depending on if the user is logged in or not
 // and the user's privileges in relation to the specified required role, a redirect will
@@ -68,25 +68,6 @@ const useUserWithDefaultAccessAndWithSettings = (requiredRole: Role = Role.READO
     return useUser('/login', '/no-access', undefined, true, requiredRole);
 };
 
-const hasSufficientAccess = (role: Role | null | undefined, requiredRole: Role | null) => {
-    switch (requiredRole) {
-        case Role.ADMIN:
-            return role === Role.ADMIN;
-
-        case Role.USER:
-            return role === Role.USER || role === Role.ADMIN;
-
-        case Role.READONLY:
-            return role === Role.READONLY || role === Role.USER || role === Role.ADMIN;
-
-        case Role.CASH_PAYMENT_MANAGER:
-            return role === Role.CASH_PAYMENT_MANAGER || role === Role.USER || role === Role.ADMIN;
-
-        case null:
-            return true;
-    }
-};
-
 const getGlobalSettings = async (isLoggedIn = false) => {
     const settings = (await fetchSettings()).map(toKeyValue);
     const publicSettings = [
@@ -139,4 +120,4 @@ const getGlobalSettings = async (isLoggedIn = false) => {
     return isLoggedIn ? globalSettings : globalSettings.filter((s) => publicSettings.includes(s.key));
 };
 
-export { useUser, useUserWithDefaultAccessAndWithSettings, hasSufficientAccess, getGlobalSettings };
+export { useUser, useUserWithDefaultAccessAndWithSettings, getGlobalSettings };

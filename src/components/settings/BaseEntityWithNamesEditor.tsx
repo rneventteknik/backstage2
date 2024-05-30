@@ -17,8 +17,9 @@ type Props<T extends BaseEntityWithName> = {
     apiUrl: string;
     entityName: string;
     entityDisplayName: string;
-    getEditComponent: (x: T, save: (x: T) => void) => React.ReactElement;
+    getEditComponent: (x: T, save: (x: T) => void, readOnly?: boolean) => React.ReactElement;
     sortBySortIndex?: boolean;
+    readonly?: boolean;
 };
 
 const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
@@ -28,6 +29,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
     fetcher,
     getEditComponent,
     sortBySortIndex = false,
+    readonly = false,
 }: Props<T>): React.ReactElement => {
     const { data, mutate, error, isValidating } = useSwr(apiUrl, fetcher);
     const [entityToDelete, setEntityToDelete] = useState<T | null>(null);
@@ -128,7 +130,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
                 }}
                 className="mr-2"
             >
-                Redigera
+                {readonly ? 'Visa detaljer' : 'Redigera'}
             </Button>
             <Button
                 variant="danger"
@@ -136,6 +138,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
                 onClick={() => {
                     setEntityToDelete(entity);
                 }}
+                disabled={readonly}
             >
                 Ta bort
             </Button>
@@ -187,6 +190,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
                     onClick={() => {
                         setEntityToEdit({} as T);
                     }}
+                    disabled={readonly}
                 >
                     <FontAwesomeIcon icon={faPlus} className="mr-1" /> Lägg till
                 </Button>
@@ -207,9 +211,11 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
 
             <Modal show={entityToEdit !== null} onHide={() => setEntityToEdit(null)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Redigera {entityToEdit?.name}</Modal.Title>
+                    <Modal.Title>{readonly ? entityToEdit?.name : 'Redigera ' + entityToEdit?.name}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>{entityToEdit ? getEditComponent(entityToEdit, setEntityToEdit) : null}</Modal.Body>
+                <Modal.Body>
+                    {entityToEdit ? getEditComponent(entityToEdit, setEntityToEdit, readonly) : null}
+                </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setEntityToEdit(null)}>
                         Avbryt
@@ -226,6 +232,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
 
                             setEntityToEdit(null);
                         }}
+                        disabled={readonly}
                     >
                         Spara
                     </Button>

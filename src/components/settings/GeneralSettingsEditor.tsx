@@ -15,7 +15,11 @@ import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import ConfirmModal from '../utils/ConfirmModal';
 import SettingsModal from '../utils/setting/SettingsModal';
 
-const GeneralSettingsEditor: React.FC = () => {
+type Props = {
+    readonly?: boolean;
+};
+
+const GeneralSettingsEditor: React.FC<Props> = ({ readonly = false }) => {
     const { data: settings, error, isValidating, mutate } = useSwr('/api/setting', settingsFetcher);
 
     const [settingToEdit, setSettingToEdit] = useState<Setting | null>(null);
@@ -116,10 +120,16 @@ const GeneralSettingsEditor: React.FC = () => {
 
     const SettingEntryActionsDisplayFn = (entry: Setting) => (
         <>
-            <Button variant="secondary" size="sm" onClick={() => setSettingToEdit(entry)} className="mr-2">
+            <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setSettingToEdit(entry)}
+                className="mr-2"
+                disabled={readonly}
+            >
                 Redigera
             </Button>
-            <Button variant="danger" size="sm" onClick={() => setSettingToDelete(entry)}>
+            <Button variant="danger" size="sm" onClick={() => setSettingToDelete(entry)} disabled={readonly}>
                 Ta bort
             </Button>
         </>
@@ -181,6 +191,7 @@ const GeneralSettingsEditor: React.FC = () => {
                     onClick={() => {
                         setSettingToAdd({ note: '', value: '' });
                     }}
+                    disabled={readonly}
                 >
                     <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till inställning
                 </Button>
