@@ -45,6 +45,7 @@ export const fetchBookings = async (): Promise<BookingObjectionModel[]> => {
 
     return BookingObjectionModel.query()
         .withGraphFetched('ownerUser')
+        .withGraphFetched('timeEstimates')
         .withGraphFetched('timeReports.user')
         .withGraphFetched('equipmentLists.listEntries.equipment')
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment');
