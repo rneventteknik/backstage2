@@ -54,6 +54,9 @@ interface BookingAnalyticsModel {
     usageEndDatetime: string | undefined;
     equipmentOutDatetime: string | undefined;
     equipmentInDatetime: string | undefined;
+    estimatedHours: number;
+    actualWorkingHours: number;
+    billableWorkingHours: number;
 }
 
 const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =>
@@ -86,6 +89,11 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
         usageEndDatetime: formatDatetimeForForm(booking.usageEndDatetime),
         equipmentOutDatetime: formatDatetimeForForm(booking.equipmentOutDatetime),
         equipmentInDatetime: formatDatetimeForForm(booking.equipmentInDatetime),
+
+        // Working hours
+        estimatedHours: booking.timeEstimates?.reduce((sum, entry) => sum + entry.numberOfHours, 0) ?? 0,
+        actualWorkingHours: booking.timeReports?.reduce((sum, entry) => sum + entry.actualWorkingHours, 0) ?? 0,
+        billableWorkingHours: booking.timeReports?.reduce((sum, entry) => sum + entry.billableWorkingHours, 0) ?? 0,
     }));
 
 const mapToCSV = (bookings: BookingAnalyticsModel[]) => {
