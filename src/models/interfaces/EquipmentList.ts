@@ -27,8 +27,8 @@ export interface EquipmentListHeading extends BaseEntityWithName {
 }
 export interface EquipmentListEntry extends BaseEntityWithName {
     sortIndex: number;
-    equipment?: Equipment;
-    equipmentId?: number;
+    equipment?: Equipment | null;
+    equipmentId?: number | null;
     name: string;
     description: string;
 
@@ -37,7 +37,7 @@ export interface EquipmentListEntry extends BaseEntityWithName {
 
     pricePerUnit: currency;
     pricePerHour: currency;
-    equipmentPrice?: EquipmentPrice;
+    equipmentPrice?: EquipmentPrice | null;
     discount: currency;
     isHidden: boolean;
     account: string | null;
