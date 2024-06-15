@@ -285,9 +285,9 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     onClick={() =>
                                         setEquipmentListEntryToEditViewModel({
                                             ...equipmentListEntryToEditViewModel,
-                                            equipment: undefined,
-                                            equipmentId: undefined,
-                                            equipmentPrice: undefined,
+                                            equipment: null,
+                                            equipmentId: null,
+                                            equipmentPrice: null,
                                         })
                                     }
                                 >
