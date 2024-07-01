@@ -25,12 +25,14 @@ const TimeReportAddButton: React.FC<Props & React.ComponentProps<typeof Button>>
     defaultLaborHourlyRate,
     ...rest
 }: Props & React.ComponentProps<typeof Button>) => {
-    const { showCreateFailedNotification } = useNotifications();
     const [timeReport, setTimeReport] = useState<Partial<TimeReport> | undefined>(undefined);
+    const { showCreateSuccessNotification, showCreateFailedNotification } =
+        useNotifications();
 
     const addTimeReport = (timeReport: ITimeReportObjectionModel) => {
         addTimeReportApiCall(timeReport, booking.id)
             .then((data) => {
+                showCreateSuccessNotification("Tidrapporten");
                 onAdd(data);
             })
             .catch((error: Error) => {
