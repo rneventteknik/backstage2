@@ -44,7 +44,6 @@ interface BookingAnalyticsModel {
     pricePlan: number;
     accountKind: number | null;
     location: string;
-    customerName: string;
     language: string;
     fixedPrice?: number | null;
     totalTimeEstimatesPrice: number;
@@ -74,7 +73,6 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
         pricePlan: booking.pricePlan,
         accountKind: booking.accountKind,
         location: booking.location,
-        customerName: booking.customerName,
         language: booking.language,
 
         // Pricing
