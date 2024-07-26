@@ -10,6 +10,8 @@ import { validateEquipmentListEntryObjectionModel } from './equipmentListEntry';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 import { RentalStatus } from '../../models/enums/RentalStatus';
 import { BookingType } from '../../models/enums/BookingType';
+import { formatDatetimeForForm } from '../datetimeUtils';
+import { Status } from '../../models/enums/Status';
 
 export const fetchEquipmentList = async (
     id: number,
@@ -45,7 +47,7 @@ export const fetchEquipmentListsForBooking = async (bookingId: number): Promise<
 
 export const fetchOutEquipmentLists = async (): Promise<EquipmentListObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    const now = new Date();
+    const now = formatDatetimeForForm(new Date());
 
     return EquipmentListObjectionModel.query()
         .join('Booking', 'Booking.id', '=', 'EquipmentList.bookingId')
@@ -54,7 +56,15 @@ export const fetchOutEquipmentLists = async (): Promise<EquipmentListObjectionMo
             x
                 .where({ bookingType: BookingType.GIG })
                 .where('equipmentOutDatetime', '<=', now)
-                .where('equipmentInDatetime', '>=', now),
+                .where('equipmentInDatetime', '>=', now)
+                .whereNot({status: Status.CANCELED})
+        )
+        .orWhere((x) =>
+            x
+                .where({ bookingType: BookingType.GIG })
+                .where('usageStartDatetime', '<=', now)
+                .where('usageEndDatetime', '>=', now)
+                .whereNot({status: Status.CANCELED})
         )
         .withGraphFetched('listEntries.equipment')
         .withGraphFetched('listHeadings.listEntries.equipment');
