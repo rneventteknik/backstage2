@@ -8,6 +8,8 @@ import {
 import { ensureDatabaseIsInitialized } from '../database';
 import { validateEquipmentListEntryObjectionModel } from './equipmentListEntry';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
+import { RentalStatus } from '../../models/enums/RentalStatus';
+import { BookingType } from '../../models/enums/BookingType';
 
 export const fetchEquipmentList = async (
     id: number,
@@ -39,6 +41,23 @@ export const fetchEquipmentLists = async (): Promise<EquipmentListObjectionModel
 export const fetchEquipmentListsForBooking = async (bookingId: number): Promise<EquipmentListObjectionModel[]> => {
     ensureDatabaseIsInitialized();
     return EquipmentListObjectionModel.query().where('bookingId', bookingId).orderBy('id');
+};
+
+export const fetchOutEquipmentLists = async (): Promise<any[]> => {
+    ensureDatabaseIsInitialized();
+    const now = new Date();
+
+    return EquipmentListObjectionModel.query()
+        .join('Booking', 'Booking.id', '=', 'EquipmentList.bookingId')
+        .where({ rentalStatus: RentalStatus.OUT, bookingType: BookingType.RENTAL })
+        .orWhere((x) =>
+            x
+                .where({ bookingType: BookingType.GIG })
+                .where('equipmentOutDatetime', '<=', now)
+                .where('equipmentInDatetime', '>=', now),
+        )
+        .withGraphFetched('listEntries.equipment')
+        .withGraphFetched('listHeadings.listEntries.equipment');
 };
 
 export const updateEquipmentList = async (
