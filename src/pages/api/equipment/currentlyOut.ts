@@ -2,10 +2,10 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { respondWithCustomErrorMessage, respondWithEntityNotFoundResponse } from '../../../lib/apiResponses';
 import { withSessionContext } from '../../../lib/sessionContext';
 import { fetchOutEquipmentLists } from '../../../lib/db-access/equipmentList';
-import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 import { groupBy, reduceSumFn } from '../../../lib/utils';
+import { EquipmentListObjectionModel } from '../../../models/objection-models/BookingObjectionModel';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<Promise<void> | void> => {
+const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<Promise<void> | void> => {
     switch (req.method) {
         case 'GET':
             await fetchOutEquipmentLists()
@@ -20,11 +20,11 @@ const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<Promi
     }
 
     return;
-};
+});
 
 export default handler;
 
-const getEquipmentFromLists = (equipmentLists: EquipmentList[]) => {
+const getEquipmentFromLists = (equipmentLists: EquipmentListObjectionModel[]) => {
     const listEntries = equipmentLists.flatMap((list) => [
         ...list.listEntries,
         ...list.listHeadings.flatMap((heading) => heading.listEntries),

@@ -43,7 +43,7 @@ export const fetchEquipmentListsForBooking = async (bookingId: number): Promise<
     return EquipmentListObjectionModel.query().where('bookingId', bookingId).orderBy('id');
 };
 
-export const fetchOutEquipmentLists = async (): Promise<any[]> => {
+export const fetchOutEquipmentLists = async (): Promise<EquipmentListObjectionModel[]> => {
     ensureDatabaseIsInitialized();
     const now = new Date();
 
