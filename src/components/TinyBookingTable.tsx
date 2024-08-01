@@ -54,7 +54,7 @@ const TinyBookingTable: React.FC<Props> = ({
     const tableSettings: TableConfiguration<BookingViewModel> = {
         entityTypeDisplayName: 'bokningar',
         defaultSortPropertyName: 'date',
-        defaultSortAscending: true,
+        defaultSortAscending: false,
         hideTableFilter: true,
         hideTableCountControls: true,
         statusColumns: [
