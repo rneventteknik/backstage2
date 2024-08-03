@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Col, Form, Modal, Row } from 'react-bootstrap';
+import React, { FormEvent, useEffect, useState } from 'react';
+import { Button, Card, Col, Form, Modal, Row } from 'react-bootstrap';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 import RequiredIndicator from '../../utils/RequiredIndicator';
-import { formatDatetime, formatDatetimeForForm } from '../../../lib/datetimeUtils';
+import { formatDatetime, formatDatetimeForForm, getFormattedInterval } from '../../../lib/datetimeUtils';
 import useSwr from 'swr';
 import { CalendarResult } from '../../../models/misc/CalendarResult';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
+import { useLocalStorageState } from '../../../lib/useLocalStorageState';
 
 type Props = {
     show: boolean;
@@ -34,33 +35,66 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
         equipmentList.equipmentInDatetime?.getTime()?.toString() ?? '',
     );
 
+    const [wizardSelectedCalendarEvent, setWizardSelectedCalendarEvent] = useState<string>('');
+    const [userHasClosedWizard, setUserHasClosedWizard] = useLocalStorageState(
+        'hide-equipment-list-calendar-wizard',
+        false,
+    );
+
     // Fetch open hours to suggest equipment in and out times
-    const { data: list, error } = useSwr('/api/calendar/open-hours', (url) =>
+    const { data: openHoursCalendarList, error: openHoursCalendarListError } = useSwr(
+        '/api/calendar/open-hours',
+        (url) =>
+            fetch(url)
+                .then((response) => getResponseContentOrError<CalendarResult[]>(response))
+                .then((calenderResults) =>
+                    calenderResults.map((calenderResult) => ({
+                        ...calenderResult,
+                        key: new Date(calenderResult.start ?? '').getTime().toString(),
+                        label: `${formatDatetime(new Date(calenderResult.start ?? ''))} - ${calenderResult.name}`,
+                    })),
+                ),
+    );
+
+    const dateWithoutTimeRegEx = /^[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]$/;
+    const calendarEventDateHasTimeComponent = (date: string | null | undefined) =>
+        !(date?.match(dateWithoutTimeRegEx) ?? false);
+    const { data: bookingsCalendarList, error: bookingsCalendarListError } = useSwr('/api/calendar', (url) =>
         fetch(url)
             .then((response) => getResponseContentOrError<CalendarResult[]>(response))
             .then((calenderResults) =>
-                calenderResults.map((calenderResult) => ({
-                    ...calenderResult,
-                    key: new Date(calenderResult.start ?? '').getTime().toString(),
-                    label: `${formatDatetime(new Date(calenderResult.start ?? ''))} - ${calenderResult.name}`,
-                })),
+                calenderResults
+                    .filter(
+                        (calenderResult) =>
+                            calendarEventDateHasTimeComponent(calenderResult.start) ||
+                            calendarEventDateHasTimeComponent(calenderResult.end),
+                    )
+                    .map((calenderResult) => ({
+                        ...calenderResult,
+                        key: calenderResult.id,
+                        label: `${calenderResult.name} (${getFormattedInterval(new Date(calenderResult.start ?? ''), new Date(calenderResult.end ?? ''), true)})`,
+                    })),
             ),
     );
 
     useEffect(() => {
-        const equipmentOutMatchingListEntry = list?.find((x) => x.key === new Date(equipmentOut).getTime()?.toString());
+        const equipmentOutMatchingListEntry = openHoursCalendarList?.find(
+            (x) => x.key === new Date(equipmentOut).getTime()?.toString(),
+        );
         if (equipmentOutMatchingListEntry) {
             setEquipmentOutCalenderSelection(equipmentOutMatchingListEntry.key);
         } else {
             setEquipmentOutCalenderSelection('');
         }
-        const equipmentInMatchingListEntry = list?.find((x) => x.key === new Date(equipmentIn).getTime()?.toString());
+        const equipmentInMatchingListEntry = openHoursCalendarList?.find(
+            (x) => x.key === new Date(equipmentIn).getTime()?.toString(),
+        );
         if (equipmentInMatchingListEntry) {
             setEquipmentInCalenderSelection(equipmentInMatchingListEntry.key);
         } else {
             setEquipmentInCalenderSelection('');
         }
-    }, [equipmentIn, equipmentOut, list]);
+    }, [equipmentIn, equipmentOut, openHoursCalendarList]);
 
     const verifyTimes = () => {
         const usageStartDatetime = new Date(usageStart);
@@ -92,9 +126,89 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
         return true;
     };
 
+    const handleSubmitWizard = (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const calendarEvent = bookingsCalendarList?.find((x) => x.id === wizardSelectedCalendarEvent);
+
+        if (!calendarEvent) {
+            throw new Error('Could not find calendar event');
+        }
+
+        setUsageStart(formatDatetimeForForm(new Date(calendarEvent.start ?? '')));
+        setUsageEnd(formatDatetimeForForm(new Date(calendarEvent.end ?? '')));
+    };
+
     return (
         <Modal show={show} onHide={() => onHide()} size="lg">
             <Modal.Body>
+                {bookingsCalendarList && !bookingsCalendarListError ? (
+                    <Card className="mb-3">
+                        <Card.Body>
+                            <div className="d-flex">
+                                <strong className="flex-grow-1">
+                                    Hämta debiterad start och sluttid från kalenderhändelse
+                                </strong>
+                                <Button
+                                    className="mr-2"
+                                    variant=""
+                                    size="sm"
+                                    onClick={() => setUserHasClosedWizard((x) => !x)}
+                                >
+                                    <FontAwesomeIcon icon={!userHasClosedWizard ? faAngleUp : faAngleDown} />
+                                </Button>
+                            </div>
+                            {!userHasClosedWizard ? (
+                                <Form
+                                    onSubmit={handleSubmitWizard}
+                                    id={equipmentList.id + 'calendar-wizard'}
+                                    className="d-flex flex-row"
+                                >
+                                    <div>
+                                        <Form.Control
+                                            as="select"
+                                            value={wizardSelectedCalendarEvent}
+                                            onChange={(e) => setWizardSelectedCalendarEvent(e.target.value)}
+                                        >
+                                            <option value="" disabled>
+                                                -
+                                            </option>
+                                            {bookingsCalendarList.map((x) => (
+                                                <option key={x.id} value={x.key}>
+                                                    {x.label}
+                                                </option>
+                                            ))}
+                                        </Form.Control>
+                                        <Form.Text className="text-muted">
+                                            <a
+                                                href={
+                                                    bookingsCalendarList.find(
+                                                        (x) => x.key == wizardSelectedCalendarEvent,
+                                                    )?.link
+                                                }
+                                                target="_blank"
+                                                rel="noreferrer"
+                                            >
+                                                Visa i Google Calender <FontAwesomeIcon icon={faExternalLinkAlt} />
+                                            </a>
+                                        </Form.Text>
+                                    </div>
+                                    <div>
+                                        <Button
+                                            form={equipmentList.id + 'calendar-wizard'}
+                                            type="submit"
+                                            variant="secondary"
+                                            className="ml-2"
+                                        >
+                                            Hämta
+                                        </Button>
+                                    </div>
+                                </Form>
+                            ) : null}
+                        </Card.Body>
+                    </Card>
+                ) : null}
+
                 <Row>
                     <Col lg={6}>
                         <Form.Group>
@@ -139,7 +253,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                     <>
                         <Row>
                             <Col lg={6}>
-                                {list && !error ? (
+                                {openHoursCalendarList && !openHoursCalendarListError ? (
                                     <Form.Group controlId="openHours">
                                         <Form.Label>
                                             Utlämning <RequiredIndicator />
@@ -149,7 +263,8 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                             value={equipmentOutCalenderSelection}
                                             onChange={(e) => {
                                                 const startTime = new Date(
-                                                    list.find((x) => x.key == e.target.value)?.start ?? '',
+                                                    openHoursCalendarList.find((x) => x.key == e.target.value)?.start ??
+                                                        '',
                                                 );
                                                 if (e.target.value === '') {
                                                     setEquipmentOutCalenderSelection('');
@@ -160,7 +275,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                             }}
                                         >
                                             <option value="">Anpassad tid</option>
-                                            {list.map((x) => (
+                                            {openHoursCalendarList.map((x) => (
                                                 <option key={x.id} value={x.key}>
                                                     {x.label}
                                                 </option>
@@ -168,7 +283,11 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                         </Form.Control>
                                         <Form.Text className="text-muted">
                                             <a
-                                                href={list.find((x) => x.key == equipmentOutCalenderSelection)?.link}
+                                                href={
+                                                    openHoursCalendarList.find(
+                                                        (x) => x.key == equipmentOutCalenderSelection,
+                                                    )?.link
+                                                }
                                                 target="_blank"
                                                 rel="noreferrer"
                                             >
@@ -190,7 +309,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                 </Form.Group>
                             </Col>
                             <Col lg={6}>
-                                {list && !error ? (
+                                {openHoursCalendarList && !openHoursCalendarListError ? (
                                     <Form.Group controlId="openHours">
                                         <Form.Label>
                                             Återlämning <RequiredIndicator />
@@ -200,7 +319,8 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                             value={equipmentInCalenderSelection}
                                             onChange={(e) => {
                                                 const startTime = new Date(
-                                                    list.find((x) => x.key == e.target.value)?.start ?? '',
+                                                    openHoursCalendarList.find((x) => x.key == e.target.value)?.start ??
+                                                        '',
                                                 );
                                                 if (e.target.value === '') {
                                                     setEquipmentInCalenderSelection('');
@@ -211,7 +331,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                             }}
                                         >
                                             <option value="">Anpassad tid</option>
-                                            {list.map((x) => (
+                                            {openHoursCalendarList.map((x) => (
                                                 <option key={x.id} value={x.key}>
                                                     {x.label}
                                                 </option>
@@ -219,7 +339,11 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                         </Form.Control>
                                         <Form.Text className="text-muted">
                                             <a
-                                                href={list.find((x) => x.key == equipmentInCalenderSelection)?.link}
+                                                href={
+                                                    openHoursCalendarList.find(
+                                                        (x) => x.key == equipmentInCalenderSelection,
+                                                    )?.link
+                                                }
                                                 target="_blank"
                                                 rel="noreferrer"
                                             >
