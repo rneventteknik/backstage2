@@ -25,7 +25,7 @@ const ConfirmModal: React.FC<Props> = ({
     children,
 }: Props) => {
     return (
-        <Modal show={show} onHide={() => onHide()}>
+        <Modal show={show} onHide={() => onHide()} backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{title}</Modal.Title>
             </Modal.Header>

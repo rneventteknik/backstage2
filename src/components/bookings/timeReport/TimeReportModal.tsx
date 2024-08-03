@@ -73,7 +73,7 @@ const TimeReportModal: React.FC<Props> = ({
     };
 
     return (
-        <Modal show={!!timeReport} onHide={() => handleHide()} size="lg">
+        <Modal show={!!timeReport} onHide={() => handleHide()} size="lg" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>
                     {readonly ? 'Visa tidsrapport' : timeReport?.id ? 'Redigera tidrapport' : 'Ny tidrapport'}

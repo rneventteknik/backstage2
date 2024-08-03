@@ -121,7 +121,7 @@ const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
         onChange(booking);
     };
     return (
-        <Modal show={show} onHide={hide} size="lg">
+        <Modal show={show} onHide={hide} size="lg" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>Verifiera bokningsinformationen</Modal.Title>
             </Modal.Header>
