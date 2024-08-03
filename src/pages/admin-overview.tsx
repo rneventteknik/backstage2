@@ -11,6 +11,7 @@ import { Role } from '../models/enums/Role';
 import AdminBookingList from '../components/admin/AdminBookingList';
 import { toBookingViewModel } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import SendMessageToBookingOwnersButton from '../components/admin/SendMessageToBookingOwnersButton';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
@@ -42,7 +43,8 @@ const AdminOverviewPage: React.FC<Props> = ({ user: currentUser, globalSettings 
     return (
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
-            <p className="text-muted">
+            <SendMessageToBookingOwnersButton bookings={bookingsToShow} />
+            <p className="text-muted mt-2">
                 I listan nedan visas endast bokningar vars startdatum har passerats, dvs inga bokningar framåt i tiden.
             </p>
             <AdminBookingList bookings={bookingsToShow} showHeadings={true} />
