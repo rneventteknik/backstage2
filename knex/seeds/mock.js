@@ -1908,6 +1908,13 @@ export async function seed(knex) {
             value: '3620',
         },
         {
+            key: 'accounts.defaultFixedPriceAccount.external',
+            note: 'Standardkonto för fast pris för externa evenemang',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: 'XXXX',
+        },
+        {
             key: 'invoice.dimension1',
             note: 'Resultatställe på fakturaexporter',
             created: getVarianceDateString(-100),
