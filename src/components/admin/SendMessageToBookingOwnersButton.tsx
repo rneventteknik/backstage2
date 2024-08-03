@@ -62,7 +62,10 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
 
     const sendMessageAndClose = () => {
         sendMessage(message, selectedBookingIds);
-        // hide();
+        setActiveTab('step-one');
+        setSelectedBookingIds([]);
+        setMessage('');
+        hide();
     };
 
     if (!bookings) {
