@@ -2013,6 +2013,13 @@ export async function seed(knex) {
             value: ' ',
         },
         {
+            key: 'content.image.documentRentalAgreementQrCodeImage',
+            note: 'Bild för QR-kod för utvärderingsformulär i hyresavtal, som base64-sträng.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: ' ',
+        },
+        {
             key: 'content.image.publicPriceHeaderImage',
             note: 'Bild för header i publika prislistan, som base64-sträng.',
             created: getVarianceDateString(-100),

@@ -66,6 +66,8 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'rental-agreement.signature.4': 'Namnförtydligande:',
         'rental-agreement.signature.5': 'Personnummer:',
         'rental-agreement.signature.6': 'Utlämnat av:',
+        'rental-agreement.qr-code.description':
+            'Vi uppskattar all feedback du kan ge oss. Hjälp oss bli ännu bättre genom att fylla detta korta formulär.',
 
         // Misc
         'common.pagenumber.label': 'Sida',
@@ -160,6 +162,7 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'rental-agreement.signature.4': 'Name in block letters:',
         'rental-agreement.signature.5': 'Personal identity number:',
         'rental-agreement.signature.6': 'Handed out by:',
+        'rental-agreement.qr-code.description': 'We appreciate any feedback you would like to give us. Help us improve by filling out this short form.',
 
         // Misc
         'common.pagenumber.label': 'Page',
