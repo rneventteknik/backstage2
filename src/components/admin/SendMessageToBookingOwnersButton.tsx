@@ -223,7 +223,7 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                                                 overlay={
                                                                     <Tooltip id="1">
                                                                         <strong>
-                                                                            Denna användare har inget slack Id
+                                                                            Denna användare har inget slack-id
                                                                             konfigurerat och kommer inte att få
                                                                             meddelandet.
                                                                         </strong>
