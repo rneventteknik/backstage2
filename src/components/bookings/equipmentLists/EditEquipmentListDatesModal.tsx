@@ -199,6 +199,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                             type="submit"
                                             variant="secondary"
                                             className="ml-2"
+                                            disabled={!wizardSelectedCalendarEvent}
                                         >
                                             Hämta
                                         </Button>
