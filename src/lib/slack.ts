@@ -15,6 +15,25 @@ export const sendSlackMessage = async (message: string, channelId: string) => {
     }
 };
 
+export const sendSlackMessageToUserRegardingBookings = async (
+    message: string,
+    bookings: { id: number; name: string }[],
+    userSlackId: string,
+) => {
+    const bookingList = bookings.map((x) => {
+        const bookingUrl = process.env.APPLICATION_BASE_URL + '/bookings/' + x.id;
+        return `>- <${bookingUrl}|${x.name}>\n`;
+    });
+
+    const formattedMessage = `${message}\n\n>Angående bokningar:\n${bookingList.join('')}`;
+
+    if (!userSlackId) {
+        throw new Error('Invalid slack channel id');
+    }
+
+    sendSlackMessage(formattedMessage, userSlackId);
+};
+
 export const sendSlackMessageForBooking = async (
     message: string,
     bookingId: number,

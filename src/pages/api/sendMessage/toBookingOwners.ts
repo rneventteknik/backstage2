@@ -1,0 +1,44 @@
+import { NextApiRequest, NextApiResponse } from 'next';
+import { respondWithCustomErrorMessage, respondWithInvalidDataResponse } from '../../../lib/apiResponses';
+import { withSessionContext } from '../../../lib/sessionContext';
+import { fetchBookings } from '../../../lib/db-access';
+import { onlyUniqueById } from '../../../lib/utils';
+import { toUser } from '../../../lib/mappers/user';
+import { sendSlackMessageToUserRegardingBookings } from '../../../lib/slack';
+
+const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+    const bookingIds: number[] = req.body.bookingIds;
+    const message: string = req.body.message;
+
+    if (!bookingIds || !Array.isArray(bookingIds) || bookingIds.length === 0) {
+        respondWithInvalidDataResponse(res);
+        return;
+    }
+
+    if (!message || message.length === 0) {
+        respondWithInvalidDataResponse(res);
+        return;
+    }
+
+    try {
+        const bookings = (await fetchBookings()).filter((x) => bookingIds.includes(x.id));
+        const recipients = bookings
+            .map((x) => x.ownerUser!)
+            .map((x) => toUser(x))
+            .filter(onlyUniqueById)
+            .filter((x) => x.slackId);
+
+        recipients.forEach(async (recipient) => {
+            const slackId = recipient.slackId;
+            const bookingsForRecipient = bookings.filter((x) => x.ownerUser!.id === recipient.id);
+
+            await sendSlackMessageToUserRegardingBookings(message, bookingsForRecipient, slackId);
+        });
+
+        res.status(200).json(true);
+    } catch (error) {
+        respondWithCustomErrorMessage(res, (error as { message: string }).message);
+    }
+});
+
+export default handler;

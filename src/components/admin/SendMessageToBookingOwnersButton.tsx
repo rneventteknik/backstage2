@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Booking } from '../../models/interfaces';
-import { Button, Card, Form, Modal, Tab } from 'react-bootstrap';
+import { Button, Card, Form, Modal, OverlayTrigger, Tab, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
-import { faEnvelope } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import AdminBookingList from './AdminBookingList';
 import { formatTime, toBookingViewModel } from '../../lib/datetimeUtils';
@@ -49,7 +49,7 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
             body: JSON.stringify(body),
         };
 
-        fetch('/api/sendSlackMessage', request)
+        fetch('/api/sendMessage/toBookingOwners', request)
             .then((apiResponse) => getResponseContentOrError(apiResponse))
             .then(() => {
                 showGeneralSuccessMessage('Meddelande skickat!');
@@ -62,12 +62,15 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
 
     const sendMessageAndClose = () => {
         sendMessage(message, selectedBookingIds);
-        hide();
+        // hide();
     };
 
     if (!bookings) {
         return <Skeleton height={150} className="mb-3" />;
     }
+
+    // The user avatar used in the preview requires a id used to generate the color. User -1 has a nice color, we we will use that one.
+    const userIdForPreview = -1;
 
     return (
         <>
@@ -184,19 +187,20 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                     <Card.Body>
                                         <div className="d-flex">
                                             <div className="p-2">
-                                                <UserIcon user={{ userId: 9, isLoggedIn: false }} />
+                                                <UserIcon user={{ userId: userIdForPreview, isLoggedIn: false }} />
                                             </div>
                                             <div className="w-100">
                                                 <p className="mb-0">
                                                     <strong>Backstage2</strong> {formatTime(now)}
                                                 </p>
                                                 <p>{message}</p>
-                                                <hr />
-                                                Angående bokningar:
-                                                <ul>
-                                                    <li>Exempelbokning 1</li>
-                                                    <li>Exempelbokning 2</li>
-                                                </ul>
+                                                <div style={{ borderLeft: '3px solid gray' }} className="pl-2">
+                                                    Angående bokningar:
+                                                    <ul>
+                                                        <li>Exempelbokning 1</li>
+                                                        <li>Exempelbokning 2</li>
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
                                     </Card.Body>
@@ -206,8 +210,34 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                     <Card.Header>Mottagare</Card.Header>
                                     <Card.Body>
                                         <ul>
-                                            {recipients.map((x) => (
-                                                <li key={x.id}>{x.name}</li>
+                                            {recipients.map((user) => (
+                                                <li key={user.id}>
+                                                    <p className="mb-0">
+                                                        {user.name}{' '}
+                                                        {!user.slackId ? (
+                                                            <OverlayTrigger
+                                                                placement="right"
+                                                                overlay={
+                                                                    <Tooltip id="1">
+                                                                        <strong>
+                                                                            Denna användare har inget slack Id
+                                                                            konfigurerat och kommer inte att få
+                                                                            meddelandet.
+                                                                        </strong>
+                                                                    </Tooltip>
+                                                                }
+                                                            >
+                                                                <FontAwesomeIcon icon={faWarning} />
+                                                            </OverlayTrigger>
+                                                        ) : null}
+                                                    </p>
+                                                    <p className="mb-0 text-muted">
+                                                        {bookings
+                                                            .filter((x) => x.ownerUser!.id === user.id)
+                                                            .map((x) => x.name)
+                                                            .join(', ')}
+                                                    </p>
+                                                </li>
                                             ))}
                                         </ul>
                                     </Card.Body>
