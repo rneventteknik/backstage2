@@ -1,10 +1,9 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Form } from 'react-bootstrap';
-import { formatDatetime, formatDatetimeForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 
-const doubleClickToEditHelpText = 'Dubbelklicka för att redigera';
+const doubleClickToEditHelpText = 'Klicka för att redigera';
 
-type DoubleClickToEditProps = {
+type ClickToEditProps = {
     children?: ReactNode;
     value?: string;
     size?: 'sm' | 'lg' | undefined;
@@ -16,7 +15,7 @@ type DoubleClickToEditProps = {
     max?: string;
 };
 
-export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
+export const ClickToEdit: React.FC<ClickToEditProps> = ({
     value,
     onUpdate,
     size,
@@ -26,7 +25,7 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
     className,
     min,
     max,
-}: DoubleClickToEditProps) => {
+}: ClickToEditProps) => {
     const [trackedValue, setTrackedValue] = useState(value ?? '');
     const [isEditing, setIsEditing] = useState(false);
 
@@ -35,6 +34,11 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
         if (trackedValue !== value) {
             onUpdate(trackedValue);
         }
+    };
+
+    const startEditing = () => {
+        setTrackedValue(value ?? '');
+        setIsEditing(true);
     };
 
     if (readonly) {
@@ -49,7 +53,7 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
                 title={doubleClickToEditHelpText}
                 tabIndex={0}
                 onDoubleClick={() => setIsEditing(true)}
-                onFocus={() => setIsEditing(true)}
+                onFocus={() => startEditing()}
             >
                 {children}
             </span>
@@ -74,52 +78,7 @@ export const DoubleClickToEdit: React.FC<DoubleClickToEditProps> = ({
     );
 };
 
-type DoubleClickToEditDatetimeProps = {
-    value?: Date | null;
-    onUpdate: (x: Date | undefined) => void;
-    size?: 'sm' | 'lg' | undefined;
-    readonly?: boolean;
-    className?: string;
-    placeholder?: string;
-    min?: string;
-    max?: string;
-};
-
-export const DoubleClickToEditDatetime: React.FC<DoubleClickToEditDatetimeProps> = ({
-    value,
-    onUpdate,
-    size,
-    readonly,
-    className,
-    placeholder = 'N/A',
-    min,
-    max,
-}: DoubleClickToEditDatetimeProps) => {
-    return (
-        <DoubleClickToEdit
-            inputType="datetime-local"
-            value={value ? formatDatetimeForForm(value) : ''}
-            onUpdate={(newValue) => onUpdate(toDatetimeOrUndefined(newValue))}
-            size={size}
-            readonly={readonly}
-            className={className}
-            min={min}
-            max={max}
-        >
-            <div className="mb-3">
-                {value ? (
-                    formatDatetime(value)
-                ) : (
-                    <span className="text-muted" title="Dubbelklicka för att konfigurera">
-                        {placeholder}
-                    </span>
-                )}
-            </div>
-        </DoubleClickToEdit>
-    );
-};
-
-type DoubleClickToEditDropdownProps<T> = {
+type ClickToEditDropdownProps<T> = {
     children?: ReactNode;
     options: T[];
     optionLabelFn: (option: T) => string;
@@ -131,7 +90,7 @@ type DoubleClickToEditDropdownProps<T> = {
     readonly?: boolean;
 };
 
-export const DoubleClickToEditDropdown = <T,>({
+export const ClickToEditDropdown = <T,>({
     value,
     options,
     optionLabelFn,
@@ -141,7 +100,7 @@ export const DoubleClickToEditDropdown = <T,>({
     size,
     children,
     readonly,
-}: DoubleClickToEditDropdownProps<T>): React.ReactElement => {
+}: ClickToEditDropdownProps<T>): React.ReactElement => {
     const [selectedKey, setSelectedKey] = useState(optionKeyFn(value));
     const [isEditing, setIsEditing] = useState(false);
 

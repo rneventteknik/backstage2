@@ -7,9 +7,10 @@ import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScr
 type Props = {
     entity: EquipmentPublicCategory;
     save: (x: EquipmentPublicCategory) => void;
+    readOnly?: boolean;
 };
 
-const EquipmentPublicCategoryEditor: React.FC<Props> = ({ entity, save }: Props) => {
+const EquipmentPublicCategoryEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Props) => {
     return (
         <>
             <Form.Group controlId="formName">
@@ -17,6 +18,7 @@ const EquipmentPublicCategoryEditor: React.FC<Props> = ({ entity, save }: Props)
                 <Form.Control
                     type="text"
                     defaultValue={entity?.name}
+                    readOnly={readOnly}
                     onChange={(e) => save({ ...entity, name: e.target.value })}
                 />
             </Form.Group>
@@ -25,6 +27,7 @@ const EquipmentPublicCategoryEditor: React.FC<Props> = ({ entity, save }: Props)
                 <Form.Control
                     as="textarea"
                     rows={3}
+                    readOnly={readOnly}
                     onChange={(e) => save({ ...entity, description: e.target.value })}
                     defaultValue={entity.description}
                 />
@@ -35,6 +38,7 @@ const EquipmentPublicCategoryEditor: React.FC<Props> = ({ entity, save }: Props)
                     type="number"
                     min="0"
                     value={entity.sortIndex}
+                    readOnly={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,

@@ -5,10 +5,11 @@ import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
 
 type Props = {
     entity: EquipmentTag;
+    readOnly?: boolean;
     save: (x: EquipmentTag) => void;
 };
 
-const EquipmentTagEditor: React.FC<Props> = ({ entity, save }: Props) => {
+const EquipmentTagEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Props) => {
     return (
         <>
             <Form.Group controlId="formName">
@@ -16,6 +17,7 @@ const EquipmentTagEditor: React.FC<Props> = ({ entity, save }: Props) => {
                 <Form.Control
                     type="text"
                     defaultValue={entity?.name}
+                    readOnly={readOnly}
                     onChange={(e) => save({ ...entity, name: e.target.value })}
                 />
             </Form.Group>
@@ -24,6 +26,7 @@ const EquipmentTagEditor: React.FC<Props> = ({ entity, save }: Props) => {
                     type="checkbox"
                     label="Visa i publika prislistan"
                     defaultChecked={entity?.isPublic ?? false}
+                    disabled={readOnly}
                     onChange={(e) => save({ ...entity, isPublic: e.target.checked })}
                 />
             </Form.Group>
@@ -33,6 +36,7 @@ const EquipmentTagEditor: React.FC<Props> = ({ entity, save }: Props) => {
                     type="text"
                     placeholder="#FF0000"
                     defaultValue={entity?.color}
+                    readOnly={readOnly}
                     onChange={(e) => save({ ...entity, color: e.target.value })}
                 />
             </Form.Group>

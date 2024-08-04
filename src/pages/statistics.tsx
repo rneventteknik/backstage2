@@ -1,12 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../components/layout/Layout';
 import Header from '../components/layout/Header';
 import useSwr from 'swr';
 import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
-import { Card, Nav, Tab } from 'react-bootstrap';
+import { Card, Form, Nav, Tab } from 'react-bootstrap';
 import { bookingsFetcher } from '../lib/fetchers';
-import { getOperationalYear, groupBy, onlyUniqueById, reduceSumFn } from '../lib/utils';
+import { getOperationalYear, getStatusName, groupBy, notEmpty, onlyUniqueById, reduceSumFn } from '../lib/utils';
 import { TableLoadingPage } from '../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../components/layout/ErrorPage';
 import { TableConfiguration, TableDisplay } from '../components/TableDisplay';
@@ -19,6 +19,7 @@ import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import AccountStatistics from '../components/statistics/AccountStatistics';
 import currency from 'currency.js';
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -213,6 +214,8 @@ const getUserStatistics = (bookings: BookingViewModel[]): UserStatisticViewModel
 //
 const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: bookings, error } = useSwr('/api/bookings', bookingsFetcher);
+    const [statuses, setStatuses] = useState<Status[]>([Status.DONE]);
+    const [includeFixedPriceZero, setIncludeFixedPriceZero] = useState<boolean>(true);
 
     if (error) {
         return (
@@ -229,9 +232,16 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
+    const statusOptions = [Status.DRAFT, Status.BOOKED, Status.DONE, Status.CANCELED].map((status) => ({
+        label: getStatusName(status),
+        value: status,
+    }));
+
     const bookingsViewModels = bookings
         ?.map(toBookingViewModel)
-        ?.filter((b) => b.usageStartDatetime && b.status === Status.DONE);
+        ?.filter((b) => b.usageStartDatetime)
+        ?.filter((b) => includeFixedPriceZero || b.fixedPrice !== 0)
+        ?.filter((booking: BookingViewModel) => statuses.length === 0 || statuses.indexOf(booking.status) >= 0);
 
     // Table display functions
     //
@@ -417,6 +427,36 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
 
+            <Card className="mb-3 mt-3">
+                <Card.Header>Filter</Card.Header>
+                <Card.Body>
+                    <Form inline>
+                        <Form.Group controlId="statuses" className="mr-3">
+                            <Form.Label className="mr-2">Status</Form.Label>
+                            <Typeahead<{ label: string; value: Status }>
+                                id="status-typeahead"
+                                multiple
+                                labelKey={(x) => x.label}
+                                options={statusOptions}
+                                onChange={(e) => setStatuses(e.map((o) => o.value))}
+                                placeholder="Filtrera på status"
+                                selected={statuses
+                                    .map((id) => statusOptions.find((x) => x.value === id))
+                                    .filter(notEmpty)}
+                            />
+                        </Form.Group>
+                        <Form.Group controlId="includeFixedPriceZero">
+                            <Form.Check
+                                type="checkbox"
+                                label={`Inkludera bokningar med fast pris ${formatNumberAsCurrency(0)}`}
+                                checked={includeFixedPriceZero}
+                                onChange={() => setIncludeFixedPriceZero(!includeFixedPriceZero)}
+                            />
+                        </Form.Group>
+                    </Form>
+                </Card.Body>
+            </Card>
+
             <Tab.Container id="statistics-tabs" defaultActiveKey="equipment" transition={false}>
                 <Nav variant="pills" className="flex-row">
                     <Nav.Item>
@@ -432,9 +472,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
                         <Nav.Link eventKey="accounts">Konton</Nav.Link>
                     </Nav.Item>
                 </Nav>
-                <p className="text-muted font-italic mt-2">
-                    Statistiken nedan är presenterad exklusive moms och endast klarmarkerade bokningar är inkluderade.
-                </p>
+                <p className="text-muted font-italic mt-2">Statistiken nedan är presenterad exklusive moms.</p>
                 <Tab.Content>
                     <Tab.Pane eventKey="equipment">
                         {statistics.map((yearlyStatistics) => (

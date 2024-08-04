@@ -160,7 +160,7 @@ export const toEquipmentListEntryObjectionModel = (
         updated: undefined,
         id: clientModel.id,
         equipment: undefined,
-        equipmentId: clientModel.equipment?.id,
+        equipmentId: clientModel.equipment?.id ?? null,
         equipmentPrice: undefined,
         equipmentPriceId: clientModel.equipmentPrice?.id ?? null,
         pricePerHour: clientModel.pricePerHour?.value,

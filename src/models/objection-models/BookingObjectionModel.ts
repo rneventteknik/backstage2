@@ -267,7 +267,7 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
 
     sortIndex: number;
     equipment?: IEquipmentObjectionModel;
-    equipmentId?: number;
+    equipmentId?: number | null;
     name: string;
     description: string;
 

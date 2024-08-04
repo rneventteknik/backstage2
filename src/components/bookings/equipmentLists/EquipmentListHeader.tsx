@@ -17,7 +17,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
-import { DoubleClickToEdit } from '../../utils/DoubleClickToEdit';
+import { ClickToEdit } from '../../utils/DoubleClickToEdit';
 import { addVAT, formatCurrency, getEquipmentListPrice } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import {
@@ -114,7 +114,7 @@ const EquipmentListHeader: React.FC<Props> = ({
         <>
             <div className="d-flex">
                 <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
-                    <DoubleClickToEdit
+                    <ClickToEdit
                         value={list.name}
                         onUpdate={(newValue: string) =>
                             saveList({
@@ -125,7 +125,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                         readonly={readonly}
                     >
                         {list.name}
-                    </DoubleClickToEdit>
+                    </ClickToEdit>
                 </div>
                 <div className="d-flex">
                     <Button className="mr-2" variant="" onClick={() => toggleListContent()}>
@@ -358,7 +358,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                     <div className="d-flex">
                         <div className="flex-grow-1">
                             <div className="mb-3" style={{ fontSize: '1.2em' }}>
-                                <DoubleClickToEdit
+                                <ClickToEdit
                                     value={list.numberOfDays?.toString()}
                                     inputType="number"
                                     onUpdate={(newValue) =>
@@ -371,7 +371,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     className="mb-3 d-block"
                                 >
                                     {list.numberOfDays} {list.numberOfDays != 1 ? 'dagar' : 'dag'}
-                                </DoubleClickToEdit>
+                                </ClickToEdit>
                             </div>
                         </div>
                         {readonly ? null : (

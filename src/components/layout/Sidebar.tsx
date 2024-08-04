@@ -103,6 +103,7 @@ const sidebar: React.FC<Props> = ({ currentUser, globalSettings }: Props) => (
             <SidebarLink displayName="Utrustning" link="/equipment" icon={faCube} />
             <SidebarLink displayName="Användare" link="/users" icon={faUsers} />
             <SidebarLink displayName="Statistik" link="/statistics" icon={faChartPie} />
+            <SidebarLink displayName="Inställningar" link="/settings" icon={faCog} />
         </SidebarLinkGroup>
 
         <IfAdmin currentUser={currentUser}>
@@ -110,7 +111,6 @@ const sidebar: React.FC<Props> = ({ currentUser, globalSettings }: Props) => (
                 <SidebarLink displayName="Översikt" link="/admin-overview" icon={faListCheck} />
                 <SidebarLink displayName="Timarvodesunderlag" link="/salary" icon={faMoneyBillWave} />
                 <SidebarLink displayName="Fakturaunderlag" link="/invoices" icon={faFileInvoiceDollar} />
-                <SidebarLink displayName="Inställningar" link="/settings" icon={faCog} />
             </SidebarLinkGroup>
         </IfAdmin>
 
