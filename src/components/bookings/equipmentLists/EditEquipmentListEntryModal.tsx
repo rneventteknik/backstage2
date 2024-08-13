@@ -329,7 +329,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     pricePerUnit: equipmentListEntryToEditViewModel.pricePerUnit ?? currency(0),
                                     pricePerHour: equipmentListEntryToEditViewModel.pricePerHour ?? currency(0),
                                     discount: equipmentListEntryToEditViewModel.discount ?? currency(0),
-                                    equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
+                                    equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice ?? null,
                                     isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
                                     account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),
                                 };

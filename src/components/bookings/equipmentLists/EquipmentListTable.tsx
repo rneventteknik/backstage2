@@ -471,7 +471,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             onClick={() =>
                                 saveListEntry({
                                     ...entry,
-                                    equipmentPrice: undefined,
+                                    equipmentPrice: null,
                                     pricePerUnit: currency(0),
                                     pricePerHour: currency(0),
                                 })
@@ -536,6 +536,8 @@ const EquipmentListTable: React.FC<Props> = ({
 
             // Save inner entity as well
             movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
+
+            console.log(movedItems);
 
             // Save list
             saveSortIndexOfViewModels(movedItems, saveListEntriesAndHeadings);
