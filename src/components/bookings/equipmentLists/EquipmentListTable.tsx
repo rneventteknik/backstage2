@@ -537,8 +537,6 @@ const EquipmentListTable: React.FC<Props> = ({
             // Save inner entity as well
             movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
 
-            console.log(movedItems);
-
             // Save list
             saveSortIndexOfViewModels(movedItems, saveListEntriesAndHeadings);
 
