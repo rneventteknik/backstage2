@@ -1,6 +1,6 @@
 import React from 'react';
 import { Booking } from '../../models/interfaces';
-import { Page, View, Text, Document } from '@react-pdf/renderer';
+import { Page, View, Text, Document, Link } from '@react-pdf/renderer';
 import { commonStyles } from '../utils';
 import { BookingInfo } from './shared/bookingInfo';
 import { PageCount } from './shared/pageCount';
@@ -51,7 +51,10 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking, globalSettings
                         priceByAgreement={!showPrices}
                     />
                     <Text style={styles.bold}>{t('price-estimate.legal-note.title')}</Text>
-                    <Text>{t('price-estimate.legal-note.content')}</Text>
+                    <Text>
+                        {t('price-estimate.legal-note.content')}{' '}
+                        <Link src={t('price-estimate.legal-note.url')}>{t('price-estimate.legal-note.url')}</Link>
+                    </Text>
                 </MainContent>
 
                 <Footer booking={booking} />
