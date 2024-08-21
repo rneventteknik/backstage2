@@ -32,7 +32,7 @@ const BookingSearchCustomerModal: React.FC<Props> = ({
     };
 
     return (
-        <Modal show={show} onHide={onCancel} size="lg">
+        <Modal show={show} onHide={onCancel} size="lg" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>Sök kund</Modal.Title>
             </Modal.Header>

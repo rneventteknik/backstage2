@@ -233,7 +233,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                 Vill du verkligen ta bort inloggningsuppgifterna för användaren {user.name}?
             </ConfirmModal>
 
-            <Modal show={showEditAuthModal} onHide={() => setShowEditAuthModal(false)}>
+            <Modal show={showEditAuthModal} onHide={() => setShowEditAuthModal(false)} backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>{user.username ? 'Redigera inloggningsuppgifter' : 'Skapa inloggning'}</Modal.Title>
                 </Modal.Header>

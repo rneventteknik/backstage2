@@ -30,7 +30,7 @@ const PackageInfoModal: React.FC<Props> = ({ show, onHide, onSave, equipmentPack
     }, [onSave]);
 
     return (
-        <Modal show={show} onHide={() => onHide()}>
+        <Modal show={show} onHide={() => onHide()} backdrop="static">
             <Form>
                 <Modal.Header>
                     <Modal.Title>Lägg till utrustning från paket</Modal.Title>

@@ -93,7 +93,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
     };
 
     return (
-        <Modal show={show} onHide={() => onHide()} size="lg">
+        <Modal show={show} onHide={() => onHide()} size="lg" backdrop="static">
             <Modal.Body>
                 <Row>
                     <Col lg={6}>

@@ -71,7 +71,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                 </Dropdown>
             </Navbar>
 
-            <Modal show={showHelpModal} onHide={() => setShowHelpModal(false)} size="xl">
+            <Modal show={showHelpModal} onHide={() => setShowHelpModal(false)} size="xl" backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Hjälp</Modal.Title>
                 </Modal.Header>

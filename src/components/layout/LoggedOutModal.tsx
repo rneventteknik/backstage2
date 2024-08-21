@@ -43,7 +43,7 @@ const LoggedOutModal: React.FC<Props> = ({ currentUser, globalSettings }: Props)
     const loginPageUrl = '/login?redirectUrl=' + router.asPath;
 
     return (!hideModal && isSoonLoggedOut) || isLoggedOut ? (
-        <Modal show={true}>
+        <Modal show={true} backdrop="static">
             <Modal.Header>
                 <Modal.Title>{isLoggedOut ? 'Utloggad' : 'Snart utloggad'}</Modal.Title>
             </Modal.Header>

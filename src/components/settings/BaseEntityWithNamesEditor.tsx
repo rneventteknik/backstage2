@@ -209,7 +209,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
                 Vill du verkligen ta bort {entityToDelete?.name}?
             </ConfirmModal>
 
-            <Modal show={entityToEdit !== null} onHide={() => setEntityToEdit(null)}>
+            <Modal show={entityToEdit !== null} onHide={() => setEntityToEdit(null)} backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>{readonly ? entityToEdit?.name : 'Redigera ' + entityToEdit?.name}</Modal.Title>
                 </Modal.Header>

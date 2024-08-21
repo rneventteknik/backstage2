@@ -51,7 +51,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
 }: Props) => {
     const invoiceAccounts: Account[] = JSON.parse(getGlobalSetting('accounts.availableAccounts', globalSettings, '[]'));
     return (
-        <Modal show={show} onHide={() => onHide()} size="lg">
+        <Modal show={show} onHide={() => onHide()} size="lg" backdrop="static">
             {!!equipmentListEntryToEditViewModel ? (
                 <Modal.Body>
                     <Row>
