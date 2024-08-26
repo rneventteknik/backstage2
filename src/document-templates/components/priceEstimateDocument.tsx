@@ -53,7 +53,7 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking, globalSettings
                     <Text style={styles.bold}>{t('price-estimate.legal-note.title')}</Text>
                     <Text>
                         {t('price-estimate.legal-note.content')}{' '}
-                        <Link src={t('price-estimate.legal-note.url')}>{t('price-estimate.legal-note.url')}</Link>
+                        <Link src={t('price-estimate.legal-note.url')}>{t('price-estimate.legal-note.shown-url')}</Link>
                     </Text>
                 </MainContent>
 

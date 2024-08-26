@@ -49,7 +49,8 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'price-estimate.legal-note.title': 'Observera',
         'price-estimate.legal-note.content':
             'Ovanstående är en prisuppskattning. Det är den faktiska tidsåtgången och använd utrustning som faktureras. Fullständiga hyresvillkor återfinns på',
-        'price-estimate.legal-note.url': 'www.rneventteknik.se/terms',
+        'price-estimate.legal-note.url': 'https://www.rneventteknik.se/terms',
+        'price-estimate.legal-note.shown-url': 'rneventteknik.se/terms',
 
         // Packing list
         'packing-list.filename': 'Packlista',
@@ -145,7 +146,8 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'price-estimate.legal-note.title': 'Please observe',
         'price-estimate.legal-note.content':
             'The above is a price estimate. It is the actual time required and used equipment that is invoiced. Term and conditions are available at',
-        'price-estimate.legal-note.url': 'www.rneventteknik.se/terms',
+        'price-estimate.legal-note.url': 'https://www.rneventteknik.se/terms',
+        'price-estimate.legal-note.shown-url': 'rneventteknik.se/terms',
 
         // Packing list
         'packing-list.filename': 'Packing List',
