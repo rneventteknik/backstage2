@@ -34,17 +34,15 @@ const PreviousBookingsCard: React.FC<Props> = ({ hogiaId, bookingId }: Props) =>
     }
 
     return (
-        <>
-            <Card className="mb-3">
-                <Card.Header className="d-flex">
-                <span className='flex-grow-1'>Andra bokningar för kund</span>
-                    <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
-                        <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
-                    </Button>
-                </Card.Header>
-                {showContent ? <PreviousBookingsCardList hogiaId={hogiaId} bookingId={bookingId}/> : null}
-            </Card>
-        </>
+        <Card className="mb-3">
+            <Card.Header className="d-flex">
+            <span className='flex-grow-1'>Andra bokningar för kund</span>
+                <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+                    <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
+                </Button>
+            </Card.Header>
+            {showContent ? <PreviousBookingsCardList hogiaId={hogiaId} bookingId={bookingId}/> : null}
+        </Card>
     );
 };
 
