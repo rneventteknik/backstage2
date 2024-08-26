@@ -1,6 +1,6 @@
 import React from 'react';
 import { Booking } from '../../models/interfaces';
-import { Page, View, Text, Document } from '@react-pdf/renderer';
+import { Page, View, Text, Document, Link } from '@react-pdf/renderer';
 import { commonStyles } from '../utils';
 import { BookingInfo } from './shared/bookingInfo';
 import { PageCount } from './shared/pageCount';
@@ -58,7 +58,12 @@ export const RentalConfirmationDocument: React.FC<Props> = ({ booking, globalSet
                         <Text style={[styles.bold, styles.marginTopLarge]}>
                             {t('rental-agreement.legal-note.title')}
                         </Text>
-                        <Text>{t('rental-agreement.legal-note.content')}</Text>
+                        <Text>
+                            {t('rental-agreement.legal-note.content')}{' '}
+                            <Link src={t('rental-agreement.legal-note.url')}>
+                                {t('rental-agreement.legal-note.url')}
+                            </Link>
+                        </Text>
 
                         <View>
                             <Row>
