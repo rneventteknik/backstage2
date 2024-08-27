@@ -60,6 +60,7 @@ import ConfirmModal from '../../../components/utils/ConfirmModal';
 import BookingInfoSection from '../../../components/bookings/BookingInfoSection';
 import FilesCard from '../../../components/bookings/FilesCard';
 import currency from 'currency.js';
+import PreviousBookingsCard from '../../../components/bookings/PreviousBookingsCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -520,13 +521,13 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         onSubmit={(driveFolderId) => saveBooking({ driveFolderId })}
                         readonly={readonly}
                     />
-
                     <MarkdownCard
                         text={booking.returnalNote}
                         onSubmit={(returnalNote) => saveBooking({ returnalNote })}
                         cardTitle="Återlämningsanmärkning"
                         readonly={readonly}
                     />
+                    <PreviousBookingsCard hogiaId={booking.invoiceHogiaId} bookingId={booking.id}/>
                     <ChangelogCard changelog={booking.changelog ?? []} />
                 </Col>
             </Row>
