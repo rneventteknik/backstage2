@@ -84,7 +84,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
     }
 
     return (
-        <Modal show={show} onHide={() => resetAndHide()} size="xl">
+        <Modal show={show} onHide={() => resetAndHide()} size="xl" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>Skapa Fakturaunderlagsgrupp</Modal.Title>
             </Modal.Header>

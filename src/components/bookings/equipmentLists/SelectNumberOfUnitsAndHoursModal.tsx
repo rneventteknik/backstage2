@@ -88,7 +88,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
     };
 
     return (
-        <Modal show={show} onHide={() => onHide()}>
+        <Modal show={show} onHide={() => onHide()} backdrop="static">
             <Form>
                 <Modal.Header>
                     <Modal.Title>{title}</Modal.Title>

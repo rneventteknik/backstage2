@@ -500,7 +500,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
     };
 
     return (
-        <Modal show={show} onHide={() => resetAndHide()} size="lg">
+        <Modal show={show} onHide={() => resetAndHide()} size="lg" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>Hämta utrustning från bokning</Modal.Title>
             </Modal.Header>

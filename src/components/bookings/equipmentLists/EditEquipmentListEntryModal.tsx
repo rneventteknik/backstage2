@@ -51,7 +51,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
 }: Props) => {
     const invoiceAccounts: Account[] = JSON.parse(getGlobalSetting('accounts.availableAccounts', globalSettings, '[]'));
     return (
-        <Modal show={show} onHide={() => onHide()} size="lg">
+        <Modal show={show} onHide={() => onHide()} size="lg" backdrop="static">
             {!!equipmentListEntryToEditViewModel ? (
                 <Modal.Body>
                     <Row>
@@ -329,7 +329,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     pricePerUnit: equipmentListEntryToEditViewModel.pricePerUnit ?? currency(0),
                                     pricePerHour: equipmentListEntryToEditViewModel.pricePerHour ?? currency(0),
                                     discount: equipmentListEntryToEditViewModel.discount ?? currency(0),
-                                    equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice,
+                                    equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice ?? null,
                                     isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
                                     account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),
                                 };

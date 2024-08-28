@@ -24,8 +24,7 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
     ...rest
 }: Props & React.ComponentProps<typeof Button>) => {
     const [timeEstimateViewModel, setTimeEstimateViewModel] = useState<Partial<TimeEstimate> | undefined>(undefined);
-    const { showCreateSuccessNotification, showCreateFailedNotification } =
-        useNotifications();
+    const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
 
     const addTimeEstimate = async (timeEstimate: ITimeEstimateObjectionModel) => {
         addTimeEstimateApiCall(timeEstimate, booking.id)

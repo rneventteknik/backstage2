@@ -48,7 +48,9 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'price-estimate.title': 'Prisuppskattning',
         'price-estimate.legal-note.title': 'Observera',
         'price-estimate.legal-note.content':
-            'Ovanstående är en prisuppskattning. Det är den faktiska tidsåtgången och använd utrustning som faktureras. Ni som arrangör ansvarar för att utrustningen inte blir stulen eller förstörd.',
+            'Ovanstående är en prisuppskattning. Det är den faktiska tidsåtgången och använd utrustning som faktureras. Fullständiga hyresvillkor återfinns på',
+        'price-estimate.legal-note.url': 'https://www.rneventteknik.se/terms',
+        'price-estimate.legal-note.shown-url': 'rneventteknik.se/terms',
 
         // Packing list
         'packing-list.filename': 'Packlista',
@@ -59,7 +61,8 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'rental-agreement.title': 'Hyresavtal',
         'rental-agreement.legal-note.title': 'Hyresvillkor',
         'rental-agreement.legal-note.content':
-            'Utrustningen skall lämnas tillbaka i det skick och nedpackat på samma vis som den hämtades i. Detta innebär att alla kablar skall rullas ihop snyggt och om något blivit smutsigt, kladdigt eller lämnats kvar tejprester på skall detta göras rent.',
+            'Genom att signera detta avtal godkänner Hyrestagaren villkoren som återfinns på',
+        'rental-agreement.legal-note.url': 'www.rneventteknik.se/terms',
         'rental-agreement.signature.1': 'Namnteckning:',
         'rental-agreement.signature.2': 'Datum:',
         'rental-agreement.signature.3': 'Ort:',
@@ -144,7 +147,9 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'price-estimate.title': 'Price estimate',
         'price-estimate.legal-note.title': 'Please observe',
         'price-estimate.legal-note.content':
-            'The above is a price estimate. It is the actual time required and used equipment that is invoiced. You as the organizer are responsible for ensuring that the equipment is not stolen or destroyed',
+            'The above is a price estimate. It is the actual time required and used equipment that is invoiced. Term and conditions are available at',
+        'price-estimate.legal-note.url': 'https://www.rneventteknik.se/terms',
+        'price-estimate.legal-note.shown-url': 'rneventteknik.se/terms',
 
         // Packing list
         'packing-list.filename': 'Packing List',
@@ -155,7 +160,8 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'rental-agreement.title': 'Rental agreement',
         'rental-agreement.legal-note.title': 'Rental conditions',
         'rental-agreement.legal-note.content':
-            'The equipment shall be returned in the same condition and packed in the same wat as it was picked up in. All cabled should be neatly rolled and if anything has become dirty or sticky it must be cleaned.',
+            'By signing this agreement the Lessee is accepting the terms and conditions found at',
+        'rental-agreement.legal-note.url': 'www.rneventteknik.se/terms',
         'rental-agreement.signature.1': 'Signature:',
         'rental-agreement.signature.2': 'Date:',
         'rental-agreement.signature.3': 'Place:',
