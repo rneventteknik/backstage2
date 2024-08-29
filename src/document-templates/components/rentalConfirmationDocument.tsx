@@ -64,7 +64,13 @@ export const RentalConfirmationDocument: React.FC<Props> = ({ booking, globalSet
                             <View wrap={false} style={{ position: 'absolute', bottom: 0 }}>
                                 <View style={{ ...styles.row, marginBottom: 20, marginTop: 4 }}>
                                     <Image style={styles.qrCodeImage} src={qrCodeImageSrc} />
-                                    <View style={{ ...styles.col, justifyContent: 'flex-end' }}>
+                                    <View
+                                        style={{
+                                            ...styles.col,
+                                            justifyContent: 'flex-end',
+                                            paddingBottom: 0,
+                                        }}
+                                    >
                                         <Text style={{ width: 100 }}>{t('rental-agreement.qr-code.description')}</Text>
                                     </View>
                                 </View>
