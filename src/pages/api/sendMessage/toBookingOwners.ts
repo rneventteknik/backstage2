@@ -28,12 +28,14 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             .filter(onlyUniqueById)
             .filter((x) => x.slackId);
 
-        recipients.forEach(async (recipient) => {
-            const slackId = recipient.slackId;
-            const bookingsForRecipient = bookings.filter((x) => x.ownerUser!.id === recipient.id);
+        await Promise.all(
+            recipients.map((recipient) => {
+                const slackId = recipient.slackId;
+                const bookingsForRecipient = bookings.filter((x) => x.ownerUser!.id === recipient.id);
 
-            await sendSlackMessageToUserRegardingBookings(message, bookingsForRecipient, slackId);
-        });
+                return sendSlackMessageToUserRegardingBookings(message, bookingsForRecipient, slackId);
+            }),
+        );
 
         res.status(200).json(true);
     } catch (error) {
