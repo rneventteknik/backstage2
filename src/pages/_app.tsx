@@ -1,5 +1,5 @@
 import '../style/style.scss';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppProps } from 'next/app';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -19,6 +19,17 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 config.autoAddCss = false;
 
 export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
+    useEffect(() => {
+        const odds = 1000;
+        const result = Math.floor(Math.random() * odds + 1);
+
+        if (result === 1) {
+            const style = document.createElement('style');
+            style.textContent = "* { font-family: 'Comic Sans MS'; }";
+            document.head.append(style);
+        }
+    }, []);
+
     return (
         <DndProvider backend={HTML5Backend}>
             <Provider>
