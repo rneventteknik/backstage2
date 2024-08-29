@@ -237,6 +237,7 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                                     <p className="mb-0 text-muted">
                                                         {bookings
                                                             .filter((x) => x.ownerUser!.id === user.id)
+                                                            .filter((x) => selectedBookingIds.includes(x.id))
                                                             .map((x) => x.name)
                                                             .join(', ')}
                                                     </p>
