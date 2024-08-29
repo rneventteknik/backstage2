@@ -14,7 +14,7 @@ type Props = {
 
 const SettingsModal: React.FC<Props> = ({ setting, onSubmit, onChange, hide, show }: Props) => {
     return (
-        <Modal show={show} onHide={hide} size="lg">
+        <Modal show={show} onHide={hide} size="lg" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title> {setting?.id ? 'Redigera inställning' : 'Lägg till inställning'}</Modal.Title>
             </Modal.Header>

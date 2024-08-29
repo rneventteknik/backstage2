@@ -186,10 +186,10 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
         };
     };
 
-    const getEquipmentName = (equipment: Equipment | undefined) =>
+    const getEquipmentName = (equipment: Equipment | undefined | null) =>
         language === Language.SV ? equipment?.name : equipment?.nameEN;
 
-    const getEquipmentDescription = (equipment: Equipment | undefined) =>
+    const getEquipmentDescription = (equipment: Equipment | undefined | null) =>
         language === Language.SV ? equipment?.description : equipment?.descriptionEN;
 
     const isDisabled = (entry: EquipmentListEntry) => entry.equipment?.isArchived;
@@ -500,7 +500,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
     };
 
     return (
-        <Modal show={show} onHide={() => resetAndHide()} size="lg">
+        <Modal show={show} onHide={() => resetAndHide()} size="lg" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>Hämta utrustning från bokning</Modal.Title>
             </Modal.Header>

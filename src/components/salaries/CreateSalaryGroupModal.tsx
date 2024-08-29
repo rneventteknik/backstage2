@@ -92,7 +92,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
     }
 
     return (
-        <Modal show={show} onHide={() => resetAndHide()} size="xl">
+        <Modal show={show} onHide={() => resetAndHide()} size="xl" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>Skapa Timarvodesunderlagsgrupp</Modal.Title>
             </Modal.Header>

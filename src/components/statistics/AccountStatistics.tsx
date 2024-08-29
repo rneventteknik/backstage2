@@ -387,7 +387,7 @@ const AccountStatisticDetailsModal: React.FC<AccountStatisticDetailsModalProps> 
         ],
     };
     return (
-        <Modal show={show} onHide={() => onHide()} size="xl">
+        <Modal show={show} onHide={() => onHide()} size="xl" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>Detaljer</Modal.Title>
             </Modal.Header>

@@ -471,7 +471,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             onClick={() =>
                                 saveListEntry({
                                     ...entry,
-                                    equipmentPrice: undefined,
+                                    equipmentPrice: null,
                                     pricePerUnit: currency(0),
                                     pricePerHour: currency(0),
                                 })

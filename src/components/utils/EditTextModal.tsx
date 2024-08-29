@@ -36,7 +36,7 @@ const EditTextModal: React.FC<Props> = ({
         onCancelCallback ? onCancelCallback() : null;
     };
     return (
-        <Modal show={show} onHide={onCancel} size="lg">
+        <Modal show={show} onHide={onCancel} size="lg" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>

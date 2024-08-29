@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { IfNotReadonly } from '../components/utils/IfAdmin';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import CurrentlyOutEquipment from '../components/CurrentlyOutEquipment';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -74,6 +75,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                         bookings={outBookings}
                         showDateHeadings={false}
                     ></TinyBookingTable>
+                    <CurrentlyOutEquipment />
                     <Card className="mb-3">
                         <Card.Header className="d-flex">
                             <span className="flex-grow-1">Aktivitet</span>

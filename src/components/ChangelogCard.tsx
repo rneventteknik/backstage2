@@ -32,7 +32,7 @@ const ChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
                     ))}
                 </ListGroup>
             </Card>
-            <Modal show={showAllModal} onHide={() => setShowAllModal(false)} size="lg">
+            <Modal show={showAllModal} onHide={() => setShowAllModal(false)} size="lg" backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Ändringshistorik</Modal.Title>
                 </Modal.Header>
