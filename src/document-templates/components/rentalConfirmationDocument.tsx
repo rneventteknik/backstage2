@@ -28,8 +28,6 @@ const styles = {
     qrCodeImage: {
         height: '80pt',
         width: '80pt',
-        marginTop: 4,
-        marginBottom: 20,
     },
 };
 
@@ -64,12 +62,12 @@ export const RentalConfirmationDocument: React.FC<Props> = ({ booking, globalSet
                     <View>
                         {qrCodeImageSrc ? (
                             <View wrap={false} style={{ position: 'absolute', bottom: 0 }}>
-                                <Row>
+                                <View style={{ ...styles.row, marginBottom: 20, marginTop: 4 }}>
                                     <Image style={styles.qrCodeImage} src={qrCodeImageSrc} />
-                                    <Col>
+                                    <View style={{ ...styles.col, justifyContent: 'flex-end' }}>
                                         <Text style={{ width: 100 }}>{t('rental-agreement.qr-code.description')}</Text>
-                                    </Col>
-                                </Row>
+                                    </View>
+                                </View>
                             </View>
                         ) : null}
                         <TotalPriceSection
