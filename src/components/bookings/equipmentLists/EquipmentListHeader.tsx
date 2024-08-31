@@ -228,22 +228,29 @@ const EquipmentListHeader: React.FC<Props> = ({
                                 <Dropdown.Item onClick={() => setShowEditDiscountPercentageModal(true)}>
                                     <FontAwesomeIcon icon={faPercent} className="mr-1 fa-fw" /> Redigera rabatt
                                 </Dropdown.Item>
-                                {showEditDiscountPercentageModal ? 
-                                <EditTextModal
-                                    text={list.discountPercentage.toString()}
-                                    onSubmit={(newDiscountPercentage) => {
-                                        saveList({ ...list, discountPercentage: Math.min(100, Math.max(0, parseInt(newDiscountPercentage))) });
-                                        setShowEditDiscountPercentageModal(false);
-                                    }}
-                                    hide={() => setShowEditDiscountPercentageModal(false)}
-                                    show={showEditDiscountPercentageModal}
-                                    modalTitle={'Redigera rabatt'}
-                                    modalConfirmText={'Spara'}
-                                    modalSize='sm'
-                                    textarea={false}
-                                    textFieldSuffix='%'
-                                    textIsValid={(text) => !isNaN(parseInt(text))}
-                                />: null}
+                                {showEditDiscountPercentageModal ? (
+                                    <EditTextModal
+                                        text={list.discountPercentage.toString()}
+                                        onSubmit={(newDiscountPercentage) => {
+                                            saveList({
+                                                ...list,
+                                                discountPercentage: Math.min(
+                                                    100,
+                                                    Math.max(0, parseInt(newDiscountPercentage)),
+                                                ),
+                                            });
+                                            setShowEditDiscountPercentageModal(false);
+                                        }}
+                                        hide={() => setShowEditDiscountPercentageModal(false)}
+                                        show={showEditDiscountPercentageModal}
+                                        modalTitle={'Redigera rabatt'}
+                                        modalConfirmText={'Spara'}
+                                        modalSize="sm"
+                                        textarea={false}
+                                        textFieldSuffix="%"
+                                        textIsValid={(text) => !isNaN(parseInt(text))}
+                                    />
+                                ) : null}
                                 <CopyEquipmentListEntriesModal
                                     show={showImportModal}
                                     onHide={() => setShowImportModal(false)}
@@ -373,10 +380,10 @@ const EquipmentListHeader: React.FC<Props> = ({
                     </>
                 ) : null}
                 {bookingType === BookingType.RENTAL ? <> / {getRentalStatusName(list.rentalStatus)}</> : null}
-                {list.discountPercentage !== 0 || true ? (
+                {list.discountPercentage !== 0 ? (
                     <>
                         {' '}
-                        / <span className="text-danger">{list.discountPercentage}% Rabatt</span>
+                        / <span className="text-danger">{list.discountPercentage}% rabatt</span>
                     </>
                 ) : null}
             </p>

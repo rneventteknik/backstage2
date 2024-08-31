@@ -13,18 +13,25 @@ import currency from 'currency.js';
 
 // Calculate total price
 //
-export const getPrice = (entry: EquipmentListEntry, numberOfDays: number, withDiscount = true): currency => {
+export const getPrice = (
+    entry: EquipmentListEntry,
+    numberOfDays: number,
+    discountPercentage: number,
+    withDiscount = true,
+): currency => {
     const fullPrice = getUnitPrice(entry, numberOfDays).multiply(entry.numberOfUnits);
 
     if (!withDiscount) {
         return fullPrice;
     }
 
-    if (fullPrice.subtract(entry.discount).value < 0) {
+    const discount = fullPrice.multiply(discountPercentage / 100).add(entry.discount);
+
+    if (fullPrice.subtract(discount).value < 0) {
         return currency(0);
     }
 
-    return fullPrice.subtract(entry.discount);
+    return fullPrice.subtract(discount);
 };
 
 export const getUnitPrice = (entry: EquipmentListEntry, numberOfDays: number): currency => {
@@ -53,27 +60,31 @@ export const getExtraDaysPrice = (entry: EquipmentListEntry, numberOfTotalDays: 
         .multiply(0.25);
 };
 
-export const getCalculatedDiscount = (entry: EquipmentListEntry, numberOfDays: number): currency => {
-    const priceWithoutDiscount = getPrice(entry, numberOfDays, false);
+export const getCalculatedDiscount = (
+    entry: EquipmentListEntry,
+    numberOfDays: number,
+    discountPercentage: number,
+): currency => {
+    const priceWithoutDiscount = getPrice(entry, numberOfDays, discountPercentage, false);
+    const priceWithDiscount = getPrice(entry, numberOfDays, discountPercentage, true);
 
-    // The database can contain a discount value larger than the linetotal
-    if (priceWithoutDiscount.value < entry.discount.value) {
-        return priceWithoutDiscount;
-    }
-
-    return currency(entry.discount);
+    return priceWithoutDiscount.subtract(priceWithDiscount);
 };
 
-export const getEquipmentListHeadingPrice = (heading: EquipmentListHeading, numberOfDays: number): currency => {
-    return heading.listEntries.reduce((sum, e) => sum.add(getPrice(e, numberOfDays)), currency(0));
+export const getEquipmentListHeadingPrice = (
+    heading: EquipmentListHeading,
+    discountPercentage: number,
+    numberOfDays: number,
+): currency => {
+    return heading.listEntries.reduce((sum, e) => sum.add(getPrice(e, numberOfDays, discountPercentage)), currency(0));
 };
 
 export const getEquipmentListPrice = (list: EquipmentList): currency => {
     return list.listEntries
-        .reduce((sum, e) => sum.add(getPrice(e, getNumberOfDays(list))), currency(0))
+        .reduce((sum, e) => sum.add(getPrice(e, getNumberOfDays(list), list.discountPercentage)), currency(0))
         .add(
             list.listHeadings.reduce(
-                (sum, h) => sum.add(getEquipmentListHeadingPrice(h, getNumberOfDays(list))),
+                (sum, h) => sum.add(getEquipmentListHeadingPrice(h, getNumberOfDays(list), list.discountPercentage)),
                 currency(0),
             ),
         );
@@ -248,7 +259,7 @@ export const getInvoiceRows = (
             const numberOfDays = getNumberOfDays(equipmentList);
             if (isHeading) {
                 const heading = wrappedEntity.entity as EquipmentListHeading;
-                const rowPrice = getEquipmentListHeadingPrice(heading, numberOfDays);
+                const rowPrice = getEquipmentListHeadingPrice(heading, numberOfDays, equipmentList.discountPercentage);
                 const mainRow: PricedInvoiceRow = {
                     rowType: InvoiceRowType.ITEM,
                     text: wrappedEntity.entity.name,
@@ -274,7 +285,7 @@ export const getInvoiceRows = (
                     text: entry.name,
                     numberOfUnits: entry.numberOfUnits,
                     pricePerUnit: getUnitPrice(entry, numberOfDays),
-                    rowPrice: getPrice(entry, numberOfDays, true), // Row price including discount
+                    rowPrice: getPrice(entry, numberOfDays, equipmentList.discountPercentage, true), // Row price including discount
                     account:
                         entry.account ??
                         (booking.accountKind === AccountKind.EXTERNAL
@@ -316,7 +327,7 @@ export const getInvoiceRows = (
                 if (entry.discount.value) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('invoice.discount')}: ${formatCurrency(getCalculatedDiscount(entry, numberOfDays))}`,
+                        text: `${t('invoice.discount')}: ${formatCurrency(getCalculatedDiscount(entry, numberOfDays, equipmentList.discountPercentage))}`,
                     });
                 }
 

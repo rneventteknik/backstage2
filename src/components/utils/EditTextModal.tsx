@@ -10,7 +10,7 @@ type Props = {
     modalTitle: string;
     modalHelpText?: string;
     modalConfirmText: string;
-    modalSize?: "sm" | "lg" | "xl";
+    modalSize?: 'sm' | 'lg' | 'xl';
     textarea?: boolean;
     textFieldSuffix?: string;
     textIsValid?: (x: string) => boolean;
