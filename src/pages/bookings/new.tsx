@@ -137,8 +137,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             contactPersonPhone: fileContent.phoneNumber,
         }));
 
-        setStartDate(fileContent.startDate);
-        setEndDate(fileContent.endDate);
+        setStartDate(fileContent.startDate + 'T00:00');
+        setEndDate(fileContent.endDate + 'T00:00');
         setEquipment(fileContent.equipment);
 
         // If booking type is not set from calender event selection, default to rental.
