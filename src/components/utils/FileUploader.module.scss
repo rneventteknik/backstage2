@@ -1,0 +1,13 @@
+@import '../../style/variables';
+
+.fileUploaderArea {
+    background-color: $backstage-color-2;
+
+    &:hover {
+        background-color: $backstage-color-3;
+    }
+
+    &.isDragAccept {
+        background-color: $backstage-color-3;
+    }
+}
