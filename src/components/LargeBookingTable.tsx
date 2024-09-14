@@ -81,10 +81,11 @@ const tableSettings: TableConfiguration<BookingViewModel> = {
 
 type Props = {
     bookings: BookingViewModel[];
+    showAdvancedFilters?: boolean;
     tableSettingsOverride?: Partial<TableConfiguration<BookingViewModel>>;
 };
 
-const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }: Props) => {
+const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, showAdvancedFilters = true }: Props) => {
     const [searchText, setSearchText] = useSessionStorageState('large-booking-table-search-text', '');
     const [userIds, setUserIds] = useSessionStorageState<number[]>('large-booking-table-user-ids', []);
     const [statuses, setStatuses] = useSessionStorageState<Status[]>('large-booking-table-statuses', []);
@@ -149,74 +150,76 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride }:
 
     return (
         <>
-            <AdvancedFilters
-                handleChangeFilterString={handleChangeFilterString}
-                searchText={searchText}
-                resetAdvancedFilters={() => {
-                    setSearchText('');
-                    setUserIds([]);
-                    setStatuses([]);
-                    setStartDate(undefined);
-                    setEndDate(undefined);
-                }}
-                activeFilterCount={countNullorEmpty(searchText, userIds, statuses, startDate, endDate)}
-            >
-                <Form.Row className="mb-2">
-                    <Col md="4">
-                        <Form.Group>
-                            <Form.Label>Status</Form.Label>
-                            <Typeahead<{ label: string; value: Status }>
-                                id="status-typeahead"
-                                multiple
-                                labelKey={(x) => x.label}
-                                options={statusOptions}
-                                onChange={(e) => setStatuses(e.map((o) => o.value))}
-                                placeholder="Filtrera på status"
-                                selected={statuses
-                                    .map((id) => statusOptions.find((x) => x.value === id))
-                                    .filter(notEmpty)}
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col md="4">
-                        <Form.Group>
-                            <Form.Label>Ansvarig</Form.Label>
-                            <Typeahead<{ label: string; value: number }>
-                                id="user-typeahead"
-                                multiple
-                                labelKey={(x) => x.label}
-                                options={ownerUserOptions}
-                                onChange={(e) => setUserIds(e.map((o) => o.value))}
-                                placeholder="Filtrera på ansvarig"
-                                selected={userIds
-                                    .map((id) => ownerUserOptions.find((x) => x.value === id))
-                                    .filter(notEmpty)}
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col md="2">
-                        <Form.Group>
-                            <Form.Label>Börjar efter</Form.Label>
-                            <Form.Control
-                                type="date"
-                                onChange={handleChangeStartDate}
-                                value={formatDateForForm(startDate)}
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col md="2">
-                        <Form.Group>
-                            <Form.Label>Slutar före</Form.Label>
-                            <Form.Control
-                                type="date"
-                                onChange={handleChangeEndDate}
-                                value={formatDateForForm(endDate)}
-                            />
-                        </Form.Group>
-                    </Col>
-                </Form.Row>
-            </AdvancedFilters>
-
+            {' '}
+            {showAdvancedFilters ? (
+                <AdvancedFilters
+                    handleChangeFilterString={handleChangeFilterString}
+                    searchText={searchText}
+                    resetAdvancedFilters={() => {
+                        setSearchText('');
+                        setUserIds([]);
+                        setStatuses([]);
+                        setStartDate(undefined);
+                        setEndDate(undefined);
+                    }}
+                    activeFilterCount={countNullorEmpty(searchText, userIds, statuses, startDate, endDate)}
+                >
+                    <Form.Row className="mb-2">
+                        <Col md="4">
+                            <Form.Group>
+                                <Form.Label>Status</Form.Label>
+                                <Typeahead<{ label: string; value: Status }>
+                                    id="status-typeahead"
+                                    multiple
+                                    labelKey={(x) => x.label}
+                                    options={statusOptions}
+                                    onChange={(e) => setStatuses(e.map((o) => o.value))}
+                                    placeholder="Filtrera på status"
+                                    selected={statuses
+                                        .map((id) => statusOptions.find((x) => x.value === id))
+                                        .filter(notEmpty)}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md="4">
+                            <Form.Group>
+                                <Form.Label>Ansvarig</Form.Label>
+                                <Typeahead<{ label: string; value: number }>
+                                    id="user-typeahead"
+                                    multiple
+                                    labelKey={(x) => x.label}
+                                    options={ownerUserOptions}
+                                    onChange={(e) => setUserIds(e.map((o) => o.value))}
+                                    placeholder="Filtrera på ansvarig"
+                                    selected={userIds
+                                        .map((id) => ownerUserOptions.find((x) => x.value === id))
+                                        .filter(notEmpty)}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md="2">
+                            <Form.Group>
+                                <Form.Label>Börjar efter</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    onChange={handleChangeStartDate}
+                                    value={formatDateForForm(startDate)}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md="2">
+                            <Form.Group>
+                                <Form.Label>Slutar före</Form.Label>
+                                <Form.Control
+                                    type="date"
+                                    onChange={handleChangeEndDate}
+                                    value={formatDateForForm(endDate)}
+                                />
+                            </Form.Group>
+                        </Col>
+                    </Form.Row>
+                </AdvancedFilters>
+            ) : null}
             <TableDisplay
                 entities={bookingsToShow}
                 configuration={{ ...tableSettings, ...tableSettingsOverride }}

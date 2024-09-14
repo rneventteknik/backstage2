@@ -527,7 +527,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         cardTitle="Återlämningsanmärkning"
                         readonly={readonly}
                     />
-                    <PreviousBookingsCard hogiaId={booking.invoiceHogiaId} bookingId={booking.id}/>
+                    <PreviousBookingsCard hogiaId={booking.invoiceHogiaId} bookingId={booking.id} />
                     <ChangelogCard changelog={booking.changelog ?? []} />
                 </Col>
             </Row>
