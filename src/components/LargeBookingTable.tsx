@@ -150,7 +150,6 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
 
     return (
         <>
-            {' '}
             {showAdvancedFilters ? (
                 <AdvancedFilters
                     handleChangeFilterString={handleChangeFilterString}
