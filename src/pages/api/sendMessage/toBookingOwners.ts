@@ -1,12 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { respondWithCustomErrorMessage, respondWithInvalidDataResponse } from '../../../lib/apiResponses';
-import { withSessionContext } from '../../../lib/sessionContext';
+import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
 import { fetchBookings } from '../../../lib/db-access';
 import { onlyUniqueById } from '../../../lib/utils';
 import { toUser } from '../../../lib/mappers/user';
 import { sendSlackMessageToUserRegardingBookings } from '../../../lib/slack';
+import { logMessageSentToBookingOwner } from '../../../lib/changelogUtils';
 
-const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
     const bookingIds: number[] = req.body.bookingIds;
     const message: string = req.body.message;
 
@@ -34,6 +35,12 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
                 const bookingsForRecipient = bookings.filter((x) => x.ownerUser!.id === recipient.id);
 
                 return sendSlackMessageToUserRegardingBookings(message, bookingsForRecipient, slackId);
+            }),
+        );
+
+        await Promise.all(
+            bookings.map((booking) => {
+                logMessageSentToBookingOwner(context.currentUser, booking.id, booking.ownerUser.name)
             }),
         );
 
