@@ -16,6 +16,7 @@ import {
     faPlus,
     faInfoCircle,
     faClone,
+    faWarning,
 } from '@fortawesome/free-solid-svg-icons';
 import { TimeReport } from '../../../models/interfaces';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
@@ -209,11 +210,41 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
         </ClickToEdit>
     );
 
+    const getOverlappingTimeReports = (timeReport: TimeReport) =>
+        timeReports.filter(
+            (x) =>
+                x.id !== timeReport.id &&
+                x.userId === timeReport.userId &&
+                x.startDatetime &&
+                timeReport.startDatetime &&
+                x.endDatetime &&
+                timeReport.endDatetime &&
+                x.startDatetime < timeReport.endDatetime &&
+                x.endDatetime > timeReport.startDatetime,
+        );
+
     const TimeReportUserIdDisplayFn = (timeReport: TimeReport) => (
         <>
             {timeReport.user?.name ?? (
                 <span className="text-muted font-italic">Dubbelklicka för att välja användare</span>
             )}
+            {getOverlappingTimeReports(timeReport).length > 0 ? (
+                <OverlayTrigger
+                    placement="right"
+                    overlay={
+                        <Tooltip id="1">
+                            <strong>Det finns överlappande tidrapporter för användaren {timeReport.user?.name}.</strong>
+                            {getOverlappingTimeReports(timeReport).map((overlappingTimeReport) => (
+                                <div key={overlappingTimeReport.id}>
+                                    <div>{overlappingTimeReport.name}</div>
+                                </div>
+                            ))}
+                        </Tooltip>
+                    }
+                >
+                    <FontAwesomeIcon icon={faWarning} className="ml-2" />
+                </OverlayTrigger>
+            ) : null}
             <div className="mb-0 text-muted d-md-none">
                 {timeReport.billableWorkingHours + ' h'}{' '}
                 {timeReport.actualWorkingHours !== timeReport.billableWorkingHours ? (
