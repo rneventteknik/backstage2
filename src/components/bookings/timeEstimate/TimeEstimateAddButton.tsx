@@ -41,12 +41,12 @@ const TimeEstimateAddButton: React.FC<Props & React.ComponentProps<typeof Button
     return (
         <>
             <Button
-                {...rest}
                 onClick={() => {
                     setTimeEstimateViewModel({
                         pricePerHour: currency(defaultLaborHourlyRate),
                     });
                 }}
+                {...rest}
             >
                 {children}
             </Button>

@@ -303,6 +303,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                             booking={booking}
                             disabled={readonly}
                             onAdd={onAdd}
+                            className="ml-2 mr-2 mb-2"
                             variant="secondary"
                             size="sm"
                             defaultLaborHourlyRate={defaultLaborHourlyRate}
@@ -331,7 +332,8 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                             numberOfHours: timeEstimateToEditViewModel?.numberOfHours ?? 0,
                             pricePerHour: timeEstimateToEditViewModel?.pricePerHour ?? currency(0),
                             name: timeEstimateToEditViewModel?.name ?? '',
-                            sortIndex: timeEstimateToEditViewModel.sortIndex ?? getNextSortIndex(booking.timeEstimates ?? []),
+                            sortIndex:
+                                timeEstimateToEditViewModel.sortIndex ?? getNextSortIndex(booking.timeEstimates ?? []),
                         };
                         updateTimeEstimates(timeEstimateToSend);
                     }

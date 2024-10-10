@@ -57,14 +57,14 @@ export const fetchOutEquipmentLists = async (): Promise<EquipmentListObjectionMo
                 .where({ bookingType: BookingType.GIG })
                 .where('equipmentOutDatetime', '<=', now)
                 .where('equipmentInDatetime', '>=', now)
-                .whereNot({status: Status.CANCELED})
+                .whereNot({ status: Status.CANCELED }),
         )
         .orWhere((x) =>
             x
                 .where({ bookingType: BookingType.GIG })
                 .where('usageStartDatetime', '<=', now)
                 .where('usageEndDatetime', '>=', now)
-                .whereNot({status: Status.CANCELED})
+                .whereNot({ status: Status.CANCELED }),
         )
         .withGraphFetched('listEntries.equipment')
         .withGraphFetched('listHeadings.listEntries.equipment');
