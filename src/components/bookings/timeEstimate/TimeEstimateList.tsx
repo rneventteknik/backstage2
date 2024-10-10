@@ -303,6 +303,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                             booking={booking}
                             disabled={readonly}
                             onAdd={onAdd}
+                            className="ml-2 mr-2 mb-2"
                             variant="secondary"
                             size="sm"
                             defaultLaborHourlyRate={defaultLaborHourlyRate}
