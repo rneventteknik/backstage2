@@ -58,6 +58,10 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
         );
         const defaultSalaryAccountExternal = getGlobalSetting('accounts.defaultSalaryAccount.external', globalSettings);
         const defaultSalaryAccountInternal = getGlobalSetting('accounts.defaultSalaryAccount.internal', globalSettings);
+        const defaultFixedPriceAccountExternal = getGlobalSetting(
+            'accounts.defaultFixedPriceAccount.external',
+            globalSettings,
+        );
 
         const invoiceData = getInvoiceData(
             bookingViewModel,
@@ -69,6 +73,7 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             defaultEquipmentAccountInternal,
             defaultSalaryAccountExternal,
             defaultSalaryAccountInternal,
+            defaultFixedPriceAccountExternal,
             t,
             documentLanguage === Language.EN ? 'en-SE' : 'sv-SE',
         );
