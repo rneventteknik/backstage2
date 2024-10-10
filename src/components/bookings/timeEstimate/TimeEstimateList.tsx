@@ -331,7 +331,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                             numberOfHours: timeEstimateToEditViewModel?.numberOfHours ?? 0,
                             pricePerHour: timeEstimateToEditViewModel?.pricePerHour ?? currency(0),
                             name: timeEstimateToEditViewModel?.name ?? '',
-                            sortIndex: getNextSortIndex(booking.timeEstimates ?? []),
+                            sortIndex: timeEstimateToEditViewModel.sortIndex ?? getNextSortIndex(booking.timeEstimates ?? []),
                         };
                         updateTimeEstimates(timeEstimateToSend);
                     }
