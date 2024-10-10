@@ -123,7 +123,7 @@ export const getInvoiceDocument = (
     </TextResourcesContext.Provider>
 );
 
-export const getInvoiceDocumentFileName = (invoiceData: InvoiceData): string =>
+export const getInvoiceDocumentFileName = (invoiceData: { invoiceNumber: string; name: string }): string =>
     `${invoiceData.invoiceNumber ?? ''} ${invoiceData.name}.pdf`;
 
 export const getHogiaInvoiceFileName = (booking: Booking): string =>
