@@ -181,6 +181,7 @@ export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName
     numberOfDays?: number | null;
     bookingId: number;
     rentalStatus?: number | null;
+    discountPercentage: number;
 }
 
 export class EquipmentListObjectionModel extends Model {
@@ -219,6 +220,7 @@ export class EquipmentListObjectionModel extends Model {
     numberOfDays?: number | null;
     bookingId!: number;
     rentalStatus?: number | null;
+    discountPercentage!: number;
 }
 
 export interface IEquipmentListHeadingEntryObjectionModel extends BaseObjectionModelWithName {

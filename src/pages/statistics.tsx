@@ -111,7 +111,7 @@ const getEquipmentStatistics = (bookings: BookingViewModel[]): EquipmentStatisti
             totalNumberOfUnitHours: entries.map((x) => x.numberOfUnits * x.numberOfHours).reduce(reduceSumFn, 0),
             sum: entries
                 .filter((x) => x.booking.fixedPrice === null)
-                .map((x) => getPrice(x, getNumberOfDays(x.list)))
+                .map((x) => getPrice(x, getNumberOfDays(x.list), x.list.discountPercentage))
                 .reduce((a, b) => a.add(b), currency(0)).value,
             percentTHS:
                 (bookingsForThisEquipment.filter((x) => x.pricePlan === PricePlan.THS).length /

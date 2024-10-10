@@ -28,6 +28,7 @@ type Props = {
     nextId: number;
     nextSortIndex: number;
     globalSettings: KeyValue[];
+    equipmentListDiscountPercentage: number;
     readonly?: boolean;
 };
 
@@ -47,6 +48,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
     nextSortIndex,
     onSave,
     globalSettings,
+    equipmentListDiscountPercentage,
     readonly = false,
 }: Props) => {
     const invoiceAccounts: Account[] = JSON.parse(getGlobalSetting('accounts.availableAccounts', globalSettings, '[]'));
@@ -214,6 +216,11 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     price={equipmentListEntryToEditViewModel?.discount}
                                     text={'Rabatt per rad inklusive moms: '}
                                 />
+                                {equipmentListDiscountPercentage > 0 ? (
+                                    <Form.Text className="text-muted">
+                                        Rabatt från listan: {equipmentListDiscountPercentage}%.
+                                    </Form.Text>
+                                ) : null}
                             </Form.Group>
                         </Col>
                         <Col lg={8} xs={6}>

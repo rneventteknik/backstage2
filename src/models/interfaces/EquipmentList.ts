@@ -14,6 +14,7 @@ export interface EquipmentList extends BaseEntityWithName {
     usageEndDatetime?: Date | null;
     numberOfDays?: number | null;
     rentalStatus?: RentalStatus | null;
+    discountPercentage: number;
 }
 
 export interface EquipmentListHeading extends BaseEntityWithName {
