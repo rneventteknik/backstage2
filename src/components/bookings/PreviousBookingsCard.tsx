@@ -1,49 +1,38 @@
 import React, { useState } from 'react';
-import { Button, Card, ListGroup } from 'react-bootstrap';
+import { Card, ListGroup, Modal } from 'react-bootstrap';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import useSwr from 'swr';
-import {
-    faAngleDown,
-    faAngleUp,
-    faExclamationCircle,
-    faInfoCircle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faExclamationCircle, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TableStyleLink from '../utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import { bookingsFetcher } from '../../lib/fetchers';
 import { getSortedList } from '../../lib/sortIndexUtils';
+import LargeBookingTable from '../LargeBookingTable';
 
 type Props = {
     hogiaId: number | null;
     bookingId: number;
 };
 
-const PreviousBookingsCard: React.FC<Props> = ({ hogiaId, bookingId }: Props) => {
-    const [showContent, setShowContent] = useState(true);
+const defaultListLength = 3;
 
+const PreviousBookingsCard: React.FC<Props> = ({ hogiaId, bookingId }: Props) => {
     if (hogiaId === null) {
         return (
             <Card className="mb-3">
                 <Card.Header>Andra bokningar för kund</Card.Header>
                 <Card.Body>
-                    <p className="text-muted mb-0"><FontAwesomeIcon icon={faInfoCircle} className='mr-2'/>Endast tillgängligt för kunder med Hogia Id.</p>
+                    <p className="text-muted mb-0">
+                        <FontAwesomeIcon icon={faInfoCircle} className="mr-2" />
+                        Endast tillgängligt för kunder med Hogia Id.
+                    </p>
                 </Card.Body>
             </Card>
         );
     }
 
-    return (
-        <Card className="mb-3">
-            <Card.Header className="d-flex">
-            <span className='flex-grow-1'>Andra bokningar för kund</span>
-                <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
-                    <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
-                </Button>
-            </Card.Header>
-            {showContent ? <PreviousBookingsCardList hogiaId={hogiaId} bookingId={bookingId}/> : null}
-        </Card>
-    );
+    return <PreviousBookingsCardList hogiaId={hogiaId} bookingId={bookingId} />;
 };
 
 type PreviousBookingsCardProps = {
@@ -51,7 +40,11 @@ type PreviousBookingsCardProps = {
     bookingId: number;
 };
 
-const PreviousBookingsCardList: React.FC<PreviousBookingsCardProps> = ({ hogiaId, bookingId }: PreviousBookingsCardProps) => {
+const PreviousBookingsCardList: React.FC<PreviousBookingsCardProps> = ({
+    hogiaId,
+    bookingId,
+}: PreviousBookingsCardProps) => {
+    const [showAllModal, setShowAllModal] = useState(false);
     const { data: list, error } = useSwr('/api/bookings', bookingsFetcher);
 
     // Error handling
@@ -81,22 +74,42 @@ const PreviousBookingsCardList: React.FC<PreviousBookingsCardProps> = ({ hogiaId
 
     const sortedBookingViewModels = getSortedList(bookingViewModels);
 
-    // List
-    //
     return (
-        <ListGroup variant="flush">
-            {sortedBookingViewModels.map((booking) => (
-                <ListGroup.Item key={booking.id}>
-                    <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
-                    <p className="mb-0 text-muted">{booking.monthYearUsageStartString}</p>
-                </ListGroup.Item>
-            ))}
-            {sortedBookingViewModels.length === 0 ? (
-                <ListGroup.Item className="text-center font-italic text-muted">
-                    Denna kund har inga andra bokningar.
-                </ListGroup.Item>
-            ) : null}
-        </ListGroup>
+        <>
+            <Card className="mb-3">
+                <Card.Header className="d-flex">
+                    <span className="flex-grow-1">Andra bokningar för kund</span>
+                    <a href="#" onClick={() => setShowAllModal(true)}>
+                        Visa alla ({sortedBookingViewModels.length})
+                    </a>
+                </Card.Header>
+                <ListGroup variant="flush">
+                    {sortedBookingViewModels.slice(0, defaultListLength).map((booking) => (
+                        <ListGroup.Item key={booking.id}>
+                            <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
+                            <p className="mb-0 text-muted">{booking.monthYearUsageStartString}</p>
+                        </ListGroup.Item>
+                    ))}
+                    {sortedBookingViewModels.length === 0 ? (
+                        <ListGroup.Item className="text-center font-italic text-muted">
+                            Denna kund har inga andra bokningar.
+                        </ListGroup.Item>
+                    ) : null}
+                </ListGroup>
+            </Card>
+            <Modal show={showAllModal} onHide={() => setShowAllModal(false)} size="xl" backdrop="static">
+                <Modal.Header closeButton>
+                    <Modal.Title>Andra bokningar för kund</Modal.Title>
+                </Modal.Header>
+                <LargeBookingTable
+                    bookings={sortedBookingViewModels}
+                    showAdvancedFilters={false}
+                    tableSettingsOverride={{
+                        hideTableCountControls: true,
+                    }}
+                />
+            </Modal>
+        </>
     );
 };
 
