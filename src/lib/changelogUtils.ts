@@ -205,11 +205,7 @@ export const logPaymentStatusChangeToBooking = (
     return addChangelogToBooking(message, bookingId, 0);
 };
 
-export const logMessageSentToBookingOwner = (
-    user: CurrentUserInfo,
-    bookingId: number,
-    bookingOwner: string,
-) => {
+export const logMessageSentToBookingOwner = (user: CurrentUserInfo, bookingId: number, bookingOwner: string) => {
     const message = `${user.name} skickade ett meddelande till ansvarig ${bookingOwner}.`;
 
     return addChangelogToBooking(message, bookingId);
