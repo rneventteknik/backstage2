@@ -12,7 +12,6 @@ import {
     faGears,
     faTrashCan,
     faStopwatch,
-    faAdd,
     faPlus,
     faInfoCircle,
     faClone,
@@ -411,7 +410,6 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                             className="ml-2 mr-2 mb-2"
                             variant="secondary"
                             size="sm"
-                            icon={faAdd}
                             defaultLaborHourlyRate={defaultLaborHourlyRate}
                         >
                             <FontAwesomeIcon icon={faPlus} className="mr-1" />

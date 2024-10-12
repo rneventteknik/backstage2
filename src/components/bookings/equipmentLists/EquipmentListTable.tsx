@@ -719,7 +719,8 @@ const EquipmentListTable: React.FC<Props> = ({
                             // Number of hours are shown if and only if there is a price per hour.
                             // Number of units are shown if there is no price per hour, or if there is both a price per hour and price per unit and the number of units in our inventory is larger than 1.
                             showNumberOfUnits={
-                                (!!getEquipmentListEntryPrices(equipmentToAdd.prices[0], pricePlan).pricePerUnit.value &&
+                                (!!getEquipmentListEntryPrices(equipmentToAdd.prices[0], pricePlan).pricePerUnit
+                                    .value &&
                                     equipmentToAdd.inventoryCount != 1) ||
                                 !getEquipmentListEntryPrices(equipmentToAdd.prices[0], pricePlan).pricePerHour.value
                             }
