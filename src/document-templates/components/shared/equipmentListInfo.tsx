@@ -23,6 +23,7 @@ import { Booking } from '../../../models/interfaces';
 import { EquipmentListDateInfo } from './equipmentListDateInfo';
 import { getSortedList } from '../../../lib/sortIndexUtils';
 import currency from 'currency.js';
+import { EquipmentListDiscountInfo } from './equipmentListDiscountInfo';
 
 const styles = StyleSheet.create({
     ...commonStyles,
@@ -56,6 +57,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
             <View style={styles.marginBottom}>
                 <Text style={styles.heading}>{list.name}</Text>
                 <EquipmentListDateInfo list={list} booking={booking} />
+                <EquipmentListDiscountInfo list={list} />
             </View>
 
             <TableRowWithNoBorder>
@@ -110,6 +112,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                                             pricePerUnit: getEquipmentListHeadingPrice(
                                                                 heading,
                                                                 getNumberOfDays(list),
+                                                                list.discountPercentage,
                                                             ),
                                                             pricePerHour: currency(0),
                                                         },
@@ -121,10 +124,18 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                         <TableCellFixedWidth width={80} textAlign="right">
                                             {!isHeading ? (
                                                 <Text>
-                                                    {getCalculatedDiscount(entry, getNumberOfDays(list)).value > 0
+                                                    {getCalculatedDiscount(
+                                                        entry,
+                                                        getNumberOfDays(list),
+                                                        list.discountPercentage,
+                                                    ).value > 0
                                                         ? formatCurrency(
                                                               addVAT(
-                                                                  getCalculatedDiscount(entry, getNumberOfDays(list)),
+                                                                  getCalculatedDiscount(
+                                                                      entry,
+                                                                      getNumberOfDays(list),
+                                                                      list.discountPercentage,
+                                                                  ),
                                                               ),
                                                           )
                                                         : ''}
@@ -134,7 +145,15 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                         <TableCellFixedWidth width={80} textAlign="right">
                                             {!isHeading ? (
                                                 <Text>
-                                                    {formatCurrency(addVAT(getPrice(entry, getNumberOfDays(list))))}
+                                                    {formatCurrency(
+                                                        addVAT(
+                                                            getPrice(
+                                                                entry,
+                                                                getNumberOfDays(list),
+                                                                list.discountPercentage,
+                                                            ),
+                                                        ),
+                                                    )}
                                                 </Text>
                                             ) : (
                                                 <Text>
@@ -143,6 +162,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                                             getEquipmentListHeadingPrice(
                                                                 heading,
                                                                 getNumberOfDays(list),
+                                                                list.discountPercentage,
                                                             ),
                                                         ),
                                                     )}

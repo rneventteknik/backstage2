@@ -450,6 +450,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                 getEquipmentListEntryPrices={(x: EquipmentPrice) => getEquipmentListEntryPrices(x, booking.pricePlan)}
                 equipmentListEntryToEditViewModel={equipmentListEntryToEditViewModel}
                 setEquipmentListEntryToEditViewModel={setEquipmentListEntryToEditViewModel}
+                equipmentListDiscountPercentage={list.discountPercentage}
                 onSave={onEditModalSave}
                 nextId={getNextEquipmentListEntryId(list)}
                 nextSortIndex={getNextSortIndex(getEntitiesToDisplay(list))}
