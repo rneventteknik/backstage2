@@ -25,13 +25,15 @@ export const getPrice = (
         return fullPrice;
     }
 
-    const discount = fullPrice.multiply(discountPercentage / 100).add(entry.discount);
+    const priceWithEntryDiscount = fullPrice.subtract(entry.discount);
+    const percentDiscount = priceWithEntryDiscount.multiply(discountPercentage / 100);
+    const totalDiscount = percentDiscount.add(entry.discount);
 
-    if (fullPrice.subtract(discount).value < 0) {
+    if (fullPrice.subtract(totalDiscount).value < 0) {
         return currency(0);
     }
 
-    return fullPrice.subtract(discount);
+    return fullPrice.subtract(totalDiscount);
 };
 
 export const getUnitPrice = (entry: EquipmentListEntry, numberOfDays: number): currency => {
