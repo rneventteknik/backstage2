@@ -259,6 +259,10 @@ const getInvoiceRowsForBookings = (
     );
     const defaultSalaryAccountExternal = getGlobalSetting('accounts.defaultSalaryAccount.external', globalSettings);
     const defaultSalaryAccountInternal = getGlobalSetting('accounts.defaultSalaryAccount.internal', globalSettings);
+    const defaultFixedPriceAccountExternal = getGlobalSetting(
+        'accounts.defaultFixedPriceAccount.external',
+        globalSettings,
+    );
 
     const invoiceRows = bookings.flatMap((bookingViewModel) => {
         const t = (key: string): string =>
@@ -270,6 +274,7 @@ const getInvoiceRowsForBookings = (
             defaultEquipmentAccountInternal,
             defaultSalaryAccountExternal,
             defaultSalaryAccountInternal,
+            defaultFixedPriceAccountExternal,
             t,
         )
             .filter((x) => x.rowType === InvoiceRowType.ITEM)
