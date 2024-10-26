@@ -326,7 +326,7 @@ export const getInvoiceRows = (
                     });
                 }
 
-                if (entry.discount.value) {
+                if (getCalculatedDiscount(entry, numberOfDays, equipmentList.discountPercentage).value) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
                         text: `${t('invoice.discount')}: ${formatCurrency(getCalculatedDiscount(entry, numberOfDays, equipmentList.discountPercentage))}`,
