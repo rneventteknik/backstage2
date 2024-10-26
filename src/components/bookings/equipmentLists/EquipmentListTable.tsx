@@ -357,19 +357,24 @@ const EquipmentListTable: React.FC<Props> = ({
         }
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
-        const priceWithoutDiscount = formatCurrency(addVAT(getPrice(entry, getNumberOfDays(list), false)));
-        const discount = formatCurrency(addVAT(getCalculatedDiscount(entry, getNumberOfDays(list))));
-        const priceWithDiscount = formatCurrency(addVAT(getPrice(entry, getNumberOfDays(list))));
+        const priceWithoutDiscount = formatCurrency(
+            addVAT(getPrice(entry, getNumberOfDays(list), list.discountPercentage, false)),
+        );
+        const discount = getCalculatedDiscount(entry, getNumberOfDays(list), list.discountPercentage);
+        const formattedDiscount = formatCurrency(addVAT(discount));
+        const priceWithDiscount = formatCurrency(
+            addVAT(getPrice(entry, getNumberOfDays(list), list.discountPercentage)),
+        );
 
         return (
             <em className={showPricesAsMuted ? 'text-muted' : ''}>
-                {entry.discount.value > 0 ? (
+                {discount.value > 0 ? (
                     <OverlayTrigger
                         placement="right"
                         overlay={
                             <Tooltip id="1">
                                 <p className="mb-0">{priceWithoutDiscount}</p>
-                                <p className="mb-0">-{discount} (rabatt)</p>
+                                <p className="mb-0">-{formattedDiscount} (rabatt)</p>
                             </Tooltip>
                         }
                     >
@@ -483,7 +488,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             onClick={() =>
                                 saveListEntry({
                                     ...entry,
-                                    discount: getPrice(entry, getNumberOfDays(list), false),
+                                    discount: getPrice(entry, getNumberOfDays(list), 0, false), // Here we ignore the list percentage discount by setting it to 0
                                 })
                             }
                         >
@@ -632,9 +637,13 @@ const EquipmentListTable: React.FC<Props> = ({
                     addVAT(
                         viewModelIsHeading(viewModel)
                             ? getEquipmentListHeadingFromViewModel(viewModel)
-                                  .listEntries.map((x) => getPrice(x, getNumberOfDays(list)))
+                                  .listEntries.map((x) => getPrice(x, getNumberOfDays(list), list.discountPercentage))
                                   .reduce((a, b) => a.add(b), currency(0))
-                            : getPrice(getEquipmentListEntryFromViewModel(viewModel), getNumberOfDays(list)),
+                            : getPrice(
+                                  getEquipmentListEntryFromViewModel(viewModel),
+                                  getNumberOfDays(list),
+                                  list.discountPercentage,
+                              ),
                     ).value,
                 getContentOverride: EquipmentListEntryTotalPriceDisplayFn,
                 columnWidth: 90,

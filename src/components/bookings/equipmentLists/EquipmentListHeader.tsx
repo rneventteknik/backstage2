@@ -14,6 +14,7 @@ import {
     faRightFromBracket,
     faRightToBracket,
     faFileDownload,
+    faPercent,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
@@ -37,6 +38,7 @@ import ConfirmModal from '../../utils/ConfirmModal';
 import BookingReturnalNoteModal from '../BookingReturnalNoteModal';
 import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EditEquipmentListDatesModal from './EditEquipmentListDatesModal';
+import EditTextModal from '../../utils/EditTextModal';
 
 type Props = {
     list: EquipmentList;
@@ -96,6 +98,7 @@ const EquipmentListHeader: React.FC<Props> = ({
     const [showResetDatesModal, setShowResetDatesModal] = useState(false);
     const [showImportModal, setShowImportModal] = useState(false);
     const [showEditDatesModal, setShowEditDatesModal] = useState(false);
+    const [showEditDiscountPercentageModal, setShowEditDiscountPercentageModal] = useState(false);
 
     // Consts to control which date edit components are shown (i.e. interval, dates or both). Note that
     // the logic for usage dates and in/out dates are seperated.
@@ -222,6 +225,32 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     <FontAwesomeIcon icon={faClone} className="mr-1 fa-fw" />
                                     Hämta utrustning från bokning
                                 </Dropdown.Item>
+                                <Dropdown.Item onClick={() => setShowEditDiscountPercentageModal(true)}>
+                                    <FontAwesomeIcon icon={faPercent} className="mr-1 fa-fw" /> Redigera rabatt
+                                </Dropdown.Item>
+                                {showEditDiscountPercentageModal ? (
+                                    <EditTextModal
+                                        text={list.discountPercentage.toString()}
+                                        onSubmit={(newDiscountPercentage) => {
+                                            saveList({
+                                                ...list,
+                                                discountPercentage: Math.min(
+                                                    100,
+                                                    Math.max(0, parseInt(newDiscountPercentage)),
+                                                ),
+                                            });
+                                            setShowEditDiscountPercentageModal(false);
+                                        }}
+                                        hide={() => setShowEditDiscountPercentageModal(false)}
+                                        show={showEditDiscountPercentageModal}
+                                        modalTitle={'Redigera rabatt'}
+                                        modalConfirmText={'Spara'}
+                                        modalSize="sm"
+                                        textarea={false}
+                                        textFieldSuffix="%"
+                                        textIsValid={(text) => !isNaN(parseInt(text))}
+                                    />
+                                ) : null}
                                 <CopyEquipmentListEntriesModal
                                     show={showImportModal}
                                     onHide={() => setShowImportModal(false)}
@@ -351,6 +380,12 @@ const EquipmentListHeader: React.FC<Props> = ({
                     </>
                 ) : null}
                 {bookingType === BookingType.RENTAL ? <> / {getRentalStatusName(list.rentalStatus)}</> : null}
+                {list.discountPercentage !== 0 ? (
+                    <>
+                        {' '}
+                        / <span className="text-danger">{list.discountPercentage}% rabatt</span>
+                    </>
+                ) : null}
             </p>
             {showIntervalControls ? (
                 <>
