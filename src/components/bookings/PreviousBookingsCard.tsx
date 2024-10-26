@@ -2,12 +2,7 @@ import React, { useState } from 'react';
 import { Button, Card, ListGroup } from 'react-bootstrap';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import useSwr from 'swr';
-import {
-    faAngleDown,
-    faAngleUp,
-    faExclamationCircle,
-    faInfoCircle,
-} from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faExclamationCircle, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TableStyleLink from '../utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
@@ -27,7 +22,10 @@ const PreviousBookingsCard: React.FC<Props> = ({ hogiaId, bookingId }: Props) =>
             <Card className="mb-3">
                 <Card.Header>Andra bokningar för kund</Card.Header>
                 <Card.Body>
-                    <p className="text-muted mb-0"><FontAwesomeIcon icon={faInfoCircle} className='mr-2'/>Endast tillgängligt för kunder med Hogia Id.</p>
+                    <p className="text-muted mb-0">
+                        <FontAwesomeIcon icon={faInfoCircle} className="mr-2" />
+                        Endast tillgängligt för kunder med Hogia Id.
+                    </p>
                 </Card.Body>
             </Card>
         );
@@ -36,12 +34,12 @@ const PreviousBookingsCard: React.FC<Props> = ({ hogiaId, bookingId }: Props) =>
     return (
         <Card className="mb-3">
             <Card.Header className="d-flex">
-            <span className='flex-grow-1'>Andra bokningar för kund</span>
+                <span className="flex-grow-1">Andra bokningar för kund</span>
                 <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
                     <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                 </Button>
             </Card.Header>
-            {showContent ? <PreviousBookingsCardList hogiaId={hogiaId} bookingId={bookingId}/> : null}
+            {showContent ? <PreviousBookingsCardList hogiaId={hogiaId} bookingId={bookingId} /> : null}
         </Card>
     );
 };
@@ -51,7 +49,10 @@ type PreviousBookingsCardProps = {
     bookingId: number;
 };
 
-const PreviousBookingsCardList: React.FC<PreviousBookingsCardProps> = ({ hogiaId, bookingId }: PreviousBookingsCardProps) => {
+const PreviousBookingsCardList: React.FC<PreviousBookingsCardProps> = ({
+    hogiaId,
+    bookingId,
+}: PreviousBookingsCardProps) => {
     const { data: list, error } = useSwr('/api/bookings', bookingsFetcher);
 
     // Error handling
