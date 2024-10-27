@@ -5,7 +5,11 @@ import { fetchBookingWithUser } from '../../../../../../lib/db-access/booking';
 import { toBooking } from '../../../../../../lib/mappers/booking';
 import { withSessionContext } from '../../../../../../lib/sessionContext';
 import { getTextResource } from '../../../../../../document-templates/useTextResources';
-import { getHogiaInvoiceFileName, getInvoiceDocument } from '../../../../../../document-templates';
+import {
+    getHogiaInvoiceFileName,
+    getInvoiceDocument,
+    getInvoiceDocumentFileName,
+} from '../../../../../../document-templates';
 import { Language } from '../../../../../../models/enums/Language';
 import { toBookingViewModel } from '../../../../../../lib/datetimeUtils';
 import { fetchSettings } from '../../../../../../lib/db-access/setting';
@@ -29,7 +33,10 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
         const booking = toBooking(result);
         const bookingViewModel = toBookingViewModel(booking);
         const documentLanguage = req.query.language === 'en' ? Language.EN : Language.SV;
-        const filename = getHogiaInvoiceFileName(bookingViewModel);
+        const filename =
+            req.query.exportType === 'pdf'
+                ? getInvoiceDocumentFileName(bookingViewModel)
+                : getHogiaInvoiceFileName(bookingViewModel);
 
         const t = (key: string): string => {
             return getTextResource(key, documentLanguage, getTextResourcesFromGlobalSettings(globalSettings));

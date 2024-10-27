@@ -23,6 +23,7 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.equipment-list.table-header.total-price': 'Belopp',
         'common.equipment-list.table-header.total-price-ex-vat': 'Belopp (exkl. moms)',
         'common.equipment-list.total': 'Total',
+        'common.equipment-list.discountPercentage': 'Rabatt',
 
         // Time Estimate list
         'common.time-estimate-list.heading': 'Personalkostnader',
@@ -122,6 +123,7 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'common.equipment-list.table-header.total-price': 'Amount',
         'common.equipment-list.table-header.total-price-ex-vat': 'Amount (excl. VAT)',
         'common.equipment-list.total': 'Total',
+        'common.equipment-list.discountPercentage': 'Discount',
 
         // Time Estimate list
         'common.time-estimate-list.heading': 'Personnel costs',
@@ -168,7 +170,8 @@ export const defaultTextResources: Record<Language, Record<string, string>> = {
         'rental-agreement.signature.4': 'Name in block letters:',
         'rental-agreement.signature.5': 'Personal identity number:',
         'rental-agreement.signature.6': 'Handed out by:',
-        'rental-agreement.qr-code.description': 'We appreciate any feedback you would like to give us. Help us improve by filling out this short form.',
+        'rental-agreement.qr-code.description':
+            'We appreciate any feedback you would like to give us. Help us improve by filling out this short form.',
 
         // Misc
         'common.pagenumber.label': 'Page',
