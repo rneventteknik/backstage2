@@ -186,6 +186,7 @@ export const getInvoiceData = (
     defaultEquipmentAccountInternal: string,
     defaultSalaryAccountExternal: string,
     defaultSalaryAccountInternal: string,
+    defaultFixedPriceAccountExternal: string,
     t: (t: string) => string,
     locale: 'sv-SE' | 'en-SE' | undefined,
 ): InvoiceData => {
@@ -215,6 +216,7 @@ export const getInvoiceData = (
             defaultEquipmentAccountInternal,
             defaultSalaryAccountExternal,
             defaultSalaryAccountInternal,
+            defaultFixedPriceAccountExternal,
             t,
         ),
     };
@@ -226,6 +228,7 @@ export const getInvoiceRows = (
     defaultEquipmentAccountInternal: string,
     defaultSalaryAccountExternal: string,
     defaultSalaryAccountInternal: string,
+    defaultFixedPriceAccountExternal: string,
     t: (t: string) => string,
 ): InvoiceRow[] => {
     const equipmentListToInvoiceRows = (equipmentList: EquipmentList): InvoiceRow[] => {
@@ -376,21 +379,50 @@ export const getInvoiceRows = (
     };
 
     const fixedPriceBookingToInvoiceRows = (booking: BookingViewModel): InvoiceRow[] => {
-        const mainRow: PricedInvoiceRow = {
+        const fixedPrice = currency(booking.fixedPrice ?? 0);
+
+        if (booking.accountKind === AccountKind.EXTERNAL) {
+            const fixedPriceRow: PricedInvoiceRow = {
+                rowType: InvoiceRowType.ITEM,
+                text: t('hogia-invoice.price-by-agreement'),
+                numberOfUnits: 1,
+                pricePerUnit: fixedPrice,
+                rowPrice: fixedPrice,
+                account: defaultFixedPriceAccountExternal,
+                unit: t('common.misc.count-unit-single'),
+                sourceId: 'B' + booking.id,
+            };
+
+            return [fixedPriceRow];
+        }
+
+        const salaryPrice = getTotalTimeReportsPrice(booking.timeReports);
+        const adjustedSalaryPrice = salaryPrice.value > fixedPrice.value ? fixedPrice : salaryPrice;
+        const nonSalaryPrice = fixedPrice.subtract(adjustedSalaryPrice);
+
+        const nonSalaryRow: PricedInvoiceRow = {
             rowType: InvoiceRowType.ITEM,
             text: t('hogia-invoice.price-by-agreement'),
             numberOfUnits: 1,
-            pricePerUnit: currency(booking.fixedPrice ?? 0),
-            rowPrice: currency(booking.fixedPrice ?? 0),
-            account:
-                booking.accountKind === AccountKind.EXTERNAL
-                    ? defaultEquipmentAccountExternal
-                    : defaultEquipmentAccountInternal,
+            pricePerUnit: nonSalaryPrice,
+            rowPrice: nonSalaryPrice,
+            account: defaultEquipmentAccountInternal,
             unit: t('common.misc.count-unit-single'),
             sourceId: 'B' + booking.id,
         };
 
-        return [mainRow];
+        const salaryRow: PricedInvoiceRow = {
+            rowType: InvoiceRowType.ITEM,
+            text: t('hogia-invoice.price-by-agreement.salary'),
+            numberOfUnits: 1,
+            pricePerUnit: adjustedSalaryPrice,
+            rowPrice: adjustedSalaryPrice,
+            account: defaultSalaryAccountInternal,
+            unit: t('common.misc.count-unit-single'),
+            sourceId: 'B' + booking.id,
+        };
+
+        return [nonSalaryRow, salaryRow].filter((x) => x.rowPrice.value !== 0);
     };
 
     if (booking.fixedPrice !== null) {
