@@ -75,8 +75,8 @@ export const getCalculatedDiscount = (
 
 export const getEquipmentListHeadingPrice = (
     heading: EquipmentListHeading,
-    discountPercentage: number,
     numberOfDays: number,
+    discountPercentage: number,
 ): currency => {
     return heading.listEntries.reduce((sum, e) => sum.add(getPrice(e, numberOfDays, discountPercentage)), currency(0));
 };
