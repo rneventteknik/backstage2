@@ -51,6 +51,23 @@ export const fetchBookings = async (): Promise<BookingObjectionModel[]> => {
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment');
 };
 
+export const fetchBookingsForAnalytics = async (): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .withGraphFetched('ownerUser')
+        .withGraphFetched('timeEstimates')
+        .withGraphFetched('timeReports.user')
+        .withGraphFetched('equipmentLists.listEntries.equipment')
+        .withGraphFetched('equipmentLists.listEntries.equipment.equipmentPublicCategory')
+        .withGraphFetched('equipmentLists.listEntries.equipment.tags')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.equipmentPublicCategory')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.tags')
+        .withGraphFetched('equipmentLists.listEntries.equipmentPrice')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipmentPrice');
+};
+
 export const fetchBookingsForUser = async (userId: number): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
