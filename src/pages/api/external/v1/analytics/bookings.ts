@@ -10,7 +10,7 @@ import {
 import { BookingViewModel } from '../../../../../models/interfaces';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import currency from 'currency.js';
-import { formatDatetimeForForm, toBookingViewModel } from '../../../../../lib/datetimeUtils';
+import { formatDatetimeForForm, formatDatetimeForAnalyticsExport, toBookingViewModel } from '../../../../../lib/datetimeUtils';
 import { getAccountKindName, getBookingTypeName, getPaymentStatusName, getPricePlanName, getSalaryStatusName, getStatusName } from '../../../../../lib/utils';
 
 const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
@@ -50,10 +50,10 @@ interface BookingAnalyticsModel {
     totalTimeEstimatesPrice: number;
     totalTimeReportsPrice: number;
     totalEquipmentPrice: number;
-    usageStartDatetime: string | undefined;
-    usageEndDatetime: string | undefined;
-    equipmentOutDatetime: string | undefined;
-    equipmentInDatetime: string | undefined;
+    usageStartDatetime: string | null;
+    usageEndDatetime: string | null;
+    equipmentOutDatetime: string | null;
+    equipmentInDatetime: string | null;
     estimatedHours: number;
     actualWorkingHours: number;
     billableWorkingHours: number;
@@ -84,10 +84,10 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
             booking.equipmentLists?.reduce((sum, l) => sum.add(getEquipmentListPrice(l)), currency(0)).value ?? 0,
 
         // Dates
-        usageStartDatetime: formatDatetimeForForm(booking.usageStartDatetime),
-        usageEndDatetime: formatDatetimeForForm(booking.usageEndDatetime),
-        equipmentOutDatetime: formatDatetimeForForm(booking.equipmentOutDatetime),
-        equipmentInDatetime: formatDatetimeForForm(booking.equipmentInDatetime),
+        usageStartDatetime: formatDatetimeForAnalyticsExport(booking.usageStartDatetime),
+        usageEndDatetime: formatDatetimeForAnalyticsExport(booking.usageEndDatetime),
+        equipmentOutDatetime: formatDatetimeForAnalyticsExport(booking.equipmentOutDatetime),
+        equipmentInDatetime: formatDatetimeForAnalyticsExport(booking.equipmentInDatetime),
 
         // Working hours
         estimatedHours: booking.timeEstimates?.reduce((sum, entry) => sum + entry.numberOfHours, 0) ?? 0,
