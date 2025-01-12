@@ -117,13 +117,14 @@ const mapToAnalytics = (bookings: BookingViewModel[], defaultEquipmentAccountExt
     }));
 }
 
-const mapToCSV = (bookings: EquipmentUsageAnalyticsModel[]) => {
-    const headings = Object.keys(bookings[0]);
+const mapToCSV = (equipmentUsage: EquipmentUsageAnalyticsModel[]) => {
+    const headings = Object.keys(equipmentUsage[0]);
     const headerRow = headings.join(',');
 
-    const bookingRows = bookings.map((booking) =>
+    const bookingRows = equipmentUsage.map((booking) =>
         headings
             .map((fieldName) => JSON.stringify((booking as unknown as { [name: string]: string })[fieldName]))
+            .map((value) => value.replace('\\"', '”'))
             .map((value) => value == 'null' ? '' : value)
             .join(','),
     );

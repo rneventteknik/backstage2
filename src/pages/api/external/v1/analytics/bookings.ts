@@ -102,6 +102,7 @@ const mapToCSV = (bookings: BookingAnalyticsModel[]) => {
     const bookingRows = bookings.map((booking) =>
         headings
             .map((fieldName) => JSON.stringify((booking as unknown as { [name: string]: string })[fieldName]))
+            .map((value) => value.replace('\\"', '”'))
             .map((value) => value == 'null' ? '' : value)
             .join(','),
     );
