@@ -10,7 +10,8 @@ import {
 import { BookingViewModel } from '../../../../../models/interfaces';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import currency from 'currency.js';
-import { formatDatetimeForForm, toBookingViewModel } from '../../../../../lib/datetimeUtils';
+import { formatDatetimeForAnalyticsExport, toBookingViewModel } from '../../../../../lib/datetimeUtils';
+import { getAccountKindName, getBookingTypeName, getPaymentStatusName, getPricePlanName, getSalaryStatusName, getStatusName } from '../../../../../lib/utils';
 
 const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     switch (req.method) {
@@ -33,26 +34,26 @@ const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiRespon
 interface BookingAnalyticsModel {
     id: number;
     name: string;
-    created?: string;
+    created: string | null;
     ownerUserName?: string;
     ownerUserId?: number;
-    bookingType: number;
-    status: number;
-    paymentStatus: number;
+    bookingType: string;
+    status: string;
+    paymentStatus: string;
     invoiceHogiaId: number | null;
-    salaryStatus: number;
-    pricePlan: number;
-    accountKind: number | null;
+    salaryStatus: string;
+    pricePlan: string;
+    accountKind: string | null;
     location: string;
     language: string;
     fixedPrice?: number | null;
     totalTimeEstimatesPrice: number;
     totalTimeReportsPrice: number;
     totalEquipmentPrice: number;
-    usageStartDatetime: string | undefined;
-    usageEndDatetime: string | undefined;
-    equipmentOutDatetime: string | undefined;
-    equipmentInDatetime: string | undefined;
+    usageStartDatetime: string | null;
+    usageEndDatetime: string | null;
+    equipmentOutDatetime: string | null;
+    equipmentInDatetime: string | null;
     estimatedHours: number;
     actualWorkingHours: number;
     billableWorkingHours: number;
@@ -62,16 +63,16 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
     bookings.map((booking) => ({
         id: booking.id,
         name: booking.name,
-        created: formatDatetimeForForm(booking.created),
+        created: formatDatetimeForAnalyticsExport(booking.created),
         ownerUserName: booking.ownerUser?.name,
         ownerUserId: booking.ownerUserId,
-        bookingType: booking.bookingType,
-        status: booking.status,
-        salaryStatus: booking.salaryStatus,
-        paymentStatus: booking.paymentStatus,
+        bookingType: getBookingTypeName(booking.bookingType),
+        status: getStatusName(booking.status),
+        salaryStatus: getSalaryStatusName(booking.salaryStatus),
+        paymentStatus: getPaymentStatusName(booking.paymentStatus),
         invoiceHogiaId: booking.invoiceHogiaId,
-        pricePlan: booking.pricePlan,
-        accountKind: booking.accountKind,
+        pricePlan: getPricePlanName(booking.pricePlan),
+        accountKind: getAccountKindName(booking.accountKind),
         location: booking.location,
         language: booking.language,
 
@@ -83,10 +84,10 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
             booking.equipmentLists?.reduce((sum, l) => sum.add(getEquipmentListPrice(l)), currency(0)).value ?? 0,
 
         // Dates
-        usageStartDatetime: formatDatetimeForForm(booking.usageStartDatetime),
-        usageEndDatetime: formatDatetimeForForm(booking.usageEndDatetime),
-        equipmentOutDatetime: formatDatetimeForForm(booking.equipmentOutDatetime),
-        equipmentInDatetime: formatDatetimeForForm(booking.equipmentInDatetime),
+        usageStartDatetime: formatDatetimeForAnalyticsExport(booking.usageStartDatetime),
+        usageEndDatetime: formatDatetimeForAnalyticsExport(booking.usageEndDatetime),
+        equipmentOutDatetime: formatDatetimeForAnalyticsExport(booking.equipmentOutDatetime),
+        equipmentInDatetime: formatDatetimeForAnalyticsExport(booking.equipmentInDatetime),
 
         // Working hours
         estimatedHours: booking.timeEstimates?.reduce((sum, entry) => sum + entry.numberOfHours, 0) ?? 0,
@@ -101,6 +102,7 @@ const mapToCSV = (bookings: BookingAnalyticsModel[]) => {
     const bookingRows = bookings.map((booking) =>
         headings
             .map((fieldName) => JSON.stringify((booking as unknown as { [name: string]: string })[fieldName]))
+            .map((value) => value == 'null' ? '' : value)
             .join(','),
     );
 
