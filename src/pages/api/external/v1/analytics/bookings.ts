@@ -11,6 +11,7 @@ import { BookingViewModel } from '../../../../../models/interfaces';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import currency from 'currency.js';
 import { formatDatetimeForForm, toBookingViewModel } from '../../../../../lib/datetimeUtils';
+import { getAccountKindName, getBookingTypeName, getPaymentStatusName, getPricePlanName, getSalaryStatusName, getStatusName } from '../../../../../lib/utils';
 
 const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     switch (req.method) {
@@ -36,13 +37,13 @@ interface BookingAnalyticsModel {
     created?: string;
     ownerUserName?: string;
     ownerUserId?: number;
-    bookingType: number;
-    status: number;
-    paymentStatus: number;
+    bookingType: string;
+    status: string;
+    paymentStatus: string;
     invoiceHogiaId: number | null;
-    salaryStatus: number;
-    pricePlan: number;
-    accountKind: number | null;
+    salaryStatus: string;
+    pricePlan: string;
+    accountKind: string | null;
     location: string;
     language: string;
     fixedPrice?: number | null;
@@ -65,13 +66,13 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
         created: formatDatetimeForForm(booking.created),
         ownerUserName: booking.ownerUser?.name,
         ownerUserId: booking.ownerUserId,
-        bookingType: booking.bookingType,
-        status: booking.status,
-        salaryStatus: booking.salaryStatus,
-        paymentStatus: booking.paymentStatus,
+        bookingType: getBookingTypeName(booking.bookingType),
+        status: getStatusName(booking.status),
+        salaryStatus: getSalaryStatusName(booking.salaryStatus),
+        paymentStatus: getPaymentStatusName(booking.paymentStatus),
         invoiceHogiaId: booking.invoiceHogiaId,
-        pricePlan: booking.pricePlan,
-        accountKind: booking.accountKind,
+        pricePlan: getPricePlanName(booking.pricePlan),
+        accountKind: getAccountKindName(booking.accountKind),
         location: booking.location,
         language: booking.language,
 
