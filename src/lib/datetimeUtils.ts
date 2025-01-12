@@ -78,8 +78,7 @@ export const formatDatetimeForForm = (
 
 export const formatDatetimeForAnalyticsExport = (
     date: Date | null | undefined,
-    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
-): string | null => (date ? date.toLocaleString(locale, datetimeFormFormatOptions) : null);
+): string | null => (date ? date.toISOString() : null);
 
 export const formatDateForForm = (
     date: Date | null | undefined,

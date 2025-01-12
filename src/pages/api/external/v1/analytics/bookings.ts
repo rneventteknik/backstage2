@@ -10,7 +10,7 @@ import {
 import { BookingViewModel } from '../../../../../models/interfaces';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import currency from 'currency.js';
-import { formatDatetimeForForm, formatDatetimeForAnalyticsExport, toBookingViewModel } from '../../../../../lib/datetimeUtils';
+import { formatDatetimeForAnalyticsExport, toBookingViewModel } from '../../../../../lib/datetimeUtils';
 import { getAccountKindName, getBookingTypeName, getPaymentStatusName, getPricePlanName, getSalaryStatusName, getStatusName } from '../../../../../lib/utils';
 
 const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
@@ -34,7 +34,7 @@ const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiRespon
 interface BookingAnalyticsModel {
     id: number;
     name: string;
-    created?: string;
+    created: string | null;
     ownerUserName?: string;
     ownerUserId?: number;
     bookingType: string;
@@ -63,7 +63,7 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
     bookings.map((booking) => ({
         id: booking.id,
         name: booking.name,
-        created: formatDatetimeForForm(booking.created),
+        created: formatDatetimeForAnalyticsExport(booking.created),
         ownerUserName: booking.ownerUser?.name,
         ownerUserId: booking.ownerUserId,
         bookingType: getBookingTypeName(booking.bookingType),
