@@ -52,7 +52,7 @@ import {
 } from '../../../lib/pricingUtils';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
-import { formatDate, formatDateForForm, toBookingViewModel } from '../../../lib/datetimeUtils';
+import { formatDateForForm, toBookingViewModel } from '../../../lib/datetimeUtils';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import MarkdownCard from '../../../components/MarkdownCard';
 import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButton';
@@ -508,7 +508,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
                                 <span className="flex-grow-1">Fakturadatum</span>
-                                <span>{formatDate(booking.invoiceDate)}</span>
+                                <span>{formatDateForForm(booking.invoiceDate)}</span>
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
