@@ -28,6 +28,7 @@ import { Language } from '../../models/enums/Language';
 import BookingSearchCustomerModal from './BookingSearchCustomerModal';
 import PriceWithVATPreview from '../utils/PriceWithVATPreview';
 import currency from 'currency.js';
+import { formatDateForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
@@ -112,6 +113,7 @@ const BookingForm: React.FC<Props> = ({
             driveFolderId: getValueFromForm('driveFolderId'),
             language: getValueFromForm('language') as Language | undefined,
             fixedPrice: toIntOrUndefined(getValueFromForm('fixedPrice')) ?? null,
+            invoiceDate: toDatetimeOrUndefined(getValueFromForm('invoiceDate')) ? getValueFromForm('invoiceDate') : null,
         };
 
         handleSubmitBooking(modifiedBooking);
@@ -561,6 +563,17 @@ const BookingForm: React.FC<Props> = ({
                                 />
                             </Form.Group>
                         </Col>
+                        <Col lg="4" md="4">
+                            <Form.Group controlId="invoiceDate">
+                                <Form.Label>Faktureringsdatum</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    placeholder=""
+                                    name="invoiceDate"
+                                    defaultValue={formatDateForForm(booking?.invoiceDate)}
+                                />
+                            </Form.Group>
+                        </Col>
                     </Row>
                 </>
             ) : null}
@@ -594,6 +607,7 @@ const BookingForm: React.FC<Props> = ({
                         name="paymentStatus"
                         defaultValue={booking?.paymentStatus ?? PaymentStatus.NOT_PAID}
                     />
+                    <Form.Control type="hidden" name="invoiceDate" defaultValue={formatDateForForm(booking?.invoiceDate)} />
                 </>
             ) : null}
             {isNewBooking ? (
