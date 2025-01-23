@@ -26,7 +26,15 @@ import CustomerSearch from '../../components/CustomerSearch';
 import { Customer } from '../../models/interfaces/Customer';
 import { BookingType } from '../../models/enums/BookingType';
 import { KeyValue } from '../../models/interfaces/KeyValue';
-import { getDefaultEquipmentListName } from '../../lib/equipmentListUtils';
+import { addEquipment, addListEntryApiCall, getDefaultEquipmentListName } from '../../lib/equipmentListUtils';
+import { PricePlan } from '../../models/enums/PricePlan';
+import BookingSpecificationUploader from '../../components/utils/BookingSpecificationUploader';
+import {
+    BookingSpecificationEquipmentModel,
+    BookingSpecificationModel,
+} from '../../models/misc/BookingSpecificationImportModel';
+import { EquipmentListEntry } from '../../models/interfaces/EquipmentList';
+import { toEquipmentList } from '../../lib/mappers/booking';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
@@ -36,9 +44,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     const router = useRouter();
     const pageTitle = 'Ny bokning';
     const [selectedDefaultBooking, setSelectedDefaultBooking] = useState<Partial<Booking> | undefined>();
-    const [wizardStep, setWizardStep] = useState<'step-one' | 'step-two' | 'step-three'>('step-one');
+    const [wizardStep, setWizardStep] = useState<'step-one' | 'step-two' | 'step-three' | 'step-four'>('step-one');
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
+    const [equipment, setEquipment] = useState<BookingSpecificationEquipmentModel[] | undefined>();
 
     const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
 
@@ -54,7 +63,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         setWizardStep('step-one');
     };
 
-    const createBookingFrom = (calendarBooking: CalendarResult | null) => {
+    const createBookingFromCalendar = (calendarBooking: CalendarResult | null) => {
         setSelectedDefaultBooking({
             status: Status.DRAFT,
             salaryStatus: SalaryStatus.NOT_SENT,
@@ -111,6 +120,42 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         setWizardStep('step-three');
     };
 
+    const createBookingFromFile = (fileContent?: BookingSpecificationModel) => {
+        if (!fileContent) {
+            setWizardStep('step-four');
+            return;
+        }
+
+        // Extend default booking with info from fileContent
+        setSelectedDefaultBooking((booking) => ({
+            ...booking,
+            name: fileContent.projectName,
+            note: fileContent.description,
+            pricePlan: fileContent.isThsMember ? PricePlan.THS : PricePlan.EXTERNAL,
+            contactPersonEmail: fileContent.email,
+            contactPersonName: fileContent.firstName + ' ' + fileContent.lastName,
+            contactPersonPhone: fileContent.phoneNumber,
+        }));
+
+        // Only use the start and end date from file if not already set from calendar event selection
+        if (!startDate && !endDate) {
+            setStartDate(fileContent.startDate + 'T00:00');
+            setEndDate(fileContent.endDate + 'T00:00');
+        }
+
+        setEquipment(fileContent.equipment);
+
+        // If booking type is not set from calender event selection, default to rental.
+        if (!selectedDefaultBooking?.bookingType) {
+            setSelectedDefaultBooking((booking) => ({
+                ...booking,
+                bookingType: BookingType.RENTAL,
+            }));
+        }
+
+        setWizardStep('step-four');
+    };
+
     const handleSubmit = async (booking: Partial<IBookingObjectionModel>) => {
         const body = { booking: booking };
 
@@ -149,9 +194,31 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             body: JSON.stringify(body),
         };
 
-        return fetch('/api/bookings/' + booking.id + '/equipmentLists', request).then((apiResponse) =>
-            getResponseContentOrError<IEquipmentListObjectionModel>(apiResponse),
-        );
+        return fetch('/api/bookings/' + booking.id + '/equipmentLists', request)
+            .then((apiResponse) => getResponseContentOrError<IEquipmentListObjectionModel>(apiResponse))
+            .then((equipmentList) => {
+                createDefaultEquipmentListEntries(booking, equipmentList);
+            });
+    };
+
+    const createDefaultEquipmentListEntries = async (
+        booking: IBookingObjectionModel,
+        equipmentList: IEquipmentListObjectionModel,
+    ) => {
+        equipment?.forEach((equipmentEntry) => {
+            const saveFunction = (entries: EquipmentListEntry[]) =>
+                entries.map((entry) => addListEntryApiCall(entry, booking.id, equipmentList.id));
+            addEquipment(
+                equipmentEntry.equipment,
+                toEquipmentList(equipmentList),
+                booking.pricePlan,
+                booking.language,
+                saveFunction,
+                equipmentEntry.amount,
+                equipmentEntry.hours ?? undefined,
+                equipmentEntry.selectedPrice?.id,
+            );
+        });
     };
 
     return (
@@ -166,15 +233,19 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             <Card.Body>
                                 <div className="d-flex">
                                     <p className="text-muted flex-grow-1 mb-0">
-                                        <strong>Steg 1 av 3</strong> Välj en bokning från kalendern nedan eller skapa en
+                                        <strong>Steg 1 av 4</strong> Välj en bokning från kalendern nedan eller skapa en
                                         manuellt.
                                     </p>
-                                    <Button onClick={() => createBookingFrom(null)}>Skapa bokning manuellt</Button>
+                                    <Button onClick={() => createBookingFromCalendar(null)}>
+                                        Skapa bokning manuellt
+                                    </Button>
                                 </div>
                             </Card.Body>
                         </Card>
 
-                        <CalendarBookingsList onSelect={(calendarBooking) => createBookingFrom(calendarBooking)} />
+                        <CalendarBookingsList
+                            onSelect={(calendarBooking) => createBookingFromCalendar(calendarBooking)}
+                        />
                     </Tab.Pane>
                     <Tab.Pane eventKey="step-two">
                         <Card className="mb-3">
@@ -182,7 +253,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             <Card.Body>
                                 <div className="d-flex">
                                     <p className="text-muted flex-grow-1 mb-0">
-                                        <strong>Steg 2 av 3</strong> Sök efter en kund nedan eller fortsätt utan kund.
+                                        <strong>Steg 2 av 4</strong> Sök efter en kund nedan eller fortsätt utan kund.
                                     </p>
                                     <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2">
                                         Avbryt
@@ -205,7 +276,28 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             <Card.Body>
                                 <div className="d-flex">
                                     <p className="text-muted flex-grow-1 mb-0">
-                                        <strong>Steg 3 av 3</strong> Fyll i bokningsdetaljerna nedan.
+                                        <strong>Steg 3 av 4</strong> Ladda upp en fil med bokningsspecifikation.
+                                    </p>
+                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2">
+                                        Avbryt
+                                    </Button>
+                                    <Button onClick={() => createBookingFromFile()}>
+                                        Fyll i bokningsdetaljer manuellt
+                                    </Button>
+                                </div>
+                            </Card.Body>
+                        </Card>
+                        {selectedDefaultBooking && wizardStep == 'step-three' ? (
+                            <BookingSpecificationUploader onSave={createBookingFromFile} />
+                        ) : null}
+                    </Tab.Pane>
+                    <Tab.Pane eventKey="step-four">
+                        <Card className="mb-3">
+                            <Card.Header className="p-1"></Card.Header>
+                            <Card.Body>
+                                <div className="d-flex">
+                                    <p className="text-muted flex-grow-1 mb-0">
+                                        <strong>Steg 4 av 4</strong> Fyll i bokningsdetaljerna nedan.
                                     </p>
                                     <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2">
                                         Avbryt
@@ -216,7 +308,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                 </div>
                             </Card.Body>
                         </Card>
-                        {selectedDefaultBooking && wizardStep == 'step-three' ? (
+                        {selectedDefaultBooking && wizardStep == 'step-four' ? (
                             <BookingForm
                                 handleSubmitBooking={handleSubmit}
                                 formId="editBookingForm"
