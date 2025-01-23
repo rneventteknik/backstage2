@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.15.1-basil",
+    "version": "1.16.0-juneberry",
     "engines": {
         "yarn": "^1.0.0",
         "node": "^18.0.0"
