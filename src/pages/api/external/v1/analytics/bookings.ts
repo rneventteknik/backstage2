@@ -11,7 +11,14 @@ import { BookingViewModel } from '../../../../../models/interfaces';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import currency from 'currency.js';
 import { formatDatetimeForAnalyticsExport, toBookingViewModel } from '../../../../../lib/datetimeUtils';
-import { getAccountKindName, getBookingTypeName, getPaymentStatusName, getPricePlanName, getSalaryStatusName, getStatusName } from '../../../../../lib/utils';
+import {
+    getAccountKindName,
+    getBookingTypeName,
+    getPaymentStatusName,
+    getPricePlanName,
+    getSalaryStatusName,
+    getStatusName,
+} from '../../../../../lib/utils';
 
 const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     switch (req.method) {
@@ -103,7 +110,7 @@ const mapToCSV = (bookings: BookingAnalyticsModel[]) => {
         headings
             .map((fieldName) => JSON.stringify((booking as unknown as { [name: string]: string })[fieldName]))
             .map((value) => value.replace('\\"', '”'))
-            .map((value) => value == 'null' ? '' : value)
+            .map((value) => (value == 'null' ? '' : value))
             .join(','),
     );
 

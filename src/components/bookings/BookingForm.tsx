@@ -113,7 +113,9 @@ const BookingForm: React.FC<Props> = ({
             driveFolderId: getValueFromForm('driveFolderId'),
             language: getValueFromForm('language') as Language | undefined,
             fixedPrice: toIntOrUndefined(getValueFromForm('fixedPrice')) ?? null,
-            invoiceDate: toDatetimeOrUndefined(getValueFromForm('invoiceDate')) ? getValueFromForm('invoiceDate') : null,
+            invoiceDate: toDatetimeOrUndefined(getValueFromForm('invoiceDate'))
+                ? getValueFromForm('invoiceDate')
+                : null,
         };
 
         handleSubmitBooking(modifiedBooking);
@@ -607,7 +609,11 @@ const BookingForm: React.FC<Props> = ({
                         name="paymentStatus"
                         defaultValue={booking?.paymentStatus ?? PaymentStatus.NOT_PAID}
                     />
-                    <Form.Control type="hidden" name="invoiceDate" defaultValue={formatDateForForm(booking?.invoiceDate)} />
+                    <Form.Control
+                        type="hidden"
+                        name="invoiceDate"
+                        defaultValue={formatDateForForm(booking?.invoiceDate)}
+                    />
                 </>
             ) : null}
             {isNewBooking ? (

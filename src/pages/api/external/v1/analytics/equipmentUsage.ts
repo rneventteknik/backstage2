@@ -1,13 +1,16 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { respondWithCustomErrorMessage, respondWithInvalidMethodResponse } from '../../../../../lib/apiResponses';
 import { withApiKeyContext } from '../../../../../lib/sessionContext';
-import {
-    getCalculatedDiscount,
-    getPrice,
-} from '../../../../../lib/pricingUtils';
+import { getCalculatedDiscount, getPrice } from '../../../../../lib/pricingUtils';
 import { BookingViewModel } from '../../../../../models/interfaces';
 import { toBooking } from '../../../../../lib/mappers/booking';
-import { formatDatetimeForAnalyticsExport, getEquipmentInDatetime, getEquipmentOutDatetime, getNumberOfDays, toBookingViewModel } from '../../../../../lib/datetimeUtils';
+import {
+    formatDatetimeForAnalyticsExport,
+    getEquipmentInDatetime,
+    getEquipmentOutDatetime,
+    getNumberOfDays,
+    toBookingViewModel,
+} from '../../../../../lib/datetimeUtils';
 import { getBookingTypeName, getGlobalSetting, getPricePlanName, getStatusName } from '../../../../../lib/utils';
 import { AccountKind } from '../../../../../models/enums/AccountKind';
 import { fetchSettings } from '../../../../../lib/db-access/setting';
@@ -71,7 +74,11 @@ interface EquipmentUsageAnalyticsModel {
     equipmentListId: number;
 }
 
-const mapToAnalytics = (bookings: BookingViewModel[], defaultEquipmentAccountExternal: string, defaultEquipmentAccountInternal: string): EquipmentUsageAnalyticsModel[] => {
+const mapToAnalytics = (
+    bookings: BookingViewModel[],
+    defaultEquipmentAccountExternal: string,
+    defaultEquipmentAccountInternal: string,
+): EquipmentUsageAnalyticsModel[] => {
     const allEquipmentEntries = bookings.flatMap((b) =>
         (b.equipmentLists ?? []).flatMap((l) =>
             [...l.listEntries, ...l.listHeadings.flatMap((x) => x.listEntries ?? [])].map((x) => ({
@@ -115,7 +122,7 @@ const mapToAnalytics = (bookings: BookingViewModel[], defaultEquipmentAccountExt
         equipmentListName: x.list.name,
         equipmentListId: x.list.id,
     }));
-}
+};
 
 const mapToCSV = (equipmentUsage: EquipmentUsageAnalyticsModel[]) => {
     const headings = Object.keys(equipmentUsage[0]);
@@ -125,7 +132,7 @@ const mapToCSV = (equipmentUsage: EquipmentUsageAnalyticsModel[]) => {
         headings
             .map((fieldName) => JSON.stringify((booking as unknown as { [name: string]: string })[fieldName]))
             .map((value) => value.replace('\\"', '”'))
-            .map((value) => value == 'null' ? '' : value)
+            .map((value) => (value == 'null' ? '' : value))
             .join(','),
     );
 

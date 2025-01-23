@@ -5,7 +5,14 @@ import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import AdminBookingList from '../admin/AdminBookingList';
 import { InvoiceGroup } from '../../models/interfaces/InvoiceGroup';
-import { faCreditCard, faPaperPlane, faFileDownload, faPen, faTrashCan, faCalendarDay } from '@fortawesome/free-solid-svg-icons';
+import {
+    faCreditCard,
+    faPaperPlane,
+    faFileDownload,
+    faPen,
+    faTrashCan,
+    faCalendarDay,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { toBooking } from '../../lib/mappers/booking';
@@ -289,7 +296,12 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                     />
                     <EditTextModal
                         text={formatDateForForm(new Date())}
-                        onSubmit={(invocieDateAsString) => setBookingInvoiceDates(toDatetimeOrUndefined(invocieDateAsString) ?? null, getSelectedBookingIds())}
+                        onSubmit={(invocieDateAsString) =>
+                            setBookingInvoiceDates(
+                                toDatetimeOrUndefined(invocieDateAsString) ?? null,
+                                getSelectedBookingIds(),
+                            )
+                        }
                         hide={() => setShowSetInvoiceDateModal(false)}
                         show={showSetInvoiceDateModal}
                         modalTitle={'Sätt fakturadatum'}
