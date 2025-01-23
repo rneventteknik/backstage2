@@ -168,7 +168,7 @@ const TimeReportsPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             },
             {
                 key: 'hourly-rate',
-                displayName: 'Timlön',
+                displayName: 'Timarvode',
                 getValue: (timeReport: TimeReportViewModel) => timeReport.hourlyRate,
                 getContentOverride: TimeReportHourlyRateDisplayFn,
                 textAlignment: 'right',
