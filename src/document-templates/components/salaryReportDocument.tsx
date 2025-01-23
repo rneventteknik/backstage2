@@ -69,7 +69,7 @@ export const SalaryReportDocument: React.FC<Props> = ({ salaryReport, globalSett
                                     <Text style={styles.italic}>Antal</Text>
                                 </TableCellFixedWidth>
                                 <TableCellFixedWidth width={70} textAlign="right">
-                                    <Text style={styles.italic}>Timlön</Text>
+                                    <Text style={styles.italic}>Timarvode</Text>
                                 </TableCellFixedWidth>
                                 <TableCellFixedWidth width={70} textAlign="right">
                                     <Text style={styles.italic}>Belopp</Text>
