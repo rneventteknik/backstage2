@@ -46,6 +46,10 @@ const getEncodedInvoices = async (id: number) => {
         );
         const defaultSalaryAccountExternal = getGlobalSetting('accounts.defaultSalaryAccount.external', globalSettings);
         const defaultSalaryAccountInternal = getGlobalSetting('accounts.defaultSalaryAccount.internal', globalSettings);
+        const defaultFixedPriceAccountExternal = getGlobalSetting(
+            'accounts.defaultFixedPriceAccount.external',
+            globalSettings,
+        );
         const locale = booking.language === Language.EN ? 'en-SE' : 'sv-SE';
 
         const invoiceData = getInvoiceData(
@@ -58,6 +62,7 @@ const getEncodedInvoices = async (id: number) => {
             defaultEquipmentAccountInternal,
             defaultSalaryAccountExternal,
             defaultSalaryAccountInternal,
+            defaultFixedPriceAccountExternal,
             t,
             locale,
         );
