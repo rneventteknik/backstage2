@@ -506,6 +506,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                 <span className="flex-grow-1">Kontotyp</span>
                                 <span>{getAccountKindName(booking.accountKind)}</span>
                             </ListGroup.Item>
+                            <ListGroup.Item className="d-flex">
+                                <span className="flex-grow-1">Fakturadatum</span>
+                                <span>{formatDateForForm(booking.invoiceDate)}</span>
+                            </ListGroup.Item>
                         </ListGroup>
                     </Card>
                     <MarkdownCard

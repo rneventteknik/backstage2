@@ -5,13 +5,13 @@ import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import AdminBookingList from '../admin/AdminBookingList';
 import { InvoiceGroup } from '../../models/interfaces/InvoiceGroup';
-import { faCreditCard, faPaperPlane, faFileDownload, faPen, faTrashCan } from '@fortawesome/free-solid-svg-icons';
+import { faCreditCard, faPaperPlane, faFileDownload, faPen, faTrashCan, faCalendarDay } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { toBooking } from '../../lib/mappers/booking';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import { useNotifications } from '../../lib/useNotifications';
-import { toBookingViewModel } from '../../lib/datetimeUtils';
+import { formatDateForForm, toBookingViewModel, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
 import ConfirmModal from '../utils/ConfirmModal';
 import EditTextModal from '../utils/EditTextModal';
 
@@ -26,6 +26,7 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
     const [deSelectedBookingIds, setSelectedBookingIds] = useState<number[]>([]);
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
     const [showChangeNameModal, setShowChangeNameModal] = useState(false);
+    const [showSetInvoiceDateModal, setShowSetInvoiceDateModal] = useState(false);
 
     const {
         showSaveSuccessNotification,
@@ -55,6 +56,38 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                 booking: {
                     id: bookingId,
                     paymentStatus: paymentStatus,
+                },
+            };
+
+            const request = {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            };
+
+            fetch('/api/bookings/' + bookingId, request)
+                .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
+                .then(toBooking)
+                .then(() => {
+                    showSaveSuccessNotification('Bokningen');
+                    onMutate();
+                })
+                .catch((error: Error) => {
+                    console.error(error);
+                    showSaveFailedNotification('Bokningen');
+                });
+        });
+    };
+
+    const setBookingInvoiceDates = (invoiceDate: Date | null, bookingIds: number[] | null = null) => {
+        // If not bookings are specified, set status of all
+        bookingIds = bookingIds ? bookingIds : invoiceGroup?.bookings?.map((b) => b.id) ?? [];
+
+        bookingIds.forEach((bookingId) => {
+            const body = {
+                booking: {
+                    id: bookingId,
+                    invoiceDate: invoiceDate ? formatDateForForm(invoiceDate) : null,
                 },
             };
 
@@ -199,6 +232,16 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                                 Markera som betalda
                             </Button>
 
+                            <Button
+                                variant="secondary"
+                                className="mr-2 mb-2"
+                                onClick={() => setShowSetInvoiceDateModal(true)}
+                                disabled={deSelectedBookingIds.length === invoiceGroup.bookings?.length}
+                            >
+                                <FontAwesomeIcon icon={faCalendarDay} className="mr-2 fa-fw" />
+                                Sätt fakturadatum
+                            </Button>
+
                             <DropdownButton
                                 id="dropdown-basic-button"
                                 className="d-inline-block mb-2 align-middle"
@@ -241,6 +284,15 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                         hide={() => setShowChangeNameModal(false)}
                         show={showChangeNameModal}
                         modalTitle={'Byt namn'}
+                        modalConfirmText={'Spara'}
+                        textarea={false}
+                    />
+                    <EditTextModal
+                        text={formatDateForForm(new Date())}
+                        onSubmit={(invocieDateAsString) => setBookingInvoiceDates(toDatetimeOrUndefined(invocieDateAsString) ?? null, getSelectedBookingIds())}
+                        hide={() => setShowSetInvoiceDateModal(false)}
+                        show={showSetInvoiceDateModal}
+                        modalTitle={'Sätt fakturadatum'}
                         modalConfirmText={'Spara'}
                         textarea={false}
                     />

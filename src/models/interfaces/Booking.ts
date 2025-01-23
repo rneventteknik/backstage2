@@ -41,6 +41,7 @@ export interface Booking extends BaseEntityWithName {
     customerName: string;
     language: Language;
     fixedPrice: number | null;
+    invoiceDate?: Date;
 }
 
 export interface BookingViewModel extends Booking {
