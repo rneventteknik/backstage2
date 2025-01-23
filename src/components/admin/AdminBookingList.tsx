@@ -22,7 +22,7 @@ import DoneIcon from '../utils/DoneIcon';
 import { ClickToEdit } from '../utils/DoubleClickToEdit';
 import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
 import TableStyleLink from '../utils/TableStyleLink';
-import { formatDatetime, getBookingDateHeadingValue } from '../../lib/datetimeUtils';
+import { formatDateForForm, getBookingDateHeadingValue } from '../../lib/datetimeUtils';
 import { addVAT, formatCurrency, getBookingPrice } from '../../lib/pricingUtils';
 import CancelledIcon from '../utils/CancelledIcon';
 
@@ -87,7 +87,6 @@ const AdminBookingList: React.FC<Props> = ({
             >
                 {replaceEmptyStringWithNull(booking.invoiceNumber) ?? <span className="text-muted">XXXXXXX</span>}
             </ClickToEdit>
-            {booking.invoiceDate ? <p className="text-muted mb-0">{formatDatetime(booking.invoiceDate)}</p> : null}
         </>
     );
 
@@ -190,6 +189,7 @@ const AdminBookingList: React.FC<Props> = ({
                 ? getPaymentStatusName(booking.paymentStatus)
                 : '-'}
             {bookingPaymentStatusIsDone(booking) ? <DoneIcon /> : null}
+            {booking.invoiceDate ? <p className="text-muted mb-0">{formatDateForForm(booking.invoiceDate)}</p> : null}
         </>
     );
 
