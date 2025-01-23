@@ -165,6 +165,7 @@ export class BookingObjectionModel extends Model {
     customerName!: string;
     language!: Language;
     fixedPrice!: number;
+    invoiceDate!: string | null;
 }
 
 export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName {
