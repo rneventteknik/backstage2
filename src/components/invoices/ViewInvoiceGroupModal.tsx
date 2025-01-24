@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Booking } from '../../models/interfaces';
-import { getResponseContentOrError } from '../../lib/utils';
+import { getResponseContentOrError, toIntOrUndefined } from '../../lib/utils';
 import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import AdminBookingList from '../admin/AdminBookingList';
@@ -12,13 +12,19 @@ import {
     faPen,
     faTrashCan,
     faCalendarDay,
+    faReceipt,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { toBooking } from '../../lib/mappers/booking';
-import { IBookingObjectionModel } from '../../models/objection-models';
+import { BookingObjectionModel, IBookingObjectionModel } from '../../models/objection-models';
 import { useNotifications } from '../../lib/useNotifications';
-import { formatDateForForm, toBookingViewModel, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
+import {
+    bookingUsageStartDatetimeSortFn,
+    formatDateForForm,
+    toBookingViewModel,
+    toDatetimeOrUndefined,
+} from '../../lib/datetimeUtils';
 import ConfirmModal from '../utils/ConfirmModal';
 import EditTextModal from '../utils/EditTextModal';
 
@@ -34,12 +40,14 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
     const [showConfirmDeleteModal, setShowConfirmDeleteModal] = useState(false);
     const [showChangeNameModal, setShowChangeNameModal] = useState(false);
     const [showSetInvoiceDateModal, setShowSetInvoiceDateModal] = useState(false);
+    const [showSetInvoiceNumberModal, setShowSetInvoiceNumberModal] = useState(false);
 
     const {
         showSaveSuccessNotification,
         showSaveFailedNotification,
         showDeleteSuccessNotification,
         showDeleteFailedNotification,
+        showErrorMessage,
     } = useNotifications();
 
     const toggleBookingSelection = (booking: Booking) => {
@@ -54,78 +62,13 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
     const getSelectedBookingIds = () =>
         invoiceGroup?.bookings?.map((b) => b.id).filter((id) => !deSelectedBookingIds.includes(id));
 
-    const setBookingPaymentStatus = (paymentStatus: PaymentStatus, bookingIds: number[] | null = null) => {
-        // If not bookings are specified, set status of all
-        bookingIds = bookingIds ? bookingIds : invoiceGroup?.bookings?.map((b) => b.id) ?? [];
+    const getSelectedBookingIdsInDateOrder = () =>
+        invoiceGroup?.bookings
+            ?.sort(bookingUsageStartDatetimeSortFn)
+            .map((b) => b.id)
+            .filter((id) => !deSelectedBookingIds.includes(id));
 
-        bookingIds.forEach((bookingId) => {
-            const body = {
-                booking: {
-                    id: bookingId,
-                    paymentStatus: paymentStatus,
-                },
-            };
-
-            const request = {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-            };
-
-            fetch('/api/bookings/' + bookingId, request)
-                .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
-                .then(toBooking)
-                .then(() => {
-                    showSaveSuccessNotification('Bokningen');
-                    onMutate();
-                })
-                .catch((error: Error) => {
-                    console.error(error);
-                    showSaveFailedNotification('Bokningen');
-                });
-        });
-    };
-
-    const setBookingInvoiceDates = (invoiceDate: Date | null, bookingIds: number[] | null = null) => {
-        // If not bookings are specified, set status of all
-        bookingIds = bookingIds ? bookingIds : invoiceGroup?.bookings?.map((b) => b.id) ?? [];
-
-        bookingIds.forEach((bookingId) => {
-            const body = {
-                booking: {
-                    id: bookingId,
-                    invoiceDate: invoiceDate ? formatDateForForm(invoiceDate) : null,
-                },
-            };
-
-            const request = {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body),
-            };
-
-            fetch('/api/bookings/' + bookingId, request)
-                .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
-                .then(toBooking)
-                .then(() => {
-                    showSaveSuccessNotification('Bokningen');
-                    onMutate();
-                })
-                .catch((error: Error) => {
-                    console.error(error);
-                    showSaveFailedNotification('Bokningen');
-                });
-        });
-    };
-
-    const setBookingInvoiceNumber = (invoiceNumber: string, bookingId: number) => {
-        const body = {
-            booking: {
-                id: bookingId,
-                invoiceNumber: invoiceNumber,
-            },
-        };
-
+    const saveBooking = (body: { booking: Partial<BookingObjectionModel> }, bookingId: number) => {
         const request = {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
@@ -143,6 +86,75 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                 console.error(error);
                 showSaveFailedNotification('Bokningen');
             });
+    };
+
+    const setBookingPaymentStatus = (paymentStatus: PaymentStatus, bookingIds: number[] | null = null) => {
+        // If not bookings are specified, set status of all
+        bookingIds = bookingIds ? bookingIds : invoiceGroup?.bookings?.map((b) => b.id) ?? [];
+
+        bookingIds.forEach((bookingId) => {
+            const body = {
+                booking: {
+                    id: bookingId,
+                    paymentStatus: paymentStatus,
+                },
+            };
+
+            saveBooking(body, bookingId);
+        });
+    };
+
+    const setBookingInvoiceDates = (invoiceDate: Date | null, bookingIds: number[] | null = null) => {
+        // If not bookings are specified, set status of all
+        bookingIds = bookingIds ? bookingIds : invoiceGroup?.bookings?.map((b) => b.id) ?? [];
+
+        bookingIds.forEach((bookingId) => {
+            const body = {
+                booking: {
+                    id: bookingId,
+                    invoiceDate: invoiceDate ? formatDateForForm(invoiceDate) : null,
+                },
+            };
+
+            saveBooking(body, bookingId);
+        });
+    };
+
+    const setBookingInvoiceNumbersIncrementing = (
+        invoiceNumberAsString: string,
+        bookingIds: number[] | null = null,
+    ) => {
+        const invoiceNumber = toIntOrUndefined(invoiceNumberAsString);
+
+        if (invoiceNumber === undefined) {
+            showErrorMessage('Felaktigt fakturanummer', 'Fakturanumret måste vara ett heltal.');
+            return;
+        }
+
+        // If not bookings are specified, set status of all
+        bookingIds = bookingIds ? bookingIds : invoiceGroup?.bookings?.map((b) => b.id) ?? [];
+
+        bookingIds.forEach((bookingId, i) => {
+            const body = {
+                booking: {
+                    id: bookingId,
+                    invoiceNumber: (invoiceNumber + i).toString(),
+                },
+            };
+
+            saveBooking(body, bookingId);
+        });
+    };
+
+    const setBookingInvoiceNumber = (invoiceNumber: string, bookingId: number) => {
+        const body = {
+            booking: {
+                id: bookingId,
+                invoiceNumber: invoiceNumber,
+            },
+        };
+
+        saveBooking(body, bookingId);
     };
 
     const deleteInvoiceGroup = (invoiceGroup: InvoiceGroup) => {
@@ -242,6 +254,16 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                             <Button
                                 variant="secondary"
                                 className="mr-2 mb-2"
+                                onClick={() => setShowSetInvoiceNumberModal(true)}
+                                disabled={deSelectedBookingIds.length === invoiceGroup.bookings?.length}
+                            >
+                                <FontAwesomeIcon icon={faReceipt} className="mr-2 fa-fw" />
+                                Sätt referens
+                            </Button>
+
+                            <Button
+                                variant="secondary"
+                                className="mr-2 mb-2"
                                 onClick={() => setShowSetInvoiceDateModal(true)}
                                 disabled={deSelectedBookingIds.length === invoiceGroup.bookings?.length}
                             >
@@ -307,6 +329,19 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                         modalTitle={'Sätt fakturadatum'}
                         modalConfirmText={'Spara'}
                         textarea={false}
+                    />
+                    <EditTextModal
+                        text={''}
+                        onSubmit={(invoiceNumber) =>
+                            setBookingInvoiceNumbersIncrementing(invoiceNumber, getSelectedBookingIdsInDateOrder())
+                        }
+                        hide={() => setShowSetInvoiceNumberModal(false)}
+                        show={showSetInvoiceNumberModal}
+                        modalTitle={'Sätt referens'}
+                        modalConfirmText={'Spara'}
+                        modalHelpText="Fakturanumret måste vara ett heltal. Första bokning får detta nummer, och sedan ökar det med 1 för varje bokning."
+                        textarea={false}
+                        textIsValid={(x) => toIntOrUndefined(x) !== undefined}
                     />
                     <ConfirmModal
                         show={showConfirmDeleteModal}

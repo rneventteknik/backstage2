@@ -231,6 +231,15 @@ const getBookingDates = (booking: Booking) => {
     };
 };
 
+export const bookingUsageStartDatetimeSortFn = (a: Booking, b: Booking) => {
+    const aDates = getBookingDates(a);
+    const bDates = getBookingDates(b);
+
+    return aDates.usageStartDatetime && bDates.usageStartDatetime
+        ? aDates.usageStartDatetime.getTime() - bDates.usageStartDatetime.getTime()
+        : 0;
+};
+
 // Misc helper functions
 //
 export const addDays = <T extends Date | undefined>(date: T, days: number) => {
