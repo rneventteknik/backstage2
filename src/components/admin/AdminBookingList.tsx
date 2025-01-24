@@ -1,4 +1,4 @@
-import { faCircleInfo, faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
@@ -122,22 +122,6 @@ const AdminBookingList: React.FC<Props> = ({
                         }
                     >
                         <FontAwesomeIcon icon={faCircleInfo} className="mr-1" title="" />
-                    </OverlayTrigger>
-                ) : null}
-
-                {booking.fixedPrice !== null && booking.fixedPrice > 0 && (booking.timeReports?.length ?? 0) > 0 ? (
-                    <OverlayTrigger
-                        placement="right"
-                        overlay={
-                            <Tooltip id="1">
-                                <strong>
-                                    Denna bokning har både fast pris och tidrapporter. Detta stödjs inte av Stage
-                                    fakturaexporter och bokningen behöver därför faktureras manuellt.
-                                </strong>
-                            </Tooltip>
-                        }
-                    >
-                        <FontAwesomeIcon icon={faWarning} className="mr-1 text-danger" title="" />
                     </OverlayTrigger>
                 ) : null}
 
