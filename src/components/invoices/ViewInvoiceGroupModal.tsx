@@ -339,7 +339,7 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                         show={showSetInvoiceNumberModal}
                         modalTitle={'Sätt referens'}
                         modalConfirmText={'Spara'}
-                        modalHelpText="Fakturanumret måste vara ett heltal. Första bokning får detta nummer, och sedan ökar det med 1 för varje bokning."
+                        modalHelpText="Första bokningen får detta nummer, och sedan ökar det med 1 för varje bokning. Ange ett heltal."
                         textarea={false}
                         textIsValid={(x) => toIntOrUndefined(x) !== undefined}
                     />
