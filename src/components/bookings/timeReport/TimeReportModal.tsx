@@ -1,7 +1,7 @@
 import React, { FormEvent } from 'react';
 import { Modal, Col, Form, InputGroup, Button } from 'react-bootstrap';
 import { usersFetcher } from '../../../lib/fetchers';
-import { toIntOrUndefined } from '../../../lib/utils';
+import { nameSortFn, toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import useSwr from 'swr';
 import RequiredIndicator from '../../utils/RequiredIndicator';
@@ -240,7 +240,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     }
                                 >
                                     <option value="">Inte tilldelat</option>
-                                    {users?.map((user) => (
+                                    {users?.sort(nameSortFn).map((user) => (
                                         <option key={user.id} value={user.id}>
                                             {user.name}
                                         </option>

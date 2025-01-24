@@ -10,6 +10,7 @@ import {
     getPricePlanName,
     getSalaryStatusName,
     getStatusName,
+    nameSortFn,
     replaceEmptyStringWithNull,
     toIntOrUndefined,
 } from '../../lib/utils';
@@ -296,7 +297,7 @@ const BookingForm: React.FC<Props> = ({
                                 defaultValue={booking.ownerUser?.id ?? booking.ownerUserId}
                                 required={isFieldRequired(Status.DRAFT)}
                             >
-                                {users?.map((user) => (
+                                {users?.sort(nameSortFn).map((user) => (
                                     <option key={user.id} value={user.id}>
                                         {user.name}
                                     </option>
