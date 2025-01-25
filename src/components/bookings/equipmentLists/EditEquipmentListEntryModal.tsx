@@ -339,6 +339,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     equipmentPrice: equipmentListEntryToEditViewModel.equipmentPrice ?? null,
                                     isHidden: equipmentListEntryToEditViewModel.isHidden ?? false,
                                     account: replaceEmptyStringWithNull(equipmentListEntryToEditViewModel.account),
+                                    isPacked: equipmentListEntryToEditViewModel.isPacked ?? false,
                                 };
 
                                 onSave(entryToSave, !equipmentListEntryToEditViewModel.id);
