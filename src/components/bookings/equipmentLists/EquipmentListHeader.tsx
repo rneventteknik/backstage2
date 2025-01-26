@@ -15,6 +15,7 @@ import {
     faRightToBracket,
     faFileDownload,
     faPercent,
+    faListCheck,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
@@ -39,6 +40,7 @@ import BookingReturnalNoteModal from '../BookingReturnalNoteModal';
 import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EditEquipmentListDatesModal from './EditEquipmentListDatesModal';
 import EditTextModal from '../../utils/EditTextModal';
+import Link from 'next/link';
 
 type Props = {
     list: EquipmentList;
@@ -321,11 +323,19 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     </Dropdown.Item>
                                 ) : null}
 
+                                <Dropdown.Divider />
+
+                                <Link href={'/bookings/' + bookingId + '/equipmentList/' + list.id} passHref>
+                                    <Dropdown.Item href={'/bookings/' + bookingId + '/equipmentList/' + list.id}>
+                                        <FontAwesomeIcon icon={faListCheck} className="mr-1 fa-fw" /> Visa som packlista
+                                    </Dropdown.Item>
+                                </Link>
+
                                 <Dropdown.Item
                                     href={'/api/documents/packing-list/sv/' + bookingId + '?list=' + list.id}
                                     target="_blank"
                                 >
-                                    <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Packlista
+                                    <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Ladda ner packlista
                                 </Dropdown.Item>
 
                                 <Dropdown.Divider />
