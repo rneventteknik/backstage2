@@ -1,6 +1,7 @@
 import { WebClient } from '@slack/web-api';
 import { fetchBookingWithEquipmentLists } from './db-access/booking';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
+import { onlyUnique } from './utils';
 
 export const sendSlackMessage = async (message: string, channelId: string) => {
     const client = new WebClient(process.env.SLACK_BOT_TOKEN);
@@ -15,11 +16,31 @@ export const sendSlackMessage = async (message: string, channelId: string) => {
     }
 };
 
+export const startDmGroupWithUsers = async (userSlackIds: string[]): Promise<string> => {
+    try {
+        const client = new WebClient(process.env.SLACK_BOT_TOKEN);
+
+        const response = await client.conversations.open({
+            users: userSlackIds.join(','),
+        });
+
+        if (!response?.ok || !response.channel?.id) {
+            throw new Error('Failed to open conversation');
+        }
+
+        return response.channel.id;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
 export const sendSlackMessageToUserRegardingBookings = async (
     message: string,
     bookings: { id: number; name: string }[],
-    userSlackId: string,
+    userSlackIds: string[],
 ) => {
+    const uniqueUserSlackIds = userSlackIds.filter(onlyUnique);
     const bookingList = bookings.map((x) => {
         const bookingUrl = process.env.APPLICATION_BASE_URL + '/bookings/' + x.id;
         return `>- <${bookingUrl}|${x.name}>\n`;
@@ -27,11 +48,14 @@ export const sendSlackMessageToUserRegardingBookings = async (
 
     const formattedMessage = `${message}\n\n>Angående bokningar:\n${bookingList.join('')}`;
 
-    if (!userSlackId) {
+    if (!uniqueUserSlackIds || uniqueUserSlackIds.length === 0) {
         throw new Error('Invalid slack channel id');
     }
 
-    sendSlackMessage(formattedMessage, userSlackId);
+    const channelId =
+        uniqueUserSlackIds.length === 1 ? uniqueUserSlackIds[0] : await startDmGroupWithUsers(uniqueUserSlackIds);
+
+    sendSlackMessage(formattedMessage, channelId);
 };
 
 export const sendSlackMessageForBooking = async (
