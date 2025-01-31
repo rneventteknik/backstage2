@@ -18,10 +18,12 @@ const PackageEquipmentList: React.FC<Props> = ({ equipmentPackage, language = La
                 <ListGroup.Item key={e.id} className="d-flex">
                     <span className="flex-grow-1">
                         {language == Language.SV ? e.equipment?.name : e.equipment?.nameEN}
-                        <br />
-                        <span className="text-muted">
-                            {language == Language.SV ? e.equipment?.description : e.equipment?.descriptionEN}
-                        </span>
+                        {!!(language == Language.SV ? e.equipment?.description : e.equipment?.descriptionEN) ? (
+                            <p className="text-muted  mb-0">
+                                {language == Language.SV ? e.equipment?.description : e.equipment?.descriptionEN}
+                            </p>
+                        ) : null}
+                        {e.equipmentPrice ? <p className="text-muted mb-0">{e.equipmentPrice.name}</p> : null}
                     </span>
                     <span>
                         {e.isHidden ? (

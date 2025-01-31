@@ -43,6 +43,7 @@ export const fetchEquipmentPackage = async (
     return EquipmentPackageObjectionModel.query(trx)
         .findById(id)
         .withGraphFetched('equipmentEntries.equipment.prices')
+        .withGraphFetched('equipmentEntries.equipmentPrice')
         .withGraphFetched('tags');
 };
 
@@ -50,6 +51,7 @@ export const fetchEquipmentPackages = async (): Promise<EquipmentPackageObjectio
     ensureDatabaseIsInitialized();
     return EquipmentPackageObjectionModel.query()
         .withGraphFetched('equipmentEntries.equipment')
+        .withGraphFetched('equipmentEntries.equipmentPrice')
         .withGraphFetched('tags');
 };
 
