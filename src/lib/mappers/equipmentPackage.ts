@@ -3,7 +3,7 @@ import {
     IEquipmentPackageObjectionModel,
 } from '../../models/objection-models/EquipmentPackageObjectionModel';
 import { EquipmentPackage, EquipmentPackageEntry } from '../../models/interfaces/EquipmentPackage';
-import { toEquipment, toEquipmentTag } from './equipment';
+import { toEquipment, toEquipmentPrice, toEquipmentTag } from './equipment';
 import { toDatetimeOrUndefined } from '../datetimeUtils';
 
 export const toEquipmentPackage = (objectionModel: IEquipmentPackageObjectionModel): EquipmentPackage => {
@@ -35,6 +35,7 @@ export const toEquipmentPackageEntry = (
         ...objectionModel,
         id: objectionModel.id,
         equipment: objectionModel.equipment ? toEquipment(objectionModel.equipment) : undefined,
+        equipmentPrice: objectionModel.equipmentPrice ? toEquipmentPrice(objectionModel.equipmentPrice) : undefined,
         updated: toDatetimeOrUndefined(objectionModel.updated),
         created: toDatetimeOrUndefined(objectionModel.created),
     };

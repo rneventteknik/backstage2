@@ -2,7 +2,7 @@ import React, { FormEvent, useState, useEffect } from 'react';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../models/objection-models';
-import { EquipmentTag } from '../../models/interfaces';
+import { Equipment, EquipmentTag } from '../../models/interfaces';
 import { toEquipment } from '../../lib/mappers/equipment';
 import useSwr from 'swr';
 import { EquipmentPackage, EquipmentPackageEntry } from '../../models/interfaces/EquipmentPackage';
@@ -12,7 +12,9 @@ import { equipmentTagsFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
 import { fixSortIndexUniqueness, getNextSortIndex, moveItemToItem, sortIndexSortFn } from '../../lib/sortIndexUtils';
-import { updateItemsInArrayById } from '../../lib/utils';
+import { getPricePlanName, getResponseContentOrError, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
+import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
+import { PricePlan } from '../../models/enums/PricePlan';
 
 type Props = {
     handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => void;
@@ -35,12 +37,13 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
 
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
-    const addEquipment = (equipment: IEquipmentObjectionModel) => {
+    const addEquipment = (equipment: Equipment) => {
         if (!equipment.id) {
             throw 'Invalid equipment';
         }
 
         const nextId = Math.max(1, ...selectedEquipmentPackageEntries.map((x) => x.id)) + 1;
+        const defaultPrice = equipment.prices && equipment.prices[0] ? equipment.prices[0] : null;
 
         const equipmentPackageEntry: EquipmentPackageEntry = {
             id: nextId, // This id is only used in the client, it is striped before sending to the server
@@ -48,8 +51,10 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             numberOfHours: 0,
             isFree: false,
             isHidden: false,
-            equipment: toEquipment(equipment),
+            equipment: equipment,
             equipmentId: equipment.id,
+            equipmentPrice: defaultPrice,
+            equipmentPriceId: defaultPrice?.id ?? null,
             sortIndex: getNextSortIndex(selectedEquipmentPackageEntries),
         };
         setSelectedEquipmentPackageEntries(
@@ -63,8 +68,35 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         );
     };
 
+    const EquipmentPackagePriceDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
+        <InputGroup className="mb-1">
+            <Form.Control
+                as="select"
+                defaultValue={equipmentPackageEntry.equipmentPrice?.id}
+                onChange={(e) => {
+                    const newEquipmentPrice = equipmentPackageEntry.equipment?.prices.filter(
+                        (x) => x.id == toIntOrUndefined(e.target.value),
+                    )[0];
+
+                    equipmentPackageEntry.equipmentPrice = newEquipmentPrice;
+                    equipmentPackageEntry.equipmentPriceId = newEquipmentPrice?.id ?? null;
+                }}
+            >
+                <option value={undefined} className="font-italic">
+                    Odefinerat
+                </option>
+                {equipmentPackageEntry.equipment?.prices?.map((x) => (
+                    <option key={x.id.toString()} value={x.id.toString()}>
+                        {x.name} ({getPricePlanName(PricePlan.EXTERNAL)} {formatPrice(x)},{' '}
+                        {getPricePlanName(PricePlan.THS)} {formatTHSPrice(x)})
+                    </option>
+                ))}
+            </Form.Control>
+        </InputGroup>
+    );
+
     const EquipmentPackageNumberOfUnitsDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
-        <InputGroup className="mb-1" size="sm">
+        <InputGroup className="mb-1">
             <Form.Control
                 required
                 type="text"
@@ -79,7 +111,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
     );
 
     const EquipmentPackageNumberOfHoursDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
-        <InputGroup className="mb-1" size="sm">
+        <InputGroup className="mb-1">
             <Form.Control
                 required
                 type="text"
@@ -162,6 +194,14 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                 textAlignment: 'center',
             },
             {
+                key: 'price',
+                displayName: 'Pris',
+                getValue: (equipmentPackageEntry: EquipmentPackageEntry) =>
+                    equipmentPackageEntry.equipmentPrice?.name ?? '',
+                getContentOverride: EquipmentPackagePriceDisplayFn,
+                columnWidth: 180,
+            },
+            {
                 key: 'number',
                 displayName: 'Antal',
                 getValue: (equipmentPackageEntry: EquipmentPackageEntry) => equipmentPackageEntry.numberOfUnits,
@@ -222,6 +262,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                 ...x,
                 id: undefined,
                 equipment: undefined,
+                equipmentPrice: undefined,
+                equipmentPriceId: x.equipmentPriceId ?? null,
                 created: x.created?.toString(),
                 updated: x.updated?.toString(),
             })),
@@ -306,7 +348,16 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                                         placeholder="Lägg till utrustning"
                                         includePackages={false}
                                         id="equipment-search"
-                                        onSelect={(x) => addEquipment(x as unknown as IEquipmentObjectionModel)}
+                                        onSelect={(x) =>
+                                            fetch('/api/equipment/' + x.id)
+                                                .then((apiResponse) =>
+                                                    getResponseContentOrError<IEquipmentObjectionModel>(apiResponse),
+                                                )
+                                                .then(toEquipment)
+                                                .then((equipment) => {
+                                                    addEquipment(equipment);
+                                                })
+                                        }
                                     />
                                 </div>
                             </Form.Group>

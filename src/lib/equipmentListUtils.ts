@@ -251,9 +251,16 @@ export const addEquipmentPackage = (
         return;
     }
     addMultipleEquipment(
-        getSortedList(equipmentPackage.equipmentEntries).filter((x) => x.equipment) as (EquipmentPackageEntry & {
-            equipment: Equipment;
-        })[],
+        getSortedList(equipmentPackage.equipmentEntries)
+            .filter((x) => x.equipment)
+            .map((x) => ({
+                equipment: x.equipment!,
+                numberOfUnits: x.numberOfUnits,
+                numberOfHours: x.numberOfHours,
+                isFree: x.isFree,
+                isHidden: x.isHidden,
+                selectedPriceId: x.equipmentPriceId ?? undefined,
+            })),
         list,
         pricePlan,
         language,
