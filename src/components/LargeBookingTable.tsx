@@ -2,7 +2,7 @@ import React, { ChangeEvent } from 'react';
 import { BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
-import { countNullorEmpty, getStatusColor, getStatusName, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
+import { countNullorEmpty, getStatusColor, getStatusName, nameSortFn, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Col, Form } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
@@ -104,6 +104,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
         .map((x) => x.ownerUser)
         .filter(notEmpty)
         .filter(onlyUniqueById)
+        .sort(nameSortFn)
         .map((user) => ({ label: user.name, value: user.id }));
 
     // Check stored values against available values and reset stored values if they do not match available ones
