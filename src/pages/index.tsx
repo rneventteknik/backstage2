@@ -66,7 +66,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                 </Col>
                 <Col xl={6}>
                     <TinyBookingTable
-                        title="Kommande hyror (inom 24h)"
+                        title="Kommande hyror (inom 1 vecka)"
                         bookings={upcomingRentalBookings}
                         showDateHeadings={false}
                     ></TinyBookingTable>

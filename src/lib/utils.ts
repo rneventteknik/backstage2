@@ -353,7 +353,7 @@ export const IsBookingUpcomingRental = (booking: BookingViewModel) => {
         return (
             equipmentOutDatetime &&
             equipmentOutDatetime > addHours(new Date(), -12) &&
-            equipmentOutDatetime < addDays(new Date(), 1)
+            equipmentOutDatetime < addDays(new Date(), 7)
         );
     });
 };
