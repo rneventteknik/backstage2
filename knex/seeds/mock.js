@@ -1912,7 +1912,7 @@ export async function seed(knex) {
             note: 'Standardkonto för fast pris för externa evenemang',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
-            value: 'XXXX',
+            value: '3570',
         },
         {
             key: 'invoice.dimension1',
