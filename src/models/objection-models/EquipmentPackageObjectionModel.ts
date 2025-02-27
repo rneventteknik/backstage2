@@ -4,6 +4,8 @@ import {
     EquipmentTagObjectionModel,
     IEquipmentTagObjectionModel,
     IEquipmentObjectionModel,
+    EquipmentPriceObjectionModel,
+    IEquipmentPriceObjectionModel,
 } from './EquipmentObjectionModel';
 
 export interface IEquipmentPackageObjectionModel extends BaseObjectionModelWithName {
@@ -70,8 +72,11 @@ export interface IEquipmentPackageEntryObjectionModel extends BaseObjectionModel
     updated?: string;
 
     equipmentId: number;
-
     equipment?: IEquipmentObjectionModel;
+
+    equipmentPriceId: number | null;
+    equipmentPrice?: IEquipmentPriceObjectionModel | null;
+
     numberOfUnits: number;
     numberOfHours: number;
     sortIndex: number;
@@ -91,14 +96,26 @@ export class EquipmentPackageEntryObjectionModel extends Model implements IEquip
                 to: 'Equipment.id',
             },
         },
+        equipmentPrice: {
+            relation: Model.HasOneRelation,
+            modelClass: EquipmentPriceObjectionModel,
+            join: {
+                from: 'EquipmentPackageEntry.equipmentPriceId',
+                to: 'EquipmentPrice.id',
+            },
+        },
     });
 
     id!: number;
     created?: string;
     updated?: string;
-    equipmentId!: number;
 
+    equipmentId!: number;
     equipment?: EquipmentObjectionModel;
+
+    equipmentPriceId!: number | null;
+    equipmentPrice?: EquipmentPriceObjectionModel | null;
+
     numberOfUnits!: number;
     numberOfHours!: number;
     sortIndex!: number;

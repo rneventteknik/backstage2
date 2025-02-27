@@ -2,6 +2,7 @@ import { BaseEntity, BaseEntityWithName } from './BaseEntity';
 import { Equipment } from './Equipment';
 import { Image } from './Image';
 import { EquipmentTag } from './EquipmentTag';
+import { EquipmentPrice } from './EquipmentPrice';
 
 export interface EquipmentPackage extends BaseEntityWithName {
     note: string;
@@ -18,6 +19,8 @@ export interface EquipmentPackage extends BaseEntityWithName {
 export interface EquipmentPackageEntry extends BaseEntity {
     equipmentId: number;
     equipment?: Equipment;
+    equipmentPriceId: number | null;
+    equipmentPrice?: EquipmentPrice | null;
     numberOfUnits: number;
     numberOfHours: number;
     sortIndex: number;
