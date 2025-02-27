@@ -285,6 +285,7 @@ export interface IEquipmentListEntryObjectionModel extends BaseObjectionModelWit
     discount: number;
     isHidden: boolean;
     account: string | null;
+    isPacked: boolean;
 
     equipmentListId?: number | null;
     equipmentListHeadingId?: number | null;
@@ -332,6 +333,7 @@ export class EquipmentListEntryObjectionModel extends Model implements IEquipmen
     discount!: number;
     isHidden!: boolean;
     account!: string | null;
+    isPacked!: boolean;
 
     equipmentListId?: number | null;
     equipmentListHeadingId?: number | null;

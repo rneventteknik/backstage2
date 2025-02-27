@@ -111,6 +111,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
             pricePerUnit: x.pricePerUnit,
             isHidden: x.isHidden,
             account: x.account,
+            isPacked: false,
         };
 
         if (resetNames && x.equipment) {

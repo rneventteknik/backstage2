@@ -7,7 +7,7 @@ import {
 } from '../../../../../lib/apiResponses';
 import { SessionContext, withSessionContext } from '../../../../../lib/sessionContext';
 import { Status } from '../../../../../models/enums/Status';
-import { BookingChangelogEntryType, logChangeToBooking } from '../../../../../lib/changelogUtils';
+import { BookingChangelogEntryType, hasChanges, logChangeToBooking } from '../../../../../lib/changelogUtils';
 import { fetchBookingWithEquipmentLists } from '../../../../../lib/db-access/booking';
 import {
     deleteEquipmentListEntry,
@@ -27,16 +27,11 @@ const handler = withSessionContext(
         }
 
         const booking = await fetchBookingWithEquipmentLists(bookingId);
+        const oldEquipmentListEntry = booking.equipmentLists
+            .flatMap((list) => [...list.listEntries, ...list.listHeadings.flatMap((x) => x.listEntries ?? [])])
+            .find((entry) => entry.id === equipmentListEntryId);
 
-        if (
-            !booking.equipmentLists.some(
-                (list) =>
-                    list.listEntries.some((entry) => entry.id === equipmentListEntryId) ||
-                    list.listHeadings.some((heading) =>
-                        heading.listEntries.some((entry) => entry.id === equipmentListEntryId),
-                    ),
-            )
-        ) {
+        if (!oldEquipmentListEntry) {
             respondWithEntityNotFoundResponse(res);
             return;
         }
@@ -87,12 +82,15 @@ const handler = withSessionContext(
 
                 await updateEquipmentListEntry(equipmentListEntryId, req.body.equipmentListEntry)
                     .then(async (result) => {
-                        await logChangeToBooking(
-                            context.currentUser,
-                            bookingId,
-                            booking.name,
-                            BookingChangelogEntryType.EQUIPMENTLIST,
-                        );
+
+                        if (hasChanges(oldEquipmentListEntry, req.body.equipmentListEntry, ['isPacked'])) {
+                            await logChangeToBooking(
+                                context.currentUser,
+                                bookingId,
+                                booking.name,
+                                BookingChangelogEntryType.EQUIPMENTLIST,
+                            );
+                        }
 
                         res.status(200).json(result);
                     })

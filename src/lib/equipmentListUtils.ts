@@ -137,6 +137,7 @@ export const getDefaultListEntryFromEquipment = (
         discount: currency(0),
         isHidden: false,
         account: null,
+        isPacked: false,
         ...prices,
     };
 
@@ -373,6 +374,7 @@ export const importEquipmentEntries = (
             pricePerHour: x.pricePerHour,
             isHidden: x.isHidden,
             account: x.account,
+            isPacked: false,
         };
 
         nextEntryId -= 1;
