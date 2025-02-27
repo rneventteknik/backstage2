@@ -113,6 +113,18 @@ const EquipmentListHeader: React.FC<Props> = ({
         list.equipmentOutDatetime ||
         list.equipmentInDatetime;
 
+    const getEquipmentDateColor = (list: EquipmentList) => {
+        if (!!list.equipmentOutDatetime) {
+            return '';
+        }
+
+        if (bookingStatus === Status.BOOKED) {
+            return 'text-danger';
+        }
+
+        return 'text-muted';
+    };
+
     // HTML template
     //
     return (
@@ -483,7 +495,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                         <Col md={3} xs={6}>
                             <small>Utlämning</small>
                             <div
-                                className={'mb-3 ' + (!!list.equipmentOutDatetime ? '' : 'text-muted')}
+                                className={'mb-3 ' + getEquipmentDateColor(list)}
                                 style={{ fontSize: '1.2em' }}
                                 title={formatDatetimeForForm(getEquipmentOutDatetime(list))}
                             >
@@ -493,7 +505,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                         <Col md={3} xs={6}>
                             <small>Återlämning</small>
                             <div
-                                className={'mb-3 ' + (!!list.equipmentOutDatetime ? '' : 'text-muted')}
+                                className={'mb-3 ' + getEquipmentDateColor(list)}
                                 style={{ fontSize: '1.2em' }}
                                 title={formatDatetimeForForm(getEquipmentInDatetime(list))}
                             >

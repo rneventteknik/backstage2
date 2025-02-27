@@ -120,12 +120,22 @@ const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
         hide();
         onChange(booking);
     };
+
     return (
         <Modal show={show} onHide={hide} size="lg" backdrop="static">
             <Modal.Header closeButton>
                 <Modal.Title>Verifiera bokningsinformationen</Modal.Title>
             </Modal.Header>
             <Modal.Body className="was-validated">
+                {(booking.status === Status.DONE || booking.status === Status.BOOKED) &&
+                booking.bookingType === BookingType.RENTAL &&
+                equipmentLists &&
+                equipmentLists.some((x) => !x.equipmentOutDatetime) ? (
+                    <Alert variant="danger">
+                        Den här bokningen har utrustningslistor utan in- och utlämningstider. Är du säker på att du vill
+                        markera den som bokad?
+                    </Alert>
+                ) : null}
                 {booking.status === Status.DONE &&
                 booking.bookingType === BookingType.GIG &&
                 timeReports &&
