@@ -1,10 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { respondWithCustomErrorMessage, respondWithInvalidDataResponse } from '../../../lib/apiResponses';
 import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
-import { fetchBookings } from '../../../lib/db-access';
+import { fetchBookings, fetchUser } from '../../../lib/db-access';
 import { onlyUniqueById } from '../../../lib/utils';
 import { toUser } from '../../../lib/mappers/user';
-import { sendSlackMessageToUserRegardingBookings } from '../../../lib/slack';
+import { sendSlackMessageToUsersRegardingBookings } from '../../../lib/slack';
 import { logMessageSentToBookingOwner } from '../../../lib/changelogUtils';
 
 const handler = withSessionContext(
@@ -22,7 +22,13 @@ const handler = withSessionContext(
             return;
         }
 
+        if (!context.currentUser.userId) {
+            throw new Error('User not logged in');
+        }
+
         try {
+            const currentUser = await fetchUser(context.currentUser.userId);
+
             const bookings = (await fetchBookings()).filter((x) => bookingIds.includes(x.id));
             const recipients = bookings
                 .map((x) => x.ownerUser!)
@@ -32,10 +38,12 @@ const handler = withSessionContext(
 
             await Promise.all(
                 recipients.map((recipient) => {
-                    const slackId = recipient.slackId;
+                    const slackIds = !!currentUser?.slackId
+                        ? [recipient.slackId, currentUser.slackId]
+                        : [recipient.slackId];
                     const bookingsForRecipient = bookings.filter((x) => x.ownerUser!.id === recipient.id);
 
-                    return sendSlackMessageToUserRegardingBookings(message, bookingsForRecipient, slackId);
+                    return sendSlackMessageToUsersRegardingBookings(message, bookingsForRecipient, slackIds);
                 }),
             );
 
