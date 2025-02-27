@@ -35,7 +35,7 @@ export const startDmGroupWithUsers = async (userSlackIds: string[]): Promise<str
     }
 };
 
-export const sendSlackMessageToUserRegardingBookings = async (
+export const sendSlackMessageToUsersRegardingBookings = async (
     message: string,
     bookings: { id: number; name: string }[],
     userSlackIds: string[],

@@ -4,7 +4,7 @@ import { SessionContext, withSessionContext } from '../../../lib/sessionContext'
 import { fetchBookings, fetchUser } from '../../../lib/db-access';
 import { onlyUniqueById } from '../../../lib/utils';
 import { toUser } from '../../../lib/mappers/user';
-import { sendSlackMessageToUserRegardingBookings } from '../../../lib/slack';
+import { sendSlackMessageToUsersRegardingBookings } from '../../../lib/slack';
 import { logMessageSentToBookingOwner } from '../../../lib/changelogUtils';
 
 const handler = withSessionContext(
@@ -43,7 +43,7 @@ const handler = withSessionContext(
                         : [recipient.slackId];
                     const bookingsForRecipient = bookings.filter((x) => x.ownerUser!.id === recipient.id);
 
-                    return sendSlackMessageToUserRegardingBookings(message, bookingsForRecipient, slackIds);
+                    return sendSlackMessageToUsersRegardingBookings(message, bookingsForRecipient, slackIds);
                 }),
             );
 
