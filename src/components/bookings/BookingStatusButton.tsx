@@ -120,6 +120,7 @@ const BookingStatusModal: React.FC<BookingStatusModalProps> = ({
         hide();
         onChange(booking);
     };
+
     return (
         <Modal show={show} onHide={hide} size="lg" backdrop="static">
             <Modal.Header closeButton>
