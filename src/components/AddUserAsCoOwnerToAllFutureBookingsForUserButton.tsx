@@ -16,7 +16,7 @@ type Props = {
     mutate: () => void;
 };
 
-const ManageCoOwnerBookingsButton: React.FC<Props> = ({
+const AddUserAsCoOwnerToAllFutureBookingsForUserButton: React.FC<Props> = ({
     className,
     currentUser,
     currentCoOwnerBookings,
@@ -92,4 +92,4 @@ const ManageCoOwnerBookingsButton: React.FC<Props> = ({
     );
 };
 
-export default ManageCoOwnerBookingsButton;
+export default AddUserAsCoOwnerToAllFutureBookingsForUserButton;

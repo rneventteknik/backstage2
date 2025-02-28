@@ -22,7 +22,7 @@ import { IfNotReadonly } from '../components/utils/IfAdmin';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import CurrentlyOutEquipment from '../components/CurrentlyOutEquipment';
-import ManageCoOwnerBookingsButton from '../components/ManageCoOwnerBookingsButton';
+import AddUserAsCoOwnerToAllFutureBookingsForUserButton from '../components/AddUserAsCoOwnerToAllFutureBookingsForUserButton';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -68,7 +68,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                         tableSettingsOverride={{ defaultSortAscending: false }}
                     >
                         <div>
-                            <ManageCoOwnerBookingsButton
+                            <AddUserAsCoOwnerToAllFutureBookingsForUserButton
                                 className="mr-2 ml-2 mb-2"
                                 currentUser={currentUser}
                                 currentCoOwnerBookings={coOwnerBookings ?? []}
