@@ -6,7 +6,7 @@ import { fetchSettings } from '../../../lib/db-access/setting';
 import { withSessionContext } from '../../../lib/sessionContext';
 import { getGlobalSetting } from '../../../lib/utils';
 import { CalendarResult } from '../../../models/misc/CalendarResult';
-import { getNameTagsFromEventName, getUsersIdsFromEventName } from '../../../lib/calenderUtils';
+import { mapCalendarEvent } from '../../../lib/calenderUtils';
 
 const calendarClient = calendar({
     version: 'v3',
@@ -43,19 +43,7 @@ const mapCalendarResponse = (res: GaxiosResponse<calendar_v3.Schema$Events>): Pr
         return Promise.resolve(null);
     }
 
-    return Promise.all(
-        res.data.items
-            .filter((x) => x.id)
-            .map(async (x) => ({
-                id: x.id as string,
-                name: x.summary ?? undefined,
-                link: x.htmlLink ?? undefined,
-                start: x.start?.dateTime ?? x.start?.date ?? undefined,
-                end: x.end?.dateTime ?? x.start?.date ?? undefined,
-                initials: getNameTagsFromEventName(x.summary ?? ''),
-                workingUsersIds: await getUsersIdsFromEventName(x.summary ?? ''),
-            })),
-    );
+    return Promise.all(res.data.items.filter((x) => x.id).map(mapCalendarEvent));
 };
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
