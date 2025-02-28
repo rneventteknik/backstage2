@@ -35,7 +35,7 @@ const ManageCoOwnerBookingsButton: React.FC<Props> = ({
             headers: { 'Content-Type': 'application/json' },
         };
 
-        fetch('/api/users/' + userId + '/coOwnerBookings/' + bookingId, request)
+        return fetch('/api/users/' + userId + '/coOwnerBookings/' + bookingId, request)
             .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
             .then(() => {
                 showGeneralSuccessMessage('Favorit tillagd');
