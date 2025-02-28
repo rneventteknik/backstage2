@@ -36,7 +36,6 @@ export const mapCalendarEvent = async (event: calendar_v3.Schema$Event): Promise
         start: event.start?.dateTime ?? event.start?.date ?? undefined,
         end: event.end?.dateTime ?? event.start?.date ?? undefined,
         existingBookingId: (await fetchFirstBookingByCalendarBookingId(event.id as string))?.id,
-        initials: getNameTagsFromEventName(event.summary ?? ''),
         workingUsers: await getUsersFromEventName(event.summary ?? ''),
     };
 };

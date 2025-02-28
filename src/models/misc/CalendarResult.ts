@@ -10,6 +10,5 @@ export interface CalendarResult {
     start?: string;
     end?: string;
     existingBookingId?: number;
-    initials: string[];
     workingUsers: UserObjectionModel[];
 }
