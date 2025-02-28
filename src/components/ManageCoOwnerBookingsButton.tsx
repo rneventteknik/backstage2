@@ -53,7 +53,7 @@ const ManageCoOwnerBookingsButton: React.FC<Props> = ({
         const userId = currentUser.userId!;
 
         const calendarEvents = await fetchCalenderEvents();
-        const calenderEventForThisUser = calendarEvents.filter((event) => event.workingUsersIds.includes(userId));
+        const calenderEventForThisUser = calendarEvents.filter((event) => event.workingUsers.map(x => x.id).includes(userId));
         const bookingIds = calenderEventForThisUser.map((event) => event.existingBookingId).filter(notEmpty);
 
         const bookingsToAdd = bookingIds.filter(

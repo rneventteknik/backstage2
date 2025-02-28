@@ -28,6 +28,7 @@ import {
     faFileText,
     faLock,
     faLockOpen,
+    faMessage,
     faPen,
     faTimesCircle,
     faTrashCan,
@@ -61,13 +62,19 @@ import BookingInfoSection from '../../../components/bookings/BookingInfoSection'
 import FilesCard from '../../../components/bookings/FilesCard';
 import currency from 'currency.js';
 import PreviousBookingsCard from '../../../components/bookings/PreviousBookingsCard';
+import { BookingType } from '../../../models/enums/BookingType';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
 const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage } = useNotifications();
+    const {
+        showSaveSuccessNotification,
+        showSaveFailedNotification,
+        showGeneralSuccessMessage,
+        showGeneralDangerMessage,
+    } = useNotifications();
 
     // Enable this when we enable the KårX feature
     // const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
@@ -167,6 +174,27 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             .catch((error) => {
                 console.error(error);
                 showGeneralDangerMessage('Fel!', 'Bokningen kunde inte tas bort');
+            });
+    };
+
+    // Send message to booking workers
+    //
+    const sendMessageToBookingWorkers = () => {
+        const request = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                bookingId: booking.id,
+                message: `Denna kanal har automatiskt skapats för bokningen *${booking.name}* som äger rum ${formatDateForForm(booking.usageStartDatetime)}. Här kan ni diskutera bokningen och dela viktig information.`,
+            }),
+        };
+
+        fetch('/api/sendMessage/toBookingWorkers', request)
+            .then(getResponseContentOrError)
+            .then(() => showGeneralSuccessMessage('Meddelandet skickades'))
+            .catch((error) => {
+                console.error(error);
+                showGeneralDangerMessage('Fel!', 'Meddelandet kunde inte skickas');
             });
     };
 
@@ -299,6 +327,15 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
                 {!readonly ? (
                     <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                        {booking.bookingType == BookingType.GIG ? (
+                            <Dropdown.Item
+                                onClick={() => sendMessageToBookingWorkers()}
+                                disabled={!booking.calendarBookingId}
+                            >
+                                <FontAwesomeIcon icon={faMessage} className="mr-1 fa-fw" /> Skicka meddelande till de
+                                som jobbar
+                            </Dropdown.Item>
+                        ) : null}
                         {booking.status !== Status.CANCELED && booking.status !== Status.DONE ? (
                             <Dropdown.Item onClick={() => setShowCancelModal(true)}>
                                 <FontAwesomeIcon icon={faTimesCircle} className="mr-1" /> Ställ in bokningen

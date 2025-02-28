@@ -1,8 +1,10 @@
-import { calendar_v3 } from '@googleapis/calendar';
-import { fetchUserIdByNameTag } from './db-access/user';
+import { calendar, calendar_v3 } from '@googleapis/calendar';
+import { fetchUserByNameTag } from './db-access/user';
 import { notEmpty } from './utils';
 import { CalendarResult } from '../models/misc/CalendarResult';
 import { fetchFirstBookingByCalendarBookingId } from './db-access/booking';
+import { GaxiosResponse } from 'googleapis-common';
+import { UserObjectionModel } from '../models/objection-models';
 
 export const getNameTagsFromEventName = (name: string): string[] => {
     // Get part of string within [] brackets
@@ -16,11 +18,11 @@ export const getNameTagsFromEventName = (name: string): string[] => {
     return [];
 };
 
-export const getUsersIdsFromEventName = async (name: string): Promise<number[]> => {
+export const getUsersFromEventName = async (name: string): Promise<UserObjectionModel[]> => {
     const nameTags = getNameTagsFromEventName(name ?? '');
-    const users = await Promise.all(nameTags.map(fetchUserIdByNameTag));
+    const users = await Promise.all(nameTags.map(fetchUserByNameTag));
 
-    return users.map((x) => x?.id).filter(notEmpty);
+    return users.filter(notEmpty);
 };
 
 export const mapCalendarEvent = async (event: calendar_v3.Schema$Event): Promise<CalendarResult> => {
@@ -35,6 +37,38 @@ export const mapCalendarEvent = async (event: calendar_v3.Schema$Event): Promise
         end: event.end?.dateTime ?? event.start?.date ?? undefined,
         existingBookingId: (await fetchFirstBookingByCalendarBookingId(event.id as string))?.id,
         initials: getNameTagsFromEventName(event.summary ?? ''),
-        workingUsersIds: await getUsersIdsFromEventName(event.summary ?? ''),
+        workingUsers: await getUsersFromEventName(event.summary ?? ''),
     };
 };
+
+const mapCalendarResponse = (res: GaxiosResponse<calendar_v3.Schema$Events>): Promise<CalendarResult[] | null> => {
+    if (!res.data.items) {
+        return Promise.resolve(null);
+    }
+
+    return Promise.all(res.data.items.filter((x) => x.id).map(mapCalendarEvent));
+};
+
+const calendarClient = calendar({
+    version: 'v3',
+    auth: process.env.CALENDAR_API_KEY,
+});
+
+export const getCalendarEvent = (calendarEventId: string) =>
+    calendarClient.events
+        .get({
+            calendarId: process.env.CALENDAR_ID,
+            eventId: calendarEventId,
+        })
+        .then((result) => mapCalendarEvent(result.data));
+
+export const getCalendarEvents = () =>
+    calendarClient.events
+        .list({
+            calendarId: process.env.CALENDAR_ID,
+            timeMin: new Date().toISOString(),
+            maxResults: 135,
+            singleEvents: true,
+            orderBy: 'startTime',
+        })
+        .then(mapCalendarResponse);
