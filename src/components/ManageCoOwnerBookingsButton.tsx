@@ -62,6 +62,10 @@ const ManageCoOwnerBookingsButton: React.FC<Props> = ({
         coOwnerBookingsToAdd.forEach((bookingId) => {
             currentUser.userId && bookingId ? addUserAsCoOwnerToBooking(currentUser.userId, bookingId) : null;
         });
+
+        if (coOwnerBookingsToAdd.length === 0) {
+            showGeneralSuccessMessage('Inga nya bokningar att lägga till');
+        }
     };
 
     return (
