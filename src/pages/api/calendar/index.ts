@@ -7,6 +7,7 @@ import { fetchSettings } from '../../../lib/db-access/setting';
 import { withSessionContext } from '../../../lib/sessionContext';
 import { getGlobalSetting } from '../../../lib/utils';
 import { CalendarResult } from '../../../models/misc/CalendarResult';
+import { fetchUserIdByNameTag } from '../../../lib/db-access/user';
 
 const calendarClient = calendar({
     version: 'v3',
@@ -56,6 +57,8 @@ const mapCalendarResponse = (res: GaxiosResponse<calendar_v3.Schema$Events>): Pr
                 start: x.start?.dateTime ?? x.start?.date ?? undefined,
                 end: x.end?.dateTime ?? x.start?.date ?? undefined,
                 existingBookingId: (await fetchFirstBookingByCalendarBookingId(x.id as string))?.id,
+                initials: getNameTagsFromEventName(x.summary ?? ''),
+                workingUsersIds: await getUsersIdsFromEventName(x.summary ?? ''),
             })),
     );
 };
@@ -83,5 +86,24 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
     }
     return;
 });
+
+const getNameTagsFromEventName = (name: string): string[] => {
+    // Get part of string within [] brackets
+    const match = name.match(/\[(.*?)\]/);
+    if (match) {
+        return match[1]
+            .split(',')
+            .map((x) => (x.includes(':') ? x.split(':')[1] : x))
+            .map((x) => x.trim());
+    }
+    return [];
+};
+
+const getUsersIdsFromEventName = async (name: string): Promise<number[]> => {
+    const nameTags = getNameTagsFromEventName(name ?? '');
+    const users = await Promise.all(nameTags.map(fetchUserIdByNameTag));
+
+    return users.filter((x) => x !== undefined).map((x) => x.id!);
+};
 
 export default handler;

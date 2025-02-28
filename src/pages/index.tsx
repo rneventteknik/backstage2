@@ -22,6 +22,7 @@ import { IfNotReadonly } from '../components/utils/IfAdmin';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import CurrentlyOutEquipment from '../components/CurrentlyOutEquipment';
+import ManageCoOwnerBookingsButton from '../components/ManageCoOwnerBookingsButton';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -30,7 +31,10 @@ type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { data: bookings } = useSwr('/api/bookings', bookingsFetcher);
     const { data: myBookings } = useSwr('/api/users/' + currentUser.userId + '/bookings', bookingsFetcher);
-    const { data: coOwnerBookings } = useSwr('/api/users/' + currentUser.userId + '/coOwnerBookings', bookingsFetcher);
+    const { data: coOwnerBookings, mutate: mutateCoOwnerBookings } = useSwr(
+        '/api/users/' + currentUser.userId + '/coOwnerBookings',
+        bookingsFetcher,
+    );
 
     const myDraftOrBookedBookings = myBookings?.map(toBookingViewModel).filter(IsBookingDraftOrBooked);
     const upcomingRentalBookings = bookings?.map(toBookingViewModel).filter(IsBookingUpcomingRental);
@@ -62,7 +66,16 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                         title="Mina favoritbokningar"
                         bookings={coOwnerBookings}
                         tableSettingsOverride={{ defaultSortAscending: false }}
-                    ></TinyBookingTable>
+                    >
+                        <div>
+                            <ManageCoOwnerBookingsButton
+                                className="mr-2 ml-2 mb-2"
+                                currentUser={currentUser}
+                                currentCoOwnerBookings={coOwnerBookings ?? []}
+                                mutate={mutateCoOwnerBookings}
+                            />
+                        </div>
+                    </TinyBookingTable>
                 </Col>
                 <Col xl={6}>
                     <TinyBookingTable
