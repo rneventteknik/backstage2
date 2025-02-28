@@ -185,7 +185,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 bookingId: booking.id,
-                message: `Denna kanal har automatiskt skapats för bokningen *${booking.name}* som äger rum ${formatDateForForm(booking.usageStartDatetime)}. Här kan ni diskutera bokningen och dela viktig information.`,
             }),
         };
 
