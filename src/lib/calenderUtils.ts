@@ -1,5 +1,5 @@
-import { fetchUserIdByNameTag } from "./db-access/user";
-import { notEmpty } from "./utils";
+import { fetchUserIdByNameTag } from './db-access/user';
+import { notEmpty } from './utils';
 
 export const getNameTagsFromEventName = (name: string): string[] => {
     // Get part of string within [] brackets
@@ -17,5 +17,5 @@ export const getUsersIdsFromEventName = async (name: string): Promise<number[]> 
     const nameTags = getNameTagsFromEventName(name ?? '');
     const users = await Promise.all(nameTags.map(fetchUserIdByNameTag));
 
-    return users.map(x => x?.id).filter(notEmpty);
+    return users.map((x) => x?.id).filter(notEmpty);
 };

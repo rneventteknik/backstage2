@@ -56,7 +56,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                     <TinyBookingTable title="Mina bokningar" bookings={myDraftOrBookedBookings}>
                         <IfNotReadonly currentUser={currentUser}>
                             <Link href="/bookings/new" passHref>
-                                <Button variant="secondary" as="span" className="mr-2 ml-2 mb-2">
+                                <Button size="sm" variant="secondary" as="span" className="mr-2 ml-2 mb-2">
                                     <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till bokning
                                 </Button>
                             </Link>

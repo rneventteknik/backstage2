@@ -86,12 +86,16 @@ const TinyBookingTable: React.FC<Props> = ({
 
     return (
         <Card className="mb-3">
-            <Card.Header>{title}</Card.Header>
+            <Card.Header>
+                <div className="d-flex justify-content-between">
+                    {title}
+                    {children}
+                </div>
+            </Card.Header>
             <TableDisplay
                 entities={bookings.map(toBookingViewModel)}
                 configuration={{ ...tableSettings, ...tableSettingsOverride }}
             />
-            {children}
         </Card>
     );
 };
