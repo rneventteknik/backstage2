@@ -191,7 +191,6 @@ export const startSlackChannelWithUsersForBooking = async (booking: Booking, use
     const channelId = await startChannelIfNotExists(channelName);
 
     await inviteUsersToChannel(uniqueUserSlackIds, channelId);
-
     await sendSlackMessage(formattedMessage, channelId);
 };
 

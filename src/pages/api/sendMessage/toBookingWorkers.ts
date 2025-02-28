@@ -23,7 +23,6 @@ const handler = withSessionContext(
 
         try {
             const currentUser = await fetchUser(context.currentUser.userId);
-
             const booking = await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
 
             if (!booking.calendarBookingId || booking.calendarBookingId.length === 0) {
@@ -32,12 +31,11 @@ const handler = withSessionContext(
             }
 
             const calenderEvent = await getCalendarEvent(booking.calendarBookingId);
-
+            const bookingWorkersSlackIds = calenderEvent.workingUsers?.map((user) => user.slackId);
             const currentUserSlackId = currentUser?.slackId;
             const bookingOwnerSlackId = booking.ownerUser?.slackId;
-            const bookingWorkersSlackIds = calenderEvent.workingUsers?.map((user) => user.slackId);
 
-            const slackIds = [currentUserSlackId, bookingOwnerSlackId, ...bookingWorkersSlackIds]
+            const slackIds = [...bookingWorkersSlackIds, currentUserSlackId, bookingOwnerSlackId]
                 .filter((x) => !!x && x?.length > 0)
                 .filter(notEmpty)
                 .filter(onlyUnique);
