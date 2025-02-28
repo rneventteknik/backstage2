@@ -32,3 +32,5 @@ export const compareLists = <T extends BaseObjectionModel>(
 
     return { toAdd, toDelete, toUpdate };
 };
+
+export const getDriveLink = (driveFolderId: string) => 'https://drive.google.com/drive/folders/' + driveFolderId;
