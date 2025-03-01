@@ -1,8 +1,4 @@
-@import 'variables';
-@import '../../node_modules/bootstrap/scss/_functions';
-@import '../../node_modules/bootstrap/scss/_mixins';
-@import 'bootstrap-variable-overrides';
-@import '../../node_modules/bootstrap/scss/_variables';
-@import 'bootstrap-component-overrides';
-@import 'react-bootstrap-typeahead-overrides.scss';
-@import '../../node_modules/bootstrap/scss/bootstrap';
+@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
