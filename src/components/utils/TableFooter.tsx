@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
+import { Form, FormControlSelect, FormGroup, FormLabel } from '../ui/Form';
 
 type Props = {
     viewCount: number;
@@ -24,18 +24,17 @@ const TableFooterWithViewCount: React.FC<Props> = ({
             </div>
             <div className="flex-grow-1 ml-2">
                 <Form>
-                    <Form.Group controlId="viewcount">
+                    <FormGroup >
                         <div className="d-flex justify-content-end">
                             <div>
-                                <Form.Label className="text-right">Antal {entityTypeDisplayName} att visa</Form.Label>
+                                <FormLabel className="text-right" htmlFor="viewcount">Antal {entityTypeDisplayName} att visa</FormLabel>
                             </div>
                             <div>
-                                <Form.Control
-                                    as="select"
+                                <FormControlSelect
                                     name="viewcount"
                                     className="ml-2"
                                     size="sm"
-                                    defaultValue={viewCount}
+                                    defaultValue={viewCount.toString()}
                                     onChange={(e) => setViewCount(Number(e.target.value))}
                                 >
                                     <option value="25">25</option>
@@ -47,10 +46,10 @@ const TableFooterWithViewCount: React.FC<Props> = ({
                                     <option value={totalCount}>
                                         Alla {totalCount} {entityTypeDisplayName}
                                     </option>
-                                </Form.Control>
+                                </FormControlSelect>
                             </div>
                         </div>
-                    </Form.Group>
+                    </FormGroup>
                 </Form>
             </div>
         </div>

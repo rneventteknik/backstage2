@@ -1,8 +1,10 @@
 import React, { ChangeEvent } from 'react';
-import { Button, Col, Collapse, Form } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { useSessionStorageState } from '../lib/useSessionStorageState';
+import { Col, Row } from './ui/Row';
+import { FormControl, FormGroup } from './ui/Form';
+import { Button } from './ui/Button';
 
 type Props = {
     handleChangeFilterString: (booking: ChangeEvent<HTMLInputElement>) => void;
@@ -23,19 +25,18 @@ const AdvancedFilters: React.FC<Props> = ({
 
     return (
         <>
-            <Form.Row>
+            <Row>
                 <Col>
-                    <Form.Group>
-                        <Form.Control
-                            type="text"
+                    <FormGroup>
+                        <FormControl
                             placeholder="Fritextfilter"
                             onChange={handleChangeFilterString}
                             value={searchText}
                         />
-                    </Form.Group>
+                    </FormGroup>
                 </Col>
-                <Col md="auto">
-                    <Form.Group>
+                <Col>
+                    <FormGroup>
                         <Button variant="secondary" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
                             <FontAwesomeIcon icon={faFilter} className="mr-1" /> {showAdvancedFilters ? 'Göm' : 'Visa'}{' '}
                             filter
@@ -46,12 +47,13 @@ const AdvancedFilters: React.FC<Props> = ({
                                 {activeFilterCount} {activeFilterCount == 1 ? 'aktivt' : 'aktiva'})
                             </Button>
                         ) : null}
-                    </Form.Group>
+                    </FormGroup>
                 </Col>
-            </Form.Row>
-            <Collapse in={showAdvancedFilters}>
+            </Row>
+            {/* <Collapse in={showAdvancedFilters}>
                 <div>{children}</div>
-            </Collapse>
+            </Collapse> TODO */}
+            {showAdvancedFilters ? <div>{children}</div> : null}
         </>
     );
 };

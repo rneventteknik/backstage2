@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { getGlobalSetting } from '../../lib/utils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
+import { Button } from '../ui/Button';
+import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from '../ui/Modal';
 
 type Props = {
     currentUser: CurrentUserInfo;
@@ -44,10 +45,10 @@ const LoggedOutModal: React.FC<Props> = ({ currentUser, globalSettings }: Props)
 
     return (!hideModal && isSoonLoggedOut) || isLoggedOut ? (
         <Modal show={true} backdrop="static">
-            <Modal.Header>
-                <Modal.Title>{isLoggedOut ? 'Utloggad' : 'Snart utloggad'}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
+            <ModalHeader>
+                <ModalTitle>{isLoggedOut ? 'Utloggad' : 'Snart utloggad'}</ModalTitle>
+            </ModalHeader>
+            <ModalBody>
                 <p>
                     {isLoggedOut ? (
                         <p>Du är nu utloggad, vänligen logga in igen.</p>
@@ -59,9 +60,9 @@ const LoggedOutModal: React.FC<Props> = ({ currentUser, globalSettings }: Props)
                     )}
                 </p>
                 <p></p>
-            </Modal.Body>
+            </ModalBody>
 
-            <Modal.Footer>
+            <ModalFooter>
                 {isLoggedOut ? (
                     <Link href={loginPageUrl} passHref>
                         <Button variant="primary" as="span">
@@ -78,7 +79,7 @@ const LoggedOutModal: React.FC<Props> = ({ currentUser, globalSettings }: Props)
                         </Button>
                     </>
                 )}
-            </Modal.Footer>
+            </ModalFooter>
         </Modal>
     ) : null;
 };

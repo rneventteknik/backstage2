@@ -3,8 +3,6 @@ import { BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
 import { countNullorEmpty, getStatusColor, getStatusName, nameSortFn, notEmpty, onlyUnique, onlyUniqueById } from '../lib/utils';
-import { Typeahead } from 'react-bootstrap-typeahead';
-import { Col, Form } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
@@ -13,6 +11,8 @@ import AdvancedFilters from './AdvancedFilters';
 import BookingStatusTag from './utils/BookingStatusTag';
 import { useSessionStorageState, useSessionStorageStateForDate } from '../lib/useSessionStorageState';
 import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
+import { FormControl, FormGroup, FormLabel } from './ui/Form';
+import { Col, Row } from './ui/Row';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
@@ -164,11 +164,11 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                     }}
                     activeFilterCount={countNullorEmpty(searchText, userIds, statuses, startDate, endDate)}
                 >
-                    <Form.Row className="mb-2">
+                    <Row className="mb-2">
                         <Col md="4">
-                            <Form.Group>
-                                <Form.Label>Status</Form.Label>
-                                <Typeahead<{ label: string; value: Status }>
+                            <FormGroup>
+                                <FormLabel>Status</FormLabel>
+                                {/* <Typeahead<{ label: string; value: Status }>
                                     id="status-typeahead"
                                     multiple
                                     labelKey={(x) => x.label}
@@ -178,13 +178,13 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     selected={statuses
                                         .map((id) => statusOptions.find((x) => x.value === id))
                                         .filter(notEmpty)}
-                                />
-                            </Form.Group>
+                                /> TODO */}
+                            </FormGroup>
                         </Col>
                         <Col md="4">
-                            <Form.Group>
-                                <Form.Label>Ansvarig</Form.Label>
-                                <Typeahead<{ label: string; value: number }>
+                            <FormGroup>
+                                <FormLabel>Ansvarig</FormLabel>
+                                {/* <Typeahead<{ label: string; value: number }>
                                     id="user-typeahead"
                                     multiple
                                     labelKey={(x) => x.label}
@@ -194,30 +194,30 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     selected={userIds
                                         .map((id) => ownerUserOptions.find((x) => x.value === id))
                                         .filter(notEmpty)}
-                                />
-                            </Form.Group>
+                                /> TODO */}
+                            </FormGroup>
                         </Col>
                         <Col md="2">
-                            <Form.Group>
-                                <Form.Label>Börjar efter</Form.Label>
-                                <Form.Control
+                            <FormGroup>
+                                <FormLabel>Börjar efter</FormLabel>
+                                <FormControl
                                     type="date"
                                     onChange={handleChangeStartDate}
                                     value={formatDateForForm(startDate)}
                                 />
-                            </Form.Group>
+                            </FormGroup>
                         </Col>
                         <Col md="2">
-                            <Form.Group>
-                                <Form.Label>Slutar före</Form.Label>
-                                <Form.Control
+                            <FormGroup>
+                                <FormLabel>Slutar före</FormLabel>
+                                <FormControl
                                     type="date"
                                     onChange={handleChangeEndDate}
                                     value={formatDateForForm(endDate)}
                                 />
-                            </Form.Group>
+                            </FormGroup>
                         </Col>
-                    </Form.Row>
+                    </Row>
                 </AdvancedFilters>
             ) : null}
             <TableDisplay

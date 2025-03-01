@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from 'react-bootstrap';
+import { Badge } from '../ui/Badge';
 import { getGlobalSetting } from '../../lib/utils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 

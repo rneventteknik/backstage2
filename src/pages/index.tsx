@@ -3,7 +3,6 @@ import Layout from '../components/layout/Layout';
 import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import Header from '../components/layout/Header';
-import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
 import useSwr from 'swr';
 import TinyBookingTable from '../components/TinyBookingTable';
 import { bookingsFetcher } from '../lib/fetchers';
@@ -22,6 +21,10 @@ import { IfNotReadonly } from '../components/utils/IfAdmin';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import CurrentlyOutEquipment from '../components/CurrentlyOutEquipment';
+import { Col, Row } from '../components/ui/Row';
+import { Button } from '../components/ui/Button';
+import { Card, CardHeader } from '../components/ui/Card';
+import { ListGroup, ListGroupItem } from '../components/ui/ListGroup';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -77,12 +80,12 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                     ></TinyBookingTable>
                     <CurrentlyOutEquipment />
                     <Card className="mb-3">
-                        <Card.Header className="d-flex">
+                        <CardHeader className="d-flex">
                             <span className="flex-grow-1">Aktivitet</span>
-                        </Card.Header>
+                        </CardHeader>
                         <ListGroup variant="flush">
                             {changelog.slice(0, 15).map((changelogEntry) => (
-                                <ListGroup.Item key={changelogEntry.id}>
+                                <ListGroupItem key={changelogEntry.id}>
                                     <div className="mb-1">
                                         <TableStyleLink href={'/bookings/' + changelogEntry.bookingId}>
                                             {changelogEntry.bookingName}
@@ -92,7 +95,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                                     <div className="text-muted">
                                         {changelogEntry.updated ? formatDatetime(changelogEntry.updated) : 'N/A'}
                                     </div>
-                                </ListGroup.Item>
+                                </ListGroupItem>
                             ))}
                         </ListGroup>
                     </Card>

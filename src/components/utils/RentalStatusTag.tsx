@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from 'react-bootstrap';
+import { Badge } from '../ui/Badge';
 import { RentalStatus } from '../../models/enums/RentalStatus';
 
 type Props = {

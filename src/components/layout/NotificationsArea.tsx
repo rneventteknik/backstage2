@@ -1,7 +1,6 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
-import { Toast } from 'react-bootstrap';
 import { useListener } from 'react-bus';
 import { v4 as generateGuid } from 'uuid';
 import styles from './NotificationsArea.module.scss';
@@ -39,27 +38,29 @@ const getNotificationTypeClassName = (variant: 'success' | 'warning' | 'danger' 
 };
 
 const Notification: React.FC<NotificationProps> = ({ notification, onClose }: NotificationProps) => (
-    <Toast
-        onClose={onClose}
-        show={notification.show}
-        animation={true}
-        delay={notification.timeout * 1000}
-        autohide
-        className={styles.notification + ' ' + getNotificationTypeClassName(notification.variant)}
-    >
-        <Toast.Header className={styles.header}>
-            <span className="mr-auto">
-                <strong>
-                    <span className={styles.iconContainer}>
-                        <FontAwesomeIcon icon={notification.icon} size="lg" className={styles.icon} />
-                    </span>
-                    {notification.title}{' '}
-                </strong>
-                {notification.description}
-            </span>
-        </Toast.Header>
-        {notification.body ? <Toast.Body>{notification.body}</Toast.Body> : null}
-    </Toast>
+    // TODO: Implement the Notification component
+    // <Toast
+    //     onClose={onClose}
+    //     show={notification.show}
+    //     animation={true}
+    //     delay={notification.timeout * 1000}
+    //     autohide
+    //     className={styles.notification + ' ' + getNotificationTypeClassName(notification.variant)}
+    // >
+    //     <Toast.Header className={styles.header}>
+    //         <span className="mr-auto">
+    //             <strong>
+    //                 <span className={styles.iconContainer}>
+    //                     <FontAwesomeIcon icon={notification.icon} size="lg" className={styles.icon} />
+    //                 </span>
+    //                 {notification.title}{' '}
+    //             </strong>
+    //             {notification.description}
+    //         </span>
+    //     </Toast.Header>
+    //     {notification.body ? <Toast.Body>{notification.body}</Toast.Body> : null}
+    // </Toast>
+    <div onClick={onClose}>{notification.title} - {notification.body} - {getNotificationTypeClassName(notification.variant)}</div>
 );
 
 const NotificationsArea: React.FC = () => {

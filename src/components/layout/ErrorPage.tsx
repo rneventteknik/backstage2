@@ -1,13 +1,13 @@
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { Button } from 'react-bootstrap';
 import Breadcrumbs from './Breadcrumbs';
 import Layout from './Layout';
 import styles from './ErrorPage.module.scss';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import Link from 'next/link';
 import { KeyValue } from '../../models/interfaces/KeyValue';
+import { Button } from '../ui/Button';
 
 type Props = {
     currentUser: CurrentUserInfo;
@@ -38,7 +38,7 @@ export const ErrorPageContent: React.FC<ErrorPageContentProps> = ({ errorMessage
             <p>Det gick inte att ladda innehållet just nu.</p>
             <p className="text-monospace text-muted">{errorMessage}</p>
             <Link href="/" passHref legacyBehavior>
-                <Button variant="secondary" href="/">
+                <Button variant="secondary" as="a" href="/">
                     Gå tillbaka till startsidan
                 </Button>
             </Link>

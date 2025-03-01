@@ -1,18 +1,19 @@
 import Link from 'next/link';
 import Router from 'next/router';
 import React, { useState } from 'react';
-import { Navbar, Dropdown, Button, Modal, Row, Col, Card, ListGroup } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import UserDisplay from '../utils/UserDisplay';
 import UserIcon from '../utils/UserIcon';
 import styles from './Topbar.module.scss';
-import Search from './Search';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { getGlobalSetting } from '../../lib/utils';
 import { formatDatetimeForForm } from '../../lib/datetimeUtils';
 import EnvironmentTypeTag from '../utils/EnvironmentTypeTag';
+import { Button } from '../ui/Button';
+import { Modal, ModalBody, ModalHeader, ModalTitle } from '../ui/Modal';
+import { Card } from '../ui/Card';
 
 type Props = {
     currentUser: CurrentUserInfo;
@@ -45,7 +46,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                     </Link>
                 </div>
                 <div className={styles.search}>
-                    <Search onFocus={() => setSearchActive(true)} onBlur={() => setSearchActive(false)} />
+                    {/* <Search onFocus={() => setSearchActive(true)} onBlur={() => setSearchActive(false)} /> */}
                 </div>
                 <Dropdown>
                     <Dropdown.Toggle variant="default" id="dropdown-basic" className="py-0" aria-label="User Menu">
@@ -72,10 +73,10 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
             </Navbar>
 
             <Modal show={showHelpModal} onHide={() => setShowHelpModal(false)} size="xl" backdrop="static">
-                <Modal.Header closeButton>
-                    <Modal.Title>Hjälp</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
+                <ModalHeader closeButton>
+                    <ModalTitle>Hjälp</ModalTitle>
+                </ModalHeader>
+                <ModalBody>
                     <Row>
                         <Col md={8} className="mb-3">
                             {getGlobalSetting('content.helpPageText', globalSettings, '')}
@@ -130,7 +131,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                             </Card>
                         </Col>
                     </Row>
-                </Modal.Body>
+                </ModalBody>
             </Modal>
         </header>
     );

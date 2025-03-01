@@ -2,7 +2,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
-import { Alert, Nav } from 'react-bootstrap';
 import styles from './Sidebar.module.scss';
 
 import {
@@ -23,6 +22,7 @@ import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { IfAdmin } from '../utils/IfAdmin';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { getGlobalSetting } from '../../lib/utils';
+import { Alert } from '../ui/Alert';
 
 // Component for a single link
 //
@@ -38,14 +38,14 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ displayName, link, icon, exac
     const isActive = exactMatch ? link === path : path.indexOf(link) === 0;
 
     return (
-        <Nav.Item className={[isActive ? styles.activeNavItem : undefined, styles.link].join(' ')}>
+        <li className={[isActive ? styles.activeNavItem : undefined, styles.link, 'p-2'].join(' ')}>
             <Link href={link} passHref legacyBehavior>
-                <Nav.Link as="a" href={link}>
+                <Link as="a" href={link}>
                     <FontAwesomeIcon className="fa-fw" icon={icon} />
                     <span className="ml-3">{displayName}</span>
-                </Nav.Link>
+                </Link>
             </Link>
-        </Nav.Item>
+        </li>
     );
 };
 
@@ -59,7 +59,7 @@ type SidebarLinkGroupProps = {
 const SidebarLinkGroup: React.FC<SidebarLinkGroupProps> = ({ children, title }: SidebarLinkGroupProps) => (
     <>
         {title ? <h1 className="ml-4 mt-4">{title}</h1> : null}
-        <Nav className={'flex-column ' + styles.main}>{children}</Nav>
+        <ul className={'flex-column ' + styles.main}>{children}</ul>
     </>
 );
 

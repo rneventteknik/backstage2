@@ -1,6 +1,4 @@
 import React, { ChangeEvent } from 'react';
-import { FormControl, FormGroup } from 'react-bootstrap';
-import Table from 'react-bootstrap/Table';
 import { HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import TableFooterWithViewCount from './utils/TableFooter';
 import styles from './TableDisplay.module.scss';
@@ -8,6 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { useDrag, useDrop } from 'react-dnd';
 import { notEmpty, onlyUnique } from '../lib/utils';
+import { Table } from './ui/Table';
+import { FormControl, FormGroup } from './ui/Form';
 
 enum SortDirection {
     Ascending,

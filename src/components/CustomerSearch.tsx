@@ -8,7 +8,7 @@ import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { SplitHighlighter } from './utils/Highlight';
 import { toCustomer } from '../lib/mappers/customer';
 import { Customer } from '../models/interfaces/Customer';
-import { Badge } from 'react-bootstrap';
+import { Badge } from '../ui/Badge';
 import { Language } from '../models/enums/Language';
 
 interface HasIndex {

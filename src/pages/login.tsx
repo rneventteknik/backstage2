@@ -1,5 +1,4 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react';
-import { Form, FormControl, Button, FormGroup, Alert, Spinner } from 'react-bootstrap';
 import Router from 'next/router';
 import { useUser } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
@@ -7,6 +6,9 @@ import { getGlobalSetting, getValueOrFirst } from '../lib/utils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import Head from 'next/head';
 import EnvironmentTypeTag from '../components/utils/EnvironmentTypeTag';
+import { Form, FormControl, FormGroup } from '../components/ui/Form';
+import { Alert } from '../components/ui/Alert';
+import { Button } from '../components/ui/Button';
 
 const containerStyle = {
     margin: 'auto',
@@ -133,7 +135,8 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                 ) : null}
                 {waitingForResponse ? (
                     <Button variant="outline-primary" type="submit" disabled>
-                        <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Loggar in...
+                        {/* <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Loggar in... TODO */}
+                        Loggar in...
                     </Button>
                 ) : (
                     <Button variant="outline-primary" type="submit">

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Col, Row } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import Header from './Header';
 import Layout from './Layout';
+import { Col, Row } from '../ui/Row';
 
 type Props = {
     currentUser: CurrentUserInfo;

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Layout from '../../components/layout/Layout';
 import { useRouter } from 'next/router';
-import { Button, Card, Tab } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IBookingObjectionModel } from '../../models/objection-models';

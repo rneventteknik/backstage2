@@ -3,13 +3,13 @@ import { Booking, BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from './utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
 import { getStatusColor, getStatusName } from '../lib/utils';
-import { Card } from 'react-bootstrap';
 import TableStyleLink from './utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import RentalStatusTag from './utils/RentalStatusTag';
 import { getBookingDateHeadingValue, toBookingViewModel } from '../lib/datetimeUtils';
 import BookingStatusTag from './utils/BookingStatusTag';
 import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
+import { Card, CardHeader } from './ui/Card';
 
 type Props = {
     title: string;
@@ -86,7 +86,7 @@ const TinyBookingTable: React.FC<Props> = ({
 
     return (
         <Card className="mb-3">
-            <Card.Header>{title}</Card.Header>
+            <CardHeader>{title}</CardHeader>
             <TableDisplay
                 entities={bookings.map(toBookingViewModel)}
                 configuration={{ ...tableSettings, ...tableSettingsOverride }}

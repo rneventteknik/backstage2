@@ -4,8 +4,8 @@ import useSwr from 'swr';
 import { getResponseContentOrError } from '../lib/utils';
 import { CurrentlyOutEquipmentInfo } from '../models/misc/CurrentlyOutEquipmentInfo';
 import { TableConfiguration, TableDisplay } from './TableDisplay';
-import { Card } from 'react-bootstrap';
 import TableStyleLink from './utils/TableStyleLink';
+import { Card, CardHeader } from './ui/Card';
 
 const EquipmentNameDisplayFn = (x: CurrentlyOutEquipmentInfo) =>
     x.equipmentId ? <TableStyleLink href={'/equipment/' + x.equipmentId}>{x.name}</TableStyleLink> : <em>{x.name}</em>;
@@ -45,7 +45,7 @@ const CurrentlyOutEquipment: React.FC = () => {
 
     return (
         <Card className="mb-3">
-            <Card.Header>Utlämnad utrustning</Card.Header>
+            <CardHeader>Utlämnad utrustning</CardHeader>
             <TableDisplay entities={currentlyOutEquipmentInfos} configuration={tableSettings} />
         </Card>
     );

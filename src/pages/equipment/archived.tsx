@@ -3,7 +3,7 @@ import Layout from '../../components/layout/Layout';
 import { Equipment } from '../../models/interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { Badge } from 'react-bootstrap';
+import { Badge } from '../ui/Badge';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { faEyeSlash } from '@fortawesome/free-solid-svg-icons';

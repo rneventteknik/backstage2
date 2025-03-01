@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
 import styles from './EquipmentSearch.module.scss';
-import { Badge } from 'react-bootstrap';
+import { Badge } from '../ui/Badge';
 import { BookingsSearchResult } from '../models/misc/SearchResult';
 import { getResponseContentOrError, getStatusName } from '../lib/utils';
 import { useNotifications } from '../lib/useNotifications';

@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import React from 'react';
-import { Breadcrumb } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import styles from './Breadcrumbs.module.scss';
 
@@ -11,12 +10,12 @@ type Props = {
 
 const Breadcrumbs: React.FC<Props> = ({ loading, breadcrumbs = [] }: Props) => (
     <section className={styles.breadcrumbs}>
-        <Breadcrumb className="d-none d-sm-block">
+        <div className="d-none d-sm-block">
             <BreadcrumbsList maxSize={10} loading={loading} breadcrumbs={breadcrumbs} />
-        </Breadcrumb>
-        <Breadcrumb className="d-sm-none">
+        </div>
+        <div className="d-sm-none">
             <BreadcrumbsList maxSize={2} loading={loading} breadcrumbs={breadcrumbs} />
-        </Breadcrumb>
+        </div>
     </section>
 );
 
@@ -36,39 +35,36 @@ const BreadcrumbsList: React.FC<BreadcrumbsListProps> = ({
     return (
         <>
             {breadcrumbs?.length > maxSize - 1 ? (
-                <Breadcrumb.Item
+                <Link
                     href={breadcrumbs?.length > maxSize ? breadcrumbs?.splice(-(maxSize + 1))[0].link : '/'}
-                    linkAs={Link}
                     className={styles.breadcrumb}
                 >
                     ...
-                </Breadcrumb.Item>
+                </Link>
             ) : (
-                <Breadcrumb.Item
+                <Link
                     href="/"
-                    linkAs={Link}
                     className={styles.breadcrumb}
-                    active={breadcrumbs?.length === 0 && !loading}
+                    //active={breadcrumbs?.length === 0 && !loading} // TODO
                 >
                     Backstage2
-                </Breadcrumb.Item>
+                </Link>
             )}
 
             {loading ? (
-                <Breadcrumb.Item className={styles.breadcrumb}>
+                <div className={styles.breadcrumb}>
                     <Skeleton width={125} />
-                </Breadcrumb.Item>
+                </div>
             ) : (
                 breadcrumbsTail?.map((b, index) => (
-                    <Breadcrumb.Item
-                        linkAs={Link}
+                    <Link
                         key={index}
                         href={b.link}
-                        active={index === breadcrumbsTail.length - 1}
+                        //active={index === breadcrumbsTail.length - 1} // TODO
                         className={styles.breadcrumb}
                     >
                         {b.displayName}
-                    </Breadcrumb.Item>
+                    </Link>
                 ))
             )}
         </>
