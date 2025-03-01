@@ -263,7 +263,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                                 {configuration.statusColumns?.map((p) => <td key={p.key} className={'p-0'}></td>)}
                                 <td
                                     colSpan={configuration.columns.length + (configuration.statusColumns?.length ?? 0)}
-                                    className="pt-4"
+                                    className="p-2"
                                 >
                                     {x.contentOverride === null ? (
                                         <strong>{x.heading?.toString()}</strong>
@@ -278,7 +278,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                         <tr>
                             <td
                                 colSpan={configuration.columns.length + (configuration.statusColumns?.length ?? 0)}
-                                className="text-center font-italic text-muted"
+                                className="text-center font-italic text-muted p-2"
                             >
                                 {configuration.noResultsLabel ?? 'Inga matchingar'}
                             </td>
@@ -416,6 +416,7 @@ const TableRow = <T extends HasId | HasStringId>({
                     <td
                         key={p.key}
                         className={
+                            'p-2 ' +
                             getTextAlignmentClassName(p.textAlignment) +
                             ' ' +
                             getCellDisplayClassName(p.cellHideSize) +

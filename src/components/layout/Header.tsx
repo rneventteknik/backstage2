@@ -14,7 +14,7 @@ const Header: React.FC<Props> = ({ title, children, loading, breadcrumbs = [] }:
     <div>
         <Breadcrumbs breadcrumbs={breadcrumbs} loading={loading} />
 
-        <h1 className={styles.pageTitle}> {loading ? <Skeleton width={280} /> : title} </h1>
+        <h1 className={'bg-utkast text-utkast ' + styles.pageTitle}> {loading ? <Skeleton width={280} /> : title} </h1>
         {loading ? <Skeleton width={140} height={30} /> : <div className={styles.buttonContainer}>{children}</div>}
         <hr className='border-gray-700 mb-4' />
     </div>
