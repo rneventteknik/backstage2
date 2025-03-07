@@ -2,9 +2,9 @@ import React, { ChangeEvent } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { useSessionStorageState } from '../lib/useSessionStorageState';
-import { Col, Row } from './ui/Row';
-import { FormControl, FormGroup } from './ui/Form';
-import { Button } from './ui/Button';
+import { Col, Row } from './customUi/Row';
+import { FormControl, FormGroup } from './customUi/Form';
+import { Button } from './ui/button';
 
 type Props = {
     handleChangeFilterString: (booking: ChangeEvent<HTMLInputElement>) => void;

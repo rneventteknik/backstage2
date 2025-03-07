@@ -9,7 +9,7 @@ import RentalStatusTag from './utils/RentalStatusTag';
 import { getBookingDateHeadingValue, toBookingViewModel } from '../lib/datetimeUtils';
 import BookingStatusTag from './utils/BookingStatusTag';
 import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
-import { Card, CardHeader } from './ui/Card';
+import { Card, CardHeader } from './ui/card';
 
 type Props = {
     title: string;

@@ -5,7 +5,7 @@ import { getResponseContentOrError } from '../lib/utils';
 import { CurrentlyOutEquipmentInfo } from '../models/misc/CurrentlyOutEquipmentInfo';
 import { TableConfiguration, TableDisplay } from './TableDisplay';
 import TableStyleLink from './utils/TableStyleLink';
-import { Card, CardHeader } from './ui/Card';
+import { Card, CardHeader } from './ui/card';
 
 const EquipmentNameDisplayFn = (x: CurrentlyOutEquipmentInfo) =>
     x.equipmentId ? <TableStyleLink href={'/equipment/' + x.equipmentId}>{x.name}</TableStyleLink> : <em>{x.name}</em>;

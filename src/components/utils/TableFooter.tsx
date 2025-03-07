@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, FormControlSelect, FormGroup, FormLabel } from '../ui/Form';
+import { Form, FormControlSelect, FormGroup, FormLabel } from '../customUi/Form';
 
 type Props = {
     viewCount: number;

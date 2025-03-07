@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '../ui/Badge';
+import { Badge } from '../ui/badge';
 import { EquipmentTag } from '../../models/interfaces';
 import { IEquipmentTagObjectionModel } from '../../models/objection-models';
 

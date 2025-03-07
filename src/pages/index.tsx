@@ -21,10 +21,10 @@ import { IfNotReadonly } from '../components/utils/IfAdmin';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import CurrentlyOutEquipment from '../components/CurrentlyOutEquipment';
-import { Col, Row } from '../components/ui/Row';
-import { Button } from '../components/ui/Button';
-import { Card, CardHeader } from '../components/ui/Card';
-import { ListGroup, ListGroupItem } from '../components/ui/ListGroup';
+import { Col, Row } from '../components/customUi/Row';
+import { Button } from '../components/ui/button';
+import { Card, CardHeader } from '../components/ui/card';
+import { ListGroup, ListGroupItem } from '../components/customUi/ListGroup';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();

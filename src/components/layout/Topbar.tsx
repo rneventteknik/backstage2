@@ -11,9 +11,9 @@ import { KeyValue } from '../../models/interfaces/KeyValue';
 import { getGlobalSetting } from '../../lib/utils';
 import { formatDatetimeForForm } from '../../lib/datetimeUtils';
 import EnvironmentTypeTag from '../utils/EnvironmentTypeTag';
-import { Button } from '../ui/Button';
-import { Modal, ModalBody, ModalHeader, ModalTitle } from '../ui/Modal';
-import { Card } from '../ui/Card';
+import { Button } from '../ui/button';
+import { Modal, ModalBody, ModalHeader, ModalTitle } from '../customUi/Modal';
+import { Card } from '../ui/card';
 
 type Props = {
     currentUser: CurrentUserInfo;

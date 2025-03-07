@@ -6,8 +6,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
 import { useDrag, useDrop } from 'react-dnd';
 import { notEmpty, onlyUnique } from '../lib/utils';
-import { Table } from './ui/Table';
-import { FormControl, FormGroup } from './ui/Form';
+import { Table } from './customUi/Table';
+import { FormControl, FormGroup } from './customUi/Form';
 
 enum SortDirection {
     Ascending,

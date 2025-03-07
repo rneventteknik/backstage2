@@ -6,9 +6,9 @@ import { getGlobalSetting, getValueOrFirst } from '../lib/utils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import Head from 'next/head';
 import EnvironmentTypeTag from '../components/utils/EnvironmentTypeTag';
-import { Form, FormControl, FormGroup } from '../components/ui/Form';
-import { Alert } from '../components/ui/Alert';
-import { Button } from '../components/ui/Button';
+import { Form, FormControl, FormGroup } from '../components/customUi/Form';
+import { Alert } from '../components/ui/alert';
+import { Button } from '../components/ui/button';
 
 const containerStyle = {
     margin: 'auto',

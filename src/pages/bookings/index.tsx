@@ -15,7 +15,7 @@ import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { IsBookingActive } from '../../lib/utils';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
-import { Button } from '../../components/ui/Button';
+import { Button } from '../../components/ui/button';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();

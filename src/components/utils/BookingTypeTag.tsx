@@ -1,5 +1,5 @@
 import React from 'react';
-import { Badge } from '../ui/Badge';
+import { Badge } from '../ui/badge';
 import { getBookingTypeName } from '../../lib/utils';
 import { BookingType } from '../../models/enums/BookingType';
 

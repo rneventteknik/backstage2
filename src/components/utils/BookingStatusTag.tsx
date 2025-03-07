@@ -1,7 +1,7 @@
 import React from 'react';
 import { getStatusColor, getStatusName } from '../../lib/utils';
 import { Status } from '../../models/enums/Status';
-import { Badge } from '../ui/Badge';
+import { Badge } from '../ui/badge';
 
 type Props = {
     booking: { status: Status };

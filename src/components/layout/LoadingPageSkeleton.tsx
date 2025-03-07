@@ -4,7 +4,7 @@ import { KeyValue } from '../../models/interfaces/KeyValue';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import Header from './Header';
 import Layout from './Layout';
-import { Col, Row } from '../ui/Row';
+import { Col, Row } from '../customUi/Row';
 
 type Props = {
     currentUser: CurrentUserInfo;

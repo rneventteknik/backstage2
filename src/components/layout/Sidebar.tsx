@@ -22,7 +22,7 @@ import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { IfAdmin } from '../utils/IfAdmin';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { getGlobalSetting } from '../../lib/utils';
-import { Alert } from '../ui/Alert';
+import { Alert } from '../ui/alert';
 
 // Component for a single link
 //

@@ -4,8 +4,8 @@ import { getGlobalSetting } from '../../lib/utils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import { Button } from '../ui/Button';
-import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from '../ui/Modal';
+import { Button } from '../ui/button';
+import { Modal, ModalBody, ModalFooter, ModalHeader, ModalTitle } from '../customUi/Modal';
 
 type Props = {
     currentUser: CurrentUserInfo;

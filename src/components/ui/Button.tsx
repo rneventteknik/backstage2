@@ -1,48 +1,58 @@
-import React from 'react';
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
 
-type Props = {
-    className?: string;
-    children: React.ReactNode;
-    onClick?: () => void;
-    variant?: 'primary' | 'outline-primary' | 'secondary' | 'success' | 'danger' | 'none';
-    as?: 'button' | 'a' | 'span';
-    type?: 'button' | 'submit' | 'reset';
-    href?: string;
-    disabled?: boolean;
-};
+import { cn } from "@/lib/utils"
 
-const variantStyleClasses = {
-    primary: 'bg-blue-500 text-white',
-    'outline-primary': 'border border-blue-500 text-blue-500',
-    secondary: 'bg-gray-700 text-white',
-    success: 'bg-green-500 text-white',
-    danger: 'bg-red-500 text-white',
-    none: '',
-    '': 'bg-gray-500 text-white',
-};
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-[color,box-shadow] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+  {
+    variants: {
+      variant: {
+        default:
+          "bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-white shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40",
+        outline:
+          "border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-9 px-4 py-2 has-[>svg]:px-3",
+        sm: "h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5",
+        lg: "h-10 rounded-md px-6 has-[>svg]:px-4",
+        icon: "size-9",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
 
-export const Button: React.FC<Props> = ({ children, className, onClick, variant, as, type, href, disabled}: Props) => {
-    const buttonClassName = 'shadow-md rounded px-4 pt-2 pb-2 mb-4 text-opacity-70 hover:text-opacity-100 duration-100 ' + variantStyleClasses[variant ?? ''] + className;
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}: React.ComponentProps<"button"> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }) {
+  const Comp = asChild ? Slot : "button"
 
-    if (as === 'a') {
-        return (
-            <a className={buttonClassName} onClick={onClick} href={href}>
-                {children}
-            </a>
-        );
-    }
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
+}
 
-    if (as === 'span') {
-        return (
-            <span className={buttonClassName} onClick={onClick}>
-                {children}
-            </span>
-        );
-    }
-
-    return (
-        <button onClick={onClick} className={buttonClassName} type={type} disabled={disabled}>
-            {children}
-        </button>
-    );
-};
+export { Button, buttonVariants }

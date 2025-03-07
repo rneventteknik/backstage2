@@ -1,3 +1,5 @@
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
 import { BaseEntity, BaseEntityWithName, HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import { MemberStatus } from '../models/enums/MemberStatus';
 import { Role } from '../models/enums/Role';
@@ -487,3 +489,9 @@ export const hasSufficientAccess = (role: Role | null | undefined, requiredRole:
             return true;
     }
 };
+
+// Tailwind/shadcdn
+//
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}

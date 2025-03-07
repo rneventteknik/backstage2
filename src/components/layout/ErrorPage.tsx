@@ -7,7 +7,7 @@ import styles from './ErrorPage.module.scss';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import Link from 'next/link';
 import { KeyValue } from '../../models/interfaces/KeyValue';
-import { Button } from '../ui/Button';
+import { Button } from '../ui/button';
 
 type Props = {
     currentUser: CurrentUserInfo;

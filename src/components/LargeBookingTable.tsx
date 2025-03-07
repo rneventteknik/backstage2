@@ -11,8 +11,8 @@ import AdvancedFilters from './AdvancedFilters';
 import BookingStatusTag from './utils/BookingStatusTag';
 import { useSessionStorageState, useSessionStorageStateForDate } from '../lib/useSessionStorageState';
 import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
-import { FormControl, FormGroup, FormLabel } from './ui/Form';
-import { Col, Row } from './ui/Row';
+import { FormControl, FormGroup, FormLabel } from './customUi/Form';
+import { Col, Row } from './customUi/Row';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
