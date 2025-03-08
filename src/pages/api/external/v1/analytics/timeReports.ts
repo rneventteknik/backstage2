@@ -3,14 +3,19 @@ import { respondWithCustomErrorMessage, respondWithInvalidMethodResponse } from 
 import { withApiKeyContext } from '../../../../../lib/sessionContext';
 import { BookingViewModel } from '../../../../../models/interfaces';
 import { toBooking } from '../../../../../lib/mappers/booking';
+import { formatDatetimeForAnalyticsExport, toBookingViewModel } from '../../../../../lib/datetimeUtils';
 import {
-    formatDatetimeForAnalyticsExport,
-    toBookingViewModel,
-} from '../../../../../lib/datetimeUtils';
-import { getAccountKindName, getBookingTypeName, getGlobalSetting, getPricePlanName, getStatusName } from '../../../../../lib/utils';
+    getAccountKindName,
+    getBookingTypeName,
+    getGlobalSetting,
+    getPricePlanName,
+    getStatusName,
+} from '../../../../../lib/utils';
 import { AccountKind } from '../../../../../models/enums/AccountKind';
 import { fetchSettings } from '../../../../../lib/db-access/setting';
 import { fetchBookingsForAnalytics } from '../../../../../lib/db-access/booking';
+import { getTimeReportPrice } from '../../../../../lib/pricingUtils';
+import { PricePlan } from '../../../../../models/enums/PricePlan';
 
 const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     switch (req.method) {
@@ -24,10 +29,20 @@ const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiRespon
                 'accounts.defaultSalaryAccount.internal',
                 globalSettings,
             );
+            const renumerationRatioThs = getGlobalSetting('salary.wageRatio.ths', globalSettings);
+            const renumerationRatioExternal = getGlobalSetting('salary.wageRatio.external', globalSettings);
             await fetchBookingsForAnalytics()
                 .then((x) => x.map(toBooking))
                 .then((x) => x.map(toBookingViewModel))
-                .then((x) => mapToAnalytics(x, defaultSalaryAccountExternal, defaultSalaryAccountInternal))
+                .then((x) =>
+                    mapToAnalytics(
+                        x,
+                        defaultSalaryAccountExternal,
+                        defaultSalaryAccountInternal,
+                        renumerationRatioThs,
+                        renumerationRatioExternal,
+                    ),
+                )
                 .then((x) => mapToCSV(x))
                 .then((result) => res.status(200).setHeader('Content-Type', 'text/csv').send(result))
                 .catch((error) => respondWithCustomErrorMessage(res, error.message));
@@ -57,18 +72,23 @@ interface TimeReportsAnalyticsModel {
     bookingPricePlan: string;
     bookingAccountKind: string;
     bookingFixedPrice: number | null;
+    bookingInvoiceDate: string | null;
+    totalPrice: number;
+    renumerationRatio: number;
 }
 
 const mapToAnalytics = (
     bookings: BookingViewModel[],
     defaultSalaryAccountExternal: string,
     defaultSalaryAccountInternal: string,
+    renumerationRatioThs: string,
+    renumerationRatioExternal: string,
 ): TimeReportsAnalyticsModel[] => {
     const allTimeReports = bookings.flatMap((b) =>
         (b.timeReports ?? []).map((x) => ({
-                entry: x,
-                booking: b,
-            })),
+            entry: x,
+            booking: b,
+        })),
     );
 
     return allTimeReports.map((x) => ({
@@ -82,15 +102,20 @@ const mapToAnalytics = (
         pricePerHour: x.entry.pricePerHour.value,
         sortIndex: x.entry.sortIndex,
         account:
-        (x.booking.accountKind === AccountKind.EXTERNAL
-            ? defaultSalaryAccountExternal
-            : defaultSalaryAccountInternal),        bookingId: x.booking.id,
+            x.booking.accountKind === AccountKind.EXTERNAL
+                ? defaultSalaryAccountExternal
+                : defaultSalaryAccountInternal,
+        bookingId: x.booking.id,
         bookingName: x.booking.name,
         bookingStatus: getStatusName(x.booking.status),
         bookingType: getBookingTypeName(x.booking.bookingType),
         bookingPricePlan: getPricePlanName(x.booking.pricePlan),
         bookingAccountKind: getAccountKindName(x.booking.accountKind),
         bookingFixedPrice: x.booking.fixedPrice,
+        bookingInvoiceDate: x.booking.invoiceDate ? formatDatetimeForAnalyticsExport(x.booking.invoiceDate) : null,
+        totalPrice: getTimeReportPrice(x.entry).value,
+        renumerationRatio:
+            parseFloat(x.booking.pricePlan === PricePlan.EXTERNAL ? renumerationRatioExternal : renumerationRatioThs),
     }));
 };
 
