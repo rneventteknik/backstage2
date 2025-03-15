@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.18.2-raspberry",
+    "version": "1.19.0-peach",
     "engines": {
         "yarn": "^1.0.0",
         "node": "^18.0.0"
