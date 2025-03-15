@@ -33,7 +33,7 @@ const getRentalsToHandleTodayFromBookings = (
         .map(toBooking)
         .map((booking) => ({
             name: booking.name,
-            ownerUserId: booking.ownerUser?.name,
+            ownerUser: booking.ownerUser?.name,
             link: getLinkToBooking(booking.id),
             equipmentLists: booking
                 .equipmentLists!.filter((equipmentList) => isToday(getDatetime(equipmentList)))
