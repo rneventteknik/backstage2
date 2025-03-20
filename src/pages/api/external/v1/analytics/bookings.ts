@@ -61,6 +61,7 @@ interface BookingAnalyticsModel {
     usageEndDatetime: string | null;
     equipmentOutDatetime: string | null;
     equipmentInDatetime: string | null;
+    invoiceDate: string | null;
     estimatedHours: number;
     actualWorkingHours: number;
     billableWorkingHours: number;
@@ -95,6 +96,7 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
         usageEndDatetime: formatDatetimeForAnalyticsExport(booking.usageEndDatetime),
         equipmentOutDatetime: formatDatetimeForAnalyticsExport(booking.equipmentOutDatetime),
         equipmentInDatetime: formatDatetimeForAnalyticsExport(booking.equipmentInDatetime),
+        invoiceDate: booking.invoiceDate ? formatDatetimeForAnalyticsExport(booking.invoiceDate) : null,
 
         // Working hours
         estimatedHours: booking.timeEstimates?.reduce((sum, entry) => sum + entry.numberOfHours, 0) ?? 0,

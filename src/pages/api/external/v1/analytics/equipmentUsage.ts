@@ -11,7 +11,13 @@ import {
     getNumberOfDays,
     toBookingViewModel,
 } from '../../../../../lib/datetimeUtils';
-import { getBookingTypeName, getGlobalSetting, getPricePlanName, getStatusName } from '../../../../../lib/utils';
+import {
+    getAccountKindName,
+    getBookingTypeName,
+    getGlobalSetting,
+    getPricePlanName,
+    getStatusName,
+} from '../../../../../lib/utils';
 import { AccountKind } from '../../../../../models/enums/AccountKind';
 import { fetchSettings } from '../../../../../lib/db-access/setting';
 import { fetchBookingsForAnalytics } from '../../../../../lib/db-access/booking';
@@ -66,6 +72,9 @@ interface EquipmentUsageAnalyticsModel {
     bookingStatus: string;
     bookingType: string;
     bookingPricePlan: string;
+    bookingAccountKind: string;
+    bookingFixedPrice: number | null;
+    bookingInvoiceDate: string | null;
     equipmentOutDatetime: string | null;
     equipmentInDatetime: string | null;
     usageStartDatetime: string | null;
@@ -115,6 +124,9 @@ const mapToAnalytics = (
         bookingStatus: getStatusName(x.booking.status),
         bookingType: getBookingTypeName(x.booking.bookingType),
         bookingPricePlan: getPricePlanName(x.booking.pricePlan),
+        bookingAccountKind: getAccountKindName(x.booking.accountKind),
+        bookingFixedPrice: x.booking.fixedPrice,
+        bookingInvoiceDate: x.booking.invoiceDate ? formatDatetimeForAnalyticsExport(x.booking.invoiceDate) : null,
         equipmentOutDatetime: formatDatetimeForAnalyticsExport(getEquipmentOutDatetime(x.list)),
         equipmentInDatetime: formatDatetimeForAnalyticsExport(getEquipmentInDatetime(x.list)),
         usageStartDatetime: formatDatetimeForAnalyticsExport(x.list.usageStartDatetime),
