@@ -61,6 +61,8 @@ import BookingInfoSection from '../../../components/bookings/BookingInfoSection'
 import FilesCard from '../../../components/bookings/FilesCard';
 import currency from 'currency.js';
 import PreviousBookingsCard from '../../../components/bookings/PreviousBookingsCard';
+import { BookingType } from '../../../models/enums/BookingType';
+import CalendarWorkersCard from '../../../components/bookings/CalendarWorkersCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -359,6 +361,13 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 </Col>
                 <Col xl={4}>
                     <BookingInfoSection booking={booking} className="d-none d-xl-block mb-3" />
+                    {booking.bookingType === BookingType.GIG ? (
+                        <CalendarWorkersCard
+                            bookingId={booking.id}
+                            calendarEventId={booking.calendarBookingId}
+                            readonly={readonly}
+                        />
+                    ) : null}
                     <Card className="mb-3">
                         <Card.Header>Prisinformation (ink. moms)</Card.Header>
                         <ListGroup variant="flush">

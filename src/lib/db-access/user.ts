@@ -42,6 +42,26 @@ export const fetchUser = async (
     return query;
 };
 
+export const fetchUserByNameTag = async (nameTag: string): Promise<UserObjectionModel | undefined> => {
+    ensureDatabaseIsInitialized();
+
+    const query = UserObjectionModel.query()
+        .findOne('nameTag', '=', nameTag)
+        .select(
+            'id',
+            'name',
+            'created',
+            'updated',
+            'memberStatus',
+            'nameTag',
+            'phoneNumber',
+            'slackId',
+            'emailAddress',
+        );
+
+    return query;
+};
+
 export const fetchUserByNameTagForExternalApi = async (nameTag: string): Promise<UserObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
