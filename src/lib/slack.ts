@@ -176,7 +176,12 @@ export const sendSlackDMForBooking = async (
     );
 };
 
-export const startSlackChannelWithUsersForBooking = async (booking: Booking, userSlackIds: string[]) => {
+export const sendMessageToUsersForBooking = async (
+    booking: Booking,
+    startSlackChannel: boolean,
+    userSlackIds: string[],
+    calendarLink: string | undefined = undefined,
+) => {
     const uniqueUserSlackIds = userSlackIds.filter(onlyUnique);
     const bookingViewModel = toBookingViewModel(booking);
 
@@ -187,11 +192,20 @@ export const startSlackChannelWithUsersForBooking = async (booking: Booking, use
         formattedMessage += `\n- <${driveLink}|Google Drive>`;
     }
 
-    const channelName = getChannelNameForBooking(bookingViewModel);
-    const channelId = await startChannelIfNotExists(channelName);
+    if (calendarLink) {
+        formattedMessage += `\n- <${calendarLink}|Google Calendar>`;
+    }
 
-    await inviteUsersToChannel(uniqueUserSlackIds, channelId);
-    await sendSlackMessage(formattedMessage, channelId);
+    if (startSlackChannel) {
+        const channelName = getChannelNameForBooking(bookingViewModel);
+        const channelId = await startChannelIfNotExists(channelName);
+
+        await inviteUsersToChannel(uniqueUserSlackIds, channelId);
+        await sendSlackMessage(formattedMessage, channelId);
+    } else {
+        const channelId = await startDmGroupWithUsers(uniqueUserSlackIds);
+        await sendSlackMessage(formattedMessage, channelId);
+    }
 };
 
 const getChannelNameForBooking = (bookingViewModel: BookingViewModel): string => {
@@ -203,7 +217,7 @@ const getChannelNameForBooking = (bookingViewModel: BookingViewModel): string =>
     const formattedBookingName = bookingViewModel.name
         .toLocaleLowerCase()
         .replace(/\s+/g, '-')
-        .replace(/[^a-zA-Z0-9\-]/g, '')
+        .replace(/[^a-zåäöA-ZÅÄÖ0-9\-]/g, '')
         .substring(0, contentMaxLength);
 
     return `${prefix}${formattedBookingName}${suffix}`;

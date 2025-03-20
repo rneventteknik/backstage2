@@ -10,5 +10,5 @@ export interface CalendarResult {
     start?: string;
     end?: string;
     existingBookingId?: number;
-    workingUsers: UserObjectionModel[];
+    workingUsers: Partial<UserObjectionModel>[];
 }

@@ -3,7 +3,7 @@ import { respondWithCustomErrorMessage, respondWithInvalidDataResponse } from '.
 import { SessionContext, withSessionContext } from '../../../lib/sessionContext';
 import { fetchUser } from '../../../lib/db-access';
 import { notEmpty, onlyUnique } from '../../../lib/utils';
-import { startSlackChannelWithUsersForBooking } from '../../../lib/slack';
+import { sendMessageToUsersForBooking } from '../../../lib/slack';
 import { getCalendarEvent } from '../../../lib/calenderUtils';
 import { toBooking } from '../../../lib/mappers/booking';
 import { fetchBookingWithEquipmentLists } from '../../../lib/db-access/booking';
@@ -11,6 +11,7 @@ import { fetchBookingWithEquipmentLists } from '../../../lib/db-access/booking';
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
         const bookingId = Number(req.body.bookingId);
+        const startSlackChannel = req.body.startSlackChannel === true;
 
         if (isNaN(bookingId)) {
             respondWithInvalidDataResponse(res);
@@ -45,7 +46,7 @@ const handler = withSessionContext(
                 return;
             }
 
-            await startSlackChannelWithUsersForBooking(booking, slackIds);
+            await sendMessageToUsersForBooking(booking, startSlackChannel, slackIds, calenderEvent.link);
 
             res.status(200).json(true);
         } catch (error) {
