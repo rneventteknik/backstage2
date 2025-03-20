@@ -1971,6 +1971,13 @@ export async function seed(knex) {
             value: '[]',
         },
         {
+            key: 'googleCalendar.nameTagBlackList',
+            note: 'En blacklist som JSON-lista med strängar. Om ett tagg på ett event i kalendern finns med i denna lista visas den inte som en användare uppskriven i kalendern.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '["Många", "Alla", "Internt", "Hyra"]',
+        },
+        {
             key: 'googleCalendar.keywordBlackList',
             note: 'En blacklist som JSON-lista med strängar. Om ett event i kalendern innehåller någon av dessa strängar i namnet visas det inte i listan.',
             created: getVarianceDateString(-100),
