@@ -132,7 +132,7 @@ const CalendarWorkersCardWithCalendarConnection: React.FC<FilesCardListProps> = 
                 </Button>
                 {!readonly ? (
                     <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
-                        {!readonly ? (
+                        {!readonly && workingUsers.length > 0 ? (
                             <>
                                 <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(false)}>
                                     <FontAwesomeIcon icon={faMessage} className="mr-1 fa-fw" /> Skicka direktmeddelande
