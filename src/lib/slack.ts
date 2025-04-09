@@ -93,10 +93,18 @@ export const inviteUsersToChannel = async (userSlackIds: string[], channelId: st
 
         // Invite new members
         //
-        await client.conversations.invite({
-            channel: channelId,
-            users: newMembers.join(','),
-        });
+        const inviteResults = await Promise.allSettled(
+            newMembers.map((newMember) =>
+                client.conversations.invite({
+                    channel: channelId,
+                    users: newMember,
+                }),
+            ),
+        );
+
+        if (inviteResults.every((x) => x.status === 'rejected')) {
+            throw Error('No invite requests succeeded');
+        }
 
         return;
     } catch (error) {
@@ -199,7 +207,8 @@ export const sendMessageToUsersForBooking = async (
     if (startSlackChannel) {
         const channelName = getChannelNameForBooking(bookingViewModel);
         const channelId = await startChannelIfNotExists(channelName);
-
+        // If all slackIDs for the users we trie to invite are single channel guests or invalid,
+        // the channel will be created but no users invited.
         await inviteUsersToChannel(uniqueUserSlackIds, channelId);
         await sendSlackMessage(formattedMessage, channelId);
     } else {
