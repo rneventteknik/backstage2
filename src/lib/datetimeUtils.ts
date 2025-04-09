@@ -47,7 +47,7 @@ const monthYearFormatOptions: Intl.DateTimeFormatOptions = {
 };
 
 const datetimeYearFormatOptions: Intl.DateTimeFormatOptions = {
-	year: 'numeric',
+    year: 'numeric',
     month: 'numeric',
     day: 'numeric',
     hour: 'numeric',

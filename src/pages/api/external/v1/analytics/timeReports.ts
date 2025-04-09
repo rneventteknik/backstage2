@@ -114,8 +114,9 @@ const mapToAnalytics = (
         bookingFixedPrice: x.booking.fixedPrice,
         bookingInvoiceDate: x.booking.invoiceDate ? formatDatetimeForAnalyticsExport(x.booking.invoiceDate) : null,
         totalPrice: getTimeReportPrice(x.entry).value,
-        renumerationRatio:
-            parseFloat(x.booking.pricePlan === PricePlan.EXTERNAL ? renumerationRatioExternal : renumerationRatioThs),
+        renumerationRatio: parseFloat(
+            x.booking.pricePlan === PricePlan.EXTERNAL ? renumerationRatioExternal : renumerationRatioThs,
+        ),
     }));
 };
 

@@ -181,7 +181,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                             option={entity}
                             position={entity.index}
                             className={styles.dropdownItem}
-							href={entity.url}
+                            href={entity.url}
                         >
                             <SplitHighlighter search={state.text} textToHighlight={entity.name} />
                             <div>{getDescription(entity, state.text)}</div>
