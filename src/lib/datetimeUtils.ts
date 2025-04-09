@@ -46,6 +46,14 @@ const monthYearFormatOptions: Intl.DateTimeFormatOptions = {
     month: 'long',
 };
 
+const datetimeYearFormatOptions: Intl.DateTimeFormatOptions = {
+    year: 'numeric',
+    month: 'numeric',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+};
+
 export const formatDatetime = (
     date: Date | null | undefined,
     defaultValue = '-',
@@ -90,6 +98,12 @@ export const formatMonthYear = (
     defaultValue = '-',
     locale: 'sv-SE' | 'en-SE' = 'sv-SE',
 ): string => (date ? uppercaseFirstLetter(date.toLocaleString(locale, monthYearFormatOptions)) : defaultValue);
+
+export const formatDatetimeWithYear = (
+    date: Date | null | undefined,
+    defaultValue = '-',
+    locale: 'sv-SE' | 'en-SE' = 'sv-SE',
+): string => (date ? date.toLocaleString(locale, datetimeYearFormatOptions) : defaultValue);
 
 // Check if value is a valid date
 //
