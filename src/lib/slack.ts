@@ -193,16 +193,18 @@ export const sendMessageToUsersForBooking = async (
     const uniqueUserSlackIds = userSlackIds.filter(onlyUnique);
     const bookingViewModel = toBookingViewModel(booking);
 
-    let formattedMessage = `Denna kanal har automatiskt skapats för bokningen *${booking.name}* som äger rum ${bookingViewModel.displayUsageInterval}. Här kan ni diskutera bokningen och dela viktig information.\n\nLänkar:\n- <${process.env.APPLICATION_BASE_URL}/bookings/${booking.id}|Backstage2-bokning>`;
+    let formattedMessage = `*${booking.name}*\n${bookingViewModel.displayUsageInterval}\nDenna ${startSlackChannel ? "kanal" : "grupp"} har skapats av Backstage2. Här kan ni diskutera bokningen och dela viktig information.\n\nBokningslänkar:\n<${process.env.APPLICATION_BASE_URL}/bookings/${booking.id}|:better-rn: Backstage2-bokning>`;
 
     if (booking.driveFolderId) {
         const driveLink = await getDriveLink(booking.driveFolderId);
-        formattedMessage += `\n- <${driveLink}|Google Drive>`;
+        formattedMessage += `\n<${driveLink}|:google-drive: Google Drive-mapp>`;
     }
 
     if (calendarLink) {
-        formattedMessage += `\n- <${calendarLink}|Google Calendar>`;
+        formattedMessage += `\n<${calendarLink}|:calendar: Google Calendar-event>`;
     }
+
+    formattedMessage += "\n\nHa ett trevligt gigg! :dancing_penguin:"
 
     if (startSlackChannel) {
         const channelName = getChannelNameForBooking(bookingViewModel);
