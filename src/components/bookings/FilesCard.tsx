@@ -23,6 +23,7 @@ import { getSortedList } from '../../lib/sortIndexUtils';
 import TableStyleLink from '../utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import { useNotifications } from '../../lib/useNotifications';
+import { getDriveLink } from '../../lib/db-access/utils';
 
 type Props = {
     driveFolderId: string;
@@ -42,7 +43,7 @@ const FilesCard: React.FC<Props> = ({
     const [showContent, setShowContent] = useState(true);
     const { showErrorMessage } = useNotifications();
 
-    const link = 'https://drive.google.com/drive/folders/' + driveFolderId;
+    const link = getDriveLink(driveFolderId);
 
     const createFolder = async (name: string, parentName: string) => {
         const body = {

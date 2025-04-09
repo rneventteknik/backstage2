@@ -82,7 +82,6 @@ const handler = withSessionContext(
 
                 await updateEquipmentListEntry(equipmentListEntryId, req.body.equipmentListEntry)
                     .then(async (result) => {
-
                         if (hasChanges(oldEquipmentListEntry, req.body.equipmentListEntry, ['isPacked'])) {
                             await logChangeToBooking(
                                 context.currentUser,

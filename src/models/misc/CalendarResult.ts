@@ -1,3 +1,5 @@
+import { UserObjectionModel } from '../objection-models';
+
 export interface CalendarResult {
     id: string;
     name?: string;
@@ -8,4 +10,5 @@ export interface CalendarResult {
     start?: string;
     end?: string;
     existingBookingId?: number;
+    workingUsers: Partial<UserObjectionModel>[];
 }
