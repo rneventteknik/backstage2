@@ -10,7 +10,11 @@ import {
 import { BookingViewModel } from '../../../../../models/interfaces';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import currency from 'currency.js';
-import { formatDatetimeForAnalyticsExport, toBookingViewModel } from '../../../../../lib/datetimeUtils';
+import {
+    formatDatetimeForAnalyticsExport,
+    getEquipmentInDatetime,
+    toBookingViewModel,
+} from '../../../../../lib/datetimeUtils';
 import {
     getAccountKindName,
     getBookingTypeName,
@@ -67,6 +71,7 @@ interface BookingAnalyticsModel {
     actualWorkingHours: number;
     billableWorkingHours: number;
     operationalYear: string | null;
+    fiscalYear: string | null;
 }
 
 const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =>
@@ -99,7 +104,10 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
         equipmentOutDatetime: formatDatetimeForAnalyticsExport(booking.equipmentOutDatetime),
         equipmentInDatetime: formatDatetimeForAnalyticsExport(booking.equipmentInDatetime),
         invoiceDate: booking.invoiceDate ? formatDatetimeForAnalyticsExport(booking.invoiceDate) : null,
-        operationalYear: booking.invoiceDate ? getOperationalYear(booking.invoiceDate, true) : null,
+        operationalYear: getEquipmentInDatetime(booking)
+            ? getOperationalYear(getEquipmentInDatetime(booking), true)
+            : null,
+        fiscalYear: booking.invoiceDate ? getOperationalYear(booking.invoiceDate, true) : null,
 
         // Working hours
         estimatedHours: booking.timeEstimates?.reduce((sum, entry) => sum + entry.numberOfHours, 0) ?? 0,

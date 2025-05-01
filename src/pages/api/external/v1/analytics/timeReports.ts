@@ -3,7 +3,11 @@ import { respondWithCustomErrorMessage, respondWithInvalidMethodResponse } from 
 import { withApiKeyContext } from '../../../../../lib/sessionContext';
 import { BookingViewModel } from '../../../../../models/interfaces';
 import { toBooking } from '../../../../../lib/mappers/booking';
-import { formatDatetimeForAnalyticsExport, toBookingViewModel } from '../../../../../lib/datetimeUtils';
+import {
+    formatDatetimeForAnalyticsExport,
+    getEquipmentInDatetime,
+    toBookingViewModel,
+} from '../../../../../lib/datetimeUtils';
 import {
     getAccountKindName,
     getBookingTypeName,
@@ -74,9 +78,10 @@ interface TimeReportsAnalyticsModel {
     bookingAccountKind: string;
     bookingFixedPrice: number | null;
     bookingInvoiceDate: string | null;
+    bookingOperationalYear: string | null;
+    bookingFiscalYear: string | null;
     totalPrice: number;
     renumerationRatio: number;
-    bookingOperationalYear: string | null;
 }
 
 const mapToAnalytics = (
@@ -115,11 +120,14 @@ const mapToAnalytics = (
         bookingAccountKind: getAccountKindName(x.booking.accountKind),
         bookingFixedPrice: x.booking.fixedPrice,
         bookingInvoiceDate: x.booking.invoiceDate ? formatDatetimeForAnalyticsExport(x.booking.invoiceDate) : null,
+        bookingOperationalYear: getEquipmentInDatetime(x.booking)
+            ? getOperationalYear(getEquipmentInDatetime(x.booking), true)
+            : null,
+        bookingFiscalYear: x.booking.invoiceDate ? getOperationalYear(x.booking.invoiceDate, true) : null,
         totalPrice: getTimeReportPrice(x.entry).value,
         renumerationRatio: parseFloat(
             x.booking.pricePlan === PricePlan.EXTERNAL ? renumerationRatioExternal : renumerationRatioThs,
         ),
-        bookingOperationalYear: x.booking.invoiceDate ? getOperationalYear(x.booking.invoiceDate, true) : null,
     }));
 };
 

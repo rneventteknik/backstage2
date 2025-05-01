@@ -83,6 +83,7 @@ interface EquipmentUsageAnalyticsModel {
     equipmentListName: string;
     equipmentListId: number;
     bookingOperationalYear: string | null;
+    bookingFiscalYear: string | null;
 }
 
 const mapToAnalytics = (
@@ -129,13 +130,16 @@ const mapToAnalytics = (
         bookingAccountKind: getAccountKindName(x.booking.accountKind),
         bookingFixedPrice: x.booking.fixedPrice,
         bookingInvoiceDate: x.booking.invoiceDate ? formatDatetimeForAnalyticsExport(x.booking.invoiceDate) : null,
+        bookingOperationalYear: getEquipmentInDatetime(x.booking)
+            ? getOperationalYear(getEquipmentInDatetime(x.booking), true)
+            : null,
+        bookingFiscalYear: x.booking.invoiceDate ? getOperationalYear(x.booking.invoiceDate, true) : null,
         equipmentOutDatetime: formatDatetimeForAnalyticsExport(getEquipmentOutDatetime(x.list)),
         equipmentInDatetime: formatDatetimeForAnalyticsExport(getEquipmentInDatetime(x.list)),
         usageStartDatetime: formatDatetimeForAnalyticsExport(x.list.usageStartDatetime),
         usageEndDatetime: formatDatetimeForAnalyticsExport(x.list.usageEndDatetime),
         equipmentListName: x.list.name,
         equipmentListId: x.list.id,
-        bookingOperationalYear: x.booking.invoiceDate ? getOperationalYear(x.booking.invoiceDate, true) : null,
     }));
 };
 
