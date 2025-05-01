@@ -456,17 +456,19 @@ export const nameSortFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
 
 const formatOperationalYear = (year: number) => `${year}-${year + 1}`;
 
-export const getOperationalYear = (date?: Date) => {
+const formatShortOperationalYear = (year: number) => `${year.toString().slice(-2)}/${(year + 1).toString().slice(-2)}`;
+
+export const getOperationalYear = (date?: Date | null, shortOutput = false) => {
     if (!date) {
         return 'N/A';
     }
 
-    if (date.getMonth() < 6) {
-        // Operational year turns over at 1st of July (month is 0 indexed)
-        return formatOperationalYear(date.getFullYear() - 1);
-    }
+    const year = date.getFullYear();
+    const earliestOperationalYearPart = date.getMonth() < 6 ? year - 1 : year;
 
-    return formatOperationalYear(date.getFullYear());
+    return shortOutput
+        ? formatShortOperationalYear(earliestOperationalYearPart)
+        : formatOperationalYear(earliestOperationalYearPart);
 };
 
 export const hasSufficientAccess = (role: Role | null | undefined, requiredRole: Role | null) => {

@@ -14,6 +14,7 @@ import { formatDatetimeForAnalyticsExport, toBookingViewModel } from '../../../.
 import {
     getAccountKindName,
     getBookingTypeName,
+    getOperationalYear,
     getPaymentStatusName,
     getPricePlanName,
     getSalaryStatusName,
@@ -65,6 +66,7 @@ interface BookingAnalyticsModel {
     estimatedHours: number;
     actualWorkingHours: number;
     billableWorkingHours: number;
+    operationalYear: string | null;
 }
 
 const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =>
@@ -97,6 +99,7 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
         equipmentOutDatetime: formatDatetimeForAnalyticsExport(booking.equipmentOutDatetime),
         equipmentInDatetime: formatDatetimeForAnalyticsExport(booking.equipmentInDatetime),
         invoiceDate: booking.invoiceDate ? formatDatetimeForAnalyticsExport(booking.invoiceDate) : null,
+        operationalYear: booking.invoiceDate ? getOperationalYear(booking.invoiceDate, true) : null,
 
         // Working hours
         estimatedHours: booking.timeEstimates?.reduce((sum, entry) => sum + entry.numberOfHours, 0) ?? 0,

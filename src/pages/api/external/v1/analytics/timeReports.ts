@@ -8,6 +8,7 @@ import {
     getAccountKindName,
     getBookingTypeName,
     getGlobalSetting,
+    getOperationalYear,
     getPricePlanName,
     getStatusName,
 } from '../../../../../lib/utils';
@@ -75,6 +76,7 @@ interface TimeReportsAnalyticsModel {
     bookingInvoiceDate: string | null;
     totalPrice: number;
     renumerationRatio: number;
+    bookingOperationalYear: string | null;
 }
 
 const mapToAnalytics = (
@@ -117,6 +119,7 @@ const mapToAnalytics = (
         renumerationRatio: parseFloat(
             x.booking.pricePlan === PricePlan.EXTERNAL ? renumerationRatioExternal : renumerationRatioThs,
         ),
+        bookingOperationalYear: x.booking.invoiceDate ? getOperationalYear(x.booking.invoiceDate, true) : null,
     }));
 };
 

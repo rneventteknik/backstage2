@@ -15,6 +15,7 @@ import {
     getAccountKindName,
     getBookingTypeName,
     getGlobalSetting,
+    getOperationalYear,
     getPricePlanName,
     getStatusName,
 } from '../../../../../lib/utils';
@@ -81,6 +82,7 @@ interface EquipmentUsageAnalyticsModel {
     usageEndDatetime: string | null;
     equipmentListName: string;
     equipmentListId: number;
+    bookingOperationalYear: string | null;
 }
 
 const mapToAnalytics = (
@@ -133,6 +135,7 @@ const mapToAnalytics = (
         usageEndDatetime: formatDatetimeForAnalyticsExport(x.list.usageEndDatetime),
         equipmentListName: x.list.name,
         equipmentListId: x.list.id,
+        bookingOperationalYear: x.booking.invoiceDate ? getOperationalYear(x.booking.invoiceDate, true) : null,
     }));
 };
 
