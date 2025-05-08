@@ -15,6 +15,18 @@ import { EquipmentLocation } from '../models/interfaces/EquipmentLocation';
 import { getSortedList } from '../lib/sortIndexUtils';
 import AdvancedFilters from './AdvancedFilters';
 import { useSessionStorageState } from '../lib/useSessionStorageState';
+import { ImageHideOnError } from './equipment/ImageHideOnError';
+
+const EquipmentImageDisplayFn = (equipment: Equipment) => (
+    <>
+        {process.env.NEXT_PUBLIC_EQUIPMENT_IMAGE_BASEURL ? (
+            <ImageHideOnError
+                src={process.env.NEXT_PUBLIC_EQUIPMENT_IMAGE_BASEURL + equipment.id}
+                altText={equipment.name}
+            />
+        ) : null}
+    </>
+);
 
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
@@ -87,6 +99,13 @@ const tableSettings: TableConfiguration<Equipment> = {
     defaultSortAscending: true,
     hideTableFilter: true,
     columns: [
+        {
+            key: 'image',
+            displayName: 'Bild',
+            getValue: (equipment: Equipment) => equipment.id,
+            getContentOverride: EquipmentImageDisplayFn,
+            columnWidth: 75,
+        },
         {
             key: 'name',
             displayName: 'Utrustning',
