@@ -13,6 +13,17 @@ module.exports = {
         NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION: versionNumber,
         NEXT_PUBLIC_BACKSTAGE2_BUILD_DATE: currentDate,
     },
+    images: {
+        remotePatterns: [
+            {
+                protocol: 'https',
+                hostname: process.env.NEXT_PUBLIC_EQUIPMENT_IMAGE_BASEURL
+                    ? new URL(process.env.NEXT_PUBLIC_EQUIPMENT_IMAGE_BASEURL).hostname
+                    : 'localhost',
+                pathname: '**',
+            },
+        ],
+    },
     async headers() {
         return [
             {

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
@@ -27,6 +27,7 @@ import { toEquipment } from '../../../lib/mappers/equipment';
 import { IEquipmentObjectionModel } from '../../../models/objection-models';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Role } from '../../../models/enums/Role';
+import Image from 'next/image';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -99,6 +100,13 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
 
             <Row className="mb-3">
                 <Col xl={4}>
+                    {process.env.NEXT_PUBLIC_EQUIPMENT_IMAGE_BASEURL ? (
+                        <ImageCardHideOnError
+                            src={process.env.NEXT_PUBLIC_EQUIPMENT_IMAGE_BASEURL + equipment.id}
+                            altText={equipment.name}
+                        />
+                    ) : null}
+
                     <Card className="mb-3">
                         <Card.Header>
                             <div style={{ fontSize: '1.6em' }}>
@@ -187,6 +195,33 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                 </Col>
             </Row>
         </Layout>
+    );
+};
+
+const ImageCardHideOnError = ({ src, altText }: { src: string; altText: string }) => {
+    const [hide, setHide] = useState(false);
+
+    if (hide) {
+        return null;
+    }
+
+    return (
+        <Card className="mb-3">
+            <Card.Header>
+                <div style={{ height: '250px', width: '100%' }}>
+                    <Image
+                        src={src}
+                        alt={altText}
+                        className="p-4"
+                        style={{ objectFit: 'contain' }}
+                        fill={true}
+                        onError={() => {
+                            setHide(true);
+                        }}
+                    />
+                </div>
+            </Card.Header>
+        </Card>
     );
 };
 
