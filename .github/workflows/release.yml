@@ -63,7 +63,7 @@ jobs:
               run: |
                   RELEASE_URL="https://api.github.com/repos/${{ github.repository }}/releases/tags/v${{ steps.version.outputs.tag }}"
                   RELEASE_JSON=$(curl -s "$RELEASE_URL")
-                  DATA="$(jq -c '. | {text: ("A new version has been released for Backstage2: *" + .name + "*\n. This version contains the following improvements :dancing_penguin::\n" + .body)}' <<< $RELEASE_JSON)"
+                  DATA="$(jq -c '. | {text: ("A new version has been released for Backstage2: *" + .name + "*\nThis version contains the following improvements :dancing_penguin::\n" + .body)}' <<< $RELEASE_JSON)"
 
                   curl -X POST -H 'Content-type: application/json' \
                       --data "$DATA" \
