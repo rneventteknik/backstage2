@@ -27,6 +27,7 @@ import { toEquipment } from '../../../lib/mappers/equipment';
 import { IEquipmentObjectionModel } from '../../../models/objection-models';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Role } from '../../../models/enums/Role';
+import FormFileInput from 'react-bootstrap/esm/FormFileInput';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -171,6 +172,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                 </ListGroup.Item>
                             ) : null}
                         </ListGroup>
+                    </Card>
+                    <Card className="mb-3">
+                        <Card.Header>Ladda upp bild</Card.Header>
+                        <input type="file"></input>
+                        <FormFileInput/>
                     </Card>
 
                     <ChangelogCard changelog={equipment.changelog ?? []} />
