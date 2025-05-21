@@ -106,8 +106,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
     const [statuses, setStatuses] = useSessionStorageState<Status[]>('large-booking-table-statuses', []);
     const [startDate, setStartDate] = useSessionStorageStateForDate('large-booking-table-start-date');
     const [endDate, setEndDate] = useSessionStorageStateForDate('large-booking-table-end-date');
-    const [customerName, setCustomerName] = useSessionStorageState<string | undefined>('large-booking-table-end-date');
-    const [location, setLocation] = useSessionStorageState<string | undefined>('large-booking-table-location');
+    const [customerName, setCustomerName] = useSessionStorageState<string>('large-booking-table-end-date');
+    const [location, setLocation] = useSessionStorageState<string>('large-booking-table-location');
     const [bookingType, setBookingType] = useSessionStorageState<BookingType | undefined>(
         'large-booking-table-booking-type',
     );
@@ -196,8 +196,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         setStatuses([]);
                         setStartDate(undefined);
                         setEndDate(undefined);
-                        setCustomerName(undefined);
-                        setLocation(undefined);
+                        setCustomerName('');
+                        setLocation('');
                         setBookingType(undefined);
                         setPricePlan(undefined);
                         setAccountKind(undefined);
