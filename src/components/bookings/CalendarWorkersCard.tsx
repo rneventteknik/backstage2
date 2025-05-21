@@ -160,12 +160,12 @@ const CalendarWorkersCardWithCalendarConnection: React.FC<CalendarWorkersCardWit
                     {!readonly && workingUsers.length > 0 ? (
                         <>
                             <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(false)}>
-                                <FontAwesomeIcon icon={faMessage} className="mr-1 fa-fw" /> Skicka direktmeddelande
-                                till de som jobbar
+                                <FontAwesomeIcon icon={faMessage} className="mr-1 fa-fw" /> Skicka direktmeddelande till
+                                de som jobbar
                             </Dropdown.Item>
                             <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(true)}>
-                                <FontAwesomeIcon icon={faHashtag} className="mr-1 fa-fw" /> Skapa slackkanal med de
-                                som jobbar
+                                <FontAwesomeIcon icon={faHashtag} className="mr-1 fa-fw" /> Skapa slackkanal med de som
+                                jobbar
                             </Dropdown.Item>
                         </>
                     ) : null}
