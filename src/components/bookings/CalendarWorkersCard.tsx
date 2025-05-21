@@ -156,30 +156,32 @@ const CalendarWorkersCardWithCalendarConnection: React.FC<CalendarWorkersCardWit
                 <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
                     <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                 </Button>
-                {!readonly ? (
-                    <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
-                        {!readonly && workingUsers.length > 0 ? (
-                            <>
-                                <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(false)}>
-                                    <FontAwesomeIcon icon={faMessage} className="mr-1 fa-fw" /> Skicka direktmeddelande
-                                    till de som jobbar
-                                </Dropdown.Item>
-                                <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(true)}>
-                                    <FontAwesomeIcon icon={faHashtag} className="mr-1 fa-fw" /> Skapa slackkanal med de
-                                    som jobbar
-                                </Dropdown.Item>
-                                <Dropdown.Divider />
-                                <Dropdown.Item onClick={() => setShowSelectCalendarEventModal(true)}>
-                                    <FontAwesomeIcon icon={faCalendar} className="mr-1 fa-fw" /> Redigara koppling till
-                                    kalenderevent
-                                </Dropdown.Item>
-                            </>
-                        ) : null}
-                        <Dropdown.Item href={data?.link} target="_blank">
-                            <FontAwesomeIcon icon={faExternalLinkAlt} className="mr-1 fa-fw" /> Öppna i Google Calendar
-                        </Dropdown.Item>
-                    </DropdownButton>
-                ) : null}
+                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
+                    {!readonly && workingUsers.length > 0 ? (
+                        <>
+                            <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(false)}>
+                                <FontAwesomeIcon icon={faMessage} className="mr-1 fa-fw" /> Skicka direktmeddelande
+                                till de som jobbar
+                            </Dropdown.Item>
+                            <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(true)}>
+                                <FontAwesomeIcon icon={faHashtag} className="mr-1 fa-fw" /> Skapa slackkanal med de
+                                som jobbar
+                            </Dropdown.Item>
+                        </>
+                    ) : null}
+                    {!readonly ? (
+                        <>
+                            <Dropdown.Item onClick={() => setShowSelectCalendarEventModal(true)}>
+                                <FontAwesomeIcon icon={faCalendar} className="mr-1 fa-fw" /> Redigara koppling till
+                                kalenderevent
+                            </Dropdown.Item>
+                            <Dropdown.Divider />
+                        </>
+                    ) : null}
+                    <Dropdown.Item href={data?.link} target="_blank">
+                        <FontAwesomeIcon icon={faExternalLinkAlt} className="mr-1 fa-fw" /> Öppna i Google Calendar
+                    </Dropdown.Item>
+                </DropdownButton>
                 {showSelectCalendarEventModal ? (
                     <SelectCalendarEventModal
                         show={showSelectCalendarEventModal}
@@ -290,6 +292,7 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
     }
 
     const previousCalendarEvent = bookingsCalendarList.find((x) => x.key == value);
+    const cannotFindConnectedEvent = value && !previousCalendarEvent;
 
     return (
         <Modal show={show} onHide={hide}>
@@ -297,7 +300,7 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
                 <Modal.Title>Välj kalenderevent</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {value && !previousCalendarEvent ? (
+                {cannotFindConnectedEvent ? (
                     <Alert variant="warning" className="mb-3">
                         <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
                         Denna bokning är kopplad till ett okänt kalenderevent som har passerat eller tagits inte längre
@@ -310,7 +313,7 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
                     value={selectedCalendarEvent}
                     onChange={(e) => setSelectedCalendarEvent(e.target.value)}
                 >
-                    {!previousCalendarEvent ? (
+                    {cannotFindConnectedEvent ? (
                         <option value={selectedCalendarEvent}>Okänt event ({value})</option>
                     ) : null}
                     <option value="">Ingen koppling till kalenderevent</option>
