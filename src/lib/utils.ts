@@ -279,7 +279,7 @@ export const replaceEmptyStringWithNull = (s: string | undefined | null): string
 
 // Count number of null or empty values
 export const countNullorEmpty = (...values: (string | Date | number | null | boolean | undefined | unknown[])[]) =>
-    values.filter((x) => (Array.isArray(x) ? x.length > 0 : !!x)).length;
+    values.filter((x) => (Array.isArray(x) ? x.length > 0 : !!x || x === 0)).length;
 
 // Get value or if the input is an array, the first value (useful for parsing url query params)
 //
