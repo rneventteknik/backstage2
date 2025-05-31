@@ -386,6 +386,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         <CalendarWorkersCard
                             bookingId={booking.id}
                             calendarEventId={booking.calendarBookingId}
+                            onSubmit={(calendarBookingId) => saveBooking({ calendarBookingId })}
                             readonly={readonly}
                         />
                     ) : null}
