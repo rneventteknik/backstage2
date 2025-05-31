@@ -40,7 +40,11 @@ const BookingRentalStatusButton: React.FC<Props> = ({
                 : booking.returnalNote,
         });
 
-    if (booking.bookingType === BookingType.GIG || alwaysShowRentalControls) {
+    if (
+        booking.bookingType === BookingType.GIG &&
+        !booking.equipmentLists?.some((list) => list.rentalStatus == RentalStatus.OUT) &&
+        !alwaysShowRentalControls
+    ) {
         return null;
     }
 
