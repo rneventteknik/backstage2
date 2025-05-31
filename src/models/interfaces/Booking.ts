@@ -42,6 +42,7 @@ export interface Booking extends BaseEntityWithName {
     language: Language;
     fixedPrice: number | null;
     invoiceDate?: Date;
+    internalReservation: boolean;
 }
 
 export interface BookingViewModel extends Booking {

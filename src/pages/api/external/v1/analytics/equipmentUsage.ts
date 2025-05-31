@@ -18,6 +18,7 @@ import {
     getOperationalYear,
     getPricePlanName,
     getStatusName,
+    IsNotInternalReservation,
 } from '../../../../../lib/utils';
 import { AccountKind } from '../../../../../models/enums/AccountKind';
 import { fetchSettings } from '../../../../../lib/db-access/setting';
@@ -38,6 +39,7 @@ const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiRespon
             await fetchBookingsForAnalytics()
                 .then((x) => x.map(toBooking))
                 .then((x) => x.map(toBookingViewModel))
+                .then((x) => x.filter(IsNotInternalReservation))
                 .then((x) => mapToAnalytics(x, defaultEquipmentAccountExternal, defaultEquipmentAccountInternal))
                 .then((x) => mapToCSV(x))
                 .then((result) => res.status(200).setHeader('Content-Type', 'text/csv').send(result))

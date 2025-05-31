@@ -8,6 +8,7 @@ import BookingStatusTag from '../utils/BookingStatusTag';
 import BookingTypeTag from '../utils/BookingTypeTag';
 import RentalStatusTag from '../utils/RentalStatusTag';
 import FixedPriceStatusTag from '../utils/FixedPriceStatusTag';
+import InternalReservationTag from '../utils/InternalReservationTag';
 
 type Props = {
     booking: BookingViewModel;
@@ -31,6 +32,7 @@ const BookingInfoSection: React.FC<Props> = ({ booking, className, showName = tr
                 <Badge variant="dark" className="ml-1">
                     {getPaymentStatusName(booking.paymentStatus)}
                 </Badge>
+                <InternalReservationTag booking={booking} className="ml-1" />
                 {booking.language !== Language.SV ? (
                     <Badge variant="dark" className="ml-1">
                         {getLanguageName(booking.language)}
