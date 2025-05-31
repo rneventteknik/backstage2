@@ -29,13 +29,20 @@ type Props = {
     bookingId: number;
     readonly: boolean;
     defaultLaborHourlyRate: number;
+    alwaysShowRentalControls: boolean;
     globalSettings: KeyValue[];
 };
 
 // This component only contains logic to create and delete lists. Everything else
 // is handled by the EquipmentListDisplay component which manages it's list internally.
 //
-const EquipmentLists: React.FC<Props> = ({ bookingId, readonly, defaultLaborHourlyRate, globalSettings }: Props) => {
+const EquipmentLists: React.FC<Props> = ({
+    bookingId,
+    readonly,
+    defaultLaborHourlyRate,
+    alwaysShowRentalControls,
+    globalSettings,
+}: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
 
     const {
@@ -190,6 +197,7 @@ const EquipmentLists: React.FC<Props> = ({ bookingId, readonly, defaultLaborHour
                     isFirstFn={(list: EquipmentList) => isFirst(equipmentLists, list)}
                     isLastFn={(list: EquipmentList) => isLast(equipmentLists, list)}
                     globalSettings={globalSettings}
+                    alwaysShowRentalControls={alwaysShowRentalControls}
                 />
             ))}
             {readonly ? null : (

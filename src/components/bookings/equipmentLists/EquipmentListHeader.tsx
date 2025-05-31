@@ -68,6 +68,7 @@ type Props = {
     disableMoveUp: boolean;
     disableMoveDown: boolean;
     disableDelete: boolean;
+    alwaysShowRentalControls: boolean;
     readonly: boolean;
 };
 
@@ -92,6 +93,7 @@ const EquipmentListHeader: React.FC<Props> = ({
     disableMoveUp,
     disableMoveDown,
     disableDelete,
+    alwaysShowRentalControls,
     readonly,
 }: Props) => {
     const [showEmptyListModal, setShowEmptyListModal] = useState(false);
@@ -129,6 +131,8 @@ const EquipmentListHeader: React.FC<Props> = ({
         return 'text-muted';
     };
 
+    const showRentalControls = bookingType === BookingType.RENTAL || alwaysShowRentalControls;
+
     // HTML template
     //
     return (
@@ -154,7 +158,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                     </Button>
                     {readonly ? null : (
                         <>
-                            {bookingType === BookingType.RENTAL && list.rentalStatus == undefined ? (
+                            {showRentalControls && list.rentalStatus == undefined ? (
                                 <>
                                     <Button
                                         variant="secondary"
@@ -187,7 +191,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                                 </>
                             ) : null}
 
-                            {bookingType === BookingType.RENTAL && list.rentalStatus == RentalStatus.OUT ? (
+                            {list.rentalStatus == RentalStatus.OUT ? (
                                 <>
                                     <Button
                                         variant="secondary"
@@ -329,7 +333,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     </Dropdown.Item>
                                 )}
 
-                                {bookingType === BookingType.RENTAL ? (
+                                {showRentalControls ? (
                                     <Dropdown.Item
                                         onClick={() => saveList({ ...list, rentalStatus: null })}
                                         disabled={list.rentalStatus == undefined}
@@ -405,7 +409,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                         / {getNumberOfEquipmentOutDays(list)} dagar / {getNumberOfDays(list)} debiterade dagar
                     </>
                 ) : null}
-                {bookingType === BookingType.RENTAL ? <> / {getRentalStatusName(list.rentalStatus)}</> : null}
+                {showRentalControls ? <> / {getRentalStatusName(list.rentalStatus)}</> : null}
                 {list.discountPercentage !== 0 ? (
                     <>
                         {' '}
