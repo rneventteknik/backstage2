@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import { Equipment, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
-import { countNullorEmpty, notEmpty } from '../lib/utils';
+import { countNotNullorEmpty, notEmpty } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -215,7 +215,7 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                     setFilterLocations([]);
                     setFilterPubliclyHidden('all');
                 }}
-                activeFilterCount={countNullorEmpty(
+                activeFilterCount={countNotNullorEmpty(
                     searchText,
                     filterTags,
                     filterLocations,

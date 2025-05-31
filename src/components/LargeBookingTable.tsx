@@ -3,13 +3,17 @@ import { BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
 import {
-    countNullorEmpty,
+    countNotNullorEmpty,
     getStatusColor,
     getStatusName,
     nameSortFn,
     notEmpty,
     onlyUnique,
     onlyUniqueById,
+    getBookingTypeName,
+    toIntOrUndefined,
+    getPricePlanName,
+    getAccountKindName,
 } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Col, Form } from 'react-bootstrap';
@@ -21,6 +25,9 @@ import AdvancedFilters from './AdvancedFilters';
 import BookingStatusTag from './utils/BookingStatusTag';
 import { useSessionStorageState, useSessionStorageStateForDate } from '../lib/useSessionStorageState';
 import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
+import { BookingType } from '../models/enums/BookingType';
+import { PricePlan } from '../models/enums/PricePlan';
+import { AccountKind } from '../models/enums/AccountKind';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
@@ -99,6 +106,15 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
     const [statuses, setStatuses] = useSessionStorageState<Status[]>('large-booking-table-statuses', []);
     const [startDate, setStartDate] = useSessionStorageStateForDate('large-booking-table-start-date');
     const [endDate, setEndDate] = useSessionStorageStateForDate('large-booking-table-end-date');
+    const [customerName, setCustomerName] = useSessionStorageState<string>('large-booking-table-end-date');
+    const [location, setLocation] = useSessionStorageState<string>('large-booking-table-location');
+    const [bookingType, setBookingType] = useSessionStorageState<BookingType | undefined>(
+        'large-booking-table-booking-type',
+    );
+    const [pricePlan, setPricePlan] = useSessionStorageState<PricePlan | undefined>('large-booking-table-price-plan');
+    const [accountKind, setAccountKind] = useSessionStorageState<AccountKind | undefined>(
+        'large-booking-table-account-kind',
+    );
 
     // Generate option lists for filters
     //
@@ -155,7 +171,18 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
         .filter(
             (booking: BookingViewModel) =>
                 !endDate || !validDate(endDate) || (booking.usageEndDatetime && booking.usageEndDatetime < endDate),
-        );
+        )
+        .filter(
+            (booking: BookingViewModel) =>
+                !customerName || booking.customerName?.toLowerCase().includes(customerName.toLowerCase()),
+        )
+        .filter(
+            (booking: BookingViewModel) =>
+                !location || booking.location?.toLowerCase().includes(location.toLowerCase()),
+        )
+        .filter((booking: BookingViewModel) => bookingType == undefined || booking.bookingType === bookingType)
+        .filter((booking: BookingViewModel) => pricePlan == undefined || booking.pricePlan === pricePlan)
+        .filter((booking: BookingViewModel) => accountKind == undefined || booking.accountKind === accountKind);
 
     return (
         <>
@@ -169,8 +196,24 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         setStatuses([]);
                         setStartDate(undefined);
                         setEndDate(undefined);
+                        setCustomerName('');
+                        setLocation('');
+                        setBookingType(undefined);
+                        setPricePlan(undefined);
+                        setAccountKind(undefined);
                     }}
-                    activeFilterCount={countNullorEmpty(searchText, userIds, statuses, startDate, endDate)}
+                    activeFilterCount={countNotNullorEmpty(
+                        searchText,
+                        userIds,
+                        statuses,
+                        startDate,
+                        endDate,
+                        customerName,
+                        location,
+                        bookingType,
+                        pricePlan,
+                        accountKind,
+                    )}
                 >
                     <Form.Row className="mb-2">
                         <Col md="4">
@@ -205,7 +248,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md="2">
+                        <Col md="4" lg="2">
                             <Form.Group>
                                 <Form.Label>Börjar efter</Form.Label>
                                 <Form.Control
@@ -215,7 +258,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md="2">
+                        <Col md="4" lg="2">
                             <Form.Group>
                                 <Form.Label>Slutar före</Form.Label>
                                 <Form.Control
@@ -223,6 +266,76 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     onChange={handleChangeEndDate}
                                     value={formatDateForForm(endDate)}
                                 />
+                            </Form.Group>
+                        </Col>
+                        <Col md="4" lg="3">
+                            <Form.Group>
+                                <Form.Label>Kund</Form.Label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Filtrera på kund"
+                                    value={customerName}
+                                    onChange={(e) => setCustomerName(e.target.value)}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md="4" lg="3">
+                            <Form.Group>
+                                <Form.Label>Plats</Form.Label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Filtrera på plats"
+                                    value={location}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                />
+                            </Form.Group>
+                        </Col>
+                        <Col md="4" lg="2">
+                            <Form.Group>
+                                <Form.Label>Typ av bokning</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    value={bookingType ?? ''}
+                                    onChange={(e) => setBookingType(toIntOrUndefined(e.target.value) as BookingType)}
+                                >
+                                    <option value="">Alla typer</option>
+                                    <option value={BookingType.GIG}>{getBookingTypeName(BookingType.GIG)}</option>
+                                    <option value={BookingType.RENTAL}>{getBookingTypeName(BookingType.RENTAL)}</option>
+                                </Form.Control>
+                            </Form.Group>
+                        </Col>
+                        <Col md="4" lg="2">
+                            <Form.Group>
+                                <Form.Label>Prisplan</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    value={pricePlan ?? ''}
+                                    onChange={(e) => setPricePlan(toIntOrUndefined(e.target.value) as PricePlan)}
+                                >
+                                    <option value="">Alla prisplaner</option>
+                                    <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
+                                    <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
+                                </Form.Control>
+                            </Form.Group>
+                        </Col>
+                        <Col md="4" lg="2">
+                            <Form.Group>
+                                <Form.Label>Kontotyp</Form.Label>
+                                <Form.Control
+                                    as="select"
+                                    value={accountKind ?? ''}
+                                    onChange={(e) => setAccountKind(toIntOrUndefined(e.target.value) as AccountKind)}
+                                >
+                                    <option value="">Alla kontotyper</option>
+                                    <option value={AccountKind.EXTERNAL}>
+                                        {getAccountKindName(AccountKind.EXTERNAL)}
+                                    </option>
+                                    <option value={AccountKind.INTERNAL}>
+                                        {getAccountKindName(AccountKind.INTERNAL)}
+                                    </option>
+                                </Form.Control>
                             </Form.Group>
                         </Col>
                     </Form.Row>

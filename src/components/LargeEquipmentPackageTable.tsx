@@ -1,7 +1,7 @@
 import React, { ChangeEvent } from 'react';
 import { EquipmentPackage, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
-import { countNullorEmpty, notEmpty } from '../lib/utils';
+import { countNotNullorEmpty, notEmpty } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Col, Form } from 'react-bootstrap';
 import TableStyleLink from './utils/TableStyleLink';
@@ -99,7 +99,7 @@ const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableS
                     setSearchText('');
                     setFilterTags([]);
                 }}
-                activeFilterCount={countNullorEmpty(searchText, filterTags)}
+                activeFilterCount={countNotNullorEmpty(searchText, filterTags)}
             >
                 <Form.Row className="mb-2">
                     <Col md="4">
