@@ -52,6 +52,7 @@ type Props = {
     moveListFn: (x: EquipmentList, direction: 'UP' | 'DOWN') => void;
     isFirstFn: (x: EquipmentList) => boolean;
     isLastFn: (x: EquipmentList) => boolean;
+    alwaysShowRentalControls: boolean;
     globalSettings: KeyValue[];
 };
 
@@ -63,6 +64,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
     moveListFn: parentMoveListFn,
     isFirstFn: parentIsFirstFn,
     isLastFn: parentIsLastFn,
+    alwaysShowRentalControls,
     readonly,
     globalSettings,
 }: Props) => {
@@ -418,6 +420,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     disableMoveUp={parentIsFirstFn(list)}
                     disableMoveDown={parentIsLastFn(list)}
                     disableDelete={otherLists.length === 0}
+                    alwaysShowRentalControls={alwaysShowRentalControls}
                     readonly={readonly}
                 />
             </Card.Header>

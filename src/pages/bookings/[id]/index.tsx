@@ -9,6 +9,7 @@ import {
     getPricePlanName,
     getResponseContentOrError,
     getOperationalYear,
+    getBookingTypeName,
 } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
@@ -30,6 +31,8 @@ import {
     faLockOpen,
     faPen,
     faTimesCircle,
+    faToggleOff,
+    faToggleOn,
     faTrashCan,
 } from '@fortawesome/free-solid-svg-icons';
 import { Role } from '../../../models/enums/Role';
@@ -75,6 +78,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     // const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
     const [showConfirmPaidModal, setShowConfirmPaidModal] = useState(false);
     const [adminEditModeOverrideEnabled, setAdminEditModeOverrideEnabled] = useState(false);
+    const [alwaysShowRentalControls, setAlwaysShowRentalControls] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showCancelModal, setShowCancelModal] = useState(false);
 
@@ -198,7 +202,11 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         </Link>
 
                         <BookingStatusButton booking={booking} onChange={saveBooking} />
-                        <BookingRentalStatusButton booking={booking} onChange={saveBooking} />
+                        <BookingRentalStatusButton
+                            booking={booking}
+                            onChange={saveBooking}
+                            alwaysShowRentalControls={alwaysShowRentalControls}
+                        />
                     </>
                 ) : null}
                 <Dropdown as={ButtonGroup}>
@@ -301,6 +309,18 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
                 {!readonly ? (
                     <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                        {booking.bookingType === BookingType.GIG && !alwaysShowRentalControls ? (
+                            <Dropdown.Item onClick={() => setAlwaysShowRentalControls(true)}>
+                                <FontAwesomeIcon icon={faToggleOff} className="mr-1" /> Visa hyreskontroller för detta{' '}
+                                {getBookingTypeName(booking.bookingType)}
+                            </Dropdown.Item>
+                        ) : null}
+                        {booking.bookingType === BookingType.GIG && alwaysShowRentalControls ? (
+                            <Dropdown.Item onClick={() => setAlwaysShowRentalControls(false)}>
+                                <FontAwesomeIcon icon={faToggleOn} className="mr-1" /> Sluta visa hyreskontroller för
+                                detta {getBookingTypeName(booking.bookingType)}
+                            </Dropdown.Item>
+                        ) : null}
                         {booking.status !== Status.CANCELED && booking.status !== Status.DONE ? (
                             <Dropdown.Item onClick={() => setShowCancelModal(true)}>
                                 <FontAwesomeIcon icon={faTimesCircle} className="mr-1" /> Ställ in bokningen
@@ -357,6 +377,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         readonly={readonly}
                         globalSettings={globalSettings}
                         defaultLaborHourlyRate={defaultLaborHourlyRate}
+                        alwaysShowRentalControls={alwaysShowRentalControls}
                     />
                 </Col>
                 <Col xl={4}>

@@ -14,10 +14,16 @@ import { Status } from '../../models/enums/Status';
 type Props = {
     booking: Partial<Booking>;
     onChange: (booking: PartialDeep<IBookingObjectionModel, { recurseIntoArrays: true }>) => void;
+    alwaysShowRentalControls: boolean;
     className?: string;
 };
 
-const BookingRentalStatusButton: React.FC<Props> = ({ booking, onChange, className }: Props) => {
+const BookingRentalStatusButton: React.FC<Props> = ({
+    booking,
+    onChange,
+    className,
+    alwaysShowRentalControls,
+}: Props) => {
     const [showConfirmOutModal, setShowConfirmOutModal] = useState(false);
     const [showReturnalNoteModal, setShowReturnalNoteModal] = useState(false);
 
@@ -34,7 +40,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({ booking, onChange, classNa
                 : booking.returnalNote,
         });
 
-    if (booking.bookingType === BookingType.GIG) {
+    if (booking.bookingType === BookingType.GIG || alwaysShowRentalControls) {
         return null;
     }
 
