@@ -3,7 +3,7 @@ import { BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from '../components/utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from '../components/TableDisplay';
 import {
-    countNullorEmpty,
+    countNotNullorEmpty,
     getStatusColor,
     getStatusName,
     nameSortFn,
@@ -202,7 +202,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         setPricePlan(undefined);
                         setAccountKind(undefined);
                     }}
-                    activeFilterCount={countNullorEmpty(
+                    activeFilterCount={countNotNullorEmpty(
                         searchText,
                         userIds,
                         statuses,
