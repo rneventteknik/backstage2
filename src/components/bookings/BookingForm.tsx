@@ -65,6 +65,7 @@ const BookingForm: React.FC<Props> = ({
 
         const form = event.currentTarget;
         const getValueFromForm = (key: string): string | undefined => form[key]?.value;
+        const getCheckedFromForm = (key: string): boolean | undefined => form[key]?.checked;
 
         if (
             !replaceEmptyStringWithNull(getValueFromForm('invoiceHogiaId')) &&
@@ -117,6 +118,7 @@ const BookingForm: React.FC<Props> = ({
             invoiceDate: toDatetimeOrUndefined(getValueFromForm('invoiceDate'))
                 ? getValueFromForm('invoiceDate')
                 : null,
+            internalReservation: getCheckedFromForm('internalReservation') ?? booking.internalReservation,
         };
 
         handleSubmitBooking(modifiedBooking);
@@ -575,6 +577,24 @@ const BookingForm: React.FC<Props> = ({
                                     name="invoiceDate"
                                     defaultValue={formatDateForForm(booking?.invoiceDate)}
                                 />
+                            </Form.Group>
+                        </Col>
+                        <Col lg={6}>
+                            <Form.Group controlId="internalReservation">
+                                <Form.Check
+                                    type="checkbox"
+                                    label={'Intern reservation av utrustning'}
+                                    name="internalReservation"
+                                    defaultChecked={booking.internalReservation ?? false}
+                                    id="internal-reservation-checkbox"
+                                />
+
+                                <Form.Text className="text-muted">
+                                    Markera denna checkruta om denna bokning inte är till för utrustningsanvändning utan
+                                    reserverar utrustning för fast installation, reparation, eller annan aktivitet som
+                                    hindrar att den används i normal verksamhet. Om denna checkruta är aktiv exkluderas
+                                    bokningen från listan över utlämnad utrustning, statistik, etc.
+                                </Form.Text>
                             </Form.Group>
                         </Col>
                     </Row>

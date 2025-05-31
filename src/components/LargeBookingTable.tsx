@@ -28,6 +28,7 @@ import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
 import { BookingType } from '../models/enums/BookingType';
 import { PricePlan } from '../models/enums/PricePlan';
 import { AccountKind } from '../models/enums/AccountKind';
+import InternalReservationTag from './utils/InternalReservationTag';
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
@@ -36,6 +37,7 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
         <BookingStatusTag booking={booking} className="ml-1" />
         <BookingTypeTag booking={booking} className="ml-1" />
         <RentalStatusTag booking={booking} className="ml-1" />
+        <InternalReservationTag booking={booking} className="ml-1" />
         <FixedPriceStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
     </>

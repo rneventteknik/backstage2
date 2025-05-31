@@ -51,17 +51,17 @@ export const fetchOutEquipmentLists = async (): Promise<EquipmentListObjectionMo
 
     return EquipmentListObjectionModel.query()
         .join('Booking', 'Booking.id', '=', 'EquipmentList.bookingId')
-        .where({ rentalStatus: RentalStatus.OUT, bookingType: BookingType.RENTAL })
+        .where({ rentalStatus: RentalStatus.OUT, bookingType: BookingType.RENTAL, internalReservation: false })
         .orWhere((x) =>
             x
-                .where({ bookingType: BookingType.GIG })
+                .where({ bookingType: BookingType.GIG, internalReservation: false })
                 .where('equipmentOutDatetime', '<=', now)
                 .where('equipmentInDatetime', '>=', now)
                 .whereNot({ status: Status.CANCELED }),
         )
         .orWhere((x) =>
             x
-                .where({ bookingType: BookingType.GIG })
+                .where({ bookingType: BookingType.GIG, internalReservation: false })
                 .where('usageStartDatetime', '<=', now)
                 .where('usageEndDatetime', '>=', now)
                 .whereNot({ status: Status.CANCELED }),

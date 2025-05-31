@@ -6,7 +6,15 @@ import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { Card, Form, Nav, Tab } from 'react-bootstrap';
 import { bookingsFetcher } from '../lib/fetchers';
-import { getOperationalYear, getStatusName, groupBy, notEmpty, onlyUniqueById, reduceSumFn } from '../lib/utils';
+import {
+    getOperationalYear,
+    getStatusName,
+    groupBy,
+    IsNotInternalReservation,
+    notEmpty,
+    onlyUniqueById,
+    reduceSumFn,
+} from '../lib/utils';
 import { TableLoadingPage } from '../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../components/layout/ErrorPage';
 import { TableConfiguration, TableDisplay } from '../components/TableDisplay';
@@ -239,6 +247,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
 
     const bookingsViewModels = bookings
         ?.map(toBookingViewModel)
+        ?.filter(IsNotInternalReservation)
         ?.filter((b) => b.usageStartDatetime)
         ?.filter((b) => includeFixedPriceZero || b.fixedPrice !== 0)
         ?.filter((booking: BookingViewModel) => statuses.length === 0 || statuses.indexOf(booking.status) >= 0);
