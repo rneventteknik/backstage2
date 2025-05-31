@@ -6,7 +6,7 @@ import { Status } from '../../../../models/enums/Status';
 import { getEquipmentInDatetime, getEquipmentOutDatetime, HasDatetimes } from '../../../../lib/datetimeUtils';
 import { toBooking } from '../../../../lib/mappers/booking';
 import { EquipmentList } from '../../../../models/interfaces/EquipmentList';
-import { reduceSumFn } from '../../../../lib/utils';
+import { IsNotInternalReservation, reduceSumFn } from '../../../../lib/utils';
 import { BookingObjectionModel } from '../../../../models/objection-models';
 import { BookingType } from '../../../../models/enums/BookingType';
 
@@ -30,6 +30,7 @@ const getRentalsToHandleTodayFromBookings = (
     return result
         .filter((booking) => booking.status !== Status.CANCELED)
         .filter((booking) => booking.bookingType === BookingType.RENTAL)
+        .filter(IsNotInternalReservation)
         .map(toBooking)
         .map((booking) => ({
             name: booking.name,
@@ -50,7 +51,7 @@ const numberOfEquipment = (equipmentList: EquipmentList): number => {
     return allEquipmentEntries.map((x) => x.numberOfUnits).reduce(reduceSumFn);
 };
 
-const getLinkToBooking = (bookingId: number): string => (process.env.APPLICATION_BASE_URL + '/bookings/' + bookingId)
+const getLinkToBooking = (bookingId: number): string => process.env.APPLICATION_BASE_URL + '/bookings/' + bookingId;
 
 const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     switch (req.method) {
