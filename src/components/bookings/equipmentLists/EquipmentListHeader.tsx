@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Button, Col, Dropdown, DropdownButton, Row } from 'react-bootstrap';
+import { Alert, Button, Col, Dropdown, DropdownButton, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faAngleDown,
@@ -16,6 +16,7 @@ import {
     faFileDownload,
     faPercent,
     faListCheck,
+    faWarning,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
@@ -113,12 +114,15 @@ const EquipmentListHeader: React.FC<Props> = ({
         list.equipmentOutDatetime ||
         list.equipmentInDatetime;
 
+    const showEquipmentDateWarning = (list: EquipmentList) =>
+        bookingStatus === Status.BOOKED && bookingType == BookingType.RENTAL && !list.equipmentOutDatetime;
+
     const getEquipmentDateColor = (list: EquipmentList) => {
         if (!!list.equipmentOutDatetime) {
             return '';
         }
 
-        if (bookingStatus === Status.BOOKED) {
+        if (showEquipmentDateWarning(list)) {
             return 'text-danger';
         }
 
@@ -493,7 +497,23 @@ const EquipmentListHeader: React.FC<Props> = ({
                             </div>
                         </Col>
                         <Col md={3} xs={6}>
-                            <small>Utlämning</small>
+                            <small>
+                                Utlämning
+                                {showEquipmentDateWarning(list) ? (
+                                    <OverlayTrigger
+                                        placement="right"
+                                        overlay={
+                                            <Tooltip id="1">
+                                                <strong>
+                                                    Denna utrustningslista saknar explicit datum för utlämning.
+                                                </strong>
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faWarning} className="ml-1" />
+                                    </OverlayTrigger>
+                                ) : null}
+                            </small>
                             <div
                                 className={'mb-3 ' + getEquipmentDateColor(list)}
                                 style={{ fontSize: '1.2em' }}
@@ -503,7 +523,23 @@ const EquipmentListHeader: React.FC<Props> = ({
                             </div>
                         </Col>
                         <Col md={3} xs={6}>
-                            <small>Återlämning</small>
+                            <small>
+                                Återlämning
+                                {showEquipmentDateWarning(list) ? (
+                                    <OverlayTrigger
+                                        placement="right"
+                                        overlay={
+                                            <Tooltip id="2">
+                                                <strong>
+                                                    Denna utrustningslista saknar explicit datum för återlämning.
+                                                </strong>
+                                            </Tooltip>
+                                        }
+                                    >
+                                        <FontAwesomeIcon icon={faWarning} className="ml-1" />
+                                    </OverlayTrigger>
+                                ) : null}
+                            </small>
                             <div
                                 className={'mb-3 ' + getEquipmentDateColor(list)}
                                 style={{ fontSize: '1.2em' }}
