@@ -25,6 +25,7 @@ import TableStyleLink from '../utils/TableStyleLink';
 import { formatDateForForm, getBookingDateHeadingValue } from '../../lib/datetimeUtils';
 import { addVAT, formatCurrency, getBookingPrice } from '../../lib/pricingUtils';
 import CancelledIcon from '../utils/CancelledIcon';
+import InternalReservationTag from '../utils/InternalReservationTag';
 
 type Props = {
     bookings: BookingViewModel[];
@@ -108,6 +109,7 @@ const AdminBookingList: React.FC<Props> = ({
                 </TableStyleLink>
 
                 <BookingTypeTag booking={booking} className="mr-1" />
+                <InternalReservationTag booking={booking} className="mr-1" />
                 <FixedPriceStatusTag booking={booking} className="mr-1" />
 
                 {customAccountsOnBooking.length > 0 ? (

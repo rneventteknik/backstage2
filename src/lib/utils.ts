@@ -319,6 +319,10 @@ export const getDefaultLaborHourlyRate = (pricePlan: PricePlan, globalSettings: 
     return toIntOrUndefined(defaultLaborHourlyRate) ?? 0;
 };
 
+export const IsNotInternalReservation = (booking: { internalReservation: boolean }) => {
+    return !booking.internalReservation;
+};
+
 export const IsBookingActive = (booking: BookingViewModel) => {
     return booking.status === Status.BOOKED || (booking.status === Status.DRAFT && booking.usageStartDatetime);
 };
@@ -330,10 +334,6 @@ export const IsBookingDraftOrBooked = (booking: BookingViewModel) => {
 export const IsBookingOut = (booking: BookingViewModel) => {
     if (!booking.equipmentLists) {
         throw new Error('Missing equipmentLists property');
-    }
-
-    if (booking.bookingType !== BookingType.RENTAL) {
-        return false;
     }
 
     return booking.equipmentLists?.some((x) => x.rentalStatus === RentalStatus.OUT);
