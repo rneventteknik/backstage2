@@ -45,6 +45,10 @@ SLACK_CHANNEL_ID={Slack channel to post message to}
 APPLICATION_BASE_URL={Base URL of application when generating links, for example http://localhost:3000}
 
 API_KEYS={JSON list of API keys, for example [{"key": "XXX", "name": "slackbot"}]} (optional, only needed when using backstage2 as an API from an external service)
+
+NEXT_PUBLIC_MQTT_BROKER_URL={wss://hostname:port}
+MQTT_BROKER_USERNAME={Username to the mqtt broker}
+MQTT_BROKER_PASSWORD={Passowrd to the mqtt broker}
 ```
 
 ### Version Control

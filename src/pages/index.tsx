@@ -24,6 +24,7 @@ import TableStyleLink from '../components/utils/TableStyleLink';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import CurrentlyOutEquipment from '../components/CurrentlyOutEquipment';
 import AddUserAsCoOwnerToAllFutureBookingsForUserButton from '../components/AddUserAsCoOwnerToAllFutureBookingsForUserButton';
+import DoorAndKeyStatus from '../components/DoorAndKeytatus';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -82,6 +83,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                     </TinyBookingTable>
                 </Col>
                 <Col xl={6}>
+                    <DoorAndKeyStatus globalSettings={globalSettings} />
                     <TinyBookingTable
                         title="Kommande hyror (inom 1 vecka)"
                         bookings={upcomingRentalBookings}
