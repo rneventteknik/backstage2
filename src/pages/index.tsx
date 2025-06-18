@@ -83,6 +83,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                     </TinyBookingTable>
                 </Col>
                 <Col xl={6}>
+                    <DoorAndKeyStatus globalSettings={globalSettings} />
                     <TinyBookingTable
                         title="Kommande hyror (inom 1 vecka)"
                         bookings={upcomingRentalBookings}
@@ -113,12 +114,6 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                                 </ListGroup.Item>
                             ))}
                         </ListGroup>
-                    </Card>
-                    <Card>
-                        <Card.Header className="d-flex">
-                            <span className="flex-grow-1">Dörr och nyckelstatus</span>
-                            <DoorAndKeyStatus></DoorAndKeyStatus>
-                        </Card.Header>
                     </Card>
                 </Col>
             </Row>

@@ -2,11 +2,31 @@ import { faKey, faLock, faLockOpen, faPlane, faQuestion } from '@fortawesome/fre
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import mqtt from 'mqtt';
 import React, { useState, useEffect, useRef } from 'react';
+import { Card, ListGroup } from 'react-bootstrap';
+import { KeyValue } from '../models/interfaces/KeyValue';
+import { getGlobalSetting } from '../lib/utils';
 
-const DoorAndKeyStatus: React.FC = () => {
+type Props = {
+    globalSettings: KeyValue[];
+};
+const DoorAndKeyStatus: React.FC<Props> = ({ globalSettings }: Props) => {
+    if (!process.env.NEXT_PUBLIC_MQTT_BROKER_URL) {
+        return null;
+    }
+
+    return <DoorAndKeyStatusContent globalSettings={globalSettings} />;
+}
+
+type DoorAndKeyStatusContentProps = {
+    globalSettings: KeyValue[];
+};
+const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globalSettings }: DoorAndKeyStatusContentProps) => {
     const [KeyInPlace, setKeyInPlace] = useState('unknown');
     const [Armed, setArmed] = useState('unknown');
     const mqttConnection = useRef<mqtt.MqttClient | null>(null);
+
+    const keyTopic = getGlobalSetting('mqtt.keyTopic', globalSettings, '');
+    const doorTopic = getGlobalSetting('mqtt.doorTopic', globalSettings, '');
 
     useEffect(() => {
         fetch('api/auth/mqtt-credentials').then(async (response) => {
@@ -26,7 +46,7 @@ const DoorAndKeyStatus: React.FC = () => {
             }
 
             mqttConnection.current.on('connect', () => {
-                mqttConnection.current?.subscribe(['rn/nymble/3/door', 'rn/nymble/3/spånk/key'], (error) => {
+                mqttConnection.current?.subscribe([doorTopic, keyTopic], (error) => {
                     if (error) {
                         console.error('Error subscribing', error);
                     }
@@ -37,24 +57,21 @@ const DoorAndKeyStatus: React.FC = () => {
                 console.error('Mqtt connection error', error);
             });
 
-            mqttConnection.current.on('message', (topic, message) => {
+            mqttConnection.current.on('message', (topic, messageString) => {
                 try {
-                    const msg = JSON.parse(message.toString());
+                    const parsedMessage = JSON.parse(messageString.toString());
+                    const status = parsedMessage.hasOwnProperty('status') ? parsedMessage['status'] : null;
+                    const event = parsedMessage.hasOwnProperty('event') ? parsedMessage['event'] : null;
+                    const result = status ?? event;
 
-                    if (topic === 'rn/nymble/3/door') {
-                        if (msg.hasOwnProperty('status')) {
-                            setArmed(msg['status']);
-                        } else if (msg.hasOwnProperty('event')) {
-                            setArmed(msg['event']);
-                        }
+
+                    if (topic === doorTopic) {
+                        setArmed(result);
                     }
-                    if (topic === 'rn/nymble/3/spånk/key') {
-                        if (msg.hasOwnProperty('status')) {
-                            setKeyInPlace(msg['status']);
-                        } else if (msg.hasOwnProperty('event')) {
-                            setKeyInPlace(msg['event']);
-                        }
+                    else if (topic === keyTopic) {
+                        setKeyInPlace(result);
                     }
+
                 } catch (error) {
                     console.warn('Non json message received', error);
                 }
@@ -75,7 +92,7 @@ const DoorAndKeyStatus: React.FC = () => {
                 return { icon: faKey, text: 'Nyckeln är på sin plats' };
 
             default:
-                return { icon: faQuestion, text: 'Status saknas' };
+                return { icon: faQuestion, text: 'Nyckelstatus saknas' };
         }
     };
 
@@ -88,27 +105,34 @@ const DoorAndKeyStatus: React.FC = () => {
                 return { icon: faLockOpen, text: 'Dörren är olarmad' };
 
             default:
-                return { icon: faQuestion, text: 'Status saknas' };
+                return { icon: faQuestion, text: 'Dörrstatus saknas' };
         }
     };
 
     return (
-        <div>
-            <FontAwesomeIcon
-                id="keyStatusIcon"
-                titleId="key-status-icon"
-                className="m-1"
-                icon={getKeyIconAndText(KeyInPlace).icon}
-                title={getKeyIconAndText(KeyInPlace).text}
-            ></FontAwesomeIcon>
-            <FontAwesomeIcon
-                id="doorStatusIcon"
-                titleId="door-status-icon"
-                className="m-1"
-                icon={getArmedIconAndText(Armed).icon}
-                title={getArmedIconAndText(Armed).text}
-            ></FontAwesomeIcon>
-        </div>
+        <Card className="mb-3">
+            <Card.Header className="d-flex">
+                <span className="flex-grow-1">Nyckel- och dörrstatus</span>
+            </Card.Header>
+            <ListGroup>
+                <ListGroup.Item>
+                    <FontAwesomeIcon
+                        id="keyStatusIcon"
+                        className="mr-2 fa-fw"
+                        icon={getKeyIconAndText(KeyInPlace).icon}
+                    />
+                    <span>{getKeyIconAndText(KeyInPlace).text}</span>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                    <FontAwesomeIcon
+                        id="doorStatusIcon"
+                        className="mr-2 fa-fw "
+                        icon={getArmedIconAndText(Armed).icon}
+                    />
+                    <span>{getArmedIconAndText(Armed).text}</span>
+                </ListGroup.Item>
+            </ListGroup>
+        </Card>
     );
 };
 
