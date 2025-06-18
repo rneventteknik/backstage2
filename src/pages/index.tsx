@@ -12,6 +12,7 @@ import {
     IsBookingDraftOrBooked,
     IsBookingOut,
     IsBookingUpcomingRental,
+    IsNotInternalReservation,
     onlyUniqueById,
 } from '../lib/utils';
 import { formatDatetime, toBookingViewModel } from '../lib/datetimeUtils';
@@ -37,8 +38,11 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
     );
 
     const myDraftOrBookedBookings = myBookings?.map(toBookingViewModel).filter(IsBookingDraftOrBooked);
-    const upcomingRentalBookings = bookings?.map(toBookingViewModel).filter(IsBookingUpcomingRental);
-    const outBookings = bookings?.map(toBookingViewModel).filter(IsBookingOut);
+    const upcomingRentalBookings = bookings
+        ?.map(toBookingViewModel)
+        .filter(IsBookingUpcomingRental)
+        .filter(IsNotInternalReservation);
+    const outBookings = bookings?.map(toBookingViewModel).filter(IsBookingOut).filter(IsNotInternalReservation);
 
     const changelog = [...(myBookings ?? []), ...(coOwnerBookings ?? [])]
         .filter(onlyUniqueById)

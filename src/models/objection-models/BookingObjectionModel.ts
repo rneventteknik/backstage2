@@ -48,6 +48,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     language: Language;
     fixedPrice: number | null;
     invoiceDate: string | null;
+    internalReservation: boolean;
 }
 
 export class BookingObjectionModel extends Model {
@@ -166,6 +167,7 @@ export class BookingObjectionModel extends Model {
     language!: Language;
     fixedPrice!: number;
     invoiceDate!: string | null;
+    internalReservation!: boolean;
 }
 
 export interface IEquipmentListObjectionModel extends BaseObjectionModelWithName {

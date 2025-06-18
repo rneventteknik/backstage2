@@ -23,6 +23,7 @@ import {
     getPricePlanName,
     getSalaryStatusName,
     getStatusName,
+    IsNotInternalReservation,
 } from '../../../../../lib/utils';
 
 const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
@@ -31,6 +32,7 @@ const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiRespon
             await fetchBookings()
                 .then((x) => x.map(toBooking))
                 .then((x) => x.map(toBookingViewModel))
+                .then((x) => x.filter(IsNotInternalReservation))
                 .then((x) => mapToAnalytics(x))
                 .then((x) => mapToCSV(x))
                 .then((result) => res.status(200).setHeader('Content-Type', 'text/csv').send(result))
