@@ -2082,6 +2082,13 @@ export async function seed(knex) {
             updated: getVarianceDateString(100),
             value: '',
         },
+        {
+            key: 'mqtt.alarmTopic',
+            note: 'Alarm topic för MQTT, som sträng.',
+            created: getVarianceDateString(-100),
+            updated: getVarianceDateString(100),
+            value: '',
+        },
     ]);
 
     await knex('Customer')

@@ -1,4 +1,4 @@
-import { faKey, faLock, faLockOpen, faPlane, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import { faDoorClosed, faDoorOpen, faKey, faLock, faLockOpen, faPlane, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import mqtt from 'mqtt';
 import React, { useState, useEffect, useRef } from 'react';
@@ -23,10 +23,12 @@ type DoorAndKeyStatusContentProps = {
 const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globalSettings }: DoorAndKeyStatusContentProps) => {
     const [KeyInPlace, setKeyInPlace] = useState('unknown');
     const [Armed, setArmed] = useState('unknown');
+    const [Door, setDoor] = useState('unknown');
     const mqttConnection = useRef<mqtt.MqttClient | null>(null);
 
     const keyTopic = getGlobalSetting('mqtt.keyTopic', globalSettings, '');
     const doorTopic = getGlobalSetting('mqtt.doorTopic', globalSettings, '');
+    const alarmTopic = getGlobalSetting('mqtt.alarmTopic', globalSettings, '');
 
     useEffect(() => {
         fetch('api/auth/mqtt-credentials').then(async (response) => {
@@ -65,11 +67,14 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globa
                     const result = status ?? event;
 
 
-                    if (topic === doorTopic) {
-                        setArmed(result);
-                    }
-                    else if (topic === keyTopic) {
+                    if (topic === keyTopic) {
                         setKeyInPlace(result);
+                    }
+                    if (topic === doorTopic) {
+                        setDoor(result);
+                    }
+                    if (topic === alarmTopic) {
+                        setArmed(result);
                     }
 
                 } catch (error) {
@@ -96,7 +101,20 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globa
         }
     };
 
-    const getArmedIconAndText = (status: string) => {
+    const getDoorIconAndText = (status: string) => {
+        switch (status) {
+            case 'open':
+                return { icon: faDoorOpen, text: 'Dörren är öppen' };
+
+            case 'closed':
+                return { icon: faDoorClosed, text: 'Dörren är stängd' };
+
+            default:
+                return { icon: faQuestion, text: 'Dörrstatus saknas' };
+        }
+    };
+
+    const getAlarmIconAndText = (status: string) => {
         switch (status) {
             case 'armed':
                 return { icon: faLock, text: 'Dörren är larmad' };
@@ -105,7 +123,7 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globa
                 return { icon: faLockOpen, text: 'Dörren är olarmad' };
 
             default:
-                return { icon: faQuestion, text: 'Dörrstatus saknas' };
+                return { icon: faQuestion, text: 'Larmstatus saknas' };
         }
     };
 
@@ -127,9 +145,17 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globa
                     <FontAwesomeIcon
                         id="doorStatusIcon"
                         className="mr-2 fa-fw "
-                        icon={getArmedIconAndText(Armed).icon}
+                        icon={getDoorIconAndText(Door).icon}
                     />
-                    <span>{getArmedIconAndText(Armed).text}</span>
+                    <span>{getDoorIconAndText(Door).text}</span>
+                </ListGroup.Item>
+                <ListGroup.Item>
+                    <FontAwesomeIcon
+                        id="alarmStatusIcon"
+                        className="mr-2 fa-fw "
+                        icon={getAlarmIconAndText(Armed).icon}
+                    />
+                    <span>{getAlarmIconAndText(Armed).text}</span>
                 </ListGroup.Item>
             </ListGroup>
         </Card>
