@@ -590,10 +590,10 @@ const BookingForm: React.FC<Props> = ({
                                 />
 
                                 <Form.Text className="text-muted">
-                                    Markera denna checkruta om denna bokning inte är till för utrustningsanvändning utan
-                                    reserverar utrustning för fast installation, reparation, eller annan aktivitet som
-                                    hindrar att den används i normal verksamhet. Om denna checkruta är aktiv exkluderas
-                                    bokningen från listan över utlämnad utrustning, statistik, etc.
+                                    Markera denna checkruta om denna bokning reserverar utrustning för fast
+                                    installation, reparation, eller annan aktivitet som hindrar att den används i normal
+                                    verksamhet. Om denna checkruta är aktiv exkluderas bokningen från listan över
+                                    utlämnad utrustning, statistik, etc.
                                 </Form.Text>
                             </Form.Group>
                         </Col>
