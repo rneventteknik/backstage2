@@ -44,7 +44,7 @@ jobs:
                   git push
             
             - name: Sleep to ensure version is updated in Heroku
-              run: sleep 20s
+              run: sleep 5m
 
             - name: Authenticate with Heroku
               env:
