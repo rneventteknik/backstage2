@@ -48,7 +48,7 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globa
             }
 
             mqttConnection.current.on('connect', () => {
-                mqttConnection.current?.subscribe([doorTopic, keyTopic], (error) => {
+                mqttConnection.current?.subscribe([keyTopic, doorTopic, alarmTopic], (error) => {
                     if (error) {
                         console.error('Error subscribing', error);
                     }
