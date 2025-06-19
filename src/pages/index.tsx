@@ -24,7 +24,7 @@ import TableStyleLink from '../components/utils/TableStyleLink';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import CurrentlyOutEquipment from '../components/CurrentlyOutEquipment';
 import AddUserAsCoOwnerToAllFutureBookingsForUserButton from '../components/AddUserAsCoOwnerToAllFutureBookingsForUserButton';
-import DoorAndKeyStatus from '../components/DoorAndKeytatus';
+import DoorAndKeyStatus from '../components/DoorAndKeyStatus';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
