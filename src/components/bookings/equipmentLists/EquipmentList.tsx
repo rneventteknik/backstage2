@@ -42,6 +42,7 @@ import EquipmentListHeader from './EquipmentListHeader';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import { useLocalStorageState } from '../../../lib/useLocalStorageState';
 import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
+import { Ai } from '../../Ai';
 
 type Props = {
     bookingId: number;
@@ -459,6 +460,15 @@ const EquipmentListDisplay: React.FC<Props> = ({
                 nextSortIndex={getNextSortIndex(getEntitiesToDisplay(list))}
                 globalSettings={globalSettings}
                 readonly={readonly}
+            />
+
+            <Ai
+                equipment={
+                    booking.equipmentLists
+                        ?.flatMap((l) => l.listEntries.map((e) => e.equipment))
+                        .filter((x) => x)
+                        .map((x) => x!) ?? []
+                }
             />
         </Card>
     );
