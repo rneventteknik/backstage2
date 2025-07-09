@@ -145,6 +145,7 @@ const BookingJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSetti
             status: Status.DONE,
             paymentStatus: PaymentStatus.PAID,
             salaryStatus: SalaryStatus.SENT,
+            // TODO set flag for imported bookings
 
             name: booking.title ?? 'Okänt bokningsnamn',
             note: booking.description ?? '',
@@ -158,7 +159,7 @@ const BookingJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSetti
             invoiceTag: booking.org_ref ?? '',
             calendarBookingId: booking.cal_sync_id ?? '',
 
-            // Imported without contact information due to gdpr????
+            // Imported without contact information due to gdpr?
             invoiceHogiaId: NaN,
             contactPersonEmail: '',
             contactPersonName: '',
@@ -208,10 +209,18 @@ const BookingJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSetti
         newBookingId: number,
         newEquipmentListId: number,
     ) => {
+        let priceEx = Number(equipment.price_ex);
+        let DiscountFromPriceEx = 0;
+        if (priceEx < 0)
+        {
+            priceEx = 0;
+            DiscountFromPriceEx = Math.abs(priceEx);
+        }
         const newEquipmentListEntry: Partial<IEquipmentListEntryObjectionModel> = {
+        
             name: equipment.rent_title,
-            pricePerUnit: Number(equipment.price_ex),
-            discount: Number(equipment.discount),
+            pricePerUnit: priceEx,
+            discount: Number(equipment.discount) + DiscountFromPriceEx,
             description: equipment.rent_comment,
             sortIndex: Number(equipment.sort),
             numberOfUnits: Number(equipment.rent_count),
