@@ -465,7 +465,8 @@ const EquipmentListDisplay: React.FC<Props> = ({
             <Ai
                 equipment={
                     booking.equipmentLists
-                        ?.flatMap((l) => l.listEntries.map((e) => e.equipment))
+                        ?.flatMap((l) => [...l.listEntries, ...l.listHeadings.flatMap((y) => y.listEntries)])
+                        .map((e) => e.equipment)
                         .filter((x) => x)
                         .map((x) => x!) ?? []
                 }
