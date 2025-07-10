@@ -1,10 +1,24 @@
 import React from 'react';
+import { Language } from '../models/enums/Language';
+import EquipmentSearch, { ResultType, SearchResultViewModel } from './EquipmentSearch';
+import { Equipment } from '../models/interfaces';
 import useSwr from 'swr';
 import { getResponseContentOrError } from '../lib/utils';
-import { SVD } from 'svd-js';
-import { Table } from 'react-bootstrap';
-import { Equipment } from '../models/interfaces';
 import { equipmentsFetcher } from '../lib/fetchers';
+import { SVD } from 'svd-js';
+import Skeleton from 'react-loading-skeleton';
+
+type Props = {
+    id: string;
+    placeholder?: string;
+    includePackages?: boolean;
+    includeTags?: boolean;
+    language?: Language;
+    onSelect?: (selected: SearchResultViewModel) => unknown;
+    onFocus?: () => unknown;
+    onBlur?: () => unknown;
+    equipment: Equipment[];
+};
 
 const fetchAndCalculateSimilarityMatrix = (url: string) =>
     fetch(url)
@@ -16,11 +30,7 @@ const fetchAndCalculateSimilarityMatrix = (url: string) =>
             columnToEquipmenIdMapping,
         }));
 
-type Props = {
-    equipment: Equipment[];
-};
-
-export const Ai: React.FC<Props> = ({ equipment }: Props) => {
+const EquipmentSearchWithAI: React.FC<Props> = ({ equipment, ...rest }: Props) => {
     const { data, error } = useSwr('/api/ai', fetchAndCalculateSimilarityMatrix, {
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
@@ -31,11 +41,11 @@ export const Ai: React.FC<Props> = ({ equipment }: Props) => {
     });
 
     if (error) {
-        return 'ERROR';
+        return 'ERROR' + error.message;
     }
 
     if (!data || !equipmentData) {
-        return 'LOADING';
+        return <Skeleton height={30} />;
     }
 
     const currentEquipmentMatrixRow = getEquipmentMatrixRowForEquipment(equipment, data.equipmentIdToColumnMapping);
@@ -46,26 +56,19 @@ export const Ai: React.FC<Props> = ({ equipment }: Props) => {
         equipmentData,
     );
 
+    const defaultResults: SearchResultViewModel[] = recommendedEquipment
+        .filter((x) => x.score > 0.1)
+        .slice(0, 8)
+        .map((x) => ({
+            type: ResultType.EQUIPMENT,
+            aiSuggestion: true,
+            url: '', //TODO???
+            ...x,
+        }));
+
     return (
         <div>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>AI Equipment Recommendations</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {recommendedEquipment
-                        .sort((a, b) => b.score - a.score) // Ensure sorting by score
-                        .map((x, index) => (
-                            <tr key={index}>
-                                <td>{x.name}</td>
-                                <td>{x.score.toFixed(2)}</td>
-                            </tr>
-                        ))}
-                </tbody>
-            </Table>
+            <EquipmentSearch defaultResults={defaultResults} {...rest} />
         </div>
     );
 };
@@ -163,3 +166,5 @@ const getEquipmentFromRecommendedEquipment = (
         };
     });
 };
+
+export default EquipmentSearchWithAI;

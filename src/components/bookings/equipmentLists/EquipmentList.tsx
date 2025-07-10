@@ -461,16 +461,6 @@ const EquipmentListDisplay: React.FC<Props> = ({
                 globalSettings={globalSettings}
                 readonly={readonly}
             />
-
-            <Ai
-                equipment={
-                    booking.equipmentLists
-                        ?.flatMap((l) => [...l.listEntries, ...l.listHeadings.flatMap((y) => y.listEntries)])
-                        .map((e) => e.equipment)
-                        .filter((x) => x)
-                        .map((x) => x!) ?? []
-                }
-            />
         </Card>
     );
 };

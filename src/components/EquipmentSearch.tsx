@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
 import styles from './EquipmentSearch.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -13,6 +13,7 @@ import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../mo
 import { Language } from '../models/enums/Language';
 import { SplitHighlighter } from './utils/Highlight';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
+import { Badge } from 'react-bootstrap';
 
 export enum ResultType {
     EQUIPMENT,
@@ -22,6 +23,7 @@ export enum ResultType {
 export interface SearchResultViewModel extends BaseEntityWithName {
     type: ResultType;
     url: string;
+    aiSuggestion: boolean;
 }
 interface HasIndex {
     index: number;
@@ -36,6 +38,7 @@ type Props = {
     onSelect?: (selected: SearchResultViewModel) => unknown;
     onFocus?: () => unknown;
     onBlur?: () => unknown;
+    defaultResults?: SearchResultViewModel[];
 };
 
 const EquipmentSearch: React.FC<Props> = ({
@@ -44,16 +47,26 @@ const EquipmentSearch: React.FC<Props> = ({
     includePackages = true,
     includeTags = false,
     language = Language.SV,
+    defaultResults = [],
     onSelect,
     onFocus,
     onBlur,
 }: Props) => {
     const { showErrorMessage } = useNotifications();
 
-    const [searchResult, setSearchResult] = useState<SearchResultViewModel[]>([]);
+    const [searchResult, setSearchResult] = useState<SearchResultViewModel[]>(defaultResults);
     const [isLoading, setIsLoading] = useState(false);
 
+    useEffect(() => {
+        setSearchResult(defaultResults);
+    }, [defaultResults]);
+
     const fetchSearchResults = async (searchString: string) => {
+        if (searchString === '') {
+            setSearchResult(defaultResults);
+            return;
+        }
+
         setIsLoading(true);
         const request = {
             method: 'GET',
@@ -82,6 +95,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 results.equipmentPackages.map((equipmentPackage) => ({
                     type: ResultType.EQUIPMENTPACKAGE,
                     url: '/equipmentPackage/' + equipmentPackage.id,
+                    aiSuggestion: false,
                     ...toEquipmentPackage(equipmentPackage),
                 })),
             )
@@ -89,6 +103,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 results.equipment.map((equipment) => ({
                     type: ResultType.EQUIPMENT,
                     url: '/equipment/' + equipment.id,
+                    aiSuggestion: false,
                     ...toEquipment(equipment),
                 })),
             )
@@ -96,6 +111,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 results.equipmentTags.map((tag) => ({
                     type: ResultType.EQUIPMENTTAG,
                     url: '/equipment/' + tag.id,
+                    aiSuggestion: false,
                     ...toEquipmentTag(tag),
                 })),
             );
@@ -105,6 +121,13 @@ const EquipmentSearch: React.FC<Props> = ({
         const selectedEntity = selected[0];
         if (selectedEntity && onSelect) {
             onSelect(selectedEntity);
+        }
+        setSearchResult(defaultResults);
+    };
+
+    const onInputChange = (input: string) => {
+        if (input.length === 0) {
+            fetchSearchResults('');
         }
     };
 
@@ -120,15 +143,25 @@ const EquipmentSearch: React.FC<Props> = ({
         const typedEntity = entity as unknown as IEquipmentObjectionModel | IEquipmentPackageObjectionModel;
         const englishName: string | undefined = (entity as unknown as IEquipmentObjectionModel).nameEN;
         const displayName = language === Language.EN && englishName ? `${englishName} (${entity.name})` : entity.name;
+        const score = (entity as unknown as { score: number }).score?.toFixed(2);
         return (
             <>
                 <div>
-                    <SplitHighlighter search={state.text} textToHighlight={displayName} />{' '}
-                    {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
-                    {entity.type === ResultType.EQUIPMENTTAG ? <FontAwesomeIcon icon={faTag} /> : null}
-                    {(typedEntity as IEquipmentPackageObjectionModel).estimatedHours > 0 ? (
-                        <FontAwesomeIcon icon={faClock} className="ml-2" />
-                    ) : null}
+                    <div className="d-flex">
+                        <span className="flex-grow-1">
+                            <SplitHighlighter search={state.text} textToHighlight={displayName} />{' '}
+                            {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
+                            {entity.type === ResultType.EQUIPMENTTAG ? <FontAwesomeIcon icon={faTag} /> : null}
+                            {(typedEntity as IEquipmentPackageObjectionModel).estimatedHours > 0 ? (
+                                <FontAwesomeIcon icon={faClock} className="ml-2" />
+                            ) : null}
+                        </span>
+                        {entity.aiSuggestion ? (
+                            <span className="ml-auto text-muted text-small font-italic">
+                                Förslag från AI {score ? <span className="d-none d-md-inline">({score})</span> : null}
+                            </span>
+                        ) : null}
+                    </div>
                 </div>
                 <div>
                     <small>
@@ -189,6 +222,9 @@ const EquipmentSearch: React.FC<Props> = ({
             placeholder={placeholder}
             onFocus={onFocus}
             onBlur={onBlur}
+            onInputChange={onInputChange}
+            minLength={0}
+            useCache={false}
         />
     );
 };

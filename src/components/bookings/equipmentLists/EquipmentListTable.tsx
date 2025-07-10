@@ -20,7 +20,7 @@ import {
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
 import { toIntOrUndefined, reduceSumFn, getResponseContentOrError } from '../../../lib/utils';
-import EquipmentSearch, { ResultType } from '../../EquipmentSearch';
+import { ResultType } from '../../EquipmentSearch';
 import { ClickToEdit, ClickToEditDropdown } from '../../utils/DoubleClickToEdit';
 import {
     addVAT,
@@ -43,6 +43,7 @@ import {
     EquipmentListEntityViewModel,
     getDefaultListEntryFromEquipment,
     getEntitiesToDisplay,
+    getEquipmentFromViewModel,
     getEquipmentListEntryFromViewModel,
     getEquipmentListEntryPrices,
     getEquipmentListHeadingFromViewModel,
@@ -63,6 +64,7 @@ import { toEquipmentPackage } from '../../../lib/mappers/equipmentPackage';
 import TimeEstimateModal from '../timeEstimate/TimeEstimateModal';
 import PackageInfoModal from './PackageInfoModal';
 import currency from 'currency.js';
+import EquipmentSearchWithAI from '../../EquipmentSearchWithAi';
 
 type Props = {
     list: EquipmentList;
@@ -675,7 +677,8 @@ const EquipmentListTable: React.FC<Props> = ({
 
             {readonly ? null : (
                 <div className="ml-2 mr-2 mb-2">
-                    <EquipmentSearch
+                    <EquipmentSearchWithAI
+                        equipment={listEntries.flatMap(getEquipmentFromViewModel)}
                         placeholder="Lägg till utrustning"
                         includePackages={true}
                         language={language}

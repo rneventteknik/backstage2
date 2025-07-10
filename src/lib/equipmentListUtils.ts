@@ -91,6 +91,20 @@ export const getPeersOfViewModel = (viewModel: EquipmentListEntityViewModel, lis
         ? getSubEntitiesToDisplay(list).find((x) => x.parentId === viewModel.parentId)?.entities ?? []
         : getEntitiesToDisplay(list);
 
+export const getEquipmentFromViewModel = (viewModel: EquipmentListEntityViewModel) => {
+    if (viewModelIsHeading(viewModel)) {
+        const heading = getEquipmentListHeadingFromViewModel(viewModel);
+        return heading.listEntries
+            .map((x) => x.equipment)
+            .filter((x) => x)
+            .map((x) => x!);
+    }
+    if (viewModelIsEntity(viewModel)) {
+        const entity = getEquipmentListEntryFromViewModel(viewModel);
+        return [entity.equipment].filter((x) => x).map((x) => x!);
+    }
+    throw new Error('Invalid row');
+};
 // Heper functions to get default values
 //
 
