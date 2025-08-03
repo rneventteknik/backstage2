@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.22.1-guava",
+    "version": "1.23.0-lime",
     "engines": {
         "yarn": "^1.0.0",
         "node": "^18.0.0"
