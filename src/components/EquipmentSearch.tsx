@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
 import styles from './EquipmentSearch.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -11,6 +11,7 @@ import { toEquipment, toEquipmentTag } from '../lib/mappers/equipment';
 import { BaseEntityWithName } from '../models/interfaces/BaseEntity';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../models/objection-models';
 import { Language } from '../models/enums/Language';
+import Image from 'next/image';
 import { SplitHighlighter } from './utils/Highlight';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 
@@ -22,6 +23,7 @@ export enum ResultType {
 export interface SearchResultViewModel extends BaseEntityWithName {
     type: ResultType;
     url: string;
+    aiSuggestion: boolean;
 }
 interface HasIndex {
     index: number;
@@ -36,6 +38,7 @@ type Props = {
     onSelect?: (selected: SearchResultViewModel) => unknown;
     onFocus?: () => unknown;
     onBlur?: () => unknown;
+    defaultResults: SearchResultViewModel[];
 };
 
 const EquipmentSearch: React.FC<Props> = ({
@@ -44,16 +47,28 @@ const EquipmentSearch: React.FC<Props> = ({
     includePackages = true,
     includeTags = false,
     language = Language.SV,
+    defaultResults,
     onSelect,
     onFocus,
     onBlur,
 }: Props) => {
     const { showErrorMessage } = useNotifications();
 
-    const [searchResult, setSearchResult] = useState<SearchResultViewModel[]>([]);
+    const [searchResult, setSearchResult] = useState<SearchResultViewModel[]>(defaultResults);
     const [isLoading, setIsLoading] = useState(false);
 
+    useEffect(() => {
+        setSearchResult(defaultResults);
+    }, [defaultResults]);
+
     const fetchSearchResults = async (searchString: string) => {
+        if (searchString === '') {
+            // Sleeps to make sure all search result fetches are complete before setting default search results
+            await new Promise((resolve) => setTimeout(resolve, 700));
+            setSearchResult(defaultResults);
+            return;
+        }
+
         setIsLoading(true);
         const request = {
             method: 'GET',
@@ -82,6 +97,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 results.equipmentPackages.map((equipmentPackage) => ({
                     type: ResultType.EQUIPMENTPACKAGE,
                     url: '/equipmentPackage/' + equipmentPackage.id,
+                    aiSuggestion: false,
                     ...toEquipmentPackage(equipmentPackage),
                 })),
             )
@@ -89,6 +105,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 results.equipment.map((equipment) => ({
                     type: ResultType.EQUIPMENT,
                     url: '/equipment/' + equipment.id,
+                    aiSuggestion: false,
                     ...toEquipment(equipment),
                 })),
             )
@@ -96,6 +113,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 results.equipmentTags.map((tag) => ({
                     type: ResultType.EQUIPMENTTAG,
                     url: '/equipment/' + tag.id,
+                    aiSuggestion: false,
                     ...toEquipmentTag(tag),
                 })),
             );
@@ -105,6 +123,13 @@ const EquipmentSearch: React.FC<Props> = ({
         const selectedEntity = selected[0];
         if (selectedEntity && onSelect) {
             onSelect(selectedEntity);
+        }
+        setSearchResult(defaultResults);
+    };
+
+    const onInputChange = (input: string) => {
+        if (input.length === 0) {
+            fetchSearchResults('');
         }
     };
 
@@ -123,17 +148,35 @@ const EquipmentSearch: React.FC<Props> = ({
         return (
             <>
                 <div>
-                    <SplitHighlighter search={state.text} textToHighlight={displayName} />{' '}
-                    {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
-                    {entity.type === ResultType.EQUIPMENTTAG ? <FontAwesomeIcon icon={faTag} /> : null}
-                    {(typedEntity as IEquipmentPackageObjectionModel).estimatedHours > 0 ? (
-                        <FontAwesomeIcon icon={faClock} className="ml-2" />
-                    ) : null}
+                    <div className="d-flex">
+                        <span className="flex-grow-1">
+                            <SplitHighlighter search={state.text} textToHighlight={displayName} />{' '}
+                            {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
+                            {entity.type === ResultType.EQUIPMENTTAG ? <FontAwesomeIcon icon={faTag} /> : null}
+                            {(typedEntity as IEquipmentPackageObjectionModel).estimatedHours > 0 ? (
+                                <FontAwesomeIcon icon={faClock} className="ml-2" />
+                            ) : null}
+                        </span>
+                        {entity.aiSuggestion ? (
+                            <div className="d-md-flex d-none ml-auto text-muted text-small font-italic align-items-center">
+                                <div className="position-relative mr-2" style={{height: "0.75rem", width:"0.75rem"}} >
+                                    <Image src="/ai-duck.svg" alt="Quack!" title="Quack!" fill={true} />
+                                </div>
+                                Rekommendation
+                            </div>
+                        ) : null}
+                    </div>
                 </div>
                 <div>
                     <small>
                         {typedEntity.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
                     </small>
+                </div>
+                <div className="d-md-none d-flex small ml-auto text-muted text-small font-italic align-items-center">
+                    <div className="position-relative mr-2" style={{height: "0.75rem", width:"0.75rem"}} >
+                        <Image src="/ai-duck.svg" alt="Quack!" title="Quack!" fill={true} />
+                    </div>
+                    Rekommendation
                 </div>
             </>
         );
@@ -189,6 +232,9 @@ const EquipmentSearch: React.FC<Props> = ({
             placeholder={placeholder}
             onFocus={onFocus}
             onBlur={onBlur}
+            onInputChange={onInputChange}
+            minLength={0}
+            useCache={false}
         />
     );
 };

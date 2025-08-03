@@ -303,8 +303,7 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
                 {cannotFindConnectedEvent ? (
                     <Alert variant="warning" className="mb-3">
                         <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
-                        Denna bokning är kopplad till ett okänt kalenderevent som har passerats eller inte längre
-                        finns.
+                        Denna bokning är kopplad till ett okänt kalenderevent som har passerats eller inte längre finns.
                         <p className="text-monospace mt-2 mb-0">Id: {value}</p>
                     </Alert>
                 ) : null}
