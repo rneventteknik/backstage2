@@ -1,4 +1,12 @@
-import { faDoorClosed, faDoorOpen, faKey, faLock, faLockOpen, faPlane, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import {
+    faDoorClosed,
+    faDoorOpen,
+    faKey,
+    faLock,
+    faLockOpen,
+    faPlane,
+    faQuestion,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import mqtt from 'mqtt';
 import React, { useState, useEffect, useRef } from 'react';
@@ -15,12 +23,14 @@ const DoorAndKeyStatus: React.FC<Props> = ({ globalSettings }: Props) => {
     }
 
     return <DoorAndKeyStatusContent globalSettings={globalSettings} />;
-}
+};
 
 type DoorAndKeyStatusContentProps = {
     globalSettings: KeyValue[];
 };
-const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globalSettings }: DoorAndKeyStatusContentProps) => {
+const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({
+    globalSettings,
+}: DoorAndKeyStatusContentProps) => {
     const [KeyInPlace, setKeyInPlace] = useState('unknown');
     const [Armed, setArmed] = useState('unknown');
     const [Door, setDoor] = useState('unknown');
@@ -66,7 +76,6 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globa
                     const event = parsedMessage.hasOwnProperty('event') ? parsedMessage['event'] : null;
                     const result = status ?? event;
 
-
                     if (topic === keyTopic) {
                         setKeyInPlace(result);
                     }
@@ -76,7 +85,6 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globa
                     if (topic === alarmTopic) {
                         setArmed(result);
                     }
-
                 } catch (error) {
                     console.warn('Non json message received', error);
                 }
@@ -142,11 +150,7 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globa
                     <span>{getKeyIconAndText(KeyInPlace).text}</span>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                    <FontAwesomeIcon
-                        id="doorStatusIcon"
-                        className="mr-2 fa-fw "
-                        icon={getDoorIconAndText(Door).icon}
-                    />
+                    <FontAwesomeIcon id="doorStatusIcon" className="mr-2 fa-fw " icon={getDoorIconAndText(Door).icon} />
                     <span>{getDoorIconAndText(Door).text}</span>
                 </ListGroup.Item>
                 <ListGroup.Item>

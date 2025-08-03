@@ -44,7 +44,7 @@ const EquipmentSearchWithAI: React.FC<Props> = ({ equipment, bookingType, ...res
     });
 
     if (error) {
-        return <EquipmentSearch defaultResults={[]} {...rest} />
+        return <EquipmentSearch defaultResults={[]} {...rest} />;
     }
 
     if (!data || !equipmentData) {
@@ -69,9 +69,7 @@ const EquipmentSearchWithAI: React.FC<Props> = ({ equipment, bookingType, ...res
             ...x,
         }));
 
-    return (
-        <EquipmentSearch defaultResults={defaultResults} {...rest} />
-    );
+    return <EquipmentSearch defaultResults={defaultResults} {...rest} />;
 };
 
 const calculateEquipmentMatrix = (

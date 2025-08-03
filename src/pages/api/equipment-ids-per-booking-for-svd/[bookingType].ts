@@ -22,7 +22,10 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
     return;
 });
 
-const calculateEquipmentForBookings = (bookingsObjectionModels: BookingObjectionModel[], bookingType: BookingType): number[][] => {
+const calculateEquipmentForBookings = (
+    bookingsObjectionModels: BookingObjectionModel[],
+    bookingType: BookingType,
+): number[][] => {
     return bookingsObjectionModels
         .filter((booking) => booking.bookingType === bookingType)
         .map(getEquipmentIdsForBooking);
