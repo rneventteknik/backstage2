@@ -42,7 +42,6 @@ import EquipmentListHeader from './EquipmentListHeader';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import { useLocalStorageState } from '../../../lib/useLocalStorageState';
 import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
-import { Ai } from '../../Ai';
 
 type Props = {
     bookingId: number;
@@ -431,6 +430,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     list={list}
                     otherLists={otherLists}
                     pricePlan={booking.pricePlan}
+                    bookingType={booking.bookingType}
                     language={booking.language}
                     defaultLaborHourlyRate={defaultLaborHourlyRate}
                     showPricesAsMuted={booking.fixedPrice !== null}

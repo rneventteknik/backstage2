@@ -13,7 +13,6 @@ import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../mo
 import { Language } from '../models/enums/Language';
 import { SplitHighlighter } from './utils/Highlight';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
-import { Badge } from 'react-bootstrap';
 
 export enum ResultType {
     EQUIPMENT,
@@ -38,7 +37,7 @@ type Props = {
     onSelect?: (selected: SearchResultViewModel) => unknown;
     onFocus?: () => unknown;
     onBlur?: () => unknown;
-    defaultResults?: SearchResultViewModel[];
+    defaultResults: SearchResultViewModel[];
 };
 
 const EquipmentSearch: React.FC<Props> = ({
@@ -47,7 +46,7 @@ const EquipmentSearch: React.FC<Props> = ({
     includePackages = true,
     includeTags = false,
     language = Language.SV,
-    defaultResults = [],
+    defaultResults,
     onSelect,
     onFocus,
     onBlur,

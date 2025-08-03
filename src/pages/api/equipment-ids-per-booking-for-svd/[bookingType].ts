@@ -3,12 +3,15 @@ import { respondWithCustomErrorMessage, respondWithInvalidMethodResponse } from 
 import { fetchBookings } from '../../../lib/db-access';
 import { withSessionContext } from '../../../lib/sessionContext';
 import { BookingObjectionModel } from '../../../models/objection-models';
+import { BookingType } from '../../../models/enums/BookingType';
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+    const bookingType = req.query.bookingType === 'rental' ? BookingType.RENTAL : BookingType.GIG;
+
     switch (req.method) {
         case 'GET':
             await fetchBookings()
-                .then((result) => calculateEquipmentForBookings(result))
+                .then((result) => calculateEquipmentForBookings(result, bookingType))
                 .then((result) => res.status(200).json(result))
                 .catch((error) => respondWithCustomErrorMessage(res, error.message));
             break;
@@ -19,8 +22,10 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
     return;
 });
 
-const calculateEquipmentForBookings = (bookingsObjectionModels: BookingObjectionModel[]): number[][] => {
-    return bookingsObjectionModels.map(getEquipmentIdsForBooking);
+const calculateEquipmentForBookings = (bookingsObjectionModels: BookingObjectionModel[], bookingType: BookingType): number[][] => {
+    return bookingsObjectionModels
+        .filter((booking) => booking.bookingType === bookingType)
+        .map(getEquipmentIdsForBooking);
 };
 
 const getEquipmentIdsForBooking = (booking: BookingObjectionModel) => {

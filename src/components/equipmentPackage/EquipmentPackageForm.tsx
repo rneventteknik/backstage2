@@ -347,6 +347,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                                     <EquipmentSearch
                                         placeholder="Lägg till utrustning"
                                         includePackages={false}
+                                        defaultResults={[]}
                                         id="equipment-search"
                                         onSelect={(x) =>
                                             fetch('/api/equipment/' + x.id)

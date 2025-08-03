@@ -7,6 +7,7 @@ import { getResponseContentOrError } from '../lib/utils';
 import { equipmentsFetcher } from '../lib/fetchers';
 import { SVD } from 'svd-js';
 import Skeleton from 'react-loading-skeleton';
+import { BookingType } from '../models/enums/BookingType';
 
 type Props = {
     id: string;
@@ -18,6 +19,7 @@ type Props = {
     onFocus?: () => unknown;
     onBlur?: () => unknown;
     equipment: Equipment[];
+    bookingType: BookingType;
 };
 
 const fetchAndCalculateSimilarityMatrix = (url: string) =>
@@ -30,8 +32,9 @@ const fetchAndCalculateSimilarityMatrix = (url: string) =>
             columnToEquipmenIdMapping,
         }));
 
-const EquipmentSearchWithAI: React.FC<Props> = ({ equipment, ...rest }: Props) => {
-    const { data, error } = useSwr('/api/ai', fetchAndCalculateSimilarityMatrix, {
+const EquipmentSearchWithAI: React.FC<Props> = ({ equipment, bookingType, ...rest }: Props) => {
+    const similarityMatrixUrl = `/api/equipment-ids-per-booking-for-svd/${bookingType === BookingType.RENTAL ? 'rental' : 'gig'}`;
+    const { data, error } = useSwr(similarityMatrixUrl, fetchAndCalculateSimilarityMatrix, {
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
     });
@@ -41,7 +44,7 @@ const EquipmentSearchWithAI: React.FC<Props> = ({ equipment, ...rest }: Props) =
     });
 
     if (error) {
-        return 'ERROR' + error.message;
+        return <EquipmentSearch defaultResults={[]} {...rest} />
     }
 
     if (!data || !equipmentData) {
@@ -62,14 +65,12 @@ const EquipmentSearchWithAI: React.FC<Props> = ({ equipment, ...rest }: Props) =
         .map((x) => ({
             type: ResultType.EQUIPMENT,
             aiSuggestion: true,
-            url: '', //TODO???
+            url: '',
             ...x,
         }));
 
     return (
-        <div>
-            <EquipmentSearch defaultResults={defaultResults} {...rest} />
-        </div>
+        <EquipmentSearch defaultResults={defaultResults} {...rest} />
     );
 };
 
@@ -114,7 +115,7 @@ const calculateSimilarityMatrix = (equipmentMatrix: number[][]) => {
 
     // Equipment similarity matrix = V * S * V^T
     const similarityMatrix = Vk.map((rowI) =>
-        Vk.map((rowJ, j) => rowI.reduce((sum, val, f) => sum + val * Sk[f] * Vk[j][f], 0)),
+        Vk.map((_, j) => rowI.reduce((sum, val, f) => sum + val * Sk[f] * Vk[j][f], 0)),
     );
 
     return similarityMatrix;

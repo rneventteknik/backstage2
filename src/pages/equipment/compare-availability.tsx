@@ -133,6 +133,7 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
                         <EquipmentSearch
                             id={'equipment-search'}
                             includeTags={true}
+                            defaultResults={[]}
                             placeholder="Välj utrustning"
                             onSelect={(e) => addFromSearch(e)}
                         />

@@ -86,7 +86,7 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({ globa
         return () => {
             mqttConnection.current?.end();
         };
-    }, []);
+    }, [alarmTopic, doorTopic, keyTopic]);
 
     const getKeyIconAndText = (status: string) => {
         switch (status) {

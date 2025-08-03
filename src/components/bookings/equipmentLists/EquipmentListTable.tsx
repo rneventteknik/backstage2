@@ -65,11 +65,13 @@ import TimeEstimateModal from '../timeEstimate/TimeEstimateModal';
 import PackageInfoModal from './PackageInfoModal';
 import currency from 'currency.js';
 import EquipmentSearchWithAI from '../../EquipmentSearchWithAi';
+import { BookingType } from '../../../models/enums/BookingType';
 
 type Props = {
     list: EquipmentList;
     otherLists: EquipmentList[];
     pricePlan: PricePlan;
+    bookingType: BookingType;
     language: Language;
     defaultLaborHourlyRate: number;
     showPricesAsMuted: boolean;
@@ -92,6 +94,7 @@ const EquipmentListTable: React.FC<Props> = ({
     list,
     otherLists,
     pricePlan,
+    bookingType,
     language,
     defaultLaborHourlyRate,
     showPricesAsMuted,
@@ -683,6 +686,7 @@ const EquipmentListTable: React.FC<Props> = ({
                         includePackages={true}
                         language={language}
                         id="equipment-search"
+                        bookingType={bookingType}
                         onSelect={(x) => {
                             switch (x.type) {
                                 case ResultType.EQUIPMENT:
