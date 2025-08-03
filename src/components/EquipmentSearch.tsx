@@ -11,6 +11,7 @@ import { toEquipment, toEquipmentTag } from '../lib/mappers/equipment';
 import { BaseEntityWithName } from '../models/interfaces/BaseEntity';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../models/objection-models';
 import { Language } from '../models/enums/Language';
+import Image from 'next/image';
 import { SplitHighlighter } from './utils/Highlight';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 
@@ -62,6 +63,8 @@ const EquipmentSearch: React.FC<Props> = ({
 
     const fetchSearchResults = async (searchString: string) => {
         if (searchString === '') {
+            // Sleeps to make sure all search result fetches are complete before setting default search results
+            await new Promise((resolve) => setTimeout(resolve, 700));
             setSearchResult(defaultResults);
             return;
         }
@@ -142,7 +145,6 @@ const EquipmentSearch: React.FC<Props> = ({
         const typedEntity = entity as unknown as IEquipmentObjectionModel | IEquipmentPackageObjectionModel;
         const englishName: string | undefined = (entity as unknown as IEquipmentObjectionModel).nameEN;
         const displayName = language === Language.EN && englishName ? `${englishName} (${entity.name})` : entity.name;
-        const score = (entity as unknown as { score: number }).score?.toFixed(2);
         return (
             <>
                 <div>
@@ -156,9 +158,12 @@ const EquipmentSearch: React.FC<Props> = ({
                             ) : null}
                         </span>
                         {entity.aiSuggestion ? (
-                            <span className="ml-auto text-muted text-small font-italic">
-                                Förslag från AI {score ? <span className="d-none d-md-inline">({score})</span> : null}
-                            </span>
+                            <div className="d-md-flex d-none ml-auto text-muted text-small font-italic align-items-center">
+                                <div className="position-relative mr-2" style={{height: "0.75rem", width:"0.75rem"}} >
+                                    <Image src="/ai-duck.svg" alt="Quack!" title="Quack!" fill={true} />
+                                </div>
+                                Rekommendation
+                            </div>
                         ) : null}
                     </div>
                 </div>
@@ -166,6 +171,12 @@ const EquipmentSearch: React.FC<Props> = ({
                     <small>
                         {typedEntity.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
                     </small>
+                </div>
+                <div className="d-md-none d-flex small ml-auto text-muted text-small font-italic align-items-center">
+                    <div className="position-relative mr-2" style={{height: "0.75rem", width:"0.75rem"}} >
+                        <Image src="/ai-duck.svg" alt="Quack!" title="Quack!" fill={true} />
+                    </div>
+                    Rekommendation
                 </div>
             </>
         );
