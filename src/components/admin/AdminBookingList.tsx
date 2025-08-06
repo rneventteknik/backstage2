@@ -1,11 +1,13 @@
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import React, { ChangeEvent } from 'react';
+import { Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
+    countNotNullorEmpty,
     getPaymentStatusName,
     getSalaryStatusName,
     getStatusName,
+    notEmpty,
     onlyUnique,
     reduceSumFn,
     replaceEmptyStringWithNull,
@@ -26,6 +28,9 @@ import { formatDateForForm, getBookingDateHeadingValue } from '../../lib/datetim
 import { addVAT, formatCurrency, getBookingPrice } from '../../lib/pricingUtils';
 import CancelledIcon from '../utils/CancelledIcon';
 import InternalReservationTag from '../utils/InternalReservationTag';
+import AdvancedFilters from '../AdvancedFilters';
+import { useSessionStorageState } from '../../lib/useSessionStorageState';
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 type Props = {
     bookings: BookingViewModel[];
@@ -48,6 +53,30 @@ const AdminBookingList: React.FC<Props> = ({
     allowEditInvoiceNumber = false,
     showHeadings = false,
 }: Props) => {
+    const [bookingStatuses, setBookingStatuses] = useSessionStorageState<Status[]>('admin-overview-booking-status', [])
+    const [paymentStatuses, setPaymentStatuses] = useSessionStorageState<PaymentStatus[]>('admin-overview-payment-status', [])
+    const [searchText, setSearchText] = useSessionStorageState('admin-overview-payment-status', '')
+
+    const bookingStatusOptions = bookings
+        .map((x) => x.status)
+        .filter(notEmpty)
+        .filter(onlyUnique)
+        .map((status) => ({ label: getStatusName(status), value: status }));
+        
+    const paymentStatusOptions = bookings
+        .map((x) => x.paymentStatus)
+        .filter(notEmpty)
+        .filter(onlyUnique)
+        .map((paymentStatus) => ({ label: getPaymentStatusName(paymentStatus), value: paymentStatus }));
+
+    const filteredBookings = bookings
+        .filter((booking) => bookingStatuses.includes(booking.status))
+        .filter((booking) => paymentStatuses.includes(booking.paymentStatus))
+
+    const handleChangeFilterString = (event: ChangeEvent<HTMLInputElement>) => {
+        setSearchText(event.target.value);
+    };
+
     // Table display functions
     //
     const getRentalStatusString = (booking: BookingViewModel): string => {
@@ -343,7 +372,62 @@ const AdminBookingList: React.FC<Props> = ({
         ];
     }
 
-    return <TableDisplay entities={bookings} configuration={{ ...tableSettings, ...tableSettingsOverride }} />;
+    return <>
+        <AdvancedFilters
+            handleChangeFilterString={handleChangeFilterString}
+            searchText={searchText}
+            resetAdvancedFilters={() => {
+                setSearchText('');
+                setBookingStatuses([]);
+                setPaymentStatuses([]);
+            }}
+            activeFilterCount={countNotNullorEmpty(
+                searchText,
+                bookingStatuses,
+                paymentStatuses
+            )}
+        >
+            <Form.Row className="mb-2">
+                <Col md="4">
+                    <Form.Group>
+                        <Form.Label>Status</Form.Label>
+                        <Typeahead<{ label: string; value: Status }>
+                            id="status-typeahead"
+                            multiple
+                            labelKey={(x) => x.label}
+                            options={bookingStatusOptions}
+                            onChange={(e) => setBookingStatuses(e.map((o) => o.value))}
+                            placeholder="Filtrera på status"
+                            selected={bookingStatuses
+                                .map((id) => bookingStatusOptions.find((x) => x.value === id))
+                                .filter(notEmpty)}
+                        />
+                    </Form.Group>
+                </Col>
+                <Col md="4">
+                    <Form.Group>
+                        <Form.Label>Betalningsstatus</Form.Label>
+                        <Typeahead<{ label: string; value: PaymentStatus }>
+                            id="status-typeahead"
+                            multiple
+                            labelKey={(x) => x.label}
+                            options={paymentStatusOptions}
+                            onChange={(e) => setPaymentStatuses(e.map((o) => o.value))}
+                            placeholder="Filtrera på betalningsstatus"
+                            selected={paymentStatuses
+                                .map((id) => paymentStatusOptions.find((x) => x.value === id))
+                                .filter(notEmpty)}
+                        />
+                    </Form.Group>
+                </Col>
+            </Form.Row>
+        </AdvancedFilters>
+        <TableDisplay
+            filterString={searchText}
+            entities={filteredBookings}
+            configuration={{ ...tableSettings, ...tableSettingsOverride }}
+        />;
+    </>
 };
 
 export default AdminBookingList;
