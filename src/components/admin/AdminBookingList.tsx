@@ -55,6 +55,7 @@ const AdminBookingList: React.FC<Props> = ({
 }: Props) => {
     const [bookingStatuses, setBookingStatuses] = useSessionStorageState<Status[]>('admin-overview-booking-status', [])
     const [paymentStatuses, setPaymentStatuses] = useSessionStorageState<PaymentStatus[]>('admin-overview-payment-status', [])
+    const [salaryStatuses, setSalaryStatuses] = useSessionStorageState<SalaryStatus[]>('admin-overview-salary-status', [])
     const [searchText, setSearchText] = useSessionStorageState('admin-overview-payment-status', '')
 
     const bookingStatusOptions = bookings
@@ -62,16 +63,23 @@ const AdminBookingList: React.FC<Props> = ({
         .filter(notEmpty)
         .filter(onlyUnique)
         .map((status) => ({ label: getStatusName(status), value: status }));
-        
+
     const paymentStatusOptions = bookings
         .map((x) => x.paymentStatus)
         .filter(notEmpty)
         .filter(onlyUnique)
         .map((paymentStatus) => ({ label: getPaymentStatusName(paymentStatus), value: paymentStatus }));
 
+    const salaryStatusOptions = bookings
+        .map((x) => x.salaryStatus)
+        .filter(notEmpty)
+        .filter(onlyUnique)
+        .map((salaryStatus) => ({ label: getSalaryStatusName(salaryStatus), value: salaryStatus }));
+
     const filteredBookings = bookings
-        .filter((booking) => bookingStatuses.includes(booking.status))
-        .filter((booking) => paymentStatuses.includes(booking.paymentStatus))
+        .filter((booking) => bookingStatuses.length == 0 || bookingStatuses.includes(booking.status))
+        .filter((booking) => paymentStatuses.length == 0 || paymentStatuses.includes(booking.paymentStatus))
+        .filter((booking) => salaryStatuses.length == 0 || salaryStatuses.includes(booking.salaryStatus))
 
     const handleChangeFilterString = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchText(event.target.value);
@@ -380,11 +388,13 @@ const AdminBookingList: React.FC<Props> = ({
                 setSearchText('');
                 setBookingStatuses([]);
                 setPaymentStatuses([]);
+                setSalaryStatuses([]);
             }}
             activeFilterCount={countNotNullorEmpty(
                 searchText,
                 bookingStatuses,
-                paymentStatuses
+                paymentStatuses,
+                salaryStatuses
             )}
         >
             <Form.Row className="mb-2">
@@ -416,6 +426,22 @@ const AdminBookingList: React.FC<Props> = ({
                             placeholder="Filtrera på betalningsstatus"
                             selected={paymentStatuses
                                 .map((id) => paymentStatusOptions.find((x) => x.value === id))
+                                .filter(notEmpty)}
+                        />
+                    </Form.Group>
+                </Col>
+                <Col md="4">
+                    <Form.Group>
+                        <Form.Label>Timarvodestatus</Form.Label>
+                        <Typeahead<{ label: string; value: SalaryStatus }>
+                            id="status-typeahead"
+                            multiple
+                            labelKey={(x) => x.label}
+                            options={salaryStatusOptions}
+                            onChange={(e) => setSalaryStatuses(e.map((o) => o.value))}
+                            placeholder="Filtrera på timarvodestatus"
+                            selected={salaryStatuses
+                                .map((id) => salaryStatusOptions.find((x) => x.value === id))
                                 .filter(notEmpty)}
                         />
                     </Form.Group>
