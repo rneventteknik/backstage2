@@ -300,6 +300,7 @@ const AdminBookingList: React.FC<Props> = ({
         entityTypeDisplayName: 'bokningar',
         defaultSortPropertyName: 'date',
         defaultSortAscending: false,
+        hideTableFilter: true,
         columns: [
             {
                 key: 'reference',
