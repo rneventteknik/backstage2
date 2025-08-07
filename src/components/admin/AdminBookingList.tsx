@@ -420,7 +420,7 @@ const AdminBookingList: React.FC<Props> = ({
                         <Form.Group>
                             <Form.Label>Betalningsstatus</Form.Label>
                             <Typeahead<{ label: string; value: PaymentStatus }>
-                                id="status-typeahead"
+                                id="payment-status-typeahead"
                                 multiple
                                 labelKey={(x) => x.label}
                                 options={paymentStatusOptions}
@@ -436,7 +436,7 @@ const AdminBookingList: React.FC<Props> = ({
                         <Form.Group>
                             <Form.Label>Timarvodestatus</Form.Label>
                             <Typeahead<{ label: string; value: SalaryStatus }>
-                                id="status-typeahead"
+                                id="salary-status-typeahead"
                                 multiple
                                 labelKey={(x) => x.label}
                                 options={salaryStatusOptions}
