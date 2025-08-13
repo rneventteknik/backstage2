@@ -1,6 +1,6 @@
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
     countNotNullorEmpty,
@@ -29,7 +29,6 @@ import { addVAT, formatCurrency, getBookingPrice } from '../../lib/pricingUtils'
 import CancelledIcon from '../utils/CancelledIcon';
 import InternalReservationTag from '../utils/InternalReservationTag';
 import AdvancedFilters from '../AdvancedFilters';
-import { useSessionStorageState } from '../../lib/useSessionStorageState';
 import { Typeahead } from 'react-bootstrap-typeahead';
 
 type Props = {
@@ -53,10 +52,10 @@ const AdminBookingList: React.FC<Props> = ({
     allowEditInvoiceNumber = false,
     showHeadings = false,
 }: Props) => {
-    const [bookingStatuses, setBookingStatuses] = useSessionStorageState<Status[]>('admin-overview-booking-status', []);
-    const [paymentStatuses, setPaymentStatuses] = useSessionStorageState<PaymentStatus[]>('admin-overview-payment-status', []);
-    const [salaryStatuses, setSalaryStatuses] = useSessionStorageState<SalaryStatus[]>('admin-overview-salary-status', []);
-    const [searchText, setSearchText] = useSessionStorageState('admin-overview-payment-status', '');
+    const [bookingStatuses, setBookingStatuses] = useState<Status[]>([]);
+    const [paymentStatuses, setPaymentStatuses] = useState<PaymentStatus[]>([]);
+    const [salaryStatuses, setSalaryStatuses] = useState<SalaryStatus[]>([]);
+    const [searchText, setSearchText] = useState('');
 
     const bookingStatusOptions = bookings
         .map((x) => x.status)
