@@ -74,8 +74,7 @@ type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
     const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage } = useNotifications();
 
-    // Enable this when we enable the KårX feature
-    // const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
+    const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
     const [showConfirmPaidModal, setShowConfirmPaidModal] = useState(false);
     const [adminEditModeOverrideEnabled, setAdminEditModeOverrideEnabled] = useState(false);
     const [alwaysShowRentalControls, setAlwaysShowRentalControls] = useState(false);
@@ -256,10 +255,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     currentUser={currentUser}
                     and={booking.status === Status.DONE && booking.paymentStatus === PaymentStatus.NOT_PAID}
                 >
-                    {/*
-
-                    Note: Enable this code once pating is KårX is available
-                    
                     <Button variant="secondary" onClick={() => setShowConfirmReadyForCashPaymentModal(true)}>
                         <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Skicka till KårX för betalning
                     </Button>
@@ -275,7 +270,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         confirmButtonType="primary"
                     >
                         Vill du markera bokningen <em>{booking.name}</em> som redo att betalas i KårX?
-                    </ConfirmModal> */}
+                    </ConfirmModal>
 
                     <Button variant="secondary" onClick={() => setShowConfirmPaidModal(true)}>
                         <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som skall ej faktureras
