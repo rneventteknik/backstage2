@@ -172,12 +172,14 @@ const EquipmentSearch: React.FC<Props> = ({
                         {typedEntity.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
                     </small>
                 </div>
-                <div className="d-md-none d-flex small ml-auto text-muted text-small font-italic align-items-center">
-                    <div className="position-relative mr-2" style={{height: "0.75rem", width:"0.75rem"}} >
-                        <Image src="/ai-duck.svg" alt="Quack!" title="Quack!" fill={true} />
+                {entity.aiSuggestion ? (
+                    <div className="d-md-none d-flex small ml-auto text-muted text-small font-italic align-items-center">
+                        <div className="position-relative mr-2" style={{height: "0.75rem", width:"0.75rem"}} >
+                            <Image src="/ai-duck.svg" alt="Quack!" title="Quack!" fill={true} />
+                        </div>
+                        Rekommendation
                     </div>
-                    Rekommendation
-                </div>
+                ) : null}
             </>
         );
     };
