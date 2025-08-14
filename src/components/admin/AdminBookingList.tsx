@@ -1,11 +1,13 @@
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React from 'react';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import React, { ChangeEvent, useState } from 'react';
+import { Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
+    countNotNullorEmpty,
     getPaymentStatusName,
     getSalaryStatusName,
     getStatusName,
+    notEmpty,
     onlyUnique,
     reduceSumFn,
     replaceEmptyStringWithNull,
@@ -26,6 +28,8 @@ import { formatDateForForm, getBookingDateHeadingValue } from '../../lib/datetim
 import { addVAT, formatCurrency, getBookingPrice } from '../../lib/pricingUtils';
 import CancelledIcon from '../utils/CancelledIcon';
 import InternalReservationTag from '../utils/InternalReservationTag';
+import AdvancedFilters from '../AdvancedFilters';
+import { Typeahead } from 'react-bootstrap-typeahead';
 
 type Props = {
     bookings: BookingViewModel[];
@@ -48,6 +52,38 @@ const AdminBookingList: React.FC<Props> = ({
     allowEditInvoiceNumber = false,
     showHeadings = false,
 }: Props) => {
+    const [bookingStatuses, setBookingStatuses] = useState<Status[]>([]);
+    const [paymentStatuses, setPaymentStatuses] = useState<PaymentStatus[]>([]);
+    const [salaryStatuses, setSalaryStatuses] = useState<SalaryStatus[]>([]);
+    const [searchText, setSearchText] = useState('');
+
+    const bookingStatusOptions = bookings
+        .map((x) => x.status)
+        .filter(notEmpty)
+        .filter(onlyUnique)
+        .map((status) => ({ label: getStatusName(status), value: status }));
+
+    const paymentStatusOptions = bookings
+        .map((x) => x.paymentStatus)
+        .filter(notEmpty)
+        .filter(onlyUnique)
+        .map((paymentStatus) => ({ label: getPaymentStatusName(paymentStatus), value: paymentStatus }));
+
+    const salaryStatusOptions = bookings
+        .map((x) => x.salaryStatus)
+        .filter(notEmpty)
+        .filter(onlyUnique)
+        .map((salaryStatus) => ({ label: getSalaryStatusName(salaryStatus), value: salaryStatus }));
+
+    const filteredBookings = bookings
+        .filter((booking) => bookingStatuses.length == 0 || bookingStatuses.includes(booking.status))
+        .filter((booking) => paymentStatuses.length == 0 || paymentStatuses.includes(booking.paymentStatus))
+        .filter((booking) => salaryStatuses.length == 0 || salaryStatuses.includes(booking.salaryStatus));
+
+    const handleChangeFilterString = (event: ChangeEvent<HTMLInputElement>) => {
+        setSearchText(event.target.value);
+    };
+
     // Table display functions
     //
     const getRentalStatusString = (booking: BookingViewModel): string => {
@@ -263,6 +299,7 @@ const AdminBookingList: React.FC<Props> = ({
         entityTypeDisplayName: 'bokningar',
         defaultSortPropertyName: 'date',
         defaultSortAscending: false,
+        hideTableFilter: true,
         columns: [
             {
                 key: 'reference',
@@ -343,7 +380,82 @@ const AdminBookingList: React.FC<Props> = ({
         ];
     }
 
-    return <TableDisplay entities={bookings} configuration={{ ...tableSettings, ...tableSettingsOverride }} />;
+    return (
+        <>
+            <AdvancedFilters
+                handleChangeFilterString={handleChangeFilterString}
+                searchText={searchText}
+                resetAdvancedFilters={() => {
+                    setSearchText('');
+                    setBookingStatuses([]);
+                    setPaymentStatuses([]);
+                    setSalaryStatuses([]);
+                }}
+                activeFilterCount={countNotNullorEmpty(
+                    searchText,
+                    bookingStatuses,
+                    paymentStatuses,
+                    salaryStatuses
+                )}
+            >
+                <Form.Row className="mb-2">
+                    <Col md="4">
+                        <Form.Group>
+                            <Form.Label>Status</Form.Label>
+                            <Typeahead<{ label: string; value: Status }>
+                                id="status-typeahead"
+                                multiple
+                                labelKey={(x) => x.label}
+                                options={bookingStatusOptions}
+                                onChange={(e) => setBookingStatuses(e.map((o) => o.value))}
+                                placeholder="Filtrera på status"
+                                selected={bookingStatuses
+                                    .map((id) => bookingStatusOptions.find((x) => x.value === id))
+                                    .filter(notEmpty)}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md="4">
+                        <Form.Group>
+                            <Form.Label>Betalningsstatus</Form.Label>
+                            <Typeahead<{ label: string; value: PaymentStatus }>
+                                id="payment-status-typeahead"
+                                multiple
+                                labelKey={(x) => x.label}
+                                options={paymentStatusOptions}
+                                onChange={(e) => setPaymentStatuses(e.map((o) => o.value))}
+                                placeholder="Filtrera på betalningsstatus"
+                                selected={paymentStatuses
+                                    .map((id) => paymentStatusOptions.find((x) => x.value === id))
+                                    .filter(notEmpty)}
+                            />
+                        </Form.Group>
+                    </Col>
+                    <Col md="4">
+                        <Form.Group>
+                            <Form.Label>Timarvodestatus</Form.Label>
+                            <Typeahead<{ label: string; value: SalaryStatus }>
+                                id="salary-status-typeahead"
+                                multiple
+                                labelKey={(x) => x.label}
+                                options={salaryStatusOptions}
+                                onChange={(e) => setSalaryStatuses(e.map((o) => o.value))}
+                                placeholder="Filtrera på timarvodestatus"
+                                selected={salaryStatuses
+                                    .map((id) => salaryStatusOptions.find((x) => x.value === id))
+                                    .filter(notEmpty)}
+                            />
+                        </Form.Group>
+                    </Col>
+                </Form.Row>
+            </AdvancedFilters>
+            <TableDisplay
+                filterString={searchText}
+                entities={filteredBookings}
+                configuration={{ ...tableSettings, ...tableSettingsOverride }}
+            />
+        </>
+    );
 };
 
 export default AdminBookingList;
