@@ -30,7 +30,7 @@ export const InvoiceInfo: React.FC<Props> = ({ invoiceData }: Props) => {
                             ? 'common.booking-info.booking-gig'
                             : 'common.booking-info.booking-rental',
                     )}
-                    content={invoiceData.customer.name}
+                    content={invoiceData.name}
                 />
                 <InfoItem title={t('common.booking-info.dates')} content={invoiceData.dates} />
                 <InfoItem title={t('common.booking-info.our-reference')} content={invoiceData.ourReference} />
