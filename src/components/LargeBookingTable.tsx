@@ -158,7 +158,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
 
     // Filter list. Note that the free text filter are handled by the table and not here.
     //
-    const bookingsToShow = bookings
+    const bookingsToShow = !showAdvancedFilters ? bookings : bookings
         .filter(
             (booking: BookingViewModel) =>
                 userIds.length === 0 || (booking.ownerUser?.id && userIds.indexOf(booking.ownerUser?.id) >= 0),
@@ -346,7 +346,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
             <TableDisplay
                 entities={bookingsToShow}
                 configuration={{ ...tableSettings, ...tableSettingsOverride }}
-                filterString={searchText}
+                filterString={showAdvancedFilters ? searchText : undefined}
             />
         </>
     );
