@@ -91,24 +91,6 @@ const TinyBookingTable: React.FC<Props> = ({
         ],
     };
 
-    // const headerContent = (
-    //         <div className="d-flex align-items-center">
-    //             <span>{title}</span>
-    //             {collapsible && !isOpen && bookings.length > 0 && (
-    //                 <span className="text-muted ms-2">({bookings.length})</span>
-    //             )}
-    //         </div>
-    //         <div className="d-flex align-items-center">
-    //             {children}
-    //             {collapsible && (
-    //                 <FontAwesomeIcon
-    //                     icon={isOpen ? faChevronUp : faChevronDown}
-    //                     className="text-primary ms-2 text-white"
-    //                 />
-    //             )}
-    //         </div>
-    //     </div>
-    // );
 
     const CardWrapper = ({ children: tableChildren }: { children: React.ReactNode }) =>
         collapsible ? (
