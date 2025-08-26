@@ -85,21 +85,27 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                 </Col>
                 <Col xl={6}>
                     <DoorAndKeyStatus globalSettings={globalSettings} />
-                    <TinyBookingTable
-                        title="Kommande hyror (inom 1 vecka)"
-                        bookings={upcomingRentalBookings}
-                        showDateHeadings={false}
-                        collapsible={true}
-                        defaultOpen={true}
-                    ></TinyBookingTable>
-                    <TinyBookingTable
-                        title="Utlämnade hyror"
-                        bookings={outBookings}
-                        showDateHeadings={false}
-                        collapsible={true}
-                        defaultOpen={true}
-                    ></TinyBookingTable>
-                    <CurrentlyOutEquipment collapsible={true} defaultOpen={true} />
+                    <div className="mb-3">
+                        <TinyBookingTable
+                            title="Kommande hyror (inom 1 vecka)"
+                            bookings={upcomingRentalBookings}
+                            showDateHeadings={false}
+                            collapsible={true}
+                            defaultOpen={true}
+                        ></TinyBookingTable>
+                    </div>
+                    <div className="mb-3">
+                        <TinyBookingTable
+                            title="Utlämnade hyror"
+                            bookings={outBookings}
+                            showDateHeadings={false}
+                            collapsible={true}
+                            defaultOpen={true}
+                        ></TinyBookingTable>
+                    </div>
+                    <div className="mb-3">
+                        <CurrentlyOutEquipment collapsible={true} defaultOpen={true} />
+                    </div>
 
                     <CollapsibleCard title="Aktivitet" className="mb-3">
                         <ListGroup variant="flush">

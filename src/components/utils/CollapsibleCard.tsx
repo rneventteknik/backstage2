@@ -33,7 +33,7 @@ const CollapsibleCard: React.FC<Props> = ({
                     <span className="flex-grow-1">{title}</span>
                     {headerContent && !isOpen && <span className="text-muted me-2">{headerContent}</span>}
                 </div>
-                <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} className="text-primary" />
+                <FontAwesomeIcon icon={isOpen ? faChevronUp : faChevronDown} color="white" />
             </Card.Header>
             <Collapse in={isOpen}>
                 <div>{children}</div>
