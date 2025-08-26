@@ -6,11 +6,17 @@ import { CurrentlyOutEquipmentInfo } from '../models/misc/CurrentlyOutEquipmentI
 import { TableConfiguration, TableDisplay } from './TableDisplay';
 import { Card } from 'react-bootstrap';
 import TableStyleLink from './utils/TableStyleLink';
+import CollapsibleCard from './utils/CollapsibleCard';
 
 const EquipmentNameDisplayFn = (x: CurrentlyOutEquipmentInfo) =>
     x.equipmentId ? <TableStyleLink href={'/equipment/' + x.equipmentId}>{x.name}</TableStyleLink> : <em>{x.name}</em>;
 
-const CurrentlyOutEquipment: React.FC = () => {
+type Props = {
+    collapsible?: boolean;
+    defaultOpen?: boolean;
+};
+
+const CurrentlyOutEquipment: React.FC<Props> = ({ collapsible = false, defaultOpen = true }: Props) => {
     const { data: currentlyOutEquipmentInfos } = useSwr('/api/equipment/currentlyOut', (url) =>
         fetch(url).then((response) => getResponseContentOrError<CurrentlyOutEquipmentInfo[]>(response)),
     );
@@ -43,11 +49,22 @@ const CurrentlyOutEquipment: React.FC = () => {
         ],
     };
 
+    const CardWrapper = ({ children }: { children: React.ReactNode }) =>
+        collapsible ? (
+            <CollapsibleCard title="Utlämnad utrustning" defaultOpen={defaultOpen} className="mb-3">
+                {children}
+            </CollapsibleCard>
+        ) : (
+            <Card className="mb-3">
+                <Card.Header>Utlämnad utrustning</Card.Header>
+                {children}
+            </Card>
+        );
+
     return (
-        <Card className="mb-3">
-            <Card.Header>Utlämnad utrustning</Card.Header>
+        <CardWrapper>
             <TableDisplay entities={currentlyOutEquipmentInfos} configuration={tableSettings} />
-        </Card>
+        </CardWrapper>
     );
 };
 
