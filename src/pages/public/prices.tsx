@@ -13,6 +13,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { toEquipmentPrice } from '../../lib/mappers/equipment';
 import { EquipmentPrice } from '../../models/interfaces';
+import { getDefaultSelectedPrice } from '../../lib/equipmentListUtils';
 
 const containerStyle: React.CSSProperties = {
     margin: 'auto',
@@ -190,7 +191,9 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
                                             </td>
                                             {equipment.prices ? (
                                                 <PriceCells
-                                                    price={toEquipmentPrice(equipment.prices[0])}
+                                                    price={getDefaultSelectedPrice(
+                                                        equipment.prices.map(toEquipmentPrice),
+                                                    )}
                                                     hidePriceType={equipment.prices.length === 1}
                                                     showWithVat={includeVat}
                                                     showThsPrice={showThsPrice}

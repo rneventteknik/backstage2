@@ -9,6 +9,8 @@ import MarkdownCard from '../../MarkdownCard';
 import RequiredIndicator from '../../utils/RequiredIndicator';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
+import { getDefaultSelectedPrice } from '../../../lib/equipmentListUtils';
+import { idSortFn } from '../../../lib/sortIndexUtils';
 
 type Props = {
     show: boolean;
@@ -37,7 +39,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
 }: Props) => {
     const [numberOfUnits, setNumberOfUnits] = useState<string>('1');
     const [numberOfHours, setNumberOfHours] = useState<string>(showNumberOfHours ? '1' : '0');
-    const [selectedPriceId, setSelectedPriceId] = useState<number>(equipment.prices[0]?.id);
+    const [selectedPriceId, setSelectedPriceId] = useState<number>(getDefaultSelectedPrice(equipment.prices).id);
 
     const numberOfUnitsRef = useRef<HTMLInputElement>(null);
     const numberOfHoursRef = useRef<HTMLInputElement>(null);
@@ -133,7 +135,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                         <Card className="mb-3">
                             <Card.Header>Prissättning (ink. moms)</Card.Header>
                             <ListGroup variant="flush">
-                                {equipment.prices.map((p) => (
+                                {equipment.prices.sort(idSortFn).map((p) => (
                                     <ListGroup.Item key={p.id}>
                                         <div className="d-flex flex-row align-items-center">
                                             <label htmlFor={'price-' + p.id} className="flex-grow-1 m-0">

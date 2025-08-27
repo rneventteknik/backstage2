@@ -14,6 +14,7 @@ import { Booking, Equipment, EquipmentPrice } from '../../../models/interfaces';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
 import { Language } from '../../../models/enums/Language';
+import { getDefaultSelectedPrice } from '../../../lib/equipmentListUtils';
 
 type Props = {
     show: boolean;
@@ -124,11 +125,14 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                 entry.pricePerUnit = getEquipmentListEntryPrices(x.equipmentPrice).pricePerUnit;
                 entry.pricePerHour = getEquipmentListEntryPrices(x.equipmentPrice).pricePerHour;
             } else if (resetManualPrices && x.equipment && x.equipment.prices.length > 0) {
-                entry.pricePerUnit = getEquipmentListEntryPrices(x.equipment.prices[0]).pricePerUnit;
-                entry.pricePerHour = getEquipmentListEntryPrices(x.equipment.prices[0]).pricePerHour;
+                entry.pricePerUnit = getEquipmentListEntryPrices(
+                    getDefaultSelectedPrice(x.equipment.prices),
+                ).pricePerUnit;
+                entry.pricePerHour = getEquipmentListEntryPrices(
+                    getDefaultSelectedPrice(x.equipment.prices),
+                ).pricePerHour;
             }
         }
-
         if (resetManualAccounts) {
             entry.account = null;
         }
@@ -409,8 +413,10 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                 Det manuella priset kommer återställas till
                                 <br />
                                 <em>
-                                    {entry.equipment.prices[0].name}:{' '}
-                                    {formatPrice(getEquipmentListEntryPrices(entry.equipment.prices[0]))}
+                                    {getDefaultSelectedPrice(entry.equipment.prices).name}:{' '}
+                                    {formatPrice(
+                                        getEquipmentListEntryPrices(getDefaultSelectedPrice(entry.equipment.prices)),
+                                    )}
                                 </em>
                             </Tooltip>
                         }
