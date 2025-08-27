@@ -191,7 +191,9 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
                                             </td>
                                             {equipment.prices ? (
                                                 <PriceCells
-                                                    price={toEquipmentPrice(getDefaultSelectedPrice(equipment.prices))}
+                                                    price={getDefaultSelectedPrice(
+                                                        equipment.prices.map(toEquipmentPrice),
+                                                    )}
                                                     hidePriceType={equipment.prices.length === 1}
                                                     showWithVat={includeVat}
                                                     showThsPrice={showThsPrice}

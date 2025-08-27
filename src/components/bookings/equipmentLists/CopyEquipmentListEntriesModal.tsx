@@ -125,9 +125,14 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                 entry.pricePerUnit = getEquipmentListEntryPrices(x.equipmentPrice).pricePerUnit;
                 entry.pricePerHour = getEquipmentListEntryPrices(x.equipmentPrice).pricePerHour;
             } else if (resetManualPrices && x.equipment && x.equipment.prices.length > 0) {
-                entry.pricePerUnit = getEquipmentListEntryPrices(getDefaultSelectedPrice(x.equipment.prices)).pricePerUnit;
-                entry.pricePerHour = getEquipmentListEntryPrices(getDefaultSelectedPrice(x.equipment.prices)).pricePerHour;
+                entry.pricePerUnit = getEquipmentListEntryPrices(
+                    getDefaultSelectedPrice(x.equipment.prices),
+                ).pricePerUnit;
+                entry.pricePerHour = getEquipmentListEntryPrices(
+                    getDefaultSelectedPrice(x.equipment.prices),
+                ).pricePerHour;
             }
+        }
         if (resetManualAccounts) {
             entry.account = null;
         }
@@ -409,7 +414,9 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                 <br />
                                 <em>
                                     {getDefaultSelectedPrice(entry.equipment.prices).name}:{' '}
-                                    {formatPrice(getEquipmentListEntryPrices(getDefaultSelectedPrice(entry.equipment.prices)))}
+                                    {formatPrice(
+                                        getEquipmentListEntryPrices(getDefaultSelectedPrice(entry.equipment.prices)),
+                                    )}
                                 </em>
                             </Tooltip>
                         }
