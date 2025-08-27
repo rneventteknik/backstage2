@@ -3,7 +3,7 @@ import Layout from '../components/layout/Layout';
 import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import Header from '../components/layout/Header';
-import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
+import { Button, Col, ListGroup, Row } from 'react-bootstrap';
 import useSwr from 'swr';
 import TinyBookingTable from '../components/TinyBookingTable';
 import { bookingsFetcher } from '../lib/fetchers';
@@ -25,6 +25,7 @@ import { KeyValue } from '../models/interfaces/KeyValue';
 import CurrentlyOutEquipment from '../components/CurrentlyOutEquipment';
 import AddUserAsCoOwnerToAllFutureBookingsForUserButton from '../components/AddUserAsCoOwnerToAllFutureBookingsForUserButton';
 import DoorAndKeyStatus from '../components/DoorAndKeyStatus';
+import CollapsibleCard from '../components/utils/CollapsibleCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -84,21 +85,29 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                 </Col>
                 <Col xl={6}>
                     <DoorAndKeyStatus globalSettings={globalSettings} />
-                    <TinyBookingTable
-                        title="Kommande hyror (inom 1 vecka)"
-                        bookings={upcomingRentalBookings}
-                        showDateHeadings={false}
-                    ></TinyBookingTable>
-                    <TinyBookingTable
-                        title="Utlämnade hyror"
-                        bookings={outBookings}
-                        showDateHeadings={false}
-                    ></TinyBookingTable>
-                    <CurrentlyOutEquipment />
-                    <Card className="mb-3">
-                        <Card.Header className="d-flex">
-                            <span className="flex-grow-1">Aktivitet</span>
-                        </Card.Header>
+                    <div className="mb-3">
+                        <TinyBookingTable
+                            title="Kommande hyror (inom 1 vecka)"
+                            bookings={upcomingRentalBookings}
+                            showDateHeadings={false}
+                            collapsible={true}
+                            defaultOpen={true}
+                        ></TinyBookingTable>
+                    </div>
+                    <div className="mb-3">
+                        <TinyBookingTable
+                            title="Utlämnade hyror"
+                            bookings={outBookings}
+                            showDateHeadings={false}
+                            collapsible={true}
+                            defaultOpen={true}
+                        ></TinyBookingTable>
+                    </div>
+                    <div className="mb-3">
+                        <CurrentlyOutEquipment collapsible={true} defaultOpen={true} />
+                    </div>
+
+                    <CollapsibleCard title="Aktivitet" className="mb-3">
                         <ListGroup variant="flush">
                             {changelog.slice(0, 15).map((changelogEntry) => (
                                 <ListGroup.Item key={changelogEntry.id}>
@@ -114,7 +123,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                                 </ListGroup.Item>
                             ))}
                         </ListGroup>
-                    </Card>
+                    </CollapsibleCard>
                 </Col>
             </Row>
         </Layout>

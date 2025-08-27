@@ -11,13 +11,16 @@ import { getBookingDateHeadingValue, toBookingViewModel } from '../lib/datetimeU
 import BookingStatusTag from './utils/BookingStatusTag';
 import FixedPriceStatusTag from './utils/FixedPriceStatusTag';
 import InternalReservationTag from './utils/InternalReservationTag';
+import CollapsibleCard from './utils/CollapsibleCard';
 
 type Props = {
     title: string;
     bookings: Booking[] | undefined;
     tableSettingsOverride?: Partial<TableConfiguration<BookingViewModel>>;
     showDateHeadings?: boolean;
-    children?: React.ReactChild;
+    children?: React.ReactNode;
+    collapsible?: boolean;
+    defaultOpen?: boolean;
 };
 
 const BookingNameDisplayFn = (booking: BookingViewModel) => (
@@ -48,6 +51,8 @@ const TinyBookingTable: React.FC<Props> = ({
     children,
     showDateHeadings = true,
     tableSettingsOverride = {},
+    collapsible = false,
+    defaultOpen = true,
 }: Props) => {
     if (!bookings) {
         return <Skeleton height={150} className="mb-3" />;
@@ -86,19 +91,31 @@ const TinyBookingTable: React.FC<Props> = ({
         ],
     };
 
+
+    const CardWrapper = ({ children: tableChildren }: { children: React.ReactNode }) =>
+        collapsible ? (
+            <CollapsibleCard title={title} defaultOpen={defaultOpen}>
+                {tableChildren}
+            </CollapsibleCard>
+        ) : (
+            <Card className="mb-3">
+                <Card.Header>
+                    <div className="d-flex justify-content-between">
+                        {title}
+                        {children}
+                    </div>
+                </Card.Header>
+                {tableChildren}
+            </Card>
+        );
+
     return (
-        <Card className="mb-3">
-            <Card.Header>
-                <div className="d-flex justify-content-between">
-                    {title}
-                    {children}
-                </div>
-            </Card.Header>
+        <CardWrapper>
             <TableDisplay
                 entities={bookings.map(toBookingViewModel)}
                 configuration={{ ...tableSettings, ...tableSettingsOverride }}
             />
-        </Card>
+        </CardWrapper>
     );
 };
 
