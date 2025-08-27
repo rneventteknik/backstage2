@@ -133,7 +133,7 @@ export const getDefaultListEntryFromEquipment = (
         throw new Error('Invalid equipment');
     }
 
-    const selectedPrice = equipment.prices.find((price) => price.id === selectedPriceId) ?? equipment.prices[0];
+    const selectedPrice = equipment.prices.find((price) => price.id === selectedPriceId) ?? getDefaultSelectedPrice(equipment.prices);
 
     const prices = isFree
         ? { pricePerHour: currency(0), pricePerUnit: currency(0) }
@@ -666,4 +666,8 @@ export const addTimeReportApiCall = async (timeReport: ITimeReportObjectionModel
     return fetch(`/api/bookings/${bookingId}/timeReport`, request)
         .then((apiResponse) => getResponseContentOrError<ITimeReportObjectionModel>(apiResponse))
         .then(toTimeReport);
+};
+
+export const getDefaultSelectedPrice = (prices: EquipmentPrice[]): EquipmentPrice => {
+    return prices.reduce((minIdPrice, currentPrice) => (currentPrice.id < minIdPrice.id ? currentPrice : minIdPrice));
 };

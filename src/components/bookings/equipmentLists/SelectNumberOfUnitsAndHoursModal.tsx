@@ -9,6 +9,7 @@ import MarkdownCard from '../../MarkdownCard';
 import RequiredIndicator from '../../utils/RequiredIndicator';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
+import { getDefaultSelectedPrice } from '../../../lib/equipmentListUtils';
 
 type Props = {
     show: boolean;
@@ -37,7 +38,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
 }: Props) => {
     const [numberOfUnits, setNumberOfUnits] = useState<string>('1');
     const [numberOfHours, setNumberOfHours] = useState<string>(showNumberOfHours ? '1' : '0');
-    const [selectedPriceId, setSelectedPriceId] = useState<number>(equipment.prices[0]?.id);
+    const [selectedPriceId, setSelectedPriceId] = useState<number>(getDefaultSelectedPrice(equipment.prices).id);
 
     const numberOfUnitsRef = useRef<HTMLInputElement>(null);
     const numberOfHoursRef = useRef<HTMLInputElement>(null);

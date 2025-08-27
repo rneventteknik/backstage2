@@ -15,6 +15,7 @@ import { fixSortIndexUniqueness, getNextSortIndex, moveItemToItem, sortIndexSort
 import { getPricePlanName, getResponseContentOrError, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
 import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { PricePlan } from '../../models/enums/PricePlan';
+import { getDefaultSelectedPrice } from '../../lib/equipmentListUtils';
 
 type Props = {
     handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => void;
@@ -43,7 +44,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         }
 
         const nextId = Math.max(1, ...selectedEquipmentPackageEntries.map((x) => x.id)) + 1;
-        const defaultPrice = equipment.prices && equipment.prices[0] ? equipment.prices[0] : null;
+        const defaultPrice = equipment.prices && equipment.prices[0] ? getDefaultSelectedPrice(equipment.prices) : null;
 
         const equipmentPackageEntry: EquipmentPackageEntry = {
             id: nextId, // This id is only used in the client, it is striped before sending to the server
