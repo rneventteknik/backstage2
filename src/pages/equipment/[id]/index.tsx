@@ -28,6 +28,7 @@ import { IEquipmentObjectionModel } from '../../../models/objection-models';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Role } from '../../../models/enums/Role';
 import { ImageCardHideOnError } from '../../../components/equipment/ImageHideOnError';
+import { idSortFn } from '../../../lib/sortIndexUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -159,7 +160,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     <Card className="mb-3">
                         <Card.Header>Prissättning (ink. moms)</Card.Header>
                         <ListGroup variant="flush">
-                            {equipment.prices.map((p) => (
+                            {equipment.prices.sort(idSortFn).map((p) => (
                                 <ListGroup.Item key={p.id}>
                                     <span className="d-block">{p.name}</span>
                                     <span className="d-flex text-muted">
