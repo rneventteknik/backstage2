@@ -70,7 +70,7 @@ const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props)
                     />
                 </p>
             ) : null}
-            {result.shouldBeOut.length > 0 ? (
+            {result.shouldBeIn.length > 0 ? (
                 <p className="mb-1">
                     Inte återlämnad
                     <WarningIcon
