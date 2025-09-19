@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Booking } from '../../models/interfaces';
-import { Alert, Button, Card } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 import { getBookingsWithPotentialProblems } from '../../lib/bookingsWithPotentialProblemsUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faWarning } from '@fortawesome/free-solid-svg-icons';
-import { countNotNullorEmpty } from '../../lib/utils';
 import { formatDatetime } from '../../lib/datetimeUtils';
 
 type Props = {
