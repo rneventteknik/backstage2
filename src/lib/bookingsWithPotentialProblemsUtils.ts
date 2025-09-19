@@ -39,7 +39,7 @@ export const getBookingsWithPotentialProblems = (bookings: Booking[]): BookingsW
 
     return bookingsToCheck
         .map((booking) => {
-            const now = new Date('2025-07-10');
+            const now = new Date();
 
             const shouldBeBooked =
                 booking.status === Status.DRAFT &&
