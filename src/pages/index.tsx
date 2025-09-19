@@ -88,7 +88,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                     <DoorAndKeyStatus globalSettings={globalSettings} />
 
                     <div className="mb-3">
-                        <BookingsWithPotentialProblemsCard bookings={bookings ?? []} />
+                        <BookingsWithPotentialProblemsCard bookings={bookings} />
                     </div>
 
                     <div className="mb-3">

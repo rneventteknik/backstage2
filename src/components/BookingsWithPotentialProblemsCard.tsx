@@ -18,14 +18,18 @@ import { faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { formatDatetime } from '../lib/datetimeUtils';
+import Skeleton from 'react-loading-skeleton';
 
 type Props = {
-    bookings: Booking[];
+    bookings?: Booking[];
 };
 
 const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props) => {
-    const bookingsWithPotentialProblems = getBookingsWithPotentialProblems(bookings);
+    if (!bookings) {
+        return <Skeleton height={150} className="mb-3" />;
+    }
 
+    const bookingsWithPotentialProblems = getBookingsWithPotentialProblems(bookings);
     const bookingsWithPotentialProblemsWithId = bookingsWithPotentialProblems.map((x) => ({ ...x, id: x.booking.id }));
 
     const BookingNameDisplayFn = (result: BookingsWithPotentialProblemsResult) => (
