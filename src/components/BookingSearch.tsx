@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
 import styles from './EquipmentSearch.module.scss';
-import { Badge } from 'react-bootstrap';
 import { BookingsSearchResult } from '../models/misc/SearchResult';
-import { getResponseContentOrError, getStatusName } from '../lib/utils';
+import { getResponseContentOrError } from '../lib/utils';
 import { useNotifications } from '../lib/useNotifications';
 import { BaseEntityWithName } from '../models/interfaces/BaseEntity';
 import { IBookingObjectionModel } from '../models/objection-models';
 import { toBooking } from '../lib/mappers/booking';
-import BookingTypeTag from './utils/BookingTypeTag';
 import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { SplitHighlighter } from './utils/Highlight';
+import { toBookingViewModel } from '../lib/datetimeUtils';
 
 export interface SearchResultViewModel extends BaseEntityWithName {
     url: string;
@@ -83,6 +82,8 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
         state,
     }: SearchListItemProps<T>): React.ReactElement => {
         const booking = entity as unknown as IBookingObjectionModel;
+        const viewModel = toBookingViewModel(toBooking(booking));
+
         return (
             <>
                 <div>
@@ -90,10 +91,9 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
                 </div>
                 <div>
                     <small>
-                        {booking.contactPersonName} <BookingTypeTag booking={booking} />{' '}
-                        <Badge variant="dark" className="ml-1">
-                            {getStatusName(booking.status)}
-                        </Badge>
+                        {booking.customerName} / {booking.contactPersonName}
+                        {booking.contactPersonName && viewModel.displayUsageInterval !== '-' ? ' / ' : ''}
+                        {viewModel.displayUsageInterval === '-' ? null : viewModel.monthYearUsageStartString}
                     </small>
                 </div>
             </>
