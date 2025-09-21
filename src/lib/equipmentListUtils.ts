@@ -108,12 +108,14 @@ export const getEquipmentFromViewModel = (viewModel: EquipmentListEntityViewMode
 // Heper functions to get default values
 //
 
-export const getEquipmentListEntryPrices = (equipmentPrice: EquipmentPrice, pricePlan: PricePlan) => {
+export const getEquipmentListEntryPrices = (equipmentPrice: EquipmentPrice | null, pricePlan: PricePlan) => {
     return {
         pricePerHour:
-            (pricePlan === PricePlan.EXTERNAL ? equipmentPrice?.pricePerHour : equipmentPrice?.pricePerHourTHS) ?? 0,
+            (pricePlan === PricePlan.EXTERNAL ? equipmentPrice?.pricePerHour : equipmentPrice?.pricePerHourTHS) ??
+            currency(0),
         pricePerUnit:
-            (pricePlan === PricePlan.EXTERNAL ? equipmentPrice?.pricePerUnit : equipmentPrice?.pricePerUnitTHS) ?? 0,
+            (pricePlan === PricePlan.EXTERNAL ? equipmentPrice?.pricePerUnit : equipmentPrice?.pricePerUnitTHS) ??
+            currency(0),
         equipmentPrice: equipmentPrice,
     };
 };
@@ -133,7 +135,8 @@ export const getDefaultListEntryFromEquipment = (
         throw new Error('Invalid equipment');
     }
 
-    const selectedPrice = equipment.prices.find((price) => price.id === selectedPriceId) ?? getDefaultSelectedPrice(equipment.prices);
+    const selectedPrice =
+        equipment.prices.find((price) => price.id === selectedPriceId) ?? getDefaultSelectedPrice(equipment.prices);
 
     const prices = isFree
         ? { pricePerHour: currency(0), pricePerUnit: currency(0) }
@@ -668,6 +671,10 @@ export const addTimeReportApiCall = async (timeReport: ITimeReportObjectionModel
         .then(toTimeReport);
 };
 
-export const getDefaultSelectedPrice = (prices: EquipmentPrice[]): EquipmentPrice => {
+export const getDefaultSelectedPrice = (prices: EquipmentPrice[]): EquipmentPrice | null => {
+    if (prices.length === 0) {
+        return null;
+    }
+
     return prices.reduce((minIdPrice, currentPrice) => (currentPrice.id < minIdPrice.id ? currentPrice : minIdPrice));
 };
