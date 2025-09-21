@@ -10,11 +10,11 @@ import { toBooking } from '../../../lib/mappers/booking';
 import { IBookingObjectionModel } from '../../../models/objection-models';
 import { getSortedList, sortIndexSortFn } from '../../../lib/sortIndexUtils';
 import { formatCurrency, formatPrice } from '../../../lib/pricingUtils';
-import { Booking, Equipment, EquipmentPrice } from '../../../models/interfaces';
+import { Booking, Equipment } from '../../../models/interfaces';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import { TableConfiguration, TableDisplay } from '../../TableDisplay';
 import { Language } from '../../../models/enums/Language';
-import { getDefaultSelectedPrice } from '../../../lib/equipmentListUtils';
+import { getDefaultSelectedPrice, getEquipmentListEntryPrices } from '../../../lib/equipmentListUtils';
 
 type Props = {
     show: boolean;
@@ -27,7 +27,7 @@ type Props = {
             listEntries: Omit<EquipmentListEntry, 'id' | 'created' | 'updated' | 'sortIndex'>[];
         }[],
     ) => void;
-    pricePlan: PricePlan | undefined;
+    pricePlan: PricePlan;
     language: Language | undefined;
 };
 
@@ -122,14 +122,16 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
 
         if (resetPrices) {
             if (x.equipmentPrice) {
-                entry.pricePerUnit = getEquipmentListEntryPrices(x.equipmentPrice).pricePerUnit;
-                entry.pricePerHour = getEquipmentListEntryPrices(x.equipmentPrice).pricePerHour;
+                entry.pricePerUnit = getEquipmentListEntryPrices(x.equipmentPrice, pricePlan).pricePerUnit;
+                entry.pricePerHour = getEquipmentListEntryPrices(x.equipmentPrice, pricePlan).pricePerHour;
             } else if (resetManualPrices && x.equipment && x.equipment.prices.length > 0) {
                 entry.pricePerUnit = getEquipmentListEntryPrices(
                     getDefaultSelectedPrice(x.equipment.prices),
+                    pricePlan,
                 ).pricePerUnit;
                 entry.pricePerHour = getEquipmentListEntryPrices(
                     getDefaultSelectedPrice(x.equipment.prices),
+                    pricePlan,
                 ).pricePerHour;
             }
         }
@@ -180,17 +182,6 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
 
     // Helper functions
     //
-    const getEquipmentListEntryPrices = (equipmentPrice: EquipmentPrice) => {
-        return {
-            pricePerHour:
-                (pricePlan === PricePlan.EXTERNAL ? equipmentPrice?.pricePerHour : equipmentPrice?.pricePerHourTHS) ??
-                0,
-            pricePerUnit:
-                (pricePlan === PricePlan.EXTERNAL ? equipmentPrice?.pricePerUnit : equipmentPrice?.pricePerUnitTHS) ??
-                0,
-        };
-    };
-
     const getEquipmentName = (equipment: Equipment | undefined | null) =>
         language === Language.SV ? equipment?.name : equipment?.nameEN;
 
@@ -385,8 +376,8 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                 {resetPrices &&
                 entry.equipment &&
                 entry.equipmentPrice &&
-                (entry.pricePerHour != getEquipmentListEntryPrices(entry.equipmentPrice).pricePerHour ||
-                    entry.pricePerUnit != getEquipmentListEntryPrices(entry.equipmentPrice).pricePerUnit) &&
+                (entry.pricePerHour != getEquipmentListEntryPrices(entry.equipmentPrice, pricePlan).pricePerHour ||
+                    entry.pricePerUnit != getEquipmentListEntryPrices(entry.equipmentPrice, pricePlan).pricePerUnit) &&
                 !isDisabled(entry) ? (
                     <OverlayTrigger
                         placement="right"
@@ -394,7 +385,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                             <Tooltip id="1">
                                 Priset kommer återställas till:
                                 <br />
-                                <em>{formatPrice(getEquipmentListEntryPrices(entry.equipmentPrice))}</em>
+                                <em>{formatPrice(getEquipmentListEntryPrices(entry.equipmentPrice, pricePlan))}</em>
                             </Tooltip>
                         }
                     >
@@ -413,9 +404,12 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                 Det manuella priset kommer återställas till
                                 <br />
                                 <em>
-                                    {getDefaultSelectedPrice(entry.equipment.prices).name}:{' '}
+                                    {getDefaultSelectedPrice(entry.equipment.prices)?.name}:{' '}
                                     {formatPrice(
-                                        getEquipmentListEntryPrices(getDefaultSelectedPrice(entry.equipment.prices)),
+                                        getEquipmentListEntryPrices(
+                                            getDefaultSelectedPrice(entry.equipment.prices),
+                                            pricePlan,
+                                        ),
                                     )}
                                 </em>
                             </Tooltip>
