@@ -51,7 +51,7 @@ export const fetchBookings = async (excludeDoneAndCancelledBookings = false): Pr
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment');
 
     if (excludeDoneAndCancelledBookings) {
-        query = query.where('status', '<>', Status.DONE).where('status', '<>', Status.DONE);
+        query = query.where('status', '<>', Status.DONE).andWhere('status', '<>', Status.CANCELED);
     }
 
     return query;
