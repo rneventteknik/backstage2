@@ -66,6 +66,7 @@ import currency from 'currency.js';
 import PreviousBookingsCard from '../../../components/bookings/PreviousBookingsCard';
 import { BookingType } from '../../../models/enums/BookingType';
 import CalendarWorkersCard from '../../../components/bookings/CalendarWorkersCard';
+import BookingPotentialProblemsSection from '../../../components/bookings/BookingPotentialProblemsSection';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -354,6 +355,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             <Row className="mb-3">
                 <Col xl={8}>
                     <BookingInfoSection booking={booking} showName={false} className="d-xl-none mb-3" />
+                    <BookingPotentialProblemsSection booking={booking} />
                     <TimeEstimateList
                         bookingId={booking.id}
                         pricePlan={booking.pricePlan}
