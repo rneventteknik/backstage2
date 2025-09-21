@@ -24,7 +24,7 @@ const pageTitle = 'Aktiva bokningar';
 const breadcrumbs = [{ link: 'bookings', displayName: pageTitle }];
 
 const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: bookings, error } = useSwr('/api/bookings', bookingsFetcher);
+    const { data: bookings, error } = useSwr('/api/bookings/active', bookingsFetcher);
 
     if (error) {
         return (

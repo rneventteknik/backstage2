@@ -40,15 +40,23 @@ export const searchBookings = async (searchString: string, count: number): Promi
         .limit(count);
 };
 
-export const fetchBookings = async (): Promise<BookingObjectionModel[]> => {
+export const fetchActiveBookings = async () => fetchBookings(true);
+
+export const fetchBookings = async (excludeDoneAndCancelledBookings = false): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query()
+    let query = BookingObjectionModel.query()
         .withGraphFetched('ownerUser')
         .withGraphFetched('timeEstimates')
         .withGraphFetched('timeReports.user')
         .withGraphFetched('equipmentLists.listEntries.equipment')
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment');
+
+    if (excludeDoneAndCancelledBookings) {
+        query = query.where('status', '<>', Status.DONE).andWhere('status', '<>', Status.CANCELED);
+    }
+
+    return query;
 };
 
 export const fetchBookingsForAnalytics = async (): Promise<BookingObjectionModel[]> => {

@@ -32,7 +32,7 @@ export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
 const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: bookings } = useSwr('/api/bookings', bookingsFetcher);
+    const { data: bookings } = useSwr('/api/bookings/active', bookingsFetcher);
     const { data: myBookings } = useSwr('/api/users/' + currentUser.userId + '/bookings', bookingsFetcher);
     const { data: coOwnerBookings, mutate: mutateCoOwnerBookings } = useSwr(
         '/api/users/' + currentUser.userId + '/coOwnerBookings',
