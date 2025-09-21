@@ -40,6 +40,8 @@ export const searchBookings = async (searchString: string, count: number): Promi
         .limit(count);
 };
 
+export const fetchActiveBookings = async () => fetchBookings(true);
+
 export const fetchBookings = async (excludeDoneAndCancelledBookings = false): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
