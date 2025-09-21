@@ -12,7 +12,7 @@ const getNameTagsFromEventName = (name: string): string[] => {
     const match = name.match(/\[(.*?)\]/);
     if (match) {
         return match[1]
-            .split(',')
+            .split(/[,/]/)
             .map((x) => (x.includes(':') ? x.split(':')[1] : x))
             .map((x) => x.trim());
     }
