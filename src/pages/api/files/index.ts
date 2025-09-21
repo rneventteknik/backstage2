@@ -33,7 +33,7 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             }
             await driveClient.files
                 .list({
-                    q: `\'${driveFolderId}\' in parents`,
+                    q: `\'${driveFolderId}\' in parents and trashed=false`,
                     fields: 'files(id, name, mimeType, modifiedTime, webViewLink)',
                     includeItemsFromAllDrives: true,
                     supportsAllDrives: true,
