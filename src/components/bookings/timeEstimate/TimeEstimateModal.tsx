@@ -175,6 +175,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 <Form.Control
                                     type="text"
                                     required
+                                    placeholder="2 tekniker (18:00-03:00)"
                                     readOnly={readonly}
                                     value={timeEstimate?.name}
                                     onChange={(e) =>
@@ -197,6 +198,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         required
                                         value={timeEstimate?.numberOfHours}
                                         type="text"
+                                        placeholder="18"
                                         readOnly={readonly}
                                         onChange={(e) =>
                                             setTimeEstimate({

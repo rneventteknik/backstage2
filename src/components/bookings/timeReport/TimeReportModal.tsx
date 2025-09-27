@@ -92,6 +92,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     type="text"
                                     required
                                     defaultValue={timeReport?.name}
+                                    placeholder="Upprigg torsdag"
                                     readOnly={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
