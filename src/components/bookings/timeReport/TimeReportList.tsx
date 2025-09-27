@@ -34,7 +34,7 @@ import {
     moveItemUp,
     sortIndexSortFn,
 } from '../../../lib/sortIndexUtils';
-import { formatDatetime, toBookingViewModel } from '../../../lib/datetimeUtils';
+import { formatDateForForm, formatDatetime, toBookingViewModel } from '../../../lib/datetimeUtils';
 import TimeReportAddButton from './TimeReportAddButton';
 import TimeReportModal from './TimeReportModal';
 import { addTimeReportApiCall } from '../../../lib/equipmentListUtils';
@@ -332,7 +332,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                 key: 'specification',
                 displayName: 'Beskrivning',
                 getValue: (timeReport: TimeReport) =>
-                    timeReport.startDatetime ? formatDatetime(timeReport.startDatetime) : '-',
+                    timeReport.startDatetime ? formatDateForForm(timeReport.startDatetime) : '-',
                 getContentOverride: TimeReportSpecificationDisplayFn,
             },
             {
