@@ -1,6 +1,5 @@
 import React from 'react';
 import { Booking } from '../models/interfaces';
-import CollapsibleCard from './utils/CollapsibleCard';
 import {
     BookingsWithPotentialProblemsResult,
     getBookingsWithPotentialProblems,
@@ -14,11 +13,13 @@ import InternalReservationTag from './utils/InternalReservationTag';
 import RentalStatusTag from './utils/RentalStatusTag';
 import TableStyleLink from './utils/TableStyleLink';
 import { HasId } from '../models/interfaces/BaseEntity';
-import { faWarning } from '@fortawesome/free-solid-svg-icons';
+import { faList } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button, Card } from 'react-bootstrap';
 import { formatDatetime } from '../lib/datetimeUtils';
 import Skeleton from 'react-loading-skeleton';
+import Link from 'next/link';
+import WarningIcon from './utils/WarningIcon';
 
 type Props = {
     bookings?: Booking[];
@@ -119,29 +120,24 @@ const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props)
 
     return (
         <>
-            <CollapsibleCard title={'Bokningar med potentiella problem'} defaultOpen={true}>
-                {bookingsWithPotentialProblems.length === 0 && <p>Inga bokningar med potentiella problem.</p>}
-                <TableDisplay entities={bookingsWithPotentialProblemsWithId} configuration={tableSettings} />
-            </CollapsibleCard>
+            <Card>
+                <Card.Header className="d-flex justify-content-between">
+                    Dina bokningar med potentiella problem
+                    <Link href="/bookings/problems" passHref>
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            as="span"
+                        >
+                            <FontAwesomeIcon icon={faList} /> Visa alla
+                        </Button>
+                    </Link>
+                </Card.Header>
+                {bookingsWithPotentialProblems.length === 0 ? <Card.Body>Inga bokningar med potentiella problem.</Card.Body> :
+                <TableDisplay entities={bookingsWithPotentialProblemsWithId} configuration={tableSettings} />}
+            </Card>
         </>
     );
 };
 
-type WarningIconProps = {
-    text: string;
-    className: string;
-};
-
-const WarningIcon: React.FC<WarningIconProps> = ({ text, className }: WarningIconProps) => (
-    <OverlayTrigger
-        placement="right"
-        overlay={
-            <Tooltip id="1">
-                <strong>{text}</strong>
-            </Tooltip>
-        }
-    >
-        <FontAwesomeIcon className={className} icon={faWarning} />
-    </OverlayTrigger>
-);
 export default BookingsWithPotentialProblemsCard;

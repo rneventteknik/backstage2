@@ -391,12 +391,7 @@ const AdminBookingList: React.FC<Props> = ({
                     setPaymentStatuses([]);
                     setSalaryStatuses([]);
                 }}
-                activeFilterCount={countNotNullorEmpty(
-                    searchText,
-                    bookingStatuses,
-                    paymentStatuses,
-                    salaryStatuses
-                )}
+                activeFilterCount={countNotNullorEmpty(searchText, bookingStatuses, paymentStatuses, salaryStatuses)}
             >
                 <Form.Row className="mb-2">
                     <Col md="4">

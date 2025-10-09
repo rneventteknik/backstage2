@@ -133,7 +133,8 @@ export const getDefaultListEntryFromEquipment = (
         throw new Error('Invalid equipment');
     }
 
-    const selectedPrice = equipment.prices.find((price) => price.id === selectedPriceId) ?? getDefaultSelectedPrice(equipment.prices);
+    const selectedPrice =
+        equipment.prices.find((price) => price.id === selectedPriceId) ?? getDefaultSelectedPrice(equipment.prices);
 
     const prices = isFree
         ? { pricePerHour: currency(0), pricePerUnit: currency(0) }
