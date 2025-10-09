@@ -28,7 +28,7 @@ const pageTitle = 'Bokningar med potentiella problem';
 const breadcrumbs = [{ link: 'bookings', displayName: pageTitle }];
 
 const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: bookings, error } = useSwr('/api/bookings', bookingsFetcher);
+    const { data: bookings, error } = useSwr('/api/bookings/active', bookingsFetcher);
 
     const bookingsWithPotentialProblems = getBookingsWithPotentialProblems(bookings ?? []);
     const bookingsWithPotentialProblemsWithId = bookingsWithPotentialProblems.map((x) => ({ ...x, id: x.booking.id }));
