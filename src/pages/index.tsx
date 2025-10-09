@@ -26,6 +26,7 @@ import CurrentlyOutEquipment from '../components/CurrentlyOutEquipment';
 import AddUserAsCoOwnerToAllFutureBookingsForUserButton from '../components/AddUserAsCoOwnerToAllFutureBookingsForUserButton';
 import DoorAndKeyStatus from '../components/DoorAndKeyStatus';
 import CollapsibleCard from '../components/utils/CollapsibleCard';
+import BookingsWithPotentialProblemsCard from '../components/BookingsWithPotentialProblemsCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -85,6 +86,11 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                 </Col>
                 <Col xl={6}>
                     <DoorAndKeyStatus globalSettings={globalSettings} />
+
+                    <div className="mb-3">
+                        <BookingsWithPotentialProblemsCard bookings={myBookings} />
+                    </div>
+
                     <div className="mb-3">
                         <TinyBookingTable
                             title="Kommande hyror (inom 1 vecka)"

@@ -91,7 +91,6 @@ const TinyBookingTable: React.FC<Props> = ({
         ],
     };
 
-
     const CardWrapper = ({ children: tableChildren }: { children: React.ReactNode }) =>
         collapsible ? (
             <CollapsibleCard title={title} defaultOpen={defaultOpen}>

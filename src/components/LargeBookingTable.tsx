@@ -158,33 +158,37 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
 
     // Filter list. Note that the free text filter are handled by the table and not here.
     //
-    const bookingsToShow = !showAdvancedFilters ? bookings : bookings
-        .filter(
-            (booking: BookingViewModel) =>
-                userIds.length === 0 || (booking.ownerUser?.id && userIds.indexOf(booking.ownerUser?.id) >= 0),
-        )
-        .filter((booking: BookingViewModel) => statuses.length === 0 || statuses.indexOf(booking.status) >= 0)
-        .filter(
-            (booking: BookingViewModel) =>
-                !startDate ||
-                !validDate(startDate) ||
-                (booking.usageStartDatetime && booking.usageStartDatetime > startDate),
-        )
-        .filter(
-            (booking: BookingViewModel) =>
-                !endDate || !validDate(endDate) || (booking.usageEndDatetime && booking.usageEndDatetime < endDate),
-        )
-        .filter(
-            (booking: BookingViewModel) =>
-                !customerName || booking.customerName?.toLowerCase().includes(customerName.toLowerCase()),
-        )
-        .filter(
-            (booking: BookingViewModel) =>
-                !location || booking.location?.toLowerCase().includes(location.toLowerCase()),
-        )
-        .filter((booking: BookingViewModel) => bookingType == undefined || booking.bookingType === bookingType)
-        .filter((booking: BookingViewModel) => pricePlan == undefined || booking.pricePlan === pricePlan)
-        .filter((booking: BookingViewModel) => accountKind == undefined || booking.accountKind === accountKind);
+    const bookingsToShow = !showAdvancedFilters
+        ? bookings
+        : bookings
+              .filter(
+                  (booking: BookingViewModel) =>
+                      userIds.length === 0 || (booking.ownerUser?.id && userIds.indexOf(booking.ownerUser?.id) >= 0),
+              )
+              .filter((booking: BookingViewModel) => statuses.length === 0 || statuses.indexOf(booking.status) >= 0)
+              .filter(
+                  (booking: BookingViewModel) =>
+                      !startDate ||
+                      !validDate(startDate) ||
+                      (booking.usageStartDatetime && booking.usageStartDatetime > startDate),
+              )
+              .filter(
+                  (booking: BookingViewModel) =>
+                      !endDate ||
+                      !validDate(endDate) ||
+                      (booking.usageEndDatetime && booking.usageEndDatetime < endDate),
+              )
+              .filter(
+                  (booking: BookingViewModel) =>
+                      !customerName || booking.customerName?.toLowerCase().includes(customerName.toLowerCase()),
+              )
+              .filter(
+                  (booking: BookingViewModel) =>
+                      !location || booking.location?.toLowerCase().includes(location.toLowerCase()),
+              )
+              .filter((booking: BookingViewModel) => bookingType == undefined || booking.bookingType === bookingType)
+              .filter((booking: BookingViewModel) => pricePlan == undefined || booking.pricePlan === pricePlan)
+              .filter((booking: BookingViewModel) => accountKind == undefined || booking.accountKind === accountKind);
 
     return (
         <>
