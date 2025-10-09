@@ -1,3 +1,4 @@
+import { BookingType } from '../models/enums/BookingType';
 import { RentalStatus } from '../models/enums/RentalStatus';
 import { Status } from '../models/enums/Status';
 import { Booking, BookingViewModel } from '../models/interfaces';
@@ -51,6 +52,7 @@ export const getBookingsWithPotentialProblems = (bookings: Booking[]): BookingsW
             const shouldBeOut =
                 booking.equipmentLists?.filter(
                     (x) =>
+                        booking.bookingType == BookingType.RENTAL &&
                         x.rentalStatus == null &&
                         isMoreThanXHoursAfter(now, getEquipmentOutDatetime(x), hoursBeforeWarningOut),
                 ) ?? [];
@@ -58,6 +60,7 @@ export const getBookingsWithPotentialProblems = (bookings: Booking[]): BookingsW
             const shouldBeIn =
                 booking.equipmentLists?.filter(
                     (x) =>
+                        booking.bookingType == BookingType.RENTAL &&
                         x.rentalStatus != RentalStatus.RETURNED &&
                         isMoreThanXHoursAfter(now, getEquipmentInDatetime(x), hoursBeforeWarningIn),
                 ) ?? [];
