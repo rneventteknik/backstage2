@@ -28,7 +28,7 @@ const pageTitle = 'Bokningar med potentiella problem';
 const breadcrumbs = [{ link: 'bookings', displayName: pageTitle }];
 
 const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { data: bookings, error } = useSwr('/api/bookings', bookingsFetcher);
+    const { data: bookings, error } = useSwr('/api/bookings/active', bookingsFetcher);
 
     const bookingsWithPotentialProblems = getBookingsWithPotentialProblems(bookings ?? []);
     const bookingsWithPotentialProblemsWithId = bookingsWithPotentialProblems.map((x) => ({ ...x, id: x.booking.id }));
@@ -77,6 +77,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                     Inte markerat som bokad
                     <WarningIcon
                         className="ml-2"
+                        placement="top"
                         text={`Denna bokning lämnas ut ${formatDatetime(result.booking.equipmentOutDatetime)} och är fortfarande inte markerad som bokad.`}
                     />
                 </p>
@@ -86,6 +87,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                     Inte klarmarkerad
                     <WarningIcon
                         className="ml-2"
+                        placement="top"
                         text={`Denna bokning återlämnades ${formatDatetime(result.booking.equipmentInDatetime)} och är fortfarande inte klarmarkerad.`}
                     />
                 </p>
@@ -95,6 +97,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                     Inte utlämnad
                     <WarningIcon
                         className="ml-2"
+                        placement="top"
                         text={`Denna bokning har utrustningslistor som borde ha lämnats ut men som inte markerats som utlämnade (${result.shouldBeOut.map((x) => x.name).join(', ')}).`}
                     />
                 </p>
@@ -104,6 +107,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                     Inte återlämnad
                     <WarningIcon
                         className="ml-2"
+                        placement="top"
                         text={`Denna bokning har utrustningslistor som borde ha återlämnats men som inte markerats som återlämnade (${result.shouldBeIn.map((x) => x.name).join(', ')}).`}
                     />
                 </p>
