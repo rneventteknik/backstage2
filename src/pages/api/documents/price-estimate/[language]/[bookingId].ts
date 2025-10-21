@@ -7,6 +7,7 @@ import { fetchSettings } from '../../../../../lib/db-access/setting';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { withSessionContext } from '../../../../../lib/sessionContext';
 import { Language } from '../../../../../models/enums/Language';
+import { parseTextResourcesOverridesFromQuery } from '../../../../../document-templates/utils';
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     if (isNaN(Number(req.query.bookingId))) {
@@ -24,8 +25,16 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             const booking = toBooking(result);
             const globalSettings = await fetchSettings();
             const documentLanguage = req.query.language === 'en' ? Language.EN : Language.SV;
-            const filename = getPriceEstimateDocumentFileName(booking, documentLanguage, globalSettings);
-            const stream = await renderToStream(getPriceEstimateDocument(booking, documentLanguage, globalSettings));
+            const textResourcesOverrides = parseTextResourcesOverridesFromQuery(req.query);
+            const filename = getPriceEstimateDocumentFileName(
+                booking,
+                documentLanguage,
+                globalSettings,
+                textResourcesOverrides,
+            );
+            const stream = await renderToStream(
+                getPriceEstimateDocument(booking, documentLanguage, globalSettings, textResourcesOverrides),
+            );
 
             // If the download flag is set, tell the browser to download the file instead of showing it in a new tab.
             if (req.query.download) {
@@ -33,6 +42,8 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             } else {
                 res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
             }
+
+            res.removeHeader('X-Frame-Options');
 
             res.setHeader('Content-Type', 'application/pdf');
             stream.pipe(res);
