@@ -139,7 +139,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
         setUserIds([]);
     }
     if (statuses.some((status) => !statusOptions.some((x) => x.value === status))) {
-        setUserIds([]);
+        setStatuses([]);
     }
 
     // Handlers for changed bookings
