@@ -26,6 +26,7 @@ import {
     faCoins,
     faFileDownload,
     faFilePdf,
+    faFilePen,
     faFileText,
     faLock,
     faLockOpen,
@@ -248,6 +249,12 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                 <FontAwesomeIcon icon={faFileText} className="mr-1 fa-fw" /> Fakturaunderlag (Hogia
                                 import)
                             </Dropdown.Item>
+                            <Dropdown.Divider />
+                            <Link href={`/bookings/${booking.id}/custom-document-export`} passHref>
+                                <Dropdown.Item href={`/bookings/${booking.id}/custom-document-export`} target="_blank">
+                                    <FontAwesomeIcon icon={faFilePen} className="mr-1 fa-fw" /> Anpassad dokumentexport
+                                </Dropdown.Item>
+                            </Link>
                         </IfAdmin>
                     </Dropdown.Menu>
                 </Dropdown>

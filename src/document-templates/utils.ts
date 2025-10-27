@@ -5,7 +5,9 @@ import { PricedEntity } from '../models/interfaces/BaseEntity';
 import { EquipmentListEntry } from '../models/interfaces/EquipmentList';
 import { addVATToPrice, formatPrice } from '../lib/pricingUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
-import { getGlobalSetting } from '../lib/utils';
+import { getGlobalSetting, getValueOrFirst } from '../lib/utils';
+import { Language } from '../models/enums/Language';
+import { NextApiRequest } from 'next';
 
 export const registerFonts = (): void => {
     Font.register({
@@ -143,3 +145,26 @@ export const getTextResourcesFromGlobalSettings = (globalSettings: KeyValue[]) =
     sv: JSON.parse(getGlobalSetting('content.documentTextResources.sv', globalSettings, '{}')),
     en: JSON.parse(getGlobalSetting('content.documentTextResources.en', globalSettings, '{}')),
 });
+
+export const overrideTranslations = (
+    translations: Record<Language, Record<string, string>>,
+    overrides: Record<string, string>,
+): Record<Language, Record<string, string>> => {
+    return Object.entries(translations).reduce<Record<Language, Record<string, string>>>(
+        (acc, [language, entries]) => {
+            return {
+                ...acc,
+                [language]: { ...entries, ...overrides },
+            };
+        },
+        {} as Record<Language, Record<string, string>>,
+    );
+};
+
+export const parseTextResourcesOverridesFromQuery = (query: NextApiRequest['query']): Record<string, string> => {
+    const entries = Object.entries(query)
+        .filter(([key]) => key.startsWith('override-'))
+        .map(([key, value]) => [key.replace(/^override-/, ''), getValueOrFirst(value)]);
+
+    return Object.fromEntries(entries);
+};
