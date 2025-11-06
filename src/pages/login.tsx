@@ -25,6 +25,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const [showWrongPasswordError, setShowWrongPasswordError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
     const [waitingForResponse, setWaitingForResponse] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -118,13 +119,22 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                 </FormGroup>
                 <FormGroup>
                     <FormControl
-                        type="password"
+                        type={!showPassword ? "password" : "text"}
                         placeholder="Lösenord"
                         name="password"
                         autoComplete="off"
                         onChange={(e) => setPassword(e.target.value)}
                     />
                 </FormGroup>
+				<FormGroup>
+					<Form.Check
+						type="switch"
+						name="show password"
+						id="showPasswordToggle"
+						label="Visa lösenord"
+						onChange= {(e) => setShowPassword(e.target.checked)}
+					/>
+				</FormGroup>
                 {showWrongPasswordError ? <Alert variant="danger">Felaktigt användarnamn eller lösenord</Alert> : null}
                 {showServerError ? (
                     <Alert variant="danger">
