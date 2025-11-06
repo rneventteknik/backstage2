@@ -13,6 +13,7 @@ import {
 } from '.';
 import { Language } from '../enums/Language';
 import { TimeReportObjectionModel } from './TimeReportObjectionModel';
+import { EmailThreadObjectionModel, IEmailThreadObjectionModel } from './EmailThreadObjectionModel';
 
 export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     id: number;
@@ -26,6 +27,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     ownerUser?: IUserObjectionModel;
     ownerUserId?: number;
     coOwnerUsers: IUserObjectionModel[];
+    emailThreads: IEmailThreadObjectionModel[];
     bookingType: number;
     status: number;
     salaryStatus: number;
@@ -131,6 +133,14 @@ export class BookingObjectionModel extends Model {
                 to: 'BookingChangelogEntry.bookingId',
             },
         },
+        emailThreads: {
+            relation: Model.HasManyRelation,
+            modelClass: EmailThreadObjectionModel,
+            join: {
+                from: 'Booking.id',
+                to: 'EmailThread.bookingId'
+            }
+        }
     });
 
     id!: number;
@@ -145,6 +155,7 @@ export class BookingObjectionModel extends Model {
     ownerUserId?: number;
     coOwnerUsers!: UserObjectionModel[];
     changelog!: BookingChangelogEntryObjectionModel[];
+    emailThreads!: EmailThreadObjectionModel[];
     bookingType!: number;
     status!: number;
     salaryStatus!: number;
