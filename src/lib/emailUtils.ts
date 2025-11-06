@@ -12,6 +12,15 @@ interface EmailMessage {
     link?: string;
 }
 
+interface EmailThread {
+    id: string;
+    messages: EmailMessage[];
+    subject?: string;
+    snippet?: string;
+    link: string;
+    messageCount: number;
+}
+
 interface EmailHeaders {
     subject?: string;
     from?: string;
@@ -73,6 +82,44 @@ const parseEmailHeaders = (headers?: gmail_v1.Schema$MessagePartHeader[]): Email
     }, {} as EmailHeaders);
 };
 
+const getEmailBody = (payload?: gmail_v1.Schema$MessagePart): string | undefined => {
+    if (!payload) return undefined;
+
+    // Check if the body data is directly in the payload
+    if (payload.body?.data) {
+        return Buffer.from(payload.body.data, 'base64').toString('utf-8');
+    }
+
+    // If it's a multipart message, recursively check parts
+    if (!payload.parts || payload.parts.length === 0) {
+        return undefined;
+    }
+
+    // Find text/html part
+    const htmlPart = payload.parts.find(
+        part => part.mimeType === 'text/html' && part.body?.data
+    );
+    if (htmlPart?.body?.data) {
+        return Buffer.from(htmlPart.body.data, 'base64').toString('utf-8');
+    }
+
+    // Find text/plain part
+    const textPart = payload.parts.find(
+        part => part.mimeType === 'text/plain' && part.body?.data
+    );
+    if (textPart?.body?.data) {
+        return Buffer.from(textPart.body.data, 'base64').toString('utf-8');
+    }
+
+    // Recursively check nested parts
+    const nestedBodies = payload.parts
+        .filter(part => part.parts)
+        .map(part => getEmailBody(part))
+        .filter(body => body !== undefined);
+
+    return nestedBodies[0];
+};
+
 const mapEmailMessage = async (
     message: gmail_v1.Schema$Message
 ): Promise<EmailMessage> => {
@@ -88,9 +135,7 @@ const mapEmailMessage = async (
         to: headers['to'],
         date: headers['date'],
         snippet: message.snippet || undefined,
-        body: message.payload?.body?.data 
-            ? Buffer.from(message.payload.body.data, 'base64').toString('utf-8')
-            : undefined,
+        body: getEmailBody(message.payload),
         link: `https://mail.google.com/mail/u/0/#inbox/${threadId}`,
     };
 };
@@ -141,5 +186,40 @@ export const getEmails = async () => {
     }
     catch(e) {
         console.log(e)
+    }
+};
+
+export const getEmailThread = async (threadId: string): Promise<EmailThread | null> => {
+    const gmail = getEmailClient();
+
+    try {
+        const thread = await gmail.users.threads.get({
+            userId: 'me',
+            id: threadId,
+            format: 'full',
+        });
+
+        if (!thread.data || !thread.data.messages) {
+            return null;
+        }
+
+        const messages = await Promise.all(
+            thread.data.messages.map((message) => mapEmailMessage(message))
+        );
+
+        // Get subject from the first message
+        const firstMessage = messages[0];
+
+        return {
+            id: thread.data.id as string,
+            messages,
+            subject: firstMessage?.subject,
+            snippet: thread.data.snippet || undefined,
+            link: `https://mail.google.com/mail/u/0/#inbox/${threadId}`,
+            messageCount: messages.length,
+        };
+    } catch (e) {
+        console.error('Error fetching thread:', e);
+        return null;
     }
 };
