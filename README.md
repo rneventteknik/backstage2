@@ -70,6 +70,7 @@ To set up Gmail integration, you need to:
 9. Restart the development server
 
 Example `.env.local` configuration:
+
 ```
 GMAIL_CLIENT_ID=1095269337813-xxxxxxxxxxxxx.apps.googleusercontent.com
 GMAIL_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxxxxx

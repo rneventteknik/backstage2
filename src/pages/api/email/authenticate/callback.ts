@@ -13,7 +13,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.status(400).json({
             statusCode: 400,
             message: 'Authentication was cancelled or failed',
-            error: error
+            error: error,
         });
         return;
     }
@@ -21,7 +21,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!code || typeof code !== 'string') {
         res.status(400).json({
             statusCode: 400,
-            message: 'Missing authorization code'
+            message: 'Missing authorization code',
         });
         return;
     }
@@ -34,16 +34,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         if (!clientId || !clientSecret) {
             res.status(500).json({
                 statusCode: 500,
-                message: 'Gmail OAuth credentials not configured. Please set GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET environment variables.'
+                message:
+                    'Gmail OAuth credentials not configured. Please set GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET environment variables.',
             });
             return;
         }
 
-        const oauth2Client = new google.auth.OAuth2(
-            clientId,
-            clientSecret,
-            redirectUri
-        );
+        const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 
         const { tokens } = await oauth2Client.getToken(code);
 
@@ -51,14 +48,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
             statusCode: 200,
             message: 'Authentication successful',
             refreshToken: tokens.refresh_token,
-            instructions: 'Add the refresh token to your environment variables or .env.local file as GMAIL_REFRESH_TOKEN'
+            instructions:
+                'Add the refresh token to your environment variables or .env.local file as GMAIL_REFRESH_TOKEN',
         });
     } catch (error) {
         console.error('Error during authentication:', error);
         res.status(500).json({
             statusCode: 500,
             message: 'Error during authentication',
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
 };

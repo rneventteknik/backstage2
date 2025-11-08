@@ -1,16 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Card, Dropdown, DropdownButton, ListGroup, Modal } from 'react-bootstrap';
 import useSwr from 'swr';
+import DOMPurify from 'dompurify';
 import { getResponseContentOrError } from '../../lib/utils';
-import {
-    faAngleDown,
-    faAngleUp,
-    faEnvelope,
-    faExclamationCircle,
-    faPlus,
-    faTrash,
-    faExternalLinkAlt,
-} from '@fortawesome/free-solid-svg-icons';
+import { faAngleDown, faAngleUp, faExclamationCircle, faPlus, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Skeleton from 'react-loading-skeleton';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
@@ -157,17 +150,21 @@ const EmailThreadItem: React.FC<EmailThreadItemProps> = ({ threadId, onRemove, r
             <ListGroup.Item>
                 <div className="d-flex align-items-start">
                     <div className="flex-grow-1" role="button" onClick={() => setShowViewThreadModal(true)}>
-                        <div className="mb-1">
-                            {emailThreadData.subject || '(Inget ämne)'}
-                        </div>
+                        <div className="mb-1">{emailThreadData.subject || '(Inget ämne)'}</div>
                         <div className="text-muted">
                             {emailThreadData.messageCount} meddelande{emailThreadData.messageCount !== 1 ? 'n' : ''}
                         </div>
                     </div>
                     {!readonly ? (
-                        <DropdownButton id="dropdown-email-threads" variant="secondary" title="Mer" size="sm" className='ml-3'>
+                        <DropdownButton
+                            id="dropdown-email-threads"
+                            variant="secondary"
+                            title="Mer"
+                            size="sm"
+                            className="ml-3"
+                        >
                             <Dropdown.Item variant="link" size="sm" className="text-danger" onClick={onRemove}>
-                                <FontAwesomeIcon icon={faTrash} className='mr-2' /> Ta bort kopping
+                                <FontAwesomeIcon icon={faTrash} className="mr-2" /> Ta bort kopping
                             </Dropdown.Item>
                         </DropdownButton>
                     ) : null}
@@ -294,7 +291,8 @@ const SelectEmailThreadModal: React.FC<SelectEmailThreadModalProps> = ({
             {
                 key: 'subject',
                 displayName: 'Ämne',
-                getValue: (thread: EmailThreadResult) => `${thread.subject} ${thread.messages[0].from} ${thread.snippet} `,
+                getValue: (thread: EmailThreadResult) =>
+                    `${thread.subject} ${thread.messages[0].from} ${thread.snippet} `,
                 getContentOverride: EmailThreadSubjectDisplayFn,
             },
             {
@@ -312,8 +310,10 @@ const SelectEmailThreadModal: React.FC<SelectEmailThreadModalProps> = ({
             {
                 key: 'lastMessage',
                 displayName: 'Senaste meddelande',
-                getValue: (thread: EmailThreadResult) => formatDatetimeForForm(toDatetimeOrUndefined(thread.firstMessageDate)),
-                getContentOverride: (thread: EmailThreadResult) => formatDatetimeForForm(toDatetimeOrUndefined(thread.firstMessageDate)),
+                getValue: (thread: EmailThreadResult) =>
+                    formatDatetimeForForm(toDatetimeOrUndefined(thread.firstMessageDate)),
+                getContentOverride: (thread: EmailThreadResult) =>
+                    formatDatetimeForForm(toDatetimeOrUndefined(thread.firstMessageDate)),
                 columnWidth: 170,
                 cellHideSize: 'lg',
             },
@@ -418,12 +418,42 @@ const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
         );
     }
 
+    const sanitizeMessageBody = (message: EmailMessageResult) =>
+        message.body
+            ? DOMPurify.sanitize(message.body, {
+                  ALLOWED_TAGS: [
+                      'p',
+                      'br',
+                      'strong',
+                      'b',
+                      'em',
+                      'i',
+                      'u',
+                      'a',
+                      'ul',
+                      'ol',
+                      'li',
+                      'h1',
+                      'h2',
+                      'h3',
+                      'h4',
+                      'h5',
+                      'h6',
+                      'blockquote',
+                      'pre',
+                      'code',
+                      'div',
+                      'span',
+                      'img',
+                  ],
+                  ALLOWED_ATTR: ['href', 'target', 'rel', 'class', 'style', 'src', 'alt', 'width', 'height'],
+              })
+            : '';
+
     return (
         <Modal show={show} onHide={hide} size="xl">
             <Modal.Header closeButton>
-                <Modal.Title>
-                    {thread.subject || '(Inget ämne)'}
-                </Modal.Title>
+                <Modal.Title>{thread.subject || '(Inget ämne)'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <div className="mb-3 text-muted">
@@ -454,7 +484,10 @@ const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
                             </div>
                             {message.body ? (
                                 <div
-                                    dangerouslySetInnerHTML={{ __html: message.body }}
+                                    className="mt-2 p-3 border"
+                                    dangerouslySetInnerHTML={{
+                                        __html: sanitizeMessageBody(message),
+                                    }}
                                 />
                             ) : null}
                         </ListGroup.Item>

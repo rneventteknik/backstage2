@@ -13,22 +13,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         const redirectUri = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/email/authenticate/callback`;
 
         if (!clientId || !clientSecret) {
-            res.status(500).json({ 
-                statusCode: 500, 
-                message: 'Gmail OAuth credentials not configured. Please set GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET environment variables.'
+            res.status(500).json({
+                statusCode: 500,
+                message:
+                    'Gmail OAuth credentials not configured. Please set GMAIL_CLIENT_ID and GMAIL_CLIENT_SECRET environment variables.',
             });
             return;
         }
 
-        const oauth2Client = new google.auth.OAuth2(
-            clientId,
-            clientSecret,
-            redirectUri
-        );
+        const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
 
-        const scopes = [
-            'https://www.googleapis.com/auth/gmail.readonly',
-        ];
+        const scopes = ['https://www.googleapis.com/auth/gmail.readonly'];
 
         const authUrl = oauth2Client.generateAuthUrl({
             access_type: 'offline',
@@ -40,10 +35,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         res.redirect(authUrl);
     } catch (error) {
         console.error('Error generating auth URL:', error);
-        res.status(500).json({ 
-            statusCode: 500, 
+        res.status(500).json({
+            statusCode: 500,
             message: 'Error initiating authentication',
-            error: error instanceof Error ? error.message : 'Unknown error'
+            error: error instanceof Error ? error.message : 'Unknown error',
         });
     }
 };

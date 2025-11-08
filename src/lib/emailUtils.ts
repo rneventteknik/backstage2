@@ -15,7 +15,9 @@ const getEmailClient = () => {
     const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
 
     if (!clientId || !clientSecret || !refreshToken) {
-        console.error('Missing Gmail credentials. Please set GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET and GMAIL_REFRESH_TOKEN');
+        console.error(
+            'Missing Gmail credentials. Please set GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET and GMAIL_REFRESH_TOKEN',
+        );
         return null;
     }
 
@@ -163,9 +165,7 @@ export const getEmailThreads = async (): Promise<EmailThreadResult[] | null> => 
                 return null;
             }
 
-            const messages = await Promise.all(
-                fullThread.data.messages.map((message) => mapEmailMessage(message)),
-            );
+            const messages = await Promise.all(fullThread.data.messages.map((message) => mapEmailMessage(message)));
 
             const firstMessage = messages[0];
             const lastMessage = messages[messages.length - 1];
