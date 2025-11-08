@@ -29,20 +29,14 @@ interface EmailHeaders {
 }
 
 const getEmailClient = () => {
-    const credentialsString = process.env.EMAIL_CREDENTIALS;
+    const clientId = process.env.GMAIL_CLIENT_ID;
+    const clientSecret = process.env.GMAIL_CLIENT_SECRET;
+    const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
 
-    if (!credentialsString) {
+    if (!clientId || !clientSecret || !refreshToken) {
+        console.error('Missing Gmail credentials. Please set GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET and GMAIL_REFRESH_TOKEN');
         return null;
     }
-
-    const credentials = JSON.parse(credentialsString);
-
-    // Handle both formats: direct credentials or nested under 'web' or 'installed'
-    const clientConfig = credentials.web || credentials.installed || credentials;
-
-    const clientId = clientConfig.web.client_id;
-    const clientSecret = clientConfig.web.client_secret;
-    const refreshToken = credentials.refresh_token;
 
     const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, 'http://localhost:3000');
 
