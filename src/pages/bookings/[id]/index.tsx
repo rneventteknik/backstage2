@@ -67,6 +67,7 @@ import PreviousBookingsCard from '../../../components/bookings/PreviousBookingsC
 import { BookingType } from '../../../models/enums/BookingType';
 import CalendarWorkersCard from '../../../components/bookings/CalendarWorkersCard';
 import BookingPotentialProblemsSection from '../../../components/bookings/BookingPotentialProblemsSection';
+import EmailThreadsCard from '../../../components/bookings/EmailThreadsCard';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -544,6 +545,15 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         text={booking.note}
                         onSubmit={(note) => saveBooking({ note })}
                         cardTitle="Anteckningar"
+                        readonly={readonly}
+                    />
+                    <EmailThreadsCard
+                        emailThreadIds={booking.emailThreads?.map((t) => t.threadId) ?? []}
+                        onSubmit={(threadIds) =>
+                            saveBooking({
+                                emailThreads: threadIds.map((threadId) => ({ threadId, bookingId: booking.id })),
+                            })
+                        }
                         readonly={readonly}
                     />
                     <FilesCard

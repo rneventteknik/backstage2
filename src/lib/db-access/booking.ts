@@ -5,6 +5,7 @@ import { PricePlan } from '../../models/enums/PricePlan';
 import { Status } from '../../models/enums/Status';
 import { BookingObjectionModel } from '../../models/objection-models';
 import { EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
+import { EmailThreadObjectionModel } from '../../models/objection-models/EmailThreadObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 import { getPartialSearchStrings, isMemberOfEnum } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
@@ -282,11 +283,11 @@ export const updateBooking = async (
         });
 
         emailThreadsToDelete.map(async (x) => {
-            await EquipmentListObjectionModel.query().deleteById(x.id);
+            await EmailThreadObjectionModel.query().deleteById(x.id);
         });
 
         emailThreadsToUpdate.map(async (x) => {
-            await EquipmentListObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
+            await EmailThreadObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
         });
     }
 
