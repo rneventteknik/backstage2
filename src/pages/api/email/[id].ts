@@ -7,7 +7,6 @@ import {
 import { withSessionContext } from '../../../lib/sessionContext';
 import { getEmailThread } from '../../../lib/emailUtils';
 
-
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     const emailThreadId = req.query.id;
 
@@ -17,18 +16,17 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
     }
 
     switch (req.method) {
-            case 'GET':
-                console.log('TESTA')
-                await getEmailThread(emailThreadId.toString())
-                    .then((result) => res.status(200).json(result))
-                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
-    
-                break;
-    
-            default:
-                respondWithInvalidMethodResponse(res);
-        }
-        return;
+        case 'GET':
+            await getEmailThread(emailThreadId.toString())
+                .then((result) => res.status(200).json(result))
+                .catch((error) => respondWithCustomErrorMessage(res, error.message));
+
+            break;
+
+        default:
+            respondWithInvalidMethodResponse(res);
+    }
+    return;
 });
 
 export default handler;

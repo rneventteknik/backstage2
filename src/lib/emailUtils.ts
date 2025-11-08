@@ -9,7 +9,6 @@ interface EmailMessage {
     date?: string;
     snippet?: string;
     body?: string;
-    link?: string;
 }
 
 interface EmailThread {
@@ -31,38 +30,21 @@ interface EmailHeaders {
 
 const getEmailClient = () => {
     const credentialsString = process.env.EMAIL_CREDENTIALS;
-    
+
     if (!credentialsString) {
-        throw new Error('EMAIL_CREDENTIALS environment variable is not set');
+        return null;
     }
 
-    let credentials;
-    try {
-        credentials = JSON.parse(credentialsString);
-    } catch (error) {
-        throw new Error('EMAIL_CREDENTIALS is not valid JSON');
-    }
+    const credentials = JSON.parse(credentialsString);
 
     // Handle both formats: direct credentials or nested under 'web' or 'installed'
     const clientConfig = credentials.web || credentials.installed || credentials;
-    
-    const clientId = clientConfig.client_id;
-    const clientSecret = clientConfig.client_secret;
+
+    const clientId = clientConfig.web.client_id;
+    const clientSecret = clientConfig.web.client_secret;
     const refreshToken = credentials.refresh_token;
 
-    if (!clientId || !clientSecret) {
-        throw new Error('EMAIL_CREDENTIALS is missing client_id or client_secret');
-    }
-
-    if (!refreshToken) {
-        throw new Error('EMAIL_CREDENTIALS is missing refresh_token. You need to add the refresh_token to your credentials JSON.');
-    }
-
-    const oauth2Client = new google.auth.OAuth2(
-        clientId,
-        clientSecret,
-        "http://localhost:3000"
-    );
+    const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, 'http://localhost:3000');
 
     oauth2Client.setCredentials({
         refresh_token: refreshToken,
@@ -73,7 +55,7 @@ const getEmailClient = () => {
 
 const parseEmailHeaders = (headers?: gmail_v1.Schema$MessagePartHeader[]): EmailHeaders => {
     if (!headers) return {};
-    
+
     return headers.reduce((acc, header) => {
         if (header.name) {
             acc[header.name.toLowerCase()] = header.value || '';
@@ -96,37 +78,31 @@ const getEmailBody = (payload?: gmail_v1.Schema$MessagePart): string | undefined
     }
 
     // Find text/html part
-    const htmlPart = payload.parts.find(
-        part => part.mimeType === 'text/html' && part.body?.data
-    );
+    const htmlPart = payload.parts.find((part) => part.mimeType === 'text/html' && part.body?.data);
     if (htmlPart?.body?.data) {
         return Buffer.from(htmlPart.body.data, 'base64').toString('utf-8');
     }
 
     // Find text/plain part
-    const textPart = payload.parts.find(
-        part => part.mimeType === 'text/plain' && part.body?.data
-    );
+    const textPart = payload.parts.find((part) => part.mimeType === 'text/plain' && part.body?.data);
     if (textPart?.body?.data) {
         return Buffer.from(textPart.body.data, 'base64').toString('utf-8');
     }
 
     // Recursively check nested parts
     const nestedBodies = payload.parts
-        .filter(part => part.parts)
-        .map(part => getEmailBody(part))
-        .filter(body => body !== undefined);
+        .filter((part) => part.parts)
+        .map((part) => getEmailBody(part))
+        .filter((body) => body !== undefined);
 
     return nestedBodies[0];
 };
 
-const mapEmailMessage = async (
-    message: gmail_v1.Schema$Message
-): Promise<EmailMessage> => {
+const mapEmailMessage = async (message: gmail_v1.Schema$Message): Promise<EmailMessage> => {
     const headers = parseEmailHeaders(message.payload?.headers);
     const threadId = message.threadId ?? '';
     const messageId = message.id as string;
-    
+
     return {
         id: messageId,
         threadId: threadId,
@@ -136,13 +112,10 @@ const mapEmailMessage = async (
         date: headers['date'],
         snippet: message.snippet || undefined,
         body: getEmailBody(message.payload),
-        link: `https://mail.google.com/mail/u/0/#inbox/${threadId}`,
     };
 };
 
-const mapEmailResponse = async (
-    messages: gmail_v1.Schema$Message[]
-): Promise<EmailMessage[] | null> => {
+const mapEmailResponse = async (messages: gmail_v1.Schema$Message[]): Promise<EmailMessage[] | null> => {
     if (!messages || messages.length === 0) {
         return null;
     }
@@ -152,45 +125,46 @@ const mapEmailResponse = async (
 
 export const getEmails = async () => {
     const gmail = getEmailClient();
-                console.log('TESTB')
 
+    if (!gmail) {
+        return [];
+    }
 
     try {
+        const response = await gmail.users.messages.list({
+            userId: 'me',
+            maxResults: 250,
+        });
 
-    
-    const response = await gmail.users.messages.list({
-        userId: 'me',
-        maxResults: 135,
-        q: 'is:unread', // Query to filter emails
-    });
-    
-    console.log(response)
+        if (!response.data.messages) {
+            return null;
+        }
 
-    if (!response.data.messages) {
+        // Fetch full message details for each email
+        const messagesWithDetails = await Promise.all(
+            response.data.messages.map(async (message: gmail_v1.Schema$Message) => {
+                const fullMessage = await gmail.users.messages.get({
+                    userId: 'me',
+                    id: message.id!,
+                    format: 'full',
+                });
+                return fullMessage.data;
+            }),
+        );
+
+        return mapEmailResponse(messagesWithDetails);
+    } catch (e) {
+        console.error('Error fetching thread:', e);
         return null;
-    }
-
-    // Fetch full message details for each email
-    const messagesWithDetails = await Promise.all(
-        response.data.messages.map(async (message: gmail_v1.Schema$Message) => {
-            const fullMessage = await gmail.users.messages.get({
-                userId: 'me',
-                id: message.id!,
-                format: 'full',
-            });
-            return fullMessage.data;
-        })
-    );
-
-    return mapEmailResponse(messagesWithDetails);
-    }
-    catch(e) {
-        console.log(e)
     }
 };
 
 export const getEmailThread = async (threadId: string): Promise<EmailThread | null> => {
     const gmail = getEmailClient();
+
+    if (!gmail) {
+        return null;
+    }
 
     try {
         const thread = await gmail.users.threads.get({
@@ -203,9 +177,7 @@ export const getEmailThread = async (threadId: string): Promise<EmailThread | nu
             return null;
         }
 
-        const messages = await Promise.all(
-            thread.data.messages.map((message) => mapEmailMessage(message))
-        );
+        const messages = await Promise.all(thread.data.messages.map((message) => mapEmailMessage(message)));
 
         // Get subject from the first message
         const firstMessage = messages[0];

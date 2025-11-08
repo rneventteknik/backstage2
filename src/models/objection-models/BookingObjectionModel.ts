@@ -138,9 +138,9 @@ export class BookingObjectionModel extends Model {
             modelClass: EmailThreadObjectionModel,
             join: {
                 from: 'Booking.id',
-                to: 'EmailThread.bookingId'
-            }
-        }
+                to: 'EmailThread.bookingId',
+            },
+        },
     });
 
     id!: number;

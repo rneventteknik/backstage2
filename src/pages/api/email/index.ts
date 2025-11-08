@@ -6,7 +6,6 @@ import { getEmails } from '../../../lib/emailUtils';
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     switch (req.method) {
         case 'GET':
-            console.log('TESTA')
             await getEmails()
                 .then((result) => res.status(200).json(result))
                 .catch((error) => respondWithCustomErrorMessage(res, error.message));

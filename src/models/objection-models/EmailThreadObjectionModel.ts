@@ -4,8 +4,8 @@ import { Model } from 'objection';
 import { BaseObjectionModel } from '.';
 
 export interface IEmailThreadObjectionModel extends BaseObjectionModel {
-    bookingId: number,
-    threadId: string
+    bookingId: number;
+    threadId: string;
 }
 
 export class EmailThreadObjectionModel extends Model implements IEmailThreadObjectionModel {

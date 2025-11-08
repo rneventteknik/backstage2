@@ -109,9 +109,7 @@ export const toBookingChangelogEntry = (
     };
 };
 
-export const toEmailThread = (
-    objectionModel: IEmailThreadObjectionModel,
-) => {
+export const toEmailThread = (objectionModel: IEmailThreadObjectionModel) => {
     if (!objectionModel.id) {
         throw new Error('Invalid email thread entry');
     }
@@ -121,8 +119,8 @@ export const toEmailThread = (
         id: objectionModel.id,
         updated: toDatetimeOrUndefined(objectionModel.updated),
         created: toDatetimeOrUndefined(objectionModel.created),
-    }
-}
+    };
+};
 
 export const toEquipmentListObjectionModel = (
     clientModel: EquipmentList,
