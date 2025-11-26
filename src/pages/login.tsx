@@ -1,9 +1,10 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Form, FormControl, Button, FormGroup, Alert, Spinner } from 'react-bootstrap';
 import Router from 'next/router';
+import posthog from 'posthog-js';
 import { useUser } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
-import { getGlobalSetting, getValueOrFirst } from '../lib/utils';
+import { getGlobalSetting, getRoleName, getValueOrFirst } from '../lib/utils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import Head from 'next/head';
 import EnvironmentTypeTag from '../components/utils/EnvironmentTypeTag';
@@ -72,6 +73,10 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
             .then((data) => data as CurrentUserInfo)
             .then((user) => {
                 if (user.isLoggedIn) {
+                    posthog.identify(String(user.userId), {
+                        name: user.name,
+                        role: getRoleName(user.role),
+                    });
                     Router.push(getRedirectUrl());
                 } else {
                     setShowWrongPasswordError(true);
