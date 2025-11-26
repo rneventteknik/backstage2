@@ -1,7 +1,7 @@
 import React, { ReactElement } from 'react';
 import { PriceEstimateDocument } from './components/priceEstimateDocument';
 import { Booking } from '../models/interfaces';
-import { getTextResourcesFromGlobalSettings, registerFonts } from './utils';
+import { getTextResourcesFromGlobalSettings, overrideTranslations, registerFonts } from './utils';
 import { getTextResource, TextResourcesContext } from './useTextResources';
 import { PackingListDocument } from './components/packingListDocument';
 import { Language } from '../models/enums/Language';
@@ -21,9 +21,16 @@ export const getPriceEstimateDocument = (
     booking: Booking,
     documentLanguage: Language,
     globalSettings: KeyValue[],
+    textResourcesOverrides: Record<string, string> = {},
 ): ReactElement => (
     <TextResourcesContext.Provider
-        value={{ language: documentLanguage, textResources: getTextResourcesFromGlobalSettings(globalSettings) }}
+        value={{
+            language: documentLanguage,
+            textResources: overrideTranslations(
+                getTextResourcesFromGlobalSettings(globalSettings),
+                textResourcesOverrides,
+            ),
+        }}
     >
         <PriceEstimateDocument booking={booking} globalSettings={globalSettings} />
     </TextResourcesContext.Provider>
@@ -33,11 +40,12 @@ export const getPriceEstimateDocumentFileName = (
     booking: Booking,
     documentLanguage: Language,
     globalSettings: KeyValue[],
+    textResourcesOverrides: Record<string, string> = {},
 ): string => {
     const prefix = getTextResource(
         'price-estimate.filename',
         documentLanguage,
-        getTextResourcesFromGlobalSettings(globalSettings),
+        overrideTranslations(getTextResourcesFromGlobalSettings(globalSettings), textResourcesOverrides),
     );
 
     const date = toBookingViewModel(booking).usageStartDatetime;
@@ -57,9 +65,16 @@ export const getPackingListDocument = (
     documentLanguage: Language,
     globalSettings: KeyValue[],
     equipmentListId?: number,
+    textResourcesOverrides: Record<string, string> = {},
 ): ReactElement => (
     <TextResourcesContext.Provider
-        value={{ language: documentLanguage, textResources: getTextResourcesFromGlobalSettings(globalSettings) }}
+        value={{
+            language: documentLanguage,
+            textResources: overrideTranslations(
+                getTextResourcesFromGlobalSettings(globalSettings),
+                textResourcesOverrides,
+            ),
+        }}
     >
         <PackingListDocument booking={booking} globalSettings={globalSettings} equipmentListId={equipmentListId} />
     </TextResourcesContext.Provider>
@@ -69,11 +84,12 @@ export const getPackingListDocumentFileName = (
     booking: Booking,
     documentLanguage: Language,
     globalSettings: KeyValue[],
+    textResourcesOverrides: Record<string, string> = {},
 ): string =>
     `${getTextResource(
         'packing-list.filename',
         documentLanguage,
-        getTextResourcesFromGlobalSettings(globalSettings),
+        overrideTranslations(getTextResourcesFromGlobalSettings(globalSettings), textResourcesOverrides),
     )} ${booking.name}.pdf`;
 
 // Rental Confirmation
@@ -82,9 +98,16 @@ export const getRentalConfirmationDocument = (
     booking: Booking,
     documentLanguage: Language,
     globalSettings: KeyValue[],
+    textResourcesOverrides: Record<string, string> = {},
 ): ReactElement => (
     <TextResourcesContext.Provider
-        value={{ language: documentLanguage, textResources: getTextResourcesFromGlobalSettings(globalSettings) }}
+        value={{
+            language: documentLanguage,
+            textResources: overrideTranslations(
+                getTextResourcesFromGlobalSettings(globalSettings),
+                textResourcesOverrides,
+            ),
+        }}
     >
         <RentalConfirmationDocument booking={booking} globalSettings={globalSettings} />
     </TextResourcesContext.Provider>
@@ -94,11 +117,12 @@ export const getRentalConfirmationDocumentFileName = (
     booking: Booking,
     documentLanguage: Language,
     globalSettings: KeyValue[],
+    textResourcesOverrides: Record<string, string> = {},
 ): string =>
     `${getTextResource(
         'rental-agreement.filename',
         documentLanguage,
-        getTextResourcesFromGlobalSettings(globalSettings),
+        overrideTranslations(getTextResourcesFromGlobalSettings(globalSettings), textResourcesOverrides),
     )} ${booking.name}.pdf`;
 
 // Salary Report (no language support)
@@ -115,9 +139,16 @@ export const getInvoiceDocument = (
     invoiceData: InvoiceData,
     documentLanguage: Language,
     globalSettings: KeyValue[],
+    textResourcesOverrides: Record<string, string> = {},
 ): ReactElement => (
     <TextResourcesContext.Provider
-        value={{ language: documentLanguage, textResources: getTextResourcesFromGlobalSettings(globalSettings) }}
+        value={{
+            language: documentLanguage,
+            textResources: overrideTranslations(
+                getTextResourcesFromGlobalSettings(globalSettings),
+                textResourcesOverrides,
+            ),
+        }}
     >
         <InvoiceDocument invoiceData={invoiceData} globalSettings={globalSettings} />
     </TextResourcesContext.Provider>
