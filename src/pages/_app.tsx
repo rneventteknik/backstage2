@@ -4,6 +4,8 @@ import { AppProps } from 'next/app';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { Provider } from 'react-bus';
+import posthog from 'posthog-js';
+import { PostHogProvider } from 'posthog-js/react';
 
 // We put the notifications container here, outside of the pages and layout, to allow them
 // to persist over page navigation.
@@ -20,6 +22,16 @@ config.autoAddCss = false;
 
 export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
     useEffect(() => {
+        posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
+            api_host: '/ingest',
+            ui_host: 'https://eu.posthog.com',
+            defaults: '2025-05-24',
+            capture_exceptions: true,
+            debug: process.env.NODE_ENV === 'development',
+        });
+    }, []);
+
+    useEffect(() => {
         const odds = 1000;
         const result = Math.floor(Math.random() * odds + 1);
 
@@ -31,11 +43,13 @@ export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
     }, []);
 
     return (
-        <DndProvider backend={HTML5Backend}>
-            <Provider>
-                <NotificationsContainer />
-                <Component {...pageProps} />
-            </Provider>
-        </DndProvider>
+        <PostHogProvider client={posthog}>
+            <DndProvider backend={HTML5Backend}>
+                <Provider>
+                    <NotificationsContainer />
+                    <Component {...pageProps} />
+                </Provider>
+            </DndProvider>
+        </PostHogProvider>
     );
 }
