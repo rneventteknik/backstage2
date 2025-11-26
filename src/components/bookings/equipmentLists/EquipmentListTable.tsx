@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Badge, Dropdown, DropdownButton, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import posthog from 'posthog-js';
 import { Equipment, EquipmentPackage, EquipmentPrice, TimeEstimate } from '../../../models/interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -111,6 +112,7 @@ const EquipmentListTable: React.FC<Props> = ({
     readonly,
 }: Props) => {
     const [equipmentToAdd, setEquipmentToAdd] = useState<Equipment | null>(null);
+    const [equipmentToAddIsAiSuggestion, setEquipmentToAddIsAiSuggestion] = useState(false);
     const [equipmentPackageToAdd, setEquipmentPackageToAdd] = useState<EquipmentPackage | null>(null);
     const [equipmentPackageTimeEstimateToAdd, setEquipmentPackageTimeEstimateToAdd] =
         useState<Partial<TimeEstimate> | null>(null);
@@ -691,6 +693,7 @@ const EquipmentListTable: React.FC<Props> = ({
                         onSelect={(x) => {
                             switch (x.type) {
                                 case ResultType.EQUIPMENT:
+                                    setEquipmentToAddIsAiSuggestion(x.aiSuggestion);
                                     return fetch('/api/equipment/' + x.id)
                                         .then((apiResponse) =>
                                             getResponseContentOrError<IEquipmentObjectionModel>(apiResponse),
@@ -720,6 +723,12 @@ const EquipmentListTable: React.FC<Props> = ({
                                 if (!equipmentToAdd) {
                                     throw new Error('Invalid state: Missing searchResultModelToAdd.');
                                 }
+
+                                posthog.capture('equipment_added_to_list', {
+                                    ai_suggestion: equipmentToAddIsAiSuggestion,
+                                    equipment_id: equipmentToAdd.id,
+                                    equipment_name: equipmentToAdd.name,
+                                });
 
                                 addEquipment(
                                     equipmentToAdd,
