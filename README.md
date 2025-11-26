@@ -49,6 +49,32 @@ API_KEYS={JSON list of API keys, for example [{"key": "XXX", "name": "slackbot"}
 NEXT_PUBLIC_MQTT_BROKER_URL={wss://hostname:port}
 MQTT_BROKER_USERNAME={Username to the mqtt broker}
 MQTT_BROKER_PASSWORD={Passowrd to the mqtt broker}
+
+GMAIL_CLIENT_ID={Google OAuth2 Client ID for Gmail API}
+GMAIL_CLIENT_SECRET={Google OAuth2 Client Secret for Gmail API}
+GMAIL_REFRESH_TOKEN={OAuth2 refresh token for Gmail API access}
+```
+
+### Gmail OAuth Setup
+
+To set up Gmail integration, you need to:
+
+1. Create a Google Cloud Project and enable the Gmail API
+2. Create OAuth2 credentials (Web application type)
+3. Add `http://localhost:3000/api/email/authenticate/callback` as an authorized redirect URI (or your production URL for deployment)
+4. Set `GMAIL_CLIENT_ID` and `GMAIL_CLIENT_SECRET` in your `.env.local` file
+5. Start the development server with `yarn dev`
+6. Navigate to `http://localhost:3000/api/email/authenticate`
+7. Follow the Google OAuth flow to authorize the application
+8. Copy the returned `refreshToken` value and add it to your `.env.local` file as `GMAIL_REFRESH_TOKEN`
+9. Restart the development server
+
+Example `.env.local` configuration:
+
+```
+GMAIL_CLIENT_ID=1095269337813-xxxxxxxxxxxxx.apps.googleusercontent.com
+GMAIL_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxxxxx
+GMAIL_REFRESH_TOKEN=1//0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ### Version Control

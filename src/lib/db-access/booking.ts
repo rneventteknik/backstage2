@@ -5,6 +5,7 @@ import { PricePlan } from '../../models/enums/PricePlan';
 import { Status } from '../../models/enums/Status';
 import { BookingObjectionModel } from '../../models/objection-models';
 import { EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
+import { EmailThreadObjectionModel } from '../../models/objection-models/EmailThreadObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 import { getPartialSearchStrings, isMemberOfEnum } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
@@ -189,6 +190,7 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
         .withGraphFetched('timeEstimates')
         .withGraphFetched('timeReports.user')
         .withGraphFetched('changelog(changelogInfo)')
+        .withGraphFetched('emailThreads')
         .modifiers({
             changelogInfo: (builder) => {
                 builder.orderBy('updated', 'desc').limit(250);
@@ -241,7 +243,8 @@ export const updateBooking = async (
     const existingDatabaseModel = await BookingObjectionModel.query()
         .findById(id)
         .orderBy('id')
-        .withGraphFetched('equipmentLists.listEntries');
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('emailThreads');
 
     // EquipmentLists.
     if (booking.equipmentLists !== undefined) {
@@ -263,6 +266,28 @@ export const updateBooking = async (
 
         equipmentListsToUpdate.map(async (x) => {
             await EquipmentListObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
+        });
+    }
+
+    if (booking.emailThreads !== undefined) {
+        const {
+            toAdd: emailThreadsToAdd,
+            toDelete: emailThreadsToDelete,
+            toUpdate: emailThreadsToUpdate,
+        } = compareLists(booking.emailThreads, existingDatabaseModel?.emailThreads);
+
+        emailThreadsToAdd.map(async (x) => {
+            await BookingObjectionModel.relatedQuery('emailThreads')
+                .for(id)
+                .insert(withCreatedDate(removeIdAndDates(x)));
+        });
+
+        emailThreadsToDelete.map(async (x) => {
+            await EmailThreadObjectionModel.query().deleteById(x.id);
+        });
+
+        emailThreadsToUpdate.map(async (x) => {
+            await EmailThreadObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
         });
     }
 
