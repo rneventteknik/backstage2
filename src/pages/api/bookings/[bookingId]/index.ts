@@ -64,9 +64,15 @@ const handler = withSessionContext(
                     return;
                 }
 
+                if (req.query.reason === undefined) {
+                    respondWithCustomErrorMessage(res, "reason is missing from query parameters")
+                }
+
+                const reason = String(req.query.reason);
+
                 await deleteBooking(bookingId)
                     .then((result) => {
-                        logBookingDeletion(context.currentUser, booking.id, booking.name);
+                        logBookingDeletion(context.currentUser, booking.id, booking.name, reason);
                         res.status(200).json(result);
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
