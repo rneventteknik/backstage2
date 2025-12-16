@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, ListGroup, Row } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, Form, ListGroup, Row } from 'react-bootstrap';
 import {
     getAccountKindName,
     getDefaultLaborHourlyRate,
@@ -74,13 +74,14 @@ export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
 const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage } = useNotifications();
+    const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage, showErrorMessage } = useNotifications();
 
     const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
     const [showConfirmPaidModal, setShowConfirmPaidModal] = useState(false);
     const [adminEditModeOverrideEnabled, setAdminEditModeOverrideEnabled] = useState(false);
     const [alwaysShowRentalControls, setAlwaysShowRentalControls] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteReason, setDeleteReason] = useState("");
     const [showCancelModal, setShowCancelModal] = useState(false);
 
     // Edit booking
@@ -161,6 +162,11 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     // Delete booking handler
     //
     const deleteBooking = () => {
+        if (deleteReason.length === 0) {
+            showErrorMessage('Ange en anledning till borttagningen!');
+            return;
+        }
+
         setShowDeleteModal(false);
 
         const request = {
@@ -168,7 +174,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             headers: { 'Content-Type': 'application/json' },
         };
 
-        fetch('/api/bookings/' + booking?.id, request)
+        fetch('/api/bookings/' + booking?.id + `?reason=${deleteReason}`, request)
             .then(getResponseContentOrError)
             .then(() => router.push('/bookings/'))
             .catch((error) => {
@@ -353,9 +359,18 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     onConfirm={deleteBooking}
                 >
                     <p>Vill du verkligen ta bort bokningen {booking.name}?</p>
-                    <p className="mb-0">
+                    <p className="mb-3">
                         Om bokningen inte skapats av misstag kan det vara lämpligare att ställa in den istället.
                     </p>
+                    <Form.Control
+                        type='text'
+                        className='mb-0'
+                        placeholder={"Anledning till att bokningen tas bort"}
+                        defaultValue={deleteReason}
+                        onChange={(e) => setDeleteReason(e.target.value)}
+                        autoFocus
+                    />
+
                 </ConfirmModal>
             </Header>
 

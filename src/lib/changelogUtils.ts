@@ -187,8 +187,8 @@ export const logRentalStatusChangeToBooking = (
     return addChangelogToBooking(message, bookingId, 0);
 };
 
-export const logBookingDeletion = (user: CurrentUserInfo, bookingId: number, bookingName: string) => {
-    const message = `${user.name} tog bort bokningen.`;
+export const logBookingDeletion = (user: CurrentUserInfo, bookingId: number, bookingName: string, reason: string) => {
+    const message = `${user.name} tog bort bokningen.\n\n*Anledning*: ${reason}`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
 };
