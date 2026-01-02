@@ -44,7 +44,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     contactPersonName: string;
     contactPersonPhone: string;
     contactPersonEmail: string;
-    calendarBookingId: string;
+    calendarEventIds: string[];
     driveFolderId: string;
     customerName: string;
     language: Language;
@@ -141,6 +141,14 @@ export class BookingObjectionModel extends Model {
                 to: 'EmailThread.bookingId',
             },
         },
+        calendarEventIds: {
+            relation: Model.HasManyRelation,
+            modelClass: BookingCalendarEventIdObjectionModel,
+            join: {
+                from: 'Booking.id',
+                to: 'BookingCalendarEventId.bookingId',
+            }
+        },
     });
 
     id!: number;
@@ -172,7 +180,7 @@ export class BookingObjectionModel extends Model {
     contactPersonName!: string;
     contactPersonPhone!: string;
     contactPersonEmail!: string;
-    calendarBookingId!: string;
+    calendarEventIds?: string[]
     driveFolderId!: string;
     customerName!: string;
     language!: Language;
@@ -376,4 +384,20 @@ export class BookingChangelogEntryObjectionModel extends Model {
     timeEstimatePrice?: number | null;
     timeReportsPrice?: number | null;
     fixedPrice?: number | null;
+}
+
+export interface IBookingCalendarEventIdObjectionModel extends BaseObjectionModelWithName {
+    id: number;
+    created: string;
+    calendarEventId: string;
+    bookingId: number;
+}
+
+export class BookingCalendarEventIdObjectionModel extends Model {
+    static tableName = 'BookingCalendarEventId'
+
+    id!: number;
+    created!: string;
+    calendarEventId!: string;
+    bookingId!: number;
 }

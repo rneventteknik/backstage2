@@ -38,7 +38,7 @@ export interface Booking extends BaseEntityWithName {
     contactPersonName: string;
     contactPersonPhone: string;
     contactPersonEmail: string;
-    calendarBookingId: string;
+    calendarEventIds: string[];
     driveFolderId: string;
     customerName: string;
     language: Language;
