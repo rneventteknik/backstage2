@@ -24,16 +24,16 @@ import { getFormattedInterval } from '../../lib/datetimeUtils';
 
 type Props = {
     bookingId: number;
-    calendarEventId: string;
+    calendarEventIds: string[];
     onSubmit: (calendarEventId: string) => void;
     readonly?: boolean;
 };
 
-const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventId, onSubmit, readonly = false }: Props) => {
+const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onSubmit, readonly = false }: Props) => {
     const [showSelectCalendarEventModal, setShowSelectCalendarEventModal] = useState(false);
     // No connection to calendar event
     //
-    if (calendarEventId === null || calendarEventId === '') {
+    if (calendarEventIds.length <= 0) {
         return (
             <>
                 <Card className="mb-3">
@@ -47,13 +47,13 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventId, onSu
                                 size="sm"
                             >
                                 <FontAwesomeIcon icon={faCalendar} className="mr-1" />
-                                Välj kalenderevent
+                                Koppla fler kalenderevent
                             </Button>
                         ) : null}
                     </Card.Header>
                     <ListGroup variant="flush">
                         <ListGroup.Item className="text-center font-italic text-muted">
-                            Koppla bokningen till ett kalenderevent för att se uppskrivna arbetare.
+                            Koppla bokningen till kalenderevent för att se uppskrivna arbetare.
                         </ListGroup.Item>
                     </ListGroup>
                 </Card>
@@ -74,7 +74,7 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventId, onSu
             <Card className="mb-3">
                 <CalendarWorkersCardWithCalendarConnection
                     bookingId={bookingId}
-                    calendarEventId={calendarEventId}
+                    calendarEventId={calendarEventIds[0]} // TODO: Remove temporary.
                     onSubmit={onSubmit}
                     readonly={readonly}
                 />

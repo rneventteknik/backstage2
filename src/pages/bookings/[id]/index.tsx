@@ -183,6 +183,12 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             });
     };
 
+    // Calendar event linking handler
+    //
+    const linkCalendarEvent = (calendarEventId: string) => {
+        // TODO: Implement, or move to inside CalendarWorkersCard.
+    };
+
     // The page itself
     //
     const pageTitle = booking?.name;
@@ -404,8 +410,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     {booking.bookingType === BookingType.GIG ? (
                         <CalendarWorkersCard
                             bookingId={booking.id}
-                            calendarEventId={booking.calendarBookingId}
-                            onSubmit={(calendarBookingId) => saveBooking({ calendarBookingId })}
+                            calendarEventIds={booking.calendarEventIds}
+                            onSubmit={(calendarEventId) => linkCalendarEvent(calendarEventId)}
                             readonly={readonly}
                         />
                     ) : null}

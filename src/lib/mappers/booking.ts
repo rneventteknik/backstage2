@@ -32,6 +32,7 @@ export const toBooking = (objectionModel: IBookingObjectionModel): Booking => {
         timeEstimates: objectionModel.timeEstimates ? objectionModel.timeEstimates.map(toTimeEstimate) : undefined,
         changelog: objectionModel.changelog ? objectionModel.changelog.map(toBookingChangelogEntry) : undefined,
         timeReports: objectionModel.timeReports ? objectionModel.timeReports.map(toTimeReport) : undefined,
+        calendarEventIds: objectionModel.calendarEventIds ? objectionModel.calendarEventIds : [],
         invoiceDate: toDatetimeOrUndefined(objectionModel.invoiceDate),
     };
 };
