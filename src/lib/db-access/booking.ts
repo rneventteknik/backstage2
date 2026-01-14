@@ -4,7 +4,7 @@ import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { Status } from '../../models/enums/Status';
 import { BookingObjectionModel } from '../../models/objection-models';
-import { EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
+import { BookingCalendarEventObjectionModel, EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 import { getPartialSearchStrings, isMemberOfEnum } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
@@ -186,6 +186,7 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
         .withGraphFetched('equipmentLists.listHeadings.listEntries')
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.prices')
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipmentPrice')
+        .withGraphFetched('calendarEvents')
         .withGraphFetched('timeEstimates')
         .withGraphFetched('timeReports.user')
         .withGraphFetched('changelog(changelogInfo)')
@@ -241,7 +242,8 @@ export const updateBooking = async (
     const existingDatabaseModel = await BookingObjectionModel.query()
         .findById(id)
         .orderBy('id')
-        .withGraphFetched('equipmentLists.listEntries');
+        .withGraphFetched('equipmentLists.listEntries')
+        .withGraphFetched('calendarEvents');
 
     // EquipmentLists.
     if (booking.equipmentLists !== undefined) {
@@ -263,6 +265,29 @@ export const updateBooking = async (
 
         equipmentListsToUpdate.map(async (x) => {
             await EquipmentListObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
+        });
+    }
+
+    // BookingCalendarEvents.
+    if (booking.calendarEvents !== undefined) {
+        const {
+            toAdd: bookingCalendarEventToAdd,
+            toDelete: bookingCalendarEventToDelete,
+            toUpdate: bookingCalendarEventToUpdate,
+        } = compareLists(booking.calendarEvents, existingDatabaseModel?.calendarEvents);
+
+        bookingCalendarEventToAdd.map(async (x) => {
+            await BookingObjectionModel.relatedQuery('calendarEvents')
+                .for(id)
+                .insert(withCreatedDate(removeIdAndDates(x)));
+        });
+        
+        bookingCalendarEventToDelete.map(async (x) => {
+            await BookingCalendarEventObjectionModel.query().deleteById(x.id);
+        });
+
+        bookingCalendarEventToUpdate.map(async (x) => {
+            await BookingCalendarEventObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
         });
     }
 

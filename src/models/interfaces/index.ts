@@ -1,4 +1,5 @@
 export type { Booking, BookingViewModel } from './Booking';
+export type { BookingCalendarEvent } from './BookingCalendarEvent';
 export type { Equipment } from './Equipment';
 export type { EquipmentPrice } from './EquipmentPrice';
 export type { EquipmentPublicCategory } from './EquipmentPublicCategory';

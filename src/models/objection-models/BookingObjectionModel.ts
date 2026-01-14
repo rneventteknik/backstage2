@@ -10,9 +10,11 @@ import {
     TimeEstimateObjectionModel,
     ITimeEstimateObjectionModel,
     ITimeReportObjectionModel,
+    BaseObjectionModel,
 } from '.';
 import { Language } from '../enums/Language';
 import { TimeReportObjectionModel } from './TimeReportObjectionModel';
+import { BookingCalendarEvent } from '../interfaces';
 
 export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     id: number;
@@ -26,6 +28,7 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     ownerUser?: IUserObjectionModel;
     ownerUserId?: number;
     coOwnerUsers: IUserObjectionModel[];
+    calendarEvents?: IBookingCalendarEventObjectionModel[];
     bookingType: number;
     status: number;
     salaryStatus: number;
@@ -42,7 +45,6 @@ export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     contactPersonName: string;
     contactPersonPhone: string;
     contactPersonEmail: string;
-    calendarEventIds: string[];
     driveFolderId: string;
     customerName: string;
     language: Language;
@@ -131,12 +133,12 @@ export class BookingObjectionModel extends Model {
                 to: 'BookingChangelogEntry.bookingId',
             },
         },
-        calendarEventIds: {
+        calendarEvents: {
             relation: Model.HasManyRelation,
-            modelClass: BookingCalendarEventIdObjectionModel,
+            modelClass: BookingCalendarEventObjectionModel,
             join: {
                 from: 'Booking.id',
-                to: 'BookingCalendarEventId.bookingId',
+                to: 'BookingCalendarEvent.bookingId',
             }
         },
     });
@@ -153,6 +155,7 @@ export class BookingObjectionModel extends Model {
     ownerUserId?: number;
     coOwnerUsers!: UserObjectionModel[];
     changelog!: BookingChangelogEntryObjectionModel[];
+    calendarEvents?: BookingCalendarEventObjectionModel[]
     bookingType!: number;
     status!: number;
     salaryStatus!: number;
@@ -169,7 +172,6 @@ export class BookingObjectionModel extends Model {
     contactPersonName!: string;
     contactPersonPhone!: string;
     contactPersonEmail!: string;
-    calendarEventIds?: string[]
     driveFolderId!: string;
     customerName!: string;
     language!: Language;
@@ -367,18 +369,17 @@ export class BookingChangelogEntryObjectionModel extends Model {
     bookingId!: number;
 }
 
-export interface IBookingCalendarEventIdObjectionModel extends BaseObjectionModelWithName {
-    id: number;
-    created: string;
+export interface IBookingCalendarEventObjectionModel extends BaseObjectionModel {
     calendarEventId: string;
     bookingId: number;
 }
 
-export class BookingCalendarEventIdObjectionModel extends Model {
-    static tableName = 'BookingCalendarEventId'
+export class BookingCalendarEventObjectionModel extends Model implements IBookingCalendarEventObjectionModel {
+    static tableName = 'BookingCalendarEvent'
 
     id!: number;
     created!: string;
+    updated!: string;
     calendarEventId!: string;
     bookingId!: number;
 }

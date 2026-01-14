@@ -1,4 +1,4 @@
-import { Booking } from '../../models/interfaces';
+import { Booking, BookingCalendarEvent } from '../../models/interfaces';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../models/interfaces/EquipmentList';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import {
@@ -6,6 +6,7 @@ import {
     IEquipmentListEntryObjectionModel,
     IBookingChangelogEntryObjectionModel,
     IEquipmentListHeadingEntryObjectionModel,
+    IBookingCalendarEventObjectionModel,
 } from '../../models/objection-models/BookingObjectionModel';
 import { toEquipment, toEquipmentPrice } from './equipment';
 import { toUser } from './user';
@@ -32,7 +33,7 @@ export const toBooking = (objectionModel: IBookingObjectionModel): Booking => {
         timeEstimates: objectionModel.timeEstimates ? objectionModel.timeEstimates.map(toTimeEstimate) : undefined,
         changelog: objectionModel.changelog ? objectionModel.changelog.map(toBookingChangelogEntry) : undefined,
         timeReports: objectionModel.timeReports ? objectionModel.timeReports.map(toTimeReport) : undefined,
-        calendarEventIds: objectionModel.calendarEventIds ? objectionModel.calendarEventIds : [],
+        calendarEvents: objectionModel.calendarEvents ? objectionModel.calendarEvents.map(toBookingCalendarEvent) : undefined,
         invoiceDate: toDatetimeOrUndefined(objectionModel.invoiceDate),
     };
 };
@@ -170,3 +171,19 @@ export const toEquipmentListEntryObjectionModel = (
         discount: clientModel.discount?.value,
     };
 };
+
+export const toBookingCalendarEvent = (
+    objectionModel: IBookingCalendarEventObjectionModel,
+): BookingCalendarEvent => {
+    if (!objectionModel.id) {
+        throw new Error('Invalid booking calendar event entry');
+    }
+
+    return {
+        ...objectionModel,
+        id: objectionModel.id,
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
+    };
+};
+
