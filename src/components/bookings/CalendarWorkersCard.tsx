@@ -25,12 +25,13 @@ import { getFormattedInterval } from '../../lib/datetimeUtils';
 type Props = {
     bookingId: number;
     calendarEventIds: string[];
-    onSubmit: (calendarEventId: string) => void;
+    onSubmit: (calendarEventIds: string[]) => void;
     readonly?: boolean;
 };
 
 const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onSubmit, readonly = false }: Props) => {
     const [showSelectCalendarEventModal, setShowSelectCalendarEventModal] = useState(false);
+
     // No connection to calendar event
     //
     if (calendarEventIds.length <= 0) {
@@ -61,7 +62,7 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onS
                     <SelectCalendarEventModal
                         show={showSelectCalendarEventModal}
                         hide={() => setShowSelectCalendarEventModal(false)}
-                        onSubmit={onSubmit}
+                        onSubmit={(calendarEventId) => onSubmit([...calendarEventIds, calendarEventId])}
                     />
                 ) : null}
             </>
@@ -72,30 +73,32 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onS
     return (
         <>
             <Card className="mb-3">
-                <CalendarWorkersCardWithCalendarConnection
-                    bookingId={bookingId}
-                    calendarEventId={calendarEventIds[0]} // TODO: Remove temporary.
-                    onSubmit={onSubmit}
-                    readonly={readonly}
-                />
+                {calendarEventIds.map(calendarEventId => 
+                    <CalendarSublist
+                        bookingId={bookingId}
+                        calendarEventId={calendarEventId}
+                        onRemove={() => onSubmit(calendarEventIds.filter(id => id != calendarEventId))}
+                        readonly={readonly}
+                    />
+                )}
             </Card>
         </>
     );
 };
 
-type CalendarWorkersCardWithCalendarConnectionProps = {
+type CalendarSublistProps = {
     bookingId: number;
     calendarEventId: string;
-    onSubmit: (calendarEventId: string) => void;
+    onRemove: () => void;
     readonly: boolean;
 };
 
-const CalendarWorkersCardWithCalendarConnection: React.FC<CalendarWorkersCardWithCalendarConnectionProps> = ({
+const CalendarSublist: React.FC<CalendarSublistProps> = ({
     bookingId,
     calendarEventId,
-    onSubmit,
+    onRemove,
     readonly,
-}: CalendarWorkersCardWithCalendarConnectionProps) => {
+}: CalendarSublistProps) => {
     const [showContent, setShowContent] = useState(true);
     const [showSelectCalendarEventModal, setShowSelectCalendarEventModal] = useState(false);
 
@@ -186,7 +189,7 @@ const CalendarWorkersCardWithCalendarConnection: React.FC<CalendarWorkersCardWit
                     <SelectCalendarEventModal
                         show={showSelectCalendarEventModal}
                         hide={() => setShowSelectCalendarEventModal(false)}
-                        onSubmit={onSubmit}
+                        onSubmit={onRemove}
                         value={data?.id}
                     />
                 ) : null}
