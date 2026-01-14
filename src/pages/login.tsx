@@ -49,9 +49,11 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        var body: any = {};
-        const formData = new FormData(e.currentTarget);
-        formData.forEach((value, key) => body[key] = value);
+        const { username, password } = e.currentTarget.elements as {
+            username?: string,
+            password?: string,
+        };
+        const body = { username, password };
 
         const request = {
             method: 'POST',
