@@ -26,7 +26,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const [showWrongPasswordError, setShowWrongPasswordError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
     const [waitingForResponse, setWaitingForResponse] = useState(false);
-	const [showPassword, setShowPassword] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const usernameFieldRef = useRef<HTMLInputElement>(null);
 
@@ -49,12 +49,10 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const { username, password } = e.currentTarget.elements as {
-            username?: string,
-            password?: string,
-        };
-        const body = { username, password };
-
+        const formData = new FormData(e.currentTarget);
+        const body = Object.fromEntries(
+            ['username', 'password'].map(key => [key, formData.get(key)])
+        );
         const request = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -127,15 +125,15 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                         autoComplete="off"
                     />
                 </FormGroup>
-				<FormGroup>
-					<Form.Check
-						type="switch"
-						name="show password"
-						id="showPasswordToggle"
-						label="Visa lösenord"
-						onChange= {(e) => setShowPassword(e.target.checked)}
-					/>
-				</FormGroup>
+                <FormGroup>
+                    <Form.Check
+                        type="switch"
+                        name="show password"
+                        id="showPasswordToggle"
+                        label="Visa lösenord"
+                        onChange={(e) => setShowPassword(e.target.checked)}
+                    />
+                </FormGroup>
                 {showWrongPasswordError ? <Alert variant="danger">Felaktigt användarnamn eller lösenord</Alert> : null}
                 {showServerError ? (
                     <Alert variant="danger">
