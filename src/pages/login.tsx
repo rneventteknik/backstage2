@@ -28,9 +28,6 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const [waitingForResponse, setWaitingForResponse] = useState(false);
 	const [showPassword, setShowPassword] = useState(false);
 
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-
     const usernameFieldRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -52,10 +49,11 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const body = {
-            username: username,
-            password: password,
+        const { username, password } = e.currentTarget.elements as {
+            username?: string,
+            password?: string,
         };
+        const body = { username, password };
 
         const request = {
             method: 'POST',
@@ -119,7 +117,6 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                         placeholder="Användarnamn"
                         name="username"
                         ref={usernameFieldRef}
-                        onChange={(e) => setUsername(e.target.value)}
                     />
                 </FormGroup>
                 <FormGroup>
@@ -128,7 +125,6 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                         placeholder="Lösenord"
                         name="password"
                         autoComplete="off"
-                        onChange={(e) => setPassword(e.target.value)}
                     />
                 </FormGroup>
 				<FormGroup>
