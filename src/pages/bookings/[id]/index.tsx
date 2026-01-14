@@ -61,6 +61,8 @@ import { BookingType } from '../../../models/enums/BookingType';
 import CalendarWorkersCard from '../../../components/bookings/CalendarWorkersCard';
 import BookingPotentialProblemsSection from '../../../components/bookings/BookingPotentialProblemsSection';
 import EmailThreadsCard from '../../../components/bookings/EmailThreadsCard';
+import { BookingCalendarEventObjectionModel, IBookingCalendarEventObjectionModel } from '../../../models/objection-models/BookingObjectionModel';
+import { json } from 'stream/consumers';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -175,12 +177,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 console.error(error);
                 showGeneralDangerMessage('Fel!', 'Bokningen kunde inte tas bort');
             });
-    };
-
-    // Calendar event linking handler
-    //
-    const linkCalendarEvent = (calendarEventId: string) => {
-        // TODO: Implement, or move to inside CalendarWorkersCard.
     };
 
     // The page itself
@@ -402,8 +398,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     {booking.bookingType === BookingType.GIG ? (
                         <CalendarWorkersCard
                             bookingId={booking.id}
-                            calendarEventIds={booking.calendarEventIds}
-                            onSubmit={(calendarEventId) => linkCalendarEvent(calendarEventId)}
+                            calendarEventIds={booking.calendarEvents?.map(event => event.calendarEventId) ?? []}
+                            onSubmit={(calendarEventIds) => saveBooking({ calendarEvents: calendarEventIds.map((calendarEventId) => ({ calendarEventId, bookingId: booking.id })) })}
                             readonly={readonly}
                         />
                     ) : null}

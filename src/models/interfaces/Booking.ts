@@ -12,6 +12,7 @@ import { SalaryStatus } from '../enums/SalaryStatus';
 import { PaymentStatus } from '../enums/PaymentStatus';
 import { Language } from '../enums/Language';
 import { EmailThread } from './EmailThread';
+import { BookingCalendarEvent } from './BookingCalendarEvent';
 
 export interface Booking extends BaseEntityWithName {
     ownerUser?: User;
@@ -22,6 +23,7 @@ export interface Booking extends BaseEntityWithName {
     timeReports?: TimeReport[];
     changelog?: BookingChangelogEntry[];
     emailThreads?: EmailThread[];
+    calendarEvents?: BookingCalendarEvent[];
     bookingType: BookingType;
     status: Status;
     paymentStatus: PaymentStatus;
@@ -38,7 +40,6 @@ export interface Booking extends BaseEntityWithName {
     contactPersonName: string;
     contactPersonPhone: string;
     contactPersonEmail: string;
-    calendarEventIds: string[];
     driveFolderId: string;
     customerName: string;
     language: Language;
