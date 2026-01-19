@@ -12,6 +12,7 @@ import {
     faMessage,
     faQuestion,
     faUser,
+    faTrash,
 } from '@fortawesome/free-solid-svg-icons';
 import { faUser as faUserRegular } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -30,58 +31,55 @@ type Props = {
 };
 
 const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onSubmit, readonly = false }: Props) => {
+    const [showContent, setShowContent] = useState(true);
     const [showSelectCalendarEventModal, setShowSelectCalendarEventModal] = useState(false);
 
-    // No connection to calendar event
-    //
-    if (calendarEventIds.length <= 0) {
-        return (
-            <>
-                <Card className="mb-3">
-                    <Card.Header className="d-flex">
-                        <span className="flex-grow-1">Uppskrivna i kalendern</span>
-                        {!readonly ? (
-                            <Button
-                                onClick={() => setShowSelectCalendarEventModal(true)}
-                                variant="secondary"
-                                className="ml-2"
-                                size="sm"
-                            >
-                                <FontAwesomeIcon icon={faCalendar} className="mr-1" />
-                                Koppla fler kalenderevent
-                            </Button>
-                        ) : null}
-                    </Card.Header>
-                    <ListGroup variant="flush">
-                        <ListGroup.Item className="text-center font-italic text-muted">
-                            Koppla bokningen till kalenderevent för att se uppskrivna arbetare.
-                        </ListGroup.Item>
-                    </ListGroup>
-                </Card>
-                {showSelectCalendarEventModal ? (
-                    <SelectCalendarEventModal
-                        show={showSelectCalendarEventModal}
-                        hide={() => setShowSelectCalendarEventModal(false)}
-                        onSubmit={(calendarEventId) => onSubmit([...calendarEventIds, calendarEventId])}
-                    />
-                ) : null}
-            </>
-        );
-    }
-    // Workers list
-    //
     return (
         <>
             <Card className="mb-3">
-                {calendarEventIds.map(calendarEventId => 
-                    <CalendarSublist
-                        bookingId={bookingId}
-                        calendarEventId={calendarEventId}
-                        onRemove={() => onSubmit(calendarEventIds.filter(id => id != calendarEventId))}
-                        readonly={readonly}
-                    />
-                )}
+                <Card.Header className="d-flex">
+                    <span className="flex-grow-1 mr-2">Uppskrivna i kalendern</span>
+                    {!readonly ? (
+                        <Button
+                            onClick={() => setShowSelectCalendarEventModal(true)}
+                            variant="secondary"
+                            className="mr-2"
+                            size="sm"
+                        >
+                            <FontAwesomeIcon icon={faCalendar} className="mr-1" />
+                            Koppla fler kalenderevent
+                        </Button>
+                    ) : null}
+                    <Button variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+                        <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
+                    </Button>
+                </Card.Header>
+                {showContent ? (
+                    <ListGroup variant="flush">
+                        {calendarEventIds.length <= 0 ? (
+                            <ListGroup.Item className="text-center font-italic text-muted">
+                                Koppla bokningen till kalenderevent för att se uppskrivna arbetare.
+                            </ListGroup.Item>
+                        ) :
+                            calendarEventIds.map(calendarEventId =>
+                                <CalendarSublist
+                                    bookingId={bookingId}
+                                    calendarEventId={calendarEventId}
+                                    onRemove={() => onSubmit(calendarEventIds.filter(id => id != calendarEventId))}
+                                    readonly={readonly}
+                                />
+                            )
+                        }
+                    </ListGroup>
+                ) : null}
             </Card>
+            {showSelectCalendarEventModal ? (
+                <SelectCalendarEventModal
+                    show={showSelectCalendarEventModal}
+                    hide={() => setShowSelectCalendarEventModal(false)}
+                    onSubmit={(calendarEventId) => onSubmit([...calendarEventIds, calendarEventId])}
+                />
+            ) : null}
         </>
     );
 };
@@ -99,7 +97,6 @@ const CalendarSublist: React.FC<CalendarSublistProps> = ({
     onRemove,
     readonly,
 }: CalendarSublistProps) => {
-    const [showContent, setShowContent] = useState(true);
     const [showSelectCalendarEventModal, setShowSelectCalendarEventModal] = useState(false);
 
     const { data, error } = useSwr(`/api/calendar/${calendarEventId}`, (url) =>
@@ -152,13 +149,10 @@ const CalendarSublist: React.FC<CalendarSublistProps> = ({
 
     // Workers list
     //
-    return (
+    return ( // TODO: Better error handling for missing calendar name
         <>
             <Card.Header className="d-flex">
-                <span className="flex-grow-1">Uppskrivna i kalendern</span>
-                <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
-                    <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
-                </Button>
+                <span className="flex-grow-1">{data.name || "Kalender event"}</span>
                 <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
                     {!readonly && workingUsers.length > 0 ? (
                         <>
@@ -172,17 +166,11 @@ const CalendarSublist: React.FC<CalendarSublistProps> = ({
                             </Dropdown.Item>
                         </>
                     ) : null}
-                    {!readonly ? (
-                        <>
-                            <Dropdown.Item onClick={() => setShowSelectCalendarEventModal(true)}>
-                                <FontAwesomeIcon icon={faCalendar} className="mr-1 fa-fw" /> Redigara koppling till
-                                kalenderevent
-                            </Dropdown.Item>
-                            <Dropdown.Divider />
-                        </>
-                    ) : null}
                     <Dropdown.Item href={data?.link} target="_blank">
                         <FontAwesomeIcon icon={faExternalLinkAlt} className="mr-1 fa-fw" /> Öppna i Google Calendar
+                    </Dropdown.Item>
+                    <Dropdown.Item onClick={onRemove}>
+                        <FontAwesomeIcon icon={faTrash} className="mr-1 fa-fw" /> Ta bort koppling
                     </Dropdown.Item>
                 </DropdownButton>
                 {showSelectCalendarEventModal ? (
@@ -194,31 +182,29 @@ const CalendarSublist: React.FC<CalendarSublistProps> = ({
                     />
                 ) : null}
             </Card.Header>
-            {showContent ? (
-                <ListGroup variant="flush">
-                    {workingUsers.map((user) => (
-                        <ListGroup.Item key={user.id}>
-                            <div className="mb-1">
-                                <FontAwesomeIcon icon={getIcon(user.memberStatus)} className="mr-2" />
-                                {user.name !== undefined ? (
-                                    <TableStyleLink href={`/users/${user.id}`}>{user.name}</TableStyleLink>
-                                ) : (
-                                    user.nameTag
-                                )}
-                            </div>
-                            <div className="text-muted">
-                                {user.nameTag}{' '}
-                                {user.memberStatus !== undefined ? `/ ${getMemberStatusName(user.memberStatus)}` : null}
-                            </div>
-                        </ListGroup.Item>
-                    ))}
-                    {workingUsers.length === 0 ? (
-                        <ListGroup.Item className="text-center font-italic text-muted">
-                            Tagga användare i kalendern för att visa dem här.
-                        </ListGroup.Item>
-                    ) : null}
-                </ListGroup>
-            ) : null}
+            <ListGroup variant="flush">
+                {workingUsers.map((user) => (
+                    <ListGroup.Item key={user.id}>
+                        <div className="mb-1">
+                            <FontAwesomeIcon icon={getIcon(user.memberStatus)} className="mr-2" />
+                            {user.name !== undefined ? (
+                                <TableStyleLink href={`/users/${user.id}`}>{user.name}</TableStyleLink>
+                            ) : (
+                                user.nameTag
+                            )}
+                        </div>
+                        <div className="text-muted">
+                            {user.nameTag}{' '}
+                            {user.memberStatus !== undefined ? `/ ${getMemberStatusName(user.memberStatus)}` : null}
+                        </div>
+                    </ListGroup.Item>
+                ))}
+                {workingUsers.length === 0 ? (
+                    <ListGroup.Item className="text-center font-italic text-muted">
+                        Tagga användare i kalendern för att visa dem här.
+                    </ListGroup.Item>
+                ) : null}
+            </ListGroup>
         </>
     );
 };
