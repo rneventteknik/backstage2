@@ -7,16 +7,27 @@ import { UserObjectionModel } from '../models/objection-models';
 import { getGlobalSetting } from './utils';
 import { fetchSettings } from './db-access/setting';
 
-const getNameTagsFromEventName = (name: string): string[] => {
+export interface CalendarEventTags {
+    tags: string[];
+    nameRemaining: string;
+}
+const getTagsFromEventName = (name: string): CalendarEventTags => {
     // Get part of string within [] brackets
-    const match = name.match(/\[(.*?)\]/);
+    const match = name.match(/\[(.*?)\](.+)$/);
+    console.log(match)
     if (match) {
-        return match[1]
+        const tags = match[1]
             .split(/[,/]/)
             .map((x) => (x.includes(':') ? x.split(':')[1] : x))
             .map((x) => x.trim());
+        const nameRemaining = match[1].trim();
+        return {tags, nameRemaining}
     }
-    return [];
+    return {tags: [], nameRemaining: name};
+}
+
+const getNameTagsFromEventName = (name: string): string[] => {
+    return getTagsFromEventName(name).tags;
 };
 
 const getUserByTag = async (tag: string): Promise<Partial<UserObjectionModel>> => {
