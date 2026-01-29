@@ -1,4 +1,4 @@
-import { BaseEntityWithName } from './BaseEntity';
+import { BaseEntity, BaseEntityWithName } from './BaseEntity';
 import { EquipmentChangelogEntry } from './ChangeLogEntry';
 import { EquipmentTag } from './EquipmentTag';
 import { EquipmentPrice } from './EquipmentPrice';
@@ -21,4 +21,14 @@ export interface Equipment extends BaseEntityWithName {
     changelog: EquipmentChangelogEntry[];
     tags: EquipmentTag[];
     prices: EquipmentPrice[];
+    connectedEquipmentEntries: ConnectedEquipmentEntry[];
+}
+export interface ConnectedEquipmentEntry extends BaseEntity {
+    connectedEquipmentId: number;
+    connectedEquipment?: Equipment;
+    equipmentPriceId: number | null;
+    equipmentPrice?: EquipmentPrice | null;
+    sortIndex: number;
+    isHidden: boolean;
+    isFree: boolean;
 }

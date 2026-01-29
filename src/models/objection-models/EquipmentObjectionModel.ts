@@ -23,6 +23,7 @@ export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     tags?: IEquipmentTagObjectionModel[];
     prices?: IEquipmentPriceObjectionModel[];
     changelog?: IEquipmentChangelogEntryObjectionModel[];
+    connectedEquipmentEntries?: IConnectedEquipmentEntryObjectionModel[];
 }
 
 export class EquipmentObjectionModel extends Model implements IEquipmentObjectionModel {

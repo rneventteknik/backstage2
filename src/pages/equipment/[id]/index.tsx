@@ -29,6 +29,7 @@ import { useNotifications } from '../../../lib/useNotifications';
 import { Role } from '../../../models/enums/Role';
 import { ImageCardHideOnError } from '../../../components/equipment/ImageHideOnError';
 import { idSortFn } from '../../../lib/sortIndexUtils';
+import ConnectedEquipmentList from '../../../components/equipment/RelatedEquipmentList';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -191,6 +192,10 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         cardTitle={'Anteckningar'}
                         readonly={currentUser.role === Role.READONLY}
                     />
+                    <Card className="mb-3">
+                        <Card.Header>Relaterad utrustning</Card.Header>
+                        <ConnectedEquipmentList connectedEquipment={equipment.connectedEquipmentEntries} />
+                    </Card>
                     <EquipmentCalendar equipment={equipment} />
                     <EquipmentBookings equipment={equipment} />
                 </Col>

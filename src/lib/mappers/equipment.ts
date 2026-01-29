@@ -6,12 +6,14 @@ import {
     IEquipmentPriceObjectionModel,
     IEquipmentPublicCategoryObjectionModel,
     IEquipmentLocationObjectionModel,
+    IConnectedEquipmentEntryObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
 import { EquipmentChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 import { EquipmentPublicCategory } from '../../models/interfaces/EquipmentPublicCategory';
 import { EquipmentLocation } from '../../models/interfaces/EquipmentLocation';
 import { toDatetimeOrUndefined } from '../datetimeUtils';
 import currency from 'currency.js';
+import { ConnectedEquipmentEntry } from '../../models/interfaces/Equipment';
 
 export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment => {
     if (!objectionModel.id) {
@@ -25,6 +27,9 @@ export const toEquipment = (objectionModel: IEquipmentObjectionModel): Equipment
         tags: objectionModel.tags ? objectionModel.tags.map((x) => toEquipmentTag(x)) : [],
         prices: objectionModel.prices ? objectionModel.prices.map((x) => toEquipmentPrice(x)) : [],
         changelog: objectionModel.changelog ? objectionModel.changelog.map((x) => toEquipmentChangelogEntry(x)) : [],
+        connectedEquipmentEntries: objectionModel.connectedEquipmentEntries
+            ? objectionModel.connectedEquipmentEntries.map((x) => toConnectedEquipmentEntry(x))
+            : [],
         equipmentPublicCategory: objectionModel.equipmentPublicCategory
             ? toEquipmentPublicCategory(objectionModel.equipmentPublicCategory)
             : undefined,
@@ -123,5 +128,24 @@ export const toEquipmentPriceObjectionModel = (clientModel: EquipmentPrice): Par
         pricePerUnitTHS: clientModel.pricePerUnitTHS.value,
         created: undefined,
         updated: undefined,
+    };
+};
+
+export const toConnectedEquipmentEntry = (
+    objectionModel: IConnectedEquipmentEntryObjectionModel,
+): ConnectedEquipmentEntry => {
+    if (!objectionModel.id) {
+        throw new Error('Invalid connected equipment entry');
+    }
+
+    return {
+        ...objectionModel,
+        id: objectionModel.id,
+        connectedEquipment: objectionModel.connectedEquipment
+            ? toEquipment(objectionModel.connectedEquipment)
+            : undefined,
+        equipmentPrice: objectionModel.equipmentPrice ? toEquipmentPrice(objectionModel.equipmentPrice) : undefined,
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
