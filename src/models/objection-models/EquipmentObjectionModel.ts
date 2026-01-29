@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
 import { Model, RelationMappingsThunk } from 'objection';
-import { BaseObjectionModelWithName } from '.';
+import { BaseObjectionModel, BaseObjectionModelWithName } from '.';
 
 export interface IEquipmentObjectionModel extends BaseObjectionModelWithName {
     id: number;
@@ -73,6 +73,14 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
                 to: 'EquipmentLocation.id',
             },
         },
+        connectedEquipmentEntries: {
+            relation: Model.HasManyRelation,
+            modelClass: ConnectedEquipmentEntryObjectionModel,
+            join: {
+                from: 'Equipment.id',
+                to: 'ConnectedEquipmentEntry.parentEquipmentId',
+            },
+        },
     });
 
     id!: number;
@@ -95,6 +103,7 @@ export class EquipmentObjectionModel extends Model implements IEquipmentObjectio
     tags?: EquipmentTagObjectionModel[];
     prices?: EquipmentPriceObjectionModel[];
     changelog?: EquipmentChangelogEntryObjectionModel[];
+    connectedEquipmentEntries?: ConnectedEquipmentEntryObjectionModel[];
 }
 
 export interface IEquipmentTagObjectionModel extends BaseObjectionModelWithName {
@@ -201,4 +210,57 @@ export class EquipmentChangelogEntryObjectionModel extends Model implements IEqu
     created!: string;
     updated!: string;
     equipmentId!: number;
+}
+
+export interface IConnectedEquipmentEntryObjectionModel extends BaseObjectionModel {
+    id: number;
+    created?: string;
+    updated?: string;
+
+    connectedEquipmentId: number;
+    connectedEquipment?: IEquipmentObjectionModel;
+
+    equipmentPriceId: number | null;
+    equipmentPrice?: IEquipmentPriceObjectionModel | null;
+
+    sortIndex: number;
+    isHidden: boolean;
+    isFree: boolean;
+}
+
+export class ConnectedEquipmentEntryObjectionModel extends Model implements IConnectedEquipmentEntryObjectionModel {
+    static tableName = 'ConnectedEquipmentEntry';
+
+    static relationMappings: RelationMappingsThunk = () => ({
+        connectedEquipment: {
+            relation: Model.HasOneRelation,
+            modelClass: EquipmentObjectionModel,
+            join: {
+                from: 'ConnectedEquipmentEntry.connectedEquipmentId',
+                to: 'Equipment.id',
+            },
+        },
+        equipmentPrice: {
+            relation: Model.HasOneRelation,
+            modelClass: EquipmentPriceObjectionModel,
+            join: {
+                from: 'ConnectedEquipmentEntry.equipmentPriceId',
+                to: 'EquipmentPrice.id',
+            },
+        },
+    });
+
+    id!: number;
+    created?: string;
+    updated?: string;
+
+    connectedEquipmentId!: number;
+    connectedEquipment?: EquipmentObjectionModel;
+
+    equipmentPriceId!: number | null;
+    equipmentPrice?: EquipmentPriceObjectionModel | null;
+
+    sortIndex!: number;
+    isHidden!: boolean;
+    isFree!: boolean;
 }

@@ -49,6 +49,9 @@ export const fetchEquipment = async (id: number): Promise<EquipmentObjectionMode
         .withGraphFetched('equipmentLocation')
         .withGraphFetched('prices')
         .withGraphFetched('changelog(changelogInfo)')
+        .withGraphFetched('connectedEquipmentEntries.equipmentPrice')
+        .withGraphFetched('connectedEquipmentEntries.connectedEquipment')
+        .withGraphFetched('connectedEquipmentEntries.connectedEquipment.prices')
         .modifiers({
             changelogInfo: (builder) => {
                 builder.orderBy('updated', 'desc').limit(250);
