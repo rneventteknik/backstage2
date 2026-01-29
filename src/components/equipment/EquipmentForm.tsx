@@ -11,6 +11,11 @@ import { toEquipmentPriceObjectionModel } from '../../lib/mappers/equipment';
 import { toIntOrUndefined } from '../../lib/utils';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
 import { getSortedList } from '../../lib/sortIndexUtils';
+import {
+    IncludedOrRelatedEquipmentEditor,
+    EquipmentEntryFromConnectedEquipmentEntry,
+    ConnectedEquipmentEntryFromEquipmentEntry,
+} from '../equipmentPackage/IncludedOrRelatedEquipmentEditor';
 
 type Props = {
     handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel>) => void;
@@ -31,6 +36,10 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
     );
 
     const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentLocationsFetcher);
+
+    const [selectedEquipmentPackageEntries, setSelectedEquipmentPackageEntries] = useState(
+        equipment?.connectedEquipmentEntries ?? [],
+    );
 
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -165,6 +174,26 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Col lg="12">
                             <Form.Group controlId="formPrices">
                                 <PricesEditor prices={prices} onChange={setPrices} />
+                            </Form.Group>
+                        </Col>
+                    </Form.Row>
+
+                    <h2 className="h5 mt-4">Inkluderad utrustning</h2>
+                    <hr />
+                    <Form.Row>
+                        <Col lg="12">
+                            <Form.Group controlId="includedEquipment">
+                                <IncludedOrRelatedEquipmentEditor
+                                    selectedEquipmentEntries={selectedEquipmentPackageEntries.map(
+                                        EquipmentEntryFromConnectedEquipmentEntry,
+                                    )}
+                                    setSelectedEquipmentEntries={(x) =>
+                                        setSelectedEquipmentPackageEntries(
+                                            x.map(ConnectedEquipmentEntryFromEquipmentEntry),
+                                        )
+                                    }
+                                    showCounts={false}
+                                />
                             </Form.Group>
                         </Col>
                     </Form.Row>
