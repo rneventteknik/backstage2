@@ -34,14 +34,24 @@ export const EquipmentEntryFromConnectedEquipmentEntry = (entry: ConnectedEquipm
     equipment: entry.connectedEquipment,
 });
 export const EquipmentPackageEntryFromEquipmentEntry = (entry: EquipmentEntry): EquipmentPackageEntry => ({
-    ...entry,
-    numberOfHours: entry.numberOfHours!,
+    id: entry.id,
+    equipmentId: entry.equipmentId,
+    equipment: entry.equipment,
+    equipmentPriceId: entry.equipmentPriceId,
     numberOfUnits: entry.numberOfUnits!,
+    numberOfHours: entry.numberOfHours!,
+    sortIndex: entry.sortIndex,
+    isHidden: entry.isHidden,
+    isFree: entry.isFree,
 });
 export const ConnectedEquipmentEntryFromEquipmentEntry = (entry: EquipmentEntry): ConnectedEquipmentEntry => ({
-    ...entry,
+    id: entry.id,
     connectedEquipmentId: entry.equipmentId,
     connectedEquipment: entry.equipment,
+    equipmentPriceId: entry.equipmentPriceId,
+    sortIndex: entry.sortIndex,
+    isHidden: entry.isHidden,
+    isFree: entry.isFree,
 });
 
 type Props = {

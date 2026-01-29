@@ -37,7 +37,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
     const { data: equipmentLocations } = useSwr('/api/equipmentLocations', equipmentLocationsFetcher);
 
-    const [selectedEquipmentPackageEntries, setSelectedEquipmentPackageEntries] = useState(
+    const [selectedConnectedEquipmentEntries, setSelectedConnectedEquipmentEntries] = useState(
         equipment?.connectedEquipmentEntries ?? [],
     );
 
@@ -97,6 +97,16 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
             prices: prices.map((x) => toEquipmentPriceObjectionModel(x)),
             equipmentPublicCategoryId: toIntOrUndefined(getValueFromForm('publicCategory')) ?? null,
             equipmentLocationId: toIntOrUndefined(getValueFromForm('equipmentLocation')) ?? null,
+
+            connectedEquipmentEntries: selectedConnectedEquipmentEntries.map((x) => ({
+                ...x,
+                id: undefined,
+                connectedEquipment: undefined,
+                equipmentPrice: undefined,
+                equipmentPriceId: x.equipmentPriceId ?? null,
+                created: x.created?.toString(),
+                updated: x.updated?.toString(),
+            })),
 
             inventoryCount: toIntOrUndefined(getValueFromForm('inventoryCount')) ?? null,
             publiclyHidden: getValueFromForm('publiclyHidden') === 'true',
@@ -184,11 +194,11 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Col lg="12">
                             <Form.Group controlId="includedEquipment">
                                 <IncludedOrRelatedEquipmentEditor
-                                    selectedEquipmentEntries={selectedEquipmentPackageEntries.map(
+                                    selectedEquipmentEntries={selectedConnectedEquipmentEntries.map(
                                         EquipmentEntryFromConnectedEquipmentEntry,
                                     )}
                                     setSelectedEquipmentEntries={(x) =>
-                                        setSelectedEquipmentPackageEntries(
+                                        setSelectedConnectedEquipmentEntries(
                                             x.map(ConnectedEquipmentEntryFromEquipmentEntry),
                                         )
                                     }

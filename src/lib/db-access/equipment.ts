@@ -1,4 +1,6 @@
+import Objection from 'objection';
 import {
+    ConnectedEquipmentEntryObjectionModel,
     EquipmentObjectionModel,
     EquipmentPriceObjectionModel,
 } from '../../models/objection-models/EquipmentObjectionModel';
@@ -39,10 +41,10 @@ export const searchEquipment = async (searchString: string, count: number): Prom
         .limit(count);
 };
 
-export const fetchEquipment = async (id: number): Promise<EquipmentObjectionModel> => {
+export const fetchEquipment = async (id: number, trx?: Objection.Transaction): Promise<EquipmentObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    return EquipmentObjectionModel.query()
+    return EquipmentObjectionModel.query(trx)
         .where('id', id)
         .withGraphFetched('tags')
         .withGraphFetched('equipmentPublicCategory')
@@ -114,7 +116,8 @@ export const updateEquipment = async (
             .findById(id)
             .orderBy('id')
             .withGraphFetched('tags')
-            .withGraphFetched('prices');
+            .withGraphFetched('prices')
+            .withGraphFetched('connectedEquipmentEntries');
 
         // Tags.
         if (equipment.tags) {
@@ -158,7 +161,41 @@ export const updateEquipment = async (
             });
         }
 
-        return EquipmentObjectionModel.query(trx).patchAndFetchById(id, withUpdatedDate(removeIdAndDates(equipment)));
+        // ConnectedEquipmentEntries.
+        if (equipment.connectedEquipmentEntries !== undefined) {
+            const {
+                toAdd: connectedEquipmentEntriesToAdd,
+                toDelete: connectedEquipmentEntriesToDelete,
+                toUpdate: connectedEquipmentEntriesToUpdate,
+            } = compareLists(equipment.connectedEquipmentEntries, existingDatabaseModel?.connectedEquipmentEntries);
+
+            connectedEquipmentEntriesToAdd.map(async (x) => {
+                await EquipmentObjectionModel.relatedQuery('connectedEquipmentEntries', trx)
+                    .for(id)
+                    .insert(withCreatedDate(removeIdAndDates(x)));
+            });
+
+            connectedEquipmentEntriesToDelete.map(async (x) => {
+                await ConnectedEquipmentEntryObjectionModel.query(trx).deleteById(x.id);
+            });
+
+            connectedEquipmentEntriesToUpdate.map(async (x) => {
+                await ConnectedEquipmentEntryObjectionModel.query(trx).patchAndFetchById(
+                    x.id,
+                    withUpdatedDate(removeIdAndDates(x)),
+                );
+            });
+        }
+
+        await EquipmentObjectionModel.query(trx).patchAndFetchById(id, withUpdatedDate(removeIdAndDates(equipment)));
+
+        const updatedEquipment = await fetchEquipment(id, trx);
+
+        if (!updatedEquipment) {
+            throw new Error('Invalid DB state');
+        }
+
+        return updatedEquipment;
     });
 };
 
