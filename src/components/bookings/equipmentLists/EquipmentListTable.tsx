@@ -366,17 +366,13 @@ const EquipmentListTable: React.FC<Props> = ({
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
 
-        if (list.isHidden) {
-            return <em className="text-muted">0,00 kr</em>;
-        }
-
         const priceWithoutDiscount = formatCurrency(
-            addVAT(getPrice(entry, getNumberOfDays(list), list.discountPercentage, false)),
+            addVAT(getPrice(entry, getNumberOfDays(list), list.discountPercentage, list.isHidden, false)),
         );
-        const discount = getCalculatedDiscount(entry, getNumberOfDays(list), list.discountPercentage);
+        const discount = getCalculatedDiscount(entry, getNumberOfDays(list), list.discountPercentage, list.isHidden);
         const formattedDiscount = formatCurrency(addVAT(discount));
         const priceWithDiscount = formatCurrency(
-            addVAT(getPrice(entry, getNumberOfDays(list), list.discountPercentage)),
+            addVAT(getPrice(entry, getNumberOfDays(list), list.discountPercentage, list.isHidden)),
         );
 
         return (
@@ -501,7 +497,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             onClick={() =>
                                 saveListEntry({
                                     ...entry,
-                                    discount: getPrice(entry, getNumberOfDays(list), 0, false), // Here we ignore the list percentage discount by setting it to 0
+                                    discount: getPrice(entry, getNumberOfDays(list), 0, false, false), // Here we ignore the list percentage discount by setting it to 0. Likewise, we ignore the actual hidden status of the list
                                 })
                             }
                         >
@@ -650,12 +646,13 @@ const EquipmentListTable: React.FC<Props> = ({
                     addVAT(
                         viewModelIsHeading(viewModel)
                             ? getEquipmentListHeadingFromViewModel(viewModel)
-                                  .listEntries.map((x) => getPrice(x, getNumberOfDays(list), list.discountPercentage))
+                                  .listEntries.map((x) => getPrice(x, getNumberOfDays(list), list.discountPercentage, list.isHidden))
                                   .reduce((a, b) => a.add(b), currency(0))
                             : getPrice(
                                   getEquipmentListEntryFromViewModel(viewModel),
                                   getNumberOfDays(list),
                                   list.discountPercentage,
+                                  list.isHidden,
                               ),
                     ).value,
                 getContentOverride: EquipmentListEntryTotalPriceDisplayFn,

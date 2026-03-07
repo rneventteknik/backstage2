@@ -17,8 +17,13 @@ export const getPrice = (
     entry: EquipmentListEntry,
     numberOfDays: number,
     discountPercentage: number,
+    listIsHidden: boolean,
     withDiscount = true,
 ): currency => {
+    if (listIsHidden) {
+        return currency(0);
+    }
+
     const fullPrice = getUnitPrice(entry, numberOfDays).multiply(entry.numberOfUnits);
 
     if (!withDiscount) {
@@ -66,9 +71,10 @@ export const getCalculatedDiscount = (
     entry: EquipmentListEntry,
     numberOfDays: number,
     discountPercentage: number,
+    listIsHidden: boolean,
 ): currency => {
-    const priceWithoutDiscount = getPrice(entry, numberOfDays, discountPercentage, false);
-    const priceWithDiscount = getPrice(entry, numberOfDays, discountPercentage, true);
+    const priceWithoutDiscount = getPrice(entry, numberOfDays, discountPercentage, listIsHidden, false);
+    const priceWithDiscount = getPrice(entry, numberOfDays, discountPercentage, listIsHidden, true);
 
     return priceWithoutDiscount.subtract(priceWithDiscount);
 };
@@ -77,8 +83,9 @@ export const getEquipmentListHeadingPrice = (
     heading: EquipmentListHeading,
     numberOfDays: number,
     discountPercentage: number,
+    listIsHidden: boolean,
 ): currency => {
-    return heading.listEntries.reduce((sum, e) => sum.add(getPrice(e, numberOfDays, discountPercentage)), currency(0));
+    return heading.listEntries.reduce((sum, e) => sum.add(getPrice(e, numberOfDays, discountPercentage, listIsHidden)), currency(0));
 };
 
 export const getEquipmentListPrice = (list: EquipmentList): currency => {
@@ -87,10 +94,10 @@ export const getEquipmentListPrice = (list: EquipmentList): currency => {
     }
 
     return list.listEntries
-        .reduce((sum, e) => sum.add(getPrice(e, getNumberOfDays(list), list.discountPercentage)), currency(0))
+        .reduce((sum, e) => sum.add(getPrice(e, getNumberOfDays(list), list.discountPercentage, list.isHidden)), currency(0))
         .add(
             list.listHeadings.reduce(
-                (sum, h) => sum.add(getEquipmentListHeadingPrice(h, getNumberOfDays(list), list.discountPercentage)),
+                (sum, h) => sum.add(getEquipmentListHeadingPrice(h, getNumberOfDays(list), list.discountPercentage, list.isHidden)),
                 currency(0),
             ),
         );
@@ -268,7 +275,7 @@ export const getInvoiceRows = (
             const numberOfDays = getNumberOfDays(equipmentList);
             if (isHeading) {
                 const heading = wrappedEntity.entity as EquipmentListHeading;
-                const rowPrice = getEquipmentListHeadingPrice(heading, numberOfDays, equipmentList.discountPercentage);
+                const rowPrice = getEquipmentListHeadingPrice(heading, numberOfDays, equipmentList.discountPercentage, equipmentList.isHidden);
                 const mainRow: PricedInvoiceRow = {
                     rowType: InvoiceRowType.ITEM,
                     text: wrappedEntity.entity.name,
@@ -294,7 +301,7 @@ export const getInvoiceRows = (
                     text: entry.name,
                     numberOfUnits: entry.numberOfUnits,
                     pricePerUnit: getUnitPrice(entry, numberOfDays),
-                    rowPrice: getPrice(entry, numberOfDays, equipmentList.discountPercentage, true), // Row price including discount
+                    rowPrice: getPrice(entry, numberOfDays, equipmentList.discountPercentage, equipmentList.isHidden, true), // Row price including discount
                     account:
                         entry.account ??
                         (booking.accountKind === AccountKind.EXTERNAL
@@ -333,10 +340,10 @@ export const getInvoiceRows = (
                     });
                 }
 
-                if (getCalculatedDiscount(entry, numberOfDays, equipmentList.discountPercentage).value) {
+                if (getCalculatedDiscount(entry, numberOfDays, equipmentList.discountPercentage, equipmentList.isHidden).value) {
                     invoiceRows.push({
                         rowType: InvoiceRowType.ITEM_COMMENT,
-                        text: `${t('invoice.discount')}: ${formatCurrency(getCalculatedDiscount(entry, numberOfDays, equipmentList.discountPercentage))}`,
+                        text: `${t('invoice.discount')}: ${formatCurrency(getCalculatedDiscount(entry, numberOfDays, equipmentList.discountPercentage, equipmentList.isHidden))}`,
                     });
                 }
 

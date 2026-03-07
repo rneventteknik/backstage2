@@ -113,6 +113,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                                                 heading,
                                                                 getNumberOfDays(list),
                                                                 list.discountPercentage,
+                                                                list.isHidden
                                                             ),
                                                             pricePerHour: currency(0),
                                                         },
@@ -128,16 +129,18 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                                         entry,
                                                         getNumberOfDays(list),
                                                         list.discountPercentage,
+                                                        list.isHidden,
                                                     ).value > 0
                                                         ? formatCurrency(
-                                                              addVAT(
-                                                                  getCalculatedDiscount(
-                                                                      entry,
-                                                                      getNumberOfDays(list),
-                                                                      list.discountPercentage,
-                                                                  ),
-                                                              ),
-                                                          )
+                                                            addVAT(
+                                                                getCalculatedDiscount(
+                                                                    entry,
+                                                                    getNumberOfDays(list),
+                                                                    list.discountPercentage,
+                                                                    list.isHidden,
+                                                                ),
+                                                            ),
+                                                        )
                                                         : ''}
                                                 </Text>
                                             ) : null}
@@ -151,6 +154,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                                                 entry,
                                                                 getNumberOfDays(list),
                                                                 list.discountPercentage,
+                                                                list.isHidden
                                                             ),
                                                         ),
                                                     )}
@@ -163,6 +167,7 @@ export const EquipmentListInfo: React.FC<Props> = ({ list, booking, showPrices }
                                                                 heading,
                                                                 getNumberOfDays(list),
                                                                 list.discountPercentage,
+                                                                list.isHidden
                                                             ),
                                                         ),
                                                     )}

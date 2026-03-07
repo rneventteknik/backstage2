@@ -115,12 +115,10 @@ const mapToAnalytics = (
         pricePerUnit: x.entry.pricePerUnit.value,
         pricePerHour: x.entry.pricePerHour.value,
         equipmentPriceName: x.entry.equipmentPrice?.name ?? null,
-        discountFixed: x.list.isHidden ? 0 : getCalculatedDiscount(x.entry, getNumberOfDays(x.list), 0).value,
+        discountFixed: getCalculatedDiscount(x.entry, getNumberOfDays(x.list), 0, x.list.isHidden).value,
         discountPercentage: x.list.discountPercentage,
-        totalDiscount: x.list.isHidden
-            ? 0
-            : getCalculatedDiscount(x.entry, getNumberOfDays(x.list), x.list.discountPercentage).value,
-        totalPrice: x.list.isHidden ? 0 : getPrice(x.entry, getNumberOfDays(x.list), x.list.discountPercentage).value,
+        totalDiscount: getCalculatedDiscount(x.entry, getNumberOfDays(x.list), x.list.discountPercentage, x.list.isHidden).value,
+        totalPrice: getPrice(x.entry, getNumberOfDays(x.list), x.list.discountPercentage, x.list.isHidden).value,
         account:
             x.entry.account ??
             (x.booking.accountKind === AccountKind.EXTERNAL
