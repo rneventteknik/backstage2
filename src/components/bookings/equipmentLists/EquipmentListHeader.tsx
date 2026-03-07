@@ -17,6 +17,7 @@ import {
     faPercent,
     faListCheck,
     faWarning,
+    faEyeSlash,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
@@ -120,6 +121,10 @@ const EquipmentListHeader: React.FC<Props> = ({
         bookingStatus === Status.BOOKED && bookingType == BookingType.RENTAL && !list.equipmentOutDatetime;
 
     const getEquipmentDateColor = (list: EquipmentList) => {
+        if (list.isHidden) {
+            return 'text-muted';
+        }
+
         if (!!list.equipmentOutDatetime) {
             return '';
         }
@@ -129,6 +134,14 @@ const EquipmentListHeader: React.FC<Props> = ({
         }
 
         return 'text-muted';
+    };
+
+    const getUsageDateColor = (list: EquipmentList) => {
+        if (list.isHidden) {
+            return 'text-muted';
+        }
+
+        return '';
     };
 
     const showRentalControls = bookingType === BookingType.RENTAL || alwaysShowRentalControls;
@@ -149,7 +162,21 @@ const EquipmentListHeader: React.FC<Props> = ({
                         }
                         readonly={readonly}
                     >
-                        {list.name}
+                        <span className={list.isHidden ? 'text-muted' : ''}>
+                            {list.name}
+                            {list.isHidden ? (
+                                <OverlayTrigger
+                                    placement="right"
+                                    overlay={
+                                        <Tooltip id="hidden-list-tooltip">
+                                            <strong>Denna lista är dold och syns inte för kund.</strong>
+                                        </Tooltip>
+                                    }
+                                >
+                                    <FontAwesomeIcon icon={faEyeSlash} className="ml-2" />
+                                </OverlayTrigger>
+                            ) : null}
+                        </span>
                     </ClickToEdit>
                 </div>
                 <div className="d-flex">
@@ -249,6 +276,10 @@ const EquipmentListHeader: React.FC<Props> = ({
                                 </Dropdown.Item>
                                 <Dropdown.Item onClick={() => setShowEditDiscountPercentageModal(true)}>
                                     <FontAwesomeIcon icon={faPercent} className="mr-1 fa-fw" /> Redigera rabatt
+                                </Dropdown.Item>
+                                <Dropdown.Item onClick={() => saveList({ ...list, isHidden: !list.isHidden })}>
+                                    <FontAwesomeIcon icon={faEyeSlash} className="mr-1 fa-fw" />
+                                    {list.isHidden ? 'Visa lista för kund' : 'Dölj lista för kund'}
                                 </Dropdown.Item>
                                 {showEditDiscountPercentageModal ? (
                                     <EditTextModal
@@ -483,7 +514,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                         <Col md={3} xs={6}>
                             <small>Debiterad starttid</small>
                             <div
-                                className="mb-3"
+                                className={'mb-3 ' + getUsageDateColor(list)}
                                 style={{ fontSize: '1.2em' }}
                                 title={formatDatetimeForForm(list.usageStartDatetime)}
                             >
@@ -493,7 +524,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                         <Col md={3} xs={6}>
                             <small>Debiterad sluttid</small>
                             <div
-                                className="mb-3"
+                                className={'mb-3 ' + getUsageDateColor(list)}
                                 style={{ fontSize: '1.2em' }}
                                 title={formatDatetimeForForm(list.usageEndDatetime)}
                             >

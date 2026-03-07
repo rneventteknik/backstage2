@@ -177,7 +177,7 @@ const EquipmentListTable: React.FC<Props> = ({
 
         return (
             <>
-                <div className={'mb-0' + (entry.isHidden ? ' text-muted' : '')}>
+                <div className={'mb-0' + (entry.isHidden || list.isHidden ? ' text-muted' : '')}>
                     <ClickToEdit
                         value={entry.name}
                         onUpdate={(newValue) =>
@@ -313,7 +313,7 @@ const EquipmentListTable: React.FC<Props> = ({
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
 
-        if (entry.isHidden) {
+        if (entry.isHidden || list.isHidden) {
             return <span className="text-muted">-</span>;
         }
 
@@ -365,6 +365,11 @@ const EquipmentListTable: React.FC<Props> = ({
         }
 
         const entry = getEquipmentListEntryFromViewModel(viewModel);
+
+        if (list.isHidden) {
+            return <em className="text-muted">0,00 kr</em>;
+        }
+
         const priceWithoutDiscount = formatCurrency(
             addVAT(getPrice(entry, getNumberOfDays(list), list.discountPercentage, false)),
         );
