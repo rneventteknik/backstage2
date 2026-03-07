@@ -15,6 +15,7 @@ export interface EquipmentList extends BaseEntityWithName {
     numberOfDays?: number | null;
     rentalStatus?: RentalStatus | null;
     discountPercentage: number;
+    isHidden: boolean;
 }
 
 export interface EquipmentListHeading extends BaseEntityWithName {
