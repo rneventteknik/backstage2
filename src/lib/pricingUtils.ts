@@ -82,6 +82,10 @@ export const getEquipmentListHeadingPrice = (
 };
 
 export const getEquipmentListPrice = (list: EquipmentList): currency => {
+    if (list.isHidden) {
+        return currency(0);
+    }
+
     return list.listEntries
         .reduce((sum, e) => sum.add(getPrice(e, getNumberOfDays(list), list.discountPercentage)), currency(0))
         .add(
@@ -429,7 +433,9 @@ export const getInvoiceRows = (
         return fixedPriceBookingToInvoiceRows(booking);
     }
 
-    const equipmentRows = booking.equipmentLists ? booking.equipmentLists.flatMap(equipmentListToInvoiceRows) : [];
+    const equipmentRows = booking.equipmentLists
+        ? booking.equipmentLists.filter((l) => !l.isHidden).flatMap(equipmentListToInvoiceRows)
+        : [];
     const laborRows = timeReportsToLaborRows(booking.timeReports);
     return [...equipmentRows, ...laborRows];
 };

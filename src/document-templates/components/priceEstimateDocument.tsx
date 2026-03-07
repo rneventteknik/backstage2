@@ -38,9 +38,11 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking, globalSettings
 
                 <MainContent>
                     <View style={styles.flexGrow}>
-                        {getSortedList(booking.equipmentLists ?? []).map((l) => (
-                            <EquipmentListInfo list={l} booking={booking} showPrices={showPrices} key={l.id} />
-                        ))}
+                        {getSortedList(booking.equipmentLists ?? [])
+                            .filter((l) => !l.isHidden)
+                            .map((l) => (
+                                <EquipmentListInfo list={l} booking={booking} showPrices={showPrices} key={l.id} />
+                            ))}
                         <TimeEstimateListInfo booking={booking} showPrices={showPrices} />
                     </View>
 

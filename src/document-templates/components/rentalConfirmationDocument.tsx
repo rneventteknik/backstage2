@@ -54,9 +54,11 @@ export const RentalConfirmationDocument: React.FC<Props> = ({ booking, globalSet
 
                 <MainContent>
                     <View style={styles.flexGrow}>
-                        {getSortedList(booking.equipmentLists ?? []).map((l) => (
-                            <EquipmentListInfo list={l} booking={booking} key={l.id} showPrices={showPrices} />
-                        ))}
+                        {getSortedList(booking.equipmentLists ?? [])
+                            .filter((l) => !l.isHidden)
+                            .map((l) => (
+                                <EquipmentListInfo list={l} booking={booking} key={l.id} showPrices={showPrices} />
+                            ))}
                         {showPersonnelCosts ? <TimeEstimateListInfo booking={booking} showPrices={showPrices} /> : null}
                     </View>
                     <View>

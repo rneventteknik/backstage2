@@ -43,16 +43,18 @@ export const TotalPriceSection: React.FC<Props> = ({
 
             <View>
                 {showEquipmentCosts
-                    ? getSortedList(booking.equipmentLists ?? []).map((list) => (
-                          <TableRow key={list.id}>
-                              <TableCellAutoWidth>
-                                  <Text>{list.name}</Text>
-                              </TableCellAutoWidth>
-                              <TableCellFixedWidth width={90} textAlign="right">
-                                  <Text>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
-                              </TableCellFixedWidth>
-                          </TableRow>
-                      ))
+                    ? getSortedList(booking.equipmentLists ?? [])
+                          .filter((list) => !list.isHidden)
+                          .map((list) => (
+                              <TableRow key={list.id}>
+                                  <TableCellAutoWidth>
+                                      <Text>{list.name}</Text>
+                                  </TableCellAutoWidth>
+                                  <TableCellFixedWidth width={90} textAlign="right">
+                                      <Text>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</Text>
+                                  </TableCellFixedWidth>
+                              </TableRow>
+                          ))
                     : null}
                 {showPersonnelCosts ? (
                     <TableRow>
