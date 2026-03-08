@@ -169,7 +169,21 @@ const EquipmentListHeader: React.FC<Props> = ({
                         }
                         readonly={readonly}
                     >
-                        {list.name}
+                        <span className={listIsHidden ? 'text-muted' : ''}>
+                            {list.name}
+                            {listIsHidden ? (
+                                <OverlayTrigger
+                                    placement="right"
+                                    overlay={
+                                        <Tooltip id="hidden-list-tooltip">
+                                            <strong>Denna lista är dold för kunden.</strong>
+                                        </Tooltip>
+                                    }
+                                >
+                                    <FontAwesomeIcon icon={faEyeSlash} className="ml-2" />
+                                </OverlayTrigger>
+                            ) : null}
+                        </span>
                     </ClickToEdit>
                 </div>
                 <div className="d-flex">

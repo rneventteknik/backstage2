@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, Form, ListGroup, Row } from 'react-bootstrap';
+import { Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, Form, ListGroup, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import {
     getAccountKindName,
     getDefaultLaborHourlyRate,
@@ -24,6 +24,7 @@ import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleto
 import { ErrorPage } from '../../../components/layout/ErrorPage';
 import {
     faCoins,
+    faEyeSlash,
     faFileDownload,
     faFilePdf,
     faFilePen,
@@ -68,6 +69,7 @@ import PreviousBookingsCard from '../../../components/bookings/PreviousBookingsC
 import { BookingType } from '../../../models/enums/BookingType';
 import CalendarWorkersCard from '../../../components/bookings/CalendarWorkersCard';
 import BookingPotentialProblemsSection from '../../../components/bookings/BookingPotentialProblemsSection';
+import { getEquipmentListIsHidden } from '../../../lib/equipmentListUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -414,8 +416,24 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         <ListGroup variant="flush">
                             {booking.equipmentLists?.map((list) => (
                                 <ListGroup.Item className="d-flex" key={list.id}>
-                                    <span className="flex-grow-1">{list.name}</span>
-                                    <span>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</span>
+                                    {getEquipmentListIsHidden(list) ?
+                                        <span className="text-muted">
+                                            <span className="flex-grow-1">{list.name}</span>
+                                            <OverlayTrigger
+                                                placement="right"
+                                                overlay={
+                                                    <Tooltip id="hidden-list-tooltip">
+                                                        <strong>Denna lista är dold för kunden.</strong>
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <FontAwesomeIcon icon={faEyeSlash} className="ml-2" />
+                                            </OverlayTrigger>
+                                        </span> : <>
+                                            <span className="flex-grow-1">{list.name}</span>
+                                        </>
+                                    }
+                                    <span className='ml-auto'>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</span>
                                 </ListGroup.Item>
                             ))}
                             <ListGroup.Item className="d-flex">
