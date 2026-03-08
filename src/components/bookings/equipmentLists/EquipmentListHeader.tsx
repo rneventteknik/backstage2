@@ -17,6 +17,8 @@ import {
     faPercent,
     faListCheck,
     faWarning,
+    faEyeSlash,
+    faEye,
 } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
 import { toIntOrUndefined, getRentalStatusName } from '../../../lib/utils';
@@ -32,7 +34,7 @@ import {
     getNumberOfEquipmentOutDays,
 } from '../../../lib/datetimeUtils';
 import { Language } from '../../../models/enums/Language';
-import { addHeadingEntry, importEquipmentEntries } from '../../../lib/equipmentListUtils';
+import { addHeadingEntry, getEquipmentListIsHidden, importEquipmentEntries } from '../../../lib/equipmentListUtils';
 import { BookingType } from '../../../models/enums/BookingType';
 import { RentalStatus } from '../../../models/enums/RentalStatus';
 import { Status } from '../../../models/enums/Status';
@@ -132,6 +134,24 @@ const EquipmentListHeader: React.FC<Props> = ({
     };
 
     const showRentalControls = bookingType === BookingType.RENTAL || alwaysShowRentalControls;
+    const listIsHidden = getEquipmentListIsHidden(list);
+
+    const setHiddenListItems = (targetHiddenStatus: boolean) => {
+        saveList({
+            ...list,
+            listEntries: list.listEntries.map((x) => ({
+                ...x,
+                isHidden: targetHiddenStatus,
+            })),
+            listHeadings: list.listHeadings.map((heading) => ({
+                ...heading,
+                listEntries: heading.listEntries.map((x) => ({
+                    ...x,
+                    isHidden: targetHiddenStatus
+                }))
+            }))
+        })
+    }
 
     // HTML template
     //
@@ -149,7 +169,21 @@ const EquipmentListHeader: React.FC<Props> = ({
                         }
                         readonly={readonly}
                     >
-                        {list.name}
+                        <span className={listIsHidden ? 'text-muted' : ''}>
+                            {list.name}
+                            {listIsHidden ? (
+                                <OverlayTrigger
+                                    placement="right"
+                                    overlay={
+                                        <Tooltip id="hidden-list-tooltip">
+                                            <strong>Denna lista är dold för kunden.</strong>
+                                        </Tooltip>
+                                    }
+                                >
+                                    <FontAwesomeIcon icon={faEyeSlash} className="ml-2" />
+                                </OverlayTrigger>
+                            ) : null}
+                        </span>
                     </ClickToEdit>
                 </div>
                 <div className="d-flex">
@@ -249,6 +283,12 @@ const EquipmentListHeader: React.FC<Props> = ({
                                 </Dropdown.Item>
                                 <Dropdown.Item onClick={() => setShowEditDiscountPercentageModal(true)}>
                                     <FontAwesomeIcon icon={faPercent} className="mr-1 fa-fw" /> Redigera rabatt
+                                </Dropdown.Item>
+                                <Dropdown.Item onClick={() => setHiddenListItems(!listIsHidden)}>
+                                    {listIsHidden ?
+                                        <> <FontAwesomeIcon icon={faEye} className="mr-1 fa-fw" /> Visa lista </> :
+                                        <> <FontAwesomeIcon icon={faEyeSlash} className="mr-1 fa-fw" /> Dölj lista</>
+                                    }
                                 </Dropdown.Item>
                                 {showEditDiscountPercentageModal ? (
                                     <EditTextModal

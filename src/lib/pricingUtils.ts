@@ -10,6 +10,7 @@ import { formatDateForForm, getBookingDateDisplayValues, getNumberOfDays } from 
 import { getSortedList } from './sortIndexUtils';
 import { getTotalNumberOfHoursReported, groupBy } from './utils';
 import currency from 'currency.js';
+import { getEquipmentListIsHidden } from './equipmentListUtils';
 
 // Calculate total price
 //
@@ -429,7 +430,11 @@ export const getInvoiceRows = (
         return fixedPriceBookingToInvoiceRows(booking);
     }
 
-    const equipmentRows = booking.equipmentLists ? booking.equipmentLists.flatMap(equipmentListToInvoiceRows) : [];
+    const equipmentRows = booking.equipmentLists ?
+        booking.equipmentLists
+            .filter((l) => !getEquipmentListIsHidden(l))
+            .flatMap(equipmentListToInvoiceRows) :
+        [];
     const laborRows = timeReportsToLaborRows(booking.timeReports);
     return [...equipmentRows, ...laborRows];
 };

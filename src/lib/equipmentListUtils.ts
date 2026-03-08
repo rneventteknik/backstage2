@@ -82,6 +82,20 @@ export const getSubEntitiesToDisplay = (list: EquipmentList) => {
     }));
 };
 
+export const getEquipmentListIsHidden = (list: EquipmentList) => {
+    // Note: technically the .lenght checks could be removed, but I think it is better to be explicit
+    return (
+        list.listEntries.length === 0 ||
+        list.listEntries.every((x) => x.isHidden)
+    ) && (
+        list.listHeadings.length === 0 ||
+        list.listHeadings.every((heading) =>
+            heading.listEntries.length === 0 ||
+            heading.listEntries.every((x) => x.isHidden)
+        )
+    )
+}
+
 export const getHeaderOfEntity = (entity: EquipmentListEntry, list: EquipmentList) =>
     list.listHeadings.find((heading) => heading.listEntries.some((x) => x.id === entity.id));
 
@@ -174,6 +188,7 @@ export const getNextEquipmentListEntryId = (list: EquipmentList) =>
 const getNextEquipmentListHeadingEntryId = (list: EquipmentList) =>
     Math.min(-1, ...(list?.listHeadings ?? []).map((x) => x.id)) - 1;
 
+    
 const addMultipleEquipment = (
     entries: {
         equipment: Equipment;
