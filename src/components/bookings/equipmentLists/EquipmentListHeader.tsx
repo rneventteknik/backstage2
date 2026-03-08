@@ -34,7 +34,7 @@ import {
     getNumberOfEquipmentOutDays,
 } from '../../../lib/datetimeUtils';
 import { Language } from '../../../models/enums/Language';
-import { addHeadingEntry, importEquipmentEntries } from '../../../lib/equipmentListUtils';
+import { addHeadingEntry, getEquipmentListIsHidden, importEquipmentEntries } from '../../../lib/equipmentListUtils';
 import { BookingType } from '../../../models/enums/BookingType';
 import { RentalStatus } from '../../../models/enums/RentalStatus';
 import { Status } from '../../../models/enums/Status';
@@ -134,7 +134,7 @@ const EquipmentListHeader: React.FC<Props> = ({
     };
 
     const showRentalControls = bookingType === BookingType.RENTAL || alwaysShowRentalControls;
-    const listIsHidden = list.listEntries.every((x) => x.isHidden);
+    const listIsHidden = getEquipmentListIsHidden(list);
 
     const setHiddenListItems = (targetHiddenStatus: boolean) => {
         saveList({
