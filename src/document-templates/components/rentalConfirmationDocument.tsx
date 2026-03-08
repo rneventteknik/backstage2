@@ -17,6 +17,7 @@ import { Signature } from './shared/signature';
 import { getTotalTimeEstimatesPrice } from '../../lib/pricingUtils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 import { getGlobalSetting } from '../../lib/utils';
+import { getEquipmentListIsHidden } from '../../lib/equipmentListUtils';
 
 type Props = {
     booking: Booking;
@@ -54,8 +55,10 @@ export const RentalConfirmationDocument: React.FC<Props> = ({ booking, globalSet
 
                 <MainContent>
                     <View style={styles.flexGrow}>
-                        {getSortedList(booking.equipmentLists ?? []).map((l) => (
-                            <EquipmentListInfo list={l} booking={booking} key={l.id} showPrices={showPrices} />
+                        {getSortedList(booking.equipmentLists ?? [])
+                            .filter((l) => !getEquipmentListIsHidden(l))
+                            .map((l) => (
+                                <EquipmentListInfo list={l} booking={booking} key={l.id} showPrices={showPrices} />
                         ))}
                         {showPersonnelCosts ? <TimeEstimateListInfo booking={booking} showPrices={showPrices} /> : null}
                     </View>

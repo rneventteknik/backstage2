@@ -13,6 +13,7 @@ import { EquipmentListInfo } from './shared/equipmentListInfo';
 import { TimeEstimateListInfo } from './shared/timeEstimateListInfo';
 import { getSortedList } from '../../lib/sortIndexUtils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
+import { getEquipmentListIsHidden } from '../../lib/equipmentListUtils';
 
 type Props = {
     booking: Booking;
@@ -38,7 +39,9 @@ export const PriceEstimateDocument: React.FC<Props> = ({ booking, globalSettings
 
                 <MainContent>
                     <View style={styles.flexGrow}>
-                        {getSortedList(booking.equipmentLists ?? []).map((l) => (
+                        {getSortedList(booking.equipmentLists ?? [])
+                            .filter((l) => !getEquipmentListIsHidden(l))
+                            .map((l) => (
                             <EquipmentListInfo list={l} booking={booking} showPrices={showPrices} key={l.id} />
                         ))}
                         <TimeEstimateListInfo booking={booking} showPrices={showPrices} />

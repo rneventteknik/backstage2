@@ -7,7 +7,7 @@ import { MainContent } from './shared/mainContent';
 import { Footer } from './shared/footer';
 import { useTextResources } from '../useTextResources';
 import { KeyValue } from '../../models/interfaces/KeyValue';
-import { InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../../models/misc/Invoice';
+import { InvoiceData, InvoiceRow as InvoiceRowInterface, InvoiceRowType, PricedInvoiceRow } from '../../models/misc/Invoice';
 import { InvoiceInfo } from './invoiceInfo';
 import { groupBy } from '../../lib/utils';
 import {
@@ -40,7 +40,7 @@ const calculateTotalAmount = (invoiceData: InvoiceData): currency => calculateRo
 const calculateTotalVAT = (invoiceData: InvoiceData): currency => getVAT(calculateTotalAmount(invoiceData));
 
 type InvoiceRowProps = {
-    invoiceRow: InvoiceRow;
+    invoiceRow: InvoiceRowInterface;
 };
 
 const InvoiceRow: React.FC<InvoiceRowProps> = ({ invoiceRow }: InvoiceRowProps) => {
