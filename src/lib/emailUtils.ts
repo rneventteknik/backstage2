@@ -1,5 +1,5 @@
 import { gmail_v1, google } from 'googleapis';
-import { EmailThreadResult, EmailMessageResult } from '../models/misc/EmailThreadResult';
+import { EmailThreadResult, EmailMessageResult, EmailAttachment } from '../models/misc/EmailThreadResult';
 
 interface EmailHeaders {
     subject?: string;
@@ -75,10 +75,36 @@ const getEmailBody = (payload?: gmail_v1.Schema$MessagePart): string | undefined
     return nestedBodies[0];
 };
 
+const getAttachments = (payload?: gmail_v1.Schema$MessagePart): EmailAttachment[] => {
+    if (!payload) return [];
+
+    const attachments: EmailAttachment[] = [];
+
+    const collectAttachments = (parts?: gmail_v1.Schema$MessagePart[] | undefined) => {
+        if (!parts) return;
+        for (const part of parts) {
+            if (part.filename && part.body?.attachmentId) {
+                attachments.push({
+                    filename: part.filename,
+                    mimeType: part.mimeType || 'application/octet-stream',
+                    attachmentId: part.body.attachmentId,
+                });
+            }
+            if (part.parts) {
+                collectAttachments(part.parts as gmail_v1.Schema$MessagePart[]);
+            }
+        }
+    };
+
+    collectAttachments(payload.parts as gmail_v1.Schema$MessagePart[] | undefined);
+    return attachments;
+};
+
 const mapEmailMessage = async (message: gmail_v1.Schema$Message): Promise<EmailMessageResult> => {
     const headers = parseEmailHeaders(message.payload?.headers);
     const threadId = message.threadId ?? '';
     const messageId = message.id as string;
+    const attachments = getAttachments(message.payload);
 
     return {
         id: messageId,
@@ -89,6 +115,7 @@ const mapEmailMessage = async (message: gmail_v1.Schema$Message): Promise<EmailM
         date: headers['date'],
         snippet: message.snippet || undefined,
         body: getEmailBody(message.payload),
+        attachments: attachments.length > 0 ? attachments : undefined,
     };
 };
 
@@ -183,6 +210,27 @@ export const getEmailThreads = async (): Promise<EmailThreadResult[] | null> => 
     );
 
     return threadsWithDetails.filter((thread) => thread !== null) as EmailThreadResult[];
+};
+
+export const getEmailAttachment = async (messageId: string, attachmentId: string): Promise<string | null> => {
+    const gmail = getEmailClient();
+
+    if (!gmail) {
+        return null;
+    }
+
+    const response = await gmail.users.messages.attachments.get({
+        userId: 'me',
+        messageId: messageId,
+        id: attachmentId,
+    });
+
+    if (!response.data?.data) {
+        return null;
+    }
+
+    // Gmail API returns URL-safe base64, decode it
+    return Buffer.from(response.data.data, 'base64').toString('utf-8');
 };
 
 export const getEmailThread = async (threadId: string): Promise<EmailThreadResult | null> => {

@@ -8,6 +8,12 @@ export interface EmailThreadResult {
     lastMessageDate?: string;
 }
 
+export interface EmailAttachment {
+    filename: string;
+    mimeType: string;
+    attachmentId: string;
+}
+
 export interface EmailMessageResult {
     id: string;
     threadId?: string;
@@ -17,4 +23,5 @@ export interface EmailMessageResult {
     date?: string;
     snippet?: string;
     body?: string;
+    attachments?: EmailAttachment[];
 }

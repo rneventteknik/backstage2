@@ -3,9 +3,9 @@ import {
     respondWithCustomErrorMessage,
     respondWithEntityNotFoundResponse,
     respondWithInvalidMethodResponse,
-} from '../../../lib/apiResponses';
-import { withSessionContext } from '../../../lib/sessionContext';
-import { getEmailThread } from '../../../lib/emailUtils';
+} from '../../../../lib/apiResponses';
+import { withSessionContext } from '../../../../lib/sessionContext';
+import { getEmailThread } from '../../../../lib/emailUtils';
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     const emailThreadId = req.query.id;

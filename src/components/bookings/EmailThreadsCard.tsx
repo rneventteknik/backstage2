@@ -357,13 +357,13 @@ const SelectEmailThreadModal: React.FC<SelectEmailThreadModalProps> = ({
     );
 };
 
-type ViewThreadDetailsModalProps = {
+export type ViewThreadDetailsModalProps = {
     show: boolean;
     hide: () => void;
     threadId: string;
 };
 
-const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
+export const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
     show,
     hide,
     threadId,

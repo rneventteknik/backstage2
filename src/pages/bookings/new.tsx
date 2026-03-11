@@ -31,10 +31,13 @@ import { PricePlan } from '../../models/enums/PricePlan';
 import BookingSpecificationUploader from '../../components/utils/BookingSpecificationUploader';
 import {
     BookingSpecificationEquipmentModel,
+    BookingSpecificationImportModel,
     BookingSpecificationModel,
 } from '../../models/misc/BookingSpecificationImportModel';
 import { EquipmentListEntry } from '../../models/interfaces/EquipmentList';
 import { toEquipmentList } from '../../lib/mappers/booking';
+import EmailThreadSelector from '../../components/bookings/EmailThreadSelector';
+import { EmailThreadResult } from '../../models/misc/EmailThreadResult';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
@@ -48,6 +51,9 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
     const [equipment, setEquipment] = useState<BookingSpecificationEquipmentModel[] | undefined>();
+    const [selectedThreadId, setSelectedThreadId] = useState<string | undefined>();
+    const [loadingAttachment, setLoadingAttachment] = useState(false);
+    const [parsedSpecData, setParsedSpecData] = useState<BookingSpecificationImportModel | undefined>();
 
     const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
 
@@ -60,6 +66,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         setSelectedDefaultBooking(undefined);
         setStartDate(undefined);
         setEndDate(undefined);
+        setSelectedThreadId(undefined);
+        setParsedSpecData(undefined);
         setWizardStep('step-one');
     };
 
@@ -120,6 +128,49 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         setWizardStep('step-three');
     };
 
+    const selectEmailThread = async (threadId: string) => {
+        setSelectedThreadId(threadId);
+        setLoadingAttachment(true);
+
+        try {
+            const thread = await fetch(`/api/email/${threadId}`).then((response) =>
+                getResponseContentOrError<EmailThreadResult>(response),
+            );
+
+            // Look for a message from booking@rneventteknik.se with a booking.txt attachment
+            const bookingMessage = thread.messages.find(
+                (msg) => msg.from?.includes('booking@rneventteknik.se') && msg.attachments?.some((a) => a.filename === 'booking.txt'),
+            );
+
+            if (bookingMessage) {
+                const attachment = bookingMessage.attachments?.find((a) => a.filename === 'booking.txt');
+                if (attachment) {
+                    const attachmentResponse = await fetch(
+                        `/api/email/${bookingMessage.id}/attachments/${attachment.attachmentId}`,
+                    ).then((response) => getResponseContentOrError<{ data: string }>(response));
+
+                    try {
+                        const parsed = JSON.parse(attachmentResponse.data) as BookingSpecificationImportModel;
+                        // Valid booking spec found - show the uploader for review
+                        setParsedSpecData(parsed);
+                        setLoadingAttachment(false);
+                        return;
+                    } catch {
+                        // JSON parse failed, proceed without spec
+                    }
+                }
+            }
+
+            // No matching attachment found, proceed to step 4
+            setLoadingAttachment(false);
+            setWizardStep('step-four');
+        } catch {
+            // Error fetching thread, proceed to step 4
+            setLoadingAttachment(false);
+            setWizardStep('step-four');
+        }
+    };
+
     const createBookingFromFile = (fileContent?: BookingSpecificationModel) => {
         if (!fileContent) {
             setWizardStep('step-four');
@@ -167,16 +218,39 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
         fetch('/api/bookings', request)
             .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
-            .then((data) => {
-                createDefaultEquipmentList(data).then(() => {
-                    showCreateSuccessNotification('Bokningen');
-                    router.push('/bookings/' + data.id);
-                });
+            .then(async (data) => {
+                await createDefaultEquipmentList(data);
+
+                // Link email thread to booking if one was selected
+                if (selectedThreadId) {
+                    await linkEmailThread(data.id, selectedThreadId);
+                }
+
+                showCreateSuccessNotification('Bokningen');
+                router.push('/bookings/' + data.id);
             })
             .catch((error: Error) => {
                 console.error(error);
                 showCreateFailedNotification('Bokningen');
             });
+    };
+
+    const linkEmailThread = async (bookingId: number, threadId: string) => {
+        const body = {
+            booking: {
+                emailThreads: [{ threadId, bookingId }],
+            },
+        };
+
+        const request = {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        return fetch(`/api/bookings/${bookingId}`, request).catch((error) =>
+            console.error('Failed to link email thread:', error),
+        );
     };
 
     const createDefaultEquipmentList = async (booking: IBookingObjectionModel) => {
@@ -276,7 +350,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             <Card.Body>
                                 <div className="d-flex">
                                     <p className="text-muted flex-grow-1 mb-0">
-                                        <strong>Steg 3 av 4</strong> Ladda upp en fil med bokningsspecifikation.
+                                        <strong>Steg 3 av 4</strong> Välj en emailtråd att koppla till bokningen.
                                     </p>
                                     <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2">
                                         Avbryt
@@ -288,7 +362,20 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             </Card.Body>
                         </Card>
                         {selectedDefaultBooking && wizardStep == 'step-three' ? (
-                            <BookingSpecificationUploader onSave={createBookingFromFile} />
+                            loadingAttachment ? (
+                                <Card className="mb-3">
+                                    <Card.Body className="text-center text-muted">
+                                        Laddar emailtråd...
+                                    </Card.Body>
+                                </Card>
+                            ) : parsedSpecData ? (
+                                <BookingSpecificationUploader
+                                    onSave={createBookingFromFile}
+                                    initialData={parsedSpecData}
+                                />
+                            ) : (
+                                <EmailThreadSelector onSelect={selectEmailThread} />
+                            )
                         ) : null}
                     </Tab.Pane>
                     <Tab.Pane eventKey="step-four">
