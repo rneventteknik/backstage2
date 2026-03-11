@@ -66,7 +66,7 @@ const EmailThreadsCard: React.FC<Props> = ({ emailThreadIds, onSubmit, readonly 
                         <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                     </Button>
                     {!readonly ? (
-                        <DropdownButton id="dropdown-email-threads" variant="secondary" title="Mer" size="sm">
+                        <DropdownButton id="dropdown-email-threads-header" variant="secondary" title="Mer" size="sm">
                             <Dropdown.Item onClick={() => setShowSelectEmailThreadModal(true)}>
                                 <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Lägg till emailtråd
                             </Dropdown.Item>
@@ -123,7 +123,7 @@ const EmailThreadItem: React.FC<EmailThreadItemProps> = ({ threadId, onRemove, r
                         <div className="text-muted small">{(error as Error).message}</div>
                         {!readonly ? (
                             <Button variant="danger" size="sm" className="mt-2" onClick={onRemove}>
-                                <FontAwesomeIcon icon={faTrash} /> Ta bort kopping
+                                <FontAwesomeIcon icon={faTrash} /> Ta bort koppling
                             </Button>
                         ) : null}
                     </div>
@@ -157,14 +157,14 @@ const EmailThreadItem: React.FC<EmailThreadItemProps> = ({ threadId, onRemove, r
                     </div>
                     {!readonly ? (
                         <DropdownButton
-                            id="dropdown-email-threads"
+                            id="dropdown-email-thread-item"
                             variant="secondary"
                             title="Mer"
                             size="sm"
                             className="ml-3"
                         >
                             <Dropdown.Item variant="link" size="sm" className="text-danger" onClick={onRemove}>
-                                <FontAwesomeIcon icon={faTrash} className="mr-2" /> Ta bort kopping
+                                <FontAwesomeIcon icon={faTrash} className="mr-2" /> Ta bort koppling
                             </Dropdown.Item>
                         </DropdownButton>
                     ) : null}
@@ -311,9 +311,9 @@ const SelectEmailThreadModal: React.FC<SelectEmailThreadModalProps> = ({
                 key: 'lastMessage',
                 displayName: 'Senaste meddelande',
                 getValue: (thread: EmailThreadResult) =>
-                    formatDatetimeForForm(toDatetimeOrUndefined(thread.firstMessageDate)),
+                    formatDatetimeForForm(toDatetimeOrUndefined(thread.lastMessageDate)),
                 getContentOverride: (thread: EmailThreadResult) =>
-                    formatDatetimeForForm(toDatetimeOrUndefined(thread.firstMessageDate)),
+                    formatDatetimeForForm(toDatetimeOrUndefined(thread.lastMessageDate)),
                 columnWidth: 170,
                 cellHideSize: 'lg',
             },

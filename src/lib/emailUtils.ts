@@ -21,7 +21,7 @@ const getEmailClient = () => {
         return null;
     }
 
-    const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, 'http://localhost:3000');
+    const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000');
 
     oauth2Client.setCredentials({
         refresh_token: refreshToken,
@@ -117,50 +117,6 @@ const mapEmailMessage = async (message: gmail_v1.Schema$Message): Promise<EmailM
         body: getEmailBody(message.payload),
         attachments: attachments.length > 0 ? attachments : undefined,
     };
-};
-
-const mapEmailResponse = async (messages: gmail_v1.Schema$Message[]): Promise<EmailMessageResult[] | null> => {
-    if (!messages || messages.length === 0) {
-        return null;
-    }
-
-    return Promise.all(messages.map((x) => mapEmailMessage(x)));
-};
-
-export const getEmails = async () => {
-    const gmail = getEmailClient();
-
-    if (!gmail) {
-        return [];
-    }
-
-    try {
-        const response = await gmail.users.messages.list({
-            userId: 'me',
-            maxResults: 250,
-        });
-
-        if (!response.data.messages) {
-            return null;
-        }
-
-        // Fetch full message details for each email
-        const messagesWithDetails = await Promise.all(
-            response.data.messages.map(async (message: gmail_v1.Schema$Message) => {
-                const fullMessage = await gmail.users.messages.get({
-                    userId: 'me',
-                    id: message.id!,
-                    format: 'full',
-                });
-                return fullMessage.data;
-            }),
-        );
-
-        return mapEmailResponse(messagesWithDetails);
-    } catch (e) {
-        console.error('Error fetching thread:', e);
-        return null;
-    }
 };
 
 export const getEmailThreads = async (): Promise<EmailThreadResult[] | null> => {
