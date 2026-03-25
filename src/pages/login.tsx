@@ -1,9 +1,10 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Form, FormControl, Button, FormGroup, Alert, Spinner } from 'react-bootstrap';
 import Router from 'next/router';
+import posthog from 'posthog-js';
 import { useUser } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
-import { getGlobalSetting, getValueOrFirst } from '../lib/utils';
+import { getGlobalSetting, getRoleName, getValueOrFirst } from '../lib/utils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import Head from 'next/head';
 import EnvironmentTypeTag from '../components/utils/EnvironmentTypeTag';
@@ -25,9 +26,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const [showWrongPasswordError, setShowWrongPasswordError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
     const [waitingForResponse, setWaitingForResponse] = useState(false);
-
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const usernameFieldRef = useRef<HTMLInputElement>(null);
 
@@ -50,11 +49,10 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        const body = {
-            username: username,
-            password: password,
-        };
-
+        const formData = new FormData(e.currentTarget);
+        const body = Object.fromEntries(
+            ['username', 'password'].map(key => [key, formData.get(key)])
+        );
         const request = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -71,6 +69,10 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
             .then((data) => data as CurrentUserInfo)
             .then((user) => {
                 if (user.isLoggedIn) {
+                    posthog.identify(String(user.userId), {
+                        name: user.name,
+                        role: getRoleName(user.role),
+                    });
                     Router.push(getRedirectUrl());
                 } else {
                     setShowWrongPasswordError(true);
@@ -113,16 +115,23 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                         placeholder="Användarnamn"
                         name="username"
                         ref={usernameFieldRef}
-                        onChange={(e) => setUsername(e.target.value)}
                     />
                 </FormGroup>
                 <FormGroup>
                     <FormControl
-                        type="password"
+                        type={!showPassword ? "password" : "text"}
                         placeholder="Lösenord"
                         name="password"
                         autoComplete="off"
-                        onChange={(e) => setPassword(e.target.value)}
+                    />
+                </FormGroup>
+                <FormGroup>
+                    <Form.Check
+                        type="switch"
+                        name="show password"
+                        id="showPasswordToggle"
+                        label="Visa lösenord"
+                        onChange={(e) => setShowPassword(e.target.checked)}
                     />
                 </FormGroup>
                 {showWrongPasswordError ? <Alert variant="danger">Felaktigt användarnamn eller lösenord</Alert> : null}

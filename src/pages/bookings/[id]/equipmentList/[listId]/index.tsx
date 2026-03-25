@@ -149,6 +149,18 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 disableSort: true,
             },
             {
+                key: 'count',
+                displayName: 'Antal',
+                getValue: (entry: EquipmentListEntry) => entry.numberOfUnits ?? '-',
+                getContentOverride: (entry: EquipmentListEntry) =>
+                    entry.numberOfUnits === null ? '-' : entry.numberOfUnits + ' st',
+                getHeadingValue: (entry: EquipmentListEntry) =>
+                    entry.numberOfUnits === null ? '-' : entry.numberOfUnits + ' st',
+                textAlignment: 'center',
+                columnWidth: 120,
+                disableSort: true,
+            },
+            {
                 key: 'name',
                 displayName: 'Utrustning',
                 getValue: (entry: EquipmentListEntry) => entry.name + ' ' + entry.description,
@@ -164,18 +176,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     entry.equipment?.equipmentLocation?.name ?? 'Okänd plats',
                 cellHideSize: 'xl',
                 columnWidth: 200,
-                disableSort: true,
-            },
-            {
-                key: 'count',
-                displayName: 'Antal',
-                getValue: (entry: EquipmentListEntry) => entry.numberOfUnits ?? '-',
-                getContentOverride: (entry: EquipmentListEntry) =>
-                    entry.numberOfUnits === null ? '-' : entry.numberOfUnits + ' st',
-                getHeadingValue: (entry: EquipmentListEntry) =>
-                    entry.numberOfUnits === null ? '-' : entry.numberOfUnits + ' st',
-                textAlignment: 'center',
-                columnWidth: 120,
                 disableSort: true,
             },
         ],

@@ -93,6 +93,7 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
                                 ...array,
                             ]
                                 .filter(onlyUniqueById)
+                                .filter((x) => !x.isArchived)
                                 .filter((x) => x.id !== primaryEquipment?.id),
                         );
                     })
@@ -110,6 +111,7 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
                         setEquipment((array) =>
                             [...equipmentTag.equipment, ...array]
                                 .filter(onlyUniqueById)
+                                .filter((x) => !x.isArchived)
                                 .filter((x) => x.id !== primaryEquipment?.id),
                         );
                     })
