@@ -1,5 +1,6 @@
 import { gmail_v1, google } from 'googleapis';
 import { EmailThreadResult, EmailMessageResult, EmailAttachment } from '../models/misc/EmailThreadResult';
+import { fetchSetting } from './db-access/setting';
 
 interface EmailHeaders {
     subject?: string;
@@ -9,10 +10,12 @@ interface EmailHeaders {
     [key: string]: string | undefined;
 }
 
-const getEmailClient = () => {
+const getEmailClient = async () => {
     const clientId = process.env.GMAIL_CLIENT_ID;
     const clientSecret = process.env.GMAIL_CLIENT_SECRET;
-    const refreshToken = process.env.GMAIL_REFRESH_TOKEN;
+
+    const dbSetting = await fetchSetting('email.gmailRefreshToken');
+    const refreshToken = dbSetting?.value || process.env.GMAIL_REFRESH_TOKEN;
 
     if (!clientId || !clientSecret || !refreshToken) {
         console.error(
@@ -120,7 +123,7 @@ const mapEmailMessage = async (message: gmail_v1.Schema$Message): Promise<EmailM
 };
 
 export const getEmailThreads = async (): Promise<EmailThreadResult[] | null> => {
-    const gmail = getEmailClient();
+    const gmail = await getEmailClient();
 
     if (!gmail) {
         return [];
@@ -169,7 +172,7 @@ export const getEmailThreads = async (): Promise<EmailThreadResult[] | null> => 
 };
 
 export const getEmailAttachment = async (messageId: string, attachmentId: string): Promise<string | null> => {
-    const gmail = getEmailClient();
+    const gmail = await getEmailClient();
 
     if (!gmail) {
         return null;
@@ -190,7 +193,7 @@ export const getEmailAttachment = async (messageId: string, attachmentId: string
 };
 
 export const getEmailThread = async (threadId: string): Promise<EmailThreadResult | null> => {
-    const gmail = getEmailClient();
+    const gmail = await getEmailClient();
 
     if (!gmail) {
         return null;

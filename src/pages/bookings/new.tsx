@@ -6,7 +6,7 @@ import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import BookingForm from '../../components/bookings/BookingForm';
-import { getResponseContentOrError } from '../../lib/utils';
+import { getResponseContentOrError, getGlobalSetting } from '../../lib/utils';
 import { Booking } from '../../models/interfaces';
 import { Status } from '../../models/enums/Status';
 import Header from '../../components/layout/Header';
@@ -137,13 +137,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 getResponseContentOrError<EmailThreadResult>(response),
             );
 
-            // Look for a message from booking@rneventteknik.se with a booking.txt attachment
+            const bookingAddress = getGlobalSetting('email.bookingSiteAddress', globalSettings, 'booking@rneventteknik.se');
+            const attachmentFileName = getGlobalSetting('email.bookingSiteAttachmentFileName', globalSettings, 'booking.txt');
+
+            // Look for a message from the booking site with the expected attachment
             const bookingMessage = thread.messages.find(
-                (msg) => msg.from?.includes('booking@rneventteknik.se') && msg.attachments?.some((a) => a.filename === 'booking.txt'),
+                (msg) => msg.from?.includes(bookingAddress) && msg.attachments?.some((a) => a.filename === attachmentFileName),
             );
 
             if (bookingMessage) {
-                const attachment = bookingMessage.attachments?.find((a) => a.filename === 'booking.txt');
+                const attachment = bookingMessage.attachments?.find((a) => a.filename === attachmentFileName);
                 if (attachment) {
                     const attachmentResponse = await fetch(
                         `/api/email/${bookingMessage.id}/attachments/${attachment.attachmentId}`,

@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { google } from 'googleapis';
+import { upsertSetting } from '../../../../lib/db-access/setting';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method !== 'GET') {
@@ -44,12 +45,13 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
         const { tokens } = await oauth2Client.getToken(code);
 
+        if (tokens.refresh_token) {
+            await upsertSetting('email.gmailRefreshToken', tokens.refresh_token);
+        }
+
         res.status(200).json({
             statusCode: 200,
-            message: 'Authentication successful',
-            refreshToken: tokens.refresh_token,
-            instructions:
-                'Add the refresh token to your environment variables or .env.local file as GMAIL_REFRESH_TOKEN',
+            message: 'Authentication successful. Refresh token has been saved to the database.',
         });
     } catch (error) {
         console.error('Error during authentication:', error);

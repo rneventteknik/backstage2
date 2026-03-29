@@ -2,9 +2,9 @@ import { SettingObjectionModel } from '../../models/objection-models/SettingObje
 import { ensureDatabaseIsInitialized } from '../database';
 import { removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
-export const fetchSetting = async (name: string): Promise<SettingObjectionModel | undefined> => {
+export const fetchSetting = async (key: string): Promise<SettingObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
-    return SettingObjectionModel.query().where('name', name).first();
+    return SettingObjectionModel.query().where('key', key).first();
 };
 
 export const fetchSettings = async (): Promise<SettingObjectionModel[]> => {
@@ -22,6 +22,23 @@ export const insertSetting = async (setting: SettingObjectionModel): Promise<Set
     ensureDatabaseIsInitialized();
 
     return SettingObjectionModel.query().insert(withCreatedDate(removeIdAndDates(setting)));
+};
+
+export const upsertSetting = async (key: string, value: string): Promise<SettingObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    const existing = await SettingObjectionModel.query().where('key', key).first();
+
+    if (existing) {
+        return SettingObjectionModel.query().patchAndFetchById(
+            existing.$id() as number,
+            withUpdatedDate({ value } as SettingObjectionModel),
+        );
+    }
+
+    return SettingObjectionModel.query().insert(
+        withCreatedDate({ key, value } as SettingObjectionModel),
+    );
 };
 
 export const deleteSetting = async (id: number): Promise<boolean> => {
