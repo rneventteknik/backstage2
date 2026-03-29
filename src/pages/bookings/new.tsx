@@ -335,7 +335,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                     <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2 text-nowrap">
                                         Avbryt
                                     </Button>
-                                    <Button onClick={() => createBookingFromFile()} className="text-nowrap">
+                                    <Button variant={loadingAttachment || parsedSpecData ? 'secondary' : 'primary'} onClick={() => createBookingFromFile()} className="text-nowrap">
                                         Koppla inte emailtråd
                                     </Button>
                                 </div>
