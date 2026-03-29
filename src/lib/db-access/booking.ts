@@ -299,7 +299,21 @@ export const updateBooking = async (
 export const insertBooking = async (booking: BookingObjectionModel): Promise<BookingObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query().insert(withCreatedDate(removeIdAndDates(booking)));
+    const { emailThreads, ...bookingWithoutThreads } = booking;
+
+    const insertedBooking = await BookingObjectionModel.query().insert(
+        withCreatedDate(removeIdAndDates(bookingWithoutThreads as BookingObjectionModel)),
+    );
+
+    if (emailThreads && emailThreads.length > 0) {
+        for (const thread of emailThreads) {
+            await BookingObjectionModel.relatedQuery('emailThreads')
+                .for(insertedBooking.id)
+                .insert(withCreatedDate(removeIdAndDates(thread)));
+        }
+    }
+
+    return insertedBooking;
 };
 
 export const deleteBooking = async (id: number): Promise<boolean> => {

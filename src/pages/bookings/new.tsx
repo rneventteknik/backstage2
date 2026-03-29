@@ -51,7 +51,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
     const [equipment, setEquipment] = useState<BookingSpecificationEquipmentModel[] | undefined>();
-    const [selectedThreadId, setSelectedThreadId] = useState<string | undefined>();
     const [loadingAttachment, setLoadingAttachment] = useState(false);
     const [parsedSpecData, setParsedSpecData] = useState<BookingSpecificationImportModel | undefined>();
 
@@ -66,7 +65,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         setSelectedDefaultBooking(undefined);
         setStartDate(undefined);
         setEndDate(undefined);
-        setSelectedThreadId(undefined);
         setParsedSpecData(undefined);
         setWizardStep('step-one');
     };
@@ -129,7 +127,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     };
 
     const selectEmailThread = async (threadId: string) => {
-        setSelectedThreadId(threadId);
+        setSelectedDefaultBooking((booking) => ({
+            ...booking,
+            emailThreads: [{ threadId }] as Booking['emailThreads'],
+        }));
         setLoadingAttachment(true);
 
         try {
@@ -223,12 +224,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
             .then(async (data) => {
                 await createDefaultEquipmentList(data);
-
-                // Link email thread to booking if one was selected
-                if (selectedThreadId) {
-                    await linkEmailThread(data.id, selectedThreadId);
-                }
-
                 showCreateSuccessNotification('Bokningen');
                 router.push('/bookings/' + data.id);
             })
@@ -236,24 +231,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 console.error(error);
                 showCreateFailedNotification('Bokningen');
             });
-    };
-
-    const linkEmailThread = async (bookingId: number, threadId: string) => {
-        const body = {
-            booking: {
-                emailThreads: [{ threadId, bookingId }],
-            },
-        };
-
-        const request = {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-
-        return fetch(`/api/bookings/${bookingId}`, request).catch((error) =>
-            console.error('Failed to link email thread:', error),
-        );
     };
 
     const createDefaultEquipmentList = async (booking: IBookingObjectionModel) => {
