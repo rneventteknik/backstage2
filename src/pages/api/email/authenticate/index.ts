@@ -1,5 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { google } from 'googleapis';
+import { withSessionContext } from '../../../../lib/sessionContext';
+import { Role } from '../../../../models/enums/Role';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method !== 'GET') {
@@ -43,4 +45,4 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     }
 };
 
-export default handler;
+export default withSessionContext(handler, Role.ADMIN);
