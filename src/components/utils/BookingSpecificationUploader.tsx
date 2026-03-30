@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FileUploader from './FileUploader';
 import { Alert, Button, Card, Col, Form, ListGroup, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
 import {
@@ -19,14 +19,52 @@ import { getEquipmentListEntryPrices } from '../../lib/equipmentListUtils';
 
 type Props = {
     onSave: (bookingSpecificationModel: BookingSpecificationModel) => void;
+    initialData?: BookingSpecificationImportModel;
 };
 
-const BookingSpecificationUploader = ({ onSave }: Props): React.ReactElement => {
-    const [fileContent, setFileContent] = React.useState<BookingSpecificationImportModel | null>(null);
+const BookingSpecificationUploader = ({ onSave, initialData }: Props): React.ReactElement => {
+    const [fileContent, setFileContent] = React.useState<BookingSpecificationImportModel | null>(
+        initialData ?? null,
+    );
     const [rows, setRows] = React.useState<BookingSpecificationEquipmentModel[] | null>(null);
     const { data: equipment, error } = useSwr('/api/equipment', equipmentsFetcher);
     const [missingEquipment, setMissingEquipment] = useState<boolean>(false);
     const [selectedRowIds, setSelectedRowIds] = useState<number[]>([]);
+    const [initialDataProcessed, setInitialDataProcessed] = useState(false);
+
+    const getRowsWithEquipment = (
+        equipmentList: Equipment[],
+        equipmentImportModels: BookingSpecificationEquipmentImportModel[],
+    ): BookingSpecificationEquipmentModel[] =>
+        equipmentImportModels.flatMap((equipmentImportModel) => {
+            const eq = equipmentList.find((e) => e.id === equipmentImportModel.itemId);
+
+            if (!eq) {
+                setMissingEquipment(true);
+                return [];
+            }
+
+            return [
+                {
+                    id: equipmentImportModel.itemId,
+                    amount: equipmentImportModel.amount,
+                    equipment: eq,
+                    selectedPrice: eq?.prices.length === 1 ? eq.prices[0] : null,
+                    hours: null,
+                },
+            ];
+        });
+
+    // Process initialData once equipment is loaded
+    useEffect(() => {
+        if (initialData && equipment && !initialDataProcessed) {
+            const rowsWithEquipment = getRowsWithEquipment(equipment, initialData.equipment);
+            setRows(rowsWithEquipment);
+            setSelectedRowIds(rowsWithEquipment.map((e) => e.id) ?? []);
+            setInitialDataProcessed(true);
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialData, equipment, initialDataProcessed]);
 
     if (error) {
         return (
@@ -38,29 +76,6 @@ const BookingSpecificationUploader = ({ onSave }: Props): React.ReactElement => 
             </div>
         );
     }
-
-    const getRowsWithEquipment = (
-        equipmentList: Equipment[],
-        equipmentImportModels: BookingSpecificationEquipmentImportModel[],
-    ): BookingSpecificationEquipmentModel[] =>
-        equipmentImportModels.flatMap((equipmentImportModel) => {
-            const equipment = equipmentList.find((e) => e.id === equipmentImportModel.itemId);
-
-            if (!equipment) {
-                setMissingEquipment(true);
-                return [];
-            }
-
-            return [
-                {
-                    id: equipmentImportModel.itemId,
-                    amount: equipmentImportModel.amount,
-                    equipment: equipment,
-                    selectedPrice: equipment?.prices.length === 1 ? equipment.prices[0] : null,
-                    hours: null,
-                },
-            ];
-        });
 
     const rowRequiresHours = (row: BookingSpecificationEquipmentModel) =>
         row.selectedPrice !== null &&

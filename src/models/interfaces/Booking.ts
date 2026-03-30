@@ -11,6 +11,7 @@ import { Status } from '../enums/Status';
 import { SalaryStatus } from '../enums/SalaryStatus';
 import { PaymentStatus } from '../enums/PaymentStatus';
 import { Language } from '../enums/Language';
+import { EmailThread } from './EmailThread';
 
 export interface Booking extends BaseEntityWithName {
     ownerUser?: User;
@@ -20,6 +21,7 @@ export interface Booking extends BaseEntityWithName {
     timeEstimates?: TimeEstimate[];
     timeReports?: TimeReport[];
     changelog?: BookingChangelogEntry[];
+    emailThreads?: EmailThread[];
     bookingType: BookingType;
     status: Status;
     paymentStatus: PaymentStatus;

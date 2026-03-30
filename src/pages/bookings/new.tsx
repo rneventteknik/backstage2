@@ -6,7 +6,7 @@ import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import BookingForm from '../../components/bookings/BookingForm';
-import { getResponseContentOrError } from '../../lib/utils';
+import { getResponseContentOrError, getGlobalSetting } from '../../lib/utils';
 import { Booking } from '../../models/interfaces';
 import { Status } from '../../models/enums/Status';
 import Header from '../../components/layout/Header';
@@ -31,10 +31,13 @@ import { PricePlan } from '../../models/enums/PricePlan';
 import BookingSpecificationUploader from '../../components/utils/BookingSpecificationUploader';
 import {
     BookingSpecificationEquipmentModel,
+    BookingSpecificationImportModel,
     BookingSpecificationModel,
 } from '../../models/misc/BookingSpecificationImportModel';
 import { EquipmentListEntry } from '../../models/interfaces/EquipmentList';
 import { toEquipmentList } from '../../lib/mappers/booking';
+import EmailThreadSelector from '../../components/bookings/EmailThreadSelector';
+import { EmailThreadResult } from '../../models/misc/EmailThreadResult';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
@@ -48,6 +51,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
     const [startDate, setStartDate] = useState<string | undefined>();
     const [endDate, setEndDate] = useState<string | undefined>();
     const [equipment, setEquipment] = useState<BookingSpecificationEquipmentModel[] | undefined>();
+    const [loadingAttachment, setLoadingAttachment] = useState(false);
+    const [parsedSpecData, setParsedSpecData] = useState<BookingSpecificationImportModel | undefined>();
 
     const { showCreateSuccessNotification, showCreateFailedNotification } = useNotifications();
 
@@ -60,6 +65,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         setSelectedDefaultBooking(undefined);
         setStartDate(undefined);
         setEndDate(undefined);
+        setParsedSpecData(undefined);
         setWizardStep('step-one');
     };
 
@@ -120,6 +126,55 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         setWizardStep('step-three');
     };
 
+    const selectEmailThread = async (threadId: string) => {
+        setSelectedDefaultBooking((booking) => ({
+            ...booking,
+            emailThreads: [{ threadId }] as Booking['emailThreads'],
+        }));
+        setLoadingAttachment(true);
+
+        try {
+            const thread = await fetch(`/api/email/${threadId}`).then((response) =>
+                getResponseContentOrError<EmailThreadResult>(response),
+            );
+
+            const bookingAddress = getGlobalSetting('email.bookingSiteAddress', globalSettings, 'booking@rneventteknik.se');
+            const attachmentFileName = getGlobalSetting('email.bookingSiteAttachmentFileName', globalSettings, 'booking.txt');
+
+            // Look for a message from the booking site with the expected attachment
+            const bookingMessage = thread.messages.find(
+                (msg) => msg.from?.includes(bookingAddress) && msg.attachments?.some((a) => a.filename === attachmentFileName),
+            );
+
+            if (bookingMessage) {
+                const attachment = bookingMessage.attachments?.find((a) => a.filename === attachmentFileName);
+                if (attachment) {
+                    const attachmentResponse = await fetch(
+                        `/api/email/${bookingMessage.id}/attachments/${attachment.attachmentId}`,
+                    ).then((response) => getResponseContentOrError<{ data: string }>(response));
+
+                    try {
+                        const parsed = JSON.parse(attachmentResponse.data) as BookingSpecificationImportModel;
+                        // Valid booking spec found - show the uploader for review
+                        setParsedSpecData(parsed);
+                        setLoadingAttachment(false);
+                        return;
+                    } catch {
+                        // JSON parse failed, proceed without spec
+                    }
+                }
+            }
+
+            // No matching attachment found, proceed to step 4
+            setLoadingAttachment(false);
+            setWizardStep('step-four');
+        } catch {
+            // Error fetching thread, proceed to step 4
+            setLoadingAttachment(false);
+            setWizardStep('step-four');
+        }
+    };
+
     const createBookingFromFile = (fileContent?: BookingSpecificationModel) => {
         if (!fileContent) {
             setWizardStep('step-four');
@@ -167,11 +222,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
         fetch('/api/bookings', request)
             .then((apiResponse) => getResponseContentOrError<IBookingObjectionModel>(apiResponse))
-            .then((data) => {
-                createDefaultEquipmentList(data).then(() => {
-                    showCreateSuccessNotification('Bokningen');
-                    router.push('/bookings/' + data.id);
-                });
+            .then(async (data) => {
+                await createDefaultEquipmentList(data);
+                showCreateSuccessNotification('Bokningen');
+                router.push('/bookings/' + data.id);
             })
             .catch((error: Error) => {
                 console.error(error);
@@ -231,12 +285,12 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         <Card className="mb-3">
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
-                                <div className="d-flex">
+                                <div className="d-flex align-items-center">
                                     <p className="text-muted flex-grow-1 mb-0">
                                         <strong>Steg 1 av 4</strong> Välj en bokning från kalendern nedan eller skapa en
                                         manuellt.
                                     </p>
-                                    <Button onClick={() => createBookingFromCalendar(null)}>
+                                    <Button onClick={() => createBookingFromCalendar(null)} className="text-nowrap">
                                         Skapa bokning manuellt
                                     </Button>
                                 </div>
@@ -251,14 +305,14 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         <Card className="mb-3">
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
-                                <div className="d-flex">
+                                <div className="d-flex align-items-center">
                                     <p className="text-muted flex-grow-1 mb-0">
                                         <strong>Steg 2 av 4</strong> Sök efter en kund nedan eller fortsätt utan kund.
                                     </p>
-                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2">
+                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2 text-nowrap">
                                         Avbryt
                                     </Button>
-                                    <Button onClick={() => selectCustomer(null)}>Fyll i kunddetaljer manuellt</Button>
+                                    <Button onClick={() => selectCustomer(null)} className="text-nowrap">Fyll i kunddetaljer manuellt</Button>
                                 </div>
                             </Card.Body>
                         </Card>
@@ -274,35 +328,48 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         <Card className="mb-3">
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
-                                <div className="d-flex">
+                                <div className="d-flex align-items-center">
                                     <p className="text-muted flex-grow-1 mb-0">
-                                        <strong>Steg 3 av 4</strong> Ladda upp en fil med bokningsspecifikation.
+                                        <strong>Steg 3 av 4</strong> Välj en emailtråd att koppla till bokningen. Innehåller emailet en bokningsfil från externsidan kommer bokningsinformationen hämtas automatiskt från den.
                                     </p>
-                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2">
+                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2 text-nowrap">
                                         Avbryt
                                     </Button>
-                                    <Button onClick={() => createBookingFromFile()}>
-                                        Fyll i bokningsdetaljer manuellt
+                                    <Button variant={loadingAttachment || parsedSpecData ? 'secondary' : 'primary'} onClick={() => createBookingFromFile()} className="text-nowrap">
+                                        Koppla inte emailtråd
                                     </Button>
                                 </div>
                             </Card.Body>
                         </Card>
                         {selectedDefaultBooking && wizardStep == 'step-three' ? (
-                            <BookingSpecificationUploader onSave={createBookingFromFile} />
+                            loadingAttachment ? (
+                                <Card className="mb-3">
+                                    <Card.Body className="text-center text-muted">
+                                        Laddar emailtråd...
+                                    </Card.Body>
+                                </Card>
+                            ) : parsedSpecData ? (
+                                <BookingSpecificationUploader
+                                    onSave={createBookingFromFile}
+                                    initialData={parsedSpecData}
+                                />
+                            ) : (
+                                <EmailThreadSelector onSelect={selectEmailThread} />
+                            )
                         ) : null}
                     </Tab.Pane>
                     <Tab.Pane eventKey="step-four">
                         <Card className="mb-3">
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
-                                <div className="d-flex">
+                                <div className="d-flex align-items-center">
                                     <p className="text-muted flex-grow-1 mb-0">
                                         <strong>Steg 4 av 4</strong> Fyll i bokningsdetaljerna nedan.
                                     </p>
-                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2">
+                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2 text-nowrap">
                                         Avbryt
                                     </Button>
-                                    <Button variant="primary" form="editBookingForm" type="submit">
+                                    <Button variant="primary" form="editBookingForm" type="submit" className="text-nowrap">
                                         <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till bokning
                                     </Button>
                                 </div>

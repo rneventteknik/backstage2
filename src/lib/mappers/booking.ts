@@ -15,6 +15,7 @@ import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 import { toTimeReport } from './timeReport';
 import { toDatetimeOrUndefined } from '../datetimeUtils';
 import currency from 'currency.js';
+import { IEmailThreadObjectionModel } from '../../models/objection-models/EmailThreadObjectionModel';
 
 export const toBooking = (objectionModel: IBookingObjectionModel): Booking => {
     if (!objectionModel.id) {
@@ -33,6 +34,7 @@ export const toBooking = (objectionModel: IBookingObjectionModel): Booking => {
         changelog: objectionModel.changelog ? objectionModel.changelog.map(toBookingChangelogEntry) : undefined,
         timeReports: objectionModel.timeReports ? objectionModel.timeReports.map(toTimeReport) : undefined,
         invoiceDate: toDatetimeOrUndefined(objectionModel.invoiceDate),
+        emailThreads: objectionModel.emailThreads ? objectionModel.emailThreads.map(toEmailThread) : undefined,
     };
 };
 
@@ -97,6 +99,19 @@ export const toBookingChangelogEntry = (
 ): BookingChangelogEntry => {
     if (!objectionModel.id) {
         throw new Error('Invalid changelog entry');
+    }
+
+    return {
+        ...objectionModel,
+        id: objectionModel.id,
+        updated: toDatetimeOrUndefined(objectionModel.updated),
+        created: toDatetimeOrUndefined(objectionModel.created),
+    };
+};
+
+export const toEmailThread = (objectionModel: IEmailThreadObjectionModel) => {
+    if (!objectionModel.id) {
+        throw new Error('Invalid email thread entry');
     }
 
     return {
