@@ -6,7 +6,7 @@ export function up(knex) {
         table.dateTime('created');
         table.dateTime('updated');
         table.string('threadId');
-        table.int('bookingId');
+        table.integer('bookingId');
         table.foreign('bookingId').references('id').inTable('Booking');
     });
 }
