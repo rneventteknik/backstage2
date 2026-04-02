@@ -62,7 +62,7 @@ import MarkdownCard from '../../../components/MarkdownCard';
 import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButton';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 import BookingInfoSection from '../../../components/bookings/BookingInfoSection';
-import FilesCard from '../../../components/bookings/FilesCard';
+import FilesCard from '../../../components/FilesCard';
 import currency from 'currency.js';
 import PreviousBookingsCard from '../../../components/bookings/PreviousBookingsCard';
 import { BookingType } from '../../../models/enums/BookingType';
@@ -582,6 +582,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         driveFolderId={booking.driveFolderId}
                         defaultFolderName={`${formatDateForForm(booking.usageStartDatetime, 'N/A')} ${booking.name}`}
                         defaultParentFolder={getOperationalYear(booking.usageStartDatetime)}
+                        driveType="booking"
                         onSubmit={(driveFolderId) => saveBooking({ driveFolderId })}
                         readonly={readonly}
                     />

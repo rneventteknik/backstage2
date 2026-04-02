@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Card, ListGroup } from 'react-bootstrap';
-import { formatDatetimeForForm } from '../../lib/datetimeUtils';
+import { formatDatetimeForForm } from '../lib/datetimeUtils';
 import useSwr from 'swr';
-import { FilesResult } from '../../models/misc/FilesResult';
-import { getResponseContentOrError } from '../../lib/utils';
+import { FilesResult } from '../models/misc/FilesResult';
+import { getResponseContentOrError } from '../lib/utils';
 import {
     faAngleDown,
     faAngleUp,
@@ -19,16 +19,17 @@ import {
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { getSortedList } from '../../lib/sortIndexUtils';
-import TableStyleLink from '../utils/TableStyleLink';
+import { getSortedList } from '../lib/sortIndexUtils';
+import TableStyleLink from './utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
-import { useNotifications } from '../../lib/useNotifications';
-import { getDriveLink } from '../../lib/db-access/utils';
+import { useNotifications } from '../lib/useNotifications';
+import { getDriveLink } from '../lib/db-access/utils';
 
 type Props = {
     driveFolderId: string;
     defaultFolderName: string;
-    defaultParentFolder: string;
+    defaultParentFolder?: string;
+    driveType: 'booking' | 'equipment';
     onSubmit: (driveFolderId: string) => void;
     readonly?: boolean;
 };
@@ -37,6 +38,7 @@ const FilesCard: React.FC<Props> = ({
     driveFolderId,
     defaultFolderName,
     defaultParentFolder,
+    driveType,
     onSubmit,
     readonly = false,
 }: Props) => {
@@ -45,12 +47,8 @@ const FilesCard: React.FC<Props> = ({
 
     const link = getDriveLink(driveFolderId);
 
-    const createFolder = async (name: string, parentName: string) => {
-        const body = {
-            name,
-            parentName,
-        };
-
+    const createFolder = async (name: string, parentName: string | undefined) => {
+        const body = { name, parentName, driveType };
         const request = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
