@@ -106,6 +106,14 @@ export const toBookingChangelogEntry = (
         id: objectionModel.id,
         updated: toDatetimeOrUndefined(objectionModel.updated),
         created: toDatetimeOrUndefined(objectionModel.created),
+        equipmentPrice: objectionModel.equipmentPrice != null ? currency(objectionModel.equipmentPrice) : undefined,
+        timeEstimatePrice:
+            objectionModel.timeEstimatePrice != null ? currency(objectionModel.timeEstimatePrice) : undefined,
+        timeReportsPrice:
+            objectionModel.timeReportsPrice != null
+                ? currency(objectionModel.timeReportsPrice)
+                : objectionModel.timeReportsPrice,
+        fixedPrice: objectionModel.fixedPrice != null ? currency(objectionModel.fixedPrice) : objectionModel.fixedPrice,
     };
 };
 

@@ -6,6 +6,9 @@ import { onlyUniqueById } from '../../../lib/utils';
 import { toUser } from '../../../lib/mappers/user';
 import { sendSlackMessageToUsersRegardingBookings } from '../../../lib/slack';
 import { logMessageSentToBookingOwner } from '../../../lib/changelogUtils';
+import { fetchBookingWithEquipmentLists } from '../../../lib/db-access/booking';
+import { toBooking } from '../../../lib/mappers/booking';
+import { computePriceSummary } from '../../../lib/pricingUtils';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -49,7 +52,11 @@ const handler = withSessionContext(
 
             await Promise.all(
                 bookings.map((booking) => {
-                    logMessageSentToBookingOwner(context.currentUser, booking.id, booking.ownerUser.name);
+                    fetchBookingWithEquipmentLists(booking.id)
+                        .then(toBooking)
+                        .then(computePriceSummary)
+                        .then((priceSummary) => 
+                            logMessageSentToBookingOwner(context.currentUser, booking.id, booking.ownerUser.name, priceSummary));
                 }),
             );
 

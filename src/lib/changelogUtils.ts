@@ -3,6 +3,7 @@ import { RentalStatus } from '../models/enums/RentalStatus';
 import { SalaryStatus } from '../models/enums/SalaryStatus';
 import { Status } from '../models/enums/Status';
 import { HasId } from '../models/interfaces/BaseEntity';
+import { BookingPriceSummary } from './pricingUtils';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { EquipmentChangelogEntryObjectionModel } from '../models/objection-models';
 import { BookingChangelogEntryObjectionModel } from '../models/objection-models/BookingObjectionModel';
@@ -101,18 +102,34 @@ const getPaymentStatusActionString = (type: PaymentStatus | null) => {
 };
 
 // The deDuplicateTimeout is how far back (in seconds) we should look for a log entry to update instead of creating a new (duplicate one). Default is fifteen minutes (900 seconds).
-const addChangelogToBooking = async (message: string, bookingId: number, deDuplicateTimeout = 900) => {
+const addChangelogToBooking = async (
+    message: string,
+    bookingId: number,
+    deDuplicateTimeout = 900,
+    priceSummary: BookingPriceSummary,
+) => {
+    const priceInformation = {
+        equipmentPrice: priceSummary.equipmentPrice.value,
+        timeEstimatePrice: priceSummary.timeEstimatePrice.value,
+        timeReportsPrice: priceSummary.timeReportsPrice?.value ?? null,
+        fixedPrice: priceSummary.fixedPrice?.value ?? null,
+    };
+
     const logEntries = await fetchBookingChangelogEntrysByBookingId(bookingId);
     const existingLogEntryToUpdate = getExistingLogEntryToUpdate(logEntries, message, deDuplicateTimeout);
 
     if (existingLogEntryToUpdate) {
-        updateBookingChangelogEntry(existingLogEntryToUpdate.id, existingLogEntryToUpdate);
+        updateBookingChangelogEntry(existingLogEntryToUpdate.id, {
+            ...existingLogEntryToUpdate,
+            ...priceInformation,
+        } as BookingChangelogEntryObjectionModel);
         return message;
     }
 
     insertBookingChangelogEntry({
         name: message,
         bookingId: bookingId,
+        ...priceInformation,
     });
 
     return message;
@@ -123,6 +140,7 @@ export const logChangeToBooking = (
     bookingId: number,
     bookingName: string,
     type = BookingChangelogEntryType.BOOKING,
+    priceSummary: BookingPriceSummary,
 ) => {
     const message = `${user.name} ${getBookingEditActionString(type)}.`;
 
@@ -130,7 +148,7 @@ export const logChangeToBooking = (
         sendSlackMessageForBooking(message, bookingId, bookingName);
     }
 
-    return addChangelogToBooking(message, bookingId);
+    return addChangelogToBooking(message, bookingId, 900, priceSummary);
 };
 
 export const logStatusChangeToBooking = (
@@ -138,13 +156,14 @@ export const logStatusChangeToBooking = (
     bookingId: number,
     bookingName: string,
     newStatus: Status,
+    priceSummary: BookingPriceSummary,
 ) => {
     const message = `${user.name} ${getStatusActionString(newStatus)}.`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
     sendSlackDMForBooking(message, bookingId, bookingName, user);
 
-    return addChangelogToBooking(message, bookingId, 0);
+    return addChangelogToBooking(message, bookingId, 0, priceSummary);
 };
 
 export const logSalaryStatusChangeToBooking = (
@@ -152,11 +171,12 @@ export const logSalaryStatusChangeToBooking = (
     bookingId: number,
     bookingName: string,
     newStatus: SalaryStatus,
+    priceSummary: BookingPriceSummary,
 ) => {
     const message = `${user.name} ${getSalaryStatusActionString(newStatus)}.`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
-    return addChangelogToBooking(message, bookingId, 0);
+    return addChangelogToBooking(message, bookingId, 0, priceSummary);
 };
 
 export const logOwnerUserChangeToBooking = (
@@ -165,11 +185,12 @@ export const logOwnerUserChangeToBooking = (
     bookingName: string,
     oldOwnerUserName: string | null,
     newOwnerUserName: string | null,
+    priceSummary: BookingPriceSummary,
 ) => {
     const message = `${user.name} ändrade ansvarig från ${oldOwnerUserName} till ${newOwnerUserName}.`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
-    return addChangelogToBooking(message, bookingId, 0);
+    return addChangelogToBooking(message, bookingId, 0, priceSummary);
 };
 
 export const logRentalStatusChangeToBooking = (
@@ -178,13 +199,14 @@ export const logRentalStatusChangeToBooking = (
     bookingName: string,
     equipmentListName: string,
     newStatus: RentalStatus | null,
+    priceSummary: BookingPriceSummary,
 ) => {
     const message = `${user.name} ${getRentalStatusActionString(newStatus)} ${equipmentListName}.`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
     sendSlackDMForBooking(message, bookingId, bookingName, user);
 
-    return addChangelogToBooking(message, bookingId, 0);
+    return addChangelogToBooking(message, bookingId, 0, priceSummary);
 };
 
 export const logBookingDeletion = (user: CurrentUserInfo, bookingId: number, bookingName: string, reason: string) => {
@@ -198,17 +220,23 @@ export const logPaymentStatusChangeToBooking = (
     bookingId: number,
     bookingName: string,
     newStatus: PaymentStatus | null,
+    priceSummary: BookingPriceSummary,
 ) => {
     const message = `${user.name} ${getPaymentStatusActionString(newStatus)}.`;
 
     sendSlackMessageForBooking(message, bookingId, bookingName);
-    return addChangelogToBooking(message, bookingId, 0);
+    return addChangelogToBooking(message, bookingId, 0, priceSummary);
 };
 
-export const logMessageSentToBookingOwner = (user: CurrentUserInfo, bookingId: number, bookingOwner: string) => {
+export const logMessageSentToBookingOwner = (
+    user: CurrentUserInfo,
+    bookingId: number,
+    bookingOwner: string,
+    priceSummary: BookingPriceSummary,
+) => {
     const message = `${user.name} skickade ett meddelande till ansvarig ${bookingOwner}.`;
 
-    return addChangelogToBooking(message, bookingId);
+    return addChangelogToBooking(message, bookingId, 900, priceSummary);
 };
 
 // Equipment

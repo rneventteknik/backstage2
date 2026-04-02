@@ -2,6 +2,8 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { respondWithAccessDeniedResponse, respondWithInvalidMethodResponse } from '../../../../lib/apiResponses';
 import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
 import { fetchBookingWithEquipmentLists, updateBooking } from '../../../../lib/db-access/booking';
+import { toBooking } from '../../../../lib/mappers/booking';
+import { computePriceSummary } from '../../../../lib/pricingUtils';
 import { PaymentStatus } from '../../../../models/enums/PaymentStatus';
 import { Role } from '../../../../models/enums/Role';
 import { logPaymentStatusChangeToBooking } from '../../../../lib/changelogUtils';
@@ -38,7 +40,16 @@ const handler = withSessionContext(
 
                 await updateBooking(bookingId, { paymentStatus: status })
                     .then(async (result) => {
-                        await logPaymentStatusChangeToBooking(context.currentUser, bookingId, booking.name, status);
+                        const updatedBookingWithPrices =
+                            await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                        const priceSnapshot = computePriceSummary(updatedBookingWithPrices);
+                        await logPaymentStatusChangeToBooking(
+                            context.currentUser,
+                            bookingId,
+                            booking.name,
+                            status,
+                            priceSnapshot,
+                        );
 
                         res.status(200).json(result);
                     })
