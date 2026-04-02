@@ -35,7 +35,7 @@ const ChangelogEntryContent: React.FC<{ entry: BookingChangelogEntry; onClick?: 
 
     return (
         <ListGroup.Item key={entry.id}>
-            <div style={{ cursor: 'pointer' }} onClick={onClick}>
+            <div style={onClick ? { cursor: 'pointer' } : {}} onClick={onClick}>
                 {entry.name}
             </div>
             {displayPrice !== null ? <div className="text-muted">{formatCurrency(displayPrice)}</div> : null}
