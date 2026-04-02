@@ -9,6 +9,8 @@ import { SessionContext, withSessionContext } from '../../../../../lib/sessionCo
 import { Status } from '../../../../../models/enums/Status';
 import { BookingChangelogEntryType, hasChanges, logChangeToBooking } from '../../../../../lib/changelogUtils';
 import { fetchBookingWithEquipmentLists } from '../../../../../lib/db-access/booking';
+import { toBooking } from '../../../../../lib/mappers/booking';
+import { computePriceSummary } from '../../../../../lib/pricingUtils';
 import {
     deleteEquipmentListEntry,
     fetchEquipmentListEntry,
@@ -53,11 +55,13 @@ const handler = withSessionContext(
                     return;
                 }
 
+                const priceSnapshotForDelete = computePriceSummary(toBooking(booking));
                 await logChangeToBooking(
                     context.currentUser,
                     bookingId,
                     booking.name,
                     BookingChangelogEntryType.EQUIPMENTLIST,
+                    priceSnapshotForDelete,
                 );
 
                 await deleteEquipmentListEntry(equipmentListEntryId)
@@ -83,11 +87,14 @@ const handler = withSessionContext(
                 await updateEquipmentListEntry(equipmentListEntryId, req.body.equipmentListEntry)
                     .then(async (result) => {
                         if (hasChanges(oldEquipmentListEntry, req.body.equipmentListEntry, ['isPacked'])) {
+                            const fullBooking = await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                            const priceSnapshot = computePriceSummary(fullBooking);
                             await logChangeToBooking(
                                 context.currentUser,
                                 bookingId,
                                 booking.name,
                                 BookingChangelogEntryType.EQUIPMENTLIST,
+                                priceSnapshot,
                             );
                         }
 

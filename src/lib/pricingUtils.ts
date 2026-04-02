@@ -116,25 +116,48 @@ export const getTotalTimeReportsPrice = (timeReports: TimeReport[] | undefined):
     return timeReports?.reduce((sum, l) => sum.add(getTimeReportPrice(l)), currency(0)) ?? currency(0);
 };
 
-export const getBookingPrice = (booking: Booking, forceEstimatedTime = false, forceNoFixedPrice = false): currency => {
-    if (!forceNoFixedPrice && booking.fixedPrice !== null && booking.fixedPrice !== undefined) {
-        return currency(booking.fixedPrice);
-    }
+export const addVAT = (price: currency | number): currency => currency(price).add(getVAT(price));
+export const getVAT = (price: currency | number): currency => currency(price).multiply(0.25);
 
+export type BookingPriceSummary = {
+    equipmentPrice: currency;
+    timeEstimatePrice: currency;
+    timeReportsPrice: currency | null;
+    fixedPrice: currency | null;
+};
+
+export const computePriceSummary = (booking: Booking): BookingPriceSummary => {
     const equipmentPrice =
         booking.equipmentLists?.reduce((sum, l) => sum.add(getEquipmentListPrice(l)), currency(0)) ?? currency(0);
     const timeEstimatePrice = getTotalTimeEstimatesPrice(booking.timeEstimates);
-    const timeReportsPrice = getTotalTimeReportsPrice(booking.timeReports);
+    const timeReportsPrice =
+        booking.timeReports && booking.timeReports.length > 0 ? getTotalTimeReportsPrice(booking.timeReports) : null;
+    return {
+        equipmentPrice,
+        timeEstimatePrice,
+        timeReportsPrice,
+        fixedPrice: booking.fixedPrice != null ? currency(booking.fixedPrice) : null,
+    };
+};
 
-    if (!forceEstimatedTime && booking.timeReports && booking.timeReports.length > 0) {
+export const getCorrectPriceBasedOnBookingState = (
+    summary: BookingPriceSummary,
+    forceEstimatedTime = false,
+    forceNoFixedPrice = false,
+): currency => {
+    const { fixedPrice, timeReportsPrice, equipmentPrice, timeEstimatePrice } = summary;
+
+    if (!forceNoFixedPrice && fixedPrice !== null) {
+        return fixedPrice;
+    }
+    if (!forceEstimatedTime && timeReportsPrice !== null) {
         return equipmentPrice.add(timeReportsPrice);
     }
-
     return equipmentPrice.add(timeEstimatePrice);
 };
 
-export const addVAT = (price: currency | number): currency => currency(price).add(getVAT(price));
-export const getVAT = (price: currency | number): currency => currency(price).multiply(0.25);
+export const getBookingPrice = (booking: Booking, forceEstimatedTime = false, forceNoFixedPrice = false): currency =>
+    getCorrectPriceBasedOnBookingState(computePriceSummary(booking), forceEstimatedTime, forceNoFixedPrice);
 
 export const addVATToPrice = (price: PricedEntity): PricedEntity => ({
     pricePerHour: addVAT(price.pricePerHour),
