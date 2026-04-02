@@ -358,6 +358,10 @@ export interface IBookingChangelogEntryObjectionModel extends BaseObjectionModel
     created: string;
     updated: string;
     bookingId: number;
+    equipmentPrice?: number | null;
+    timeEstimatePrice?: number | null;
+    timeReportsPrice?: number | null;
+    fixedPrice?: number | null;
 }
 
 export class BookingChangelogEntryObjectionModel extends Model {
@@ -368,4 +372,8 @@ export class BookingChangelogEntryObjectionModel extends Model {
     created!: string;
     updated!: string;
     bookingId!: number;
+    equipmentPrice?: number | null;
+    timeEstimatePrice?: number | null;
+    timeReportsPrice?: number | null;
+    fixedPrice?: number | null;
 }

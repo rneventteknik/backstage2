@@ -23,6 +23,8 @@ import {
 } from '../../../../../lib/changelogUtils';
 import { EquipmentListObjectionModel } from '../../../../../models/objection-models/BookingObjectionModel';
 import { fetchBookingWithEquipmentLists } from '../../../../../lib/db-access/booking';
+import { toBooking } from '../../../../../lib/mappers/booking';
+import { computePriceSummary } from '../../../../../lib/pricingUtils';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -63,11 +65,15 @@ const handler = withSessionContext(
                     return;
                 }
 
+                const fullBooking = await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                const priceSnapshot = computePriceSummary(fullBooking);
+
                 await logChangeToBooking(
                     context.currentUser,
                     bookingId,
                     booking.name,
                     BookingChangelogEntryType.EQUIPMENTLIST,
+                    priceSnapshot,
                 );
 
                 await deleteEquipmentList(equipmentListId)
@@ -110,22 +116,28 @@ const handler = withSessionContext(
                             hasListChanges(existingList.listEntries, newList.listEntries) ||
                             hasChangesInListHeadings
                         ) {
+                            const fullBooking = await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                            const priceSnapshot = computePriceSummary(fullBooking);
                             await logChangeToBooking(
                                 context.currentUser,
                                 bookingId,
                                 booking.name,
                                 BookingChangelogEntryType.EQUIPMENTLIST,
+                                priceSnapshot,
                             );
                         }
 
                         // Check if the rental status has changed
                         if (newList.rentalStatus !== undefined && newList.rentalStatus !== existingList?.rentalStatus) {
+                            const fullBooking = await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                            const priceSnapshot = computePriceSummary(fullBooking);
                             await logRentalStatusChangeToBooking(
                                 context.currentUser,
                                 bookingId,
                                 booking.name,
                                 newList.name ?? existingList?.name,
                                 newList.rentalStatus ?? null,
+                                priceSnapshot,
                             );
                         }
 

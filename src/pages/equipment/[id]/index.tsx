@@ -17,7 +17,7 @@ import { faPen } from '@fortawesome/free-solid-svg-icons';
 import EquipmentCalendar from '../../../components/equipment/EquipmentCalendar';
 import EquipmentBookings from '../../../components/equipment/EquipmentBookings';
 import EquipmentTagDisplay from '../../../components/utils/EquipmentTagDisplay';
-import ChangelogCard from '../../../components/ChangelogCard';
+import EquipmentChangelogCard from '../../../components/EquipmentChangelogCard';
 import MarkdownCard from '../../../components/MarkdownCard';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import { getPricePlanName, getResponseContentOrError } from '../../../lib/utils';
@@ -182,7 +182,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         </ListGroup>
                     </Card>
 
-                    <ChangelogCard changelog={equipment.changelog ?? []} />
+                    <EquipmentChangelogCard changelog={equipment.changelog ?? []} />
                 </Col>
                 <Col xl={8}>
                     <MarkdownCard

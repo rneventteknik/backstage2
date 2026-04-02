@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { fetchBooking, fetchTimeReportsByBookingId } from '../../../../../lib/db-access';
 import { insertTimeReport, validateTimeReportObjectionModel } from '../../../../../lib/db-access/timeReport';
+import { fetchBookingWithEquipmentLists } from '../../../../../lib/db-access/booking';
 import {
     respondWithAccessDeniedResponse,
     respondWithCustomErrorMessage,
@@ -13,6 +14,7 @@ import { Role } from '../../../../../models/enums/Role';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
 import { logChangeToBooking, BookingChangelogEntryType } from '../../../../../lib/changelogUtils';
+import { computePriceSummary } from '../../../../../lib/pricingUtils';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -43,11 +45,14 @@ const handler = withSessionContext(
                 }
                 await insertTimeReport(req.body.timeReport)
                     .then(async (result) => {
+                        const fullBooking = await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                        const priceSnapshot = computePriceSummary(fullBooking);
                         await logChangeToBooking(
                             context.currentUser,
                             bookingId,
                             booking.name,
                             BookingChangelogEntryType.TIMEREPORT,
+                            priceSnapshot,
                         ).then(() => res.status(200).json(result));
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
