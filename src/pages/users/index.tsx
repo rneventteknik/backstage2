@@ -5,11 +5,11 @@ import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import { getMemberStatusName, getRoleName } from '../../lib/utils';
 import Link from 'next/link';
-import { Button } from 'react-bootstrap';
+import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IfAdmin } from '../../components/utils/IfAdmin';
-import { faAdd, faBan, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faAdd, faBan, faFileImport, faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Header from '../../components/layout/Header';
 import { TableLoadingPage } from '../../components/layout/LoadingPageSkeleton';
@@ -114,6 +114,16 @@ const UserListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                         <FontAwesomeIcon icon={faUser} className="mr-1" /> Visa min profil
                     </Button>
                 </Link>
+                <IfAdmin currentUser={currentUser}>
+                    <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer" className="d-inline-block">
+                        <Link href="/users/csv-import" passHref legacyBehavior>
+                            <Dropdown.Item href="/users/csv-import">
+                                <FontAwesomeIcon icon={faFileImport} className="mr-1 fa-fw" /> Importera användare från
+                                CSV
+                            </Dropdown.Item>
+                        </Link>
+                    </DropdownButton>
+                </IfAdmin>
             </Header>
 
             {users && users.length > 0 ? (
