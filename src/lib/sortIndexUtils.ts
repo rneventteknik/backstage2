@@ -128,6 +128,26 @@ export const moveItemToItem = <T extends Sortable>(list: T[], item: T, target: T
     return resetSortIndexes(sortedList);
 };
 
+export const moveItemAfterItem = <T extends Sortable>(list: T[], item: T, target: T): T[] => {
+    if (!list || !item || !target || !list.some((x) => x.id === item.id) || !list.some((x) => x.id === target.id)) {
+        throw new Error('Invalid parameters');
+    }
+
+    if (item.id === target.id) {
+        return [];
+    }
+
+    const sortedList = getSortedList(list.filter((x) => x.id !== item.id));
+    const targetIndex = sortedList.findIndex((x) => x.id === target.id);
+
+    // Insert AFTER the target instead of before
+    sortedList.splice(targetIndex + 1, 0, item);
+
+    // Reset sort index
+    return resetSortIndexes(sortedList);
+};
+
+
 export const getNextSortIndex = <T extends Sortable>(list: T[]): number => {
     if (!list) {
         throw new Error('Invalid list');
