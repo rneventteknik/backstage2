@@ -103,9 +103,11 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
         )
             .then((apiResponse) => getResponseContentOrError(apiResponse))
             .then(() => {
-                undo
-                    ? setConfirmingBookingIds((x) => x.filter((id) => id !== bookingId))
-                    : setConfirmingBookingIds((x) => [bookingId, ...x]);
+                if (undo) {
+                    setConfirmingBookingIds((x) => x.filter((id) => id !== bookingId));
+                } else {
+                    setConfirmingBookingIds((x) => [bookingId, ...x]);
+                }
                 showGeneralSuccessMessage(undo ? 'Markering ångrad' : 'Markerad som betald');
             })
             .catch((error: Error) => {

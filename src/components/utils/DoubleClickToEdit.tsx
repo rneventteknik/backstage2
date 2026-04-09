@@ -112,13 +112,13 @@ export const ClickToEditDropdown = <T,>({
 
     const updateValue = (key: string) => {
         setSelectedKey(key);
-        onChange ? onChange(getSelectedValue(key)) : null;
+        onChange?.(getSelectedValue(key));
     };
 
     const editingComplete = () => {
         setIsEditing(false);
         if (selectedKey !== optionKeyFn(value)) {
-            onClose ? onClose(getSelectedValue(selectedKey)) : null;
+            onClose?.(getSelectedValue(selectedKey));
         }
     };
 

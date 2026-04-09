@@ -39,7 +39,7 @@ const EditTextModal: React.FC<Props> = ({
     const onCancel = () => {
         setText(defaultText ?? '');
         hide();
-        onCancelCallback ? onCancelCallback() : null;
+        onCancelCallback?.();
     };
     return (
         <Modal show={show} onHide={onCancel} size={modalSize} backdrop="static">

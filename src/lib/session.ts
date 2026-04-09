@@ -1,4 +1,4 @@
-import { IronSessionOptions } from 'iron-session';
+import type { IronSessionOptions } from 'iron-session';
 import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next';
 import { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandler } from 'next';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';

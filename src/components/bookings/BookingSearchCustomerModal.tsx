@@ -27,7 +27,7 @@ const BookingSearchCustomerModal: React.FC<Props> = ({
     };
     const onCancel = () => {
         hide();
-        onCancelCallback ? onCancelCallback() : null;
+        onCancelCallback?.();
         setCustomer(null);
     };
 
