@@ -21,7 +21,7 @@ export type TableConfiguration<T extends HasId | HasStringId> = {
     entityTypeDisplayName: string;
     defaultSortPropertyName?: string;
     customSortFn?: (a: T, b: T) => number;
-    moveFn?: (a: T, b: T) => void;
+    moveFn?: (a: T, b: T, position?: 'before' | 'after') => void;
     noResultsLabel?: string;
     defaultSortAscending?: boolean;
     hideTableFilter?: boolean;
@@ -206,11 +206,18 @@ export const TableDisplay = <T extends HasId | HasStringId>({
         }
 
         if (active.id !== over.id) {
-            const activeEntity = rowsToShow.filter(hasEntity).find((x) => x.entity.id === active.id)?.entity;
-            const overEntity = rowsToShow.filter(hasEntity).find((x) => x.entity.id === over.id)?.entity;
+            const entities = rowsToShow.filter(hasEntity).map((x) => x.entity);
+            const activeIndex = entities.findIndex((x) => x.id === active.id);
+            const overIndex = entities.findIndex((x) => x.id === over.id);
+            const activeEntity = entities[activeIndex];
+            const overEntity = entities[overIndex];
 
             if (activeEntity && overEntity) {
-                configuration.moveFn(activeEntity, overEntity);
+                // Determine position based on drag direction
+                // When dragging down, we want to place AFTER the drop target
+                // When dragging up, we want to place BEFORE the drop target
+                const position = activeIndex < overIndex ? 'after' : 'before';
+                configuration.moveFn(activeEntity, overEntity, position);
             }
         }
     };

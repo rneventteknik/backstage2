@@ -31,6 +31,7 @@ import {
     isLast,
     moveItemDown,
     moveItemToItem,
+    moveItemAfterItem,
     moveItemUp,
     sortIndexSortFn,
 } from '../../../lib/sortIndexUtils';
@@ -311,7 +312,12 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
     };
 
     const sortFn = (a: TimeReport, b: TimeReport) => sortIndexSortFn(a, b);
-    const moveFn = (a: TimeReport, b: TimeReport) => updateTimeReports(...moveItemToItem(timeReports, a, b));
+    const moveFn = (a: TimeReport, b: TimeReport, position: 'before' | 'after' = 'before') => 
+        updateTimeReports(
+            ...(position === 'after' 
+                ? moveItemAfterItem(timeReports, a, b)
+                : moveItemToItem(timeReports, a, b))
+        );
 
     const tableSettings: TableConfiguration<TimeReport> = {
         entityTypeDisplayName: '',

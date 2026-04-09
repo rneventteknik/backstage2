@@ -34,7 +34,7 @@ import {
     getPrice,
 } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
-import { getSortedList, isFirst, isLast, moveItemToItem, sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import { getSortedList, isFirst, isLast, moveItemToItem, moveItemAfterItem, sortIndexSortFn } from '../../../lib/sortIndexUtils';
 import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus';
 import { getEquipmentInDatetime, getEquipmentOutDatetime, getNumberOfDays } from '../../../lib/datetimeUtils';
 import { Language } from '../../../models/enums/Language';
@@ -535,7 +535,7 @@ const EquipmentListTable: React.FC<Props> = ({
     };
 
     const sortFn = (a: EquipmentListEntityViewModel, b: EquipmentListEntityViewModel) => sortIndexSortFn(a, b);
-    const moveFn = (a: EquipmentListEntityViewModel, b: EquipmentListEntityViewModel) => {
+    const moveFn = (a: EquipmentListEntityViewModel, b: EquipmentListEntityViewModel, position: 'before' | 'after' = 'before') => {
         if (a.id === b.id) {
             return;
         }
@@ -545,7 +545,9 @@ const EquipmentListTable: React.FC<Props> = ({
 
         if (listEntries.some((x) => x.id === a.id) && listEntries.some((x) => x.id === b.id)) {
             // Move items
-            const movedItems = moveItemToItem(getEntitiesToDisplay(list), a, b);
+            const movedItems = position === 'after' 
+                ? moveItemAfterItem(getEntitiesToDisplay(list), a, b)
+                : moveItemToItem(getEntitiesToDisplay(list), a, b);
 
             // Save inner entity as well
             movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
@@ -564,7 +566,9 @@ const EquipmentListTable: React.FC<Props> = ({
             }
 
             // Move items
-            const movedItems = moveItemToItem(getPeersOfViewModel(a, list), a, b);
+            const movedItems = position === 'after'
+                ? moveItemAfterItem(getPeersOfViewModel(a, list), a, b)
+                : moveItemToItem(getPeersOfViewModel(a, list), a, b);
 
             // Save inner entity as well
             movedItems.forEach((x) => (x.entity = { ...x.entity, sortIndex: x.sortIndex }));
