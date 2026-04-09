@@ -6,7 +6,9 @@ import TableFooterWithViewCount from './utils/TableFooter';
 import styles from './TableDisplay.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faGripVertical } from '@fortawesome/free-solid-svg-icons';
-import { useDrag, useDrop } from 'react-dnd';
+import { DndContext, closestCenter, DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { notEmpty, onlyUnique } from '../lib/utils';
 
 enum SortDirection {
@@ -51,7 +53,6 @@ type ListProps<T extends HasId | HasStringId> = {
     subEntities?: { parentId: number | string; entities: T[] }[];
     configuration: TableConfiguration<T>;
     filterString?: string;
-    tableId?: string;
 };
 
 export const TableDisplay = <T extends HasId | HasStringId>({
@@ -59,7 +60,6 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     subEntities = [],
     configuration,
     filterString: filterStringFromParent,
-    tableId,
 }: ListProps<T>): React.ReactElement => {
     // Store sort column and direction, and filter search text using state
     //
@@ -180,8 +180,6 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     });
 
     const isSubItem = (item: T) => subEntities.some((list) => list.entities.some((x) => x.id === item.id));
-    const getParentIdOfSubItem = (item: T) =>
-        subEntities.find((list) => list.entities.some((x) => x.id === item.id))?.parentId;
 
     const rowsToShow: (WrappedEntity | WrappedHeading)[] = configuration.hideTableCountControls
         ? sortedEntities
@@ -199,8 +197,28 @@ export const TableDisplay = <T extends HasId | HasStringId>({
         rowsToShow.splice(index, 0, { heading: value, contentOverride: getHeadingContentOverride(value) });
     });
 
+    // Handle drag end event for sorting
+    const handleDragEnd = (event: DragEndEvent) => {
+        const { active, over } = event;
+
+        if (!over || !configuration.moveFn) {
+            return;
+        }
+
+        if (active.id !== over.id) {
+            const activeEntity = rowsToShow.filter(hasEntity).find((x) => x.entity.id === active.id)?.entity;
+            const overEntity = rowsToShow.filter(hasEntity).find((x) => x.entity.id === over.id)?.entity;
+
+            if (activeEntity && overEntity) {
+                configuration.moveFn(activeEntity, overEntity);
+            }
+        }
+    };
+
     // Create the table
     //
+    const sortableItems = rowsToShow.filter(hasEntity).map((x) => x.entity.id);
+
     return (
         <div>
             {configuration.hideTableFilter ? null : (
@@ -246,16 +264,15 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                     </tr>
                 </thead>
                 <tbody>
-                    {rowsToShow.map((x) =>
+                    <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+                        <SortableContext items={sortableItems} strategy={verticalListSortingStrategy}>
+                            {rowsToShow.map((x) =>
                         hasEntity(x) ? (
                             <TableRow
                                 key={x.entity.id}
                                 entity={x.entity}
-                                entitiesToShow={rowsToShow.filter(hasEntity).map((x) => x.entity)}
-                                tableId={tableId}
                                 configuration={configuration}
                                 isSubItem={isSubItem}
-                                getParentIdOfSubItem={getParentIdOfSubItem}
                                 showMoveControl={!!configuration.moveFn && sortDirection === SortDirection.Custom}
                             />
                         ) : (
@@ -272,8 +289,10 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                                     )}
                                 </td>
                             </tr>
-                        ),
-                    )}
+                            ),
+                            )}
+                        </SortableContext>
+                    </DndContext>
                     {rowsToShow.length === 0 ? (
                         <tr>
                             <td
@@ -340,64 +359,35 @@ const getSortingArrow = (sortDirection: SortDirection) => {
 
 type TableRowProps<T extends HasId | HasStringId> = {
     entity: T;
-    entitiesToShow: T[];
     configuration: TableConfiguration<T>;
-    tableId?: string;
     isSubItem: (entry: T) => boolean;
-    getParentIdOfSubItem: (entry: T) => number | string | undefined;
     showMoveControl: boolean;
 };
 
 const TableRow = <T extends HasId | HasStringId>({
     configuration,
     entity,
-    entitiesToShow,
-    tableId,
     isSubItem,
-    getParentIdOfSubItem,
     showMoveControl,
 }: TableRowProps<T>) => {
     // Set up drag-to-reorder (moveFn)
     //
-    const [{ isDragging }, drag] = useDrag(() => ({
-        type: isSubItem(entity)
-            ? `table-${tableId}-subentity-${getParentIdOfSubItem(entity)}`
-            : `table-${tableId}-entity`,
-        collect: (monitor) => ({
-            isDragging: monitor.isDragging(),
-        }),
-        item: { id: entity.id },
-    }));
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging, isOver } = useSortable({
+        id: entity.id,
+        disabled: !configuration.moveFn,
+    });
 
-    const [collectedProps, drop] = useDrop(
-        () => ({
-            accept: isSubItem(entity)
-                ? `table-${tableId}-subentity-${getParentIdOfSubItem(entity)}`
-                : `table-${tableId}-entity`,
-            drop: (data: HasId | HasStringId) => {
-                const item = entitiesToShow.find((x) => x.id === data.id);
-
-                if (!configuration.moveFn) {
-                    throw new Error('Invalid state, moveFn is invalid');
-                }
-                if (!item) {
-                    throw new Error('Invalid state, item is invalid');
-                }
-
-                configuration.moveFn(item, entity);
-            },
-            collect: (monitor) => ({
-                hovered: monitor.isOver(),
-            }),
-        }),
-        [entitiesToShow],
-    );
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+    };
 
     return (
         <>
             <tr
-                ref={drop}
-                className={(isDragging ? 'text-muted ' : '') + (collectedProps.hovered ? styles.hoveredRow : '')}
+                ref={setNodeRef}
+                style={style}
+                className={(isDragging ? 'text-muted ' : '') + (isOver ? styles.hoveredRow : '')}
             >
                 {configuration.statusColumns?.map((p) => (
                     <td
@@ -408,7 +398,7 @@ const TableRow = <T extends HasId | HasStringId>({
                     ></td>
                 ))}
                 {showMoveControl ? (
-                    <td className="pr-0 align-middle d-none d-md-table-cell" ref={drag}>
+                    <td className="pr-0 align-middle d-none d-md-table-cell" {...attributes} {...listeners}>
                         {isDragging ? null : <FontAwesomeIcon icon={faGripVertical} className="text-muted" />}
                     </td>
                 ) : null}
