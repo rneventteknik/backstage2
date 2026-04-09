@@ -484,7 +484,8 @@ export const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
                             </div>
                             {message.body ? (
                                 <div
-                                    className="mt-2 p-3 border"
+                                    className="mt-2 p-3 border rounded"
+                                    style={{ backgroundColor: '#f5f5f5', color: '#000000' }}
                                     dangerouslySetInnerHTML={{
                                         __html: sanitizeMessageBody(message),
                                     }}
