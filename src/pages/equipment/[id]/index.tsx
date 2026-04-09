@@ -113,7 +113,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                             <div style={{ fontSize: '1.6em' }}>
                                 {equipment.name}
                                 {equipment.isArchived ? (
-                                    <Badge variant="warning" className="ml-2">
+                                    <Badge bg="warning" className="ml-2">
                                         Arkiverad
                                     </Badge>
                                 ) : null}

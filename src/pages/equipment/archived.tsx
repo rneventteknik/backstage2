@@ -19,7 +19,7 @@ import { KeyValue } from '../../models/interfaces/KeyValue';
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
         <TableStyleLink href={'/equipment/' + equipment.id}>{equipment.name}</TableStyleLink>
-        <Badge variant="warning" className="mr-1 ml-1">
+        <Badge bg="warning" className="mr-1 ml-1">
             Arkiverad
         </Badge>
         {equipment.publiclyHidden ? (
@@ -28,7 +28,7 @@ const EquipmentNameDisplayFn = (equipment: Equipment) => (
             </span>
         ) : null}
         {equipment.tags.map((x) => (
-            <Badge variant="dark" key={x.id} className="ml-1">
+            <Badge bg="dark" key={x.id} className="ml-1">
                 {x.name}
             </Badge>
         ))}

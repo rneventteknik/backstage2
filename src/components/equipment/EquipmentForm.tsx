@@ -1,7 +1,8 @@
 import React, { FormEvent, useState } from 'react';
-import { Col, Form } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Equipment, EquipmentTag } from '../../models/interfaces';
+import { Equipment } from '../../models/interfaces';
+import type { EquipmentTag } from '../../models/interfaces';
 import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../models/objection-models';
 import useSwr from 'swr';
 import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher, equipmentLocationsFetcher } from '../../lib/fetchers';
@@ -99,7 +100,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
-            <Form.Row>
+            <Row>
                 <Col lg="6">
                     <Form.Group controlId="formName">
                         <Form.Label>Namn</Form.Label>
@@ -127,11 +128,11 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         />
                     </Form.Group>
                 </Col>
-            </Form.Row>
+            </Row>
 
             <h2 className="h5 mt-4">Översättningar</h2>
             <hr />
-            <Form.Row>
+            <Row>
                 <Col lg="6">
                     <Form.Group controlId="formNameEN">
                         <Form.Label>Namn (engelska)</Form.Label>
@@ -155,23 +156,23 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         />
                     </Form.Group>
                 </Col>
-            </Form.Row>
+            </Row>
 
             {!equipment ? null : (
                 <>
                     <h2 className="h5 mt-4">Prissättning</h2>
                     <hr />
-                    <Form.Row>
+                    <Row>
                         <Col lg="12">
                             <Form.Group controlId="formPrices">
                                 <PricesEditor prices={prices} onChange={setPrices} />
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
 
                     <h2 className="h5 mt-4">Övriga inställningar</h2>
                     <hr />
-                    <Form.Row>
+                    <Row>
                         <Col lg="6">
                             <Form.Group>
                                 <Form.Label>Söktermer</Form.Label>
@@ -189,12 +190,12 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Col lg="6">
                             <Form.Group>
                                 <Form.Label>Taggar</Form.Label>
-                                <Typeahead<EquipmentTag>
+                                <Typeahead
                                     id="tags-typeahead"
                                     multiple
-                                    labelKey={(x) => x.name}
+                                    labelKey="name"
                                     options={equipmentTags ?? []}
-                                    onChange={(e) => setSelectedTags(e)}
+                                    onChange={(e) => setSelectedTags(e as EquipmentTag[])}
                                     placeholder="Taggar"
                                     defaultSelected={equipment.tags ?? []}
                                 />
@@ -283,7 +284,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 />
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
                 </>
             )}
         </Form>

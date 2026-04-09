@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
+import type { RenderMenuProps, TypeaheadComponentProps } from 'react-bootstrap-typeahead';
 import styles from './EquipmentSearch.module.scss';
 import { BookingsSearchResult } from '../models/misc/SearchResult';
 import { getResponseContentOrError } from '../lib/utils';
@@ -7,9 +8,11 @@ import { useNotifications } from '../lib/useNotifications';
 import { BaseEntityWithName } from '../models/interfaces/BaseEntity';
 import { IBookingObjectionModel } from '../models/objection-models';
 import { toBooking } from '../lib/mappers/booking';
-import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { SplitHighlighter } from './utils/Highlight';
 import { toBookingViewModel } from '../lib/datetimeUtils';
+
+type Option = TypeaheadComponentProps['options'][number];
+type RenderMenuState = Parameters<NonNullable<TypeaheadComponentProps['renderMenu']>>[2];
 
 export interface SearchResultViewModel extends BaseEntityWithName {
     url: string;
@@ -33,7 +36,7 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
     const [searchResult, setSearchResult] = useState<SearchResultViewModel[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const inputField = useRef<AsyncTypeahead<SearchResultViewModel>>(null);
+    const inputField = useRef<Typeahead.TypeaheadRef | null>(null);
     useEffect(() => {
         if (inputField.current && autoFocus) {
             inputField.current.focus();
@@ -74,7 +77,7 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
 
     type SearchListItemProps<T extends SearchResultViewModel & HasIndex> = {
         entity: T;
-        state: Typeahead.TypeaheadState<SearchResultViewModel>;
+        state: RenderMenuState;
     };
 
     const SearchListItem = <T extends SearchResultViewModel & HasIndex>({
@@ -101,19 +104,19 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
     };
 
     const renderMenu = (
-        results: Typeahead.TypeaheadResult<SearchResultViewModel>[],
-        menuProps: Typeahead.TypeaheadMenuProps<SearchResultViewModel>,
-        state: Typeahead.TypeaheadState<SearchResultViewModel>,
+        results: Option[],
+        menuProps: RenderMenuProps,
+        state: RenderMenuState,
     ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
 
     type MenuProps = {
-        results: Typeahead.TypeaheadResult<SearchResultViewModel>[];
-        menuProps: Typeahead.TypeaheadMenuProps<SearchResultViewModel>;
-        state: Typeahead.TypeaheadState<SearchResultViewModel>;
+        results: Option[];
+        menuProps: RenderMenuProps;
+        state: RenderMenuState;
     };
 
     const Menu = ({ results, menuProps, state }: MenuProps): React.ReactElement => {
-        const resultWithIndex = results.map((res, index) => ({ index: index, ...res }));
+        const resultWithIndex = (results as SearchResultViewModel[]).map((res, index) => ({ index: index, ...res }));
         return (
             <Typeahead.Menu {...menuProps} className={styles.menu}>
                 {resultWithIndex && resultWithIndex.length > 0 ? (
@@ -140,12 +143,12 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
         <Typeahead.AsyncTypeahead
             id={id}
             filterBy={() => true}
-            labelKey={(x) => x.name}
+            labelKey={(x: Option) => (x as SearchResultViewModel).name}
             isLoading={isLoading}
             options={searchResult}
             selected={[]}
             onSearch={fetchSearchResults}
-            onChange={handleSelect}
+            onChange={(selected) => handleSelect(selected as SearchResultViewModel[])}
             renderMenu={renderMenu}
             placeholder={placeholder}
             ref={inputField}

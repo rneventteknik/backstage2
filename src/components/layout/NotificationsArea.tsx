@@ -81,7 +81,8 @@ const NotificationsArea: React.FC = () => {
 
     // Configure listener to add notifications and handler to remove
     //
-    useListener('notification.add', (notification: NotificationData | undefined) => {
+    useListener('notification.add', (event: unknown) => {
+        const notification = event as NotificationData | undefined;
         if (notification) {
             const notificationWithInternalData = { ...notification, id: generateGuid(), show: false };
 

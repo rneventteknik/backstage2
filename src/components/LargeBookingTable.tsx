@@ -16,7 +16,7 @@ import {
     getAccountKindName,
 } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Col, Form } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
@@ -221,16 +221,16 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         accountKind,
                     )}
                 >
-                    <Form.Row className="mb-2">
+                    <Row className="mb-2">
                         <Col md="4">
                             <Form.Group>
                                 <Form.Label>Status</Form.Label>
-                                <Typeahead<{ label: string; value: Status }>
+                                <Typeahead
                                     id="status-typeahead"
                                     multiple
-                                    labelKey={(x) => x.label}
+                                    labelKey="label"
                                     options={statusOptions}
-                                    onChange={(e) => setStatuses(e.map((o) => o.value))}
+                                    onChange={(e) => setStatuses((e as typeof statusOptions).map((o) => o.value))}
                                     placeholder="Filtrera på status"
                                     selected={statuses
                                         .map((id) => statusOptions.find((x) => x.value === id))
@@ -241,12 +241,12 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         <Col md="4">
                             <Form.Group>
                                 <Form.Label>Ansvarig</Form.Label>
-                                <Typeahead<{ label: string; value: number }>
+                                <Typeahead
                                     id="user-typeahead"
                                     multiple
-                                    labelKey={(x) => x.label}
+                                    labelKey="label"
                                     options={ownerUserOptions}
-                                    onChange={(e) => setUserIds(e.map((o) => o.value))}
+                                    onChange={(e) => setUserIds((e as typeof ownerUserOptions).map((o) => o.value))}
                                     placeholder="Filtrera på ansvarig"
                                     selected={userIds
                                         .map((id) => ownerUserOptions.find((x) => x.value === id))
@@ -344,7 +344,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                 </Form.Control>
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
                 </AdvancedFilters>
             ) : null}
             <TableDisplay

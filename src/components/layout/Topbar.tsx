@@ -52,7 +52,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                         <UserIcon user={currentUser} />
                     </Dropdown.Toggle>
 
-                    <Dropdown.Menu align="right">
+                    <Dropdown.Menu align="end">
                         <Dropdown.Item disabled={true}>
                             <UserDisplay user={currentUser} />
                         </Dropdown.Item>

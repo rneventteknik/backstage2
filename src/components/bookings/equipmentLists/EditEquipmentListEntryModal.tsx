@@ -226,24 +226,25 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                         <Col lg={8} xs={6}>
                             <Form.Group>
                                 <Form.Label>Konto</Form.Label>
-                                <Typeahead<Account>
+                                <Typeahead
                                     id="account-typeahead"
                                     options={invoiceAccounts}
                                     defaultInputValue={equipmentListEntryToEditViewModel.account ?? ''}
                                     labelKey="accountNumber"
                                     disabled={readonly}
                                     renderMenuItemChildren={(option) => {
+                                        const acct = option as Account;
                                         return (
                                             <>
-                                                {option.accountNumber}{' '}
-                                                <span className="text-muted">- {option.description}</span>
+                                                {acct.accountNumber}{' '}
+                                                <span className="text-muted">- {acct.description}</span>
                                             </>
                                         );
                                     }}
                                     onChange={(s) =>
                                         setEquipmentListEntryToEditViewModel({
                                             ...equipmentListEntryToEditViewModel,
-                                            account: s.length > 0 ? s[0].accountNumber : '',
+                                            account: s.length > 0 ? (s[0] as Account).accountNumber : '',
                                         })
                                     }
                                     onInputChange={(s) =>

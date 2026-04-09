@@ -9,10 +9,12 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useBus } from 'react-bus';
 
+type BusEvents = Record<string | symbol, unknown>;
+
 // This is the internal function which emits a add-notification event on the event bus. The
 // notification area listens for these events and adds the notification to the list.
 const emitNotification = (
-    bus: Emitter,
+    bus: Emitter<BusEvents>,
     variant: 'success' | 'warning' | 'danger' | 'info',
     icon: IconDefinition,
     title: string,
@@ -31,16 +33,16 @@ const emitNotification = (
     bus.emit('notification.add', notification);
 };
 
-const showGeneralInfoMessage = (bus: Emitter, title: string, description?: string, body?: string): void =>
+const showGeneralInfoMessage = (bus: Emitter<BusEvents>, title: string, description?: string, body?: string): void =>
     emitNotification(bus, 'info', faInfoCircle, title, description, body);
 
-const showGeneralSuccessMessage = (bus: Emitter, title: string, description?: string, body?: string): void =>
+const showGeneralSuccessMessage = (bus: Emitter<BusEvents>, title: string, description?: string, body?: string): void =>
     emitNotification(bus, 'success', faCheckCircle, title, description, body);
 
-const showGeneralWarningMessage = (bus: Emitter, title: string, description?: string, body?: string): void =>
+const showGeneralWarningMessage = (bus: Emitter<BusEvents>, title: string, description?: string, body?: string): void =>
     emitNotification(bus, 'warning', faExclamationTriangle, title, description, body);
 
-const showGeneralDangerMessage = (bus: Emitter, title: string, description?: string, body?: string): void =>
+const showGeneralDangerMessage = (bus: Emitter<BusEvents>, title: string, description?: string, body?: string): void =>
     emitNotification(bus, 'danger', faExclamationCircle, title, description, body);
 
 // Export hook

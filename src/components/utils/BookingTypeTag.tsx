@@ -9,7 +9,7 @@ type Props = {
 };
 
 const BookingTypeTag: React.FC<Props> = ({ booking, className }: Props) => (
-    <Badge variant="dark" className={className}>
+    <Badge bg="dark" className={className}>
         {getBookingTypeName(booking.bookingType)}
     </Badge>
 );

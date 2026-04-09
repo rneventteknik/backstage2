@@ -1,15 +1,18 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
+import type { RenderMenuProps, TypeaheadComponentProps } from 'react-bootstrap-typeahead';
 import styles from './EquipmentSearch.module.scss';
 import { CustomersSearchResult } from '../models/misc/SearchResult';
 import { getAccountKindName, getLanguageName, getPricePlanName, getResponseContentOrError } from '../lib/utils';
 import { useNotifications } from '../lib/useNotifications';
-import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 import { SplitHighlighter } from './utils/Highlight';
 import { toCustomer } from '../lib/mappers/customer';
 import { Customer } from '../models/interfaces/Customer';
 import { Badge } from 'react-bootstrap';
 import { Language } from '../models/enums/Language';
+
+type Option = TypeaheadComponentProps['options'][number];
+type RenderMenuState = Parameters<NonNullable<TypeaheadComponentProps['renderMenu']>>[2];
 
 interface HasIndex {
     index: number;
@@ -30,7 +33,7 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
     const [searchResult, setSearchResult] = useState<Customer[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
-    const inputField = useRef<AsyncTypeahead<Customer>>(null);
+    const inputField = useRef<Typeahead.TypeaheadRef | null>(null);
     useEffect(() => {
         if (inputField.current && autoFocus) {
             inputField.current.focus();
@@ -68,7 +71,7 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
 
     type SearchListItemProps<T extends Customer & HasIndex> = {
         entity: T;
-        state: Typeahead.TypeaheadState<Customer>;
+        state: RenderMenuState;
     };
 
     const SearchListItem = <T extends Customer & HasIndex>({
@@ -83,27 +86,27 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
                 <div>
                     <small>
                         {entity.pricePlan !== undefined && entity.pricePlan !== null ? (
-                            <Badge variant="dark" className="ml-1">
+                            <Badge bg="dark" className="ml-1">
                                 {getPricePlanName(entity.pricePlan)}
                             </Badge>
                         ) : null}
                         {entity.accountKind !== undefined && entity.accountKind !== null ? (
-                            <Badge variant="dark" className="ml-1">
+                            <Badge bg="dark" className="ml-1">
                                 {getAccountKindName(entity.accountKind)}
                             </Badge>
                         ) : null}
                         {entity.invoiceHogiaId != null ? (
-                            <Badge variant="dark" className="ml-1">
+                            <Badge bg="dark" className="ml-1">
                                 Hogia-id
                             </Badge>
                         ) : null}
                         {entity.invoiceAddress != null ? (
-                            <Badge variant="dark" className="ml-1">
+                            <Badge bg="dark" className="ml-1">
                                 Fakturaadress
                             </Badge>
                         ) : null}
                         {entity.language === Language.EN ? (
-                            <Badge variant="dark" className="ml-1">
+                            <Badge bg="dark" className="ml-1">
                                 {getLanguageName(entity.language)}
                             </Badge>
                         ) : null}
@@ -114,19 +117,19 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
     };
 
     const renderMenu = (
-        results: Typeahead.TypeaheadResult<Customer>[],
-        menuProps: Typeahead.TypeaheadMenuProps<Customer>,
-        state: Typeahead.TypeaheadState<Customer>,
+        results: Option[],
+        menuProps: RenderMenuProps,
+        state: RenderMenuState,
     ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
 
     type MenuProps = {
-        results: Typeahead.TypeaheadResult<Customer>[];
-        menuProps: Typeahead.TypeaheadMenuProps<Customer>;
-        state: Typeahead.TypeaheadState<Customer>;
+        results: Option[];
+        menuProps: RenderMenuProps;
+        state: RenderMenuState;
     };
 
     const Menu = ({ results, menuProps, state }: MenuProps): React.ReactElement => {
-        const resultWithIndex = results.map((res, index) => ({ index: index, ...res }));
+        const resultWithIndex = (results as Customer[]).map((res, index) => ({ index: index, ...res }));
         return (
             <Typeahead.Menu {...menuProps} className={styles.menu}>
                 {resultWithIndex && resultWithIndex.length > 0 ? (
@@ -153,12 +156,12 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
         <Typeahead.AsyncTypeahead
             id={id}
             filterBy={() => true}
-            labelKey={(x) => x.name}
+            labelKey={(x: Option) => (x as Customer).name}
             isLoading={isLoading}
             options={searchResult}
             selected={[]}
             onSearch={fetchSearchResults}
-            onChange={handleSelect}
+            onChange={(selected) => handleSelect(selected as Customer[])}
             renderMenu={renderMenu}
             placeholder={placeholder}
             ref={inputField}

@@ -3,7 +3,7 @@ import { Equipment, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
 import { countNotNullorEmpty, notEmpty } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Col, Form, Row, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faTags } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from './utils/TableStyleLink';
@@ -222,16 +222,16 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                     filterPubliclyHidden !== 'all',
                 )}
             >
-                <Form.Row className="mb-2">
+                <Row className="mb-2">
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Taggar</Form.Label>
-                            <Typeahead<EquipmentTag>
+                            <Typeahead
                                 id="tags-typeahead"
                                 multiple
-                                labelKey={(x) => x.name}
+                                labelKey="name"
                                 options={equipmentTags ?? []}
-                                onChange={(e) => setFilterTags(e)}
+                                onChange={(e) => setFilterTags(e as EquipmentTag[])}
                                 placeholder="Filtrera på taggar"
                                 selected={
                                     filterTags
@@ -244,12 +244,12 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Platser</Form.Label>
-                            <Typeahead<EquipmentLocation>
+                            <Typeahead
                                 id="tags-typeahead"
                                 multiple
-                                labelKey={(x) => x.name}
+                                labelKey="name"
                                 options={getSortedList(equipmentLocations ?? [])}
-                                onChange={(e) => setFilterLocations(e)}
+                                onChange={(e) => setFilterLocations(e as EquipmentLocation[])}
                                 placeholder="Filtrera på plats"
                                 selected={
                                     filterLocations
@@ -274,7 +274,7 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                             </Form.Control>
                         </Form.Group>
                     </Col>
-                </Form.Row>
+                </Row>
             </AdvancedFilters>
 
             <TableDisplay

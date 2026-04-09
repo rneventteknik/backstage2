@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Modal, Col, Form, InputGroup, Button, Card } from 'react-bootstrap';
+import { Modal, Col, Form, Row, InputGroup, Button, Card } from 'react-bootstrap';
 import { toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import RequiredIndicator from '../../utils/RequiredIndicator';
@@ -103,7 +103,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 </Button>
                             </div>
                             {!userHasClosedWizard ? (
-                                <Form onSubmit={handleSubmitWizard} id={formId + '-wizard'} inline>
+                                <Form onSubmit={handleSubmitWizard} id={formId + '-wizard'} className="d-flex">
                                     <Form.Control
                                         required
                                         defaultValue={wizardNumberOfTechnicians}
@@ -165,7 +165,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                 ) : null}
 
                 <Form onSubmit={handleSubmit} id={formId}>
-                    <Form.Row>
+                    <Row>
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>
@@ -239,7 +239,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 ) : null}
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
                 </Form>
             </Modal.Body>
             <Modal.Footer>

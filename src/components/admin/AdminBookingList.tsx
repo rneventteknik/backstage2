@@ -1,7 +1,7 @@
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { ChangeEvent, useState } from 'react';
-import { Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Col, Form, Row, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import {
     countNotNullorEmpty,
     getPaymentStatusName,
@@ -393,16 +393,16 @@ const AdminBookingList: React.FC<Props> = ({
                 }}
                 activeFilterCount={countNotNullorEmpty(searchText, bookingStatuses, paymentStatuses, salaryStatuses)}
             >
-                <Form.Row className="mb-2">
+                <Row className="mb-2">
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Status</Form.Label>
-                            <Typeahead<{ label: string; value: Status }>
+                            <Typeahead
                                 id="status-typeahead"
                                 multiple
-                                labelKey={(x) => x.label}
+                                labelKey="label"
                                 options={bookingStatusOptions}
-                                onChange={(e) => setBookingStatuses(e.map((o) => o.value))}
+                                onChange={(e) => setBookingStatuses((e as typeof bookingStatusOptions).map((o) => o.value))}
                                 placeholder="Filtrera på status"
                                 selected={bookingStatuses
                                     .map((id) => bookingStatusOptions.find((x) => x.value === id))
@@ -413,12 +413,12 @@ const AdminBookingList: React.FC<Props> = ({
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Betalningsstatus</Form.Label>
-                            <Typeahead<{ label: string; value: PaymentStatus }>
+                            <Typeahead
                                 id="payment-status-typeahead"
                                 multiple
-                                labelKey={(x) => x.label}
+                                labelKey="label"
                                 options={paymentStatusOptions}
-                                onChange={(e) => setPaymentStatuses(e.map((o) => o.value))}
+                                onChange={(e) => setPaymentStatuses((e as typeof paymentStatusOptions).map((o) => o.value))}
                                 placeholder="Filtrera på betalningsstatus"
                                 selected={paymentStatuses
                                     .map((id) => paymentStatusOptions.find((x) => x.value === id))
@@ -429,12 +429,12 @@ const AdminBookingList: React.FC<Props> = ({
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Timarvodestatus</Form.Label>
-                            <Typeahead<{ label: string; value: SalaryStatus }>
+                            <Typeahead
                                 id="salary-status-typeahead"
                                 multiple
-                                labelKey={(x) => x.label}
+                                labelKey="label"
                                 options={salaryStatusOptions}
-                                onChange={(e) => setSalaryStatuses(e.map((o) => o.value))}
+                                onChange={(e) => setSalaryStatuses((e as typeof salaryStatusOptions).map((o) => o.value))}
                                 placeholder="Filtrera på timarvodestatus"
                                 selected={salaryStatuses
                                     .map((id) => salaryStatusOptions.find((x) => x.value === id))
@@ -442,7 +442,7 @@ const AdminBookingList: React.FC<Props> = ({
                             />
                         </Form.Group>
                     </Col>
-                </Form.Row>
+                </Row>
             </AdvancedFilters>
             <TableDisplay
                 filterString={searchText}

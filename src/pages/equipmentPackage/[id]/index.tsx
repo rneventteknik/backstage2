@@ -102,7 +102,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                             <div style={{ fontSize: '1.6em' }}>{equipmentPackage.name}</div>
                             <div>
                                 {equipmentPackage.tags.map((x) => (
-                                    <Badge variant="dark" key={x.id} className="mr-1">
+                                    <Badge bg="dark" key={x.id} className="mr-1">
                                         {x.name}
                                     </Badge>
                                 ))}

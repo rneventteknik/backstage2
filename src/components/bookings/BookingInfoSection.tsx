@@ -29,12 +29,12 @@ const BookingInfoSection: React.FC<Props> = ({ booking, className, showName = tr
                 <BookingStatusTag booking={booking} />
                 <BookingTypeTag booking={booking} className="ml-1" />
                 <RentalStatusTag booking={booking} className="ml-1" />
-                <Badge variant="dark" className="ml-1">
+                <Badge bg="dark" className="ml-1">
                     {getPaymentStatusName(booking.paymentStatus)}
                 </Badge>
                 <InternalReservationTag booking={booking} className="ml-1" />
                 {booking.language !== Language.SV ? (
-                    <Badge variant="dark" className="ml-1">
+                    <Badge bg="dark" className="ml-1">
                         {getLanguageName(booking.language)}
                     </Badge>
                 ) : null}

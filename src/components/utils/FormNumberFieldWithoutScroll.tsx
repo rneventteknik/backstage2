@@ -6,7 +6,7 @@ export const FormNumberFieldWithoutScroll = React.forwardRef(
         <Form.Control
             {...props}
             ref={ref}
-            onWheel={(event: WheelEvent) => (event.currentTarget as HTMLInputElement)?.blur()}
+            onWheel={(event: React.WheelEvent) => (event.currentTarget as HTMLInputElement)?.blur()}
         />
     ),
 );

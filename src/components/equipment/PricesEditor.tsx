@@ -49,7 +49,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
         <>
             <p className="mb-0">
                 {price.id === Math.min(...prices.map((x) => x.id)) && prices.length > 1 ? (
-                    <Badge variant="dark" className="mb-2">
+                    <Badge bg="dark" className="mb-2">
                         Standardvärde
                     </Badge>
                 ) : null}

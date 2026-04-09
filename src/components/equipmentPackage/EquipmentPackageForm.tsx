@@ -2,7 +2,8 @@ import React, { FormEvent, useState, useEffect } from 'react';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../models/objection-models';
-import { Equipment, EquipmentTag } from '../../models/interfaces';
+import { Equipment } from '../../models/interfaces';
+import type { EquipmentTag } from '../../models/interfaces';
 import { toEquipment } from '../../lib/mappers/equipment';
 import useSwr from 'swr';
 import { EquipmentPackage, EquipmentPackageEntry } from '../../models/interfaces/EquipmentPackage';
@@ -397,12 +398,12 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                         <Col md="6">
                             <Form.Group>
                                 <Form.Label>Taggar</Form.Label>
-                                <Typeahead<EquipmentTag>
+                                <Typeahead
                                     id="tags-typeahead"
                                     multiple
-                                    labelKey={(x) => x.name}
+                                    labelKey="name"
                                     options={equipmentTags ?? []}
-                                    onChange={(e) => setSelectedTags(e)}
+                                    onChange={(e) => setSelectedTags(e as EquipmentTag[])}
                                     placeholder="Taggar"
                                     defaultSelected={equipmentPackage.tags ?? []}
                                 />

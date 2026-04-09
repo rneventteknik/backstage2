@@ -304,7 +304,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                         </OverlayTrigger>
                     ) : null}
                     {entry.equipment?.isArchived ? (
-                        <Badge variant="warning" className="ml-2">
+                        <Badge bg="warning" className="ml-2">
                             Arkiverad
                         </Badge>
                     ) : null}

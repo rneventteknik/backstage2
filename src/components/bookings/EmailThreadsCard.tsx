@@ -163,7 +163,7 @@ const EmailThreadItem: React.FC<EmailThreadItemProps> = ({ threadId, onRemove, r
                             size="sm"
                             className="ml-3"
                         >
-                            <Dropdown.Item variant="link" size="sm" className="text-danger" onClick={onRemove}>
+                            <Dropdown.Item className="text-danger" onClick={onRemove}>
                                 <FontAwesomeIcon icon={faTrash} className="mr-2" /> Ta bort koppling
                             </Dropdown.Item>
                         </DropdownButton>

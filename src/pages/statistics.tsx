@@ -439,15 +439,15 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
             <Card className="mb-3 mt-3">
                 <Card.Header>Filter</Card.Header>
                 <Card.Body>
-                    <Form inline>
+                    <Form className="d-flex">
                         <Form.Group controlId="statuses" className="mr-3">
                             <Form.Label className="mr-2">Status</Form.Label>
-                            <Typeahead<{ label: string; value: Status }>
+                            <Typeahead
                                 id="status-typeahead"
                                 multiple
-                                labelKey={(x) => x.label}
+                                labelKey="label"
                                 options={statusOptions}
-                                onChange={(e) => setStatuses(e.map((o) => o.value))}
+                                onChange={(e) => setStatuses((e as typeof statusOptions).map((o) => o.value))}
                                 placeholder="Filtrera på status"
                                 selected={statuses
                                     .map((id) => statusOptions.find((x) => x.value === id))

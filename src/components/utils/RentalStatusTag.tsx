@@ -14,7 +14,7 @@ const RentalStatusTag: React.FC<Props> = ({ booking, className }: Props) => {
 
     if (booking.equipmentLists.every((x) => x.rentalStatus === RentalStatus.RETURNED)) {
         return (
-            <Badge variant="dark" className={className}>
+            <Badge bg="dark" className={className}>
                 Återlämnad
             </Badge>
         );
@@ -26,7 +26,7 @@ const RentalStatusTag: React.FC<Props> = ({ booking, className }: Props) => {
         )
     ) {
         return (
-            <Badge variant="dark" className={className}>
+            <Badge bg="dark" className={className}>
                 Utlämnad
             </Badge>
         );
@@ -38,7 +38,7 @@ const RentalStatusTag: React.FC<Props> = ({ booking, className }: Props) => {
         )
     ) {
         return (
-            <Badge variant="dark" className={className}>
+            <Badge bg="dark" className={className}>
                 Delvis utlämnad
             </Badge>
         );

@@ -1,5 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { Button, Col, Collapse, Form } from 'react-bootstrap';
+import { Button, Col, Collapse, Form, Row } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { useSessionStorageState } from '../lib/useSessionStorageState';
@@ -23,7 +23,7 @@ const AdvancedFilters: React.FC<Props> = ({
 
     return (
         <>
-            <Form.Row>
+            <Row>
                 <Col>
                     <Form.Group>
                         <Form.Control
@@ -48,7 +48,7 @@ const AdvancedFilters: React.FC<Props> = ({
                         ) : null}
                     </Form.Group>
                 </Col>
-            </Form.Row>
+            </Row>
             <Collapse in={showAdvancedFilters}>
                 <div>{children}</div>
             </Collapse>

@@ -399,9 +399,7 @@ const BookingForm: React.FC<Props> = ({
                                         defaultValue={booking?.fixedPrice ?? undefined}
                                         onChange={(e) => setFixedPrice(e.target.value)}
                                     />
-                                    <InputGroup.Append>
-                                        <InputGroup.Text>kr</InputGroup.Text>
-                                    </InputGroup.Append>
+                                    <InputGroup.Text>kr</InputGroup.Text>
                                 </InputGroup>
                                 <PriceWithVATPreview price={currency(fixedPrice ?? 0)} />
                                 <Form.Text className="text-muted">

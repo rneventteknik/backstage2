@@ -10,7 +10,7 @@ type Props = {
 
 const EquipmentTagDisplay: React.FC<Props> = ({ tag, className }: Props) => {
     return (
-        <Badge variant="dark" className={className} style={tag.color ? { backgroundColor: tag.color } : undefined}>
+        <Badge bg="dark" className={className} style={tag.color ? { backgroundColor: tag.color } : undefined}>
             {tag.name}
         </Badge>
     );

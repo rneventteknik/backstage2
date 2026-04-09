@@ -188,7 +188,7 @@ const EquipmentListTable: React.FC<Props> = ({
                     >
                         {entry.name}
                         {entry.equipment?.isArchived ? (
-                            <Badge variant="warning" className="ml-1" title="">
+                            <Badge bg="warning" className="ml-1" title="">
                                 Arkiverad
                             </Badge>
                         ) : null}
