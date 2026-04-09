@@ -60,7 +60,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser, globalSettings }: P
         return <FormLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
-    const handleSubmit = async (equipment: PartialDeep<IEquipmentObjectionModel>) => {
+    const handleSubmit = async (equipment: PartialDeep<IEquipmentObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => {
         const body = { equipment: equipment };
 
         const request = {

@@ -29,7 +29,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         { link: '/equipmentPackage/new', displayName: pageTitle },
     ];
 
-    const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => {
+    const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => {
         const body = { equipmentPackage: equipmentPackage };
 
         const request = {

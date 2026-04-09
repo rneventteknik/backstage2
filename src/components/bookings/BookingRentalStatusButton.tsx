@@ -13,7 +13,7 @@ import { Status } from '../../models/enums/Status';
 
 type Props = {
     booking: Partial<Booking>;
-    onChange: (booking: PartialDeep<IBookingObjectionModel, { recurseIntoArrays: true }>) => void;
+    onChange: (booking: PartialDeep<IBookingObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
     alwaysShowRentalControls: boolean;
     className?: string;
 };

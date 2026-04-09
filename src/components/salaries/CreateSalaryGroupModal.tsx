@@ -16,7 +16,7 @@ import { SalaryStatus } from '../../models/enums/SalaryStatus';
 type Props = {
     show: boolean;
     onHide: () => void;
-    onCreate: (salaryGroup: PartialDeep<ISalaryGroupObjectionModel>) => void;
+    onCreate: (salaryGroup: PartialDeep<ISalaryGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
 };
 
 const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Props) => {
@@ -73,7 +73,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
     };
 
     const createGroup = () => {
-        const group: PartialDeep<ISalaryGroupObjectionModel, { recurseIntoArrays: true }> = {
+        const group: PartialDeep<ISalaryGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> = {
             name: selectedGroupName,
             bookings: selectedBookingIds.map((id) => ({ id })),
         };

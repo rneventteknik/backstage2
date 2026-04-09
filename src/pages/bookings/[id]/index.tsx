@@ -113,7 +113,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
     const booking = toBookingViewModel(data);
 
-    const saveBooking = async (booking: PartialDeep<IBookingObjectionModel>) => {
+    const saveBooking = async (booking: PartialDeep<IBookingObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => {
         const body = { booking: { ...booking, id: router.query.id } };
 
         const request = {

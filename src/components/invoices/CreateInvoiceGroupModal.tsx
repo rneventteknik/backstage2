@@ -17,7 +17,7 @@ import { getPaymentStatusName } from '../../lib/utils';
 type Props = {
     show: boolean;
     onHide: () => void;
-    onCreate: (invoiceGroup: PartialDeep<IInvoiceGroupObjectionModel>) => void;
+    onCreate: (invoiceGroup: PartialDeep<IInvoiceGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
 };
 
 const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Props) => {
@@ -65,7 +65,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
     };
 
     const createGroup = () => {
-        const group: PartialDeep<IInvoiceGroupObjectionModel, { recurseIntoArrays: true }> = {
+        const group: PartialDeep<IInvoiceGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> = {
             name: selectedGroupName,
             bookings: selectedBookingIds.map((id) => ({ id })),
         };

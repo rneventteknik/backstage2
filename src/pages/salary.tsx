@@ -55,7 +55,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
-    const createSalaryGroup = (newSalaryGroup: PartialDeep<ISalaryGroupObjectionModel>) => {
+    const createSalaryGroup = (newSalaryGroup: PartialDeep<ISalaryGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => {
         const body = { salaryGroup: { ...newSalaryGroup, userId: currentUser.userId } };
 
         const request = {

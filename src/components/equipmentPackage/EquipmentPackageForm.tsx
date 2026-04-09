@@ -18,7 +18,7 @@ import { PricePlan } from '../../models/enums/PricePlan';
 import { getDefaultSelectedPrice } from '../../lib/equipmentListUtils';
 
 type Props = {
-    handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => void;
+    handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
     equipmentPackage?: EquipmentPackage;
     formId: string;
 };
@@ -239,7 +239,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             return;
         }
 
-        const modifiedEquipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true }> = {
+        const modifiedEquipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> = {
             id: equipmentPackage?.id,
             created: equipmentPackage?.created?.toString(),
             updated: equipmentPackage?.updated?.toString(),
@@ -250,7 +250,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             nameEN: form.equipmentPackageNameEN.value,
             description: form.description.value,
             descriptionEN: form.descriptionEN.value,
-            addAsHeading: form.addAsHeading?.value === 'true' ?? false,
+            addAsHeading: form.addAsHeading?.value === 'true',
 
             tags: selectedTags.map((x) => ({
                 ...x,

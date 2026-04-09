@@ -396,7 +396,7 @@ const TableRow = <T extends HasId | HasStringId>({
     return (
         <>
             <tr
-                ref={drop}
+                ref={drop as unknown as React.LegacyRef<HTMLTableRowElement>}
                 className={(isDragging ? 'text-muted ' : '') + (collectedProps.hovered ? styles.hoveredRow : '')}
             >
                 {configuration.statusColumns?.map((p) => (
@@ -408,7 +408,7 @@ const TableRow = <T extends HasId | HasStringId>({
                     ></td>
                 ))}
                 {showMoveControl ? (
-                    <td className="pr-0 align-middle d-none d-md-table-cell" ref={drag}>
+                    <td className="pr-0 align-middle d-none d-md-table-cell" ref={drag as unknown as React.LegacyRef<HTMLTableDataCellElement>}>
                         {isDragging ? null : <FontAwesomeIcon icon={faGripVertical} className="text-muted" />}
                     </td>
                 ) : null}
