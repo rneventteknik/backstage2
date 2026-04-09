@@ -5,6 +5,7 @@ import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { NextApiRequest } from 'next';
 import { fetchUserAuthById } from './db-access/userAuth';
 import { IncomingMessage } from 'http';
+import { RequestWithSession } from './session';
 
 export const authenticate = async (username: string, password: string): Promise<UserAuthObjectionModel | null> => {
     const user = await fetchUserAuth(username.toLowerCase());
@@ -38,7 +39,7 @@ export const getHashedPassword = async (password: string): Promise<string> => {
 };
 
 export const setSessionCookie = async (
-    req: IncomingMessage,
+    req: IncomingMessage & RequestWithSession,
     authUser: UserAuthObjectionModel,
     userInfoOverride: Partial<CurrentUserInfo> = {},
 ): Promise<CurrentUserInfo> => {
@@ -57,12 +58,12 @@ export const setSessionCookie = async (
     return user;
 };
 
-export const destroySessionCookie = (req: NextApiRequest & IncomingMessage): void => req.session.destroy();
+export const destroySessionCookie = (req: NextApiRequest & IncomingMessage & RequestWithSession): void => req.session.destroy();
 
-export const getUserFromReq = (req: NextApiRequest & IncomingMessage): CurrentUserInfo =>
+export const getUserFromReq = (req: NextApiRequest & IncomingMessage & RequestWithSession): CurrentUserInfo =>
     req.session.user ?? { isLoggedIn: false };
 
-export const getAndVerifyUser = async (req: NextApiRequest & IncomingMessage): Promise<CurrentUserInfo> => {
+export const getAndVerifyUser = async (req: NextApiRequest & IncomingMessage & RequestWithSession): Promise<CurrentUserInfo> => {
     const currentUser = getUserFromReq(req);
 
     // We only need to verify the user if we are logged in

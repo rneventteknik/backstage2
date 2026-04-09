@@ -1,7 +1,11 @@
-import type { IronSessionOptions } from 'iron-session';
-import { withIronSessionApiRoute, withIronSessionSsr } from 'iron-session/next';
-import { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandler } from 'next';
+import type { SessionOptions, IronSession } from 'iron-session';
+import { getIronSession } from 'iron-session';
+import { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
+import { IncomingMessage, ServerResponse } from 'http';
+
+export type SessionData = { user?: CurrentUserInfo };
+export type RequestWithSession = { session: IronSession<SessionData> };
 
 declare module 'iron-session' {
     interface IronSessionData {
@@ -9,20 +13,32 @@ declare module 'iron-session' {
     }
 }
 
-const options: IronSessionOptions = {
+const options: SessionOptions = {
     password: process.env.SECRET_COOKIE_PASSWORD || '',
     cookieName: 'backstage2',
     cookieOptions: { secure: process.env.NODE_ENV !== 'development', sameSite: 'strict' },
 };
 
-export const withApiSession = (handler: NextApiHandler): NextApiHandler => {
-    return withIronSessionApiRoute(handler, options);
+export const getSession = (req: IncomingMessage | NextApiRequest, res: ServerResponse | NextApiResponse) => {
+    return getIronSession<SessionData>(req, res, options);
+};
+
+export const withApiSession = (handler: (req: NextApiRequest & RequestWithSession, res: NextApiResponse) => void | Promise<void>): NextApiHandler => {
+    return async (req, res) => {
+        const session = await getSession(req, res);
+        Object.assign(req, { session });
+        return handler(req as NextApiRequest & RequestWithSession, res);
+    };
 };
 
 export const withSsrSession = <T extends { [key: string]: unknown }>(
     handler: (context: GetServerSidePropsContext) => GetServerSidePropsResult<T> | Promise<GetServerSidePropsResult<T>>,
 ) => {
-    return withIronSessionSsr(handler, options);
+    return async (context: GetServerSidePropsContext): Promise<GetServerSidePropsResult<T>> => {
+        const session = await getSession(context.req, context.res);
+        Object.assign(context.req, { session });
+        return handler(context);
+    };
 };
 
 export { options };
