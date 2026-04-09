@@ -1,3 +1,5 @@
+@use "sass:color";
+
 /**************************
     Variables for our own use
 ***************************/
@@ -5,16 +7,16 @@
 $backstage-base-color: #121212;
 
 $backstage-color-0: $backstage-base-color;
-$backstage-color-1: lighten($backstage-base-color, 3%);
-$backstage-color-2: lighten($backstage-base-color, 6%);
-$backstage-color-3: lighten($backstage-base-color, 9%);
-$backstage-color-4: lighten($backstage-base-color, 12%);
-$backstage-color-5: lighten($backstage-base-color, 15%);
-$backstage-color-6: lighten($backstage-base-color, 18%);
-$backstage-color-7: lighten($backstage-base-color, 21%);
-$backstage-color-8: lighten($backstage-base-color, 24%);
-$backstage-color-9: lighten($backstage-base-color, 27%);
-$backstage-color-10: lighten($backstage-base-color, 30%);
+$backstage-color-1: color.adjust($backstage-base-color, $lightness: 3%);
+$backstage-color-2: color.adjust($backstage-base-color, $lightness: 6%);
+$backstage-color-3: color.adjust($backstage-base-color, $lightness: 9%);
+$backstage-color-4: color.adjust($backstage-base-color, $lightness: 12%);
+$backstage-color-5: color.adjust($backstage-base-color, $lightness: 15%);
+$backstage-color-6: color.adjust($backstage-base-color, $lightness: 18%);
+$backstage-color-7: color.adjust($backstage-base-color, $lightness: 21%);
+$backstage-color-8: color.adjust($backstage-base-color, $lightness: 24%);
+$backstage-color-9: color.adjust($backstage-base-color, $lightness: 27%);
+$backstage-color-10: color.adjust($backstage-base-color, $lightness: 30%);
 
 $backstage-text-color: #ededed;
 $backstage-dark-text-color: #6c757d;

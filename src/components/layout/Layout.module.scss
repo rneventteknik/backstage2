@@ -1,4 +1,4 @@
-@import '../../style/variables';
+@use '../../style/variables';
 
 $navbar-height-compensation: 50px;
 $sidebar-width: 260px;
@@ -13,7 +13,7 @@ $sidebar-bottom-off-screen-length: 100px;
     left: 0;
     bottom: -$sidebar-bottom-off-screen-length;
     margin-top: $navbar-height-compensation;
-    background-color: $backstage-color-2;
+    background-color: variables.$backstage-color-2;
     box-shadow: 2px 0 4px rgb(0 0 0 / 25%);
 
     transition:
@@ -44,7 +44,7 @@ $sidebar-bottom-off-screen-length: 100px;
 }
 
 .footer {
-    border-top: 1px solid $backstage-color-2;
+    border-top: 1px solid variables.$backstage-color-2;
 }
 
 .container {
@@ -57,8 +57,8 @@ $sidebar-bottom-off-screen-length: 100px;
 }
 
 :export {
-    skeletonColorBase: $backstage-color-1;
-    skeletonColorHighlight: $backstage-color-4;
+    skeletonColorBase: variables.$backstage-color-1;
+    skeletonColorHighlight: variables.$backstage-color-4;
 }
 
 // Handle sidebar toggle and responsive design

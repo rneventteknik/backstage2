@@ -1,8 +1,8 @@
-@import '../../style/variables';
+@use '../../style/variables';
 
 .container {
     z-index: 100;
-    background-color: $backstage-color-2;
+    background-color: variables.$backstage-color-2;
     box-shadow: 0 2px 4px rgb(0 0 0 / 50%);
     padding-left: 0.5rem;
 }

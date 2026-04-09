@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
 import type { RenderMenuProps, TypeaheadComponentProps } from 'react-bootstrap-typeahead';
-import styles from './EquipmentSearch.module.scss';
+import styles from './BookingSearch.module.scss';
 import { BookingsSearchResult } from '../models/misc/SearchResult';
 import { getResponseContentOrError } from '../lib/utils';
 import { useNotifications } from '../lib/useNotifications';
