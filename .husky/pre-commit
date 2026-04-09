@@ -3,6 +3,6 @@
 
 echo "Running pre-commit hook. Bypass with --no-verify."
 echo "The hook formats staged files, compiles the project with Typescript and lints it with eslint."
-yarn lint-staged
-yarn tsc
-yarn eslint .
+npm run lint-staged
+npm run tsc
+npm run eslint -- .
