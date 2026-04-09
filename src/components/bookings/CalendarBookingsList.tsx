@@ -89,7 +89,7 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
                     variant={calendarResult.existingBookingId ? 'secondary' : 'primary'}
                     title="Mer"
                     size="sm"
-                    className="d-inline mr-2"
+                    className="d-inline me-2"
                     onClick={() => onSelect(calendarResult)}
                     disabled={!!calendarResult.existingBookingId}
                 >

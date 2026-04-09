@@ -27,18 +27,18 @@ const BookingInfoSection: React.FC<Props> = ({ booking, className, showName = tr
             <Card.Header>
                 {showName ? <div style={{ fontSize: '1.6em' }}>{booking.name}</div> : null}
                 <BookingStatusTag booking={booking} />
-                <BookingTypeTag booking={booking} className="ml-1" />
-                <RentalStatusTag booking={booking} className="ml-1" />
-                <Badge bg="dark" className="ml-1">
+                <BookingTypeTag booking={booking} className="ms-1" />
+                <RentalStatusTag booking={booking} className="ms-1" />
+                <Badge bg="dark" className="ms-1">
                     {getPaymentStatusName(booking.paymentStatus)}
                 </Badge>
-                <InternalReservationTag booking={booking} className="ml-1" />
+                <InternalReservationTag booking={booking} className="ms-1" />
                 {booking.language !== Language.SV ? (
-                    <Badge bg="dark" className="ml-1">
+                    <Badge bg="dark" className="ms-1">
                         {getLanguageName(booking.language)}
                     </Badge>
                 ) : null}
-                <FixedPriceStatusTag booking={booking} className="ml-1" />
+                <FixedPriceStatusTag booking={booking} className="ms-1" />
                 <div className="text-muted mt-2"> {booking.customerName}</div>
                 <div className="text-muted">
                     {getNumberOfBookingDays(booking) ? `${getNumberOfBookingDays(booking)} debiterade dagar / ` : null}

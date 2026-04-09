@@ -215,7 +215,7 @@ const BookingForm: React.FC<Props> = ({
                                 defaultValue={booking.customerName}
                                 ref={customerNameField}
                             />
-                            <Button variant="secondary" className="ml-2" onClick={() => setCustomerSearchModal(true)}>
+                            <Button variant="secondary" className="ms-2" onClick={() => setCustomerSearchModal(true)}>
                                 Sök kund
                             </Button>
                         </InputGroup>

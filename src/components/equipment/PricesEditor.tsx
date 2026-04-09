@@ -87,7 +87,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                 />
                 <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>
-            <p className="text-muted text-left mt-1 mb-0 small">
+            <p className="text-muted text-start mt-1 mb-0 small">
                 Pris ink. moms: {formatPrice(addVATToPriceWithTHS(price))}
             </p>
         </>
@@ -113,7 +113,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
                 />
                 <InputGroup.Text>kr/h</InputGroup.Text>
             </InputGroup>
-            <p className="text-muted text-left mt-1 mb-0 small">
+            <p className="text-muted text-start mt-1 mb-0 small">
                 Pris ink. moms: {formatTHSPrice(addVATToPriceWithTHS(price))}
             </p>
         </>
@@ -123,7 +123,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
                 <Dropdown.Item onClick={() => deletePrice(price)} className="text-danger">
-                    <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort pris
+                    <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort pris
                 </Dropdown.Item>
             </DropdownButton>
         );
@@ -180,7 +180,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
 
             <div className="mb-4">
                 <Button size="sm" variant="secondary" onClick={() => savePrices([...prices, getDefaultPrice()])}>
-                    <FontAwesomeIcon icon={faPlus} className="mr-1" /> Lägg till pris
+                    <FontAwesomeIcon icon={faPlus} className="me-1" /> Lägg till pris
                 </Button>
             </div>
         </>

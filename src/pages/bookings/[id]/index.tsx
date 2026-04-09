@@ -205,7 +205,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <>
                         <Link href={'/bookings/' + booking.id + '/edit'} passHref legacyBehavior>
                             <Button variant="primary" href={'/bookings/' + booking.id + '/edit'}>
-                                <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
+                                <FontAwesomeIcon icon={faPen} className="me-1" /> Redigera
                             </Button>
                         </Link>
 
@@ -219,7 +219,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 ) : null}
                 <Dropdown as={ButtonGroup}>
                     <Dropdown.Toggle variant="secondary" id="dropdown-split-basic">
-                        <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" />
+                        <FontAwesomeIcon icon={faFileDownload} className="me-1 fa-fw" />
                         Exportera
                     </Dropdown.Toggle>
 
@@ -228,16 +228,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             href={`/api/documents/price-estimate/${booking.language}/${booking.id}`}
                             target="_blank"
                         >
-                            <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Prisuppskattning
+                            <FontAwesomeIcon icon={faFilePdf} className="me-1 fa-fw" /> Prisuppskattning
                         </Dropdown.Item>
                         <Dropdown.Item href={`/api/documents/packing-list/sv/${booking.id}`} target="_blank">
-                            <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Packlista
+                            <FontAwesomeIcon icon={faFilePdf} className="me-1 fa-fw" /> Packlista
                         </Dropdown.Item>
                         <Dropdown.Item
                             href={`/api/documents/rental-agreement/${booking.language}/${booking.id}`}
                             target="_blank"
                         >
-                            <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Hyresavtal
+                            <FontAwesomeIcon icon={faFilePdf} className="me-1 fa-fw" /> Hyresavtal
                         </Dropdown.Item>
                         <IfAdmin currentUser={currentUser}>
                             <Dropdown.Divider />
@@ -246,20 +246,20 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             href={`/api/documents/invoice/pdf/${booking.language}/${booking.id}`}
                             target="_blank"
                         >
-                            <FontAwesomeIcon icon={faFilePdf} className="mr-1 fa-fw" /> Fakturaunderlag (PDF)
+                            <FontAwesomeIcon icon={faFilePdf} className="me-1 fa-fw" /> Fakturaunderlag (PDF)
                         </Dropdown.Item>
                         <IfAdmin currentUser={currentUser}>
                             <Dropdown.Item
                                 href={`/api/documents/invoice/txt/${booking.language}/${booking.id}?download=true`}
                                 target="_blank"
                             >
-                                <FontAwesomeIcon icon={faFileText} className="mr-1 fa-fw" /> Fakturaunderlag (Hogia
+                                <FontAwesomeIcon icon={faFileText} className="me-1 fa-fw" /> Fakturaunderlag (Hogia
                                 import)
                             </Dropdown.Item>
                             <Dropdown.Divider />
                             <Link href={`/bookings/${booking.id}/custom-document-export`} passHref>
                                 <Dropdown.Item href={`/bookings/${booking.id}/custom-document-export`} target="_blank">
-                                    <FontAwesomeIcon icon={faFilePen} className="mr-1 fa-fw" /> Anpassad dokumentexport
+                                    <FontAwesomeIcon icon={faFilePen} className="me-1 fa-fw" /> Anpassad dokumentexport
                                 </Dropdown.Item>
                             </Link>
                         </IfAdmin>
@@ -271,7 +271,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     and={booking.status === Status.DONE && booking.paymentStatus === PaymentStatus.NOT_PAID}
                 >
                     <Button variant="secondary" onClick={() => setShowConfirmReadyForCashPaymentModal(true)}>
-                        <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Skicka till KårX för betalning
+                        <FontAwesomeIcon icon={faCoins} className="me-1 fw" /> Skicka till KårX för betalning
                     </Button>
                     <ConfirmModal
                         show={showConfirmReadyForCashPaymentModal}
@@ -288,7 +288,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     </ConfirmModal>
 
                     <Button variant="secondary" onClick={() => setShowConfirmPaidModal(true)}>
-                        <FontAwesomeIcon icon={faCoins} className="mr-1 fw" /> Markera som skall ej faktureras
+                        <FontAwesomeIcon icon={faCoins} className="me-1 fw" /> Markera som skall ej faktureras
                     </Button>
                     <ConfirmModal
                         show={showConfirmPaidModal}
@@ -309,7 +309,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <Button variant="secondary" onClick={() => setAdminEditModeOverrideEnabled((x) => !x)}>
                         <FontAwesomeIcon
                             icon={adminEditModeOverrideEnabled ? faLock : faLockOpen}
-                            className="mr-1 fw"
+                            className="me-1 fw"
                         />{' '}
                         {adminEditModeOverrideEnabled
                             ? 'Sluta redigera klarmarkerad bokning'
@@ -321,23 +321,23 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
                         {booking.bookingType === BookingType.GIG && !alwaysShowRentalControls ? (
                             <Dropdown.Item onClick={() => setAlwaysShowRentalControls(true)}>
-                                <FontAwesomeIcon icon={faToggleOff} className="mr-1" /> Visa hyreskontroller för detta{' '}
+                                <FontAwesomeIcon icon={faToggleOff} className="me-1" /> Visa hyreskontroller för detta{' '}
                                 {getBookingTypeName(booking.bookingType)}
                             </Dropdown.Item>
                         ) : null}
                         {booking.bookingType === BookingType.GIG && alwaysShowRentalControls ? (
                             <Dropdown.Item onClick={() => setAlwaysShowRentalControls(false)}>
-                                <FontAwesomeIcon icon={faToggleOn} className="mr-1" /> Sluta visa hyreskontroller för
+                                <FontAwesomeIcon icon={faToggleOn} className="me-1" /> Sluta visa hyreskontroller för
                                 detta {getBookingTypeName(booking.bookingType)}
                             </Dropdown.Item>
                         ) : null}
                         {booking.status !== Status.CANCELED && booking.status !== Status.DONE ? (
                             <Dropdown.Item onClick={() => setShowCancelModal(true)}>
-                                <FontAwesomeIcon icon={faTimesCircle} className="mr-1" /> Ställ in bokningen
+                                <FontAwesomeIcon icon={faTimesCircle} className="me-1" /> Ställ in bokningen
                             </Dropdown.Item>
                         ) : null}
                         <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort bokningen
+                            <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort bokningen
                         </Dropdown.Item>
                     </DropdownButton>
                 ) : null}
@@ -428,7 +428,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                 <strong>{formatCurrency(addVAT(getBookingPrice(booking, true, true)))}</strong>
                             </ListGroup.Item>
                             <ListGroup.Item className="d-flex">
-                                <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                <em className="flex-grow-1 ps-4">varav moms (25%)</em>
                                 <em>{formatCurrency(getVAT(getBookingPrice(booking, true, true)))}</em>
                             </ListGroup.Item>
                             {timeReportExists ? (
@@ -444,7 +444,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                         <strong>{formatCurrency(addVAT(getBookingPrice(booking, false, true)))}</strong>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
-                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                        <em className="flex-grow-1 ps-4">varav moms (25%)</em>
                                         <em>{formatCurrency(getVAT(getBookingPrice(booking, false, true)))}</em>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
@@ -469,7 +469,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                         <strong>{formatCurrency(addVAT(booking.fixedPrice))}</strong>
                                     </ListGroup.Item>
                                     <ListGroup.Item className="d-flex">
-                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
+                                        <em className="flex-grow-1 ps-4">varav moms (25%)</em>
                                         <em>{formatCurrency(getVAT(booking.fixedPrice))}</em>
                                     </ListGroup.Item>
                                     {timeReportExists ? (

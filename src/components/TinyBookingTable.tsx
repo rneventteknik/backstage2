@@ -27,11 +27,11 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
         <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
 
-        <BookingStatusTag booking={booking} className="ml-1" />
-        <BookingTypeTag booking={booking} className="ml-1" />
-        <RentalStatusTag booking={booking} className="ml-1" />
-        <InternalReservationTag booking={booking} className="ml-1" />
-        <FixedPriceStatusTag booking={booking} className="ml-1" />
+        <BookingStatusTag booking={booking} className="ms-1" />
+        <BookingTypeTag booking={booking} className="ms-1" />
+        <RentalStatusTag booking={booking} className="ms-1" />
+        <InternalReservationTag booking={booking} className="ms-1" />
+        <FixedPriceStatusTag booking={booking} className="ms-1" />
         <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
     </>
 );

@@ -32,12 +32,12 @@ const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
         <TableStyleLink href={'equipment/' + equipment.id}>{equipment.name}</TableStyleLink>
         {equipment.publiclyHidden ? (
-            <span className="small text-muted ml-1">
+            <span className="small text-muted ms-1">
                 <FontAwesomeIcon icon={faEyeSlash} title="Gömd i den publika prislistan"></FontAwesomeIcon>
             </span>
         ) : null}
         {equipment.tags.map((x) => (
-            <EquipmentTagDisplay tag={x} key={x.id} className="ml-1" />
+            <EquipmentTagDisplay tag={x} key={x.id} className="ms-1" />
         ))}
         <div className="text-muted mb-0">{equipment.description}</div>
         {equipment.inventoryCount === null ? null : (

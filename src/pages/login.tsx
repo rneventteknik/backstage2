@@ -104,7 +104,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
             </Head>
             <h1>
                 Backstage2
-                <span style={{ fontSize: '0.6em', position: 'relative', top: '-3px' }} className="ml-2">
+                <span style={{ fontSize: '0.6em', position: 'relative', top: '-3px' }} className="ms-2">
                     <EnvironmentTypeTag globalSettings={globalSettings} />
                 </span>
             </h1>

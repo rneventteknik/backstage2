@@ -48,7 +48,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/bookings/new" passHref>
                         <Button variant="primary" as="span">
-                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till bokning
+                            <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till bokning
                         </Button>
                     </Link>
                 </IfNotReadonly>

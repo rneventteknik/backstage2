@@ -144,19 +144,19 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({
                 <ListGroup.Item>
                     <FontAwesomeIcon
                         id="keyStatusIcon"
-                        className="mr-2 fa-fw"
+                        className="me-2 fa-fw"
                         icon={getKeyIconAndText(KeyInPlace).icon}
                     />
                     <span>{getKeyIconAndText(KeyInPlace).text}</span>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                    <FontAwesomeIcon id="doorStatusIcon" className="mr-2 fa-fw " icon={getDoorIconAndText(Door).icon} />
+                    <FontAwesomeIcon id="doorStatusIcon" className="me-2 fa-fw " icon={getDoorIconAndText(Door).icon} />
                     <span>{getDoorIconAndText(Door).text}</span>
                 </ListGroup.Item>
                 <ListGroup.Item>
                     <FontAwesomeIcon
                         id="alarmStatusIcon"
-                        className="mr-2 fa-fw "
+                        className="me-2 fa-fw "
                         icon={getAlarmIconAndText(Armed).icon}
                     />
                     <span>{getAlarmIconAndText(Armed).text}</span>

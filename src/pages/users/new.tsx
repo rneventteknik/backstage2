@@ -54,7 +54,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editUserForm" type="submit">
-                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till användare
+                    <FontAwesomeIcon icon={faSave} className="me-1" /> Lägg till användare
                 </Button>
             </Header>
 

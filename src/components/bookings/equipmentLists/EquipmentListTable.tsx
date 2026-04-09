@@ -143,7 +143,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             readonly={readonly}
                         >
                             {heading.name}
-                            <span className="text-muted ml-2">
+                            <span className="text-muted ms-2">
                                 ({heading.listEntries.length} {heading.listEntries.length === 1 ? 'del' : 'delar'})
                             </span>
                         </ClickToEdit>
@@ -188,12 +188,12 @@ const EquipmentListTable: React.FC<Props> = ({
                     >
                         {entry.name}
                         {entry.equipment?.isArchived ? (
-                            <Badge bg="warning" className="ml-1" title="">
+                            <Badge bg="warning" className="ms-1" title="">
                                 Arkiverad
                             </Badge>
                         ) : null}
                         {entry.equipment && getEquipmentOutDatetime(list) && getEquipmentInDatetime(list) ? (
-                            <span className="ml-1" title="">
+                            <span className="ms-1" title="">
                                 <EquipmentListEntryConflictStatus
                                     equipment={entry.equipment}
                                     equipmentList={list}
@@ -212,7 +212,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                     </Tooltip>
                                 }
                             >
-                                <FontAwesomeIcon icon={faEyeSlash} className="ml-1" title="" />
+                                <FontAwesomeIcon icon={faEyeSlash} className="ms-1" title="" />
                             </OverlayTrigger>
                         ) : null}
                         {entry.account ? (
@@ -224,7 +224,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                     </Tooltip>
                                 }
                             >
-                                <FontAwesomeIcon icon={faDollarSign} className="ml-1" title="" />
+                                <FontAwesomeIcon icon={faDollarSign} className="ms-1" title="" />
                             </OverlayTrigger>
                         ) : null}
                     </ClickToEdit>
@@ -407,17 +407,17 @@ const EquipmentListTable: React.FC<Props> = ({
                                 onClick={() => moveListEntryUp(viewModel, list, saveListEntriesAndHeadings)}
                                 disabled={isFirst(listEntries, viewModel)}
                             >
-                                <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+                                <FontAwesomeIcon icon={faAngleUp} className="me-1 fa-fw" /> Flytta upp
                             </Dropdown.Item>
                             <Dropdown.Item
                                 onClick={() => moveListEntryDown(viewModel, list, saveListEntriesAndHeadings)}
                                 disabled={isLast(listEntries, viewModel)}
                             >
-                                <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+                                <FontAwesomeIcon icon={faAngleDown} className="me-1 fa-fw" /> Flytta ner
                             </Dropdown.Item>
                             <Dropdown.Divider />
                             <Dropdown.Item onClick={() => deleteListHeading(heading)} className="text-danger">
-                                <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                                <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort rad
                             </Dropdown.Item>
                         </>
                     )}
@@ -435,13 +435,13 @@ const EquipmentListTable: React.FC<Props> = ({
                             onClick={() => moveListEntryUp(viewModel, list, saveListEntriesAndHeadings)}
                             disabled={isFirst(peers, viewModel)}
                         >
-                            <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+                            <FontAwesomeIcon icon={faAngleUp} className="me-1 fa-fw" /> Flytta upp
                         </Dropdown.Item>
                         <Dropdown.Item
                             onClick={() => moveListEntryDown(viewModel, list, saveListEntriesAndHeadings)}
                             disabled={isLast(peers, viewModel)}
                         >
-                            <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+                            <FontAwesomeIcon icon={faAngleDown} className="me-1 fa-fw" /> Flytta ner
                         </Dropdown.Item>
                         <Dropdown.Divider />
                         {getHeaderOfEntity(entry, list) ? (
@@ -449,7 +449,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                 <Dropdown.Item
                                     onClick={() => moveListEntryIntoHeading(entry, null, list, saveListEntry)}
                                 >
-                                    <FontAwesomeIcon icon={faAngleLeft} className="mr-1 fa-fw" /> Flytta ut ur{' '}
+                                    <FontAwesomeIcon icon={faAngleLeft} className="me-1 fa-fw" /> Flytta ut ur{' '}
                                     {getHeaderOfEntity(entry, list)?.name}
                                 </Dropdown.Item>
                             </>
@@ -459,7 +459,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                     key={heading.id}
                                     onClick={() => moveListEntryIntoHeading(entry, heading.id, list, saveListEntry)}
                                 >
-                                    <FontAwesomeIcon icon={faAngleRight} className="mr-1 fa-fw" /> Flytta in i{' '}
+                                    <FontAwesomeIcon icon={faAngleRight} className="me-1 fa-fw" /> Flytta in i{' '}
                                     {heading.name}
                                 </Dropdown.Item>
                             ))
@@ -468,16 +468,16 @@ const EquipmentListTable: React.FC<Props> = ({
                     </>
                 )}
                 <Dropdown.Item href={'/equipment/' + entry.equipmentId} target="_blank" disabled={!entry.equipment}>
-                    <FontAwesomeIcon icon={faExternalLink} className="mr-1 fa-fw" /> Öppna utrustning i ny flik
+                    <FontAwesomeIcon icon={faExternalLink} className="me-1 fa-fw" /> Öppna utrustning i ny flik
                 </Dropdown.Item>
                 {readonly ? (
                     <Dropdown.Item onClick={() => editEntry(entry)}>
-                        <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Visa detaljer
+                        <FontAwesomeIcon icon={faGears} className="me-1 fa-fw" /> Visa detaljer
                     </Dropdown.Item>
                 ) : (
                     <>
                         <Dropdown.Item onClick={() => toggleHideListEntry(entry, saveListEntry)}>
-                            <FontAwesomeIcon icon={entry.isHidden ? faEye : faEyeSlash} className="mr-1 fa-fw" />{' '}
+                            <FontAwesomeIcon icon={entry.isHidden ? faEye : faEyeSlash} className="me-1 fa-fw" />{' '}
                             {entry.isHidden ? 'Sluta dölja rad för kund' : 'Dölj rad för kund'}
                         </Dropdown.Item>
                         <Dropdown.Item
@@ -490,7 +490,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                 })
                             }
                         >
-                            <FontAwesomeIcon icon={fa0} className="mr-1 fa-fw" /> Sätt anpassat pris till 0
+                            <FontAwesomeIcon icon={fa0} className="me-1 fa-fw" /> Sätt anpassat pris till 0
                         </Dropdown.Item>
                         <Dropdown.Item
                             onClick={() =>
@@ -500,10 +500,10 @@ const EquipmentListTable: React.FC<Props> = ({
                                 })
                             }
                         >
-                            <FontAwesomeIcon icon={faPercent} className="mr-1 fa-fw" /> Sätt rabatt till 100%
+                            <FontAwesomeIcon icon={faPercent} className="me-1 fa-fw" /> Sätt rabatt till 100%
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => editEntry(entry)}>
-                            <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" /> Avancerad redigering
+                            <FontAwesomeIcon icon={faGears} className="me-1 fa-fw" /> Avancerad redigering
                         </Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item
@@ -523,10 +523,10 @@ const EquipmentListTable: React.FC<Props> = ({
                                     : null
                             }
                         >
-                            <FontAwesomeIcon icon={faEraser} className="mr-1 fa-fw" /> Återställ rad
+                            <FontAwesomeIcon icon={faEraser} className="me-1 fa-fw" /> Återställ rad
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => deleteListEntry(entry)} className="text-danger">
-                            <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                            <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort rad
                         </Dropdown.Item>
                     </>
                 )}
@@ -682,7 +682,7 @@ const EquipmentListTable: React.FC<Props> = ({
             />
 
             {readonly ? null : (
-                <div className="ml-2 mr-2 mb-2">
+                <div className="ms-2 me-2 mb-2">
                     <EquipmentSearchWithAI
                         equipment={listEntries.flatMap(getEquipmentFromViewModel)}
                         placeholder="Lägg till utrustning"

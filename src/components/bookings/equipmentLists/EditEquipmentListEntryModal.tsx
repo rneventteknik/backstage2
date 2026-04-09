@@ -282,7 +282,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                     {!!equipmentListEntryToEditViewModel.equipment ? (
                         <p className="text-muted">
                             <span>
-                                <FontAwesomeIcon icon={faLink} className="mr-1" size="sm" />
+                                <FontAwesomeIcon icon={faLink} className="me-1" size="sm" />
                                 Den här raden är länkad till utrustningen{' '}
                                 <em>{equipmentListEntryToEditViewModel.equipment.name}</em>.{' '}
                             </span>

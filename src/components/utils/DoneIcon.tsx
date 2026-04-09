@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 const DoneIcon: React.FC = () => {
     return (
         <span className="text-success">
-            <FontAwesomeIcon icon={faCircleCheck} className="ml-2" />
+            <FontAwesomeIcon icon={faCircleCheck} className="ms-2" />
         </span>
     );
 };

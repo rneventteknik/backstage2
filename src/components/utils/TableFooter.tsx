@@ -22,18 +22,18 @@ const TableFooterWithViewCount: React.FC<Props> = ({
                     Visar {Math.min(viewCount, totalCount)} {entityTypeDisplayName} av {totalCount}.
                 </p>
             </div>
-            <div className="flex-grow-1 ml-2">
+            <div className="flex-grow-1 ms-2">
                 <Form>
                     <Form.Group controlId="viewcount">
                         <div className="d-flex justify-content-end">
                             <div>
-                                <Form.Label className="text-right">Antal {entityTypeDisplayName} att visa</Form.Label>
+                                <Form.Label className="text-end">Antal {entityTypeDisplayName} att visa</Form.Label>
                             </div>
                             <div>
                                 <Form.Control
                                     as="select"
                                     name="viewcount"
-                                    className="ml-2"
+                                    className="ms-2"
                                     size="sm"
                                     defaultValue={viewCount}
                                     onChange={(e) => setViewCount(Number(e.target.value))}

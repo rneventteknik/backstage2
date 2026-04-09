@@ -63,8 +63,8 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                     <TinyBookingTable title="Mina bokningar" bookings={myDraftOrBookedBookings}>
                         <IfNotReadonly currentUser={currentUser}>
                             <Link href="/bookings/new" passHref>
-                                <Button size="sm" variant="secondary" as="span" className="mr-2 ml-2 mb-2">
-                                    <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till bokning
+                                <Button size="sm" variant="secondary" as="span" className="me-2 ms-2 mb-2">
+                                    <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till bokning
                                 </Button>
                             </Link>
                         </IfNotReadonly>
@@ -76,7 +76,7 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                     >
                         <div>
                             <AddUserAsCoOwnerToAllFutureBookingsForUserButton
-                                className="mr-2 ml-2 mb-2"
+                                className="me-2 ms-2 mb-2"
                                 currentUser={currentUser}
                                 currentCoOwnerBookings={coOwnerBookings ?? []}
                                 mutate={mutateCoOwnerBookings}

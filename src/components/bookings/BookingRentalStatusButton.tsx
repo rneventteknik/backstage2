@@ -56,7 +56,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({
         return (
             <>
                 <Button variant="secondary" className={className} onClick={() => setShowConfirmOutModal(true)}>
-                    <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
+                    <FontAwesomeIcon icon={faRightFromBracket} className="me-1" /> Lämna ut
                 </Button>
                 <ConfirmModal
                     show={showConfirmOutModal}
@@ -86,7 +86,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({
         return (
             <>
                 <Button variant="secondary" className={className} onClick={() => setShowReturnalNoteModal(true)}>
-                    <FontAwesomeIcon icon={faRightToBracket} className="mr-1" /> Ta emot
+                    <FontAwesomeIcon icon={faRightToBracket} className="me-1" /> Ta emot
                 </Button>
                 <BookingReturnalNoteModal
                     returnalNote={booking.returnalNote}

@@ -15,7 +15,7 @@ const EquipmentPackageNameDisplayFn = (equipmentPackage: EquipmentPackage) => (
     <>
         <TableStyleLink href={'equipmentPackage/' + equipmentPackage.id}>{equipmentPackage.name}</TableStyleLink>
         {equipmentPackage.tags.map((x) => (
-            <EquipmentTagDisplay tag={x} key={x.id} className="ml-1" />
+            <EquipmentTagDisplay tag={x} key={x.id} className="ms-1" />
         ))}
         <div className="text-muted mb-0 d-md-none">
             {equipmentPackage.equipmentEntries.length} delar, {equipmentPackage.estimatedHours} timmar

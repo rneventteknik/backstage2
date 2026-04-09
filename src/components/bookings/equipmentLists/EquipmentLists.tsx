@@ -72,7 +72,7 @@ const EquipmentLists: React.FC<Props> = ({
             <Card className="mb-3">
                 <Card.Header>
                     <div className="d-flex">
-                        <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
+                        <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
                             Utrustning
                         </div>
                     </div>
@@ -203,7 +203,7 @@ const EquipmentLists: React.FC<Props> = ({
             {readonly ? null : (
                 <p className="text-center">
                     <Button className="mt-4" variant="secondary" size="sm" onClick={() => createNewList()}>
-                        <FontAwesomeIcon icon={faPlus} className="mr-1" /> Lägg till utrustningslista
+                        <FontAwesomeIcon icon={faPlus} className="me-1" /> Lägg till utrustningslista
                     </Button>
                 </p>
             )}

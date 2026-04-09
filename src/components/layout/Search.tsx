@@ -140,7 +140,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     return (
                         <small>
                             <SplitHighlighter search={highlightText} textToHighlight={equipment.nameEN} />{' '}
-                            {equipment.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
+                            {equipment.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />)}
                         </small>
                     );
 
@@ -153,7 +153,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                                 textToHighlight={equipmentPackage.nameEN || equipmentPackage.name}
                             />{' '}
                             {equipmentPackage.tags?.map((x) => (
-                                <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
+                                <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />
                             ))}
                         </small>
                     );

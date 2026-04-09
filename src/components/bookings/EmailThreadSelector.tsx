@@ -25,7 +25,7 @@ const EmailThreadSelector: React.FC<Props> = ({ onSelect }: Props) => {
             <Card>
                 <Card.Body>
                     <div className="text-danger">
-                        <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
+                        <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
                         Det gick inte att ladda emailtrådar.
                     </div>
                     <div className="text-monospace text-muted mt-2">{emailThreadsError.message}</div>
@@ -53,7 +53,7 @@ const EmailThreadSelector: React.FC<Props> = ({ onSelect }: Props) => {
             <Button
                 variant="secondary"
                 size="sm"
-                className="mr-2"
+                className="me-2"
                 onClick={() => setViewThreadId(thread.id)}
             >
                 Visa
@@ -61,7 +61,7 @@ const EmailThreadSelector: React.FC<Props> = ({ onSelect }: Props) => {
             <Button
                 variant="primary"
                 size="sm"
-                className="mr-2"
+                className="me-2"
                 onClick={() => onSelect(thread.id)}
             >
                 Välj

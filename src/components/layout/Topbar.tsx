@@ -34,7 +34,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
     return (
         <header>
             <Navbar variant="dark" fixed="top" className={styles.container} data-search-active-status={searchActive}>
-                <Button variant="none" className="mr-2" onClick={toggleSidebar} aria-label="Toggle Sidebar">
+                <Button variant="none" className="me-2" onClick={toggleSidebar} aria-label="Toggle Sidebar">
                     <FontAwesomeIcon icon={faBars} size="lg" />
                 </Button>
                 <div className={styles.branding}>

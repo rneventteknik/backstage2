@@ -158,12 +158,12 @@ const EquipmentSearch: React.FC<Props> = ({
                             {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
                             {entity.type === ResultType.EQUIPMENTTAG ? <FontAwesomeIcon icon={faTag} /> : null}
                             {(typedEntity as IEquipmentPackageObjectionModel).estimatedHours > 0 ? (
-                                <FontAwesomeIcon icon={faClock} className="ml-2" />
+                                <FontAwesomeIcon icon={faClock} className="ms-2" />
                             ) : null}
                         </span>
                         {entity.aiSuggestion ? (
                             <div className="d-md-flex d-none ml-auto text-muted text-small font-italic align-items-center">
-                                <div className="position-relative mr-2" style={{ height: '0.75rem', width: '0.75rem' }}>
+                                <div className="position-relative me-2" style={{ height: '0.75rem', width: '0.75rem' }}>
                                     <Image src="/ai-duck.svg" alt="Quack!" title="Quack!" fill={true} />
                                 </div>
                                 Rekommendation
@@ -173,12 +173,12 @@ const EquipmentSearch: React.FC<Props> = ({
                 </div>
                 <div>
                     <small>
-                        {typedEntity.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
+                        {typedEntity.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />)}
                     </small>
                 </div>
                 {entity.aiSuggestion ? (
                     <div className="d-md-none d-flex small ml-auto text-muted text-small font-italic align-items-center">
-                        <div className="position-relative mr-2" style={{ height: '0.75rem', width: '0.75rem' }}>
+                        <div className="position-relative me-2" style={{ height: '0.75rem', width: '0.75rem' }}>
                             <Image src="/ai-duck.svg" alt="Quack!" title="Quack!" fill={true} />
                         </div>
                         Rekommendation

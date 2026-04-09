@@ -48,7 +48,7 @@ const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser, globalSe
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/equipmentPackage/new" passHref>
                         <Button variant="primary" as="span">
-                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till utrustningspaket
+                            <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till utrustningspaket
                         </Button>
                     </Link>
                 </IfNotReadonly>

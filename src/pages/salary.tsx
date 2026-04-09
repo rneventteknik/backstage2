@@ -106,7 +106,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             <Button
                 variant="secondary"
                 size="sm"
-                className="d-inline mr-2"
+                className="d-inline me-2"
                 onClick={() => setSalaryGroupToViewId(salaryGroup.id)}
             >
                 Visa
@@ -179,7 +179,7 @@ const SalaryGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button onClick={() => setShowCreateModal(true)}>
-                    <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Timarvodesunderlagsgrupp
+                    <FontAwesomeIcon icon={faPlus} className="me-1 fa-fw" /> Skapa Timarvodesunderlagsgrupp
                 </Button>
             </Header>
             <TableDisplay entities={salaryGroups ?? []} configuration={{ ...tableSettings }} />

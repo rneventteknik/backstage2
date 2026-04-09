@@ -31,7 +31,7 @@ type ErrorPageContentProps = {
 export const ErrorPageContent: React.FC<ErrorPageContentProps> = ({ errorMessage }: ErrorPageContentProps) => (
     <div className={styles.container + ' d-flex'}>
         <div>
-            <FontAwesomeIcon icon={faExclamationCircle} className={styles.icon + ' mr-4 text-muted'} />
+            <FontAwesomeIcon icon={faExclamationCircle} className={styles.icon + ' me-4 text-muted'} />
         </div>
         <div className="flex-grow-1">
             <h1 className={styles.title}>Ojdå!</h1>

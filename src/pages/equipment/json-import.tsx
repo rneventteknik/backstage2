@@ -419,14 +419,14 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSet
                     disabled={!modelsAreValid || equipmentToImport.length == 0 || importHasStarted}
                     onClick={() => importAll()}
                 >
-                    <FontAwesomeIcon icon={faFileImport} className="mr-1" /> Importera
+                    <FontAwesomeIcon icon={faFileImport} className="me-1" /> Importera
                 </Button>
             </Header>
 
             <Card className="mb-3">
                 <Card.Header>
                     <div className="d-flex">
-                        <div className="flex-grow-1 mr-4">Status</div>
+                        <div className="flex-grow-1 me-4">Status</div>
                     </div>
                 </Card.Header>
                 <Card.Body>

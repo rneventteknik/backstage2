@@ -103,7 +103,7 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
             <Button
                 variant="secondary"
                 size="sm"
-                className="d-inline mr-2"
+                className="d-inline me-2"
                 onClick={() => setInvoiceGroupToViewId(invoiceGroup.id)}
             >
                 Visa
@@ -216,11 +216,11 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button onClick={() => setShowCreateModal(true)}>
-                    <FontAwesomeIcon icon={faPlus} className="mr-1 fa-fw" /> Skapa Fakturaunderlagsgrupp
+                    <FontAwesomeIcon icon={faPlus} className="me-1 fa-fw" /> Skapa Fakturaunderlagsgrupp
                 </Button>
                 <Link href="/cash-payments" passHref>
                     <Button variant="secondary" as="span">
-                        <FontAwesomeIcon icon={faCoins} className="mr-1" /> Hantera KårX-betalningar
+                        <FontAwesomeIcon icon={faCoins} className="me-1" /> Hantera KårX-betalningar
                     </Button>
                 </Link>
             </Header>

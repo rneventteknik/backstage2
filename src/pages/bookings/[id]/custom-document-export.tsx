@@ -77,7 +77,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         <Layout title={pageTitle} fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" href={debouncedUrl} target="_blank">
-                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Exportera
+                    <FontAwesomeIcon icon={faSave} className="me-1" /> Exportera
                 </Button>
             </Header>
             <Row className="mb-3">

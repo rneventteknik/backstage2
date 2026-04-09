@@ -78,7 +78,7 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
     return (
         <>
             <Button variant="secondary" onClick={() => setShowModal(true)}>
-                <FontAwesomeIcon icon={faEnvelope} className="mr-1" /> Skicka meddelande till bokningsansvariga
+                <FontAwesomeIcon icon={faEnvelope} className="me-1" /> Skicka meddelande till bokningsansvariga
             </Button>
             <Modal show={showModal} onHide={hide} size="xl">
                 <Modal.Header closeButton>
@@ -101,7 +101,7 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                                     <Button
                                                         variant="primary"
                                                         onClick={() => setActiveTab('step-two')}
-                                                        className="mr-2"
+                                                        className="me-2"
                                                         disabled={selectedBookingIds.length === 0}
                                                     >
                                                         Gå vidare
@@ -132,14 +132,14 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                                     <Button
                                                         variant="secondary"
                                                         onClick={() => setActiveTab('step-one')}
-                                                        className="mr-2"
+                                                        className="me-2"
                                                     >
                                                         Gå tillbaka
                                                     </Button>
                                                     <Button
                                                         variant="primary"
                                                         onClick={() => setActiveTab('step-three')}
-                                                        className="mr-2"
+                                                        className="me-2"
                                                         disabled={message.length === 0}
                                                     >
                                                         Gå vidare
@@ -176,16 +176,16 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                                     <Button
                                                         variant="secondary"
                                                         onClick={() => setActiveTab('step-two')}
-                                                        className="mr-2"
+                                                        className="me-2"
                                                     >
                                                         Gå tillbaka
                                                     </Button>
                                                     <Button
                                                         variant="primary"
                                                         onClick={() => sendMessageAndClose()}
-                                                        className="mr-2"
+                                                        className="me-2"
                                                     >
-                                                        <FontAwesomeIcon icon={faEnvelope} className="mr-1" /> Skicka
+                                                        <FontAwesomeIcon icon={faEnvelope} className="me-1" /> Skicka
                                                         meddelande
                                                     </Button>
                                                 </div>
@@ -206,7 +206,7 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                                             <strong>Backstage2</strong> {formatTime(now)}
                                                         </p>
                                                         <p>{message}</p>
-                                                        <div style={{ borderLeft: '3px solid gray' }} className="pl-2">
+                                                        <div style={{ borderLeft: '3px solid gray' }} className="ps-2">
                                                             Angående bokningar:
                                                             <ul>
                                                                 <li>Exempelbokning 1</li>

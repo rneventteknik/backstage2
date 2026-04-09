@@ -68,9 +68,9 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                                     href={'/equipment/compare-availability/?equipmentId=' + equipment.id}
                                     size="sm"
                                     variant="secondary"
-                                    className="ml-2"
+                                    className="ms-2"
                                 >
-                                    <FontAwesomeIcon icon={faCalendarXmark} className="mr-1 fa-fw" /> Jämför
+                                    <FontAwesomeIcon icon={faCalendarXmark} className="me-1 fa-fw" /> Jämför
                                     tillgänglighet
                                 </Button>
                             </Link>

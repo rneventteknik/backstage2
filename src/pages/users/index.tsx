@@ -47,7 +47,7 @@ const UserListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
             <TableStyleLink href={'users/' + user.id}>{user.name}</TableStyleLink>
             <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
                 {!user.username ? (
-                    <span className="small text-muted ml-1">
+                    <span className="small text-muted ms-1">
                         <FontAwesomeIcon icon={faBan} title="Har inte inloggninguppgifter"></FontAwesomeIcon>
                     </span>
                 ) : null}
@@ -111,7 +111,7 @@ const UserListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                 </IfAdmin>
                 <Link href={'users/' + currentUser.userId} passHref>
                     <Button variant="secondary" as="span">
-                        <FontAwesomeIcon icon={faUser} className="mr-1" /> Visa min profil
+                        <FontAwesomeIcon icon={faUser} className="me-1" /> Visa min profil
                     </Button>
                 </Link>
             </Header>

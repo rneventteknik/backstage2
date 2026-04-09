@@ -56,7 +56,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser, globalSettings }: P
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentForm" type="submit">
-                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till utrustning
+                    <FontAwesomeIcon icon={faSave} className="me-1" /> Lägg till utrustning
                 </Button>
             </Header>
 

@@ -89,7 +89,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href={'/equipmentPackage/' + equipmentPackage.id + '/edit'} passHref legacyBehavior>
                         <Button variant="primary" href={'/equipmentPackage/' + equipmentPackage.id + '/edit'}>
-                            <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
+                            <FontAwesomeIcon icon={faPen} className="me-1" /> Redigera
                         </Button>
                     </Link>
                 </IfNotReadonly>
@@ -102,7 +102,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                             <div style={{ fontSize: '1.6em' }}>{equipmentPackage.name}</div>
                             <div>
                                 {equipmentPackage.tags.map((x) => (
-                                    <Badge bg="dark" key={x.id} className="mr-1">
+                                    <Badge bg="dark" key={x.id} className="me-1">
                                         {x.name}
                                     </Badge>
                                 ))}

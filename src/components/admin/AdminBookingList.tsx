@@ -140,13 +140,13 @@ const AdminBookingList: React.FC<Props> = ({
 
         return (
             <>
-                <TableStyleLink href={'/bookings/' + booking.id} className="mr-1">
+                <TableStyleLink href={'/bookings/' + booking.id} className="me-1">
                     {booking.name}
                 </TableStyleLink>
 
-                <BookingTypeTag booking={booking} className="mr-1" />
-                <InternalReservationTag booking={booking} className="mr-1" />
-                <FixedPriceStatusTag booking={booking} className="mr-1" />
+                <BookingTypeTag booking={booking} className="me-1" />
+                <InternalReservationTag booking={booking} className="me-1" />
+                <FixedPriceStatusTag booking={booking} className="me-1" />
 
                 {customAccountsOnBooking.length > 0 ? (
                     <OverlayTrigger
@@ -159,7 +159,7 @@ const AdminBookingList: React.FC<Props> = ({
                             </Tooltip>
                         }
                     >
-                        <FontAwesomeIcon icon={faCircleInfo} className="mr-1" title="" />
+                        <FontAwesomeIcon icon={faCircleInfo} className="me-1" title="" />
                     </OverlayTrigger>
                 ) : null}
 
@@ -192,7 +192,7 @@ const AdminBookingList: React.FC<Props> = ({
             {booking.returnalNote !== '' && booking.returnalNote ? (
                 <OverlayTrigger placement="top" overlay={<Tooltip id="1">{booking.returnalNote}</Tooltip>}>
                     <span>
-                        <FontAwesomeIcon icon={faCircleInfo} className="ml-2" />
+                        <FontAwesomeIcon icon={faCircleInfo} className="ms-2" />
                     </span>
                 </OverlayTrigger>
             ) : null}

@@ -37,12 +37,12 @@ const AdvancedFilters: React.FC<Props> = ({
                 <Col md="auto">
                     <Form.Group>
                         <Button variant="secondary" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
-                            <FontAwesomeIcon icon={faFilter} className="mr-1" /> {showAdvancedFilters ? 'Göm' : 'Visa'}{' '}
+                            <FontAwesomeIcon icon={faFilter} className="me-1" /> {showAdvancedFilters ? 'Göm' : 'Visa'}{' '}
                             filter
                         </Button>
                         {activeFilterCount > 0 ? (
-                            <Button variant="secondary" onClick={() => resetAdvancedFilters()} className="ml-2">
-                                <FontAwesomeIcon icon={faRefresh} className="mr-1" /> Återställ filter (
+                            <Button variant="secondary" onClick={() => resetAdvancedFilters()} className="ms-2">
+                                <FontAwesomeIcon icon={faRefresh} className="me-1" /> Återställ filter (
                                 {activeFilterCount} {activeFilterCount == 1 ? 'aktivt' : 'aktiva'})
                             </Button>
                         ) : null}

@@ -86,27 +86,27 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
                 <div>
                     <small>
                         {entity.pricePlan !== undefined && entity.pricePlan !== null ? (
-                            <Badge bg="dark" className="ml-1">
+                            <Badge bg="dark" className="ms-1">
                                 {getPricePlanName(entity.pricePlan)}
                             </Badge>
                         ) : null}
                         {entity.accountKind !== undefined && entity.accountKind !== null ? (
-                            <Badge bg="dark" className="ml-1">
+                            <Badge bg="dark" className="ms-1">
                                 {getAccountKindName(entity.accountKind)}
                             </Badge>
                         ) : null}
                         {entity.invoiceHogiaId != null ? (
-                            <Badge bg="dark" className="ml-1">
+                            <Badge bg="dark" className="ms-1">
                                 Hogia-id
                             </Badge>
                         ) : null}
                         {entity.invoiceAddress != null ? (
-                            <Badge bg="dark" className="ml-1">
+                            <Badge bg="dark" className="ms-1">
                                 Fakturaadress
                             </Badge>
                         ) : null}
                         {entity.language === Language.EN ? (
-                            <Badge bg="dark" className="ml-1">
+                            <Badge bg="dark" className="ms-1">
                                 {getLanguageName(entity.language)}
                             </Badge>
                         ) : null}

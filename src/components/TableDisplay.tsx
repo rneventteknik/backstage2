@@ -302,11 +302,11 @@ export const TableDisplay = <T extends HasId | HasStringId>({
 const getTextAlignmentClassName = (textAlignment: string | undefined) => {
     switch (textAlignment) {
         case 'left':
-            return 'text-left';
+            return 'text-start';
         case 'center':
             return 'text-center';
         case 'right':
-            return 'text-right';
+            return 'text-end';
         default:
             return '';
     }
@@ -408,7 +408,7 @@ const TableRow = <T extends HasId | HasStringId>({
                     ></td>
                 ))}
                 {showMoveControl ? (
-                    <td className="pr-0 align-middle d-none d-md-table-cell" ref={drag as unknown as React.LegacyRef<HTMLTableDataCellElement>}>
+                    <td className="pe-0 align-middle d-none d-md-table-cell" ref={drag as unknown as React.LegacyRef<HTMLTableDataCellElement>}>
                         {isDragging ? null : <FontAwesomeIcon icon={faGripVertical} className="text-muted" />}
                     </td>
                 ) : null}
@@ -420,7 +420,7 @@ const TableRow = <T extends HasId | HasStringId>({
                             ' ' +
                             getCellDisplayClassName(p.cellHideSize) +
                             ' ' +
-                            (p.indentSubItems && isSubItem(entity) ? 'pl-4' : '') +
+                            (p.indentSubItems && isSubItem(entity) ? 'ps-4' : '') +
                             (p.textTruncation ? styles.truncated : '') +
                             ' align-middle'
                         }

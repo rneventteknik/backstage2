@@ -94,7 +94,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                             <div className="d-flex">
                                 <strong className="flex-grow-1">Beräkna tidsestimat från klockslag</strong>
                                 <Button
-                                    className="mr-2"
+                                    className="me-2"
                                     variant=""
                                     size="sm"
                                     onClick={() => setUserHasClosedWizard((x) => !x)}
@@ -111,11 +111,11 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         type="number"
                                         htmlSize={6}
                                         onChange={(e) => setWizardNumberOfTechnicians(e.target.value)}
-                                        className="mr-2 mt-2"
+                                        className="me-2 mt-2"
                                         min={0}
                                     />
 
-                                    <span className="mr-2 mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                    <span className="me-2 mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                                         tekniker mellan klockan
                                     </span>
 
@@ -126,12 +126,12 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         type="number"
                                         htmlSize={7}
                                         onChange={(e) => setWizardStartHour(e.target.value)}
-                                        className="mr-2 mt-2"
+                                        className="me-2 mt-2"
                                         min={0}
                                         max={23}
                                     />
 
-                                    <span className="mr-2 mt-2">och</span>
+                                    <span className="me-2 mt-2">och</span>
 
                                     <Form.Control
                                         required
@@ -140,7 +140,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         type="number"
                                         htmlSize={7}
                                         onChange={(e) => setWizardEndHour(e.target.value)}
-                                        className="mr-2 mt-2"
+                                        className="me-2 mt-2"
                                         min={0}
                                         max={23}
                                     />

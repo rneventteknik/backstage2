@@ -93,7 +93,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href={'/equipment/' + equipment.id + '/edit'} passHref legacyBehavior>
                         <Button variant="primary" href={'/equipment/' + equipment.id + '/edit'}>
-                            <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
+                            <FontAwesomeIcon icon={faPen} className="me-1" /> Redigera
                         </Button>
                     </Link>
                 </IfNotReadonly>
@@ -113,14 +113,14 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                             <div style={{ fontSize: '1.6em' }}>
                                 {equipment.name}
                                 {equipment.isArchived ? (
-                                    <Badge bg="warning" className="ml-2">
+                                    <Badge bg="warning" className="ms-2">
                                         Arkiverad
                                     </Badge>
                                 ) : null}
                             </div>
                             <div>
                                 {equipment.tags.map((x) => (
-                                    <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
+                                    <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />
                                 ))}
                             </div>
                             <div className="text-muted mt-2">{equipment.description}</div>

@@ -50,7 +50,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentPackageForm" type="submit">
-                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till utrustningspaket
+                    <FontAwesomeIcon icon={faSave} className="me-1" /> Lägg till utrustningspaket
                 </Button>
             </Header>
 

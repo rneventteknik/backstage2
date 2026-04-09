@@ -55,7 +55,7 @@ const ToggleCoOwnerButton: React.FC<Props & React.ComponentProps<typeof Button>>
 
     return (
         <Button onClick={toggleCoOwnerUser} {...rest}>
-            <FontAwesomeIcon icon={isCoOwner ? faStarSolid : faStarOutline} className="mr-1" />
+            <FontAwesomeIcon icon={isCoOwner ? faStarSolid : faStarOutline} className="me-1" />
             {isCoOwner ? 'Ta bort favorit' : 'Favoritmarkera'}
         </Button>
     );

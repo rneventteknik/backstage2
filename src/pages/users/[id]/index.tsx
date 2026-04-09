@@ -59,13 +59,13 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                 <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
                     <Link href={'/users/' + user.id + '/edit'} passHref legacyBehavior>
                         <Button variant="primary" href={'/users/' + user.id + '/edit'}>
-                            <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
+                            <FontAwesomeIcon icon={faPen} className="me-1" /> Redigera
                         </Button>
                     </Link>
                 </IfAdmin>
                 <Link href={'/users/' + user.id + '/time-reports'} passHref>
                     <Button variant="secondary" href={'/users/' + user.id + '/time-reports'}>
-                        <FontAwesomeIcon icon={faStopwatch} className="mr-1" /> Visa tidrapporter
+                        <FontAwesomeIcon icon={faStopwatch} className="me-1" /> Visa tidrapporter
                     </Button>
                 </Link>
             </Header>
