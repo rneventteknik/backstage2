@@ -18,7 +18,6 @@
         "migrate:make": "knex migrate:make --stub knex/migrations_stub.js",
         "seed": "knex seed:run --specific=mock.js",
         "seed:init": "knex seed:run --specific=init.js",
-        "prepare": "husky install",
         "test": "cypress run -q",
         "reset-sqlite": "rimraf dev.sqlite3 && npm run migrate && npm run seed"
     },
@@ -85,9 +84,7 @@
         "eslint-plugin-import": "^2.29.0",
         "eslint-plugin-react": "^7.33.2",
         "eslint-plugin-react-hooks": "^4.6.0",
-        "husky": "^8.0.3",
         "identity-obj-proxy": "^3.0.0",
-        "lint-staged": "^15.1.0",
         "open": "^10.2.0",
         "prettier": "^3.1.0",
         "rimraf": "^5.0.5",
@@ -95,11 +92,6 @@
         "typescript": "^5.3.2"
     },
     "license": "MIT",
-    "lint-staged": {
-        "*.{js,json,css,scss,html,md}": [
-            "prettier --check"
-        ]
-    },
     "overrides": {
         "strip-ansi": "6.0.1"
     }
