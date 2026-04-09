@@ -1,6 +1,7 @@
 {
     "name": "backstage2",
     "version": "1.24.4-feijoa",
+    "type": "module",
     "engines": {
         "node": "^24.0.0"
     },
@@ -12,11 +13,11 @@
         "lint": "eslint .",
         "format": "prettier -w .",
         "tcl": "tsc && eslint .",
-        "migrate": "knex --esm migrate:latest",
-        "migrate:down": "knex --esm migrate:down",
-        "migrate:make": "knex --esm migrate:make --stub knex/migrations_stub.js",
-        "seed": "knex --esm seed:run --specific=mock.js",
-        "seed:init": "knex --esm seed:run --specific=init.js",
+        "migrate": "knex migrate:latest",
+        "migrate:down": "knex migrate:down",
+        "migrate:make": "knex migrate:make --stub knex/migrations_stub.js",
+        "seed": "knex seed:run --specific=mock.js",
+        "seed:init": "knex seed:run --specific=init.js",
         "prepare": "husky install",
         "test": "cypress run -q",
         "reset-sqlite": "rimraf dev.sqlite3 && npm run migrate && npm run seed"
@@ -32,7 +33,7 @@
         "@slack/web-api": "^6.10.0",
         "archiver": "^6.0.1",
         "bcryptjs": "^2.4.3",
-        "better-sqlite3": "^9.2.0",
+        "better-sqlite3": "^12.8.0",
         "bootstrap": "^4.0.0",
         "currency.js": "^2.0.4",
         "dompurify": "^3.3.0",
@@ -99,7 +100,7 @@
             "prettier --check"
         ]
     },
-    "resolutions": {
+    "overrides": {
         "strip-ansi": "6.0.1"
     }
 }
