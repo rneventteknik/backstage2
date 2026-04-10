@@ -23,7 +23,7 @@ const AdvancedFilters: React.FC<Props> = ({
 
     return (
         <>
-            <Row>
+            <Row className="mb-3">
                 <Col>
                     <Form.Group>
                         <Form.Control
@@ -49,7 +49,7 @@ const AdvancedFilters: React.FC<Props> = ({
                     </Form.Group>
                 </Col>
             </Row>
-            <Collapse in={showAdvancedFilters}>
+            <Collapse in={showAdvancedFilters} className="mb-3">
                 <div>{children}</div>
             </Collapse>
         </>

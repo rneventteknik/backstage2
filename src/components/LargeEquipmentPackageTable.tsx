@@ -101,7 +101,7 @@ const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableS
                 }}
                 activeFilterCount={countNotNullorEmpty(searchText, filterTags)}
             >
-                <Row className="mb-2">
+                <Row className="mb-2 gy-3">
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Taggar</Form.Label>

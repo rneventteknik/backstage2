@@ -440,7 +440,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
                 <Card.Header>Filter</Card.Header>
                 <Card.Body>
                     <Form className="d-flex">
-                        <Form.Group controlId="statuses" className="me-3">
+                        <Form.Group controlId="statuses" className="d-flex align-items-center me-3">
                             <Form.Label className="me-2">Status</Form.Label>
                             <Typeahead
                                 id="status-typeahead"

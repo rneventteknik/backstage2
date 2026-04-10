@@ -96,6 +96,9 @@
     // Badge
     $badge-border-radius: 0.25em,
 
+    // Grid gutter (Bootstrap 4's form-row used 10px gutters; Row now replaces form-row)
+    $grid-gutter-width: 10px,
+
     // Spacing / padding (restored to BS4/BS5.0 values; BS5.3 reduced these)
     $input-padding-y: 0.375rem,
     $input-padding-x: 0.75rem,
@@ -187,6 +190,27 @@
         font-weight: normal;
         background-color: $backstage-color-2;
         color: $backstage-text-color;
+    }
+}
+
+// Restore Bootstrap 4 form-group bottom margin; target form context only to avoid
+// affecting other mb-3 usages (Form.Group renders as div.mb-3 in react-bootstrap)
+form .mb-3 {
+    margin-bottom: 1rem;
+}
+
+// Bootstrap 4's form-group had margin-bottom: 1rem; Form.Group in react-bootstrap v2
+// renders as a plain div with no class, so restore spacing via col bottom margin.
+// Using col children (not row) so spacing works correctly when cols stack on mobile.
+form .row > * {
+    margin-bottom: 1rem;
+}
+
+.breadcrumb-item a {
+    text-decoration: none;
+
+    &:hover {
+        text-decoration: underline;
     }
 }
 

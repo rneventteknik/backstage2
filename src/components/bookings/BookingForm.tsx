@@ -206,7 +206,7 @@ const BookingForm: React.FC<Props> = ({
                             <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
                         </Form.Label>
 
-                        <InputGroup className="mb-3">
+                        <InputGroup>
                             <Form.Control
                                 required={isFieldRequired(Status.BOOKED)}
                                 type="text"

@@ -204,7 +204,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     return (
         <div>
             {configuration.hideTableFilter ? null : (
-                <FormGroup>
+                <FormGroup className="mb-3">
                     <FormControl placeholder="Filter" onChange={setFilterConfiguration}></FormControl>
                 </FormGroup>
             )}
