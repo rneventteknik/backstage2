@@ -1,8 +1,191 @@
-@import 'variables';
-@import '../../node_modules/bootstrap/scss/_functions';
-@import '../../node_modules/bootstrap/scss/_mixins';
-@import 'bootstrap-variable-overrides';
-@import '../../node_modules/bootstrap/scss/_variables';
-@import 'bootstrap-component-overrides';
-@import 'react-bootstrap-typeahead-overrides.scss';
-@import '../../node_modules/bootstrap/scss/bootstrap';
+@use "sass:color";
+@use './variables' as *;
+
+// =============================================================================
+// Bootstrap (variable overrides passed via @use ... with)
+// Note: $close-color, $close-text-shadow, $hr-border-color, $hr-border-width,
+// and $breadcrumb-link-color were Bootstrap 4 variables removed in Bootstrap 5.
+// =============================================================================
+
+@use '../../node_modules/bootstrap/scss/bootstrap' with (
+    // Colors
+    $primary: $backstage-primary,
+    $secondary: $backstage-color-5,
+
+    // Body
+    $body-color: $backstage-text-color,
+    $body-bg: $backstage-body-bg,
+
+    // Typography
+    $font-size-base: 0.8rem,
+
+    // Borders
+    $border-width: 1px,
+    $border-color: $backstage-color-7,
+    $border-radius: 0,
+    $border-radius-lg: 0,
+    $border-radius-sm: 0,
+
+    // Forms & validation
+    $enable-validation-icons: false,
+    $form-feedback-valid-color: $backstage-color-4,
+
+    // Breadcrumbs
+    $breadcrumb-bg: rgba(0, 0, 0, 0),
+    $breadcrumb-divider-color: $backstage-dark-text-color,
+    $breadcrumb-active-color: $backstage-text-color,
+    $breadcrumb-padding-y: 0,
+    $breadcrumb-padding-x: 0,
+
+    // Text muted
+    $text-muted: $backstage-dark-text-color,
+
+    // Tables
+    $table-border-width: 1px,
+    $table-border-color: $backstage-color-2,
+    $table-hover-bg: $backstage-color-2,
+    $table-bg: $backstage-color-1,
+
+    // Inputs
+    $input-bg: $backstage-color-4,
+    $input-focus-bg: $backstage-color-4,
+    $input-disabled-bg: $backstage-color-1,
+    $input-color: $backstage-text-color,
+    $input-focus-color: $backstage-text-color,
+    $input-placeholder-color: $backstage-dark-text-color,
+    $input-border-color: $backstage-color-4,
+    $input-group-addon-bg: $backstage-color-6,
+    $input-group-addon-border-color: $backstage-color-4,
+    $input-group-addon-color: $backstage-text-color,
+    $input-btn-border-width: 1px,
+    $btn-border-width: 1px,
+    $input-btn-focus-box-shadow: none,
+    $btn-active-box-shadow: none,
+    $btn-focus-width: 0px,
+
+    // Modals
+    $modal-content-bg: $backstage-color-2,
+    $modal-content-border-color: $backstage-color-4,
+    $modal-footer-border-color: $backstage-color-7,
+    $modal-header-border-color: $backstage-color-7,
+    $modal-header-border-width: 1px,
+    $modal-footer-border-width: 1px,
+
+    // Dropdowns
+    $dropdown-color: $backstage-text-color,
+    $dropdown-link-color: $backstage-text-color,
+    $dropdown-link-hover-color: $backstage-text-color,
+    $dropdown-bg: $backstage-color-3,
+    $dropdown-link-hover-bg: $backstage-color-4,
+    $dropdown-border-color: $backstage-color-6,
+    $dropdown-divider-bg: $backstage-color-6,
+    $dropdown-header-color: $backstage-dark-text-color,
+    $dropdown-item-padding-y: 0.5rem,
+    $dropdown-border-width: 0px,
+
+    // Cards
+    $card-border-color: $backstage-color-2,
+    $card-cap-bg: $backstage-color-2,
+    $card-bg: $backstage-color-1,
+
+    // List groups
+    $list-group-bg: $backstage-color-1,
+    $list-group-border-color: $backstage-color-2,
+    $list-group-hover-bg: $backstage-color-2,
+
+    // Badge
+    $badge-border-radius: 0.25em,
+);
+
+// =============================================================================
+// Bootstrap 5.3 dark color-mode overrides
+// Override the new CSS custom properties Bootstrap 5.3 introduced that no
+// longer derive from $body-color, so all components render with light text.
+// =============================================================================
+
+:root {
+    // Body
+    --bs-body-color: #{$backstage-text-color};
+    --bs-body-color-rgb: #{$backstage-text-color-rgb};
+    --bs-body-bg: #{$backstage-base-color};
+    --bs-body-bg-rgb: #{$backstage-base-color-rgb};
+
+    // Emphasis / secondary text
+    --bs-emphasis-color: #{$backstage-text-color};
+    --bs-emphasis-color-rgb: #{$backstage-text-color-rgb};
+    --bs-secondary-color: #{$backstage-dark-text-color};
+    --bs-secondary-bg: #{$backstage-color-2};
+    --bs-tertiary-bg: #{$backstage-color-3};
+    --bs-tertiary-color: #{$backstage-dark-text-color};
+
+    // Headings (Bootstrap 5.3 separates headings from body-color)
+    --bs-heading-color: #{$backstage-text-color};
+
+    // Border
+    --bs-border-color: #{$backstage-color-7};
+    --bs-border-color-translucent: rgba(255, 255, 255, 0.15);
+
+    // Tables
+    --bs-table-color: #{$backstage-text-color};
+    --bs-table-bg: #{$backstage-color-1};
+    --bs-table-border-color: #{$backstage-color-2};
+    --bs-table-hover-bg: #{$backstage-color-2};
+    --bs-table-striped-bg: #{$backstage-color-2};
+
+    // Cards
+    --bs-card-bg: #{$backstage-color-1};
+    --bs-card-border-color: #{$backstage-color-2};
+    --bs-card-cap-bg: #{$backstage-color-2};
+
+    // Modals
+    --bs-modal-bg: #{$backstage-color-2};
+    --bs-modal-border-color: #{$backstage-color-4};
+
+    // Dropdowns
+    --bs-dropdown-bg: #{$backstage-color-3};
+    --bs-dropdown-color: #{$backstage-text-color};
+    --bs-dropdown-link-color: #{$backstage-text-color};
+    --bs-dropdown-link-hover-bg: #{$backstage-color-4};
+    --bs-dropdown-border-color: #{$backstage-color-6};
+
+    // Form inputs
+    --bs-form-control-bg: #{$backstage-color-4};
+    --bs-form-control-disabled-bg: #{$backstage-color-1};
+
+    // List groups
+    --bs-list-group-bg: #{$backstage-color-1};
+    --bs-list-group-border-color: #{$backstage-color-2};
+    --bs-list-group-action-hover-bg: #{$backstage-color-2};
+    --bs-list-group-color: #{$backstage-text-color};
+
+    color-scheme: dark;
+}
+
+// =============================================================================
+// CSS overrides
+// =============================================================================
+
+.table {
+    thead th {
+        font-weight: normal;
+        background-color: $backstage-color-2;
+        color: $backstage-text-color;
+    }
+}
+
+// =============================================================================
+// React Bootstrap Typeahead overrides
+// =============================================================================
+
+.rbt-input-hint {
+    color: rgba(255, 255, 255, 0.35) !important;
+}
+
+.rbt-input-main {
+    color: $backstage-text-color;
+}
+
+.rbt-token {
+    background-color: color.adjust($backstage-color-3, $lightness: 10%) !important;
+    color: $backstage-text-color !important;
+}

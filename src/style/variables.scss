@@ -19,7 +19,9 @@ $backstage-color-9: color.adjust($backstage-base-color, $lightness: 27%);
 $backstage-color-10: color.adjust($backstage-base-color, $lightness: 30%);
 
 $backstage-text-color: #ededed;
+$backstage-text-color-rgb: #{color.red(#ededed)}, #{color.green(#ededed)}, #{color.blue(#ededed)};
 $backstage-dark-text-color: #6c757d;
 
 $backstage-body-bg: $backstage-base-color;
+$backstage-base-color-rgb: #{color.red($backstage-base-color)}, #{color.green($backstage-base-color)}, #{color.blue($backstage-base-color)};
 $backstage-primary: #1565c0;

@@ -7,10 +7,28 @@ import { readFileSync } from 'fs';
 const versionNumber = JSON.parse(readFileSync('package.json').toString()).version;
 const currentDate = new Date().toLocaleString('sv-SE', { year: 'numeric', month: 'numeric', day: 'numeric' });
 
+const sassOptions = {
+    quietDeps: true,
+    silenceDeprecations: ['import', 'legacy-js-api', 'color-functions', 'global-builtin', 'if-function'],
+};
+
 export default {
     env: {
         NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION: versionNumber,
         NEXT_PUBLIC_BACKSTAGE2_BUILD_DATE: currentDate,
+    },
+    sassOptions,
+    webpack(config) {
+        for (const rule of config.module.rules) {
+            for (const oneOfRule of rule.oneOf ?? []) {
+                for (const use of Array.isArray(oneOfRule.use) ? oneOfRule.use : []) {
+                    if (typeof use.loader === 'string' && use.loader.includes('sass-loader')) {
+                        use.options = { ...use.options, sassOptions };
+                    }
+                }
+            }
+        }
+        return config;
     },
     images: {
         remotePatterns: [
