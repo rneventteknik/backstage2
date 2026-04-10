@@ -9,12 +9,16 @@ $side-border-width: 3px;
 
 .main .link:hover,
 .main .link.activeNavItem {
-    border-start: $side-border-width solid variables.$backstage-primary;
+    border-inline-start: $side-border-width solid variables.$backstage-primary;
     background-color: variables.$backstage-color-3;
     margin-left: 0px;
 }
 
 .main a {
+    color: variables.$backstage-text-color;
+}
+
+.main a:hover {
     color: variables.$backstage-text-color;
 }
 
