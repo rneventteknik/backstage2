@@ -8,7 +8,7 @@ import { useNotifications } from '../lib/useNotifications';
 import { SplitHighlighter } from './utils/Highlight';
 import { toCustomer } from '../lib/mappers/customer';
 import { Customer } from '../models/interfaces/Customer';
-import { Badge } from 'react-bootstrap';
+import { Badge } from './ui/Badge';
 import { Language } from '../models/enums/Language';
 
 type Option = TypeaheadComponentProps['options'][number];
@@ -86,27 +86,27 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
                 <div>
                     <small>
                         {entity.pricePlan !== undefined && entity.pricePlan !== null ? (
-                            <Badge bg="dark" className="ms-1">
+                            <Badge variant="dark" className="ml-1">
                                 {getPricePlanName(entity.pricePlan)}
                             </Badge>
                         ) : null}
                         {entity.accountKind !== undefined && entity.accountKind !== null ? (
-                            <Badge bg="dark" className="ms-1">
+                            <Badge variant="dark" className="ml-1">
                                 {getAccountKindName(entity.accountKind)}
                             </Badge>
                         ) : null}
                         {entity.invoiceHogiaId != null ? (
-                            <Badge bg="dark" className="ms-1">
+                            <Badge variant="dark" className="ml-1">
                                 Hogia-id
                             </Badge>
                         ) : null}
                         {entity.invoiceAddress != null ? (
-                            <Badge bg="dark" className="ms-1">
+                            <Badge variant="dark" className="ml-1">
                                 Fakturaadress
                             </Badge>
                         ) : null}
                         {entity.language === Language.EN ? (
-                            <Badge bg="dark" className="ms-1">
+                            <Badge variant="dark" className="ml-1">
                                 {getLanguageName(entity.language)}
                             </Badge>
                         ) : null}

@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '../../components/layout/Layout';
 import { useRouter } from 'next/router';
-import { Button } from 'react-bootstrap';
+import { Button } from '../../components/ui/Button';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IEquipmentObjectionModel } from '../../models/objection-models';
@@ -56,7 +56,7 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser, globalSettings }: P
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentForm" type="submit">
-                    <FontAwesomeIcon icon={faSave} className="me-1" /> Lägg till utrustning
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till utrustning
                 </Button>
             </Header>
 

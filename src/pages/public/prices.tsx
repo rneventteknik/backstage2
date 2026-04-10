@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import React, { useState } from 'react';
 import { fetchEquipmentPublicCategoriesPublic, fetchEquipmentsPublic } from '../../lib/db-access';
-import { Button, ButtonGroup, Table } from 'react-bootstrap';
+import { Button } from '../../components/ui/Button';
 import EquipmentTagDisplay from '../../components/utils/EquipmentTagDisplay';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { getGlobalSetting, groupBy, replaceEmptyStringWithNull } from '../../lib/utils';
@@ -130,37 +130,37 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
             ) : null}
             <div style={containerStyle}>
                 <h1>{pageTitle}</h1>
-                <ButtonGroup className="mb-3 me-2">
+                <div className="flex flex-wrap gap-1 mb-3 mr-2">
                     <Button variant={language === 'sv' ? 'primary' : 'secondary'} onClick={() => setLanguage('sv')}>
                         Svenska
                     </Button>
                     <Button variant={language === 'en' ? 'primary' : 'secondary'} onClick={() => setLanguage('en')}>
                         English
                     </Button>
-                </ButtonGroup>
-                <ButtonGroup className="mb-3 me-2">
+                </div>
+                <div className="flex flex-wrap gap-1 mb-3 mr-2">
                     <Button variant={includeVat ? 'primary' : 'secondary'} onClick={() => setIncludeVAT(true)}>
                         Inklusive moms
                     </Button>
                     <Button variant={!includeVat ? 'primary' : 'secondary'} onClick={() => setIncludeVAT(false)}>
                         Exklusive moms
                     </Button>
-                </ButtonGroup>
-                <ButtonGroup className="mb-3">
+                </div>
+                <div className="flex flex-wrap gap-1 mb-3">
                     <Button variant={!showThsPrice ? 'primary' : 'secondary'} onClick={() => setShowThsPrice(false)}>
                         Ordinarie pris
                     </Button>
                     <Button variant={showThsPrice ? 'primary' : 'secondary'} onClick={() => setShowThsPrice(true)}>
                         THS-pris
                     </Button>
-                </ButtonGroup>
+                </div>
                 {equipmentGroups.map((x) => (
                     <div key={`category-${x.category.id}`} className="mb-5">
                         {x.category.name ? <h2 className="h5">{x.category.name}</h2> : null}
                         {x.category.description ? (
                             <div className="text-muted mb-3">{x.category.description}</div>
                         ) : null}
-                        <Table style={{ width: '100%' }}>
+                        <table style={{ width: '100%' }} className="w-full">
                             <colgroup>
                                 <col style={{ width: 'auto' }} />
                                 <col style={{ width: '180px' }} />
@@ -185,7 +185,7 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
                                                 </div>
                                                 <div>
                                                     {equipment.tags?.map((x) => (
-                                                        <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />
+                                                        <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
                                                     ))}
                                                 </div>
                                             </td>
@@ -213,7 +213,7 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
                                     </React.Fragment>
                                 ))}
                             </tbody>
-                        </Table>
+                        </table>
                     </div>
                 ))}
             </div>

@@ -2,10 +2,12 @@ import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
+import { Badge } from '../../../components/ui/Badge';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { ListGroup } from '../../../components/ui/ListGroup';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
-import Link from 'next/link';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
@@ -87,42 +89,40 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/equipmentPackage/' + equipmentPackage.id + '/edit'} passHref legacyBehavior>
-                        <Button variant="primary" href={'/equipmentPackage/' + equipmentPackage.id + '/edit'}>
-                            <FontAwesomeIcon icon={faPen} className="me-1" /> Redigera
+                    <Button variant="primary" href={'/equipmentPackage/' + equipmentPackage.id + '/edit'}>
+                            <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>
-                    </Link>
                 </IfNotReadonly>
             </Header>
 
-            <Row className="mb-3">
-                <Col xl={4}>
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-3">
+                <div className="xl:col-span-4">
                     <Card className="mb-3">
                         <Card.Header>
                             <div style={{ fontSize: '1.6em' }}>{equipmentPackage.name}</div>
                             <div>
                                 {equipmentPackage.tags.map((x) => (
-                                    <Badge bg="dark" key={x.id} className="me-1">
+                                    <Badge variant="dark" key={x.id} className="mr-1">
                                         {x.name}
                                     </Badge>
                                 ))}
                             </div>
                         </Card.Header>
                         <ListGroup variant="flush">
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Namn</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Namn</span>
                                 <span>{equipmentPackage.name}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Engelskt namn</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Engelskt namn</span>
                                 <span>{equipmentPackage.nameEN}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Estimerad arbetstid</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Estimerad arbetstid</span>
                                 <span>{equipmentPackage.estimatedHours} timmar</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Pakettyp</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Pakettyp</span>
                                 <span>{equipmentPackage.addAsHeading ? 'Rubrik med rader' : 'Individuella rader'}</span>
                             </ListGroup.Item>
                             <ListGroup.Item>
@@ -135,8 +135,8 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
-                </Col>
-                <Col xl={8}>
+                </div>
+                <div className="xl:col-span-8">
                     <MarkdownCard
                         text={equipmentPackage.note}
                         onSubmit={(x) => handleSubmit({ name: equipmentPackage.name, note: x })}
@@ -147,8 +147,8 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
                         <Card.Header>Utrustning</Card.Header>
                         <PackageEquipmentList equipmentPackage={equipmentPackage} />
                     </Card>
-                </Col>
-            </Row>
+                </div>
+            </div>
         </Layout>
     );
 };

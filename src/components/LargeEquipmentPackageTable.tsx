@@ -2,8 +2,8 @@ import React, { ChangeEvent } from 'react';
 import { EquipmentPackage, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
 import { countNotNullorEmpty, notEmpty } from '../lib/utils';
-import { Typeahead } from 'react-bootstrap-typeahead';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Typeahead } from './ui/Typeahead';
+import { Form } from './ui/Form';
 import TableStyleLink from './utils/TableStyleLink';
 import useSwr from 'swr';
 import { equipmentTagsFetcher } from '../lib/fetchers';
@@ -101,8 +101,8 @@ const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableS
                 }}
                 activeFilterCount={countNotNullorEmpty(searchText, filterTags)}
             >
-                <Row className="mb-2 gy-3">
-                    <Col md="4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-2">
+                    <div>
                         <Form.Group>
                             <Form.Label>Taggar</Form.Label>
                             <Typeahead
@@ -119,8 +119,8 @@ const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableS
                                 }
                             />
                         </Form.Group>
-                    </Col>
-                </Row>
+                    </div>
+                </div>
             </AdvancedFilters>
 
             <TableDisplay

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import Layout from '../../components/layout/Layout';
 import useSwr from 'swr';
-import { Button, Card, Form, ProgressBar } from 'react-bootstrap';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { Form } from '../../components/ui/Form';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { faCheckCircle, faExclamationCircle, faFileImport } from '@fortawesome/free-solid-svg-icons';
@@ -419,14 +421,14 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSet
                     disabled={!modelsAreValid || equipmentToImport.length == 0 || importHasStarted}
                     onClick={() => importAll()}
                 >
-                    <FontAwesomeIcon icon={faFileImport} className="me-1" /> Importera
+                    <FontAwesomeIcon icon={faFileImport} className="mr-1" /> Importera
                 </Button>
             </Header>
 
             <Card className="mb-3">
                 <Card.Header>
-                    <div className="d-flex">
-                        <div className="flex-grow-1 me-4">Status</div>
+                    <div className="flex">
+                        <div className="flex-grow mr-4">Status</div>
                     </div>
                 </Card.Header>
                 <Card.Body>
@@ -479,48 +481,23 @@ const EquipmentJsonImportPage: React.FC<Props> = ({ user: currentUser, globalSet
                             <p>
                                 Taggar: {numberOfImportedEquipmentTags} / {equipmentTagsToImport?.length}
                             </p>
-                            <ProgressBar
-                                className="mb-3"
-                                now={
-                                    (equipmentTagsToImport.length === 0
-                                        ? 100
-                                        : numberOfImportedEquipmentTags / equipmentTagsToImport.length) * 100
-                                }
-                            />
+                            <div className="w-full bg-bs-3 h-2 mb-3"><div className="bg-primary h-full" style={{width: `${(equipmentTagsToImport.length === 0 ? 100 : numberOfImportedEquipmentTags / equipmentTagsToImport.length) * 100}%`}} /></div>
 
                             <p>
                                 Platser: {numberOfImportedEquipmentLocations} / {equipmentLocationsToImport?.length}
                             </p>
-                            <ProgressBar
-                                className="mb-3"
-                                now={
-                                    (equipmentLocationsToImport.length === 0
-                                        ? 100
-                                        : numberOfImportedEquipmentLocations / equipmentLocationsToImport.length) * 100
-                                }
-                            />
+                            <div className="w-full bg-bs-3 h-2 mb-3"><div className="bg-primary h-full" style={{width: `${(equipmentLocationsToImport.length === 0 ? 100 : numberOfImportedEquipmentLocations / equipmentLocationsToImport.length) * 100}%`}} /></div>
 
                             <p>
                                 Publika Kategorier: {numberOfImportedEquipmentPublicCategories} /{' '}
                                 {equipmentPublicCategoriesToImport?.length}
                             </p>
-                            <ProgressBar
-                                className="mb-3"
-                                now={
-                                    (equipmentPublicCategoriesToImport.length === 0
-                                        ? 100
-                                        : numberOfImportedEquipmentPublicCategories /
-                                          equipmentPublicCategoriesToImport.length) * 100
-                                }
-                            />
+                            <div className="w-full bg-bs-3 h-2 mb-3"><div className="bg-primary h-full" style={{width: `${(equipmentPublicCategoriesToImport.length === 0 ? 100 : numberOfImportedEquipmentPublicCategories / equipmentPublicCategoriesToImport.length) * 100}%`}} /></div>
 
                             <p>
                                 Utrustning: {numberOfImportedEquipments} / {equipmentToImport?.length}
                             </p>
-                            <ProgressBar
-                                className="mb-3"
-                                now={(numberOfImportedEquipments / equipmentToImport.length) * 100}
-                            />
+                            <div className="w-full bg-bs-3 h-2 mb-3"><div className="bg-primary h-full" style={{width: `${(numberOfImportedEquipments / equipmentToImport.length) * 100}%`}} /></div>
                         </>
                     ) : null}
 

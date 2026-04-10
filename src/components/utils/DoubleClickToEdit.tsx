@@ -1,5 +1,5 @@
 import React, { ReactNode, useEffect, useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { Form } from '../ui/Form';
 
 const doubleClickToEditHelpText = 'Klicka för att redigera';
 

@@ -4,8 +4,7 @@ import { User } from '../../models/interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
 import { getMemberStatusName, getRoleName } from '../../lib/utils';
-import Link from 'next/link';
-import { Button } from 'react-bootstrap';
+import { Button } from '../../components/ui/Button';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IfAdmin } from '../../components/utils/IfAdmin';
@@ -103,17 +102,13 @@ const UserListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfAdmin currentUser={currentUser}>
-                    <Link href="/users/new" passHref>
-                        <Button variant="primary" as="span">
+                    <Button variant="primary" href="/users/new">
                             <FontAwesomeIcon icon={faAdd} /> Skapa användare
-                        </Button>
-                    </Link>
-                </IfAdmin>
-                <Link href={'users/' + currentUser.userId} passHref>
-                    <Button variant="secondary" as="span">
-                        <FontAwesomeIcon icon={faUser} className="me-1" /> Visa min profil
                     </Button>
-                </Link>
+                </IfAdmin>
+                <Button variant="secondary" href={'users/' + currentUser.userId}>
+                    <FontAwesomeIcon icon={faUser} className="mr-1" /> Visa min profil
+                </Button>
             </Header>
 
             {users && users.length > 0 ? (

@@ -2,7 +2,7 @@ import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Card } from 'react-bootstrap';
+import { Card } from '../../../components/ui/Card';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import Header from '../../../components/layout/Header';

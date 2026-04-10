@@ -1,6 +1,5 @@
 import React, { ChangeEvent } from 'react';
-import { FormControl, FormGroup } from 'react-bootstrap';
-import Table from 'react-bootstrap/Table';
+import { FormControl } from './ui/Form';
 import { HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import TableFooterWithViewCount from './utils/TableFooter';
 import styles from './TableDisplay.module.scss';
@@ -204,18 +203,21 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     return (
         <div>
             {configuration.hideTableFilter ? null : (
-                <FormGroup className="mb-3">
-                    <FormControl placeholder="Filter" onChange={setFilterConfiguration}></FormControl>
-                </FormGroup>
+                <div className="mb-3 px-4 pt-3">
+                    <FormControl
+                        placeholder="Filter"
+                        onChange={setFilterConfiguration as unknown as React.ChangeEventHandler<HTMLInputElement>}
+                    />
+                </div>
             )}
-            <Table>
+            <table className="w-full border-collapse">
                 <thead>
                     <tr>
                         {configuration.statusColumns?.map((p) => (
                             <th key={p.key} className="p-0" style={{ width: 3 }}></th>
                         ))}
                         {configuration.moveFn && sortDirection === SortDirection.Custom ? (
-                            <th className="d-none d-md-table-cell" style={{ width: 10 }}></th>
+                            <th className="hidden md:table-cell" style={{ width: 10 }}></th>
                         ) : null}
                         {configuration.columns.map((p) => (
                             <th
@@ -278,14 +280,14 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                         <tr>
                             <td
                                 colSpan={configuration.columns.length + (configuration.statusColumns?.length ?? 0)}
-                                className="text-center font-italic text-muted"
+                                className="text-center italic text-muted py-4"
                             >
                                 {configuration.noResultsLabel ?? 'Inga matchingar'}
                             </td>
                         </tr>
                     ) : null}
                 </tbody>
-            </Table>
+            </table>
 
             {!configuration.hideTableCountControls ? (
                 <TableFooterWithViewCount
@@ -302,11 +304,11 @@ export const TableDisplay = <T extends HasId | HasStringId>({
 const getTextAlignmentClassName = (textAlignment: string | undefined) => {
     switch (textAlignment) {
         case 'left':
-            return 'text-start';
+            return 'text-left';
         case 'center':
             return 'text-center';
         case 'right':
-            return 'text-end';
+            return 'text-right';
         default:
             return '';
     }
@@ -315,13 +317,13 @@ const getTextAlignmentClassName = (textAlignment: string | undefined) => {
 const getCellDisplayClassName = (screenSize: string | undefined) => {
     switch (screenSize) {
         case 'sm':
-            return 'd-none d-sm-table-cell';
+            return 'hidden sm:table-cell';
         case 'md':
-            return 'd-none d-md-table-cell';
+            return 'hidden md:table-cell';
         case 'lg':
-            return 'd-none d-lg-table-cell';
+            return 'hidden lg:table-cell';
         case 'xl':
-            return 'd-none d-xl-table-cell';
+            return 'hidden xl:table-cell';
         default:
             return '';
     }
@@ -408,7 +410,7 @@ const TableRow = <T extends HasId | HasStringId>({
                     ></td>
                 ))}
                 {showMoveControl ? (
-                    <td className="pe-0 align-middle d-none d-md-table-cell" ref={drag as unknown as React.LegacyRef<HTMLTableDataCellElement>}>
+                    <td className="pr-0 align-middle hidden md:table-cell" ref={drag as unknown as React.LegacyRef<HTMLTableDataCellElement>}>
                         {isDragging ? null : <FontAwesomeIcon icon={faGripVertical} className="text-muted" />}
                     </td>
                 ) : null}
@@ -420,7 +422,7 @@ const TableRow = <T extends HasId | HasStringId>({
                             ' ' +
                             getCellDisplayClassName(p.cellHideSize) +
                             ' ' +
-                            (p.indentSubItems && isSubItem(entity) ? 'ps-4' : '') +
+                            (p.indentSubItems && isSubItem(entity) ? 'pl-4' : '') +
                             (p.textTruncation ? styles.truncated : '') +
                             ' align-middle'
                         }

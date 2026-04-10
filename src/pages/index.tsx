@@ -3,7 +3,8 @@ import Layout from '../components/layout/Layout';
 import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import Header from '../components/layout/Header';
-import { Button, Col, ListGroup, Row } from 'react-bootstrap';
+import { Button } from '../components/ui/Button';
+import { ListGroup } from '../components/ui/ListGroup';
 import useSwr from 'swr';
 import TinyBookingTable from '../components/TinyBookingTable';
 import { bookingsFetcher } from '../lib/fetchers';
@@ -58,13 +59,13 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
     return (
         <Layout title="Hem" fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title="Backstage2" breadcrumbs={[]}></Header>
-            <Row className="mb-3">
-                <Col xl={6}>
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mb-3">
+                <div>
                     <TinyBookingTable title="Mina bokningar" bookings={myDraftOrBookedBookings}>
                         <IfNotReadonly currentUser={currentUser}>
                             <Link href="/bookings/new" passHref>
-                                <Button size="sm" variant="secondary" as="span" className="me-2 ms-2 mb-2">
-                                    <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till bokning
+                                <Button size="sm" variant="secondary" className="mr-2 ml-2 mb-2">
+                                    <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till bokning
                                 </Button>
                             </Link>
                         </IfNotReadonly>
@@ -76,15 +77,15 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                     >
                         <div>
                             <AddUserAsCoOwnerToAllFutureBookingsForUserButton
-                                className="me-2 ms-2 mb-2"
+                                className="mr-2 ml-2 mb-2"
                                 currentUser={currentUser}
                                 currentCoOwnerBookings={coOwnerBookings ?? []}
                                 mutate={mutateCoOwnerBookings}
                             />
                         </div>
                     </TinyBookingTable>
-                </Col>
-                <Col xl={6}>
+                </div>
+                <div>
                     <DoorAndKeyStatus globalSettings={globalSettings} />
 
                     <div className="mb-3">
@@ -130,8 +131,8 @@ const IndexPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props
                             ))}
                         </ListGroup>
                     </CollapsibleCard>
-                </Col>
-            </Row>
+                </div>
+            </div>
         </Layout>
     );
 };

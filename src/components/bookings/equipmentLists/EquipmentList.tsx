@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card } from 'react-bootstrap';
+import { Card } from '../../ui/Card';
 import useSwr from 'swr';
 import { bookingFetcher } from '../../../lib/fetchers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -95,8 +95,8 @@ const EquipmentListDisplay: React.FC<Props> = ({
         return (
             <Card className="mb-3">
                 <Card.Header>
-                    <div className="d-flex">
-                        <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
+                    <div className="flex">
+                        <div className="flex-grow mr-4" style={{ fontSize: '1.6em' }}>
                             {partialList.name}
                         </div>
                     </div>
@@ -105,7 +105,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     <p className="text-danger">
                         <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda utrustningslistan.
                     </p>
-                    <p className="text-monospace text-muted mb-0">{error?.message}</p>
+                    <p className="font-mono text-muted mb-0">{error?.message}</p>
                 </Card.Body>
             </Card>
         );

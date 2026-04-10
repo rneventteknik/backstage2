@@ -3,7 +3,7 @@ import Layout from '../components/layout/Layout';
 import Header from '../components/layout/Header';
 import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
-import { Nav, Tab } from 'react-bootstrap';
+import { Tab, Nav } from '../components/ui/Tabs';
 import {
     customersFetcher,
     equipmentLocationsFetcher,
@@ -34,7 +34,7 @@ const SettingsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
 
-            <Tab.Container id="settings-tabs" defaultActiveKey="customers" transition={false}>
+            <Tab.Container id="settings-tabs" defaultActiveKey="customers">
                 <Nav variant="pills" className="flex-row mb-2">
                     <Nav.Item>
                         <Nav.Link eventKey="customers">Kunder</Nav.Link>

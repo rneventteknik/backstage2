@@ -1,7 +1,7 @@
 import { faCircleNotch, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from './ui/Button';
 import { getResponseContentOrError, notEmpty } from '../lib/utils';
 import { CalendarResult } from '../models/misc/CalendarResult';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
@@ -82,9 +82,9 @@ const AddUserAsCoOwnerToAllFutureBookingsForUserButton: React.FC<Props> = ({
                 onClick={() => addUserAsCoOwnerToAllFutureBookingsForUser()}
             >
                 {isLoading ? (
-                    <FontAwesomeIcon icon={faCircleNotch} className="me-1" spin />
+                    <FontAwesomeIcon icon={faCircleNotch} className="mr-1" spin />
                 ) : (
-                    <FontAwesomeIcon icon={faPlus} className="me-1" />
+                    <FontAwesomeIcon icon={faPlus} className="mr-1" />
                 )}
                 Favoritmarkera bokningar jag arbetar på
             </Button>

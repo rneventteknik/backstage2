@@ -1,16 +1,19 @@
 import React from 'react';
-import { Button, Col, Form, InputGroup, Modal, Row } from 'react-bootstrap';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
-import { getGlobalSetting, replaceEmptyStringWithNull, toIntOrUndefined } from '../../../lib/utils';
-import { faLink } from '@fortawesome/free-solid-svg-icons';
-import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
-import { EquipmentPrice } from '../../../models/interfaces';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { Button } from '../../ui/Button';
+import { Form } from '../../ui/Form';
+import { InputGroup } from '../../ui/InputGroup';
+import { Modal } from '../../ui/Modal';
+import { Typeahead } from '../../ui/Typeahead';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
+import { getGlobalSetting, toIntOrUndefined, replaceEmptyStringWithNull } from '../../../lib/utils';
 import RequiredIndicator from '../../utils/RequiredIndicator';
 import { PricedEntityWithTHS } from '../../../models/interfaces/BaseEntity';
+import { EquipmentListEntry } from '../../../models/interfaces/EquipmentList';
+import { EquipmentPrice } from '../../../models/interfaces/EquipmentPrice';
+import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faLink } from '@fortawesome/free-solid-svg-icons';
 import currency from 'currency.js';
 
 type Props = {
@@ -56,8 +59,8 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
         <Modal show={show} onHide={() => onHide()} size="lg" backdrop="static">
             {!!equipmentListEntryToEditViewModel ? (
                 <Modal.Body>
-                    <Row>
-                        <Col lg={4}>
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
+                        <div className="lg:col-span-4">
                             <Form.Group>
                                 <Form.Label>
                                     Namn
@@ -75,8 +78,8 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     }
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col lg={4} xs={6}>
+                        </div>
+                        <div className="lg:col-span-4">
                             <Form.Group>
                                 <Form.Label>Antal</Form.Label>
                                 <InputGroup>
@@ -95,8 +98,8 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     <InputGroup.Text>st</InputGroup.Text>
                                 </InputGroup>
                             </Form.Group>
-                        </Col>
-                        <Col lg={4} xs={6}>
+                        </div>
+                        <div className="lg:col-span-4">
                             <Form.Group>
                                 <Form.Label>Timmar</Form.Label>
                                 <InputGroup>
@@ -115,11 +118,11 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                             </Form.Group>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                     {equipmentListEntryToEditViewModel.isHidden ? null : (
-                        <Row>
-                            <Col lg={4}>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                            <div>
                                 <Form.Group>
                                     <Form.Label>Pris</Form.Label>
 
@@ -148,8 +151,8 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                         ))}
                                     </Form.Control>
                                 </Form.Group>
-                            </Col>
-                            <Col lg={4} xs={6}>
+                            </div>
+                            <div>
                                 <Form.Group>
                                     <Form.Label>Pris per styck (ex. moms)</Form.Label>
                                     <InputGroup>
@@ -169,8 +172,8 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     </InputGroup>
                                     <PriceWithVATPreview price={equipmentListEntryToEditViewModel?.pricePerUnit} />
                                 </Form.Group>
-                            </Col>
-                            <Col lg={4} xs={6}>
+                            </div>
+                            <div>
                                 <Form.Group>
                                     <Form.Label>Pris per timme (ex. moms)</Form.Label>
                                     <InputGroup>
@@ -190,11 +193,11 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     </InputGroup>
                                     <PriceWithVATPreview price={equipmentListEntryToEditViewModel?.pricePerHour} />
                                 </Form.Group>
-                            </Col>
-                        </Row>
+                            </div>
+                        </div>
                     )}
-                    <Row>
-                        <Col lg={4} xs={6}>
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                        <div>
                             <Form.Group>
                                 <Form.Label>Rabatt (ex. moms)</Form.Label>
                                 <InputGroup>
@@ -222,8 +225,8 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     </Form.Text>
                                 ) : null}
                             </Form.Group>
-                        </Col>
-                        <Col lg={8} xs={6}>
+                        </div>
+                        <div className="lg:col-span-2">
                             <Form.Group>
                                 <Form.Label>Konto</Form.Label>
                                 <Typeahead
@@ -259,30 +262,28 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                     Lämna fältet tomt för att låta kontot styras av bokningens kontotyp.
                                 </Form.Text>
                             </Form.Group>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <Form.Group controlId="formPrices">
-                                <Form.Label>Beskrivning</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    value={equipmentListEntryToEditViewModel?.description}
-                                    readOnly={readonly}
-                                    onChange={(e) =>
-                                        setEquipmentListEntryToEditViewModel({
-                                            ...equipmentListEntryToEditViewModel,
-                                            description: e.target.value,
-                                        })
-                                    }
-                                />
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
+                    <div className="mb-4">
+                        <Form.Group controlId="formPrices">
+                            <Form.Label>Beskrivning</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                value={equipmentListEntryToEditViewModel?.description}
+                                readOnly={readonly}
+                                onChange={(e) =>
+                                    setEquipmentListEntryToEditViewModel({
+                                        ...equipmentListEntryToEditViewModel,
+                                        description: e.target.value,
+                                    })
+                                }
+                            />
+                        </Form.Group>
+                    </div>
                     {!!equipmentListEntryToEditViewModel.equipment ? (
                         <p className="text-muted">
                             <span>
-                                <FontAwesomeIcon icon={faLink} className="me-1" size="sm" />
+                                <FontAwesomeIcon icon={faLink} className="mr-1" size="sm" />
                                 Den här raden är länkad till utrustningen{' '}
                                 <em>{equipmentListEntryToEditViewModel.equipment.name}</em>.{' '}
                             </span>

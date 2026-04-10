@@ -2,7 +2,8 @@ import React from 'react';
 import Layout from '../../components/layout/Layout';
 import useSwr from 'swr';
 import Link from 'next/link';
-import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Button } from '../../components/ui/Button';
+import { Dropdown, DropdownButton } from '../../components/ui/Dropdown';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import {
@@ -51,41 +52,33 @@ const EquipmentListPage: React.FC<Props> = ({ user: currentUser, globalSettings 
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/equipment/new" passHref>
-                        <Button variant="primary" as="span">
-                            <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till utrustning
+                        <Button variant="primary">
+                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till utrustning
                         </Button>
                     </Link>
                 </IfNotReadonly>
                 <Link href="/equipmentPackage" passHref>
-                    <Button variant="secondary" as="span">
-                        <FontAwesomeIcon icon={faCubes} className="me-1" /> Visa utrustningspaket
+                    <Button variant="secondary">
+                        <FontAwesomeIcon icon={faCubes} className="mr-1" /> Visa utrustningspaket
                     </Button>
                 </Link>
-                <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer" className="d-inline-block">
-                    <Link href="/equipment/compare-availability" passHref legacyBehavior>
-                        <Dropdown.Item href={'/equipment/compare-availability'}>
-                            <FontAwesomeIcon icon={faCalendarXmark} className="me-1 fa-fw" /> Jämför tillgänglighet
+                <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer">
+                    <Dropdown.Item href="/equipment/compare-availability">
+                            <FontAwesomeIcon icon={faCalendarXmark} className="mr-1" /> Jämför tillgänglighet
                         </Dropdown.Item>
-                    </Link>
-                    <Link href="/equipment/archived" passHref legacyBehavior>
-                        <Dropdown.Item href={'/equipment/archived'}>
-                            <FontAwesomeIcon icon={faArchive} className="me-1 fa-fw" /> Visa arkiverad utrustning
+                    <Dropdown.Item href="/equipment/archived">
+                            <FontAwesomeIcon icon={faArchive} className="mr-1" /> Visa arkiverad utrustning
                         </Dropdown.Item>
-                    </Link>
                     <IfAdmin currentUser={currentUser}>
                         <Dropdown.Divider />
-                        <Link href="/equipment/json-import" passHref legacyBehavior>
-                            <Dropdown.Item href={'/equipment/json-import'}>
-                                <FontAwesomeIcon icon={faFileImport} className="me-1 fa-fw" /> Importera utrustning från
+                        <Dropdown.Item href="/equipment/json-import">
+                                <FontAwesomeIcon icon={faFileImport} className="mr-1" /> Importera utrustning från
                                 JSON
                             </Dropdown.Item>
-                        </Link>
-                        <Link href="/equipment/json-export" passHref legacyBehavior>
-                            <Dropdown.Item href={'/equipment/json-export'}>
-                                <FontAwesomeIcon icon={faFileExport} className="me-1 fa-fw" /> Exportera utrustning till
+                        <Dropdown.Item href="/equipment/json-export">
+                                <FontAwesomeIcon icon={faFileExport} className="mr-1" /> Exportera utrustning till
                                 JSON
                             </Dropdown.Item>
-                        </Link>
                     </IfAdmin>
                 </DropdownButton>
             </Header>

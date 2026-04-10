@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, ButtonGroup, Card, Col, Dropdown, DropdownButton, Form, ListGroup, Row } from 'react-bootstrap';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { Dropdown, DropdownButton } from '../../../components/ui/Dropdown';
+import { Form } from '../../../components/ui/Form';
+import { ListGroup } from '../../../components/ui/ListGroup';
 import {
     getAccountKindName,
     getDefaultLaborHourlyRate,
@@ -13,7 +17,6 @@ import {
 } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
-import Link from 'next/link';
 import { IfAdmin, IfNotReadonly } from '../../../components/utils/IfAdmin';
 import { bookingFetcher } from '../../../lib/fetchers';
 import TimeEstimateList from '../../../components/bookings/timeEstimate/TimeEstimateList';
@@ -203,11 +206,9 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 {!readonly ? (
                     <>
-                        <Link href={'/bookings/' + booking.id + '/edit'} passHref legacyBehavior>
-                            <Button variant="primary" href={'/bookings/' + booking.id + '/edit'}>
-                                <FontAwesomeIcon icon={faPen} className="me-1" /> Redigera
+                        <Button variant="primary" href={'/bookings/' + booking.id + '/edit'}>
+                                <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                             </Button>
-                        </Link>
 
                         <BookingStatusButton booking={booking} onChange={saveBooking} />
                         <BookingRentalStatusButton
@@ -217,9 +218,9 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         />
                     </>
                 ) : null}
-                <Dropdown as={ButtonGroup}>
+                <Dropdown>
                     <Dropdown.Toggle variant="secondary" id="dropdown-split-basic">
-                        <FontAwesomeIcon icon={faFileDownload} className="me-1 fa-fw" />
+                        <FontAwesomeIcon icon={faFileDownload} className="mr-1" />
                         Exportera
                     </Dropdown.Toggle>
 
@@ -228,16 +229,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             href={`/api/documents/price-estimate/${booking.language}/${booking.id}`}
                             target="_blank"
                         >
-                            <FontAwesomeIcon icon={faFilePdf} className="me-1 fa-fw" /> Prisuppskattning
+                            <FontAwesomeIcon icon={faFilePdf} className="mr-1" /> Prisuppskattning
                         </Dropdown.Item>
                         <Dropdown.Item href={`/api/documents/packing-list/sv/${booking.id}`} target="_blank">
-                            <FontAwesomeIcon icon={faFilePdf} className="me-1 fa-fw" /> Packlista
+                            <FontAwesomeIcon icon={faFilePdf} className="mr-1" /> Packlista
                         </Dropdown.Item>
                         <Dropdown.Item
                             href={`/api/documents/rental-agreement/${booking.language}/${booking.id}`}
                             target="_blank"
                         >
-                            <FontAwesomeIcon icon={faFilePdf} className="me-1 fa-fw" /> Hyresavtal
+                            <FontAwesomeIcon icon={faFilePdf} className="mr-1" /> Hyresavtal
                         </Dropdown.Item>
                         <IfAdmin currentUser={currentUser}>
                             <Dropdown.Divider />
@@ -246,32 +247,30 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             href={`/api/documents/invoice/pdf/${booking.language}/${booking.id}`}
                             target="_blank"
                         >
-                            <FontAwesomeIcon icon={faFilePdf} className="me-1 fa-fw" /> Fakturaunderlag (PDF)
+                            <FontAwesomeIcon icon={faFilePdf} className="mr-1" /> Fakturaunderlag (PDF)
                         </Dropdown.Item>
                         <IfAdmin currentUser={currentUser}>
                             <Dropdown.Item
                                 href={`/api/documents/invoice/txt/${booking.language}/${booking.id}?download=true`}
                                 target="_blank"
                             >
-                                <FontAwesomeIcon icon={faFileText} className="me-1 fa-fw" /> Fakturaunderlag (Hogia
+                                <FontAwesomeIcon icon={faFileText} className="mr-1" /> Fakturaunderlag (Hogia
                                 import)
                             </Dropdown.Item>
                             <Dropdown.Divider />
-                            <Link href={`/bookings/${booking.id}/custom-document-export`} passHref>
-                                <Dropdown.Item href={`/bookings/${booking.id}/custom-document-export`} target="_blank">
-                                    <FontAwesomeIcon icon={faFilePen} className="me-1 fa-fw" /> Anpassad dokumentexport
-                                </Dropdown.Item>
-                            </Link>
+                            <Dropdown.Item href={`/bookings/${booking.id}/custom-document-export`} target="_blank">
+                                <FontAwesomeIcon icon={faFilePen} className="mr-1" /> Anpassad dokumentexport
+                            </Dropdown.Item>
                         </IfAdmin>
                     </Dropdown.Menu>
                 </Dropdown>
-                <ToggleCoOwnerButton booking={booking} currentUser={currentUser} variant="secondary" />
+                <ToggleCoOwnerButton booking={booking} currentUser={currentUser} />
                 <IfNotReadonly
                     currentUser={currentUser}
                     and={booking.status === Status.DONE && booking.paymentStatus === PaymentStatus.NOT_PAID}
                 >
                     <Button variant="secondary" onClick={() => setShowConfirmReadyForCashPaymentModal(true)}>
-                        <FontAwesomeIcon icon={faCoins} className="me-1 fw" /> Skicka till KårX för betalning
+                        <FontAwesomeIcon icon={faCoins} className="mr-1" /> Skicka till KårX för betalning
                     </Button>
                     <ConfirmModal
                         show={showConfirmReadyForCashPaymentModal}
@@ -288,7 +287,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     </ConfirmModal>
 
                     <Button variant="secondary" onClick={() => setShowConfirmPaidModal(true)}>
-                        <FontAwesomeIcon icon={faCoins} className="me-1 fw" /> Markera som skall ej faktureras
+                        <FontAwesomeIcon icon={faCoins} className="mr-1" /> Markera som skall ej faktureras
                     </Button>
                     <ConfirmModal
                         show={showConfirmPaidModal}
@@ -309,7 +308,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <Button variant="secondary" onClick={() => setAdminEditModeOverrideEnabled((x) => !x)}>
                         <FontAwesomeIcon
                             icon={adminEditModeOverrideEnabled ? faLock : faLockOpen}
-                            className="me-1 fw"
+                            className="mr-1"
                         />{' '}
                         {adminEditModeOverrideEnabled
                             ? 'Sluta redigera klarmarkerad bokning'
@@ -321,23 +320,23 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
                         {booking.bookingType === BookingType.GIG && !alwaysShowRentalControls ? (
                             <Dropdown.Item onClick={() => setAlwaysShowRentalControls(true)}>
-                                <FontAwesomeIcon icon={faToggleOff} className="me-1" /> Visa hyreskontroller för detta{' '}
+                                <FontAwesomeIcon icon={faToggleOff} className="mr-1" /> Visa hyreskontroller för detta{' '}
                                 {getBookingTypeName(booking.bookingType)}
                             </Dropdown.Item>
                         ) : null}
                         {booking.bookingType === BookingType.GIG && alwaysShowRentalControls ? (
                             <Dropdown.Item onClick={() => setAlwaysShowRentalControls(false)}>
-                                <FontAwesomeIcon icon={faToggleOn} className="me-1" /> Sluta visa hyreskontroller för
+                                <FontAwesomeIcon icon={faToggleOn} className="mr-1" /> Sluta visa hyreskontroller för
                                 detta {getBookingTypeName(booking.bookingType)}
                             </Dropdown.Item>
                         ) : null}
                         {booking.status !== Status.CANCELED && booking.status !== Status.DONE ? (
                             <Dropdown.Item onClick={() => setShowCancelModal(true)}>
-                                <FontAwesomeIcon icon={faTimesCircle} className="me-1" /> Ställ in bokningen
+                                <FontAwesomeIcon icon={faTimesCircle} className="mr-1" /> Ställ in bokningen
                             </Dropdown.Item>
                         ) : null}
                         <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                            <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort bokningen
+                            <FontAwesomeIcon icon={faTrashCan} className="mr-1" /> Ta bort bokningen
                         </Dropdown.Item>
                     </DropdownButton>
                 ) : null}
@@ -375,9 +374,9 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 </ConfirmModal>
             </Header>
 
-            <Row className="mb-3">
-                <Col xl={8}>
-                    <BookingInfoSection booking={booking} showName={false} className="d-xl-none mb-3" />
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-3">
+                <div className="xl:col-span-8">
+                    <BookingInfoSection booking={booking} showName={false} className="xl:hidden mb-3" />
                     <BookingPotentialProblemsSection booking={booking} />
                     <TimeEstimateList
                         bookingId={booking.id}
@@ -399,9 +398,9 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         defaultLaborHourlyRate={defaultLaborHourlyRate}
                         alwaysShowRentalControls={alwaysShowRentalControls}
                     />
-                </Col>
-                <Col xl={4}>
-                    <BookingInfoSection booking={booking} className="d-none d-xl-block mb-3" />
+                </div>
+                <div className="xl:col-span-4">
+                    <BookingInfoSection booking={booking} className="hidden xl:block mb-3" />
                     {booking.bookingType === BookingType.GIG ? (
                         <CalendarWorkersCard
                             bookingId={booking.id}
@@ -414,41 +413,41 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         <Card.Header>Prisinformation (ink. moms)</Card.Header>
                         <ListGroup variant="flush">
                             {booking.equipmentLists?.map((list) => (
-                                <ListGroup.Item className="d-flex" key={list.id}>
-                                    <span className="flex-grow-1">{list.name}</span>
+                                <ListGroup.Item className="flex" key={list.id}>
+                                    <span className="flex-grow">{list.name}</span>
                                     <span>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</span>
                                 </ListGroup.Item>
                             ))}
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Estimerad personalkostnad</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Estimerad personalkostnad</span>
                                 <span>{formatCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <strong className="flex-grow-1">Pris med estimerad personalkostnad</strong>
+                            <ListGroup.Item className="flex">
+                                <strong className="flex-grow">Pris med estimerad personalkostnad</strong>
                                 <strong>{formatCurrency(addVAT(getBookingPrice(booking, true, true)))}</strong>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <em className="flex-grow-1 ps-4">varav moms (25%)</em>
+                            <ListGroup.Item className="flex">
+                                <em className="flex-grow pl-8">varav moms (25%)</em>
                                 <em>{formatCurrency(getVAT(getBookingPrice(booking, true, true)))}</em>
                             </ListGroup.Item>
                             {timeReportExists ? (
                                 <>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Faktisk personalkostnad</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Faktisk personalkostnad</span>
                                         <span>
                                             {formatCurrency(addVAT(getTotalTimeReportsPrice(booking.timeReports)))}
                                         </span>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <strong className="flex-grow-1">Pris med faktisk personalkostnad</strong>
+                                    <ListGroup.Item className="flex">
+                                        <strong className="flex-grow">Pris med faktisk personalkostnad</strong>
                                         <strong>{formatCurrency(addVAT(getBookingPrice(booking, false, true)))}</strong>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <em className="flex-grow-1 ps-4">varav moms (25%)</em>
+                                    <ListGroup.Item className="flex">
+                                        <em className="flex-grow pl-8">varav moms (25%)</em>
                                         <em>{formatCurrency(getVAT(getBookingPrice(booking, false, true)))}</em>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Skillnad mot estimerad personalkostnad</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Skillnad mot estimerad personalkostnad</span>
                                         <span>
                                             {formatCurrency(
                                                 addVAT(
@@ -464,17 +463,17 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             ) : null}
                             {booking.fixedPrice !== null && booking.fixedPrice !== undefined ? (
                                 <>
-                                    <ListGroup.Item className="d-flex">
-                                        <strong className="flex-grow-1">Fast pris</strong>
+                                    <ListGroup.Item className="flex">
+                                        <strong className="flex-grow">Fast pris</strong>
                                         <strong>{formatCurrency(addVAT(booking.fixedPrice))}</strong>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <em className="flex-grow-1 ps-4">varav moms (25%)</em>
+                                    <ListGroup.Item className="flex">
+                                        <em className="flex-grow pl-8">varav moms (25%)</em>
                                         <em>{formatCurrency(getVAT(booking.fixedPrice))}</em>
                                     </ListGroup.Item>
                                     {timeReportExists ? (
-                                        <ListGroup.Item className="d-flex">
-                                            <span className="flex-grow-1">
+                                        <ListGroup.Item className="flex">
+                                            <span className="flex-grow">
                                                 Skillnad mot pris med faktisk personalkostnad
                                             </span>
                                             <span>
@@ -489,8 +488,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                             </span>
                                         </ListGroup.Item>
                                     ) : (
-                                        <ListGroup.Item className="d-flex">
-                                            <span className="flex-grow-1">
+                                        <ListGroup.Item className="flex">
+                                            <span className="flex-grow">
                                                 Skillnad mot pris med estimerad personalkostnad
                                             </span>
                                             <span>
@@ -512,28 +511,28 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <Card className="mb-3">
                         <Card.Header>Bokningsinformation</Card.Header>
                         <ListGroup variant="flush">
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Ansvarig</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Ansvarig</span>
                                 <span>{booking.ownerUser?.name ?? '-'}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Plats</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Plats</span>
                                 <span>{booking.location}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Prisplan</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Prisplan</span>
                                 <span>{getPricePlanName(booking.pricePlan)}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Kontaktperson</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Kontaktperson</span>
                                 <span>{booking.contactPersonName}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Telefonnummer</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Telefonnummer</span>
                                 <span>{booking.contactPersonPhone}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Email</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Email</span>
                                 <span>{booking.contactPersonEmail}</span>
                             </ListGroup.Item>
                         </ListGroup>
@@ -541,24 +540,24 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <Card className="mb-3">
                         <Card.Header>Fakturainformation</Card.Header>
                         <ListGroup variant="flush">
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Fakturaadress</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Fakturaadress</span>
                                 <span>{booking.invoiceAddress}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Fakturamärkning</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Fakturamärkning</span>
                                 <span>{booking.invoiceTag}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Hogia-id</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Hogia-id</span>
                                 <span>{booking.invoiceHogiaId}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Kontotyp</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Kontotyp</span>
                                 <span>{getAccountKindName(booking.accountKind)}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Fakturadatum</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Fakturadatum</span>
                                 <span>{formatDateForForm(booking.invoiceDate)}</span>
                             </ListGroup.Item>
                         </ListGroup>
@@ -593,8 +592,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     />
                     <PreviousBookingsCard hogiaId={booking.invoiceHogiaId} bookingId={booking.id} />
                     <ChangelogCard changelog={booking.changelog ?? []} />
-                </Col>
-            </Row>
+                </div>
+            </div>
         </Layout>
     );
 };

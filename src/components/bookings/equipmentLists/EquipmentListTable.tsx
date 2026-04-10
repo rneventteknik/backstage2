@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Badge, Dropdown, DropdownButton, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Badge } from '../../ui/Badge';
+import { Dropdown, DropdownButton } from '../../ui/Dropdown';
+import { OverlayTrigger, Tooltip } from '../../ui/Tooltip';
 import posthog from 'posthog-js';
 import { Equipment, EquipmentPackage, EquipmentPrice, TimeEstimate } from '../../../models/interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -143,7 +145,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             readonly={readonly}
                         >
                             {heading.name}
-                            <span className="text-muted ms-2">
+                            <span className="text-muted ml-2">
                                 ({heading.listEntries.length} {heading.listEntries.length === 1 ? 'del' : 'delar'})
                             </span>
                         </ClickToEdit>
@@ -163,7 +165,7 @@ const EquipmentListTable: React.FC<Props> = ({
                             {heading.description && heading.description.length > 0 ? (
                                 <span className="text-muted ">{heading.description}</span>
                             ) : (
-                                <span className="text-muted font-italic">
+                                <span className="text-muted italic">
                                     {readonly ? null : 'Dubbelklicka för att lägga till en beskrivning'}
                                 </span>
                             )}{' '}
@@ -188,12 +190,12 @@ const EquipmentListTable: React.FC<Props> = ({
                     >
                         {entry.name}
                         {entry.equipment?.isArchived ? (
-                            <Badge bg="warning" className="ms-1" title="">
+                            <Badge bg="warning" className="ml-1" title="">
                                 Arkiverad
                             </Badge>
                         ) : null}
                         {entry.equipment && getEquipmentOutDatetime(list) && getEquipmentInDatetime(list) ? (
-                            <span className="ms-1" title="">
+                            <span className="ml-1" title="">
                                 <EquipmentListEntryConflictStatus
                                     equipment={entry.equipment}
                                     equipmentList={list}
@@ -207,24 +209,24 @@ const EquipmentListTable: React.FC<Props> = ({
                             <OverlayTrigger
                                 placement="right"
                                 overlay={
-                                    <Tooltip id="1">
+                                    <Tooltip>
                                         <strong>Denna utrustning är dold för kunden.</strong>
                                     </Tooltip>
                                 }
                             >
-                                <FontAwesomeIcon icon={faEyeSlash} className="ms-1" title="" />
+                                <FontAwesomeIcon icon={faEyeSlash} className="ml-1" title="" />
                             </OverlayTrigger>
                         ) : null}
                         {entry.account ? (
                             <OverlayTrigger
                                 placement="right"
                                 overlay={
-                                    <Tooltip id="1">
+                                    <Tooltip>
                                         <strong>Denna utrustning har ett anpassat konto ({entry.account}).</strong>
                                     </Tooltip>
                                 }
                             >
-                                <FontAwesomeIcon icon={faDollarSign} className="ms-1" title="" />
+                                <FontAwesomeIcon icon={faDollarSign} className="ml-1" title="" />
                             </OverlayTrigger>
                         ) : null}
                     </ClickToEdit>
@@ -239,16 +241,16 @@ const EquipmentListTable: React.FC<Props> = ({
                         {entry.description && entry.description.length > 0 ? (
                             <span className="text-muted ">{entry.description}</span>
                         ) : (
-                            <span className="text-muted font-italic">
+                            <span className="text-muted italic">
                                 {readonly ? null : 'Dubbelklicka för att lägga till en beskrivning'}
                             </span>
                         )}
                     </ClickToEdit>
                 </div>
 
-                <div className="mb-0 text-muted d-md-none">{EquipmentListEntryNumberOfHoursDisplayFn(viewModel)}</div>
-                <div className="mb-0 text-muted d-md-none">{EquipmentListEntryPriceDisplayFn(viewModel)}</div>
-                <div className="mb-0 text-muted d-md-none">{EquipmentListEntryTotalPriceDisplayFn(viewModel)}</div>
+                <div className="mb-0 text-muted md:hidden">{EquipmentListEntryNumberOfHoursDisplayFn(viewModel)}</div>
+                <div className="mb-0 text-muted md:hidden">{EquipmentListEntryPriceDisplayFn(viewModel)}</div>
+                <div className="mb-0 text-muted md:hidden">{EquipmentListEntryTotalPriceDisplayFn(viewModel)}</div>
             </>
         );
     };
@@ -380,7 +382,7 @@ const EquipmentListTable: React.FC<Props> = ({
                     <OverlayTrigger
                         placement="right"
                         overlay={
-                            <Tooltip id="1">
+                            <Tooltip>
                                 <p className="mb-0">{priceWithoutDiscount}</p>
                                 <p className="mb-0">-{formattedDiscount} (rabatt)</p>
                             </Tooltip>
@@ -407,17 +409,17 @@ const EquipmentListTable: React.FC<Props> = ({
                                 onClick={() => moveListEntryUp(viewModel, list, saveListEntriesAndHeadings)}
                                 disabled={isFirst(listEntries, viewModel)}
                             >
-                                <FontAwesomeIcon icon={faAngleUp} className="me-1 fa-fw" /> Flytta upp
+                                <FontAwesomeIcon icon={faAngleUp} className="mr-1" /> Flytta upp
                             </Dropdown.Item>
                             <Dropdown.Item
                                 onClick={() => moveListEntryDown(viewModel, list, saveListEntriesAndHeadings)}
                                 disabled={isLast(listEntries, viewModel)}
                             >
-                                <FontAwesomeIcon icon={faAngleDown} className="me-1 fa-fw" /> Flytta ner
+                                <FontAwesomeIcon icon={faAngleDown} className="mr-1" /> Flytta ner
                             </Dropdown.Item>
                             <Dropdown.Divider />
                             <Dropdown.Item onClick={() => deleteListHeading(heading)} className="text-danger">
-                                <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort rad
+                                <FontAwesomeIcon icon={faTrashCan} className="mr-1" /> Ta bort rad
                             </Dropdown.Item>
                         </>
                     )}
@@ -435,13 +437,13 @@ const EquipmentListTable: React.FC<Props> = ({
                             onClick={() => moveListEntryUp(viewModel, list, saveListEntriesAndHeadings)}
                             disabled={isFirst(peers, viewModel)}
                         >
-                            <FontAwesomeIcon icon={faAngleUp} className="me-1 fa-fw" /> Flytta upp
+                            <FontAwesomeIcon icon={faAngleUp} className="mr-1" /> Flytta upp
                         </Dropdown.Item>
                         <Dropdown.Item
                             onClick={() => moveListEntryDown(viewModel, list, saveListEntriesAndHeadings)}
                             disabled={isLast(peers, viewModel)}
                         >
-                            <FontAwesomeIcon icon={faAngleDown} className="me-1 fa-fw" /> Flytta ner
+                            <FontAwesomeIcon icon={faAngleDown} className="mr-1" /> Flytta ner
                         </Dropdown.Item>
                         <Dropdown.Divider />
                         {getHeaderOfEntity(entry, list) ? (
@@ -449,7 +451,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                 <Dropdown.Item
                                     onClick={() => moveListEntryIntoHeading(entry, null, list, saveListEntry)}
                                 >
-                                    <FontAwesomeIcon icon={faAngleLeft} className="me-1 fa-fw" /> Flytta ut ur{' '}
+                                    <FontAwesomeIcon icon={faAngleLeft} className="mr-1" /> Flytta ut ur{' '}
                                     {getHeaderOfEntity(entry, list)?.name}
                                 </Dropdown.Item>
                             </>
@@ -459,7 +461,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                     key={heading.id}
                                     onClick={() => moveListEntryIntoHeading(entry, heading.id, list, saveListEntry)}
                                 >
-                                    <FontAwesomeIcon icon={faAngleRight} className="me-1 fa-fw" /> Flytta in i{' '}
+                                    <FontAwesomeIcon icon={faAngleRight} className="mr-1" /> Flytta in i{' '}
                                     {heading.name}
                                 </Dropdown.Item>
                             ))
@@ -468,16 +470,16 @@ const EquipmentListTable: React.FC<Props> = ({
                     </>
                 )}
                 <Dropdown.Item href={'/equipment/' + entry.equipmentId} target="_blank" disabled={!entry.equipment}>
-                    <FontAwesomeIcon icon={faExternalLink} className="me-1 fa-fw" /> Öppna utrustning i ny flik
+                    <FontAwesomeIcon icon={faExternalLink} className="mr-1" /> Öppna utrustning i ny flik
                 </Dropdown.Item>
                 {readonly ? (
                     <Dropdown.Item onClick={() => editEntry(entry)}>
-                        <FontAwesomeIcon icon={faGears} className="me-1 fa-fw" /> Visa detaljer
+                        <FontAwesomeIcon icon={faGears} className="mr-1" /> Visa detaljer
                     </Dropdown.Item>
                 ) : (
                     <>
                         <Dropdown.Item onClick={() => toggleHideListEntry(entry, saveListEntry)}>
-                            <FontAwesomeIcon icon={entry.isHidden ? faEye : faEyeSlash} className="me-1 fa-fw" />{' '}
+                            <FontAwesomeIcon icon={entry.isHidden ? faEye : faEyeSlash} className="mr-1" />{' '}
                             {entry.isHidden ? 'Sluta dölja rad för kund' : 'Dölj rad för kund'}
                         </Dropdown.Item>
                         <Dropdown.Item
@@ -490,7 +492,7 @@ const EquipmentListTable: React.FC<Props> = ({
                                 })
                             }
                         >
-                            <FontAwesomeIcon icon={fa0} className="me-1 fa-fw" /> Sätt anpassat pris till 0
+                            <FontAwesomeIcon icon={fa0} className="mr-1" /> Sätt anpassat pris till 0
                         </Dropdown.Item>
                         <Dropdown.Item
                             onClick={() =>
@@ -500,10 +502,10 @@ const EquipmentListTable: React.FC<Props> = ({
                                 })
                             }
                         >
-                            <FontAwesomeIcon icon={faPercent} className="me-1 fa-fw" /> Sätt rabatt till 100%
+                            <FontAwesomeIcon icon={faPercent} className="mr-1" /> Sätt rabatt till 100%
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => editEntry(entry)}>
-                            <FontAwesomeIcon icon={faGears} className="me-1 fa-fw" /> Avancerad redigering
+                            <FontAwesomeIcon icon={faGears} className="mr-1" /> Avancerad redigering
                         </Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item
@@ -523,10 +525,10 @@ const EquipmentListTable: React.FC<Props> = ({
                                     : null
                             }
                         >
-                            <FontAwesomeIcon icon={faEraser} className="me-1 fa-fw" /> Återställ rad
+                            <FontAwesomeIcon icon={faEraser} className="mr-1" /> Återställ rad
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => deleteListEntry(entry)} className="text-danger">
-                            <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort rad
+                            <FontAwesomeIcon icon={faTrashCan} className="mr-1" /> Ta bort rad
                         </Dropdown.Item>
                     </>
                 )}
@@ -682,7 +684,7 @@ const EquipmentListTable: React.FC<Props> = ({
             />
 
             {readonly ? null : (
-                <div className="ms-2 me-2 mb-2">
+                <div className="mx-2 mb-2">
                     <EquipmentSearchWithAI
                         equipment={listEntries.flatMap(getEquipmentFromViewModel)}
                         placeholder="Lägg till utrustning"

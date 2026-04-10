@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Card, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { Dropdown, DropdownButton } from '../ui/Dropdown';
 import useSwr from 'swr';
 import { faExclamationCircle, faExternalLinkAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -7,7 +9,6 @@ import Skeleton from 'react-loading-skeleton';
 import { getResponseContentOrError } from '../../lib/utils';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import { CalendarResult } from '../../models/misc/CalendarResult';
-import Link from 'next/link';
 import { formatDatetime } from '../../lib/datetimeUtils';
 import TurndownService from 'turndown';
 import PreserveTextNewlines from '../utils/PreserveTextNewlines';
@@ -55,7 +56,7 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
                     <p className="text-danger">
                         <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda kalenderlistan.
                     </p>
-                    <p className="text-monospace text-muted mb-0">{error.message}</p>
+                    <p className="font-mono text-muted mb-0">{error.message}</p>
                 </Card.Body>
             </Card>
         );
@@ -73,7 +74,7 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
         <>
             <span>{calendarResult.name}</span>
             <div className="text-muted mb-0">{calendarResult.creator ?? 'N/A'}</div>
-            <div className="text-muted mb-0 d-lg-none">
+            <div className="text-muted mb-0 lg:hidden">
                 {calendarResult?.displayStartDate + ' till ' + calendarResult?.displayEndDate}
             </div>
             <div className="text-muted mb-0">
@@ -89,7 +90,7 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
                     variant={calendarResult.existingBookingId ? 'secondary' : 'primary'}
                     title="Mer"
                     size="sm"
-                    className="d-inline me-2"
+                    className="inline mr-2"
                     onClick={() => onSelect(calendarResult)}
                     disabled={!!calendarResult.existingBookingId}
                 >
@@ -101,17 +102,15 @@ const CalendarBookingsList: React.FC<Props> = ({ onSelect: onSelect }: Props) =>
                     variant="secondary"
                     title="Mer"
                     size="sm"
-                    className="d-inline"
+                    className="inline"
                 >
                     <Dropdown.Item href={calendarResult.link} target="_blank">
                         Visa i Google Calender <FontAwesomeIcon icon={faExternalLinkAlt} />
                     </Dropdown.Item>
                     {calendarResult.existingBookingId ? (
-                        <Link href={'/bookings/' + calendarResult.existingBookingId} passHref legacyBehavior>
-                            <Dropdown.Item href={'/bookings/' + calendarResult.existingBookingId}>
+                        <Dropdown.Item href={'/bookings/' + calendarResult.existingBookingId}>
                                 Öppna bokning
                             </Dropdown.Item>
-                        </Link>
                     ) : null}
                 </DropdownButton>
             </>

@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Button, Card, Form, InputGroup, ListGroup, Modal } from 'react-bootstrap';
+import { Alert } from '../../ui/Alert';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
+import { Form } from '../../ui/Form';
+import { InputGroup } from '../../ui/InputGroup';
+import { ListGroup } from '../../ui/ListGroup';
+import { Modal } from '../../ui/Modal';
 import useSwr from 'swr';
 import { bookingsFetcher } from '../../../lib/fetchers';
 import { getMaximumNumberOfUnitUsed, toIntOrUndefined } from '../../../lib/utils';
@@ -140,9 +146,9 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                             <ListGroup variant="flush">
                                 {equipment.prices.sort(idSortFn).map((p) => (
                                     <ListGroup.Item key={p.id}>
-                                        <div className="d-flex flex-row align-items-center">
-                                            <label htmlFor={'price-' + p.id} className="flex-grow-1 m-0">
-                                                <span className="d-block">{p.name}</span>
+                                        <div className="flex flex-row items-center">
+                                            <label htmlFor={'price-' + p.id} className="flex-grow m-0">
+                                                <span className="block">{p.name}</span>
                                                 <span className="text-muted">
                                                     {priceplan === PricePlan.EXTERNAL
                                                         ? formatPrice(addVATToPriceWithTHS(p))

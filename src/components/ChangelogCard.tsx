@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Card, ListGroup, Modal } from 'react-bootstrap';
+import { Card } from './ui/Card';
+import { ListGroup } from './ui/ListGroup';
+import { Modal } from './ui/Modal';
 import { formatDatetimeWithYear } from '../lib/datetimeUtils';
 import { BookingChangelogEntry, EquipmentChangelogEntry } from '../models/interfaces/ChangeLogEntry';
 
@@ -15,8 +17,8 @@ const ChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
     return (
         <>
             <Card className="mb-3">
-                <Card.Header className="d-flex">
-                    <span className="flex-grow-1">Senaste ändringar</span>
+                <Card.Header className="flex">
+                    <span className="flex-grow">Senaste ändringar</span>
                     <a href="#" onClick={() => setShowAllModal(true)}>
                         Visa alla ({changelog.length})
                     </a>

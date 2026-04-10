@@ -1,12 +1,11 @@
 import React from 'react';
 import { faWarning } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { Placement } from 'react-bootstrap/esm/types';
+import { OverlayTrigger, Tooltip } from '../ui/Tooltip';
 
 type WarningIconProps = {
     text: string;
-    placement?: Placement;
+    placement?: 'top' | 'bottom' | 'left' | 'right' | 'auto';
     className: string;
 };
 

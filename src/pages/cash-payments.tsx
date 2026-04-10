@@ -1,10 +1,11 @@
 import { faCheck, faFileDownload, faRotateLeft } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Head from 'next/head';
-import Link from 'next/link';
 import Router from 'next/router';
 import React, { useState } from 'react';
-import { Alert, Button, Dropdown, Navbar } from 'react-bootstrap';
+import { Alert } from '../components/ui/Alert';
+import { Button } from '../components/ui/Button';
+import { Dropdown } from '../components/ui/Dropdown';
 import useSwr from 'swr';
 import { TableConfiguration, TableDisplay } from '../components/TableDisplay';
 import ActivityIndicator from '../components/utils/ActivityIndicator';
@@ -156,25 +157,25 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
             <Button
                 variant="secondary"
                 size="sm"
-                className="me-2"
+                className="mr-2"
                 href={`/api/documents/price-estimate/${booking.language}/${booking.id}`}
                 target="_blank"
             >
-                <FontAwesomeIcon icon={faFileDownload} className="me-1" /> Visa prisunderlag
+                <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Visa prisunderlag
             </Button>
 
             {confirmedBookingIds.includes(booking.id) ? (
                 <Button
                     variant="secondary"
                     size="sm"
-                    className="me-2"
+                    className="mr-2"
                     onClick={() => markBookingAsPaidWithCashPayment(booking.id, true)}
                 >
-                    <FontAwesomeIcon icon={faRotateLeft} className="me-1" /> Ångra
+                    <FontAwesomeIcon icon={faRotateLeft} className="mr-1" /> Ångra
                 </Button>
             ) : (
-                <Button variant="primary" size="sm" className="me-2" onClick={() => setConfirmingBookingId(booking.id)}>
-                    <FontAwesomeIcon icon={faCheck} className="me-1" /> Markera som betald
+                <Button variant="primary" size="sm" className="mr-2" onClick={() => setConfirmingBookingId(booking.id)}>
+                    <FontAwesomeIcon icon={faCheck} className="mr-1" /> Markera som betald
                 </Button>
             )}
         </>
@@ -275,10 +276,10 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
                     href={getGlobalSetting('content.image.favIcon', globalSettings, '')}
                 />
             </Head>{' '}
-            <Navbar variant="dark" fixed="top">
-                <div className="flex-grow-1"></div>
+            <nav className="fixed top-0 left-0 right-0 z-40 bg-bs-1 border-b border-bs-4 px-4 py-2 flex items-center">
+                <div className="flex-grow"></div>
                 <Dropdown>
-                    <Dropdown.Toggle variant="default" id="dropdown-basic" className="py-0" aria-label="User Menu">
+                    <Dropdown.Toggle variant="secondary" id="dropdown-basic" className="py-0" aria-label="User Menu">
                         <UserIcon user={currentUser} />
                     </Dropdown.Toggle>
 
@@ -287,27 +288,25 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
                             <UserDisplay user={currentUser} />
                         </Dropdown.Item>
                         <IfNotCashPaymentManager currentUser={currentUser}>
-                            <Link href={'/'} passHref legacyBehavior>
-                                <Dropdown.Item href={'/'}>Tillbaka till Backstage2</Dropdown.Item>
-                            </Link>
+                            <Dropdown.Item href="/">Tillbaka till Backstage2</Dropdown.Item>
                         </IfNotCashPaymentManager>
                         <Dropdown.Item onClick={logOut}>Logga ut</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
-            </Navbar>
+            </nav>
             <div style={containerStyle}>
                 <h1>{pageTitle}</h1>
                 {bookings.length > 0 ? (
                     <TableDisplay entities={bookings} configuration={{ ...tableSettings }} />
                 ) : (
-                    <span className="text-center font-italic text-muted">Just nu finns inga bokningar att betala.</span>
+                    <span className="text-center italic text-muted">Just nu finns inga bokningar att betala.</span>
                 )}
 
                 <h1 className="mt-5">Betalda bokningar</h1>
                 {paidBookings.length > 0 ? (
                     <TableDisplay entities={paidBookings} configuration={{ ...paidBookingsTableSettings }} />
                 ) : (
-                    <span className="text-center font-italic text-muted">Det finns inga betala bokningar.</span>
+                    <span className="text-center italic text-muted">Det finns inga betala bokningar.</span>
                 )}
 
                 <ConfirmModal

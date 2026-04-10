@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Modal } from '../ui/Modal';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { getGlobalSetting } from '../../lib/utils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
@@ -64,7 +65,7 @@ const LoggedOutModal: React.FC<Props> = ({ currentUser, globalSettings }: Props)
             <Modal.Footer>
                 {isLoggedOut ? (
                     <Link href={loginPageUrl} passHref>
-                        <Button variant="primary" as="span">
+                        <Button variant="primary">
                             Logga in igen
                         </Button>
                     </Link>

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Card, Button, DropdownButton, Dropdown } from 'react-bootstrap';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
+import { Dropdown, DropdownButton } from '../../ui/Dropdown';
 import { TableDisplay, TableConfiguration } from '../../TableDisplay';
 import { bookingFetcher } from '../../../lib/fetchers';
 import useSwr from 'swr';
@@ -71,8 +73,8 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
         return (
             <Card className="mb-3">
                 <Card.Header>
-                    <div className="d-flex">
-                        <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
+                    <div className="flex">
+                        <div className="flex-grow mr-4" style={{ fontSize: '1.6em' }}>
                             Utrustning
                         </div>
                     </div>
@@ -81,7 +83,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                     <p className="text-danger">
                         <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda tidsestimaten.
                     </p>
-                    <p className="text-monospace text-muted mb-0">{error?.message}</p>
+                    <p className="font-mono text-muted mb-0">{error?.message}</p>
                 </Card.Body>
             </Card>
         );
@@ -163,7 +165,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
             {timeEstimate && timeEstimate.name && timeEstimate.name.trim() && timeEstimate.name.trim().length > 0 ? (
                 timeEstimate.name
             ) : (
-                <span className="text-muted font-italic">Dubbelklicka för att lägga till en beskrivning</span>
+                <span className="text-muted italic">Dubbelklicka för att lägga till en beskrivning</span>
             )}
         </ClickToEdit>
     );
@@ -181,7 +183,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
             readonly={readonly}
         >
             {isNaN(timeEstimate.numberOfHours) ? (
-                <span className="text-muted font-italic">Dubbelklicka för att lägga till en tid</span>
+                <span className="text-muted italic">Dubbelklicka för att lägga till en tid</span>
             ) : (
                 timeEstimate.numberOfHours + ' h'
             )}
@@ -201,25 +203,25 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                             onClick={() => updateTimeEstimates(...moveItemUp(timeEstimates, entry))}
                             disabled={isFirst(timeEstimates, entry)}
                         >
-                            <FontAwesomeIcon icon={faAngleUp} className="me-1 fa-fw" /> Flytta upp
+                            <FontAwesomeIcon icon={faAngleUp} className="mr-1" /> Flytta upp
                         </Dropdown.Item>
                         <Dropdown.Item
                             onClick={() => updateTimeEstimates(...moveItemDown(timeEstimates, entry))}
                             disabled={isLast(timeEstimates, entry)}
                         >
-                            <FontAwesomeIcon icon={faAngleDown} className="me-1 fa-fw" /> Flytta ner
+                            <FontAwesomeIcon icon={faAngleDown} className="mr-1" /> Flytta ner
                         </Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item onClick={() => setTimeEstimateToDelete(entry)} className="text-danger">
-                            <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort rad
+                            <FontAwesomeIcon icon={faTrashCan} className="mr-1" /> Ta bort rad
                         </Dropdown.Item>
                         <Dropdown.Item onClick={() => duplicateTimeEstimate(entry)}>
-                            <FontAwesomeIcon icon={faClone} className="me-1 fa-fw" /> Duplicera
+                            <FontAwesomeIcon icon={faClone} className="mr-1" /> Duplicera
                         </Dropdown.Item>
                     </>
                 ) : null}
                 <Dropdown.Item onClick={() => setTimeEstimateToEditViewModel(entry)}>
-                    <FontAwesomeIcon icon={faGears} className="me-1 fa-fw" />{' '}
+                    <FontAwesomeIcon icon={faGears} className="mr-1" />{' '}
                     {readonly ? 'Visa detaljer' : 'Avancerad redigering'}
                 </Dropdown.Item>
             </DropdownButton>
@@ -279,13 +281,13 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
     return (
         <Card className="mb-3">
             <Card.Header>
-                <div className="d-flex">
-                    <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
-                        <FontAwesomeIcon className="me-2" icon={faClock} />
+                <div className="flex">
+                    <div className="flex-grow mr-4" style={{ fontSize: '1.6em' }}>
+                        <FontAwesomeIcon className="mr-2" icon={faClock} />
                         Tidsestimat
                     </div>
-                    <div className="d-flex">
-                        <Button className="me-2" variant="" onClick={() => setShowContent(!showContent)}>
+                    <div className="flex">
+                        <Button className="mr-2" variant="secondary" onClick={() => setShowContent(!showContent)}>
                             <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                         </Button>
                     </div>
@@ -303,7 +305,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
                             booking={booking}
                             disabled={readonly}
                             onAdd={onAdd}
-                            className="ms-2 me-2 mb-2"
+                        className="mx-2 mb-2"
                             variant="secondary"
                             size="sm"
                             defaultLaborHourlyRate={defaultLaborHourlyRate}

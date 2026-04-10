@@ -1,8 +1,16 @@
-import React, { InputHTMLAttributes } from 'react';
-import { Form, FormControlProps } from 'react-bootstrap';
+import React from 'react';
+import { Form } from '../ui/Form';
 
-export const FormNumberFieldWithoutScroll = React.forwardRef(
-    (props: FormControlProps & InputHTMLAttributes<HTMLInputElement>, ref) => (
+// Omit native 'size' (number) to avoid conflict with Form.Control's 'size' ('sm'|'lg')
+type Props = Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> & {
+    size?: 'sm' | 'lg';
+    isInvalid?: boolean;
+    isValid?: boolean;
+    readOnly?: boolean;
+};
+
+export const FormNumberFieldWithoutScroll = React.forwardRef<HTMLInputElement, Props>(
+    (props, ref) => (
         <Form.Control
             {...props}
             ref={ref}

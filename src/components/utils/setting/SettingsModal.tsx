@@ -1,5 +1,7 @@
 import React from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Button } from '../../ui/Button';
+import { Form } from '../../ui/Form';
+import { Modal } from '../../ui/Modal';
 import { Setting } from '../../../models/interfaces';
 
 import RequiredIndicator from '../RequiredIndicator';

@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Card, ListGroup, Modal } from 'react-bootstrap';
+import { Card } from '../ui/Card';
+import { ListGroup } from '../ui/ListGroup';
+import { Modal } from '../ui/Modal';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import useSwr from 'swr';
 import { faExclamationCircle, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
@@ -24,7 +26,7 @@ const PreviousBookingsCard: React.FC<Props> = ({ hogiaId, bookingId }: Props) =>
                 <Card.Header>Andra bokningar för kund</Card.Header>
                 <Card.Body>
                     <p className="text-muted mb-0">
-                        <FontAwesomeIcon icon={faInfoCircle} className="me-2" />
+                        <FontAwesomeIcon icon={faInfoCircle} className="mr-2" />
                         Endast tillgängligt för kunder med Hogia Id.
                     </p>
                 </Card.Body>
@@ -55,7 +57,7 @@ const PreviousBookingsCardList: React.FC<PreviousBookingsCardProps> = ({
                 <p className="text-danger">
                     <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda bokningarna.
                 </p>
-                <p className="text-monospace text-muted mb-0">{error.message}</p>
+                <p className="font-mono text-muted mb-0">{error.message}</p>
             </div>
         );
     }
@@ -77,8 +79,8 @@ const PreviousBookingsCardList: React.FC<PreviousBookingsCardProps> = ({
     return (
         <>
             <Card className="mb-3">
-                <Card.Header className="d-flex">
-                    <span className="flex-grow-1">Andra bokningar för kund</span>
+                <Card.Header className="flex">
+                    <span className="flex-grow">Andra bokningar för kund</span>
                     <a href="#" onClick={() => setShowAllModal(true)}>
                         Visa alla ({sortedBookingViewModels.length})
                     </a>
@@ -91,7 +93,7 @@ const PreviousBookingsCardList: React.FC<PreviousBookingsCardProps> = ({
                         </ListGroup.Item>
                     ))}
                     {sortedBookingViewModels.length === 0 ? (
-                        <ListGroup.Item className="text-center font-italic text-muted">
+                        <ListGroup.Item className="text-center italic text-muted">
                             Denna kund har inga andra bokningar.
                         </ListGroup.Item>
                     ) : null}

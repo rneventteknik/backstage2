@@ -2,7 +2,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { ReactNode } from 'react';
-import { Alert, Nav } from 'react-bootstrap';
+import { Alert } from '../ui/Alert';
 import styles from './Sidebar.module.scss';
 
 import {
@@ -38,14 +38,12 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ displayName, link, icon, exac
     const isActive = exactMatch ? link === path : path.indexOf(link) === 0;
 
     return (
-        <Nav.Item className={[isActive ? styles.activeNavItem : undefined, styles.link].join(' ')}>
-            <Link href={link} passHref legacyBehavior>
-                <Nav.Link as="a" href={link}>
-                    <FontAwesomeIcon className="fa-fw" icon={icon} />
-                    <span className="ms-3">{displayName}</span>
-                </Nav.Link>
+        <div className={[isActive ? styles.activeNavItem : undefined, styles.link].join(' ')}>
+            <Link href={link} className="flex items-center px-4 py-2 text-body no-underline hover:no-underline">
+                <FontAwesomeIcon className="fa-fw" icon={icon} />
+                <span className="ml-3">{displayName}</span>
             </Link>
-        </Nav.Item>
+        </div>
     );
 };
 
@@ -58,8 +56,8 @@ type SidebarLinkGroupProps = {
 
 const SidebarLinkGroup: React.FC<SidebarLinkGroupProps> = ({ children, title }: SidebarLinkGroupProps) => (
     <>
-        {title ? <h1 className="ms-4 mt-4">{title}</h1> : null}
-        <Nav className={'flex-column ' + styles.main}>{children}</Nav>
+        {title ? <h1 className="ml-4 mt-4 text-sm font-medium text-muted uppercase tracking-wider">{title}</h1> : null}
+        <div className={'flex flex-col ' + styles.main}>{children}</div>
     </>
 );
 

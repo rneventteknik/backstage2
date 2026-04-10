@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Form } from '../ui/Form';
 import { User } from '../../models/interfaces';
 import { IUserObjectionModel } from '../../models/objection-models/UserObjectionModel';
 import { MemberStatus } from '../../models/enums/MemberStatus';
@@ -49,8 +49,8 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
 
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
-            <Row>
-                <Col lg="6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div className="lg:col-span-6">
                     <Form.Group controlId="formName">
                         <Form.Label>
                             Namn
@@ -65,8 +65,8 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                         />
                         <Form.Text className="text-muted">Användarens fullständiga namn.</Form.Text>
                     </Form.Group>
-                </Col>
-                <Col lg="3">
+                </div>
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formNameTag">
                         <Form.Label>
                             Tagg
@@ -80,8 +80,8 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                             defaultValue={user?.nameTag}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="3">
+                </div>
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formMemberStatus">
                         <Form.Label>
                             Medlemsstatus
@@ -102,13 +102,13 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                             Notera att medlemsstatusen inte påverkar behörigheterna i Backstage2.
                         </Form.Text>
                     </Form.Group>
-                </Col>
-            </Row>
+                </div>
+            </div>
 
             <h2 className="h5 mt-4">Kontaktuppgifter</h2>
             <hr />
-            <Row>
-                <Col lg="3">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formEmailAddress">
                         <Form.Label>
                             Emailadress
@@ -122,8 +122,8 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                             defaultValue={user?.emailAddress}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="3">
+                </div>
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formPhoneNumber">
                         <Form.Label>Telefonnummer</Form.Label>
                         <Form.Control
@@ -133,19 +133,19 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                             defaultValue={user?.phoneNumber}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="3">
+                </div>
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formSlackId">
                         <Form.Label>Slack ID</Form.Label>
                         <Form.Control type="text" placeholder="Slack ID" name="slackId" defaultValue={user?.slackId} />
                     </Form.Group>
-                </Col>
-            </Row>
+                </div>
+            </div>
 
             <h2 className="h5 mt-4">Bankuppgifter</h2>
             <hr />
-            <Row>
-                <Col lg="3">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formPersonalIdentityNumber">
                         <Form.Label>Personnummer</Form.Label>
                         <Form.Control
@@ -154,26 +154,26 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                             defaultValue={user?.personalIdentityNumber}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="3">
+                </div>
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formBankAccount">
                         <Form.Label>Bankkonto</Form.Label>
                         <Form.Control type="text" name="bankAccount" defaultValue={user?.bankAccount} />
                     </Form.Group>
-                </Col>
-                <Col lg="3">
+                </div>
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formClearingNumber">
                         <Form.Label>Clearingnummer</Form.Label>
                         <Form.Control type="text" name="clearingNumber" defaultValue={user?.clearingNumber} />
                     </Form.Group>
-                </Col>
-                <Col lg="3">
+                </div>
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formBankName">
                         <Form.Label>Banknamn</Form.Label>
                         <Form.Control type="text" name="bankName" defaultValue={user?.bankName} />
                     </Form.Group>
-                </Col>
-                <Col lg="12">
+                </div>
+                <div className="lg:col-span-12">
                     <Form.Group controlId="formHomeAddress">
                         <Form.Label>Adress</Form.Label>
                         <Form.Control
@@ -184,8 +184,8 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                             rows={2}
                         />
                     </Form.Group>
-                </Col>
-            </Row>
+                </div>
+            </div>
         </Form>
     );
 };

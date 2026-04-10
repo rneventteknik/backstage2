@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Form } from '../ui/Form';
+import { Modal } from '../ui/Modal';
 import { Customer } from '../../models/interfaces/Customer';
 import CustomerSearch from '../CustomerSearch';
 

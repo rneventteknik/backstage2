@@ -2,7 +2,8 @@ import React from 'react';
 import { BookingViewModel } from '../../models/interfaces';
 import { getLanguageName, getPaymentStatusName, getStatusColor, getStatusName } from '../../lib/utils';
 import { Language } from '../../models/enums/Language';
-import { Card, Badge } from 'react-bootstrap';
+import { Card } from '../ui/Card';
+import { Badge } from '../ui/Badge';
 import { getNumberOfBookingDays, getNumberOfEventHours } from '../../lib/datetimeUtils';
 import BookingStatusTag from '../utils/BookingStatusTag';
 import BookingTypeTag from '../utils/BookingTypeTag';
@@ -27,18 +28,18 @@ const BookingInfoSection: React.FC<Props> = ({ booking, className, showName = tr
             <Card.Header>
                 {showName ? <div style={{ fontSize: '1.6em' }}>{booking.name}</div> : null}
                 <BookingStatusTag booking={booking} />
-                <BookingTypeTag booking={booking} className="ms-1" />
-                <RentalStatusTag booking={booking} className="ms-1" />
-                <Badge bg="dark" className="ms-1">
+                <BookingTypeTag booking={booking} className="ml-1" />
+                <RentalStatusTag booking={booking} className="ml-1" />
+                <Badge bg="dark" className="ml-1">
                     {getPaymentStatusName(booking.paymentStatus)}
                 </Badge>
-                <InternalReservationTag booking={booking} className="ms-1" />
+                <InternalReservationTag booking={booking} className="ml-1" />
                 {booking.language !== Language.SV ? (
-                    <Badge bg="dark" className="ms-1">
+                    <Badge bg="dark" className="ml-1">
                         {getLanguageName(booking.language)}
                     </Badge>
                 ) : null}
-                <FixedPriceStatusTag booking={booking} className="ms-1" />
+                <FixedPriceStatusTag booking={booking} className="ml-1" />
                 <div className="text-muted mt-2"> {booking.customerName}</div>
                 <div className="text-muted">
                     {getNumberOfBookingDays(booking) ? `${getNumberOfBookingDays(booking)} debiterade dagar / ` : null}

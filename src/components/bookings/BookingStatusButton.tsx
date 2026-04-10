@@ -2,7 +2,11 @@ import React, { useState } from 'react';
 import { Booking } from '../../models/interfaces';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import { Status } from '../../models/enums/Status';
-import { Alert, Button, ButtonGroup, Dropdown, Modal, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Alert } from '../ui/Alert';
+import { Button, ButtonGroup } from '../ui/Button';
+import { Dropdown } from '../ui/Dropdown';
+import { Modal } from '../ui/Modal';
+import { OverlayTrigger, Tooltip } from '../ui/Tooltip';
 import BookingForm from './BookingForm';
 import { BookingType } from '../../models/enums/BookingType';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -34,7 +38,7 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
                             allEquipmentListsHaveDates ? (
                                 <span />
                             ) : (
-                                <Tooltip id="1">
+                                <Tooltip>
                                     <strong>
                                         För att markera en bokning som bokad måste alla utrustningslistor ha datum
                                         konfigurerade.
@@ -43,15 +47,15 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
                             )
                         }
                     >
-                        <Dropdown as={ButtonGroup} className={className}>
+                        <ButtonGroup className={className}>
                             <Button
                                 variant="secondary"
                                 onClick={() => setShowStatusChangeModal(true)}
                                 disabled={!allEquipmentListsHaveDates}
                             >
-                                <FontAwesomeIcon icon={faCircleCheckRegular} className="me-1" /> Sätt till bokad
+                                <FontAwesomeIcon icon={faCircleCheckRegular} className="mr-1" /> Sätt till bokad
                             </Button>
-                        </Dropdown>
+                        </ButtonGroup>
                     </OverlayTrigger>
                     <BookingStatusModal
                         show={showStatusChangeModal}
@@ -65,16 +69,16 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
         case Status.BOOKED:
             return (
                 <>
-                    <Dropdown as={ButtonGroup} className={className}>
-                        <Button variant="secondary" onClick={() => setShowStatusChangeModal(true)}>
-                            <FontAwesomeIcon icon={faCircleCheckSolid} className="me-1" /> Klarmarkera
-                        </Button>
-
-                        <Dropdown.Toggle split variant="secondary" id="booking-status-dropdown" />
-
+                    <Dropdown className={className}>
+                        <div className="flex">
+                            <Button variant="secondary" onClick={() => setShowStatusChangeModal(true)} className="rounded-r-none">
+                                <FontAwesomeIcon icon={faCircleCheckSolid} className="mr-1" /> Klarmarkera
+                            </Button>
+                            <Dropdown.Toggle variant="secondary" id="booking-status-dropdown" className="rounded-l-none border-l border-bs-4 px-2" />
+                        </div>
                         <Dropdown.Menu>
                             <Dropdown.Item onClick={() => changeStatusTo(Status.DRAFT)}>
-                                <FontAwesomeIcon icon={faDotCircle} className="me-1" /> Gör till utkast
+                                <FontAwesomeIcon icon={faDotCircle} className="mr-1" /> Gör till utkast
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
@@ -89,11 +93,11 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
 
         case Status.CANCELED:
             return (
-                <Dropdown as={ButtonGroup} className={className}>
+                <ButtonGroup className={className}>
                     <Button variant="secondary" onClick={() => changeStatusTo(Status.DRAFT)}>
-                        <FontAwesomeIcon icon={faDotCircle} className="me-1" /> Gör till utkast
+                        <FontAwesomeIcon icon={faDotCircle} className="mr-1" /> Gör till utkast
                     </Button>
-                </Dropdown>
+                </ButtonGroup>
             );
         default:
             return null;

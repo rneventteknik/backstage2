@@ -15,8 +15,8 @@ import {
     getPricePlanName,
     getAccountKindName,
 } from '../lib/utils';
-import { Typeahead } from 'react-bootstrap-typeahead';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Typeahead } from './ui/Typeahead';
+import { Form } from './ui/Form';
 import { Status } from '../models/enums/Status';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
@@ -221,8 +221,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         accountKind,
                     )}
                 >
-                    <Row className="mb-2 gy-3">
-                        <Col md="4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-2">
+                        <div>
                             <Form.Group>
                                 <Form.Label>Status</Form.Label>
                                 <Typeahead
@@ -237,8 +237,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                         .filter(notEmpty)}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col md="4">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Ansvarig</Form.Label>
                                 <Typeahead
@@ -253,8 +253,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                         .filter(notEmpty)}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col md="4" lg="2">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Börjar efter</Form.Label>
                                 <Form.Control
@@ -263,8 +263,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     value={formatDateForForm(startDate)}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col md="4" lg="2">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Slutar före</Form.Label>
                                 <Form.Control
@@ -273,8 +273,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     value={formatDateForForm(endDate)}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col md="4" lg="3">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Kund</Form.Label>
                                 <input
@@ -285,8 +285,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     onChange={(e) => setCustomerName(e.target.value)}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col md="4" lg="3">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Plats</Form.Label>
                                 <input
@@ -297,8 +297,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     onChange={(e) => setLocation(e.target.value)}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col md="4" lg="2">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Typ av bokning</Form.Label>
                                 <Form.Control
@@ -311,8 +311,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     <option value={BookingType.RENTAL}>{getBookingTypeName(BookingType.RENTAL)}</option>
                                 </Form.Control>
                             </Form.Group>
-                        </Col>
-                        <Col md="4" lg="2">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Prisplan</Form.Label>
                                 <Form.Control
@@ -325,8 +325,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
                                 </Form.Control>
                             </Form.Group>
-                        </Col>
-                        <Col md="4" lg="2">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Kontotyp</Form.Label>
                                 <Form.Control
@@ -343,8 +343,8 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     </option>
                                 </Form.Control>
                             </Form.Group>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </AdvancedFilters>
             ) : null}
             <TableDisplay

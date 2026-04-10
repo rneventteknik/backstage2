@@ -1,7 +1,7 @@
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from '../ui/Button';
 import Breadcrumbs from './Breadcrumbs';
 import Layout from './Layout';
 import styles from './ErrorPage.module.scss';
@@ -29,14 +29,14 @@ type ErrorPageContentProps = {
 };
 
 export const ErrorPageContent: React.FC<ErrorPageContentProps> = ({ errorMessage }: ErrorPageContentProps) => (
-    <div className={styles.container + ' d-flex'}>
+    <div className={styles.container + ' flex'}>
         <div>
-            <FontAwesomeIcon icon={faExclamationCircle} className={styles.icon + ' me-4 text-muted'} />
+            <FontAwesomeIcon icon={faExclamationCircle} className={styles.icon + ' mr-4 text-muted'} />
         </div>
-        <div className="flex-grow-1">
+        <div className="flex-grow">
             <h1 className={styles.title}>Ojdå!</h1>
             <p>Det gick inte att ladda innehållet just nu.</p>
-            <p className="text-monospace text-muted">{errorMessage}</p>
+            <p className="font-mono text-muted">{errorMessage}</p>
             <Link href="/" passHref legacyBehavior>
                 <Button variant="secondary" href="/">
                     Gå tillbaka till startsidan

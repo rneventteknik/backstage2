@@ -3,7 +3,9 @@ import { Booking } from '../../models/interfaces';
 import { IInvoiceGroupObjectionModel } from '../../models/objection-models/InvoiceGroupObjectionModel';
 import useSwr from 'swr';
 import { bookingsFetcher } from '../../lib/fetchers';
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Form } from '../ui/Form';
+import { Modal } from '../ui/Modal';
 import Skeleton from 'react-loading-skeleton';
 import { Status } from '../../models/enums/Status';
 import { faEye, faEyeSlash, faLock, faLockOpen } from '@fortawesome/free-solid-svg-icons';
@@ -101,7 +103,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
                     />
                 </Form.Group>
                 <Button onClick={toggleAllowAllBookings} variant="secondary" className="me-2 mb-3">
-                    <FontAwesomeIcon className="fa-fw me-1" icon={allowAllBookings ? faLock : faLockOpen} />
+                    <FontAwesomeIcon className="mr-1" icon={allowAllBookings ? faLock : faLockOpen} />
                     {allowAllBookings ? 'Lås irrelevanta' : 'Lås upp irrelevanta'} bokningar
                 </Button>
                 <Button
@@ -110,7 +112,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
                     className="me-2 mb-3"
                     disabled={allowAllBookings}
                 >
-                    <FontAwesomeIcon className="fa-fw me-1" icon={hideLockedBookings ? faEye : faEyeSlash} />
+                    <FontAwesomeIcon className="mr-1" icon={hideLockedBookings ? faEye : faEyeSlash} />
                     {hideLockedBookings ? 'Visa låsta' : 'Dölj låsta'} bokningar
                 </Button>
                 <Button

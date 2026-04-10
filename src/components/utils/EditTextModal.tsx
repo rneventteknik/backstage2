@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Button, Form, InputGroup, Modal } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Form } from '../ui/Form';
+import { InputGroup } from '../ui/InputGroup';
+import { Modal } from '../ui/Modal';
 
 type Props = {
     text: string | undefined;

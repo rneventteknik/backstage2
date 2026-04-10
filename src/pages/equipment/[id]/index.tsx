@@ -2,10 +2,12 @@ import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Badge, Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
+import { Badge } from '../../../components/ui/Badge';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { ListGroup } from '../../../components/ui/ListGroup';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
-import Link from 'next/link';
 import { IfNotReadonly } from '../../../components/utils/IfAdmin';
 import Header from '../../../components/layout/Header';
 import { TwoColLoadingPage } from '../../../components/layout/LoadingPageSkeleton';
@@ -91,16 +93,14 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
-                    <Link href={'/equipment/' + equipment.id + '/edit'} passHref legacyBehavior>
-                        <Button variant="primary" href={'/equipment/' + equipment.id + '/edit'}>
-                            <FontAwesomeIcon icon={faPen} className="me-1" /> Redigera
+                    <Button variant="primary" href={'/equipment/' + equipment.id + '/edit'}>
+                            <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                         </Button>
-                    </Link>
                 </IfNotReadonly>
             </Header>
 
-            <Row className="mb-3">
-                <Col xl={4}>
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-3">
+                <div className="xl:col-span-4">
                     {process.env.NEXT_PUBLIC_EQUIPMENT_IMAGE_BASEURL ? (
                         <ImageCardHideOnError
                             src={process.env.NEXT_PUBLIC_EQUIPMENT_IMAGE_BASEURL + equipment.id}
@@ -113,37 +113,37 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                             <div style={{ fontSize: '1.6em' }}>
                                 {equipment.name}
                                 {equipment.isArchived ? (
-                                    <Badge bg="warning" className="ms-2">
+                                    <Badge variant="warning" className="ml-2">
                                         Arkiverad
                                     </Badge>
                                 ) : null}
                             </div>
                             <div>
                                 {equipment.tags.map((x) => (
-                                    <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />
+                                    <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
                                 ))}
                             </div>
                             <div className="text-muted mt-2">{equipment.description}</div>
                         </Card.Header>
                         <ListGroup variant="flush">
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Namn</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Namn</span>
                                 <span>{equipment.name}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Engelskt namn</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Engelskt namn</span>
                                 <span>{equipment.nameEN}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Antal</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Antal</span>
                                 <span>{equipment.inventoryCount ?? '-'}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Plats</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Plats</span>
                                 <span>{equipment.equipmentLocation?.name ?? 'Okänd plats'}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Synlig i publika prislistan</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Synlig i publika prislistan</span>
                                 <span>{equipment.publiclyHidden ? 'Nej' : 'Ja'}</span>
                             </ListGroup.Item>
                             <ListGroup.Item>
@@ -162,20 +162,20 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         <ListGroup variant="flush">
                             {equipment.prices.sort(idSortFn).map((p) => (
                                 <ListGroup.Item key={p.id}>
-                                    <span className="d-block">{p.name}</span>
-                                    <span className="d-flex text-muted">
-                                        <span className="flex-grow-1">{getPricePlanName(PricePlan.EXTERNAL)}</span>
+                                    <span className="block">{p.name}</span>
+                                    <span className="flex text-muted">
+                                        <span className="flex-grow">{getPricePlanName(PricePlan.EXTERNAL)}</span>
                                         <span>{formatPrice(addVATToPriceWithTHS(p))}</span>
                                     </span>
-                                    <span className="d-flex text-muted">
-                                        <span className="flex-grow-1">{getPricePlanName(PricePlan.THS)}</span>
+                                    <span className="flex text-muted">
+                                        <span className="flex-grow">{getPricePlanName(PricePlan.THS)}</span>
                                         <span>{formatTHSPrice(addVATToPriceWithTHS(p))}</span>
                                     </span>
                                 </ListGroup.Item>
                             ))}
 
                             {equipment.prices?.length === 0 ? (
-                                <ListGroup.Item className="text-center font-italic text-muted">
+                                <ListGroup.Item className="text-center italic text-muted">
                                     Inga priser är konfigurerade
                                 </ListGroup.Item>
                             ) : null}
@@ -183,8 +183,8 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     </Card>
 
                     <ChangelogCard changelog={equipment.changelog ?? []} />
-                </Col>
-                <Col xl={8}>
+                </div>
+                <div className="xl:col-span-8">
                     <MarkdownCard
                         text={equipment.note}
                         onSubmit={(x) => handleSubmit({ name: equipment.name, note: x })}
@@ -193,8 +193,8 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     />
                     <EquipmentCalendar equipment={equipment} />
                     <EquipmentBookings equipment={equipment} />
-                </Col>
-            </Row>
+                </div>
+            </div>
         </Layout>
     );
 };

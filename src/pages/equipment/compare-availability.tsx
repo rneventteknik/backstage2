@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../../components/layout/Layout';
-import { Card, Form } from 'react-bootstrap';
+import { Card } from '../../components/ui/Card';
+import { Form } from '../../components/ui/Form';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import Header from '../../components/layout/Header';
@@ -130,8 +131,8 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
             />
 
             <Card className="mb-3">
-                <Card.Header className="d-flex">
-                    <div className="flex-grow-1">
+                <Card.Header className="flex">
+                    <div className="flex-grow">
                         <EquipmentSearch
                             id={'equipment-search'}
                             includeTags={true}
@@ -140,7 +141,7 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
                             onSelect={(e) => addFromSearch(e)}
                         />
                     </div>
-                    <div className="ms-3">
+                    <div className="ml-3">
                         <Form.Control
                             type="date"
                             defaultValue={formatDateForForm(defaultDate)}

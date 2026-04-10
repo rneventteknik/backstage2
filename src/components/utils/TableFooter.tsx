@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
+import { Form } from '../ui/Form';
 
 type Props = {
     viewCount: number;
@@ -15,43 +15,34 @@ const TableFooterWithViewCount: React.FC<Props> = ({
     entityTypeDisplayName,
 }: Props) => (
     <>
-        <hr />
-        <div className="d-flex">
-            <div>
-                <p className="text-muted">
+        <hr className="border-bs-2 my-0" />
+        <div className="flex items-center px-4 py-3">
+            <div className="flex-grow">
+                <p className="text-muted text-sm">
                     Visar {Math.min(viewCount, totalCount)} {entityTypeDisplayName} av {totalCount}.
                 </p>
             </div>
-            <div className="flex-grow-1 ms-2">
-                <Form>
-                    <Form.Group controlId="viewcount">
-                        <div className="d-flex justify-content-end">
-                            <div>
-                                <Form.Label className="text-end">Antal {entityTypeDisplayName} att visa</Form.Label>
-                            </div>
-                            <div>
-                                <Form.Control
-                                    as="select"
-                                    name="viewcount"
-                                    className="ms-2"
-                                    size="sm"
-                                    defaultValue={viewCount}
-                                    onChange={(e) => setViewCount(Number(e.target.value))}
-                                >
-                                    <option value="25">25</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                    <option value="200">200</option>
-                                    <option value="500">500</option>
-                                    <option value="1000">1000</option>
-                                    <option value={totalCount}>
-                                        Alla {totalCount} {entityTypeDisplayName}
-                                    </option>
-                                </Form.Control>
-                            </div>
-                        </div>
-                    </Form.Group>
-                </Form>
+            <div className="flex items-center gap-2">
+                <label className="text-sm text-muted" htmlFor="viewcount">
+                    Antal {entityTypeDisplayName} att visa
+                </label>
+                <Form.Control
+                    as="select"
+                    id="viewcount"
+                    name="viewcount"
+                    size="sm"
+                    defaultValue={viewCount}
+                    onChange={(e) => setViewCount(Number((e.target as HTMLInputElement).value))}
+                    className="w-24"
+                >
+                    <option value="25">25</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                    <option value={totalCount}>Alla {totalCount} {entityTypeDisplayName}</option>
+                </Form.Control>
             </div>
         </div>
     </>

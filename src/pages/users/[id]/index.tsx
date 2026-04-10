@@ -2,11 +2,12 @@ import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, Card, Col, ListGroup, Row } from 'react-bootstrap';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { ListGroup } from '../../../components/ui/ListGroup';
 import { getMemberStatusName, getRoleName } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
-import Link from 'next/link';
 import UserDisplay from '../../../components/utils/UserDisplay';
 import { IfAdmin } from '../../../components/utils/IfAdmin';
 import Header from '../../../components/layout/Header';
@@ -57,44 +58,40 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfAdmin or={currentUser.userId === user.id} currentUser={currentUser}>
-                    <Link href={'/users/' + user.id + '/edit'} passHref legacyBehavior>
-                        <Button variant="primary" href={'/users/' + user.id + '/edit'}>
-                            <FontAwesomeIcon icon={faPen} className="me-1" /> Redigera
-                        </Button>
-                    </Link>
-                </IfAdmin>
-                <Link href={'/users/' + user.id + '/time-reports'} passHref>
-                    <Button variant="secondary" href={'/users/' + user.id + '/time-reports'}>
-                        <FontAwesomeIcon icon={faStopwatch} className="me-1" /> Visa tidrapporter
+                    <Button variant="primary" href={'/users/' + user.id + '/edit'}>
+                        <FontAwesomeIcon icon={faPen} className="mr-1" /> Redigera
                     </Button>
-                </Link>
+                </IfAdmin>
+                <Button variant="secondary" href={'/users/' + user.id + '/time-reports'}>
+                    <FontAwesomeIcon icon={faStopwatch} className="mr-1" /> Visa tidrapporter
+                </Button>
             </Header>
 
-            <Row className="mb-3">
-                <Col xl={4}>
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-3">
+                <div className="xl:col-span-4">
                     <Card className="mb-3">
                         <Card.Header style={{ fontSize: '1.6em' }}>
                             <UserDisplay user={user} />
                         </Card.Header>
                         <ListGroup variant="flush">
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Namn</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Namn</span>
                                 <span>{user.name}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Medlemsstatus</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Medlemsstatus</span>
                                 <span>{getMemberStatusName(user.memberStatus)}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Tagg</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Tagg</span>
                                 <span>{user.nameTag}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Email</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Email</span>
                                 <span>{user.emailAddress}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Telefonnummer</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Telefonnummer</span>
                                 <span>{user.phoneNumber}</span>
                             </ListGroup.Item>
                         </ListGroup>
@@ -107,17 +104,17 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                             </Card.Header>
                             {user.username ? (
                                 <ListGroup variant="flush">
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Behörighet</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Behörighet</span>
                                         <span>{getRoleName(user.role)}</span>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Användarnamn</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Användarnamn</span>
                                         <span>{user.username}</span>
                                     </ListGroup.Item>
                                 </ListGroup>
                             ) : (
-                                <ListGroup.Item className="text-center font-italic text-muted">
+                                <ListGroup.Item className="text-center italic text-muted">
                                     Inloggningsuppgifter är inte konfigurerade
                                 </ListGroup.Item>
                             )}
@@ -134,20 +131,20 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                             user.bankName ||
                             user.homeAddress ? (
                                 <ListGroup variant="flush">
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Personnummer</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Personnummer</span>
                                         <span>{user.personalIdentityNumber}</span>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Bankkonto</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Bankkonto</span>
                                         <span>{user.bankAccount}</span>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Clearingnummer</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Clearingnummer</span>
                                         <span>{user.clearingNumber}</span>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Banknamn</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Banknamn</span>
                                         <span>{user.bankName}</span>
                                     </ListGroup.Item>
                                     <ListGroup.Item>
@@ -160,15 +157,15 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                     </ListGroup.Item>
                                 </ListGroup>
                             ) : (
-                                <ListGroup.Item className="text-center font-italic text-muted">
+                                <ListGroup.Item className="text-center italic text-muted">
                                     Bankuppgifter är inte konfigurerade
                                 </ListGroup.Item>
                             )}
                         </Card>
                     </IfAdmin>
-                </Col>
+                </div>
 
-                <Col xl={8}>
+                <div className="xl:col-span-8">
                     <TinyBookingTable
                         title="Bokningar"
                         bookings={bookings}
@@ -179,8 +176,8 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         bookings={coOwnerBookings}
                         tableSettingsOverride={{ defaultSortAscending: false }}
                     ></TinyBookingTable>
-                </Col>
-            </Row>
+                </div>
+            </div>
         </Layout>
     );
 };

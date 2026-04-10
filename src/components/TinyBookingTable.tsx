@@ -3,7 +3,7 @@ import { Booking, BookingViewModel } from '../models/interfaces';
 import BookingTypeTag from './utils/BookingTypeTag';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
 import { getStatusColor, getStatusName } from '../lib/utils';
-import { Card } from 'react-bootstrap';
+import { Card } from './ui/Card';
 import TableStyleLink from './utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import RentalStatusTag from './utils/RentalStatusTag';
@@ -27,11 +27,11 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
         <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
 
-        <BookingStatusTag booking={booking} className="ms-1" />
-        <BookingTypeTag booking={booking} className="ms-1" />
-        <RentalStatusTag booking={booking} className="ms-1" />
-        <InternalReservationTag booking={booking} className="ms-1" />
-        <FixedPriceStatusTag booking={booking} className="ms-1" />
+        <BookingStatusTag booking={booking} className="ml-1" />
+        <BookingTypeTag booking={booking} className="ml-1" />
+        <RentalStatusTag booking={booking} className="ml-1" />
+        <InternalReservationTag booking={booking} className="ml-1" />
+        <FixedPriceStatusTag booking={booking} className="ml-1" />
         <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
     </>
 );
@@ -99,7 +99,7 @@ const TinyBookingTable: React.FC<Props> = ({
         ) : (
             <Card className="mb-3">
                 <Card.Header>
-                    <div className="d-flex justify-content-between">
+                    <div className="flex justify-between">
                         {title}
                         {children}
                     </div>

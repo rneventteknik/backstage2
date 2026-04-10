@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+/* =============================================================================
+   Backstage dark theme — translated from src/style/variables.scss
+   ============================================================================= */
+
+@theme {
+    /* Color scale (base #121212 + 3% lightness steps) */
+    --color-bs-0: #121212;
+    --color-bs-1: #1a1a1a;
+    --color-bs-2: #212121;
+    --color-bs-3: #292929;
+    --color-bs-4: #313131;
+    --color-bs-5: #383838;
+    --color-bs-6: #404040;
+    --color-bs-7: #484848;
+    --color-bs-8: #4f4f4f;
+    --color-bs-9: #575757;
+    --color-bs-10: #5f5f5f;
+
+    /* Semantic colors */
+    --color-primary: #1565c0;
+    --color-primary-hover: #1976d2;
+    --color-body: #ededed;
+    --color-muted: #6c757d;
+
+    /* Status colors */
+    --color-danger: #dc3545;
+    --color-danger-hover: #bb2d3b;
+    --color-success: #198754;
+    --color-warning: #ffc107;
+    --color-warning-text: #000;
+    --color-info: #0dcaf0;
+
+    /* Border radius — intentionally 0 (flat/square design) */
+    --radius-none: 0px;
+    --radius: 0px;
+    --radius-sm: 0px;
+    --radius-md: 0px;
+    --radius-lg: 0px;
+    --radius-xl: 0px;
+    --radius-2xl: 0px;
+    --radius-full: 0px;
+
+    /* Font size */
+    --text-base: 0.8rem;
+    --text-sm: 0.75rem;
+    --text-lg: 0.9rem;
+}
+
+/* =============================================================================
+   Global base styles
+   ============================================================================= */
+
+@layer base {
+    html, body {
+        background-color: #121212;
+        color: #ededed;
+        font-size: 0.8rem;
+    }
+
+    a {
+        color: #1976d2;
+        text-decoration: none;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: #ededed;
+    }
+
+    hr {
+        border-color: #484848;
+    }
+
+    /* Table header */
+    thead th {
+        font-weight: normal;
+        background-color: #212121;
+        color: #ededed;
+    }
+}

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { Alert, Button, Col, Dropdown, DropdownButton, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import { Alert } from '../../ui/Alert';
+import { Button } from '../../ui/Button';
+import { Dropdown, DropdownButton } from '../../ui/Dropdown';
+import { OverlayTrigger, Tooltip } from '../../ui/Tooltip';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faAngleDown,
@@ -41,7 +44,6 @@ import BookingReturnalNoteModal from '../BookingReturnalNoteModal';
 import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EditEquipmentListDatesModal from './EditEquipmentListDatesModal';
 import EditTextModal from '../../utils/EditTextModal';
-import Link from 'next/link';
 
 type Props = {
     list: EquipmentList;
@@ -137,8 +139,8 @@ const EquipmentListHeader: React.FC<Props> = ({
     //
     return (
         <>
-            <div className="d-flex">
-                <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
+            <div className="flex">
+                <div className="flex-grow mr-4" style={{ fontSize: '1.6em' }}>
                     <ClickToEdit
                         value={list.name}
                         onUpdate={(newValue: string) =>
@@ -152,8 +154,8 @@ const EquipmentListHeader: React.FC<Props> = ({
                         {list.name}
                     </ClickToEdit>
                 </div>
-                <div className="d-flex">
-                    <Button className="me-2" variant="" onClick={() => toggleListContent()}>
+                <div className="flex">
+                    <Button className="mr-2" variant="secondary" onClick={() => toggleListContent()}>
                         <FontAwesomeIcon icon={showListContent ? faAngleUp : faAngleDown} />
                     </Button>
                     {readonly ? null : (
@@ -163,9 +165,9 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     <Button
                                         variant="secondary"
                                         onClick={() => setShowConfirmOutModal(true)}
-                                        className="me-2"
+                                        className="mr-2"
                                     >
-                                        <FontAwesomeIcon icon={faRightFromBracket} className="me-1" /> Lämna ut
+                                        <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
                                     </Button>
                                     <ConfirmModal
                                         show={showConfirmOutModal}
@@ -196,9 +198,9 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     <Button
                                         variant="secondary"
                                         onClick={() => setShowReturnalNoteModal(true)}
-                                        className="me-2"
+                                        className="mr-2"
                                     >
-                                        <FontAwesomeIcon icon={faRightToBracket} className="me-1" /> Ta emot
+                                        <FontAwesomeIcon icon={faRightToBracket} className="mr-1" /> Ta emot
                                     </Button>
                                     <BookingReturnalNoteModal
                                         returnalNote={returnalNote}
@@ -214,10 +216,10 @@ const EquipmentListHeader: React.FC<Props> = ({
 
                             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
                                 <Dropdown.Item onClick={() => moveListUp()} disabled={disableMoveUp}>
-                                    <FontAwesomeIcon icon={faAngleUp} className="me-1 fa-fw" /> Flytta upp
+                                    <FontAwesomeIcon icon={faAngleUp} className="mr-1" /> Flytta upp
                                 </Dropdown.Item>
                                 <Dropdown.Item onClick={() => moveListDown()} disabled={disableMoveDown}>
-                                    <FontAwesomeIcon icon={faAngleDown} className="me-1 fa-fw" /> Flytta ner
+                                    <FontAwesomeIcon icon={faAngleDown} className="mr-1" /> Flytta ner
                                 </Dropdown.Item>
 
                                 <Dropdown.Divider />
@@ -230,7 +232,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                                         })
                                     }
                                 >
-                                    <FontAwesomeIcon icon={faPlus} className="me-1 fa-fw" />
+                                    <FontAwesomeIcon icon={faPlus} className="mr-1" />
                                     Lägg till egen rad
                                 </Dropdown.Item>
 
@@ -239,16 +241,16 @@ const EquipmentListHeader: React.FC<Props> = ({
                                         addHeadingEntry('Ny rubrikrad', list, pricePlan, language, addListHeading)
                                     }
                                 >
-                                    <FontAwesomeIcon icon={faPlus} className="me-1 fa-fw" />
+                                    <FontAwesomeIcon icon={faPlus} className="mr-1" />
                                     Lägg till rubrikrad
                                 </Dropdown.Item>
 
                                 <Dropdown.Item onClick={() => setShowImportModal(true)}>
-                                    <FontAwesomeIcon icon={faClone} className="me-1 fa-fw" />
+                                    <FontAwesomeIcon icon={faClone} className="mr-1" />
                                     Hämta utrustning från bokning
                                 </Dropdown.Item>
                                 <Dropdown.Item onClick={() => setShowEditDiscountPercentageModal(true)}>
-                                    <FontAwesomeIcon icon={faPercent} className="me-1 fa-fw" /> Redigera rabatt
+                                    <FontAwesomeIcon icon={faPercent} className="mr-1" /> Redigera rabatt
                                 </Dropdown.Item>
                                 {showEditDiscountPercentageModal ? (
                                     <EditTextModal
@@ -292,7 +294,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     bookingStatus === Status.DRAFT ? (
                                         <>
                                             <Dropdown.Item onClick={() => setShowResetDatesModal(true)}>
-                                                <FontAwesomeIcon icon={faBarsStaggered} className="me-1 fa-fw" />
+                                                <FontAwesomeIcon icon={faBarsStaggered} className="mr-1" />
                                                 Ange endast antal dagar
                                             </Dropdown.Item>
                                             <ConfirmModal
@@ -328,7 +330,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                                             })
                                         }
                                     >
-                                        <FontAwesomeIcon icon={faCalendarDays} className="me-1 fa-fw" />
+                                        <FontAwesomeIcon icon={faCalendarDays} className="mr-1" />
                                         Sätt datum
                                     </Dropdown.Item>
                                 )}
@@ -338,30 +340,28 @@ const EquipmentListHeader: React.FC<Props> = ({
                                         onClick={() => saveList({ ...list, rentalStatus: null })}
                                         disabled={list.rentalStatus == undefined}
                                     >
-                                        <FontAwesomeIcon icon={faBackward} className="me-1 fa-fw" />
+                                        <FontAwesomeIcon icon={faBackward} className="mr-1" />
                                         Återställ utlämningsstatus
                                     </Dropdown.Item>
                                 ) : null}
 
                                 <Dropdown.Divider />
 
-                                <Link href={'/bookings/' + bookingId + '/equipmentList/' + list.id} passHref>
-                                    <Dropdown.Item href={'/bookings/' + bookingId + '/equipmentList/' + list.id}>
-                                        <FontAwesomeIcon icon={faListCheck} className="me-1 fa-fw" /> Visa som packlista
+                                <Dropdown.Item href={'/bookings/' + bookingId + '/equipmentList/' + list.id}>
+                                        <FontAwesomeIcon icon={faListCheck} className="mr-1" /> Visa som packlista
                                     </Dropdown.Item>
-                                </Link>
 
                                 <Dropdown.Item
                                     href={'/api/documents/packing-list/sv/' + bookingId + '?list=' + list.id}
                                     target="_blank"
                                 >
-                                    <FontAwesomeIcon icon={faFileDownload} className="me-1 fa-fw" /> Ladda ner packlista
+                                    <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Ladda ner packlista
                                 </Dropdown.Item>
 
                                 <Dropdown.Divider />
 
                                 <Dropdown.Item onClick={() => setShowEmptyListModal(true)}>
-                                    <FontAwesomeIcon icon={faEraser} className="me-1 fa-fw" /> Töm utrustningslistan
+                                    <FontAwesomeIcon icon={faEraser} className="mr-1" /> Töm utrustningslistan
                                 </Dropdown.Item>
                                 <ConfirmModal
                                     show={showEmptyListModal}
@@ -379,7 +379,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                                 {!disableDelete ? (
                                     <>
                                         <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                                            <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort
+                                            <FontAwesomeIcon icon={faTrashCan} className="mr-1" /> Ta bort
                                             utrustningslistan
                                         </Dropdown.Item>
                                         <ConfirmModal
@@ -420,8 +420,8 @@ const EquipmentListHeader: React.FC<Props> = ({
             {showIntervalControls ? (
                 <>
                     <small>Antal dagar</small>
-                    <div className="d-flex">
-                        <div className="flex-grow-1">
+                    <div className="flex">
+                        <div className="flex-grow">
                             <div className="mb-3" style={{ fontSize: '1.2em' }}>
                                 <ClickToEdit
                                     value={list.numberOfDays?.toString()}
@@ -433,7 +433,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                                         })
                                     }
                                     readonly={readonly}
-                                    className="mb-3 d-block"
+                                    className="mb-3 block"
                                 >
                                     {list.numberOfDays} {list.numberOfDays != 1 ? 'dagar' : 'dag'}
                                 </ClickToEdit>
@@ -453,9 +453,9 @@ const EquipmentListHeader: React.FC<Props> = ({
                                             equipmentOutDatetime: null,
                                         })
                                     }
-                                    className="me-2"
+                                    className="mr-2"
                                 >
-                                    <FontAwesomeIcon icon={faCalendarDays} className="me-1 fa-fw" />
+                                    <FontAwesomeIcon icon={faCalendarDays} className="mr-1" />
                                     Sätt datum
                                 </Button>
                             </div>
@@ -476,11 +476,12 @@ const EquipmentListHeader: React.FC<Props> = ({
                             }}
                         />
                     ) : null}
-                    <Row
+                    <div
+                        className="grid grid-cols-2 md:grid-cols-4 cursor-pointer"
                         onClick={() => (readonly ? null : setShowEditDatesModal(true))}
                         role={readonly ? undefined : 'button'}
                     >
-                        <Col md={3} xs={6}>
+                        <div>
                             <small>Debiterad starttid</small>
                             <div
                                 className="mb-3"
@@ -489,8 +490,8 @@ const EquipmentListHeader: React.FC<Props> = ({
                             >
                                 {formatDatetime(list.usageStartDatetime)}
                             </div>
-                        </Col>
-                        <Col md={3} xs={6}>
+                        </div>
+                        <div>
                             <small>Debiterad sluttid</small>
                             <div
                                 className="mb-3"
@@ -499,22 +500,22 @@ const EquipmentListHeader: React.FC<Props> = ({
                             >
                                 {formatDatetime(list.usageEndDatetime)}
                             </div>
-                        </Col>
-                        <Col md={3} xs={6}>
+                        </div>
+                        <div>
                             <small>
                                 Utlämning
                                 {showEquipmentDateWarning(list) ? (
                                     <OverlayTrigger
                                         placement="right"
                                         overlay={
-                                            <Tooltip id="1">
+                                            <Tooltip>
                                                 <strong>
                                                     Denna utrustningslista saknar explicit datum för utlämning.
                                                 </strong>
                                             </Tooltip>
                                         }
                                     >
-                                        <FontAwesomeIcon icon={faWarning} className="ms-1" />
+                                        <FontAwesomeIcon icon={faWarning} className="ml-1" />
                                     </OverlayTrigger>
                                 ) : null}
                             </small>
@@ -525,22 +526,22 @@ const EquipmentListHeader: React.FC<Props> = ({
                             >
                                 {formatDatetime(getEquipmentOutDatetime(list))}
                             </div>
-                        </Col>
-                        <Col md={3} xs={6}>
+                        </div>
+                        <div>
                             <small>
                                 Återlämning
                                 {showEquipmentDateWarning(list) ? (
                                     <OverlayTrigger
                                         placement="right"
                                         overlay={
-                                            <Tooltip id="2">
+                                            <Tooltip>
                                                 <strong>
                                                     Denna utrustningslista saknar explicit datum för återlämning.
                                                 </strong>
                                             </Tooltip>
                                         }
                                     >
-                                        <FontAwesomeIcon icon={faWarning} className="ms-1" />
+                                        <FontAwesomeIcon icon={faWarning} className="ml-1" />
                                     </OverlayTrigger>
                                 ) : null}
                             </small>
@@ -551,8 +552,8 @@ const EquipmentListHeader: React.FC<Props> = ({
                             >
                                 {formatDatetime(getEquipmentInDatetime(list))}
                             </div>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </>
             ) : null}
         </>

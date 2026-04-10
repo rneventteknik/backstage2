@@ -1,5 +1,5 @@
 import React from 'react';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from '../ui/Tooltip';
 import { TimeReport } from '../../models/interfaces';
 import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -21,7 +21,7 @@ const TimeReportHourDisplay: React.FC<Props> = ({ timeReport }: Props) => {
                         </Tooltip>
                     }
                 >
-                    <FontAwesomeIcon className="ms-1" icon={faInfoCircle} />
+                    <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
                 </OverlayTrigger>
             ) : null}
         </>

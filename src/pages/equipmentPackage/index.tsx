@@ -2,7 +2,7 @@ import React from 'react';
 import Layout from '../../components/layout/Layout';
 import useSwr from 'swr';
 import Link from 'next/link';
-import { Button } from 'react-bootstrap';
+import { Button } from '../../components/ui/Button';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
@@ -47,8 +47,8 @@ const EquipmentPackageListPage: React.FC<Props> = ({ user: currentUser, globalSe
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/equipmentPackage/new" passHref>
-                        <Button variant="primary" as="span">
-                            <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till utrustningspaket
+                        <Button variant="primary">
+                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till utrustningspaket
                         </Button>
                     </Link>
                 </IfNotReadonly>

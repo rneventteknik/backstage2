@@ -1,5 +1,4 @@
 import React from 'react';
-import { Badge } from 'react-bootstrap';
 import { getBookingTypeName } from '../../lib/utils';
 import { BookingType } from '../../models/enums/BookingType';
 
@@ -9,9 +8,9 @@ type Props = {
 };
 
 const BookingTypeTag: React.FC<Props> = ({ booking, className }: Props) => (
-    <Badge bg="dark" className={className}>
+    <span className={`inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-bs-2 text-body ${className ?? ''}`}>
         {getBookingTypeName(booking.bookingType)}
-    </Badge>
+    </span>
 );
 
 export default BookingTypeTag;

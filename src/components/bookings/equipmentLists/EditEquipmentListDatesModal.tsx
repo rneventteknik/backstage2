@@ -1,5 +1,8 @@
 import React, { FormEvent, useEffect, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row } from 'react-bootstrap';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
+import { Form } from '../../ui/Form';
+import { Modal } from '../../ui/Modal';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 import RequiredIndicator from '../../utils/RequiredIndicator';
 import { formatDatetime, formatDatetimeForForm, getFormattedInterval } from '../../../lib/datetimeUtils';
@@ -145,13 +148,13 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                 {bookingsCalendarList && !bookingsCalendarListError ? (
                     <Card className="mb-3">
                         <Card.Body>
-                            <div className="d-flex">
-                                <strong className="flex-grow-1">
+                            <div className="flex">
+                                <strong className="flex-grow">
                                     Hämta debiterad start och sluttid från kalenderhändelse
                                 </strong>
                                 <Button
-                                    className="me-2"
-                                    variant=""
+                                    className="mr-2"
+                                    variant="secondary"
                                     size="sm"
                                     onClick={() => setUserHasClosedWizard((x) => !x)}
                                 >
@@ -162,7 +165,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                 <Form
                                     onSubmit={handleSubmitWizard}
                                     id={equipmentList.id + 'calendar-wizard'}
-                                    className="d-flex flex-row"
+                                    className="flex flex-row gap-2"
                                 >
                                     <div>
                                         <Form.Control
@@ -198,7 +201,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                             form={equipmentList.id + 'calendar-wizard'}
                                             type="submit"
                                             variant="secondary"
-                                            className="ms-2"
+                                            className="ml-2"
                                             disabled={!wizardSelectedCalendarEvent}
                                         >
                                             Hämta
@@ -210,8 +213,8 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                     </Card>
                 ) : null}
 
-                <Row>
-                    <Col lg={6}>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <div>
                         <Form.Group>
                             <Form.Label>
                                 Debiterad starttid
@@ -223,8 +226,8 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                 onChange={(e) => setUsageStart(e.target.value)}
                             />
                         </Form.Group>
-                    </Col>
-                    <Col lg={6}>
+                    </div>
+                    <div>
                         <Form.Group>
                             <Form.Label>
                                 Debiterad sluttid
@@ -236,26 +239,24 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                 onChange={(e) => setUsageEnd(e.target.value)}
                             />
                         </Form.Group>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col>
-                        <Form.Group controlId="showInOutFields">
-                            <Form.Check
-                                type="checkbox"
-                                label="Sätt andra utlämnings- och återlämningstider"
-                                checked={showInOutFields}
-                                onChange={() => setShowInOutFields(!showInOutFields)}
-                            />
-                        </Form.Group>
-                    </Col>
-                </Row>
+                    </div>
+                </div>
+                <div>
+                    <Form.Group controlId="showInOutFields">
+                        <Form.Check
+                            type="checkbox"
+                            label="Sätt andra utlämnings- och återlämningstider"
+                            checked={showInOutFields}
+                            onChange={() => setShowInOutFields(!showInOutFields)}
+                        />
+                    </Form.Group>
+                </div>
                 {showInOutFields ? (
                     <>
-                        <Row>
-                            <Col lg={6}>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
                                 {openHoursCalendarList && !openHoursCalendarListError ? (
-                                    <Form.Group controlId="openHours">
+                                    <Form.Group controlId="openHoursOut">
                                         <Form.Label>
                                             Utlämning <RequiredIndicator />
                                         </Form.Label>
@@ -308,10 +309,10 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                         onChange={(e) => setEquipmentOut(e.target.value)}
                                     />
                                 </Form.Group>
-                            </Col>
-                            <Col lg={6}>
+                            </div>
+                            <div>
                                 {openHoursCalendarList && !openHoursCalendarListError ? (
-                                    <Form.Group controlId="openHours">
+                                    <Form.Group controlId="openHoursIn">
                                         <Form.Label>
                                             Återlämning <RequiredIndicator />
                                         </Form.Label>
@@ -364,8 +365,8 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                         onChange={(e) => setEquipmentIn(e.target.value)}
                                     />
                                 </Form.Group>
-                            </Col>
-                        </Row>
+                            </div>
+                        </div>
                     </>
                 ) : null}
             </Modal.Body>

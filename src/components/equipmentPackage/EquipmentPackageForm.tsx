@@ -1,6 +1,8 @@
 import React, { FormEvent, useState, useEffect } from 'react';
-import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { Button } from '../ui/Button';
+import { Form } from '../ui/Form';
+import { InputGroup } from '../ui/InputGroup';
+import { Typeahead } from '../ui/Typeahead';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../models/objection-models';
 import { Equipment } from '../../models/interfaces';
 import type { EquipmentTag } from '../../models/interfaces';
@@ -279,8 +281,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
 
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
-            <Row>
-                <Col lg="6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
                     <Form.Group controlId="formName">
                         <Form.Label>Namn</Form.Label>
                         <Form.Control
@@ -291,8 +293,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                             defaultValue={equipmentPackage?.name}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="6">
+                </div>
+                <div>
                     <Form.Group controlId="formDescription">
                         <Form.Label>Beskrivning</Form.Label>
                         <Form.Control
@@ -302,13 +304,13 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                             defaultValue={equipmentPackage?.description}
                         />
                     </Form.Group>
-                </Col>
-            </Row>
+                </div>
+            </div>
 
             <h2 className="h5 mt-4">Översättningar</h2>
             <hr />
-            <Row>
-                <Col lg="6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
                     <Form.Group controlId="formNameEN">
                         <Form.Label>Namn (engelska)</Form.Label>
                         <Form.Control
@@ -318,8 +320,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                             defaultValue={equipmentPackage?.nameEN}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="6">
+                </div>
+                <div>
                     <Form.Group controlId="formDescriptionEN">
                         <Form.Label>Beskrivning (engelska)</Form.Label>
                         <Form.Control
@@ -329,48 +331,46 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                             defaultValue={equipmentPackage?.descriptionEN}
                         />
                     </Form.Group>
-                </Col>
-            </Row>
+                </div>
+            </div>
 
             {!equipmentPackage ? null : (
                 <>
-                    <Row>
-                        <Col>
-                            <Form.Group controlId="includedEquipment">
-                                <h2 className="h5 mt-4">Inkluderad utrustning</h2>
-                                <hr />
-                                <div className="mb-3 mt-3">
-                                    <TableDisplay
-                                        entities={selectedEquipmentPackageEntries}
-                                        configuration={equipmentTableSettings}
-                                    />
-                                </div>
-                                <div className="mb-3">
-                                    <EquipmentSearch
-                                        placeholder="Lägg till utrustning"
-                                        includePackages={false}
-                                        defaultResults={[]}
-                                        id="equipment-search"
-                                        onSelect={(x) =>
-                                            fetch('/api/equipment/' + x.id)
-                                                .then((apiResponse) =>
-                                                    getResponseContentOrError<IEquipmentObjectionModel>(apiResponse),
-                                                )
-                                                .then(toEquipment)
-                                                .then((equipment) => {
-                                                    addEquipment(equipment);
-                                                })
-                                        }
-                                    />
-                                </div>
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                    <div>
+                        <Form.Group controlId="includedEquipment">
+                            <h2 className="h5 mt-4">Inkluderad utrustning</h2>
+                            <hr />
+                            <div className="mb-3 mt-3">
+                                <TableDisplay
+                                    entities={selectedEquipmentPackageEntries}
+                                    configuration={equipmentTableSettings}
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <EquipmentSearch
+                                    placeholder="Lägg till utrustning"
+                                    includePackages={false}
+                                    defaultResults={[]}
+                                    id="equipment-search"
+                                    onSelect={(x) =>
+                                        fetch('/api/equipment/' + x.id)
+                                            .then((apiResponse) =>
+                                                getResponseContentOrError<IEquipmentObjectionModel>(apiResponse),
+                                            )
+                                            .then(toEquipment)
+                                            .then((equipment) => {
+                                                addEquipment(equipment);
+                                            })
+                                    }
+                                />
+                            </div>
+                        </Form.Group>
+                    </div>
 
                     <h2 className="h5 mt-4">Övriga inställningar</h2>
                     <hr />
-                    <Row>
-                        <Col lg="3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
                             <Form.Group controlId="formAddAsHeading">
                                 <Form.Label>Pakettyp</Form.Label>
                                 <Form.Control
@@ -382,8 +382,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                                     <option value={'true'}>Lägg till rader med paketet som rubrik</option>
                                 </Form.Control>
                             </Form.Group>
-                        </Col>
-                        <Col lg="3">
+                        </div>
+                        <div>
                             <Form.Group controlId="formInventoryCount">
                                 <Form.Label>Estimerade arbetstimmar</Form.Label>
                                 <FormNumberFieldWithoutScroll
@@ -394,8 +394,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                                     defaultValue={equipmentPackage?.estimatedHours ?? 0}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col md="6">
+                        </div>
+                        <div className="md:col-span-2">
                             <Form.Group>
                                 <Form.Label>Taggar</Form.Label>
                                 <Typeahead
@@ -408,8 +408,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                                     defaultSelected={equipmentPackage.tags ?? []}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col lg="12">
+                        </div>
+                        <div className="md:col-span-2 lg:col-span-4">
                             <Form.Group controlId="formNote">
                                 <Form.Label>Anteckningar</Form.Label>
                                 <Form.Control
@@ -420,8 +420,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                                     defaultValue={equipmentPackage?.note}
                                 />
                             </Form.Group>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </>
             )}
         </Form>

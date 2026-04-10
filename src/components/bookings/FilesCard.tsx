@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Button, Card, ListGroup } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { ListGroup } from '../ui/ListGroup';
 import { formatDatetimeForForm } from '../../lib/datetimeUtils';
 import useSwr from 'swr';
 import { FilesResult } from '../../models/misc/FilesResult';
@@ -72,8 +74,8 @@ const FilesCard: React.FC<Props> = ({
         return (
             <>
                 <Card className="mb-3">
-                    <Card.Header className="d-flex">
-                        <span className="flex-grow-1">Filer</span>
+                    <Card.Header className="flex">
+                        <span className="flex-grow">Filer</span>
                         {!readonly ? (
                             <Button
                                 variant="secondary"
@@ -93,9 +95,9 @@ const FilesCard: React.FC<Props> = ({
     return (
         <>
             <Card className="mb-3">
-                <Card.Header className="d-flex">
-                    <span className="flex-grow-1">Filer</span>
-                    <Button className="me-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+                <Card.Header className="flex">
+                    <span className="flex-grow">Filer</span>
+                    <Button className="mr-2" variant="secondary" size="sm" onClick={() => setShowContent((x) => !x)}>
                         <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                     </Button>
                     <Button variant="secondary" size="sm" href={link} target="_blank">
@@ -135,7 +137,7 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
                 <p className="text-danger">
                     <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda filerna.
                 </p>
-                <p className="text-monospace text-muted mb-0">{error.message}</p>
+                <p className="font-mono text-muted mb-0">{error.message}</p>
             </div>
         );
     }
@@ -154,7 +156,7 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
                 <ListGroup.Item key={file.id}>
                     <div className="mb-1">
                         <TableStyleLink href={file.link ?? ''} target="_blank" rel="noreferrer">
-                            <FontAwesomeIcon icon={getIcon(file.mimeType)} className="me-2" />
+                            <FontAwesomeIcon icon={getIcon(file.mimeType)} className="mr-2" />
                             {file.name}
                         </TableStyleLink>
                     </div>
@@ -162,7 +164,7 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
                 </ListGroup.Item>
             ))}
             {list.length === 0 ? (
-                <ListGroup.Item className="text-center font-italic text-muted">
+                <ListGroup.Item className="text-center italic text-muted">
                     Ladda upp filer till Google Drive så visas de här.
                 </ListGroup.Item>
             ) : null}

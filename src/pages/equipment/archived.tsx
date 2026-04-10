@@ -3,7 +3,7 @@ import Layout from '../../components/layout/Layout';
 import { Equipment } from '../../models/interfaces';
 import useSwr from 'swr';
 import { TableDisplay, TableConfiguration } from '../../components/TableDisplay';
-import { Badge } from 'react-bootstrap';
+import { Badge } from '../../components/ui/Badge';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { faEyeSlash } from '@fortawesome/free-solid-svg-icons';
@@ -19,7 +19,7 @@ import { KeyValue } from '../../models/interfaces/KeyValue';
 const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
         <TableStyleLink href={'/equipment/' + equipment.id}>{equipment.name}</TableStyleLink>
-        <Badge bg="warning" className="me-1 ms-1">
+        <Badge variant="warning" className="mr-1 ml-1">
             Arkiverad
         </Badge>
         {equipment.publiclyHidden ? (
@@ -28,7 +28,7 @@ const EquipmentNameDisplayFn = (equipment: Equipment) => (
             </span>
         ) : null}
         {equipment.tags.map((x) => (
-            <Badge bg="dark" key={x.id} className="ms-1">
+            <Badge variant="dark" key={x.id} className="ml-1">
                 {x.name}
             </Badge>
         ))}

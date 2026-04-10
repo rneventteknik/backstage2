@@ -1,5 +1,4 @@
 import React from 'react';
-import { Badge } from 'react-bootstrap';
 import { getStatusColor, getStatusName } from '../../lib/utils';
 import { Status } from '../../models/enums/Status';
 
@@ -9,8 +8,11 @@ type Props = {
 };
 
 const BookingStatusTag: React.FC<Props> = ({ booking, className }: Props) => (
-    <Badge style={{ backgroundColor: getStatusColor(booking.status) }} className={className}>
+    <span
+        style={{ backgroundColor: getStatusColor(booking.status) }}
+        className={`inline-flex items-center px-1.5 py-0.5 text-xs font-medium text-white ${className ?? ''}`}
+    >
         {getStatusName(booking.status)}
-    </Badge>
+    </span>
 );
 export default BookingStatusTag;

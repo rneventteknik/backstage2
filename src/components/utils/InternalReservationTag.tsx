@@ -1,5 +1,4 @@
 import React from 'react';
-import { Badge } from 'react-bootstrap';
 
 type Props = {
     booking: { internalReservation: boolean };
@@ -8,8 +7,8 @@ type Props = {
 
 const InternalReservationTag: React.FC<Props> = ({ booking, className }: Props) =>
     booking.internalReservation ? (
-        <Badge className={className} bg="dark">
+        <span className={`inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-bs-2 text-body ${className ?? ''}`}>
             Intern reservation
-        </Badge>
+        </span>
     ) : null;
 export default InternalReservationTag;

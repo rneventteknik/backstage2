@@ -1,6 +1,6 @@
 import React from 'react';
 import useSwr from 'swr';
-import { Button } from 'react-bootstrap';
+import { Button } from '../ui/Button';
 import { bookingFetcher } from '../../lib/fetchers';
 import { useNotifications } from '../../lib/useNotifications';
 import { getResponseContentOrError } from '../../lib/utils';
@@ -17,11 +17,10 @@ type Props = {
     currentUser: CurrentUserInfo;
 };
 
-const ToggleCoOwnerButton: React.FC<Props & React.ComponentProps<typeof Button>> = ({
+const ToggleCoOwnerButton: React.FC<Props> = ({
     booking: parentBooking,
     currentUser,
-    ...rest
-}: Props & React.ComponentProps<typeof Button>) => {
+}: Props) => {
     const { showGeneralSuccessMessage, showErrorMessage } = useNotifications();
     const { data: booking, mutate } = useSwr('/api/bookings/' + parentBooking.id, bookingFetcher);
 
@@ -54,8 +53,8 @@ const ToggleCoOwnerButton: React.FC<Props & React.ComponentProps<typeof Button>>
     };
 
     return (
-        <Button onClick={toggleCoOwnerUser} {...rest}>
-            <FontAwesomeIcon icon={isCoOwner ? faStarSolid : faStarOutline} className="me-1" />
+        <Button onClick={toggleCoOwnerUser}>
+            <FontAwesomeIcon icon={isCoOwner ? faStarSolid : faStarOutline} className="mr-1" />
             {isCoOwner ? 'Ta bort favorit' : 'Favoritmarkera'}
         </Button>
     );

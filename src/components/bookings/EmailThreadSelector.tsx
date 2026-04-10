@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Button, Card } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 import useSwr from 'swr';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -28,7 +29,7 @@ const EmailThreadSelector: React.FC<Props> = ({ onSelect }: Props) => {
                         <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
                         Det gick inte att ladda emailtrådar.
                     </div>
-                    <div className="text-monospace text-muted mt-2">{emailThreadsError.message}</div>
+                    <div className="font-mono text-muted mt-2">{emailThreadsError.message}</div>
                 </Card.Body>
             </Card>
         );
@@ -53,7 +54,7 @@ const EmailThreadSelector: React.FC<Props> = ({ onSelect }: Props) => {
             <Button
                 variant="secondary"
                 size="sm"
-                className="me-2"
+                className="mr-2"
                 onClick={() => setViewThreadId(thread.id)}
             >
                 Visa
@@ -61,7 +62,7 @@ const EmailThreadSelector: React.FC<Props> = ({ onSelect }: Props) => {
             <Button
                 variant="primary"
                 size="sm"
-                className="me-2"
+                className="mr-2"
                 onClick={() => onSelect(thread.id)}
             >
                 Välj

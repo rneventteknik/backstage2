@@ -10,7 +10,8 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import mqtt from 'mqtt';
 import React, { useState, useEffect, useRef } from 'react';
-import { Card, ListGroup } from 'react-bootstrap';
+import { Card } from './ui/Card';
+import { ListGroup } from './ui/ListGroup';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import { getGlobalSetting } from '../lib/utils';
 
@@ -137,26 +138,26 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({
 
     return (
         <Card className="mb-3">
-            <Card.Header className="d-flex">
-                <span className="flex-grow-1">Nyckel- och dörrstatus</span>
+            <Card.Header className="flex">
+                <span className="flex-grow">Nyckel- och dörrstatus</span>
             </Card.Header>
             <ListGroup>
                 <ListGroup.Item>
                     <FontAwesomeIcon
                         id="keyStatusIcon"
-                        className="me-2 fa-fw"
+                        className="mr-2 fa-fw"
                         icon={getKeyIconAndText(KeyInPlace).icon}
                     />
                     <span>{getKeyIconAndText(KeyInPlace).text}</span>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                    <FontAwesomeIcon id="doorStatusIcon" className="me-2 fa-fw " icon={getDoorIconAndText(Door).icon} />
+                    <FontAwesomeIcon id="doorStatusIcon" className="mr-2 fa-fw " icon={getDoorIconAndText(Door).icon} />
                     <span>{getDoorIconAndText(Door).text}</span>
                 </ListGroup.Item>
                 <ListGroup.Item>
                     <FontAwesomeIcon
                         id="alarmStatusIcon"
-                        className="me-2 fa-fw "
+                        className="mr-2 fa-fw "
                         icon={getAlarmIconAndText(Armed).icon}
                     />
                     <span>{getAlarmIconAndText(Armed).text}</span>

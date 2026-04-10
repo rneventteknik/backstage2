@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, Card, Col, Form, Row } from 'react-bootstrap';
+import { Button } from '../../../components/ui/Button';
+import { Card } from '../../../components/ui/Card';
+import { Form } from '../../../components/ui/Form';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
 import { bookingFetcher } from '../../../lib/fetchers';
@@ -77,11 +79,11 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         <Layout title={pageTitle} fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" href={debouncedUrl} target="_blank">
-                    <FontAwesomeIcon icon={faSave} className="me-1" /> Exportera
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Exportera
                 </Button>
             </Header>
-            <Row className="mb-3">
-                <Col xl={8}>
+            <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 mb-3">
+                <div className="xl:col-span-8">
                     <Form.Group>
                         <Form.Label>Titel</Form.Label>
 
@@ -117,8 +119,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             onChange={() => setShowLegalLink(!showLegalLink)}
                         />
                     </Form.Group>
-                </Col>
-                <Col xl={4}>
+                </div>
+                <div className="xl:col-span-4">
                     <Card>
                         <Card.Header>Förhandsgranskning</Card.Header>
 
@@ -128,8 +130,8 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             </div>
                         </Card.Body>
                     </Card>
-                </Col>
-            </Row>
+                </div>
+            </div>
         </Layout>
     );
 };

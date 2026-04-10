@@ -1,6 +1,6 @@
 import React, { FormEvent, useState } from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { Form } from '../ui/Form';
+import { Typeahead } from '../ui/Typeahead';
 import { Equipment } from '../../models/interfaces';
 import type { EquipmentTag } from '../../models/interfaces';
 import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../models/objection-models';
@@ -100,8 +100,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
-            <Row>
-                <Col lg="6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
                     <Form.Group controlId="formName">
                         <Form.Label>Namn</Form.Label>
                         <Form.Control
@@ -116,8 +116,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                             specifikation&gt;). Komponenter av namnet som ej är tillämpbart kan utelämnas.
                         </Form.Text>
                     </Form.Group>
-                </Col>
-                <Col lg="6">
+                </div>
+                <div>
                     <Form.Group controlId="formDescription">
                         <Form.Label>Beskrivning</Form.Label>
                         <Form.Control
@@ -127,13 +127,13 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                             defaultValue={equipment?.description}
                         />
                     </Form.Group>
-                </Col>
-            </Row>
+                </div>
+            </div>
 
             <h2 className="h5 mt-4">Översättningar</h2>
             <hr />
-            <Row>
-                <Col lg="6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <div>
                     <Form.Group controlId="formNameEN">
                         <Form.Label>Namn (engelska)</Form.Label>
                         <Form.Control
@@ -144,8 +144,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                             defaultValue={equipment?.nameEN}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="6">
+                </div>
+                <div>
                     <Form.Group controlId="formDescriptionEN">
                         <Form.Label>Beskrivning (engelska)</Form.Label>
                         <Form.Control
@@ -155,25 +155,23 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                             defaultValue={equipment?.descriptionEN}
                         />
                     </Form.Group>
-                </Col>
-            </Row>
+                </div>
+            </div>
 
             {!equipment ? null : (
                 <>
                     <h2 className="h5 mt-4">Prissättning</h2>
                     <hr />
-                    <Row>
-                        <Col lg="12">
+                    <div>
                             <Form.Group controlId="formPrices">
                                 <PricesEditor prices={prices} onChange={setPrices} />
                             </Form.Group>
-                        </Col>
-                    </Row>
+                    </div>
 
                     <h2 className="h5 mt-4">Övriga inställningar</h2>
                     <hr />
-                    <Row>
-                        <Col lg="6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                        <div>
                             <Form.Group>
                                 <Form.Label>Söktermer</Form.Label>
                                 <Form.Control
@@ -186,8 +184,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     Dessa termer visas inte, men används vid sökning (utöver namnen).
                                 </Form.Text>
                             </Form.Group>
-                        </Col>
-                        <Col lg="6">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Taggar</Form.Label>
                                 <Typeahead
@@ -200,8 +198,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     defaultSelected={equipment.tags ?? []}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col lg="3">
+                        </div>
+                        <div>
                             <Form.Group controlId="formInventoryCount">
                                 <Form.Label>Antal i inventarie</Form.Label>
                                 <FormNumberFieldWithoutScroll
@@ -214,8 +212,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     Lämna detta fält tomt för att stänga av inventariestatus.
                                 </Form.Text>
                             </Form.Group>
-                        </Col>
-                        <Col lg="3">
+                        </div>
+                        <div>
                             <Form.Group controlId="formPubliclyHidden">
                                 <Form.Label>Publika prislistan</Form.Label>
                                 <Form.Control
@@ -227,8 +225,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     <option value={'true'}>Gömd (visas endast internt)</option>
                                 </Form.Control>
                             </Form.Group>
-                        </Col>
-                        <Col lg="3">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Publik kategori</Form.Label>
                                 <Form.Control
@@ -251,8 +249,8 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     I den publika prislistan grupperas utrustningen baserat på denna kategori.
                                 </Form.Text>
                             </Form.Group>
-                        </Col>
-                        <Col lg="3">
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>Plats</Form.Label>
                                 <Form.Control as="select" name="equipmentLocation">
@@ -271,20 +269,20 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                     I packlistan grupperas utrustningen baserat på denna kategori.
                                 </Form.Text>
                             </Form.Group>
-                        </Col>
-                        <Col lg="12">
-                            <Form.Group controlId="formNote">
-                                <Form.Label>Anteckningar</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    placeholder=""
-                                    name="note"
-                                    rows={10}
-                                    defaultValue={equipment?.note}
-                                />
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
+                    <div>
+                        <Form.Group controlId="formNote">
+                            <Form.Label>Anteckningar</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                placeholder=""
+                                name="note"
+                                rows={10}
+                                defaultValue={equipment?.note}
+                            />
+                        </Form.Group>
+                    </div>
                 </>
             )}
         </Form>

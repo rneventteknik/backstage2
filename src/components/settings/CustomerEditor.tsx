@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
+import { Form } from '../ui/Form';
 import { getAccountKindName, getLanguageName, getPricePlanName, toIntOrUndefined } from '../../lib/utils';
 import { AccountKind } from '../../models/enums/AccountKind';
 import { Language } from '../../models/enums/Language';

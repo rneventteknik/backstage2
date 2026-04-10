@@ -1,7 +1,11 @@
 import { faPlus, faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { Badge, Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import { Dropdown, DropdownButton } from '../ui/Dropdown';
+import { Form } from '../ui/Form';
+import { InputGroup } from '../ui/InputGroup';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { idSortFn } from '../../lib/sortIndexUtils';
 import { getPricePlanName, updateItemsInArrayById } from '../../lib/utils';
@@ -123,7 +127,7 @@ const PricesEditor: React.FC<Props> = ({ prices, onChange }: Props) => {
         return (
             <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
                 <Dropdown.Item onClick={() => deletePrice(price)} className="text-danger">
-                    <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort pris
+                    <FontAwesomeIcon icon={faTrashCan} className="mr-1" /> Ta bort pris
                 </Dropdown.Item>
             </DropdownButton>
         );

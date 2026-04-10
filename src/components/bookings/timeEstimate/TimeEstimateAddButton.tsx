@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from '../../ui/Button';
 import { ITimeEstimateObjectionModel } from '../../../models/objection-models';
 import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';

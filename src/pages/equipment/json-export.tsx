@@ -1,7 +1,8 @@
 import React from 'react';
 import Layout from '../../components/layout/Layout';
 import useSwr from 'swr';
-import { Card, Form } from 'react-bootstrap';
+import { Card } from '../../components/ui/Card';
+import { Form } from '../../components/ui/Form';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import Header from '../../components/layout/Header';
@@ -87,8 +88,8 @@ const EquipmentJsonExportPage: React.FC<Props> = ({ user: currentUser, globalSet
 
             <Card className="mb-3">
                 <Card.Header>
-                    <div className="d-flex">
-                        <div className="flex-grow-1 me-4">Export</div>
+                    <div className="flex">
+                        <div className="flex-grow mr-4">Export</div>
                     </div>
                 </Card.Header>
                 <Card.Body>JSON-koden nedan kan importeras i en annan instans av Backstage2.</Card.Body>

@@ -1,7 +1,10 @@
 import { faCalendarXmark, faCheck, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { ReactNode, useState } from 'react';
-import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { Form } from '../ui/Form';
+import { OverlayTrigger, Tooltip } from '../ui/Tooltip';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { addDays, formatDate, formatWeekDay, getWeekNumber } from '../../lib/datetimeUtils';
@@ -34,8 +37,8 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
         <>
             <Card className="mb-3">
                 <Card.Header>
-                    <div className="d-flex">
-                        <div className="flex-grow-1">
+                    <div className="flex">
+                        <div className="flex-grow">
                             Tillgänglighet
                             <div className="text-muted">
                                 {equipment.inventoryCount === null
@@ -68,9 +71,8 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                                     href={'/equipment/compare-availability/?equipmentId=' + equipment.id}
                                     size="sm"
                                     variant="secondary"
-                                    className="ms-2"
-                                >
-                                    <FontAwesomeIcon icon={faCalendarXmark} className="me-1 fa-fw" /> Jämför
+                                    className="ml-2">
+                                    <FontAwesomeIcon icon={faCalendarXmark} className="mr-1" /> Jämför
                                     tillgänglighet
                                 </Button>
                             </Link>
@@ -113,7 +115,7 @@ export const EquipmentCalendarRow: React.FC<EquipmentCalendarRowProps> = ({
     }
 
     return (
-        <div className="d-flex">
+        <div className="flex">
             {children ? <div className={styles.labelContainer + ' p-2 align-middle'}>{children}</div> : null}
             {days.map((d) => (
                 <div className={styles.statusContainer} key={d.startDatetime.getTime() + '-' + equipment.id}>
@@ -160,7 +162,7 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
 
     if (isValidating && !data) {
         return (
-            <div className="flex-grow-1">
+            <div className="flex-grow">
                 <Skeleton height={78.4} />
             </div>
         );
@@ -168,7 +170,7 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
 
     if (error && !data) {
         return (
-            <div className="p-2 flex-grow-1 text-danger">
+            <div className="p-2 flex-grow text-danger">
                 <div className="text-center mb-2">Fel</div>
                 <div className="text-center py-2">
                     <FontAwesomeIcon icon={faExclamationTriangle} size="lg" />
@@ -217,7 +219,7 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
     };
 
     return (
-        <div className={'p-2 flex-grow-1 ' + getClassName() + ' ' + getHightlightClassName()}>
+        <div className={"p-2 flex-grow " + getClassName() + ' ' + getHightlightClassName()}>
             <div
                 className={
                     'text-center mb-2' +
@@ -235,7 +237,7 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
                     <OverlayTrigger
                         placement="left"
                         overlay={
-                            <Tooltip id="1">
+                            <Tooltip>
                                 <strong>Alla {equipment.inventoryCount} st tillgängliga</strong>
                             </Tooltip>
                         }
@@ -246,11 +248,11 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
                     <OverlayTrigger
                         placement="left"
                         overlay={
-                            <Tooltip id="1">
+                            <Tooltip>
                                 {bookings.map((booking) => (
                                     <div key={booking.id}>
                                         <div>{booking.name}</div>
-                                        <div className="text-small font-italic">
+                                        <div className="text-sm italic">
                                             {booking.equipmentLists
                                                 ?.map(
                                                     (list) =>

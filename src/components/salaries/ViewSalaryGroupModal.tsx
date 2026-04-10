@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Booking } from '../../models/interfaces';
 import { getResponseContentOrError } from '../../lib/utils';
-import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Dropdown, DropdownButton } from '../ui/Dropdown';
+import { Modal } from '../ui/Modal';
 import Skeleton from 'react-loading-skeleton';
 import AdminBookingList from '../admin/AdminBookingList';
 import { SalaryGroup } from '../../models/interfaces/SalaryGroup';
@@ -139,14 +141,14 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                         <>
                             <Button
                                 variant="secondary"
-                                className="d-inline-block me-2 mb-2"
+                                className="inline-block mr-2 mb-2"
                                 href={`/api/documents/salary-report/${salaryGroup.id}?${getSelectedBookingIds()
                                     ?.map((id) => `bookingId=${id}`)
                                     .join('&')}`}
                                 target="_blank"
                                 disabled={deSelectedBookingIds.length === salaryGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faFileDownload} className="me-1 fa-fw" /> Exportera
+                                <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Exportera
                                 timarvodesunderlag
                             </Button>
 
@@ -156,7 +158,7 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                                 onClick={() => setBookingSalaryStatus(SalaryStatus.SENT, getSelectedBookingIds())}
                                 disabled={deSelectedBookingIds.length === salaryGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faPaperPlane} className="me-2 fa-fw" />
+                                <FontAwesomeIcon icon={faPaperPlane} className="mr-2" />
                                 Markera timarvode som skickat
                             </Button>
 
@@ -167,12 +169,12 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                                 title="Mer"
                             >
                                 <Dropdown.Item onClick={() => setShowChangeNameModal(true)}>
-                                    <FontAwesomeIcon icon={faPen} className="me-1 fa-fw" /> Byt namn på
+                                    <FontAwesomeIcon icon={faPen} className="mr-1" /> Byt namn på
                                     timarvodesunderlagsgrupp
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={() => setShowConfirmDeleteModal(true)} className="text-danger">
-                                    <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort
+                                    <FontAwesomeIcon icon={faTrashCan} className="mr-1" /> Ta bort
                                     timarvodesunderlagsgrupp
                                 </Dropdown.Item>
                             </DropdownButton>

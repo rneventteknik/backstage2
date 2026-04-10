@@ -4,7 +4,9 @@ import Header from '../components/layout/Header';
 import useSwr from 'swr';
 import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
-import { Card, Form, Nav, Tab } from 'react-bootstrap';
+import { Card } from '../components/ui/Card';
+import { Form } from '../components/ui/Form';
+import { Tab, Nav } from '../components/ui/Tabs';
 import { bookingsFetcher } from '../lib/fetchers';
 import {
     getOperationalYear,
@@ -27,7 +29,7 @@ import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import AccountStatistics from '../components/statistics/AccountStatistics';
 import currency from 'currency.js';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { Typeahead } from '../components/ui/Typeahead';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -439,9 +441,9 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
             <Card className="mb-3 mt-3">
                 <Card.Header>Filter</Card.Header>
                 <Card.Body>
-                    <Form className="d-flex">
-                        <Form.Group controlId="statuses" className="d-flex align-items-center me-3">
-                            <Form.Label className="me-2">Status</Form.Label>
+                    <div className="flex flex-wrap gap-4 items-center">
+                        <Form.Group controlId="statuses" className="flex items-center gap-2">
+                            <Form.Label className="mb-0">Status</Form.Label>
                             <Typeahead
                                 id="status-typeahead"
                                 multiple
@@ -462,11 +464,11 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
                                 onChange={() => setIncludeFixedPriceZero(!includeFixedPriceZero)}
                             />
                         </Form.Group>
-                    </Form>
+                    </div>
                 </Card.Body>
             </Card>
 
-            <Tab.Container id="statistics-tabs" defaultActiveKey="equipment" transition={false}>
+            <Tab.Container id="statistics-tabs" defaultActiveKey="equipment">
                 <Nav variant="pills" className="flex-row">
                     <Nav.Item>
                         <Nav.Link eventKey="equipment">Utrustning</Nav.Link>
@@ -481,7 +483,7 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
                         <Nav.Link eventKey="accounts">Konton</Nav.Link>
                     </Nav.Item>
                 </Nav>
-                <p className="text-muted font-italic mt-2">Statistiken nedan är presenterad exklusive moms.</p>
+                <p className="text-muted italic mt-2">Statistiken nedan är presenterad exklusive moms.</p>
                 <Tab.Content>
                     <Tab.Pane eventKey="equipment">
                         {statistics.map((yearlyStatistics) => (

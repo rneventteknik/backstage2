@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { Alert, Button, Card, Dropdown, DropdownButton, Form, ListGroup, Modal } from 'react-bootstrap';
+import { Alert } from '../ui/Alert';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { Dropdown, DropdownButton } from '../ui/Dropdown';
+import { Form } from '../ui/Form';
+import { ListGroup } from '../ui/ListGroup';
+import { Modal } from '../ui/Modal';
 import useSwr from 'swr';
 import { getMemberStatusName, getResponseContentOrError } from '../../lib/utils';
 import {
@@ -37,22 +43,22 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventId, onSu
         return (
             <>
                 <Card className="mb-3">
-                    <Card.Header className="d-flex">
-                        <span className="flex-grow-1">Uppskrivna i kalendern</span>
+                    <Card.Header className="flex">
+                        <span className="flex-grow">Uppskrivna i kalendern</span>
                         {!readonly ? (
                             <Button
                                 onClick={() => setShowSelectCalendarEventModal(true)}
                                 variant="secondary"
-                                className="ms-2"
+                                className="ml-2"
                                 size="sm"
                             >
-                                <FontAwesomeIcon icon={faCalendar} className="me-1" />
+                                <FontAwesomeIcon icon={faCalendar} className="mr-1" />
                                 Välj kalenderevent
                             </Button>
                         ) : null}
                     </Card.Header>
                     <ListGroup variant="flush">
-                        <ListGroup.Item className="text-center font-italic text-muted">
+                        <ListGroup.Item className="text-center italic text-muted">
                             Koppla bokningen till ett kalenderevent för att se uppskrivna arbetare.
                         </ListGroup.Item>
                     </ListGroup>
@@ -113,7 +119,7 @@ const CalendarWorkersCardWithCalendarConnection: React.FC<CalendarWorkersCardWit
                 <p className="text-danger">
                     <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda kalenderevent.
                 </p>
-                <p className="text-monospace text-muted mb-0">{error.message}</p>
+                <p className="font-mono text-muted mb-0">{error.message}</p>
             </div>
         );
     }
@@ -151,20 +157,20 @@ const CalendarWorkersCardWithCalendarConnection: React.FC<CalendarWorkersCardWit
     //
     return (
         <>
-            <Card.Header className="d-flex">
-                <span className="flex-grow-1">Uppskrivna i kalendern</span>
-                <Button className="me-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+            <Card.Header className="flex">
+                <span className="flex-grow">Uppskrivna i kalendern</span>
+                <Button className="mr-2" variant="secondary" size="sm" onClick={() => setShowContent((x) => !x)}>
                     <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                 </Button>
                 <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
                     {!readonly && workingUsers.length > 0 ? (
                         <>
                             <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(false)}>
-                                <FontAwesomeIcon icon={faMessage} className="me-1 fa-fw" /> Skicka direktmeddelande till
+                                <FontAwesomeIcon icon={faMessage} className="mr-1" /> Skicka direktmeddelande till
                                 de som jobbar
                             </Dropdown.Item>
                             <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(true)}>
-                                <FontAwesomeIcon icon={faHashtag} className="me-1 fa-fw" /> Skapa slackkanal med de som
+                                <FontAwesomeIcon icon={faHashtag} className="mr-1" /> Skapa slackkanal med de som
                                 jobbar
                             </Dropdown.Item>
                         </>
@@ -172,14 +178,14 @@ const CalendarWorkersCardWithCalendarConnection: React.FC<CalendarWorkersCardWit
                     {!readonly ? (
                         <>
                             <Dropdown.Item onClick={() => setShowSelectCalendarEventModal(true)}>
-                                <FontAwesomeIcon icon={faCalendar} className="me-1 fa-fw" /> Redigara koppling till
+                                <FontAwesomeIcon icon={faCalendar} className="mr-1" /> Redigara koppling till
                                 kalenderevent
                             </Dropdown.Item>
                             <Dropdown.Divider />
                         </>
                     ) : null}
                     <Dropdown.Item href={data?.link} target="_blank">
-                        <FontAwesomeIcon icon={faExternalLinkAlt} className="me-1 fa-fw" /> Öppna i Google Calendar
+                        <FontAwesomeIcon icon={faExternalLinkAlt} className="mr-1" /> Öppna i Google Calendar
                     </Dropdown.Item>
                 </DropdownButton>
                 {showSelectCalendarEventModal ? (
@@ -196,7 +202,7 @@ const CalendarWorkersCardWithCalendarConnection: React.FC<CalendarWorkersCardWit
                     {workingUsers.map((user) => (
                         <ListGroup.Item key={user.id}>
                             <div className="mb-1">
-                                <FontAwesomeIcon icon={getIcon(user.memberStatus)} className="me-2" />
+                                <FontAwesomeIcon icon={getIcon(user.memberStatus)} className="mr-2" />
                                 {user.name !== undefined ? (
                                     <TableStyleLink href={`/users/${user.id}`}>{user.name}</TableStyleLink>
                                 ) : (
@@ -210,7 +216,7 @@ const CalendarWorkersCardWithCalendarConnection: React.FC<CalendarWorkersCardWit
                         </ListGroup.Item>
                     ))}
                     {workingUsers.length === 0 ? (
-                        <ListGroup.Item className="text-center font-italic text-muted">
+                        <ListGroup.Item className="text-center italic text-muted">
                             Tagga användare i kalendern för att visa dem här.
                         </ListGroup.Item>
                     ) : null}
@@ -266,7 +272,7 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
                 <p className="text-danger">
                     <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda kalenderevent.
                 </p>
-                <p className="text-monospace text-muted mb-0">{bookingsCalendarListError.message}</p>
+                <p className="font-mono text-muted mb-0">{bookingsCalendarListError.message}</p>
             </div>
         );
     }
@@ -302,9 +308,9 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
             <Modal.Body>
                 {cannotFindConnectedEvent ? (
                     <Alert variant="warning" className="mb-3">
-                        <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+                        <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
                         Denna bokning är kopplad till ett okänt kalenderevent som har passerats eller inte längre finns.
-                        <p className="text-monospace mt-2 mb-0">Id: {value}</p>
+                        <p className="font-mono mt-2 mb-0">Id: {value}</p>
                     </Alert>
                 ) : null}
                 <Form.Control

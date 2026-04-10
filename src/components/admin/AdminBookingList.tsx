@@ -1,7 +1,8 @@
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { ChangeEvent, useState } from 'react';
-import { Col, Form, Row, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from '../ui/Tooltip';
+import { Form } from '../ui/Form';
 import {
     countNotNullorEmpty,
     getPaymentStatusName,
@@ -29,7 +30,7 @@ import { addVAT, formatCurrency, getBookingPrice } from '../../lib/pricingUtils'
 import CancelledIcon from '../utils/CancelledIcon';
 import InternalReservationTag from '../utils/InternalReservationTag';
 import AdvancedFilters from '../AdvancedFilters';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { Typeahead } from '../ui/Typeahead';
 
 type Props = {
     bookings: BookingViewModel[];
@@ -140,13 +141,13 @@ const AdminBookingList: React.FC<Props> = ({
 
         return (
             <>
-                <TableStyleLink href={'/bookings/' + booking.id} className="me-1">
+                <TableStyleLink href={'/bookings/' + booking.id} className="mr-1">
                     {booking.name}
                 </TableStyleLink>
 
-                <BookingTypeTag booking={booking} className="me-1" />
-                <InternalReservationTag booking={booking} className="me-1" />
-                <FixedPriceStatusTag booking={booking} className="me-1" />
+                <BookingTypeTag booking={booking} className="mr-1" />
+                <InternalReservationTag booking={booking} className="mr-1" />
+                <FixedPriceStatusTag booking={booking} className="mr-1" />
 
                 {customAccountsOnBooking.length > 0 ? (
                     <OverlayTrigger
@@ -159,14 +160,14 @@ const AdminBookingList: React.FC<Props> = ({
                             </Tooltip>
                         }
                     >
-                        <FontAwesomeIcon icon={faCircleInfo} className="me-1" title="" />
+                        <FontAwesomeIcon icon={faCircleInfo} className="mr-1" title="" />
                     </OverlayTrigger>
                 ) : null}
 
                 <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
                 <p className="text-muted mb-0">{booking.ownerUser?.name ?? '-'}</p>
-                <p className="text-muted mb-0 d-lg-none">{replaceEmptyStringWithNull(booking.invoiceNumber) ?? '-'}</p>
-                <p className="text-muted mb-0 d-lg-none">{booking.displayUsageStartString ?? '-'}</p>
+                <p className="text-muted mb-0 lg:hidden">{replaceEmptyStringWithNull(booking.invoiceNumber) ?? '-'}</p>
+                <p className="text-muted mb-0 lg:hidden">{booking.displayUsageStartString ?? '-'}</p>
                 <p className="text-muted mb-0">{formatCurrency(addVAT(getBookingPrice(booking)))}</p>
             </>
         );
@@ -179,9 +180,9 @@ const AdminBookingList: React.FC<Props> = ({
             {getStatusName(booking.status)}
             {bookingStatusIsDone(booking) ? <DoneIcon /> : null}
             {bookingStatusIsCancelled(booking) ? <CancelledIcon /> : null}
-            <p className="mb-0 d-xl-none">{bookingRentalStatusDisplayFn(booking)}</p>
-            <p className="mb-0 d-xl-none">{bookingPaymentStatusDisplayFn(booking)}</p>
-            <p className="mb-0 d-xl-none">{bookingSalaryStatusDisplayFn(booking)}</p>
+            <p className="mb-0 xl:hidden">{bookingRentalStatusDisplayFn(booking)}</p>
+            <p className="mb-0 xl:hidden">{bookingPaymentStatusDisplayFn(booking)}</p>
+            <p className="mb-0 xl:hidden">{bookingSalaryStatusDisplayFn(booking)}</p>
         </>
     );
 
@@ -192,7 +193,7 @@ const AdminBookingList: React.FC<Props> = ({
             {booking.returnalNote !== '' && booking.returnalNote ? (
                 <OverlayTrigger placement="top" overlay={<Tooltip id="1">{booking.returnalNote}</Tooltip>}>
                     <span>
-                        <FontAwesomeIcon icon={faCircleInfo} className="ms-2" />
+                        <FontAwesomeIcon icon={faCircleInfo} className="ml-2" />
                     </span>
                 </OverlayTrigger>
             ) : null}
@@ -393,56 +394,50 @@ const AdminBookingList: React.FC<Props> = ({
                 }}
                 activeFilterCount={countNotNullorEmpty(searchText, bookingStatuses, paymentStatuses, salaryStatuses)}
             >
-                <Row className="mb-2 gy-3">
-                    <Col md="4">
-                        <Form.Group>
-                            <Form.Label>Status</Form.Label>
-                            <Typeahead
-                                id="status-typeahead"
-                                multiple
-                                labelKey="label"
-                                options={bookingStatusOptions}
-                                onChange={(e) => setBookingStatuses((e as typeof bookingStatusOptions).map((o) => o.value))}
-                                placeholder="Filtrera på status"
-                                selected={bookingStatuses
-                                    .map((id) => bookingStatusOptions.find((x) => x.value === id))
-                                    .filter(notEmpty)}
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col md="4">
-                        <Form.Group>
-                            <Form.Label>Betalningsstatus</Form.Label>
-                            <Typeahead
-                                id="payment-status-typeahead"
-                                multiple
-                                labelKey="label"
-                                options={paymentStatusOptions}
-                                onChange={(e) => setPaymentStatuses((e as typeof paymentStatusOptions).map((o) => o.value))}
-                                placeholder="Filtrera på betalningsstatus"
-                                selected={paymentStatuses
-                                    .map((id) => paymentStatusOptions.find((x) => x.value === id))
-                                    .filter(notEmpty)}
-                            />
-                        </Form.Group>
-                    </Col>
-                    <Col md="4">
-                        <Form.Group>
-                            <Form.Label>Timarvodestatus</Form.Label>
-                            <Typeahead
-                                id="salary-status-typeahead"
-                                multiple
-                                labelKey="label"
-                                options={salaryStatusOptions}
-                                onChange={(e) => setSalaryStatuses((e as typeof salaryStatusOptions).map((o) => o.value))}
-                                placeholder="Filtrera på timarvodestatus"
-                                selected={salaryStatuses
-                                    .map((id) => salaryStatusOptions.find((x) => x.value === id))
-                                    .filter(notEmpty)}
-                            />
-                        </Form.Group>
-                    </Col>
-                </Row>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-2">
+                    <Form.Group>
+                        <Form.Label>Status</Form.Label>
+                        <Typeahead
+                            id="status-typeahead"
+                            multiple
+                            labelKey="label"
+                            options={bookingStatusOptions}
+                            onChange={(e) => setBookingStatuses((e as typeof bookingStatusOptions).map((o) => o.value))}
+                            placeholder="Filtrera på status"
+                            selected={bookingStatuses
+                                .map((id) => bookingStatusOptions.find((x) => x.value === id))
+                                .filter(notEmpty)}
+                        />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Betalningsstatus</Form.Label>
+                        <Typeahead
+                            id="payment-status-typeahead"
+                            multiple
+                            labelKey="label"
+                            options={paymentStatusOptions}
+                            onChange={(e) => setPaymentStatuses((e as typeof paymentStatusOptions).map((o) => o.value))}
+                            placeholder="Filtrera på betalningsstatus"
+                            selected={paymentStatuses
+                                .map((id) => paymentStatusOptions.find((x) => x.value === id))
+                                .filter(notEmpty)}
+                        />
+                    </Form.Group>
+                    <Form.Group>
+                        <Form.Label>Timarvodestatus</Form.Label>
+                        <Typeahead
+                            id="salary-status-typeahead"
+                            multiple
+                            labelKey="label"
+                            options={salaryStatusOptions}
+                            onChange={(e) => setSalaryStatuses((e as typeof salaryStatusOptions).map((o) => o.value))}
+                            placeholder="Filtrera på timarvodestatus"
+                            selected={salaryStatuses
+                                .map((id) => salaryStatusOptions.find((x) => x.value === id))
+                                .filter(notEmpty)}
+                        />
+                    </Form.Group>
+                </div>
             </AdvancedFilters>
             <TableDisplay
                 filterString={searchText}

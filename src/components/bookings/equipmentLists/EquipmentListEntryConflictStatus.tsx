@@ -2,7 +2,7 @@ import { faCheck, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { faCircleCheck } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
-import { OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { OverlayTrigger, Tooltip } from '../../ui/Tooltip';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { bookingsFetcher } from '../../../lib/fetchers';
@@ -58,7 +58,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                 <OverlayTrigger
                     placement="right"
                     overlay={
-                        <Tooltip id="1">
+                        <Tooltip>
                             <strong>Inventariestatus kunde inte hämtas.</strong>
                             <div>{error.message}</div>
                         </Tooltip>
@@ -106,7 +106,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
             <OverlayTrigger
                 placement="right"
                 overlay={
-                    <Tooltip id="1">
+                    <Tooltip>
                         <strong>
                             Inga konflikter (ingen annat bokning använder denna utrustningen dessa tider, totalt finns{' '}
                             {equipment.inventoryCount} st)
@@ -124,7 +124,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
             <OverlayTrigger
                 placement="right"
                 overlay={
-                    <Tooltip id="1">
+                    <Tooltip>
                         <strong>
                             Denna utrustningslista använder fler av denna utrustning än vad som finns (
                             {equipment.inventoryCount} st).
@@ -142,7 +142,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
             <OverlayTrigger
                 placement="right"
                 overlay={
-                    <Tooltip id="1">
+                    <Tooltip>
                         <strong>
                             Totalt används fler av denna utrustning än vad som finns ({maxNumberOfUnitsUsed}/
                             {equipment.inventoryCount} st). Konflikterande utrustningslistor:
@@ -150,7 +150,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                         {bookings.map((booking) => (
                             <div key={booking.id}>
                                 <div>{booking.name}</div>
-                                <div className="text-small font-italic">
+                                <div className="text-sm italic">
                                     {booking.equipmentLists
                                         ?.map(
                                             (list) =>
@@ -172,7 +172,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
         <OverlayTrigger
             placement="right"
             overlay={
-                <Tooltip id="1">
+                <Tooltip>
                     <strong>
                         Notera att samma typ av utrustning används samma tid av följande andra utrustningslistor (totalt
                         finns {equipment.inventoryCount} st):
@@ -180,7 +180,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                     {bookings.map((booking) => (
                         <div key={booking.id}>
                             <div>{booking.name}</div>
-                            <div className="text-small font-italic">
+                            <div className="text-sm italic">
                                 {booking.equipmentLists
                                     ?.map(
                                         (list) => `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`,

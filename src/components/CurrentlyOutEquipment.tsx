@@ -4,7 +4,7 @@ import useSwr from 'swr';
 import { getResponseContentOrError } from '../lib/utils';
 import { CurrentlyOutEquipmentInfo } from '../models/misc/CurrentlyOutEquipmentInfo';
 import { TableConfiguration, TableDisplay } from './TableDisplay';
-import { Card } from 'react-bootstrap';
+import { Card } from './ui/Card';
 import TableStyleLink from './utils/TableStyleLink';
 import CollapsibleCard from './utils/CollapsibleCard';
 

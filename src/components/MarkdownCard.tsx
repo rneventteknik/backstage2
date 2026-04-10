@@ -1,7 +1,8 @@
 import { faAngleUp, faAngleDown, faPen, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
-import { Button, Card } from 'react-bootstrap';
+import { Button } from './ui/Button';
+import { Card } from './ui/Card';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import EditTextModal from './utils/EditTextModal';
@@ -21,12 +22,12 @@ const MarkdownCard: React.FC<Props> = ({ text, onSubmit, cardTitle, editModelTit
     return (
         <>
             <Card className="mb-3">
-                <Card.Header className="d-flex">
-                    <span className="flex-grow-1">{cardTitle}</span>
+                <Card.Header className="flex">
+                    <span className="flex-grow">{cardTitle}</span>
                     {!readonly ? (
                         <>
                             {text ? (
-                                <Button className="me-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+                                <Button className="mr-2" variant="outline-secondary" size="sm" onClick={() => setShowContent((x) => !x)}>
                                     <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                                 </Button>
                             ) : null}

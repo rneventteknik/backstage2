@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
+import { Button } from '../../../components/ui/Button';
+import { Dropdown, DropdownButton } from '../../../components/ui/Dropdown';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
@@ -140,22 +141,22 @@ const EquipmentPage: React.FC<Props> = ({ user: currentUser, globalSettings }: P
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentForm" type="submit">
-                    <FontAwesomeIcon icon={faSave} className="me-1" /> Spara utrustning
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara utrustning
                 </Button>
-                <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
+                    <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer">
                     {equipment.isArchived ? (
                         <Dropdown.Item onClick={() => setShowUnarchiveModal(true)} className="text-warning">
-                            <FontAwesomeIcon icon={faBoxesPacking} className="me-1 fa-fw" />
+                            <FontAwesomeIcon icon={faBoxesPacking} className="mr-1" />
                             Avarkivera utrustning
                         </Dropdown.Item>
                     ) : (
                         <Dropdown.Item onClick={() => setShowArchiveModal(true)} className="text-warning">
-                            <FontAwesomeIcon icon={faBoxesPacking} className="me-1 fa-fw" />
+                            <FontAwesomeIcon icon={faBoxesPacking} className="mr-1" />
                             Arkivera utrustning
                         </Dropdown.Item>
                     )}
                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                        <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" />
+                        <FontAwesomeIcon icon={faTrashCan} className="mr-1" />
                         Ta bort utrustning
                     </Dropdown.Item>
                 </DropdownButton>

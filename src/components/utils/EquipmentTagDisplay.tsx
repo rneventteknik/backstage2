@@ -1,5 +1,4 @@
 import React from 'react';
-import { Badge } from 'react-bootstrap';
 import { EquipmentTag } from '../../models/interfaces';
 import { IEquipmentTagObjectionModel } from '../../models/objection-models';
 
@@ -10,9 +9,12 @@ type Props = {
 
 const EquipmentTagDisplay: React.FC<Props> = ({ tag, className }: Props) => {
     return (
-        <Badge bg="dark" className={className} style={tag.color ? { backgroundColor: tag.color } : undefined}>
+        <span
+            className={`inline-flex items-center px-1.5 py-0.5 text-xs font-medium bg-bs-2 text-body ${className ?? ''}`}
+            style={tag.color ? { backgroundColor: tag.color } : undefined}
+        >
             {tag.name}
-        </Badge>
+        </span>
     );
 };
 

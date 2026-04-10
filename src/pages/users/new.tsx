@@ -1,7 +1,7 @@
 import React from 'react';
 import Layout from '../../components/layout/Layout';
 import { useRouter } from 'next/router';
-import { Button } from 'react-bootstrap';
+import { Button } from '../../components/ui/Button';
 import UserForm from '../../components/users/UserForm';
 import { User } from '../../models/interfaces';
 import { getResponseContentOrError } from '../../lib/utils';
@@ -54,7 +54,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editUserForm" type="submit">
-                    <FontAwesomeIcon icon={faSave} className="me-1" /> Lägg till användare
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till användare
                 </Button>
             </Header>
 

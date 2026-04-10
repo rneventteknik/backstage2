@@ -12,8 +12,8 @@ import Layout from '../../../../../components/layout/Layout';
 import Header from '../../../../../components/layout/Header';
 import { TableConfiguration, TableDisplay } from '../../../../../components/TableDisplay';
 import { EquipmentListEntry } from '../../../../../models/interfaces/EquipmentList';
-import { Button, Dropdown, DropdownButton } from 'react-bootstrap';
-import Link from 'next/link';
+import { Button } from '../../../../../components/ui/Button';
+import { Dropdown, DropdownButton } from '../../../../../components/ui/Dropdown';
 import { faListCheck } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { saveListEntryApiCall } from '../../../../../lib/equipmentListUtils';
@@ -185,20 +185,17 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="secondary" onClick={() => markAllAsPacked()} disabled={readonly}>
-                    <FontAwesomeIcon icon={faCheckSquare} className="me-1" /> Markera alla som packade
+                    <FontAwesomeIcon icon={faCheckSquare} className="mr-1" /> Markera alla som packade
                 </Button>
                 <DropdownButton
                     id="other-lists-dropdown-button"
                     variant="secondary"
                     title="Välj lista"
-                    className="d-inline-block"
                 >
                     {booking.equipmentLists?.map((l) => (
-                        <Link href={`/bookings/${booking.id}/equipmentList/${l.id}`} key={l.id} passHref>
-                            <Dropdown.Item href={`/bookings/${booking.id}/equipmentList/${l.id}`}>
-                                <FontAwesomeIcon icon={faListCheck} className="me-1 fa-fw" /> {l.name}
-                            </Dropdown.Item>
-                        </Link>
+                        <Dropdown.Item href={`/bookings/${booking.id}/equipmentList/${l.id}`} key={l.id}>
+                            <FontAwesomeIcon icon={faListCheck} className="mr-1" /> {l.name}
+                        </Dropdown.Item>
                     ))}
                 </DropdownButton>
             </Header>

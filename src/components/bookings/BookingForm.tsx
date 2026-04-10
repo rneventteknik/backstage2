@@ -1,5 +1,7 @@
 import React, { FormEvent, useRef, useState } from 'react';
-import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Form } from '../ui/Form';
+import { InputGroup } from '../ui/InputGroup';
 import { Booking } from '../../models/interfaces';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import {
@@ -138,8 +140,8 @@ const BookingForm: React.FC<Props> = ({
 
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
-            <Row>
-                <Col lg="6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
+                <div className="lg:col-span-6">
                     <Form.Group controlId="formName">
                         <Form.Label>
                             Bokningsnamn
@@ -153,8 +155,8 @@ const BookingForm: React.FC<Props> = ({
                             defaultValue={booking.name}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="3" md="6" sm="6">
+                </div>
+                <div className="lg:col-span-3 md:col-span-6">
                     <Form.Group controlId="formBookingType">
                         <Form.Label>
                             Bokningstyp
@@ -171,8 +173,8 @@ const BookingForm: React.FC<Props> = ({
                             <option value={BookingType.RENTAL}>{getBookingTypeName(BookingType.RENTAL)}</option>
                         </Form.Control>
                     </Form.Group>
-                </Col>
-                <Col lg="3" md="6" sm="6">
+                </div>
+                <div className="lg:col-span-3 md:col-span-6">
                     <Form.Group controlId="formStatus">
                         <Form.Label>
                             Bokningsstatus
@@ -196,10 +198,10 @@ const BookingForm: React.FC<Props> = ({
                             )}
                         </Form.Control>
                     </Form.Group>
-                </Col>
-            </Row>
-            <Row>
-                <Col lg="6">
+                </div>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
+                <div className="lg:col-span-6">
                     <Form.Group controlId="formCustomer">
                         <Form.Label>
                             Kundnamn
@@ -215,7 +217,7 @@ const BookingForm: React.FC<Props> = ({
                                 defaultValue={booking.customerName}
                                 ref={customerNameField}
                             />
-                            <Button variant="secondary" className="ms-2" onClick={() => setCustomerSearchModal(true)}>
+                            <Button variant="secondary" className="ml-2" onClick={() => setCustomerSearchModal(true)}>
                                 Sök kund
                             </Button>
                         </InputGroup>
@@ -236,8 +238,8 @@ const BookingForm: React.FC<Props> = ({
                             show={showCustomerSearchModal}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="3" md="6">
+                </div>
+                <div className="lg:col-span-3 md:col-span-6">
                     <Form.Group controlId="formPricePlan">
                         <Form.Label>
                             Prisplan
@@ -254,8 +256,8 @@ const BookingForm: React.FC<Props> = ({
                             <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
                         </Form.Control>
                     </Form.Group>
-                </Col>
-                <Col lg="3" md="6">
+                </div>
+                <div className="lg:col-span-3 md:col-span-6">
                     <Form.Group controlId="formAccountKind">
                         <Form.Label>
                             Kontotyp
@@ -272,10 +274,10 @@ const BookingForm: React.FC<Props> = ({
                             <option value={AccountKind.INTERNAL}>{getAccountKindName(AccountKind.INTERNAL)}</option>
                         </Form.Control>
                     </Form.Group>
-                </Col>
-            </Row>
-            <Row>
-                <Col lg="6">
+                </div>
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
+                <div className="lg:col-span-6">
                     <Form.Group controlId="formLocation">
                         <Form.Label>Plats</Form.Label>
                         <Form.Control
@@ -285,8 +287,8 @@ const BookingForm: React.FC<Props> = ({
                             defaultValue={booking.location}
                         />
                     </Form.Group>
-                </Col>
-                <Col lg="3">
+                </div>
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formOwnerUser">
                         <Form.Label>
                             Ansvarig medlem
@@ -309,8 +311,8 @@ const BookingForm: React.FC<Props> = ({
                             <ActivityIndicator />
                         )}
                     </Form.Group>
-                </Col>
-                <Col lg="3">
+                </div>
+                <div className="lg:col-span-3">
                     <Form.Group controlId="formLanguage">
                         <Form.Label>
                             Språk
@@ -326,22 +328,20 @@ const BookingForm: React.FC<Props> = ({
                             <option value={Language.EN}>{getLanguageName(Language.EN)}</option>
                         </Form.Control>
                     </Form.Group>
-                </Col>
-            </Row>
-            <Row>
-                <Col>
+                </div>
+            </div>
+            <div className="mb-4">
                     <Form.Group controlId="formNote">
                         <Form.Label>Anteckningar</Form.Label>
                         <Form.Control as="textarea" name="note" rows={4} defaultValue={booking.note} />
                     </Form.Group>
-                </Col>
-            </Row>
-            <Row>
-                <Col lg="9" md="9">
+            </div>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4">
+                <div className="lg:col-span-9">
                     <h2 className="h5 mt-4">Kontaktperson</h2>
                     <hr />
-                    <Row>
-                        <Col lg="4" md="4">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                        <div>
                             <Form.Group controlId="formContactPersonName">
                                 <Form.Label>
                                     Namn
@@ -355,8 +355,8 @@ const BookingForm: React.FC<Props> = ({
                                     defaultValue={booking.contactPersonName}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4">
+                        </div>
+                        <div>
                             <Form.Group controlId="formContactPersonEmail">
                                 <Form.Label>
                                     Email
@@ -370,8 +370,8 @@ const BookingForm: React.FC<Props> = ({
                                     defaultValue={booking.contactPersonEmail}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4">
+                        </div>
+                        <div>
                             <Form.Group controlId="formContactPersonPhone">
                                 <Form.Label>Telefon</Form.Label>
                                 <Form.Control
@@ -381,42 +381,38 @@ const BookingForm: React.FC<Props> = ({
                                     defaultValue={booking.contactPersonPhone}
                                 />
                             </Form.Group>
-                        </Col>
-                    </Row>
-                </Col>
-                <Col lg="3" md="3">
+                        </div>
+                    </div>
+                </div>
+                <div className="lg:col-span-3">
                     <h2 className="h5 mt-4">Prisalternativ</h2>
                     <hr />
-                    <Row>
-                        <Col lg="12">
-                            <Form.Group controlId="fixedPrice">
-                                <Form.Label>Fast pris (ex. moms)</Form.Label>
-                                <InputGroup>
-                                    <Form.Control
-                                        type="text"
-                                        placeholder=""
-                                        name="fixedPrice"
-                                        defaultValue={booking?.fixedPrice ?? undefined}
-                                        onChange={(e) => setFixedPrice(e.target.value)}
-                                    />
-                                    <InputGroup.Text>kr</InputGroup.Text>
-                                </InputGroup>
-                                <PriceWithVATPreview price={currency(fixedPrice ?? 0)} />
-                                <Form.Text className="text-muted">
-                                    Om detta fält har ett värde skriver det över summan som beräknas från
-                                    utrustningslistor och arbetstid. Detta fält ska normalt lämnas tomt.
-                                </Form.Text>
-                            </Form.Group>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
+                    <Form.Group controlId="fixedPrice">
+                        <Form.Label>Fast pris (ex. moms)</Form.Label>
+                        <InputGroup>
+                            <Form.Control
+                                type="text"
+                                placeholder=""
+                                name="fixedPrice"
+                                defaultValue={booking?.fixedPrice ?? undefined}
+                                onChange={(e) => setFixedPrice(e.target.value)}
+                            />
+                            <InputGroup.Text>kr</InputGroup.Text>
+                        </InputGroup>
+                        <PriceWithVATPreview price={currency(fixedPrice ?? 0)} />
+                        <Form.Text className="text-muted">
+                            Om detta fält har ett värde skriver det över summan som beräknas från
+                            utrustningslistor och arbetstid. Detta fält ska normalt lämnas tomt.
+                        </Form.Text>
+                    </Form.Group>
+                </div>
+            </div>
             {!booking || isNewBooking ? null : (
                 <>
                     <h2 className="h5 mt-4">Fakturainformation</h2>
                     <hr />
-                    <Row>
-                        <Col lg="6" md="6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
+                        <div>
                             <Form.Group controlId="formInvoiceHogiaId">
                                 <Form.Label>
                                     Hogia ID
@@ -443,61 +439,57 @@ const BookingForm: React.FC<Props> = ({
                                     bokningar med fast pris 0 kr som inte behöver några fakturauppgifter.
                                 </Form.Text>
                             </Form.Group>
-                        </Col>
-                        <Col lg="6" md="6">
+                        </div>
+                        <div>
                             <Form.Group controlId="formInvoiceTag">
                                 <Form.Label>Fakturamärkning</Form.Label>
                                 <Form.Control type="text" name="invoiceTag" defaultValue={booking.invoiceTag} />
                             </Form.Group>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <Col>
-                            <Form.Group controlId="formInvoiceAddress">
-                                <Form.Label>
-                                    Fakturaadress
-                                    <RequiredIndicator
-                                        required={
-                                            isFieldRequired(Status.BOOKED) &&
-                                            !hoogiaId &&
-                                            !(toIntOrUndefined(fixedPrice) === 0)
-                                        }
-                                    />
-                                </Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    name="invoiceAddress"
-                                    rows={3}
-                                    onChange={(e) => setInvoiceAddress(e.target.value)}
-                                    defaultValue={booking.invoiceAddress}
-                                    ref={invoiceAddressField}
+                        </div>
+                    </div>
+                    <div className="mb-4">
+                        <Form.Group controlId="formInvoiceAddress">
+                            <Form.Label>
+                                Fakturaadress
+                                <RequiredIndicator
+                                    required={
+                                        isFieldRequired(Status.BOOKED) &&
+                                        !hoogiaId &&
+                                        !(toIntOrUndefined(fixedPrice) === 0)
+                                    }
                                 />
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                            </Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                name="invoiceAddress"
+                                rows={3}
+                                onChange={(e) => setInvoiceAddress(e.target.value)}
+                                defaultValue={booking.invoiceAddress}
+                                ref={invoiceAddressField}
+                            />
+                        </Form.Group>
+                    </div>
                     <h2 className="h5 mt-4">Övrigt</h2>
                     <hr />
-                    <Row>
-                        <Col>
-                            <Form.Group controlId="formReturnalNote">
-                                <Form.Label>Återlämningsanmärkning</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    name="returnalNote"
-                                    rows={6}
-                                    defaultValue={booking.returnalNote}
-                                />
-                            </Form.Group>
-                        </Col>
-                    </Row>
+                    <div className="mb-4">
+                        <Form.Group controlId="formReturnalNote">
+                            <Form.Label>Återlämningsanmärkning</Form.Label>
+                            <Form.Control
+                                as="textarea"
+                                name="returnalNote"
+                                rows={6}
+                                defaultValue={booking.returnalNote}
+                            />
+                        </Form.Group>
+                    </div>
                 </>
             )}
             {showAdvancedFields ? (
                 <>
                     <h2 className="h5 mt-4">Avancerat</h2>
                     <hr />
-                    <Row>
-                        <Col lg="4" md="4">
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+                        <div>
                             <Form.Group controlId="formPaymentStatus">
                                 <Form.Label>Betalningsstatus</Form.Label>
                                 <Form.Control as="select" name="paymentStatus" defaultValue={booking.paymentStatus}>
@@ -521,8 +513,8 @@ const BookingForm: React.FC<Props> = ({
                                     </option>
                                 </Form.Control>
                             </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4">
+                        </div>
+                        <div>
                             <Form.Group controlId="formSalaryStatus">
                                 <Form.Label>Timarvodesstatus</Form.Label>
                                 <Form.Control as="select" name="salaryStatus" defaultValue={booking.salaryStatus}>
@@ -532,8 +524,8 @@ const BookingForm: React.FC<Props> = ({
                                     <option value={SalaryStatus.SENT}>{getSalaryStatusName(SalaryStatus.SENT)}</option>
                                 </Form.Control>
                             </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4">
+                        </div>
+                        <div>
                             <Form.Group controlId="formInvoiceNumber">
                                 <Form.Label>Fakturanummer</Form.Label>
                                 <Form.Control
@@ -543,8 +535,8 @@ const BookingForm: React.FC<Props> = ({
                                     defaultValue={booking.invoiceNumber}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4">
+                        </div>
+                        <div>
                             <Form.Group controlId="calendarBookingId">
                                 <Form.Label>Kalender-id</Form.Label>
                                 <Form.Control
@@ -554,8 +546,8 @@ const BookingForm: React.FC<Props> = ({
                                     defaultValue={booking?.calendarBookingId}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4">
+                        </div>
+                        <div>
                             <Form.Group controlId="driveFolderId">
                                 <Form.Label>Mapp-id</Form.Label>
                                 <Form.Control
@@ -565,8 +557,8 @@ const BookingForm: React.FC<Props> = ({
                                     defaultValue={booking?.driveFolderId}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4">
+                        </div>
+                        <div>
                             <Form.Group controlId="invoiceDate">
                                 <Form.Label>Faktureringsdatum</Form.Label>
                                 <Form.Control
@@ -576,8 +568,8 @@ const BookingForm: React.FC<Props> = ({
                                     defaultValue={formatDateForForm(booking?.invoiceDate)}
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col lg={6}>
+                        </div>
+                        <div className="lg:col-span-2">
                             <Form.Group controlId="internalReservation">
                                 <Form.Check
                                     type="checkbox"
@@ -594,23 +586,20 @@ const BookingForm: React.FC<Props> = ({
                                     utlämnad utrustning, statistik, etc.
                                 </Form.Text>
                             </Form.Group>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </>
             ) : null}
 
-            <div className="d-flex">
-                <div className="flex-grow-1"></div>
-                <div>
-                    <Button
-                        className="mb-3"
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => setShowAdvancedFields((x) => !x)}
-                    >
-                        {showAdvancedFields ? 'Dölj' : 'Visa'} avancerade fält
-                    </Button>
-                </div>
+            <div className="flex justify-end">
+                <Button
+                    className="mb-3"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setShowAdvancedFields((x) => !x)}
+                >
+                    {showAdvancedFields ? 'Dölj' : 'Visa'} avancerade fält
+                </Button>
             </div>
 
             {!showAdvancedFields ? (

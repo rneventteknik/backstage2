@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import React from 'react';
-import { Breadcrumb } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import styles from './Breadcrumbs.module.scss';
 
@@ -11,12 +10,16 @@ type Props = {
 
 const Breadcrumbs: React.FC<Props> = ({ loading, breadcrumbs = [] }: Props) => (
     <section className={styles.breadcrumbs}>
-        <Breadcrumb className="d-none d-sm-block">
-            <BreadcrumbsList maxSize={10} loading={loading} breadcrumbs={breadcrumbs} />
-        </Breadcrumb>
-        <Breadcrumb className="d-sm-none">
-            <BreadcrumbsList maxSize={2} loading={loading} breadcrumbs={breadcrumbs} />
-        </Breadcrumb>
+        <nav aria-label="breadcrumb" className="hidden sm:block">
+            <ol className="flex items-center gap-1 text-sm text-muted">
+                <BreadcrumbsList maxSize={10} loading={loading} breadcrumbs={breadcrumbs} />
+            </ol>
+        </nav>
+        <nav aria-label="breadcrumb" className="sm:hidden">
+            <ol className="flex items-center gap-1 text-sm text-muted">
+                <BreadcrumbsList maxSize={2} loading={loading} breadcrumbs={breadcrumbs} />
+            </ol>
+        </nav>
     </section>
 );
 
@@ -25,6 +28,24 @@ type BreadcrumbsListProps = {
     loading?: boolean;
     breadcrumbs?: { link: string; displayName: string }[];
 };
+
+const BreadcrumbItem: React.FC<{ href: string; active?: boolean; className?: string; children: React.ReactNode }> = ({
+    href,
+    active,
+    className = '',
+    children,
+}) => (
+    <li className={`flex items-center gap-1 ${className}`}>
+        {active ? (
+            <span className="text-body">{children}</span>
+        ) : (
+            <Link href={href} className="text-muted hover:text-body transition-colors">
+                {children}
+            </Link>
+        )}
+        {!active && <span className="text-muted">/</span>}
+    </li>
+);
 
 const BreadcrumbsList: React.FC<BreadcrumbsListProps> = ({
     maxSize,
@@ -36,39 +57,36 @@ const BreadcrumbsList: React.FC<BreadcrumbsListProps> = ({
     return (
         <>
             {breadcrumbs?.length > maxSize - 1 ? (
-                <Breadcrumb.Item
+                <BreadcrumbItem
                     href={breadcrumbs?.length > maxSize ? breadcrumbs?.splice(-(maxSize + 1))[0].link : '/'}
-                    linkAs={Link}
                     className={styles.breadcrumb}
                 >
                     ...
-                </Breadcrumb.Item>
+                </BreadcrumbItem>
             ) : (
-                <Breadcrumb.Item
+                <BreadcrumbItem
                     href="/"
-                    linkAs={Link}
                     className={styles.breadcrumb}
                     active={breadcrumbs?.length === 0 && !loading}
                 >
                     Backstage2
-                </Breadcrumb.Item>
+                </BreadcrumbItem>
             )}
 
             {loading ? (
-                <Breadcrumb.Item className={styles.breadcrumb}>
+                <li className={styles.breadcrumb}>
                     <Skeleton width={125} />
-                </Breadcrumb.Item>
+                </li>
             ) : (
                 breadcrumbsTail?.map((b, index) => (
-                    <Breadcrumb.Item
-                        linkAs={Link}
+                    <BreadcrumbItem
                         key={index}
                         href={b.link}
                         active={index === breadcrumbsTail.length - 1}
                         className={styles.breadcrumb}
                     >
                         {b.displayName}
-                    </Breadcrumb.Item>
+                    </BreadcrumbItem>
                 ))
             )}
         </>

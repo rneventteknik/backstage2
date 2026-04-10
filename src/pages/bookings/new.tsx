@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import Layout from '../../components/layout/Layout';
 import { useRouter } from 'next/router';
-import { Button, Card, Tab } from 'react-bootstrap';
+import { Button } from '../../components/ui/Button';
+import { Card } from '../../components/ui/Card';
+import { Tab } from '../../components/ui/Tabs';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../lib/useUser';
 import { IBookingObjectionModel } from '../../models/objection-models';
@@ -279,18 +281,18 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}></Header>
 
-            <Tab.Container id="new-booking-tabs" activeKey={wizardStep}>
+            <Tab.Container id="new-booking-tabs" activeKey={wizardStep} onSelect={() => null}>
                 <Tab.Content>
                     <Tab.Pane eventKey="step-one">
                         <Card className="mb-3">
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
-                                <div className="d-flex align-items-center">
-                                    <p className="text-muted flex-grow-1 mb-0">
+                                <div className="flex items-center">
+                                    <p className="text-muted flex-grow mb-0">
                                         <strong>Steg 1 av 4</strong> Välj en bokning från kalendern nedan eller skapa en
                                         manuellt.
                                     </p>
-                                    <Button onClick={() => createBookingFromCalendar(null)} className="text-nowrap">
+                                    <Button onClick={() => createBookingFromCalendar(null)} className="whitespace-nowrap">
                                         Skapa bokning manuellt
                                     </Button>
                                 </div>
@@ -305,14 +307,14 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         <Card className="mb-3">
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
-                                <div className="d-flex align-items-center">
-                                    <p className="text-muted flex-grow-1 mb-0">
+                                <div className="flex items-center">
+                                    <p className="text-muted flex-grow mb-0">
                                         <strong>Steg 2 av 4</strong> Sök efter en kund nedan eller fortsätt utan kund.
                                     </p>
-                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="me-2 text-nowrap">
+                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2 whitespace-nowrap">
                                         Avbryt
                                     </Button>
-                                    <Button onClick={() => selectCustomer(null)} className="text-nowrap">Fyll i kunddetaljer manuellt</Button>
+                                    <Button onClick={() => selectCustomer(null)} className="whitespace-nowrap">Fyll i kunddetaljer manuellt</Button>
                                 </div>
                             </Card.Body>
                         </Card>
@@ -328,14 +330,14 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         <Card className="mb-3">
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
-                                <div className="d-flex align-items-center">
-                                    <p className="text-muted flex-grow-1 mb-0">
+                                <div className="flex items-center">
+                                    <p className="text-muted flex-grow mb-0">
                                         <strong>Steg 3 av 4</strong> Välj en emailtråd att koppla till bokningen. Innehåller emailet en bokningsfil från externsidan kommer bokningsinformationen hämtas automatiskt från den.
                                     </p>
-                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="me-2 text-nowrap">
+                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2 whitespace-nowrap">
                                         Avbryt
                                     </Button>
-                                    <Button variant={loadingAttachment || parsedSpecData ? 'secondary' : 'primary'} onClick={() => createBookingFromFile()} className="text-nowrap">
+                                    <Button variant={loadingAttachment || parsedSpecData ? 'secondary' : 'primary'} onClick={() => createBookingFromFile()} className="whitespace-nowrap">
                                         Koppla inte emailtråd
                                     </Button>
                                 </div>
@@ -362,15 +364,15 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         <Card className="mb-3">
                             <Card.Header className="p-1"></Card.Header>
                             <Card.Body>
-                                <div className="d-flex align-items-center">
-                                    <p className="text-muted flex-grow-1 mb-0">
+                                <div className="flex items-center">
+                                    <p className="text-muted flex-grow mb-0">
                                         <strong>Steg 4 av 4</strong> Fyll i bokningsdetaljerna nedan.
                                     </p>
-                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="me-2 text-nowrap">
+                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="mr-2 whitespace-nowrap">
                                         Avbryt
                                     </Button>
-                                    <Button variant="primary" form="editBookingForm" type="submit" className="text-nowrap">
-                                        <FontAwesomeIcon icon={faSave} className="me-1" /> Lägg till bokning
+                                    <Button variant="primary" form="editBookingForm" type="submit" className="whitespace-nowrap">
+                                        <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till bokning
                                     </Button>
                                 </div>
                             </Card.Body>
@@ -384,7 +386,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             />
                         ) : null}
                         <Button variant="primary" form="editBookingForm" type="submit" className="mb-3">
-                            <FontAwesomeIcon icon={faSave} className="me-1" /> Lägg till bokning
+                            <FontAwesomeIcon icon={faSave} className="mr-1" /> Lägg till bokning
                         </Button>
                     </Tab.Pane>
                 </Tab.Content>

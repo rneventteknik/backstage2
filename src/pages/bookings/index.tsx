@@ -12,7 +12,7 @@ import { ErrorPage } from '../../components/layout/ErrorPage';
 import { IfNotReadonly } from '../../components/utils/IfAdmin';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
-import { Button } from 'react-bootstrap';
+import { Button } from '../../components/ui/Button';
 import { IsBookingActive } from '../../lib/utils';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
@@ -47,8 +47,8 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/bookings/new" passHref>
-                        <Button variant="primary" as="span">
-                            <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till bokning
+                        <Button variant="primary">
+                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till bokning
                         </Button>
                     </Link>
                 </IfNotReadonly>

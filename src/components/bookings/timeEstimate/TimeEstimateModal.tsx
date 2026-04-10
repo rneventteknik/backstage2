@@ -1,5 +1,9 @@
 import React, { FormEvent, useState } from 'react';
-import { Modal, Col, Form, Row, InputGroup, Button, Card } from 'react-bootstrap';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
+import { Form } from '../../ui/Form';
+import { InputGroup } from '../../ui/InputGroup';
+import { Modal } from '../../ui/Modal';
 import { toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import RequiredIndicator from '../../utils/RequiredIndicator';
@@ -91,11 +95,11 @@ const TimeEstimateModal: React.FC<Props> = ({
                 {showWizard ? (
                     <Card className="mb-3">
                         <Card.Body>
-                            <div className="d-flex">
-                                <strong className="flex-grow-1">Beräkna tidsestimat från klockslag</strong>
+                            <div className="flex">
+                                <strong className="flex-grow">Beräkna tidsestimat från klockslag</strong>
                                 <Button
-                                    className="me-2"
-                                    variant=""
+                                    className="mr-2"
+                                    variant="secondary"
                                     size="sm"
                                     onClick={() => setUserHasClosedWizard((x) => !x)}
                                 >
@@ -103,7 +107,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 </Button>
                             </div>
                             {!userHasClosedWizard ? (
-                                <Form onSubmit={handleSubmitWizard} id={formId + '-wizard'} className="d-flex">
+                                <Form onSubmit={handleSubmitWizard} id={formId + '-wizard'} className="flex flex-wrap gap-2 mt-2">
                                     <Form.Control
                                         required
                                         defaultValue={wizardNumberOfTechnicians}
@@ -111,11 +115,10 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         type="number"
                                         htmlSize={6}
                                         onChange={(e) => setWizardNumberOfTechnicians(e.target.value)}
-                                        className="me-2 mt-2"
                                         min={0}
                                     />
 
-                                    <span className="me-2 mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                                    <span className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                                         tekniker mellan klockan
                                     </span>
 
@@ -126,12 +129,11 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         type="number"
                                         htmlSize={7}
                                         onChange={(e) => setWizardStartHour(e.target.value)}
-                                        className="me-2 mt-2"
                                         min={0}
                                         max={23}
                                     />
 
-                                    <span className="me-2 mt-2">och</span>
+                                    <span>och</span>
 
                                     <Form.Control
                                         required
@@ -140,7 +142,6 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         type="number"
                                         htmlSize={7}
                                         onChange={(e) => setWizardEndHour(e.target.value)}
-                                        className="me-2 mt-2"
                                         min={0}
                                         max={23}
                                     />
@@ -149,7 +150,6 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         form={formId + '-wizard'}
                                         type="submit"
                                         variant="secondary"
-                                        className="mt-2"
                                         disabled={
                                             toIntOrUndefined(wizardNumberOfTechnicians) === undefined ||
                                             toIntOrUndefined(wizardStartHour) === undefined ||
@@ -165,8 +165,8 @@ const TimeEstimateModal: React.FC<Props> = ({
                 ) : null}
 
                 <Form onSubmit={handleSubmit} id={formId}>
-                    <Row>
-                        <Col md={4}>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
                             <Form.Group>
                                 <Form.Label>
                                     Beskrivning
@@ -185,8 +185,8 @@ const TimeEstimateModal: React.FC<Props> = ({
                                     }
                                 />
                             </Form.Group>
-                        </Col>
-                        <Col md={4} xs={6}>
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>
                                     Antal timmar
@@ -208,8 +208,8 @@ const TimeEstimateModal: React.FC<Props> = ({
                                     <InputGroup.Text>h</InputGroup.Text>
                                 </InputGroup>
                             </Form.Group>
-                        </Col>
-                        <Col md={4} xs={6}>
+                        </div>
+                        <div>
                             <Form.Group>
                                 <Form.Label>
                                     Pris per timme (ex. moms)
@@ -238,8 +238,8 @@ const TimeEstimateModal: React.FC<Props> = ({
                                     </Form.Text>
                                 ) : null}
                             </Form.Group>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </Form>
             </Modal.Body>
             <Modal.Footer>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from '../../ui/Button';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
 import { TimeReport } from '../../../models/interfaces/TimeReport';
 import { useNotifications } from '../../../lib/useNotifications';

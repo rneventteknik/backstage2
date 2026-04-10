@@ -1,5 +1,6 @@
 import React, { ChangeEvent } from 'react';
-import { Button, Col, Collapse, Form, Row } from 'react-bootstrap';
+import { Button } from './ui/Button';
+import { Form } from './ui/Form';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faRefresh } from '@fortawesome/free-solid-svg-icons';
 import { useSessionStorageState } from '../lib/useSessionStorageState';
@@ -23,8 +24,8 @@ const AdvancedFilters: React.FC<Props> = ({
 
     return (
         <>
-            <Row className="mb-3">
-                <Col>
+            <div className="flex flex-wrap gap-3 mb-3">
+                <div className="flex-1 min-w-[200px]">
                     <Form.Group>
                         <Form.Control
                             type="text"
@@ -33,25 +34,25 @@ const AdvancedFilters: React.FC<Props> = ({
                             value={searchText}
                         />
                     </Form.Group>
-                </Col>
-                <Col md="auto">
+                </div>
+                <div>
                     <Form.Group>
                         <Button variant="secondary" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
-                            <FontAwesomeIcon icon={faFilter} className="me-1" /> {showAdvancedFilters ? 'Göm' : 'Visa'}{' '}
+                            <FontAwesomeIcon icon={faFilter} className="mr-1" /> {showAdvancedFilters ? 'Göm' : 'Visa'}{' '}
                             filter
                         </Button>
                         {activeFilterCount > 0 ? (
-                            <Button variant="secondary" onClick={() => resetAdvancedFilters()} className="ms-2">
-                                <FontAwesomeIcon icon={faRefresh} className="me-1" /> Återställ filter (
+                            <Button variant="secondary" onClick={() => resetAdvancedFilters()} className="ml-2">
+                                <FontAwesomeIcon icon={faRefresh} className="mr-1" /> Återställ filter (
                                 {activeFilterCount} {activeFilterCount == 1 ? 'aktivt' : 'aktiva'})
                             </Button>
                         ) : null}
                     </Form.Group>
-                </Col>
-            </Row>
-            <Collapse in={showAdvancedFilters} className="mb-3">
-                <div>{children}</div>
-            </Collapse>
+                </div>
+            </div>
+            {showAdvancedFilters ? (
+                <div className="mb-3">{children}</div>
+            ) : null}
         </>
     );
 };

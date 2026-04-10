@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
+import { Form } from '../ui/Form';
 import { EquipmentTag } from '../../models/interfaces';
 import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
 

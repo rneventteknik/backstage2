@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import Router from 'next/router';
 import React, { useState } from 'react';
-import { Navbar, Dropdown, Button, Modal, Row, Col, Card, ListGroup } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Dropdown } from '../ui/Dropdown';
+import { Modal } from '../ui/Modal';
+import { Card } from '../ui/Card';
+import { ListGroup } from '../ui/ListGroup';
 import { CurrentUserInfo } from '../../models/misc/CurrentUserInfo';
 import UserDisplay from '../utils/UserDisplay';
 import UserIcon from '../utils/UserIcon';
@@ -33,86 +37,74 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
 
     return (
         <header>
-            <Navbar variant="dark" fixed="top" className={styles.container} data-search-active-status={searchActive}>
-                <Button variant="none" className="me-2" onClick={toggleSidebar} aria-label="Toggle Sidebar">
+            <nav className={`fixed top-0 inset-x-0 z-40 flex items-center h-12 ${styles.container}`} data-search-active-status={searchActive}>
+                <Button variant="outline-secondary" className="mr-2 border-0 text-body" onClick={toggleSidebar} aria-label="Toggle Sidebar">
                     <FontAwesomeIcon icon={faBars} size="lg" />
                 </Button>
                 <div className={styles.branding}>
-                    <Link href="/" passHref legacyBehavior>
-                        <Navbar.Brand as="a" href="/">
-                            Backstage2 <EnvironmentTypeTag globalSettings={globalSettings} />
-                        </Navbar.Brand>
+                    <Link href="/" className="text-body font-medium no-underline hover:no-underline">
+                        Backstage2 <EnvironmentTypeTag globalSettings={globalSettings} />
                     </Link>
                 </div>
                 <div className={styles.search}>
                     <Search onFocus={() => setSearchActive(true)} onBlur={() => setSearchActive(false)} />
                 </div>
                 <Dropdown>
-                    <Dropdown.Toggle variant="default" id="dropdown-basic" className="py-0" aria-label="User Menu">
+                    <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" className="border-0 py-0" aria-label="User Menu">
                         <UserIcon user={currentUser} />
                     </Dropdown.Toggle>
-
                     <Dropdown.Menu align="end">
                         <Dropdown.Item disabled={true}>
                             <UserDisplay user={currentUser} />
                         </Dropdown.Item>
-                        <Link href={'/users/' + currentUser.userId} passHref legacyBehavior>
-                            <Dropdown.Item href={'/users/' + currentUser.userId}>Profil</Dropdown.Item>
-                        </Link>
-                        <Link href={'/users/' + currentUser.userId + '/time-reports'} passHref>
-                            <Dropdown.Item href={'/users/' + currentUser.userId + '/time-reports'}>
-                                Tidrapporter
-                            </Dropdown.Item>
-                        </Link>
+                        <Dropdown.Item href={'/users/' + currentUser.userId}>Profil</Dropdown.Item>
+                        <Dropdown.Item href={'/users/' + currentUser.userId + '/time-reports'}>Tidrapporter</Dropdown.Item>
                         <Dropdown.Item onClick={() => setShowHelpModal(true)}>Hjälp</Dropdown.Item>
                         <Dropdown.Divider />
                         <Dropdown.Item onClick={logOut}>Logga ut</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
-            </Navbar>
+            </nav>
 
             <Modal show={showHelpModal} onHide={() => setShowHelpModal(false)} size="xl" backdrop="static">
                 <Modal.Header closeButton>
                     <Modal.Title>Hjälp</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Row>
-                        <Col md={8} className="mb-3">
+                    <div className="flex flex-wrap gap-4">
+                        <div className="flex-grow min-w-0 basis-2/3">
                             {getGlobalSetting('content.helpPageText', globalSettings, '')}
-                        </Col>
-                        <Col md={4}>
+                        </div>
+                        <div className="basis-1/3">
                             <Card>
                                 <ListGroup variant="flush">
-                                    <ListGroup.Item className="d-flex">
+                                    <ListGroup.Item className="flex">
                                         <strong>
                                             Backstage2 <EnvironmentTypeTag globalSettings={globalSettings} />
                                         </strong>
                                     </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Session startad</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Session startad</span>
                                         <span>
                                             {currentUser.loginDate
                                                 ? formatDatetimeForForm(new Date(currentUser.loginDate))
                                                 : '-'}
                                         </span>
                                     </ListGroup.Item>
-
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Versionsnummer</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Versionsnummer</span>
                                         <span>
                                             {getGlobalSetting('metadata.build.currentVersion', globalSettings, '-')}
                                         </span>
                                     </ListGroup.Item>
-
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Heroku byggnummer</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Heroku byggnummer</span>
                                         <span>
                                             {getGlobalSetting('metadata.heroku.releaseVersion', globalSettings, '-')}
                                         </span>
                                     </ListGroup.Item>
-
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Commit id</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Commit id</span>
                                         <span>
                                             {getGlobalSetting(
                                                 'metadata.heroku.slugCommit',
@@ -121,15 +113,14 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                                             ).substring(0, 7)}
                                         </span>
                                     </ListGroup.Item>
-
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Kompileringsdatum</span>
+                                    <ListGroup.Item className="flex">
+                                        <span className="flex-grow">Kompileringsdatum</span>
                                         <span>{getGlobalSetting('metadata.build.buildDate', globalSettings, '-')}</span>
                                     </ListGroup.Item>
                                 </ListGroup>
                             </Card>
-                        </Col>
-                    </Row>
+                        </div>
+                    </div>
                 </Modal.Body>
             </Modal>
         </header>

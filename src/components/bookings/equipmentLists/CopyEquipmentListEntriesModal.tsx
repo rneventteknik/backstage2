@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
-import { Badge, Button, Card, Form, Modal, OverlayTrigger, Tab, Tooltip } from 'react-bootstrap';
+import { Badge } from '../../ui/Badge';
+import { Button } from '../../ui/Button';
+import { Card } from '../../ui/Card';
+import { Form } from '../../ui/Form';
+import { Modal } from '../../ui/Modal';
+import { OverlayTrigger, Tooltip } from '../../ui/Tooltip';
+import { Tab } from '../../ui/Tabs';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClone, faSync } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
@@ -295,16 +301,16 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                         <OverlayTrigger
                             placement="right"
                             overlay={
-                                <Tooltip id="1">
+                                <Tooltip>
                                     Namnet kommer att återställas till <em>{getEquipmentName(entry.equipment)}</em>
                                 </Tooltip>
                             }
                         >
-                            <FontAwesomeIcon icon={faSync} className="ms-1" />
+                            <FontAwesomeIcon icon={faSync} className="ml-1" />
                         </OverlayTrigger>
                     ) : null}
                     {entry.equipment?.isArchived ? (
-                        <Badge bg="warning" className="ms-2">
+                        <Badge bg="warning" className="ml-2">
                             Arkiverad
                         </Badge>
                     ) : null}
@@ -318,13 +324,13 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                             <OverlayTrigger
                                 placement="right"
                                 overlay={
-                                    <Tooltip id="1">
+                                    <Tooltip>
                                         Beskrivningen kommer återställas till{' '}
                                         <em>{getEquipmentDescription(entry.equipment)}</em>
                                     </Tooltip>
                                 }
                             >
-                                <FontAwesomeIcon icon={faSync} className="ms-1" />
+                                <FontAwesomeIcon icon={faSync} className="ml-1" />
                             </OverlayTrigger>
                         ) : null}
                     </span>
@@ -382,14 +388,14 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                     <OverlayTrigger
                         placement="right"
                         overlay={
-                            <Tooltip id="1">
+                            <Tooltip>
                                 Priset kommer återställas till:
                                 <br />
                                 <em>{formatPrice(getEquipmentListEntryPrices(entry.equipmentPrice, pricePlan))}</em>
                             </Tooltip>
                         }
                     >
-                        <FontAwesomeIcon icon={faSync} className="ms-1" />
+                        <FontAwesomeIcon icon={faSync} className="ml-1" />
                     </OverlayTrigger>
                 ) : null}
                 {resetPrices &&
@@ -400,7 +406,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                     <OverlayTrigger
                         placement="right"
                         overlay={
-                            <Tooltip id="1">
+                            <Tooltip>
                                 Det manuella priset kommer återställas till
                                 <br />
                                 <em>
@@ -415,13 +421,13 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                             </Tooltip>
                         }
                     >
-                        <FontAwesomeIcon icon={faSync} className="ms-1" />
+                        <FontAwesomeIcon icon={faSync} className="ml-1" />
                     </OverlayTrigger>
                 ) : null}
                 {entry.equipment && entry.equipmentPrice && entry.equipment.prices.length > 1 ? (
                     <p className="text-muted mb-0">{entry.equipmentPrice.name}</p>
                 ) : null}
-                {!entry.equipmentPrice ? <p className="text-muted mb-0 font-italic">Manuellt pris</p> : null}
+{!entry.equipmentPrice ? <p className="text-muted mb-0 italic">Manuellt pris</p> : null}
 
                 {entry.account ? (
                     <p className="text-muted mb-0">
@@ -429,9 +435,9 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                         {resetManualAccounts ? (
                             <OverlayTrigger
                                 placement="right"
-                                overlay={<Tooltip id="1">Det manuella kontot kommer tas bort</Tooltip>}
+                                overlay={<Tooltip>Det manuella kontot kommer tas bort</Tooltip>}
                             >
-                                <FontAwesomeIcon icon={faSync} className="ms-1" />
+                                <FontAwesomeIcon icon={faSync} className="ml-1" />
                             </OverlayTrigger>
                         ) : null}
                     </p>
@@ -506,14 +512,18 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                 <Modal.Title>Hämta utrustning från bokning</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Tab.Container id="import-equipment-tabs" activeKey={selectedBooking ? 'step-two' : 'step-one'}>
+                    <Tab.Container
+                        id="import-equipment-tabs"
+                        activeKey={selectedBooking ? 'step-two' : 'step-one'}
+                        onSelect={() => null}
+                    >
                     <Tab.Content>
                         <Tab.Pane eventKey="step-one">
                             <Card className="mb-3">
                                 <Card.Header className="p-1"></Card.Header>
                                 <Card.Body>
-                                    <div className="d-flex">
-                                        <p className="text-muted flex-grow-1 mb-0">
+                                    <div className="flex">
+                                        <p className="text-muted flex-grow mb-0">
                                             <strong>Steg 1 av 2</strong> Sök efter en bokning att hämta utrustning från.
                                         </p>
                                     </div>
@@ -531,14 +541,14 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                             <Card className="mb-3">
                                 <Card.Header className="p-1"></Card.Header>
                                 <Card.Body>
-                                    <div className="d-flex">
-                                        <p className="text-muted flex-grow-1 mb-0">
+                                    <div className="flex">
+                                        <p className="text-muted flex-grow mb-0">
                                             <strong>Steg 2 av 2</strong> Välj utrustningslista och utrustning.
                                         </p>
                                         <Button
                                             variant="secondary"
                                             onClick={() => setSelectedBooking(null)}
-                                            className="me-2"
+                                            className="mr-2"
                                         >
                                             Gå tillbaka
                                         </Button>
@@ -635,7 +645,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                 className="mb-3"
                                 onClick={() => importEquipment()}
                             >
-                                <FontAwesomeIcon icon={faClone} className="me-1" /> Lägg till utrustning (
+                                <FontAwesomeIcon icon={faClone} className="mr-1" /> Lägg till utrustning (
                                 {selectedEquipmentListEntryIds.length + selectedEquipmentListHeadingIds.length} st)
                             </Button>
                         </Tab.Pane>

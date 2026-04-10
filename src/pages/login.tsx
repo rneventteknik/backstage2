@@ -1,5 +1,6 @@
 import React, { FormEvent, useEffect, useRef, useState } from 'react';
-import { Form, FormControl, Button, FormGroup, Alert, Spinner } from 'react-bootstrap';
+import { Button } from '../components/ui/Button';
+import { Alert } from '../components/ui/Alert';
 import Router from 'next/router';
 import posthog from 'posthog-js';
 import { useUser } from '../lib/useUser';
@@ -108,32 +109,34 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                     <EnvironmentTypeTag globalSettings={globalSettings} />
                 </span>
             </h1>
-            <Form action="/api/users/login" method="post" onSubmit={handleSubmit}>
-                <FormGroup>
-                    <FormControl
+            <form action="/api/users/login" method="post" onSubmit={handleSubmit}>
+                <div className="mb-3">
+                    <input
                         type="text"
+                        className="form-control"
                         placeholder="Användarnamn"
                         name="username"
                         ref={usernameFieldRef}
                     />
-                </FormGroup>
-                <FormGroup>
-                    <FormControl
+                </div>
+                <div className="mb-3">
+                    <input
                         type={!showPassword ? "password" : "text"}
+                        className="form-control"
                         placeholder="Lösenord"
                         name="password"
                         autoComplete="off"
                     />
-                </FormGroup>
-                <FormGroup>
-                    <Form.Check
-                        type="switch"
-                        name="show password"
-                        id="showPasswordToggle"
-                        label="Visa lösenord"
-                        onChange={(e) => setShowPassword(e.target.checked)}
-                    />
-                </FormGroup>
+                </div>
+                <div className="mb-3">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                        <input
+                            type="checkbox"
+                            onChange={(e) => setShowPassword(e.target.checked)}
+                        />
+                        Visa lösenord
+                    </label>
+                </div>
                 {showWrongPasswordError ? <Alert variant="danger">Felaktigt användarnamn eller lösenord</Alert> : null}
                 {showServerError ? (
                     <Alert variant="danger">
@@ -142,14 +145,14 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                 ) : null}
                 {waitingForResponse ? (
                     <Button variant="outline-primary" type="submit" disabled>
-                        <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Loggar in...
+                        Loggar in...
                     </Button>
                 ) : (
                     <Button variant="outline-primary" type="submit">
                         Logga in
                     </Button>
                 )}
-            </Form>
+            </form>
         </div>
     );
 };

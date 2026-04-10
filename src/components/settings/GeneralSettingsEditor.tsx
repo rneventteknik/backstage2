@@ -1,7 +1,7 @@
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
-import { Button } from 'react-bootstrap';
+import { Button } from '../ui/Button';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { formatDatetimeForForm } from '../../lib/datetimeUtils';
@@ -124,7 +124,7 @@ const GeneralSettingsEditor: React.FC<Props> = ({ readonly = false }) => {
                 variant="secondary"
                 size="sm"
                 onClick={() => setSettingToEdit(entry)}
-                className="me-2"
+                className="mr-2"
                 disabled={readonly}
             >
                 Redigera
@@ -193,7 +193,7 @@ const GeneralSettingsEditor: React.FC<Props> = ({ readonly = false }) => {
                     }}
                     disabled={readonly}
                 >
-                    <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till inställning
+                    <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till inställning
                 </Button>
             </div>
 

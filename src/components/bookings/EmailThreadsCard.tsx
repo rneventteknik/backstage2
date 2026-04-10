@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { Button, Card, Dropdown, DropdownButton, ListGroup, Modal } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { Dropdown, DropdownButton } from '../ui/Dropdown';
+import { ListGroup } from '../ui/ListGroup';
+import { Modal } from '../ui/Modal';
 import useSwr from 'swr';
 import DOMPurify from 'dompurify';
 import { getResponseContentOrError } from '../../lib/utils';
@@ -25,22 +29,22 @@ const EmailThreadsCard: React.FC<Props> = ({ emailThreadIds, onSubmit, readonly 
         return (
             <>
                 <Card className="mb-3">
-                    <Card.Header className="d-flex">
-                        <span className="flex-grow-1">Kopplade emailtrådar</span>
+                    <Card.Header className="flex">
+                        <span className="flex-grow">Kopplade emailtrådar</span>
                         {!readonly ? (
                             <Button
                                 onClick={() => setShowSelectEmailThreadModal(true)}
                                 variant="secondary"
-                                className="ms-2"
+                                className="ml-2"
                                 size="sm"
                             >
-                                <FontAwesomeIcon icon={faPlus} className="me-1" />
+                                <FontAwesomeIcon icon={faPlus} className="mr-1" />
                                 Lägg till emailtråd
                             </Button>
                         ) : null}
                     </Card.Header>
                     <ListGroup variant="flush">
-                        <ListGroup.Item className="text-center font-italic text-muted">
+                        <ListGroup.Item className="text-center italic text-muted">
                             Koppla bokningen till emailtrådar för att se dem här.
                         </ListGroup.Item>
                     </ListGroup>
@@ -60,15 +64,15 @@ const EmailThreadsCard: React.FC<Props> = ({ emailThreadIds, onSubmit, readonly 
     return (
         <>
             <Card className="mb-3">
-                <Card.Header className="d-flex">
-                    <span className="flex-grow-1">Kopplade emailtrådar</span>
-                    <Button className="me-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+                <Card.Header className="flex">
+                    <span className="flex-grow">Kopplade emailtrådar</span>
+                    <Button className="mr-2" variant="secondary" size="sm" onClick={() => setShowContent((x) => !x)}>
                         <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                     </Button>
                     {!readonly ? (
                         <DropdownButton id="dropdown-email-threads-header" variant="secondary" title="Mer" size="sm">
                             <Dropdown.Item onClick={() => setShowSelectEmailThreadModal(true)}>
-                                <FontAwesomeIcon icon={faPlus} className="me-1 fa-fw" /> Lägg till emailtråd
+                                <FontAwesomeIcon icon={faPlus} className="mr-1" /> Lägg till emailtråd
                             </Dropdown.Item>
                         </DropdownButton>
                     ) : null}
@@ -113,13 +117,13 @@ const EmailThreadItem: React.FC<EmailThreadItemProps> = ({ threadId, onRemove, r
     if (error) {
         return (
             <ListGroup.Item>
-                <div className="d-flex align-items-start">
-                    <div className="flex-grow-1">
+                <div className="flex items-start">
+                    <div className="flex-grow">
                         <div className="text-danger mb-1">
-                            <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+                            <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
                             Det gick inte att ladda emailtråden
                         </div>
-                        <div className="text-monospace text-muted small">{threadId}</div>
+                        <div className="font-mono text-muted small">{threadId}</div>
                         <div className="text-muted small">{(error as Error).message}</div>
                         {!readonly ? (
                             <Button variant="danger" size="sm" className="mt-2" onClick={onRemove}>
@@ -136,8 +140,8 @@ const EmailThreadItem: React.FC<EmailThreadItemProps> = ({ threadId, onRemove, r
     if (!emailThreadData) {
         return (
             <ListGroup.Item>
-                <div className="d-flex align-items-start">
-                    <div className="flex-grow-1">
+                <div className="flex items-start">
+                    <div className="flex-grow">
                         <Skeleton count={2} />
                     </div>
                 </div>
@@ -148,8 +152,8 @@ const EmailThreadItem: React.FC<EmailThreadItemProps> = ({ threadId, onRemove, r
     return (
         <>
             <ListGroup.Item>
-                <div className="d-flex align-items-start">
-                    <div className="flex-grow-1" role="button" onClick={() => setShowViewThreadModal(true)}>
+                <div className="flex items-start">
+                    <div className="flex-grow" role="button" onClick={() => setShowViewThreadModal(true)}>
                         <div className="mb-1">{emailThreadData.subject || '(Inget ämne)'}</div>
                         <div className="text-muted">
                             {emailThreadData.messageCount} meddelande{emailThreadData.messageCount !== 1 ? 'n' : ''}
@@ -161,10 +165,10 @@ const EmailThreadItem: React.FC<EmailThreadItemProps> = ({ threadId, onRemove, r
                             variant="secondary"
                             title="Mer"
                             size="sm"
-                            className="ms-3"
+                            className="ml-3"
                         >
                             <Dropdown.Item className="text-danger" onClick={onRemove}>
-                                <FontAwesomeIcon icon={faTrash} className="me-2" /> Ta bort koppling
+                                <FontAwesomeIcon icon={faTrash} className="mr-2" /> Ta bort koppling
                             </Dropdown.Item>
                         </DropdownButton>
                     ) : null}
@@ -208,10 +212,10 @@ const SelectEmailThreadModal: React.FC<SelectEmailThreadModalProps> = ({
                     <Card>
                         <Card.Body>
                             <div className="text-danger">
-                                <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+                                <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
                                 Det gick inte att ladda emailtrådar.
                             </div>
-                            <div className="text-monospace text-muted mt-2">{emailThreadsError.message}</div>
+                            <div className="font-mono text-muted mt-2">{emailThreadsError.message}</div>
                         </Card.Body>
                     </Card>
                 </Modal.Body>
@@ -259,7 +263,7 @@ const SelectEmailThreadModal: React.FC<SelectEmailThreadModalProps> = ({
             <Button
                 variant="secondary"
                 size="sm"
-                className="me-2"
+                className="mr-2"
                 onClick={() => {
                     setViewThreadId(thread.id);
                 }}
@@ -269,7 +273,7 @@ const SelectEmailThreadModal: React.FC<SelectEmailThreadModalProps> = ({
             <Button
                 variant="primary"
                 size="sm"
-                className="me-2"
+                className="mr-2"
                 onClick={() => {
                     hide();
                     onSubmit(thread.id);
@@ -383,10 +387,10 @@ export const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
                     <Card>
                         <Card.Body>
                             <div className="text-danger">
-                                <FontAwesomeIcon icon={faExclamationCircle} className="me-2" />
+                                <FontAwesomeIcon icon={faExclamationCircle} className="mr-2" />
                                 Det gick inte att ladda emailtråden.
                             </div>
-                            <div className="text-monospace text-muted mt-2">{error.message}</div>
+                            <div className="font-mono text-muted mt-2">{error.message}</div>
                         </Card.Body>
                     </Card>
                 </Modal.Body>
@@ -465,7 +469,7 @@ export const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
                             <div className="mb-2">
                                 <strong>#{index + 1}</strong>
                                 {message.subject && message.subject !== thread.subject ? (
-                                    <span className="ms-2">{message.subject}</span>
+                                    <span className="ml-2">{message.subject}</span>
                                 ) : null}
                             </div>
                             <div className="mb-2">

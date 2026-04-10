@@ -10,7 +10,7 @@ import useSwr from 'swr';
 import { Role } from '../models/enums/Role';
 import { TableConfiguration, TableDisplay } from '../components/TableDisplay';
 import { InvoiceGroup } from '../models/interfaces/InvoiceGroup';
-import { Button } from 'react-bootstrap';
+import { Button } from '../components/ui/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCoins, faPlus } from '@fortawesome/free-solid-svg-icons';
 import CreateInvoiceGroupModal from '../components/invoices/CreateInvoiceGroupModal';
@@ -103,7 +103,7 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
             <Button
                 variant="secondary"
                 size="sm"
-                className="d-inline me-2"
+                className="inline mr-2"
                 onClick={() => setInvoiceGroupToViewId(invoiceGroup.id)}
             >
                 Visa
@@ -216,11 +216,11 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
         <Layout title={pageTitle} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button onClick={() => setShowCreateModal(true)}>
-                    <FontAwesomeIcon icon={faPlus} className="me-1 fa-fw" /> Skapa Fakturaunderlagsgrupp
+                    <FontAwesomeIcon icon={faPlus} className="mr-1" /> Skapa Fakturaunderlagsgrupp
                 </Button>
                 <Link href="/cash-payments" passHref>
-                    <Button variant="secondary" as="span">
-                        <FontAwesomeIcon icon={faCoins} className="me-1" /> Hantera KårX-betalningar
+                    <Button variant="secondary">
+                        <FontAwesomeIcon icon={faCoins} className="mr-1" /> Hantera KårX-betalningar
                     </Button>
                 </Link>
             </Header>

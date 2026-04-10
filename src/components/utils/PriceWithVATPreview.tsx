@@ -1,5 +1,4 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
 import { addVAT, formatCurrency } from '../../lib/pricingUtils';
 import currency from 'currency.js';
 
@@ -10,10 +9,10 @@ type Props = {
 
 const PriceWithVATPreview: React.FC<Props> = ({ price, text = 'Pris inklusive moms: ' }: Props) => {
     return (
-        <Form.Text className="text-muted">
+        <small className="block mt-1 text-xs text-muted">
             {text}
             {price != null && price != undefined ? formatCurrency(addVAT(price)) : '-'}.
-        </Form.Text>
+        </small>
     );
 };
 

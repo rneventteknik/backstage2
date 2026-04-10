@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Booking } from '../../models/interfaces';
-import { Button, Card } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
 import { getBookingsWithPotentialProblems } from '../../lib/bookingsWithPotentialProblemsUtils';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown, faAngleUp, faWarning } from '@fortawesome/free-solid-svg-icons';
@@ -22,13 +23,13 @@ const BookingPotentialProblemsSection: React.FC<Props> = ({ booking }: Props) =>
         <Card className="mb-3">
             <Card.Header className="p-0 bg-warning" style={{ height: 5 }}></Card.Header>
             <Card.Header>
-                <div className="d-flex">
-                    <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
-                        <FontAwesomeIcon className="me-2" icon={faWarning} />
+                <div className="flex">
+                    <div className="flex-grow mr-4" style={{ fontSize: '1.6em' }}>
+                        <FontAwesomeIcon className="mr-2" icon={faWarning} />
                         Potentiella problem
                     </div>
-                    <div className="d-flex">
-                        <Button className="me-2" variant="" onClick={() => setShowContent(!showContent)}>
+                    <div className="flex">
+                        <Button className="mr-2" variant="secondary" onClick={() => setShowContent(!showContent)}>
                             <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                         </Button>
                     </div>

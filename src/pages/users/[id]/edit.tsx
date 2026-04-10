@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button, Dropdown, DropdownButton, Modal } from 'react-bootstrap';
+import { Button } from '../../../components/ui/Button';
+import { Dropdown, DropdownButton } from '../../../components/ui/Dropdown';
+import { Modal } from '../../../components/ui/Modal';
 import UserForm from '../../../components/users/UserForm';
 import { getResponseContentOrError } from '../../../lib/utils';
 import UserAuthForm from '../../../components/users/UserAuthForm';
@@ -167,12 +169,12 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editUserForm" type="submit">
-                    <FontAwesomeIcon icon={faSave} className="me-1" /> Spara användare
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara användare
                 </Button>
 
                 <IfNotAdmin currentUser={currentUser}>
                     <Button variant="secondary" onClick={() => setShowEditAuthModal(true)}>
-                        <FontAwesomeIcon icon={faUserPen} className="me-1 fa-fw" /> Redigera inloggningsuppgifter
+                        <FontAwesomeIcon icon={faUserPen} className="mr-1" /> Redigera inloggningsuppgifter
                     </Button>
                 </IfNotAdmin>
 
@@ -181,13 +183,13 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         {user.username ? (
                             <>
                                 <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
-                                    <FontAwesomeIcon icon={faUserPen} className="me-1 fa-fw" /> Redigera
+                                    <FontAwesomeIcon icon={faUserPen} className="mr-1" /> Redigera
                                     inloggningsuppgifter
                                 </Dropdown.Item>
                                 <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
                                     <Dropdown.Divider />
                                     <Dropdown.Item onClick={() => setShowDeleteAuthModal(true)} className="text-danger">
-                                        <FontAwesomeIcon icon={faLock} className="me-1 fa-fw" /> Ta bort
+                                        <FontAwesomeIcon icon={faLock} className="mr-1" /> Ta bort
                                         inloggningsuppgifter
                                     </Dropdown.Item>
                                 </IfAdmin>
@@ -195,14 +197,14 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         ) : (
                             <>
                                 <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
-                                    <FontAwesomeIcon icon={faKey} className="me-1 fa-fw" /> Skapa inloggningsuppgifter
+                                    <FontAwesomeIcon icon={faKey} className="mr-1" /> Skapa inloggningsuppgifter
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                             </>
                         )}
                         <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
                             <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                                <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort användare
+                                <FontAwesomeIcon icon={faTrashCan} className="mr-1" /> Ta bort användare
                             </Dropdown.Item>
                         </IfAdmin>
                     </DropdownButton>
@@ -234,7 +236,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
             </ConfirmModal>
 
             <Modal show={showEditAuthModal} onHide={() => setShowEditAuthModal(false)} backdrop="static">
-                <Modal.Header closeButton>
+                <Modal.Header>
                     <Modal.Title>{user.username ? 'Redigera inloggningsuppgifter' : 'Skapa inloggning'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>

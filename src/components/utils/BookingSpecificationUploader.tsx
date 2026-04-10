@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import FileUploader from './FileUploader';
-import { Alert, Button, Card, Col, Form, ListGroup, OverlayTrigger, Row, Tooltip } from 'react-bootstrap';
+import { Alert } from '../ui/Alert';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { Form } from '../ui/Form';
+import { ListGroup } from '../ui/ListGroup';
+import { OverlayTrigger, Tooltip } from '../ui/Tooltip';
 import {
     BookingSpecificationEquipmentImportModel,
     BookingSpecificationEquipmentModel,
@@ -72,7 +77,7 @@ const BookingSpecificationUploader = ({ onSave, initialData }: Props): React.Rea
                 <p className="text-danger text-center">
                     <FontAwesomeIcon icon={faExclamationCircle} /> Det gick inte att ladda utrustningen.
                 </p>
-                <p className="text-monospace text-muted mb-0">{error.message}</p>
+                <p className="font-mono text-muted mb-0">{error.message}</p>
             </div>
         );
     }
@@ -114,27 +119,27 @@ const BookingSpecificationUploader = ({ onSave, initialData }: Props): React.Rea
 
     return fileContent && rows ? (
         <>
-            <Row className="mb-3">
-                <Col xl={4}>
+            <div className="grid grid-cols-1 xl:grid-cols-[1fr_2fr] gap-4 mb-3">
+                <div>
                     <Card className="mb-3">
                         <Card.Header>{fileContent.projectName ?? 'Bokningsinformation'}</Card.Header>
                         <ListGroup variant="flush">
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Prisplan</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Prisplan</span>
                                 <span>{getPricePlanName(pricePlan)}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Kontaktperson</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Kontaktperson</span>
                                 <span>
                                     {fileContent.firstName} {fileContent.lastName}
                                 </span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Telefonnummer</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Telefonnummer</span>
                                 <span>{fileContent.phoneNumber}</span>
                             </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Email</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Email</span>
                                 <span>{fileContent.email}</span>
                             </ListGroup.Item>
                             <ListGroup.Item>
@@ -143,8 +148,8 @@ const BookingSpecificationUploader = ({ onSave, initialData }: Props): React.Rea
                             </ListGroup.Item>
                         </ListGroup>
                     </Card>
-                </Col>
-                <Col xl={8}>
+                </div>
+                <div>
                     {missingEquipment ? (
                         <Alert variant="danger">All utrustning kunde inte matchas mot utrustningdatabasen.</Alert>
                     ) : null}
@@ -156,8 +161,8 @@ const BookingSpecificationUploader = ({ onSave, initialData }: Props): React.Rea
                         rowIsValid={rowIsValid}
                         pricePlan={pricePlan}
                     />
-                </Col>
-            </Row>
+                </div>
+            </div>
             <Button className="mb-3" onClick={() => save()}>
                 Spara bokningsdetaljer och utrustning
             </Button>
@@ -202,7 +207,7 @@ const BookingSpecificationTable = ({
                 <OverlayTrigger
                     placement="right"
                     overlay={
-                        <Tooltip id="1">
+                        <Tooltip>
                             <p className="mb-0">
                                 Denna utrustning kan inte läggas till eftersom den saknar information.
                             </p>

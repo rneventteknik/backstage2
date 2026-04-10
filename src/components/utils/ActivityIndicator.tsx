@@ -1,10 +1,11 @@
 import React from 'react';
-import { Spinner } from 'react-bootstrap';
 
 const ActivityIndicator: React.FC = () => (
-    <Spinner animation="border" role="status">
-        <span className="sr-only">Loading...</span>
-    </Spinner>
+    <div
+        className="inline-block w-6 h-6 border-2 border-muted border-t-primary rounded-full animate-spin"
+        role="status"
+        aria-label="Loading"
+    />
 );
 
 export default ActivityIndicator;

@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Form } from 'react-bootstrap';
+import { Form } from '../ui/Form';
 import { UpdateAuthRequest } from '../../models/misc/UpdateAuthApiModels';
 import { Role } from '../../models/enums/Role';
 import { getRoleName } from '../../lib/utils';

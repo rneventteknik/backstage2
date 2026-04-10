@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form } from 'react-bootstrap';
+import { Form } from '../ui/Form';
 import { toIntOrUndefined } from '../../lib/utils';
 import { EquipmentPublicCategory } from '../../models/interfaces';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';

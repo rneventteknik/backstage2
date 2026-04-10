@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
 import { Booking, BookingViewModel } from '../../models/interfaces';
-import { Button, Card, Form, Modal, OverlayTrigger, Tab, Tooltip } from 'react-bootstrap';
+import { Button } from '../ui/Button';
+import { Card } from '../ui/Card';
+import { Form } from '../ui/Form';
+import { Modal } from '../ui/Modal';
+import { OverlayTrigger, Tooltip } from '../ui/Tooltip';
+import { Tab } from '../ui/Tabs';
 import Skeleton from 'react-loading-skeleton';
 import { faEnvelope, faWarning } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -78,14 +83,14 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
     return (
         <>
             <Button variant="secondary" onClick={() => setShowModal(true)}>
-                <FontAwesomeIcon icon={faEnvelope} className="me-1" /> Skicka meddelande till bokningsansvariga
+                <FontAwesomeIcon icon={faEnvelope} className="mr-1" /> Skicka meddelande till bokningsansvariga
             </Button>
             <Modal show={showModal} onHide={hide} size="xl">
                 <Modal.Header closeButton>
                     <Modal.Title>Skicka meddelande till bokningsansvariga</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Tab.Container id="import-equipment-tabs" activeKey={activeTab}>
+                    <Tab.Container id="import-equipment-tabs" activeKey={activeTab} onSelect={(k) => k && setActiveTab(k)}>
                         <Tab.Content>
                             <Tab.Pane eventKey="step-one">
                                 {activeTab === 'step-one' ? (
@@ -93,15 +98,15 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                         <Card className="mb-3">
                                             <Card.Header className="p-1"></Card.Header>
                                             <Card.Body>
-                                                <div className="d-flex">
-                                                    <p className="text-muted flex-grow-1 mb-0">
+                                                <div className="flex">
+                                                    <p className="text-muted flex-grow mb-0">
                                                         <strong>Steg 1 av 3</strong> Välj bokningar vars ansvariga att
                                                         skicka meddelande till.
                                                     </p>
                                                     <Button
                                                         variant="primary"
                                                         onClick={() => setActiveTab('step-two')}
-                                                        className="me-2"
+                                                        className="mr-2"
                                                         disabled={selectedBookingIds.length === 0}
                                                     >
                                                         Gå vidare
@@ -125,21 +130,21 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                         <Card className="mb-3">
                                             <Card.Header className="p-1"></Card.Header>
                                             <Card.Body>
-                                                <div className="d-flex">
-                                                    <p className="text-muted flex-grow-1 mb-0">
+                                                <div className="flex">
+                                                    <p className="text-muted flex-grow mb-0">
                                                         <strong>Steg 2 av 3</strong> Skriv meddelande.
                                                     </p>
                                                     <Button
                                                         variant="secondary"
                                                         onClick={() => setActiveTab('step-one')}
-                                                        className="me-2"
+                                                        className="mr-2"
                                                     >
                                                         Gå tillbaka
                                                     </Button>
                                                     <Button
                                                         variant="primary"
                                                         onClick={() => setActiveTab('step-three')}
-                                                        className="me-2"
+                                                        className="mr-2"
                                                         disabled={message.length === 0}
                                                     >
                                                         Gå vidare
@@ -169,23 +174,23 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                         <Card className="mb-3">
                                             <Card.Header className="p-1"></Card.Header>
                                             <Card.Body>
-                                                <div className="d-flex">
-                                                    <p className="text-muted flex-grow-1 mb-0">
+                                                <div className="flex">
+                                                    <p className="text-muted flex-grow mb-0">
                                                         <strong>Steg 3 av 3</strong> Förhandsgranskning.
                                                     </p>
                                                     <Button
                                                         variant="secondary"
                                                         onClick={() => setActiveTab('step-two')}
-                                                        className="me-2"
+                                                        className="mr-2"
                                                     >
                                                         Gå tillbaka
                                                     </Button>
                                                     <Button
                                                         variant="primary"
                                                         onClick={() => sendMessageAndClose()}
-                                                        className="me-2"
+                                                        className="mr-2"
                                                     >
-                                                        <FontAwesomeIcon icon={faEnvelope} className="me-1" /> Skicka
+                                                        <FontAwesomeIcon icon={faEnvelope} className="mr-1" /> Skicka
                                                         meddelande
                                                     </Button>
                                                 </div>
@@ -195,7 +200,7 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                         <Card className="mb-3">
                                             <Card.Header>Förhandsgranskning av meddelande</Card.Header>
                                             <Card.Body>
-                                                <div className="d-flex">
+                                                <div className="flex">
                                                     <div className="p-2">
                                                         <UserIcon
                                                             user={{ userId: userIdForPreview, isLoggedIn: false }}
@@ -230,7 +235,7 @@ const SendMessageToBookingOwnersButton: React.FC<Props> = ({ bookings }: Props) 
                                                                     <OverlayTrigger
                                                                         placement="right"
                                                                         overlay={
-                                                                            <Tooltip id="1">
+                                                                            <Tooltip>
                                                                                 <strong>
                                                                                     Denna användare har inget slack-id
                                                                                     konfigurerat och kommer inte att få

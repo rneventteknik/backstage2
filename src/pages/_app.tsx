@@ -1,7 +1,6 @@
-import '../style/style.scss';
+import '../style/globals.css';
 import React, { useEffect } from 'react';
 import { AppProps } from 'next/app';
-import 'react-bootstrap-typeahead/css/Typeahead.css';
 import 'react-loading-skeleton/dist/skeleton.css';
 import { Provider } from 'react-bus';
 import posthog from 'posthog-js';
@@ -18,6 +17,7 @@ import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TooltipProvider } from '../components/ui/Tooltip';
 config.autoAddCss = false;
 
 export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
@@ -44,12 +44,14 @@ export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 
     return (
         <PostHogProvider client={posthog}>
-            <DndProvider backend={HTML5Backend}>
-                <Provider>
-                    <NotificationsContainer />
-                    <Component {...pageProps} />
-                </Provider>
-            </DndProvider>
+            <TooltipProvider>
+                <DndProvider backend={HTML5Backend}>
+                    <Provider>
+                        <NotificationsContainer />
+                        <Component {...pageProps} />
+                    </Provider>
+                </DndProvider>
+            </TooltipProvider>
         </PostHogProvider>
     );
 }

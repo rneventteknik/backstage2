@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
-import { Button, Form, ListGroup, Modal } from 'react-bootstrap';
+import { Button } from '../../ui/Button';
+import { Form } from '../../ui/Form';
+import { ListGroup } from '../../ui/ListGroup';
+import { Modal } from '../../ui/Modal';
 import { Language } from '../../../models/enums/Language';
 import { EquipmentPackage } from '../../../models/interfaces';
 import PackageEquipmentList from '../../equipmentPackage/PackageEquipmentList';
@@ -40,13 +43,13 @@ const PackageInfoModal: React.FC<Props> = ({ show, onHide, onSave, equipmentPack
                     <hr />
                     <ListGroup>
                         {equipmentPackage.estimatedHours && equipmentPackage.estimatedHours > 0 ? (
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Estimerad arbetstid</span>
+                            <ListGroup.Item className="flex">
+                                <span className="flex-grow">Estimerad arbetstid</span>
                                 <span>{equipmentPackage.estimatedHours} timmar</span>
                             </ListGroup.Item>
                         ) : null}
-                        <ListGroup.Item className="d-flex">
-                            <span className="flex-grow-1">Pakettyp</span>
+                        <ListGroup.Item className="flex">
+                            <span className="flex-grow">Pakettyp</span>
                             <span>{equipmentPackage.addAsHeading ? 'Rubrik med rader' : 'Individuella rader'}</span>
                         </ListGroup.Item>
                     </ListGroup>

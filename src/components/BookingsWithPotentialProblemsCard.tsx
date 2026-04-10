@@ -15,7 +15,8 @@ import TableStyleLink from './utils/TableStyleLink';
 import { HasId } from '../models/interfaces/BaseEntity';
 import { faList } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Button, Card } from 'react-bootstrap';
+import { Button } from './ui/Button';
+import { Card } from './ui/Card';
 import { formatDatetime } from '../lib/datetimeUtils';
 import Skeleton from 'react-loading-skeleton';
 import Link from 'next/link';
@@ -36,11 +37,11 @@ const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props)
     const BookingNameDisplayFn = (result: BookingsWithPotentialProblemsResult) => (
         <>
             <TableStyleLink href={'/bookings/' + result.booking.id}>{result.booking.name}</TableStyleLink>
-            <BookingStatusTag booking={result.booking} className="ms-1" />
-            <BookingTypeTag booking={result.booking} className="ms-1" />
-            <RentalStatusTag booking={result.booking} className="ms-1" />
-            <InternalReservationTag booking={result.booking} className="ms-1" />
-            <FixedPriceStatusTag booking={result.booking} className="ms-1" />
+            <BookingStatusTag booking={result.booking} className="ml-1" />
+            <BookingTypeTag booking={result.booking} className="ml-1" />
+            <RentalStatusTag booking={result.booking} className="ml-1" />
+            <InternalReservationTag booking={result.booking} className="ml-1" />
+            <FixedPriceStatusTag booking={result.booking} className="ml-1" />
             <p className="text-muted mb-0">{result.booking.customerName ?? '-'}</p>
             <p className="mb-0 text-muted">{result.booking.monthYearUsageStartString}</p>
         </>
@@ -52,7 +53,7 @@ const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props)
                 <p className="mb-1">
                     Inte markerat som bokad
                     <WarningIcon
-                        className="ms-2"
+                        className="ml-2"
                         text={`Denna bokning lämnas ut ${formatDatetime(result.booking.equipmentOutDatetime)} och är fortfarande inte markerad som bokad.`}
                     />
                 </p>
@@ -61,7 +62,7 @@ const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props)
                 <p className="mb-1">
                     Inte klarmarkerad
                     <WarningIcon
-                        className="ms-2"
+                        className="ml-2"
                         text={`Denna bokning återlämnades ${formatDatetime(result.booking.equipmentInDatetime)} och är fortfarande inte klarmarkerad.`}
                     />
                 </p>
@@ -70,7 +71,7 @@ const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props)
                 <p className="mb-1">
                     Inte utlämnad
                     <WarningIcon
-                        className="ms-2"
+                        className="ml-2"
                         text={`Denna bokning har utrustningslistor som borde ha lämnats ut men som inte markerats som utlämnade (${result.shouldBeOut.map((x) => x.name).join(', ')}).`}
                     />
                 </p>
@@ -79,7 +80,7 @@ const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props)
                 <p className="mb-1">
                     Inte återlämnad
                     <WarningIcon
-                        className="ms-2"
+                        className="ml-2"
                         text={`Denna bokning har utrustningslistor som borde ha återlämnats men som inte markerats som återlämnade (${result.shouldBeIn.map((x) => x.name).join(', ')}).`}
                     />
                 </p>
@@ -121,13 +122,12 @@ const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props)
     return (
         <>
             <Card>
-                <Card.Header className="d-flex justify-content-between">
+                <Card.Header className="flex justify-between">
                     Dina bokningar med potentiella problem
-                    <Link href="/bookings/problems" passHref>
+                    <Link href="/bookings/problems">
                         <Button
                             variant="secondary"
                             size="sm"
-                            as="span"
                         >
                             <FontAwesomeIcon icon={faList} /> Visa alla
                         </Button>

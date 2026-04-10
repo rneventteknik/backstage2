@@ -6,7 +6,7 @@ import Link from 'next/link';
 import LargeBookingTable from '../components/LargeBookingTable';
 import { useUserWithDefaultAccessAndWithSettings } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
-import { Button } from 'react-bootstrap';
+import { Button } from '../components/ui/Button';
 import { bookingsFetcher } from '../lib/fetchers';
 import { TableLoadingPage } from '../components/layout/LoadingPageSkeleton';
 import { ErrorPage } from '../components/layout/ErrorPage';
@@ -46,8 +46,8 @@ const ArchiveListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <IfNotReadonly currentUser={currentUser}>
                     <Link href="/bookings/new" passHref>
-                        <Button variant="primary" as="span">
-                            <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till bokning
+                        <Button variant="primary">
+                            <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till bokning
                         </Button>
                     </Link>
                 </IfNotReadonly>

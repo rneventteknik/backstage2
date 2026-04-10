@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Booking } from '../../models/interfaces';
 import { IBookingObjectionModel } from '../../models/objection-models';
-import { Alert, Button } from 'react-bootstrap';
+import { Alert } from '../ui/Alert';
+import { Button } from '../ui/Button';
 import { BookingType } from '../../models/enums/BookingType';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRightFromBracket, faRightToBracket } from '@fortawesome/free-solid-svg-icons';
@@ -56,7 +57,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({
         return (
             <>
                 <Button variant="secondary" className={className} onClick={() => setShowConfirmOutModal(true)}>
-                    <FontAwesomeIcon icon={faRightFromBracket} className="me-1" /> Lämna ut
+                    <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
                 </Button>
                 <ConfirmModal
                     show={showConfirmOutModal}
@@ -86,7 +87,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({
         return (
             <>
                 <Button variant="secondary" className={className} onClick={() => setShowReturnalNoteModal(true)}>
-                    <FontAwesomeIcon icon={faRightToBracket} className="me-1" /> Ta emot
+                    <FontAwesomeIcon icon={faRightToBracket} className="mr-1" /> Ta emot
                 </Button>
                 <BookingReturnalNoteModal
                     returnalNote={booking.returnalNote}

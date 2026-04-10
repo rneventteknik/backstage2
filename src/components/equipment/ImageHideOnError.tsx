@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import React, { useState } from 'react';
-import { Card } from 'react-bootstrap';
+import { Card } from '../ui/Card';
 
 export const ImageCardHideOnError = ({ src, altText }: { src: string; altText: string }) => {
     const [hide, setHide] = useState(false);

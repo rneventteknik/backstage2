@@ -1,7 +1,6 @@
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useState } from 'react';
-import { Toast } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
 import { useListener } from 'react-bus';
 import { v4 as generateGuid } from 'uuid';
 import styles from './NotificationsArea.module.scss';
@@ -38,29 +37,40 @@ const getNotificationTypeClassName = (variant: 'success' | 'warning' | 'danger' 
     }
 };
 
-const Notification: React.FC<NotificationProps> = ({ notification, onClose }: NotificationProps) => (
-    <Toast
-        onClose={onClose}
-        show={notification.show}
-        animation={true}
-        delay={notification.timeout * 1000}
-        autohide
-        className={styles.notification + ' ' + getNotificationTypeClassName(notification.variant)}
-    >
-        <Toast.Header className={styles.header}>
-            <span className="mr-auto">
-                <strong>
-                    <span className={styles.iconContainer}>
-                        <FontAwesomeIcon icon={notification.icon} size="lg" className={styles.icon} />
-                    </span>
-                    {notification.title}{' '}
-                </strong>
-                {notification.description}
+const Notification: React.FC<NotificationProps> = ({ notification, onClose }: NotificationProps) => {
+    const [visible, setVisible] = useState(true);
+
+    useEffect(() => {
+        if (notification.show) {
+            setVisible(true);
+            const timer = setTimeout(() => {
+                setVisible(false);
+                onClose();
+            }, notification.timeout * 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [notification.show, notification.timeout, onClose]);
+
+    if (!notification.show && !visible) return null;
+
+    return (
+        <div
+            className={`${styles.notification} ${getNotificationTypeClassName(notification.variant)} flex items-start gap-3 px-4 py-3 mb-2 border shadow-lg`}
+        >
+            <span className={styles.iconContainer}>
+                <FontAwesomeIcon icon={notification.icon} size="lg" className={styles.icon} />
             </span>
-        </Toast.Header>
-        {notification.body ? <Toast.Body>{notification.body}</Toast.Body> : null}
-    </Toast>
-);
+            <div className="flex-grow">
+                <strong>{notification.title}</strong>{' '}
+                {notification.description}
+                {notification.body && <div className="mt-1 text-sm">{notification.body}</div>}
+            </div>
+            <button onClick={onClose} className="text-muted hover:text-body ml-2" aria-label="Close">
+                ×
+            </button>
+        </div>
+    );
+};
 
 const NotificationsArea: React.FC = () => {
     const [notifications, setNotifications] = useState<InternalNotificationData[]>([]);

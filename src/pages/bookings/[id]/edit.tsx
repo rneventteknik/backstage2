@@ -2,7 +2,7 @@ import React from 'react';
 import Layout from '../../../components/layout/Layout';
 import useSwr from 'swr';
 import { useRouter } from 'next/router';
-import { Button } from 'react-bootstrap';
+import { Button } from '../../../components/ui/Button';
 import { getResponseContentOrError } from '../../../lib/utils';
 import { CurrentUserInfo } from '../../../models/misc/CurrentUserInfo';
 import { useUserWithDefaultAccessAndWithSettings } from '../../../lib/useUser';
@@ -90,7 +90,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editBookingForm" type="submit">
-                    <FontAwesomeIcon icon={faSave} className="me-1" /> Spara bokning
+                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara bokning
                 </Button>
             </Header>
 
