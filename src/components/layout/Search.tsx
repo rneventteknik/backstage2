@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import * as Typeahead from 'react-bootstrap-typeahead';
-import type { RenderMenuProps, TypeaheadComponentProps } from 'react-bootstrap-typeahead';
+import React, { useRef, useState } from 'react';
+import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/react';
 import { useRouter } from 'next/router';
 import { SearchResult } from '../../models/misc/SearchResult';
 import { groupBy, getResponseContentOrError } from '../../lib/utils';
@@ -23,8 +22,8 @@ import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
 
-type Option = TypeaheadComponentProps['options'][number];
-type RenderMenuState = Parameters<NonNullable<TypeaheadComponentProps['renderMenu']>>[2];
+const inputBase =
+    'bg-bs-4 border border-bs-4 text-body placeholder-muted px-3 py-1.5 text-sm focus:outline-none focus:border-bs-7 disabled:opacity-60 w-full';
 
 enum ResultType {
     BOOKING,
@@ -35,9 +34,6 @@ enum ResultType {
 interface SearchResultViewModel extends BaseEntityWithName {
     type: ResultType;
     url: string;
-}
-interface HasIndex {
-    index: number;
 }
 
 type Props = {
@@ -51,6 +47,19 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
 
     const [searchResult, setSearchResult] = useState<SearchResultViewModel[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [query, setQuery] = useState('');
+
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const handleInputChange = (value: string) => {
+        setQuery(value);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (value.length === 0) {
+            setSearchResult([]);
+            setIsLoading(false);
+            return;
+        }
+        debounceRef.current = setTimeout(() => fetchSearchResults(value), 300);
+    };
 
     const fetchSearchResults = async (searchString: string) => {
         setIsLoading(true);
@@ -104,27 +113,22 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
             );
     };
 
-    const handleSelect = (selected: SearchResultViewModel[]) => {
-        const selectedEntity = selected[0];
-        if (selectedEntity) {
-            router.push(selectedEntity.url);
+    const handleSelect = (entity: SearchResultViewModel | null) => {
+        if (entity) {
+            router.push(entity.url);
         }
+        setQuery('');
+        setSearchResult([]);
     };
 
-    type ResultSectionProps<T extends SearchResultViewModel & HasIndex> = {
-        results: T[];
+    type ResultSectionProps = {
+        results: SearchResultViewModel[] | undefined;
         heading: string;
         icon: IconDefinition;
-        state: RenderMenuState;
     };
 
-    const ResultSection = <T extends SearchResultViewModel & HasIndex>({
-        results,
-        heading,
-        icon,
-        state,
-    }: ResultSectionProps<T>): React.ReactElement => {
-        const getDescription = (entity: T, highlightText: string) => {
+    const ResultSection = ({ results, heading, icon }: ResultSectionProps): React.ReactElement => {
+        const getDescription = (entity: SearchResultViewModel, highlightText: string) => {
             switch (entity.type) {
                 case ResultType.USER:
                     const user = entity as unknown as IUserObjectionModel;
@@ -175,88 +179,53 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
 
         return (
             <>
-                <Typeahead.Menu.Header>
+                <div className={styles.menuHeader}>
                     <FontAwesomeIcon icon={icon} /> {heading}
-                </Typeahead.Menu.Header>
+                </div>
                 {results && results.length > 0 ? (
                     results.map((entity) => (
-                        <Typeahead.MenuItem
-                            key={entity.id}
-                            option={entity}
-                            position={entity.index}
-                            className={styles.dropdownItem}
-                            href={entity.url}
-                        >
-                            <SplitHighlighter search={state.text} textToHighlight={entity.name} />
-                            <div>{getDescription(entity, state.text)}</div>
-                        </Typeahead.MenuItem>
+                        <ComboboxOption key={entity.id} value={entity} className={styles.dropdownItem}>
+                            <SplitHighlighter search={query} textToHighlight={entity.name} />
+                            <div>{getDescription(entity, query)}</div>
+                        </ComboboxOption>
                     ))
                 ) : (
-                    <Typeahead.Menu.Header>
+                    <div className={styles.menuHeader}>
                         <small>{isLoading ? 'Laddar...' : 'Inga matchingar'}</small>
-                    </Typeahead.Menu.Header>
+                    </div>
                 )}
             </>
         );
     };
 
-    const renderMenu = (
-        results: Option[],
-        menuProps: RenderMenuProps,
-        state: RenderMenuState,
-    ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
-
-    type MenuProps = {
-        results: Option[];
-        menuProps: RenderMenuProps;
-        state: RenderMenuState;
-    };
-
-    const Menu = ({ results, menuProps, state }: MenuProps): React.ReactElement => {
-        const resultWithIndex = (results as SearchResultViewModel[]).map((res, index) => ({ index: index, ...res }));
-        const res = groupBy(resultWithIndex, (x) => x.type);
-
-        return (
-            <Typeahead.Menu {...menuProps} className={styles.menu}>
-                <ResultSection
-                    heading="Bokningar"
-                    icon={faCalendarDay}
-                    results={res[ResultType.BOOKING]}
-                    state={state}
-                />
-
-                <Typeahead.Menu.Divider />
-                <ResultSection heading="Utrustning" icon={faCube} results={res[ResultType.EQUIPMENT]} state={state} />
-
-                <Typeahead.Menu.Divider />
-                <ResultSection
-                    heading="Utrustningspaket"
-                    icon={faCubes}
-                    results={res[ResultType.EQUIPMENT_PACKAGE]}
-                    state={state}
-                ></ResultSection>
-
-                <Typeahead.Menu.Divider />
-                <ResultSection heading="Användare" icon={faUser} results={res[ResultType.USER]} state={state} />
-            </Typeahead.Menu>
-        );
-    };
+    const res = groupBy(searchResult, (x) => x.type);
 
     return (
-        <Typeahead.AsyncTypeahead
-            id="search"
-            filterBy={() => true}
-            labelKey={(x: Option) => (x as SearchResultViewModel).name}
-            isLoading={isLoading}
-            options={searchResult}
-            onSearch={fetchSearchResults}
-            onChange={(selected) => handleSelect(selected as SearchResultViewModel[])}
-            renderMenu={renderMenu}
-            placeholder="Sök..."
-            selected={[]}
-            onFocus={onFocus}
-            onBlur={onBlur}
-        />
+        <Combobox as="div" className="relative" value={null} onChange={handleSelect} immediate>
+            <ComboboxInput
+                displayValue={() => ''}
+                onChange={(e) => handleInputChange(e.target.value)}
+                placeholder="Sök..."
+                onFocus={onFocus}
+                onBlur={onBlur}
+                className={inputBase}
+            />
+            {query.length > 0 && (
+                <ComboboxOptions className={styles.menu}>
+                    <ResultSection heading="Bokningar" icon={faCalendarDay} results={res[ResultType.BOOKING]} />
+                    <hr className={styles.divider} />
+                    <ResultSection heading="Utrustning" icon={faCube} results={res[ResultType.EQUIPMENT]} />
+                    <hr className={styles.divider} />
+                    <ResultSection
+                        heading="Utrustningspaket"
+                        icon={faCubes}
+                        results={res[ResultType.EQUIPMENT_PACKAGE]}
+                    />
+                    <hr className={styles.divider} />
+                    <ResultSection heading="Användare" icon={faUser} results={res[ResultType.USER]} />
+                </ComboboxOptions>
+            )}
+        </Combobox>
     );
 };
 

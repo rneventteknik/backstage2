@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import * as Typeahead from 'react-bootstrap-typeahead';
-import type { RenderMenuProps, TypeaheadComponentProps } from 'react-bootstrap-typeahead';
+import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/react';
 import styles from './BookingSearch.module.scss';
 import { BookingsSearchResult } from '../models/misc/SearchResult';
 import { getResponseContentOrError } from '../lib/utils';
@@ -11,14 +10,11 @@ import { toBooking } from '../lib/mappers/booking';
 import { SplitHighlighter } from './utils/Highlight';
 import { toBookingViewModel } from '../lib/datetimeUtils';
 
-type Option = TypeaheadComponentProps['options'][number];
-type RenderMenuState = Parameters<NonNullable<TypeaheadComponentProps['renderMenu']>>[2];
+const inputBase =
+    'bg-bs-4 border border-bs-4 text-body placeholder-muted px-3 py-1.5 text-sm focus:outline-none focus:border-bs-7 disabled:opacity-60 w-full';
 
 export interface SearchResultViewModel extends BaseEntityWithName {
     url: string;
-}
-interface HasIndex {
-    index: number;
 }
 
 type Props = {
@@ -30,18 +26,31 @@ type Props = {
     autoFocus?: boolean;
 };
 
-const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFocus, onBlur, autoFocus }: Props) => {
+const BookingSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFocus, onBlur, autoFocus }: Props) => {
     const { showErrorMessage } = useNotifications();
 
     const [searchResult, setSearchResult] = useState<SearchResultViewModel[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [query, setQuery] = useState('');
 
-    const inputField = useRef<Typeahead.TypeaheadRef | null>(null);
+    const inputRef = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
-        if (inputField.current && autoFocus) {
-            inputField.current.focus();
+        if (inputRef.current && autoFocus) {
+            inputRef.current.focus();
         }
     });
+
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const handleInputChange = (value: string) => {
+        setQuery(value);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (value.length === 0) {
+            setSearchResult([]);
+            setIsLoading(false);
+            return;
+        }
+        debounceRef.current = setTimeout(() => fetchSearchResults(value), 300);
+    };
 
     const fetchSearchResults = async (searchString: string) => {
         setIsLoading(true);
@@ -68,29 +77,27 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
         }));
     };
 
-    const handleSelect = (selected: SearchResultViewModel[]) => {
-        const selectedEntity = selected[0];
-        if (selectedEntity && onSelect) {
-            onSelect(selectedEntity);
+    const handleSelect = (entity: SearchResultViewModel | null) => {
+        if (entity && onSelect) {
+            onSelect(entity);
         }
+        setQuery('');
+        setSearchResult([]);
     };
 
-    type SearchListItemProps<T extends SearchResultViewModel & HasIndex> = {
-        entity: T;
-        state: RenderMenuState;
+    type SearchListItemProps = {
+        entity: SearchResultViewModel;
+        searchText: string;
     };
 
-    const SearchListItem = <T extends SearchResultViewModel & HasIndex>({
-        entity,
-        state,
-    }: SearchListItemProps<T>): React.ReactElement => {
+    const SearchListItem = ({ entity, searchText }: SearchListItemProps): React.ReactElement => {
         const booking = entity as unknown as IBookingObjectionModel;
         const viewModel = toBookingViewModel(toBooking(booking));
 
         return (
             <>
                 <div>
-                    <SplitHighlighter search={state.text} textToHighlight={entity.name} />
+                    <SplitHighlighter search={searchText} textToHighlight={entity.name} />
                 </div>
                 <div>
                     <small>
@@ -103,59 +110,35 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
         );
     };
 
-    const renderMenu = (
-        results: Option[],
-        menuProps: RenderMenuProps,
-        state: RenderMenuState,
-    ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
-
-    type MenuProps = {
-        results: Option[];
-        menuProps: RenderMenuProps;
-        state: RenderMenuState;
-    };
-
-    const Menu = ({ results, menuProps, state }: MenuProps): React.ReactElement => {
-        const resultWithIndex = (results as SearchResultViewModel[]).map((res, index) => ({ index: index, ...res }));
-        return (
-            <Typeahead.Menu {...menuProps} className={styles.menu}>
-                {resultWithIndex && resultWithIndex.length > 0 ? (
-                    resultWithIndex.map((entity) => (
-                        <Typeahead.MenuItem
-                            key={entity.id}
-                            option={entity}
-                            position={entity.index}
-                            className={styles.dropdownItem}
-                        >
-                            <SearchListItem entity={entity} state={state}></SearchListItem>
-                        </Typeahead.MenuItem>
-                    ))
-                ) : (
-                    <Typeahead.Menu.Header>
-                        <small>{isLoading ? 'Laddar...' : 'Inga matchingar'}</small>
-                    </Typeahead.Menu.Header>
-                )}
-            </Typeahead.Menu>
-        );
-    };
-
     return (
-        <Typeahead.AsyncTypeahead
-            id={id}
-            filterBy={() => true}
-            labelKey={(x: Option) => (x as SearchResultViewModel).name}
-            isLoading={isLoading}
-            options={searchResult}
-            selected={[]}
-            onSearch={fetchSearchResults}
-            onChange={(selected) => handleSelect(selected as SearchResultViewModel[])}
-            renderMenu={renderMenu}
-            placeholder={placeholder}
-            ref={inputField}
-            onFocus={onFocus}
-            onBlur={onBlur}
-        />
+        <Combobox as="div" className="relative" value={null} onChange={handleSelect} immediate>
+            <ComboboxInput
+                id={id}
+                ref={inputRef}
+                displayValue={() => ''}
+                onChange={(e) => handleInputChange(e.target.value)}
+                placeholder={placeholder}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                className={inputBase}
+            />
+            {query.length > 0 && (
+                <ComboboxOptions className={styles.menu}>
+                    {searchResult.length === 0 ? (
+                        <div className={styles.menuHeader}>
+                            <small>{isLoading ? 'Laddar...' : 'Inga matchingar'}</small>
+                        </div>
+                    ) : (
+                        searchResult.map((entity) => (
+                            <ComboboxOption key={entity.id} value={entity} className={styles.dropdownItem}>
+                                <SearchListItem entity={entity} searchText={query} />
+                            </ComboboxOption>
+                        ))
+                    )}
+                </ComboboxOptions>
+            )}
+        </Combobox>
     );
 };
 
-export default EquipmentSearch;
+export default BookingSearch;

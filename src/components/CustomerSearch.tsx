@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import * as Typeahead from 'react-bootstrap-typeahead';
-import type { RenderMenuProps, TypeaheadComponentProps } from 'react-bootstrap-typeahead';
+import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/react';
 import styles from './CustomerSearch.module.scss';
 import { CustomersSearchResult } from '../models/misc/SearchResult';
 import { getAccountKindName, getLanguageName, getPricePlanName, getResponseContentOrError } from '../lib/utils';
@@ -11,12 +10,8 @@ import { Customer } from '../models/interfaces/Customer';
 import { Badge } from './ui/Badge';
 import { Language } from '../models/enums/Language';
 
-type Option = TypeaheadComponentProps['options'][number];
-type RenderMenuState = Parameters<NonNullable<TypeaheadComponentProps['renderMenu']>>[2];
-
-interface HasIndex {
-    index: number;
-}
+const inputBase =
+    'bg-bs-4 border border-bs-4 text-body placeholder-muted px-3 py-1.5 text-sm focus:outline-none focus:border-bs-7 disabled:opacity-60 w-full';
 
 type Props = {
     id: string;
@@ -32,13 +27,26 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
 
     const [searchResult, setSearchResult] = useState<Customer[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [query, setQuery] = useState('');
 
-    const inputField = useRef<Typeahead.TypeaheadRef | null>(null);
+    const inputRef = useRef<HTMLInputElement | null>(null);
     useEffect(() => {
-        if (inputField.current && autoFocus) {
-            inputField.current.focus();
+        if (inputRef.current && autoFocus) {
+            inputRef.current.focus();
         }
     });
+
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const handleInputChange = (value: string) => {
+        setQuery(value);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (value.length === 0) {
+            setSearchResult([]);
+            setIsLoading(false);
+            return;
+        }
+        debounceRef.current = setTimeout(() => fetchSearchResults(value), 300);
+    };
 
     const fetchSearchResults = async (searchString: string) => {
         setIsLoading(true);
@@ -62,26 +70,24 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
         return results.customers.map((customer) => toCustomer(customer));
     };
 
-    const handleSelect = (selected: Customer[]) => {
-        const selectedEntity = selected[0];
-        if (selectedEntity && onSelect) {
-            onSelect(selectedEntity);
+    const handleSelect = (entity: Customer | null) => {
+        if (entity && onSelect) {
+            onSelect(entity);
         }
+        setQuery('');
+        setSearchResult([]);
     };
 
-    type SearchListItemProps<T extends Customer & HasIndex> = {
-        entity: T;
-        state: RenderMenuState;
+    type SearchListItemProps = {
+        entity: Customer;
+        searchText: string;
     };
 
-    const SearchListItem = <T extends Customer & HasIndex>({
-        entity,
-        state,
-    }: SearchListItemProps<T>): React.ReactElement => {
+    const SearchListItem = ({ entity, searchText }: SearchListItemProps): React.ReactElement => {
         return (
             <>
                 <div>
-                    <SplitHighlighter search={state.text} textToHighlight={entity.name} />
+                    <SplitHighlighter search={searchText} textToHighlight={entity.name} />
                 </div>
                 <div>
                     <small>
@@ -116,58 +122,34 @@ const CustomerSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFoc
         );
     };
 
-    const renderMenu = (
-        results: Option[],
-        menuProps: RenderMenuProps,
-        state: RenderMenuState,
-    ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
-
-    type MenuProps = {
-        results: Option[];
-        menuProps: RenderMenuProps;
-        state: RenderMenuState;
-    };
-
-    const Menu = ({ results, menuProps, state }: MenuProps): React.ReactElement => {
-        const resultWithIndex = (results as Customer[]).map((res, index) => ({ index: index, ...res }));
-        return (
-            <Typeahead.Menu {...menuProps} className={styles.menu}>
-                {resultWithIndex && resultWithIndex.length > 0 ? (
-                    resultWithIndex.map((entity) => (
-                        <Typeahead.MenuItem
-                            key={entity.id}
-                            option={entity}
-                            position={entity.index}
-                            className={styles.dropdownItem}
-                        >
-                            <SearchListItem entity={entity} state={state}></SearchListItem>
-                        </Typeahead.MenuItem>
-                    ))
-                ) : (
-                    <Typeahead.Menu.Header>
-                        <small>{isLoading ? 'Laddar...' : 'Inga matchingar'}</small>
-                    </Typeahead.Menu.Header>
-                )}
-            </Typeahead.Menu>
-        );
-    };
-
     return (
-        <Typeahead.AsyncTypeahead
-            id={id}
-            filterBy={() => true}
-            labelKey={(x: Option) => (x as Customer).name}
-            isLoading={isLoading}
-            options={searchResult}
-            selected={[]}
-            onSearch={fetchSearchResults}
-            onChange={(selected) => handleSelect(selected as Customer[])}
-            renderMenu={renderMenu}
-            placeholder={placeholder}
-            ref={inputField}
-            onFocus={onFocus}
-            onBlur={onBlur}
-        />
+        <Combobox as="div" className="relative" value={null} onChange={handleSelect} immediate>
+            <ComboboxInput
+                id={id}
+                ref={inputRef}
+                displayValue={() => ''}
+                onChange={(e) => handleInputChange(e.target.value)}
+                placeholder={placeholder}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                className={inputBase}
+            />
+            {query.length > 0 && (
+                <ComboboxOptions className={styles.menu}>
+                    {searchResult.length === 0 ? (
+                        <div className={styles.menuHeader}>
+                            <small>{isLoading ? 'Laddar...' : 'Inga matchingar'}</small>
+                        </div>
+                    ) : (
+                        searchResult.map((entity) => (
+                            <ComboboxOption key={entity.id} value={entity} className={styles.dropdownItem}>
+                                <SearchListItem entity={entity} searchText={query} />
+                            </ComboboxOption>
+                        ))
+                    )}
+                </ComboboxOptions>
+            )}
+        </Combobox>
     );
 };
 

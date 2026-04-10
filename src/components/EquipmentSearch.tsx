@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import * as Typeahead from 'react-bootstrap-typeahead';
-import type { RenderMenuProps, TypeaheadComponentProps } from 'react-bootstrap-typeahead';
+import React, { useEffect, useRef, useState } from 'react';
+import { Combobox, ComboboxInput, ComboboxOptions, ComboboxOption } from '@headlessui/react';
 import styles from './EquipmentSearch.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock, faCubes, faTag } from '@fortawesome/free-solid-svg-icons';
@@ -16,8 +15,8 @@ import Image from 'next/image';
 import { SplitHighlighter } from './utils/Highlight';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 
-type Option = TypeaheadComponentProps['options'][number];
-type RenderMenuState = Parameters<NonNullable<TypeaheadComponentProps['renderMenu']>>[2];
+const inputBase =
+    'bg-bs-4 border border-bs-4 text-body placeholder-muted px-3 py-1.5 text-sm focus:outline-none focus:border-bs-7 disabled:opacity-60 w-full';
 
 export enum ResultType {
     EQUIPMENT,
@@ -28,9 +27,6 @@ export interface SearchResultViewModel extends BaseEntityWithName {
     type: ResultType;
     url: string;
     aiSuggestion: boolean;
-}
-interface HasIndex {
-    index: number;
 }
 
 type Props = {
@@ -60,10 +56,18 @@ const EquipmentSearch: React.FC<Props> = ({
 
     const [searchResult, setSearchResult] = useState<SearchResultViewModel[]>(defaultResults);
     const [isLoading, setIsLoading] = useState(false);
+    const [query, setQuery] = useState('');
 
     useEffect(() => {
         setSearchResult(defaultResults);
     }, [defaultResults]);
+
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const handleInputChange = (value: string) => {
+        setQuery(value);
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => fetchSearchResults(value), 300);
+    };
 
     const fetchSearchResults = async (searchString: string) => {
         if (searchString === '') {
@@ -123,29 +127,20 @@ const EquipmentSearch: React.FC<Props> = ({
             );
     };
 
-    const handleSelect = (selected: SearchResultViewModel[]) => {
-        const selectedEntity = selected[0];
-        if (selectedEntity && onSelect) {
-            onSelect(selectedEntity);
+    const handleSelect = (entity: SearchResultViewModel | null) => {
+        if (entity && onSelect) {
+            onSelect(entity);
         }
+        setQuery('');
         setSearchResult(defaultResults);
     };
 
-    const onInputChange = (input: string) => {
-        if (input.length === 0) {
-            fetchSearchResults('');
-        }
+    type SearchListItemProps = {
+        entity: SearchResultViewModel;
+        searchText: string;
     };
 
-    type SearchListItemProps<T extends SearchResultViewModel & HasIndex> = {
-        entity: T;
-        state: RenderMenuState;
-    };
-
-    const SearchListItem = <T extends SearchResultViewModel & HasIndex>({
-        entity,
-        state,
-    }: SearchListItemProps<T>): React.ReactElement => {
+    const SearchListItem = ({ entity, searchText }: SearchListItemProps): React.ReactElement => {
         const typedEntity = entity as unknown as IEquipmentObjectionModel | IEquipmentPackageObjectionModel;
         const englishName: string | undefined = (entity as unknown as IEquipmentObjectionModel).nameEN;
         const displayName = language === Language.EN && englishName ? `${englishName} (${entity.name})` : entity.name;
@@ -154,7 +149,7 @@ const EquipmentSearch: React.FC<Props> = ({
                 <div>
                     <div className="d-flex">
                         <span className="flex-grow-1">
-                            <SplitHighlighter search={state.text} textToHighlight={displayName} />{' '}
+                            <SplitHighlighter search={searchText} textToHighlight={displayName} />{' '}
                             {entity.type === ResultType.EQUIPMENTPACKAGE ? <FontAwesomeIcon icon={faCubes} /> : null}
                             {entity.type === ResultType.EQUIPMENTTAG ? <FontAwesomeIcon icon={faTag} /> : null}
                             {(typedEntity as IEquipmentPackageObjectionModel).estimatedHours > 0 ? (
@@ -188,60 +183,35 @@ const EquipmentSearch: React.FC<Props> = ({
         );
     };
 
-    const renderMenu = (
-        results: Option[],
-        menuProps: RenderMenuProps,
-        state: RenderMenuState,
-    ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
-
-    type MenuProps = {
-        results: Option[];
-        menuProps: RenderMenuProps;
-        state: RenderMenuState;
-    };
-
-    const Menu = ({ results, menuProps, state }: MenuProps): React.ReactElement => {
-        const resultWithIndex = (results as SearchResultViewModel[]).map((res, index) => ({ index: index, ...res }));
-        return (
-            <Typeahead.Menu {...menuProps} className={styles.menu}>
-                {resultWithIndex && resultWithIndex.length > 0 ? (
-                    resultWithIndex.map((entity) => (
-                        <Typeahead.MenuItem
+    return (
+        <Combobox as="div" className="relative" value={null} onChange={handleSelect} immediate>
+            <ComboboxInput
+                id={id}
+                displayValue={() => ''}
+                onChange={(e) => handleInputChange(e.target.value)}
+                placeholder={placeholder}
+                onFocus={onFocus}
+                onBlur={onBlur}
+                className={inputBase}
+            />
+            <ComboboxOptions className={styles.menu}>
+                {searchResult.length === 0 ? (
+                    <div className={styles.menuHeader}>
+                        <small>{isLoading ? 'Laddar...' : 'Inga matchingar'}</small>
+                    </div>
+                ) : (
+                    searchResult.map((entity) => (
+                        <ComboboxOption
                             key={entity.type + '-' + entity.id}
-                            option={entity}
-                            position={entity.index}
+                            value={entity}
                             className={styles.dropdownItem}
                         >
-                            <SearchListItem entity={entity} state={state}></SearchListItem>
-                        </Typeahead.MenuItem>
+                            <SearchListItem entity={entity} searchText={query} />
+                        </ComboboxOption>
                     ))
-                ) : (
-                    <Typeahead.Menu.Header>
-                        <small>{isLoading ? 'Laddar...' : 'Inga matchingar'}</small>
-                    </Typeahead.Menu.Header>
                 )}
-            </Typeahead.Menu>
-        );
-    };
-
-    return (
-        <Typeahead.AsyncTypeahead
-            id={id}
-            filterBy={() => true}
-            labelKey={(x: Option) => (x as SearchResultViewModel).name}
-            isLoading={isLoading}
-            options={searchResult}
-            selected={[]}
-            onSearch={fetchSearchResults}
-            onChange={(selected) => handleSelect(selected as SearchResultViewModel[])}
-            renderMenu={renderMenu}
-            placeholder={placeholder}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            onInputChange={onInputChange}
-            minLength={0}
-            useCache={false}
-        />
+            </ComboboxOptions>
+        </Combobox>
     );
 };
 
