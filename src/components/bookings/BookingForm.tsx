@@ -160,8 +160,7 @@ const BookingForm: React.FC<Props> = ({
                             Bokningstyp
                             <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
-                        <Form.Control
-                            as="select"
+                        <Form.Select
                             name="bookingType"
                             defaultValue={booking.bookingType}
                             required={isFieldRequired(Status.DRAFT)}
@@ -169,7 +168,7 @@ const BookingForm: React.FC<Props> = ({
                             {booking.bookingType ? null : <option value="">Välj bokningstyp</option>}
                             <option value={BookingType.GIG}>{getBookingTypeName(BookingType.GIG)}</option>
                             <option value={BookingType.RENTAL}>{getBookingTypeName(BookingType.RENTAL)}</option>
-                        </Form.Control>
+                        </Form.Select>
                     </Form.Group>
                 </Col>
                 <Col lg="3" md="6" sm="6">
@@ -178,8 +177,7 @@ const BookingForm: React.FC<Props> = ({
                             Bokningsstatus
                             <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
-                        <Form.Control
-                            as="select"
+                        <Form.Select
                             name="status"
                             defaultValue={booking.status}
                             disabled={isNewBooking || disableStatusField}
@@ -194,7 +192,7 @@ const BookingForm: React.FC<Props> = ({
                                     <option value={Status.CANCELED}>{getStatusName(Status.CANCELED)}</option>
                                 </>
                             )}
-                        </Form.Control>
+                        </Form.Select>
                     </Form.Group>
                 </Col>
             </Row>
@@ -243,8 +241,7 @@ const BookingForm: React.FC<Props> = ({
                             Prisplan
                             <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
-                        <Form.Control
-                            as="select"
+                        <Form.Select
                             name="pricePlan"
                             defaultValue={booking.pricePlan}
                             required={isFieldRequired(Status.DRAFT)}
@@ -252,7 +249,7 @@ const BookingForm: React.FC<Props> = ({
                             {booking.pricePlan ? null : <option value="">Välj prisplan</option>}
                             <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
                             <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
-                        </Form.Control>
+                        </Form.Select>
                     </Form.Group>
                 </Col>
                 <Col lg="3" md="6">
@@ -261,8 +258,7 @@ const BookingForm: React.FC<Props> = ({
                             Kontotyp
                             <RequiredIndicator required={isFieldRequired(Status.BOOKED)} />
                         </Form.Label>
-                        <Form.Control
-                            as="select"
+                        <Form.Select
                             name="accountKind"
                             defaultValue={booking.accountKind ?? ''}
                             required={isFieldRequired(Status.BOOKED)}
@@ -270,7 +266,7 @@ const BookingForm: React.FC<Props> = ({
                             <option value="">Ingen kontotyp</option>
                             <option value={AccountKind.EXTERNAL}>{getAccountKindName(AccountKind.EXTERNAL)}</option>
                             <option value={AccountKind.INTERNAL}>{getAccountKindName(AccountKind.INTERNAL)}</option>
-                        </Form.Control>
+                        </Form.Select>
                     </Form.Group>
                 </Col>
             </Row>
@@ -293,8 +289,7 @@ const BookingForm: React.FC<Props> = ({
                             <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
                         {users ? (
-                            <Form.Control
-                                as="select"
+                            <Form.Select
                                 name="ownerUser"
                                 defaultValue={booking.ownerUser?.id ?? booking.ownerUserId}
                                 required={isFieldRequired(Status.DRAFT)}
@@ -304,7 +299,7 @@ const BookingForm: React.FC<Props> = ({
                                         {user.name}
                                     </option>
                                 ))}
-                            </Form.Control>
+                            </Form.Select>
                         ) : (
                             <ActivityIndicator />
                         )}
@@ -316,15 +311,14 @@ const BookingForm: React.FC<Props> = ({
                             Språk
                             <RequiredIndicator required={isFieldRequired(Status.DRAFT)} />
                         </Form.Label>
-                        <Form.Control
-                            as="select"
+                        <Form.Select
                             name="language"
                             defaultValue={booking.language ?? Language.SV}
                             required={isFieldRequired(Status.DRAFT)}
                         >
                             <option value={Language.SV}>{getLanguageName(Language.SV)}</option>
                             <option value={Language.EN}>{getLanguageName(Language.EN)}</option>
-                        </Form.Control>
+                        </Form.Select>
                     </Form.Group>
                 </Col>
             </Row>
@@ -500,7 +494,7 @@ const BookingForm: React.FC<Props> = ({
                         <Col lg="4" md="4">
                             <Form.Group controlId="formPaymentStatus">
                                 <Form.Label>Betalningsstatus</Form.Label>
-                                <Form.Control as="select" name="paymentStatus" defaultValue={booking.paymentStatus}>
+                                <Form.Select name="paymentStatus" defaultValue={booking.paymentStatus}>
                                     <option value={PaymentStatus.NOT_PAID}>
                                         {getPaymentStatusName(PaymentStatus.NOT_PAID)}
                                     </option>
@@ -519,18 +513,18 @@ const BookingForm: React.FC<Props> = ({
                                     <option value={PaymentStatus.PAID_WITH_CASH}>
                                         {getPaymentStatusName(PaymentStatus.PAID_WITH_CASH)}
                                     </option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col lg="4" md="4">
                             <Form.Group controlId="formSalaryStatus">
                                 <Form.Label>Timarvodesstatus</Form.Label>
-                                <Form.Control as="select" name="salaryStatus" defaultValue={booking.salaryStatus}>
+                                <Form.Select name="salaryStatus" defaultValue={booking.salaryStatus}>
                                     <option value={SalaryStatus.NOT_SENT}>
                                         {getSalaryStatusName(SalaryStatus.NOT_SENT)}
                                     </option>
                                     <option value={SalaryStatus.SENT}>{getSalaryStatusName(SalaryStatus.SENT)}</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col lg="4" md="4">

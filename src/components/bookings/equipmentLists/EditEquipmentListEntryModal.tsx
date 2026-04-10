@@ -123,8 +123,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                 <Form.Group>
                                     <Form.Label>Pris</Form.Label>
 
-                                    <Form.Control
-                                        as="select"
+                                    <Form.Select
                                         disabled={!equipmentListEntryToEditViewModel.equipment || readonly}
                                         defaultValue={equipmentListEntryToEditViewModel.equipmentPrice?.id}
                                         onChange={(e) => {
@@ -146,7 +145,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                                 {x.name} {priceDisplayFn(x)}
                                             </option>
                                         ))}
-                                    </Form.Control>
+                                    </Form.Select>
                                 </Form.Group>
                             </Col>
                             <Col lg={4} xs={6}>

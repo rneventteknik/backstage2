@@ -262,8 +262,7 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Publika prislistan</Form.Label>
-                            <Form.Control
-                                as="select"
+                            <Form.Select
                                 name="publiclyHidden"
                                 onChange={(e) => setFilterPubliclyHidden(e.target.value)}
                                 value={filterPubliclyHidden}
@@ -271,7 +270,7 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                                 <option value="all">Visa alla</option>
                                 <option value="false">Synlig i publika prislistan</option>
                                 <option value="true">Gömd</option>
-                            </Form.Control>
+                            </Form.Select>
                         </Form.Group>
                     </Col>
                 </Row>

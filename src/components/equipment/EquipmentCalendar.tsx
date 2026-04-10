@@ -44,8 +44,7 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                             </div>
                         </div>
                         <div>
-                            <Form.Control
-                                as="select"
+                            <Form.Select
                                 name="paymentStatus"
                                 defaultValue={thisWeek.getTime()}
                                 onChange={(e) => setStartDate(new Date(parseInt(e.target.value)))}
@@ -60,7 +59,7 @@ const EquipmentCalendar: React.FC<Props> = ({ equipment }: Props) => {
                                         {formatDate(addDays(week, 6))})
                                     </option>
                                 ))}
-                            </Form.Control>
+                            </Form.Select>
                         </div>
                         <div>
                             <Link href={'/equipment/compare-availability/?equipmentId=' + equipment.id} passHref>

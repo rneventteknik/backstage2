@@ -218,21 +218,19 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Col lg="3">
                             <Form.Group controlId="formPubliclyHidden">
                                 <Form.Label>Publika prislistan</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     name="publiclyHidden"
                                     defaultValue={equipment?.publiclyHidden ? 'true' : 'false'}
                                 >
                                     <option value={'false'}>Synlig i publika prislistan</option>
                                     <option value={'true'}>Gömd (visas endast internt)</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col lg="3">
                             <Form.Group>
                                 <Form.Label>Publik kategori</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     name="publicCategory"
                                     defaultValue={equipment?.equipmentPublicCategory?.id}
                                 >
@@ -246,7 +244,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                             {x.name}
                                         </option>
                                     ))}
-                                </Form.Control>
+                                </Form.Select>
                                 <Form.Text className="text-muted">
                                     I den publika prislistan grupperas utrustningen baserat på denna kategori.
                                 </Form.Text>
@@ -255,7 +253,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Col lg="3">
                             <Form.Group>
                                 <Form.Label>Plats</Form.Label>
-                                <Form.Control as="select" name="equipmentLocation">
+                                <Form.Select name="equipmentLocation">
                                     <option value={undefined}>Okänd plats</option>
                                     {getSortedList(equipmentLocations ?? []).map((x) => (
                                         <option
@@ -266,7 +264,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                             {x.name}
                                         </option>
                                     ))}
-                                </Form.Control>
+                                </Form.Select>
                                 <Form.Text className="text-muted">
                                     I packlistan grupperas utrustningen baserat på denna kategori.
                                 </Form.Text>

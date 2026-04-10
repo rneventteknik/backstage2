@@ -87,8 +87,7 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                             Medlemsstatus
                             <RequiredIndicator />
                         </Form.Label>
-                        <Form.Control
-                            as="select"
+                        <Form.Select
                             name="memberStatus"
                             defaultValue={user?.memberStatus ?? MemberStatus.AKTIV}
                         >
@@ -97,7 +96,7 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                             <option value={MemberStatus.ASP}>{getMemberStatusName(MemberStatus.ASP)}</option>
                             <option value={MemberStatus.RESURS}>{getMemberStatusName(MemberStatus.RESURS)}</option>
                             <option value={MemberStatus.GLÖMD}>{getMemberStatusName(MemberStatus.GLÖMD)}</option>
-                        </Form.Control>
+                        </Form.Select>
                         <Form.Text className="text-muted">
                             Notera att medlemsstatusen inte påverkar behörigheterna i Backstage2.
                         </Form.Text>

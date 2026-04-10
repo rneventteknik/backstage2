@@ -46,6 +46,15 @@
     $table-hover-bg: $backstage-color-2,
     $table-bg: $backstage-color-1,
 
+    // Selects
+    $form-select-indicator-color: $backstage-text-color,
+    $form-select-bg: $backstage-color-4,
+    $form-select-color: $backstage-text-color,
+    $form-select-border-color: $backstage-color-4,
+    $form-select-focus-border-color: $backstage-color-4,
+    $form-select-focus-box-shadow: none,
+    $form-select-disabled-bg: $backstage-color-1,
+
     // Inputs
     $input-bg: $backstage-color-4,
     $input-focus-bg: $backstage-color-4,

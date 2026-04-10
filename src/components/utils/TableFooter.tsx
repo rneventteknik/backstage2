@@ -30,8 +30,7 @@ const TableFooterWithViewCount: React.FC<Props> = ({
                                 <Form.Label className="text-end">Antal {entityTypeDisplayName} att visa</Form.Label>
                             </div>
                             <div>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     name="viewcount"
                                     className="ms-2"
                                     size="sm"
@@ -47,7 +46,7 @@ const TableFooterWithViewCount: React.FC<Props> = ({
                                     <option value={totalCount}>
                                         Alla {totalCount} {entityTypeDisplayName}
                                     </option>
-                                </Form.Control>
+                                </Form.Select>
                             </div>
                         </div>
                     </Form.Group>

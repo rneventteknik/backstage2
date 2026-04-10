@@ -548,8 +548,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                             {selectedBooking?.equipmentLists ? (
                                 <Form.Group controlId="equipmentList">
                                     <Form.Label>Välj utrustningslista</Form.Label>
-                                    <Form.Control
-                                        as="select"
+                                    <Form.Select
                                         className="mb-3"
                                         autoFocus
                                         defaultValue={
@@ -573,7 +572,7 @@ const CopyEquipmentListEntriesModal: React.FC<Props> = ({ show, onHide, onImport
                                                 {x.name}
                                             </option>
                                         ))}
-                                    </Form.Control>
+                                    </Form.Select>
                                 </Form.Group>
                             ) : (
                                 <span className="text-danger">Någonting gick fel, försök igen.</span>

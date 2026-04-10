@@ -235,8 +235,7 @@ const BookingSpecificationTable = ({
         const prices = row.equipment?.prices ?? [];
 
         return (
-            <Form.Control
-                as="select"
+            <Form.Select
                 onChange={(e) => {
                     const newPriceId = parseInt(e.target.value);
                     setRows((rows) => {
@@ -256,7 +255,7 @@ const BookingSpecificationTable = ({
                         {x.name}
                     </option>
                 ))}
-            </Form.Control>
+            </Form.Select>
         );
     };
 

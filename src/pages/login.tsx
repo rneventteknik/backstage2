@@ -109,7 +109,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                 </span>
             </h1>
             <Form action="/api/users/login" method="post" onSubmit={handleSubmit}>
-                <FormGroup>
+                <FormGroup className="mb-3">
                     <FormControl
                         type="text"
                         placeholder="Användarnamn"
@@ -117,7 +117,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                         ref={usernameFieldRef}
                     />
                 </FormGroup>
-                <FormGroup>
+                <FormGroup className="mb-3">
                     <FormControl
                         type={!showPassword ? "password" : "text"}
                         placeholder="Lösenord"
@@ -125,7 +125,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                         autoComplete="off"
                     />
                 </FormGroup>
-                <FormGroup>
+                <FormGroup className="mb-3">
                     <Form.Check
                         type="switch"
                         name="show password"

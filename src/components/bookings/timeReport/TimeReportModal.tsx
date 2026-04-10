@@ -227,8 +227,7 @@ const TimeReportModal: React.FC<Props> = ({
                                     Användare
                                     <RequiredIndicator />
                                 </Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     defaultValue={timeReport?.userId}
                                     required
                                     readOnly={readonly}
@@ -245,7 +244,7 @@ const TimeReportModal: React.FC<Props> = ({
                                             {user.name}
                                         </option>
                                     ))}
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                     </Row>

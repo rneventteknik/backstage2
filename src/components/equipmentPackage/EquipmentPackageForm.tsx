@@ -72,8 +72,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
 
     const EquipmentPackagePriceDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
         <InputGroup className="mb-1">
-            <Form.Control
-                as="select"
+            <Form.Select
                 defaultValue={equipmentPackageEntry.equipmentPrice?.id}
                 onChange={(e) => {
                     const newEquipmentPrice = equipmentPackageEntry.equipment?.prices.filter(
@@ -93,7 +92,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                         {getPricePlanName(PricePlan.THS)} {formatTHSPrice(x)})
                     </option>
                 ))}
-            </Form.Control>
+            </Form.Select>
         </InputGroup>
     );
 
@@ -373,14 +372,13 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                         <Col lg="3">
                             <Form.Group controlId="formAddAsHeading">
                                 <Form.Label>Pakettyp</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     name="addAsHeading"
                                     defaultValue={equipmentPackage?.addAsHeading ? 'true' : 'false'}
                                 >
                                     <option value={'false'}>Lägg till rader individuellt</option>
                                     <option value={'true'}>Lägg till rader med paketet som rubrik</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col lg="3">

@@ -301,36 +301,33 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         <Col md="4" lg="2">
                             <Form.Group>
                                 <Form.Label>Typ av bokning</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     value={bookingType ?? ''}
                                     onChange={(e) => setBookingType(toIntOrUndefined(e.target.value) as BookingType)}
                                 >
                                     <option value="">Alla typer</option>
                                     <option value={BookingType.GIG}>{getBookingTypeName(BookingType.GIG)}</option>
                                     <option value={BookingType.RENTAL}>{getBookingTypeName(BookingType.RENTAL)}</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col md="4" lg="2">
                             <Form.Group>
                                 <Form.Label>Prisplan</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     value={pricePlan ?? ''}
                                     onChange={(e) => setPricePlan(toIntOrUndefined(e.target.value) as PricePlan)}
                                 >
                                     <option value="">Alla prisplaner</option>
                                     <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
                                     <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col md="4" lg="2">
                             <Form.Group>
                                 <Form.Label>Kontotyp</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     value={accountKind ?? ''}
                                     onChange={(e) => setAccountKind(toIntOrUndefined(e.target.value) as AccountKind)}
                                 >
@@ -341,7 +338,7 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     <option value={AccountKind.INTERNAL}>
                                         {getAccountKindName(AccountKind.INTERNAL)}
                                     </option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                     </Row>

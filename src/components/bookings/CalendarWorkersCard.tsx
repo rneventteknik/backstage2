@@ -307,8 +307,7 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
                         <p className="text-monospace mt-2 mb-0">Id: {value}</p>
                     </Alert>
                 ) : null}
-                <Form.Control
-                    as="select"
+                <Form.Select
                     value={selectedCalendarEvent}
                     onChange={(e) => setSelectedCalendarEvent(e.target.value)}
                 >
@@ -321,7 +320,7 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
                             {x.label}
                         </option>
                     ))}
-                </Form.Control>
+                </Form.Select>
                 <Form.Text className="text-muted">
                     <a
                         href={bookingsCalendarList.find((x) => x.key == selectedCalendarEvent)?.link}
