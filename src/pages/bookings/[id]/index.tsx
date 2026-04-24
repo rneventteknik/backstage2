@@ -44,16 +44,9 @@ import { toBooking } from '../../../lib/mappers/booking';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Status } from '../../../models/enums/Status';
 import { PaymentStatus } from '../../../models/enums/PaymentStatus';
-import ChangelogCard from '../../../components/ChangelogCard';
-import {
-    addVAT,
-    formatCurrency,
-    getBookingPrice,
-    getEquipmentListPrice,
-    getTotalTimeEstimatesPrice,
-    getTotalTimeReportsPrice,
-    getVAT,
-} from '../../../lib/pricingUtils';
+import BookingChangelogCard from '../../../components/bookings/BookingChangelogCard';
+import BookingPriceSummaryDisplay from '../../../components/bookings/BookingPriceSummary';
+import { computePriceSummary, getEquipmentListPrice } from '../../../lib/pricingUtils';
 import BookingRentalStatusButton from '../../../components/bookings/BookingRentalStatusButton';
 import { PartialDeep } from 'type-fest';
 import { formatDateForForm, toBookingViewModel } from '../../../lib/datetimeUtils';
@@ -63,7 +56,6 @@ import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButto
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 import BookingInfoSection from '../../../components/bookings/BookingInfoSection';
 import FilesCard from '../../../components/bookings/FilesCard';
-import currency from 'currency.js';
 import PreviousBookingsCard from '../../../components/bookings/PreviousBookingsCard';
 import { BookingType } from '../../../models/enums/BookingType';
 import CalendarWorkersCard from '../../../components/bookings/CalendarWorkersCard';
@@ -75,14 +67,15 @@ export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
 
 const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props) => {
-    const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage, showErrorMessage } = useNotifications();
+    const { showSaveSuccessNotification, showSaveFailedNotification, showGeneralDangerMessage, showErrorMessage } =
+        useNotifications();
 
     const [showConfirmReadyForCashPaymentModal, setShowConfirmReadyForCashPaymentModal] = useState(false);
     const [showConfirmPaidModal, setShowConfirmPaidModal] = useState(false);
     const [adminEditModeOverrideEnabled, setAdminEditModeOverrideEnabled] = useState(false);
     const [alwaysShowRentalControls, setAlwaysShowRentalControls] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [deleteReason, setDeleteReason] = useState("");
+    const [deleteReason, setDeleteReason] = useState('');
     const [showCancelModal, setShowCancelModal] = useState(false);
 
     // Edit booking
@@ -196,7 +189,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
     const readonly =
         (currentUser.role === Role.READONLY || booking.status === Status.DONE) && !adminEditModeOverrideEnabled;
-    const timeReportExists = booking.timeReports && booking.timeReports.length > 0;
 
     return (
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
@@ -364,14 +356,13 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         Om bokningen inte skapats av misstag kan det vara lämpligare att ställa in den istället.
                     </p>
                     <Form.Control
-                        type='text'
-                        className='mb-0'
-                        placeholder={"Anledning till att bokningen tas bort"}
+                        type="text"
+                        className="mb-0"
+                        placeholder={'Anledning till att bokningen tas bort'}
                         defaultValue={deleteReason}
                         onChange={(e) => setDeleteReason(e.target.value)}
                         autoFocus
                     />
-
                 </ConfirmModal>
             </Header>
 
@@ -412,102 +403,14 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     ) : null}
                     <Card className="mb-3">
                         <Card.Header>Prisinformation (ink. moms)</Card.Header>
-                        <ListGroup variant="flush">
-                            {booking.equipmentLists?.map((list) => (
-                                <ListGroup.Item className="d-flex" key={list.id}>
-                                    <span className="flex-grow-1">{list.name}</span>
-                                    <span>{formatCurrency(addVAT(getEquipmentListPrice(list)))}</span>
-                                </ListGroup.Item>
-                            ))}
-                            <ListGroup.Item className="d-flex">
-                                <span className="flex-grow-1">Estimerad personalkostnad</span>
-                                <span>{formatCurrency(addVAT(getTotalTimeEstimatesPrice(booking.timeEstimates)))}</span>
-                            </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <strong className="flex-grow-1">Pris med estimerad personalkostnad</strong>
-                                <strong>{formatCurrency(addVAT(getBookingPrice(booking, true, true)))}</strong>
-                            </ListGroup.Item>
-                            <ListGroup.Item className="d-flex">
-                                <em className="flex-grow-1 pl-4">varav moms (25%)</em>
-                                <em>{formatCurrency(getVAT(getBookingPrice(booking, true, true)))}</em>
-                            </ListGroup.Item>
-                            {timeReportExists ? (
-                                <>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Faktisk personalkostnad</span>
-                                        <span>
-                                            {formatCurrency(addVAT(getTotalTimeReportsPrice(booking.timeReports)))}
-                                        </span>
-                                    </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <strong className="flex-grow-1">Pris med faktisk personalkostnad</strong>
-                                        <strong>{formatCurrency(addVAT(getBookingPrice(booking, false, true)))}</strong>
-                                    </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
-                                        <em>{formatCurrency(getVAT(getBookingPrice(booking, false, true)))}</em>
-                                    </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <span className="flex-grow-1">Skillnad mot estimerad personalkostnad</span>
-                                        <span>
-                                            {formatCurrency(
-                                                addVAT(
-                                                    getBookingPrice(booking, false, true).subtract(
-                                                        getBookingPrice(booking, true, true),
-                                                    ),
-                                                ),
-                                                true,
-                                            )}
-                                        </span>
-                                    </ListGroup.Item>
-                                </>
-                            ) : null}
-                            {booking.fixedPrice !== null && booking.fixedPrice !== undefined ? (
-                                <>
-                                    <ListGroup.Item className="d-flex">
-                                        <strong className="flex-grow-1">Fast pris</strong>
-                                        <strong>{formatCurrency(addVAT(booking.fixedPrice))}</strong>
-                                    </ListGroup.Item>
-                                    <ListGroup.Item className="d-flex">
-                                        <em className="flex-grow-1 pl-4">varav moms (25%)</em>
-                                        <em>{formatCurrency(getVAT(booking.fixedPrice))}</em>
-                                    </ListGroup.Item>
-                                    {timeReportExists ? (
-                                        <ListGroup.Item className="d-flex">
-                                            <span className="flex-grow-1">
-                                                Skillnad mot pris med faktisk personalkostnad
-                                            </span>
-                                            <span>
-                                                {formatCurrency(
-                                                    addVAT(
-                                                        currency(booking.fixedPrice).subtract(
-                                                            getBookingPrice(booking, false, true),
-                                                        ),
-                                                    ),
-                                                    true,
-                                                )}
-                                            </span>
-                                        </ListGroup.Item>
-                                    ) : (
-                                        <ListGroup.Item className="d-flex">
-                                            <span className="flex-grow-1">
-                                                Skillnad mot pris med estimerad personalkostnad
-                                            </span>
-                                            <span>
-                                                {formatCurrency(
-                                                    addVAT(
-                                                        currency(booking.fixedPrice).subtract(
-                                                            getBookingPrice(booking, true, true),
-                                                        ),
-                                                    ),
-                                                    true,
-                                                )}
-                                            </span>
-                                        </ListGroup.Item>
-                                    )}
-                                </>
-                            ) : null}
-                        </ListGroup>
+                        <BookingPriceSummaryDisplay
+                            bookingPriceSummary={computePriceSummary(booking)}
+                            equipmentListDetails={booking.equipmentLists?.map((l) => ({
+                                id: l.id,
+                                name: l.name,
+                                price: getEquipmentListPrice(l),
+                            }))}
+                        />
                     </Card>
                     <Card className="mb-3">
                         <Card.Header>Bokningsinformation</Card.Header>
@@ -592,7 +495,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         readonly={readonly}
                     />
                     <PreviousBookingsCard hogiaId={booking.invoiceHogiaId} bookingId={booking.id} />
-                    <ChangelogCard changelog={booking.changelog ?? []} />
+                    <BookingChangelogCard changelog={booking.changelog ?? []} />
                 </Col>
             </Row>
         </Layout>

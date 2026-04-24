@@ -25,6 +25,8 @@ import {
     fetchBookingWithUser,
     fetchBookingWithEquipmentLists,
 } from '../../../../lib/db-access/booking';
+import { toBooking } from '../../../../lib/mappers/booking';
+import { BookingPriceSummary, computePriceSummary } from '../../../../lib/pricingUtils';
 import { SessionContext, withSessionContext } from '../../../../lib/sessionContext';
 import { PaymentStatus } from '../../../../models/enums/PaymentStatus';
 import { Role } from '../../../../models/enums/Role';
@@ -65,7 +67,7 @@ const handler = withSessionContext(
                 }
 
                 if (req.query.reason === undefined) {
-                    respondWithCustomErrorMessage(res, "reason is missing from query parameters")
+                    respondWithCustomErrorMessage(res, 'reason is missing from query parameters');
                 }
 
                 const reason = String(req.query.reason);
@@ -97,7 +99,10 @@ const handler = withSessionContext(
 
                 await updateBooking(bookingId, updatedBooking)
                     .then(async (result) => {
-                        await logChangesToBooking(booking, updatedBooking, context.currentUser);
+                        const updatedBookingWithPrices =
+                            await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                        const priceSnapshot = computePriceSummary(updatedBookingWithPrices);
+                        await logChangesToBooking(booking, updatedBooking, context.currentUser, priceSnapshot);
 
                         res.status(200).json(result);
                     })
@@ -134,33 +139,40 @@ const logChangesToBooking = async (
     booking: IBookingObjectionModel,
     newBooking: Partial<BookingObjectionModel>,
     currentUser: CurrentUserInfo,
+    priceSnapshot: BookingPriceSummary,
 ) => {
     const bookingId = booking.id;
 
     // General changes
     if (hasChanges(booking, newBooking, ['status', 'salaryStatus', 'ownerUserId'])) {
-        await logChangeToBooking(currentUser, bookingId, booking.name);
+        await logChangeToBooking(
+            currentUser,
+            bookingId,
+            booking.name,
+            BookingChangelogEntryType.BOOKING,
+            priceSnapshot,
+        );
     }
 
     // Check for status changes
     const newStatus = booking.status !== newBooking.status ? newBooking.status : undefined;
 
     if (newStatus !== null && newStatus !== undefined) {
-        await logStatusChangeToBooking(currentUser, bookingId, booking.name, newStatus);
+        await logStatusChangeToBooking(currentUser, bookingId, booking.name, newStatus, priceSnapshot);
     }
 
     // Check for salary changes
     const newSalaryStatus = booking.salaryStatus !== newBooking.salaryStatus ? newBooking.salaryStatus : undefined;
 
     if (newSalaryStatus !== undefined) {
-        await logSalaryStatusChangeToBooking(currentUser, bookingId, booking.name, newSalaryStatus);
+        await logSalaryStatusChangeToBooking(currentUser, bookingId, booking.name, newSalaryStatus, priceSnapshot);
     }
 
     // Check for payment status changes
     const newPaymentStatus = booking.paymentStatus !== newBooking.paymentStatus ? newBooking.paymentStatus : undefined;
 
     if (newPaymentStatus !== null && newPaymentStatus !== undefined) {
-        await logPaymentStatusChangeToBooking(currentUser, bookingId, booking.name, newPaymentStatus);
+        await logPaymentStatusChangeToBooking(currentUser, bookingId, booking.name, newPaymentStatus, priceSnapshot);
     }
 
     // Check for owner changes
@@ -177,6 +189,7 @@ const logChangesToBooking = async (
             booking.name,
             booking.ownerUser?.name ?? null,
             newOwnerUser?.name,
+            priceSnapshot,
         );
     }
 
@@ -185,7 +198,13 @@ const logChangesToBooking = async (
         newBooking.equipmentLists &&
         hasListChanges(booking.equipmentLists, newBooking.equipmentLists, ['rentalStatus'])
     ) {
-        logChangeToBooking(currentUser, bookingId, booking.name, BookingChangelogEntryType.EQUIPMENTLIST);
+        logChangeToBooking(
+            currentUser,
+            bookingId,
+            booking.name,
+            BookingChangelogEntryType.EQUIPMENTLIST,
+            priceSnapshot,
+        );
     }
 
     // Check for equipment-list rental status changes
@@ -208,6 +227,7 @@ const logChangesToBooking = async (
                 booking.name,
                 list.name ?? getExistingEquipmentListWithId(list.id)?.name,
                 list.rentalStatus ?? null,
+                priceSnapshot,
             ),
         );
     }
