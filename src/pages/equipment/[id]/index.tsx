@@ -18,6 +18,7 @@ import EquipmentCalendar from '../../../components/equipment/EquipmentCalendar';
 import EquipmentBookings from '../../../components/equipment/EquipmentBookings';
 import EquipmentTagDisplay from '../../../components/utils/EquipmentTagDisplay';
 import ChangelogCard from '../../../components/ChangelogCard';
+import FilesCard from '../../../components/FilesCard';
 import MarkdownCard from '../../../components/MarkdownCard';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import { getPricePlanName, getResponseContentOrError } from '../../../lib/utils';
@@ -182,6 +183,13 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         </ListGroup>
                     </Card>
 
+                    <FilesCard
+                        driveFolderId={equipment.driveFolderId}
+                        defaultFolderName={equipment.name}
+                        driveType="equipment"
+                        onSubmit={(driveFolderId) => handleSubmit({ name: equipment.name, driveFolderId })}
+                        readonly={currentUser.role === Role.READONLY}
+                    />
                     <ChangelogCard changelog={equipment.changelog ?? []} />
                 </Col>
                 <Col xl={8}>

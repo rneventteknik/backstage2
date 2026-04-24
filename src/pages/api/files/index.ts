@@ -12,7 +12,8 @@ import { getValueOrFirst } from '../../../lib/utils';
 
 const credentials = JSON.parse(Buffer.from(process.env.DRIVE_CREDENTIALS ?? '', 'base64').toString());
 const scopes = ['https://www.googleapis.com/auth/drive'];
-const driveRootFolderId = process.env.DRIVE_ROOT_FOLDER_ID;
+const driveBookingRootFolderId = process.env.DRIVE_BOOKING_ROOT_FOLDER_ID;
+const driveEquipmentRootFolderId = process.env.DRIVE_EQUIPMENT_ROOT_FOLDER_ID;
 
 const driveClient = drive({
     version: 'v3',
@@ -24,10 +25,17 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
 
     const name = req.body.name;
     const parentName = req.body.parentName;
+    const driveType: 'booking' | 'equipment' | undefined = req.body.driveType;
+    const driveRootFolderId =
+        driveType === 'equipment'
+            ? driveEquipmentRootFolderId
+            : driveType === 'booking'
+              ? driveBookingRootFolderId
+              : undefined;
 
     switch (req.method) {
         case 'GET':
-            if (!driveFolderId || !driveRootFolderId) {
+            if (!driveFolderId) {
                 respondWithInvalidDataResponse(res);
                 break;
             }
@@ -45,15 +53,21 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             break;
 
         case 'POST':
-            if (!name || !parentName || !driveRootFolderId) {
+            if (!name || !driveType || !driveRootFolderId) {
                 respondWithInvalidDataResponse(res);
                 break;
             }
 
-            await createFolderAndGetIdIfNotExists(parentName, driveRootFolderId)
-                .then((parentId) => createFolderAndGetIdIfNotExists(name, parentId))
-                .then((filesList) => res.status(200).json(filesList))
-                .catch((error) => respondWithCustomErrorMessage(res, error.message));
+            if (parentName) {
+                await createFolderAndGetIdIfNotExists(parentName, driveRootFolderId)
+                    .then((parentId) => createFolderAndGetIdIfNotExists(name, parentId))
+                    .then((folderId) => res.status(200).json(folderId))
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
+            } else {
+                await createFolderAndGetIdIfNotExists(name, driveRootFolderId)
+                    .then((folderId) => res.status(200).json(folderId))
+                    .catch((error) => respondWithCustomErrorMessage(res, error.message));
+            }
 
             break;
 
