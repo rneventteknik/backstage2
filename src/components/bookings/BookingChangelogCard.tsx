@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, ListGroup, Modal } from 'react-bootstrap';
 import { formatDatetimeWithYear } from '../../lib/datetimeUtils';
-import { addVAT, formatCurrency, getCorrectPriceBasedOnBookingState } from '../../lib/pricingUtils';
+import { addVAT, formatCurrency, getCorrectPriceBasedOnBookingState, getPriceCalculationType, PriceCalculationType } from '../../lib/pricingUtils';
 import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 import BookingPriceSummaryDisplay from './BookingPriceSummary';
 import currency from 'currency.js';
@@ -12,16 +12,27 @@ type Props = {
 
 const defaultListLength = 3;
 
+const getPriceSummaryFromEntry = (entry: BookingChangelogEntry) => ({
+    equipmentPrice: entry.equipmentPrice ?? currency(0),
+    timeEstimatePrice: entry.timeEstimatePrice ?? currency(0),
+    timeReportsPrice: entry.timeReportsPrice ?? null,
+    fixedPrice: entry.fixedPrice ?? null,
+});
+
+const priceCalculationTypeLabels: Record<PriceCalculationType, string> = {
+    fixedPrice: 'Fast pris',
+    timeReports: 'Faktisk personalkostnad',
+    timeEstimates: 'Estimerad personalkostnad',
+};
+
 const getDisplayPrice = (entry: BookingChangelogEntry): currency | null => {
     if (!hasPriceInformation(entry)) return null;
-    return addVAT(
-        getCorrectPriceBasedOnBookingState({
-            equipmentPrice: entry.equipmentPrice ?? currency(0),
-            timeEstimatePrice: entry.timeEstimatePrice ?? currency(0),
-            timeReportsPrice: entry.timeReportsPrice ?? null,
-            fixedPrice: entry.fixedPrice ?? null,
-        }),
-    );
+    return addVAT(getCorrectPriceBasedOnBookingState(getPriceSummaryFromEntry(entry)));
+};
+
+const getPriceTypeLabel = (entry: BookingChangelogEntry): string | null => {
+    if (!hasPriceInformation(entry)) return null;
+    return priceCalculationTypeLabels[getPriceCalculationType(getPriceSummaryFromEntry(entry))];
 };
 
 const hasPriceInformation = (entry: BookingChangelogEntry): boolean =>
@@ -32,13 +43,19 @@ const ChangelogEntryContent: React.FC<{ entry: BookingChangelogEntry; onClick?: 
     onClick,
 }) => {
     const displayPrice = getDisplayPrice(entry);
+    const priceTypeLabel = getPriceTypeLabel(entry);
 
     return (
         <ListGroup.Item key={entry.id}>
             <div style={onClick ? { cursor: 'pointer' } : {}} onClick={onClick}>
                 {entry.name}
             </div>
-            {displayPrice !== null ? <div className="text-muted">{formatCurrency(displayPrice)}</div> : null}
+            {displayPrice !== null ? (
+                <div className="text-muted">
+                    {formatCurrency(displayPrice)}{' '}
+                    {priceTypeLabel !== null ? <span className="ms-1">({priceTypeLabel})</span> : null}
+                </div>
+            ) : null}
             <div className="text-muted">{entry.updated ? formatDatetimeWithYear(entry.updated) : 'N/A'}</div>
         </ListGroup.Item>
     );
