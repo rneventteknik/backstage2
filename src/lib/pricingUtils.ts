@@ -140,6 +140,22 @@ export const computePriceSummary = (booking: Booking): BookingPriceSummary => {
     };
 };
 
+export type PriceCalculationType = 'fixedPrice' | 'timeReports' | 'timeEstimates';
+
+export const getPriceCalculationType = (
+    summary: BookingPriceSummary,
+    forceEstimatedTime = false,
+    forceNoFixedPrice = false,
+): PriceCalculationType => {
+    if (!forceNoFixedPrice && summary.fixedPrice !== null) {
+        return 'fixedPrice';
+    }
+    if (!forceEstimatedTime && summary.timeReportsPrice !== null) {
+        return 'timeReports';
+    }
+    return 'timeEstimates';
+};
+
 export const getCorrectPriceBasedOnBookingState = (
     summary: BookingPriceSummary,
     forceEstimatedTime = false,
@@ -147,13 +163,14 @@ export const getCorrectPriceBasedOnBookingState = (
 ): currency => {
     const { fixedPrice, timeReportsPrice, equipmentPrice, timeEstimatePrice } = summary;
 
-    if (!forceNoFixedPrice && fixedPrice !== null) {
-        return fixedPrice;
+    switch (getPriceCalculationType(summary, forceEstimatedTime, forceNoFixedPrice)) {
+        case 'fixedPrice':
+            return fixedPrice!;
+        case 'timeReports':
+            return equipmentPrice.add(timeReportsPrice!);
+        case 'timeEstimates':
+            return equipmentPrice.add(timeEstimatePrice);
     }
-    if (!forceEstimatedTime && timeReportsPrice !== null) {
-        return equipmentPrice.add(timeReportsPrice);
-    }
-    return equipmentPrice.add(timeEstimatePrice);
 };
 
 export const getBookingPrice = (booking: Booking, forceEstimatedTime = false, forceNoFixedPrice = false): currency =>
