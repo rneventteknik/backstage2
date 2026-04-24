@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Col, Form, Row } from 'react-bootstrap';
+import { Button, Col, Row, Form } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Equipment } from '../../models/interfaces';
 import type { EquipmentTag } from '../../models/interfaces';
@@ -23,6 +23,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
     const [validated, setValidated] = useState(false);
     const [selectedTags, setSelectedTags] = useState(equipment?.tags ?? []);
     const [prices, setPrices] = useState(equipment?.prices ?? []);
+    const [showAdvancedFields, setShowAdvancedFields] = useState(false);
 
     const { data: equipmentTags } = useSwr('/api/equipmentTags', equipmentTagsFetcher);
 
@@ -93,6 +94,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
             inventoryCount: toIntOrUndefined(getValueFromForm('inventoryCount')) ?? null,
             publiclyHidden: getValueFromForm('publiclyHidden') === 'true',
             note: getValueFromForm('note'),
+            driveFolderId: getValueFromForm('driveFolderId'),
         };
 
         handleSubmitEquipment(modifiedEquipment);
@@ -283,6 +285,38 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                             </Form.Group>
                         </Col>
                     </Row>
+
+                    <div className="d-flex">
+                        <div className="flex-grow-1"></div>
+                        <div>
+                            <Button
+                                className="mb-3"
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => setShowAdvancedFields((x) => !x)}
+                            >
+                                {showAdvancedFields ? 'Dölj' : 'Visa'} avancerade fält
+                            </Button>
+                        </div>
+                    </div>
+
+                    {showAdvancedFields ? (
+                        <Row>
+                            <Col lg="4" md="4">
+                                <Form.Group controlId="driveFolderId">
+                                    <Form.Label>Mapp-id</Form.Label>
+                                    <Form.Control
+                                        type="text"
+                                        placeholder=""
+                                        name="driveFolderId"
+                                        defaultValue={equipment?.driveFolderId}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                    ) : (
+                        <Form.Control type="hidden" name="driveFolderId" defaultValue={equipment?.driveFolderId} />
+                    )}
                 </>
             )}
         </Form>
