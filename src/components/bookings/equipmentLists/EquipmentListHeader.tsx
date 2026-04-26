@@ -40,7 +40,8 @@ import ConfirmModal from '../../utils/ConfirmModal';
 import BookingReturnalNoteModal from '../BookingReturnalNoteModal';
 import CopyEquipmentListEntriesModal from './CopyEquipmentListEntriesModal';
 import EditEquipmentListDatesModal from './EditEquipmentListDatesModal';
-import EditTextModal from '../../utils/EditTextModal';
+import EditDiscountModal from './EditDiscountModal';
+import { KeyValue } from '../../../models/interfaces/KeyValue';
 import Link from 'next/link';
 
 type Props = {
@@ -70,6 +71,7 @@ type Props = {
     disableDelete: boolean;
     alwaysShowRentalControls: boolean;
     readonly: boolean;
+    globalSettings: KeyValue[];
 };
 
 const EquipmentListHeader: React.FC<Props> = ({
@@ -95,6 +97,7 @@ const EquipmentListHeader: React.FC<Props> = ({
     disableDelete,
     alwaysShowRentalControls,
     readonly,
+    globalSettings,
 }: Props) => {
     const [showEmptyListModal, setShowEmptyListModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -251,26 +254,18 @@ const EquipmentListHeader: React.FC<Props> = ({
                                     <FontAwesomeIcon icon={faPercent} className="mr-1 fa-fw" /> Redigera rabatt
                                 </Dropdown.Item>
                                 {showEditDiscountPercentageModal ? (
-                                    <EditTextModal
-                                        text={list.discountPercentage.toString()}
+                                    <EditDiscountModal
+                                        show={showEditDiscountPercentageModal}
+                                        hide={() => setShowEditDiscountPercentageModal(false)}
+                                        discountPercentage={list.discountPercentage}
+                                        globalSettings={globalSettings}
                                         onSubmit={(newDiscountPercentage) => {
                                             saveList({
                                                 ...list,
-                                                discountPercentage: Math.min(
-                                                    100,
-                                                    Math.max(0, parseInt(newDiscountPercentage)),
-                                                ),
+                                                discountPercentage: newDiscountPercentage,
                                             });
                                             setShowEditDiscountPercentageModal(false);
                                         }}
-                                        hide={() => setShowEditDiscountPercentageModal(false)}
-                                        show={showEditDiscountPercentageModal}
-                                        modalTitle={'Redigera rabatt'}
-                                        modalConfirmText={'Spara'}
-                                        modalSize="sm"
-                                        textarea={false}
-                                        textFieldSuffix="%"
-                                        textIsValid={(text) => !isNaN(parseInt(text))}
                                     />
                                 ) : null}
                                 <CopyEquipmentListEntriesModal
