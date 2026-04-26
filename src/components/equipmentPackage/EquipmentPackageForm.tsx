@@ -11,7 +11,7 @@ import EquipmentSearch from '../EquipmentSearch';
 import { equipmentTagsFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
-import { fixSortIndexUniqueness, getNextSortIndex, moveItemToItem, sortIndexSortFn } from '../../lib/sortIndexUtils';
+import { fixSortIndexUniqueness, getNextSortIndex, moveItemToItem, moveItemAfterItem, sortIndexSortFn } from '../../lib/sortIndexUtils';
 import { getPricePlanName, getResponseContentOrError, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
 import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { PricePlan } from '../../models/enums/PricePlan';
@@ -154,11 +154,13 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         </Button>
     );
 
-    const moveFn = (a: EquipmentPackageEntry, b: EquipmentPackageEntry) =>
+    const moveFn = (a: EquipmentPackageEntry, b: EquipmentPackageEntry, position: 'before' | 'after' = 'before') =>
         setSelectedEquipmentPackageEntries(
             updateItemsInArrayById(
                 selectedEquipmentPackageEntries,
-                ...moveItemToItem(selectedEquipmentPackageEntries, a, b),
+                ...(position === 'after' 
+                    ? moveItemAfterItem(selectedEquipmentPackageEntries, a, b)
+                    : moveItemToItem(selectedEquipmentPackageEntries, a, b)),
             ),
         );
 
