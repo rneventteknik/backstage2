@@ -21,10 +21,10 @@ import { KeyValue } from '../../models/interfaces/KeyValue';
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.ADMIN);
 type Props = { user: CurrentUserInfo; globalSettings: KeyValue[] };
-const pageTitle = 'Importera Användare';
+const pageTitle = 'Importera användare från spreadsheet';
 const breadcrumbs = [
     { link: '/users', displayName: 'Användare' },
-    { link: '/users/csv-import', displayName: pageTitle },
+    { link: '/users/import', displayName: pageTitle },
 ];
 
 const parseMemberStatus = (value: string): MemberStatus | null => {
@@ -389,7 +389,7 @@ const UserCsvImportPage: React.FC<Props> = ({ user: currentUser, globalSettings 
             <Card className="mb-3">
                 <Card.Header>Status</Card.Header>
                 <Card.Body>
-                    {csv.trim().length === 0 ? <p>Klistra in CSV-data nedan för att börja.</p> : null}
+                    {csv.trim().length === 0 ? <p>Klistra in tab-separerad data nedan för att börja.</p> : null}
 
                     {csv.trim().length > 0 && csvError && csvError !== 'Tom' ? (
                         <p className="text-danger">
@@ -476,7 +476,7 @@ const UserCsvImportPage: React.FC<Props> = ({ user: currentUser, globalSettings 
             </Card>
 
             <Form.Group controlId="formCsv">
-                <Form.Label>CSV</Form.Label>
+                <Form.Label>Data</Form.Label>
                 <Form.Control
                     as="textarea"
                     placeholder={
@@ -489,7 +489,7 @@ const UserCsvImportPage: React.FC<Props> = ({ user: currentUser, globalSettings 
                     disabled={importHasStarted}
                 />
                 <Form.Text className="text-muted">
-                    Första raden är alltid en rubrikrad och hoppas över. Kolumner:{' '}
+                    Första raden är alltid en rubrikrad och hoppas över. Kolumner (tab-separerade):{' '}
                     <strong>
                         Namn | Tagg | Medlemsstatus | Email | Telefon | Slack-id | Användarnamn | Lösenord | Roll
                     </strong>

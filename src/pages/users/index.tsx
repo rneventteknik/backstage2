@@ -116,10 +116,10 @@ const UserListPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pr
                 </Link>
                 <IfAdmin currentUser={currentUser}>
                     <DropdownButton id="mer-dropdown-button" variant="secondary" title="Mer" className="d-inline-block">
-                        <Link href="/users/csv-import" passHref legacyBehavior>
-                            <Dropdown.Item href="/users/csv-import">
+                        <Link href="/users/import" passHref legacyBehavior>
+                            <Dropdown.Item href="/users/import">
                                 <FontAwesomeIcon icon={faFileImport} className="mr-1 fa-fw" /> Importera användare från
-                                CSV
+                                spreadsheet
                             </Dropdown.Item>
                         </Link>
                     </DropdownButton>
