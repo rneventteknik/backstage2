@@ -1,7 +1,7 @@
 import React, { FormEvent } from 'react';
 import { Modal, Col, Form, Row, InputGroup, Button } from 'react-bootstrap';
 import { usersFetcher } from '../../../lib/fetchers';
-import { nameSortFn, toIntOrUndefined } from '../../../lib/utils';
+import { getMemberStatusName, nameSortFn, toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import useSwr from 'swr';
 import RequiredIndicator from '../../utils/RequiredIndicator';
@@ -11,6 +11,7 @@ import { getNextSortIndex } from '../../../lib/sortIndexUtils';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
 import { formatNumberAsCurrency } from '../../../lib/pricingUtils';
 import currency from 'currency.js';
+import { MemberStatus } from '../../../models/enums/MemberStatus';
 
 type Props = {
     booking: BookingViewModel;
@@ -239,11 +240,26 @@ const TimeReportModal: React.FC<Props> = ({
                                     }
                                 >
                                     <option value="">Inte tilldelat</option>
-                                    {users?.sort(nameSortFn).map((user) => (
-                                        <option key={user.id} value={user.id}>
-                                            {user.name}
-                                        </option>
-                                    ))}
+                                    {[
+                                        MemberStatus.CHEF,
+                                        MemberStatus.AKTIV,
+                                        MemberStatus.RESURS,
+                                        MemberStatus.ASP,
+                                        MemberStatus.GLÖMD
+                                    ].map(statusGroup =>
+                                        <optgroup
+                                            key={getMemberStatusName(statusGroup)}
+                                            label={getMemberStatusName(statusGroup)}
+                                        >
+                                            {users
+                                                ?.filter((user) => user.memberStatus === statusGroup)
+                                                ?.sort(nameSortFn).map((user) => (
+                                                    <option key={user.id} value={user.id}>
+                                                        {user.name}
+                                                    </option>
+                                                ))}
+                                        </optgroup>
+                                    )}
                                 </Form.Select>
                             </Form.Group>
                         </Col>
