@@ -21,16 +21,18 @@ const isValidDiscount = (text: string) => {
     return !isNaN(n) && n >= 0 && n <= 100;
 };
 
+const parsePresets = (globalSettings: KeyValue[]) => {
+    try {
+        return JSON.parse(getGlobalSetting('booking.discountPresets', globalSettings, '[]')) as DiscountPreset[];
+    } catch {
+        return null;
+    }
+}
+
 const EditDiscountModal: React.FC<Props> = ({ show, hide, onSubmit, discountPercentage, globalSettings }: Props) => {
     const [value, setValue] = useState(discountPercentage.toString());
 
-    let presets: DiscountPreset[] = [];
-    let hasPresetError = false;
-    try {
-        presets = JSON.parse(getGlobalSetting('booking.discountPresets', globalSettings, '[]')) as DiscountPreset[];
-    } catch {
-        hasPresetError = true;
-    }
+    const presets = parsePresets(globalSettings);
 
     const onCancel = () => {
         setValue(discountPercentage.toString());
@@ -48,12 +50,12 @@ const EditDiscountModal: React.FC<Props> = ({ show, hide, onSubmit, discountPerc
                 <Modal.Title>Redigera rabatt</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {hasPresetError ? (
+                {presets === null ? (
                     <Alert variant="danger" className="mb-3">
                         <strong>Fel</strong> Ogiltig JSON i inställningen <code>booking.discountPresets</code>
                     </Alert>
                 ) : null}
-                {presets.length > 0 ? (
+                {presets && presets.length > 0 ? (
                     <div className="mb-3">
                         {presets.map((preset) => (
                             <Button
@@ -95,3 +97,4 @@ const EditDiscountModal: React.FC<Props> = ({ show, hide, onSubmit, discountPerc
 };
 
 export default EditDiscountModal;
+
