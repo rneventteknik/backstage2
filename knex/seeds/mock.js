@@ -2094,7 +2094,7 @@ export async function seed(knex) {
             note: 'Förinställda rabattvärden för utrustningslistor, som JSON-lista med objekt med "label" (sträng) och "value" (heltal 0-100).',
             created: getVarianceDateString(-100),
             updated: getVarianceDateString(100),
-            value: '[{"label": "Ingen rabatt", "value": 0}, {"label": "Student", "value": 20}, {"label": "Spex", "value": 50}]',
+            value: '[{"label": "Ingen rabatt", "value": 0}, {"label": "Student", "value": 25}, {"label": "Spex", "value": 50}]',
         },
     ]);
 
