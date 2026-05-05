@@ -6,6 +6,7 @@ import {
 } from '../../../../lib/apiResponses';
 import { withSessionContext } from '../../../../lib/sessionContext';
 import { getEmailThread } from '../../../../lib/emailUtils';
+import { Role } from '../../../../models/enums/Role';
 
 const handler = withSessionContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     const emailThreadId = req.query.id;
@@ -27,6 +28,6 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             respondWithInvalidMethodResponse(res);
     }
     return;
-});
+}, Role.USER);
 
 export default handler;

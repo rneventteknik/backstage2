@@ -569,15 +569,17 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         cardTitle="Anteckningar"
                         readonly={readonly}
                     />
-                    <EmailThreadsCard
-                        emailThreadIds={booking.emailThreads?.map((t) => t.threadId) ?? []}
-                        onSubmit={(threadIds) =>
-                            saveBooking({
-                                emailThreads: threadIds.map((threadId) => ({ threadId, bookingId: booking.id })),
-                            })
-                        }
-                        readonly={readonly}
-                    />
+                    <IfNotReadonly currentUser={currentUser}>
+                        <EmailThreadsCard
+                            emailThreadIds={booking.emailThreads?.map((t) => t.threadId) ?? []}
+                            onSubmit={(threadIds) =>
+                                saveBooking({
+                                    emailThreads: threadIds.map((threadId) => ({ threadId, bookingId: booking.id })),
+                                })
+                            }
+                            readonly={readonly}
+                        />
+                    </IfNotReadonly>
                     <FilesCard
                         driveFolderId={booking.driveFolderId}
                         defaultFolderName={`${formatDateForForm(booking.usageStartDatetime, 'N/A')} ${booking.name}`}
