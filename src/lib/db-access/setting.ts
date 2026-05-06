@@ -2,14 +2,14 @@ import { SettingObjectionModel } from '../../models/objection-models/SettingObje
 import { ensureDatabaseIsInitialized } from '../database';
 import { removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
 
-export const fetchSetting = async (key: string): Promise<SettingObjectionModel | undefined> => {
+export const fetchGmailTokenSetting = async (): Promise<SettingObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
-    return SettingObjectionModel.query().where('key', key).first();
+    return SettingObjectionModel.query().where('key', 'email.gmailRefreshToken').first();
 };
 
 export const fetchSettings = async (): Promise<SettingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return SettingObjectionModel.query();
+    return SettingObjectionModel.query().whereNot('key', 'email.gmailRefreshToken');
 };
 
 export const updateSetting = async (id: number, setting: SettingObjectionModel): Promise<SettingObjectionModel> => {
@@ -37,7 +37,7 @@ export const upsertSetting = async (key: string, value: string): Promise<Setting
     }
 
     return SettingObjectionModel.query().insert(
-        withCreatedDate({ key, value } as SettingObjectionModel),
+        withCreatedDate({ key, value, note: '' } as SettingObjectionModel),
     );
 };
 

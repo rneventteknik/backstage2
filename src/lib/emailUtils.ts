@@ -1,6 +1,6 @@
 import { gmail_v1, google } from 'googleapis';
 import { EmailThreadResult, EmailMessageResult, EmailAttachment } from '../models/misc/EmailThreadResult';
-import { fetchSetting } from './db-access/setting';
+import { fetchGmailTokenSetting } from './db-access/setting';
 
 interface EmailHeaders {
     subject?: string;
@@ -14,7 +14,7 @@ const getEmailClient = async () => {
     const clientId = process.env.GMAIL_CLIENT_ID;
     const clientSecret = process.env.GMAIL_CLIENT_SECRET;
 
-    const dbSetting = await fetchSetting('email.gmailRefreshToken');
+    const dbSetting = await fetchGmailTokenSetting();
     const refreshToken = dbSetting?.value || process.env.GMAIL_REFRESH_TOKEN;
 
     if (!clientId || !clientSecret || !refreshToken) {

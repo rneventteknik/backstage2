@@ -425,7 +425,7 @@ const TableRow = <T extends HasId | HasStringId>({
                             ' align-middle'
                         }
                     >
-                        {p.getContentOverride ? p.getContentOverride(entity) : p.getValue(entity).toString()}
+                        {p.getContentOverride ? p.getContentOverride(entity) : p.getValue(entity)?.toString() ?? ''}
                     </td>
                 ))}
             </tr>
