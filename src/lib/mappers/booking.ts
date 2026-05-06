@@ -1,4 +1,5 @@
 import { Booking } from '../../models/interfaces';
+import { EmailThread } from '../../models/interfaces/EmailThread';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../models/interfaces/EquipmentList';
 import { IBookingObjectionModel } from '../../models/objection-models';
 import {
@@ -129,6 +130,12 @@ export const toEmailThread = (objectionModel: IEmailThreadObjectionModel) => {
         created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
+
+export const toEmailThreadObjectionModel = (emailThread: EmailThread): IEmailThreadObjectionModel => ({
+    ...emailThread,
+    created: undefined,
+    updated: undefined,
+});
 
 export const toEquipmentListObjectionModel = (
     clientModel: EquipmentList,

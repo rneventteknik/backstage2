@@ -32,6 +32,7 @@ import BookingSearchCustomerModal from './BookingSearchCustomerModal';
 import PriceWithVATPreview from '../utils/PriceWithVATPreview';
 import currency from 'currency.js';
 import { formatDateForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
+import { toEmailThreadObjectionModel } from '../../lib/mappers/booking';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
@@ -121,6 +122,7 @@ const BookingForm: React.FC<Props> = ({
                 ? getValueFromForm('invoiceDate')
                 : null,
             internalReservation: getCheckedFromForm('internalReservation') ?? booking.internalReservation,
+            emailThreads: booking.emailThreads?.map(toEmailThreadObjectionModel),
         };
 
         handleSubmitBooking(modifiedBooking);
