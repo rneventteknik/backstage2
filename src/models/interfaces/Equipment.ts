@@ -16,6 +16,7 @@ export interface Equipment extends BaseEntityWithName {
     image?: Image;
     publiclyHidden: boolean;
     isArchived: boolean;
+    driveFolderId: string;
     equipmentPublicCategory?: EquipmentPublicCategory;
     equipmentLocation?: EquipmentLocation;
     changelog: EquipmentChangelogEntry[];
