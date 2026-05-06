@@ -56,7 +56,6 @@ import ToggleCoOwnerButton from '../../../components/bookings/ToggleCoOwnerButto
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 import BookingInfoSection from '../../../components/bookings/BookingInfoSection';
 import FilesCard from '../../../components/FilesCard';
-import currency from 'currency.js';
 import PreviousBookingsCard from '../../../components/bookings/PreviousBookingsCard';
 import { BookingType } from '../../../models/enums/BookingType';
 import CalendarWorkersCard from '../../../components/bookings/CalendarWorkersCard';
