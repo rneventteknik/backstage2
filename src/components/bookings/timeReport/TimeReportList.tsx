@@ -406,7 +406,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             </Card.Header>
             {showContent ? (
                 <>
-                    <TableDisplay entities={timeReports} configuration={tableSettings} tableId="time-report-list" />
+                    <TableDisplay entities={timeReports} configuration={tableSettings} />
                     {readonly ? null : (
                         <TimeReportAddButton
                             currentUser={currentUser}

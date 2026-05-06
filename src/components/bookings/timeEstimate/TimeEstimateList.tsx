@@ -303,7 +303,7 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
             </Card.Header>
             {showContent ? (
                 <>
-                    <TableDisplay entities={timeEstimates} configuration={tableSettings} tableId="time-estimate-list" />
+                    <TableDisplay entities={timeEstimates} configuration={tableSettings} />
                     {readonly ? null : (
                         <TimeEstimateAddButton
                             booking={booking}

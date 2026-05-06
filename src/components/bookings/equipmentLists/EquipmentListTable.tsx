@@ -682,7 +682,6 @@ const EquipmentListTable: React.FC<Props> = ({
                 entities={listEntries}
                 subEntities={subListEntries}
                 configuration={tableSettings}
-                tableId={'equipment-list-' + list.id}
             />
 
             {readonly ? null : (
