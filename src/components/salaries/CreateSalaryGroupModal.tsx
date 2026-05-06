@@ -97,7 +97,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
                 <Modal.Title>Skapa Timarvodesunderlagsgrupp</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Group controlId="formName">
+                <Form.Group controlId="formName" className="mb-3">
                     <Form.Label>Namn</Form.Label>
                     <Form.Control
                         required={true}

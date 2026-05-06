@@ -109,7 +109,12 @@
     // Badge
     $badge-border-radius: 0.25em,
 
-    // Tooltips 
+    // Close button (default is black; needs to be white for dark theme)
+    $btn-close-color: $backstage-text-color,
+    $btn-close-opacity: 0.6,
+    $btn-close-hover-opacity: 1,
+
+    // Tooltips
     $tooltip-bg: $backstage-color-0,
     $tooltip-color: $backstage-text-color,
 

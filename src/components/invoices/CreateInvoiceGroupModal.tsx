@@ -89,7 +89,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
                 <Modal.Title>Skapa Fakturaunderlagsgrupp</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Group controlId="formName">
+                <Form.Group controlId="formName" className="mb-3">
                     <Form.Label>Namn</Form.Label>
                     <Form.Control
                         required={true}
