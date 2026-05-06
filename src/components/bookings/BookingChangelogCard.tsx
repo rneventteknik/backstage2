@@ -21,8 +21,8 @@ const getPriceSummaryFromEntry = (entry: BookingChangelogEntry) => ({
 
 const priceCalculationTypeLabels: Record<PriceCalculationType, string> = {
     fixedPrice: 'Fast pris',
-    timeReports: 'Faktisk personalkostnad',
-    timeEstimates: 'Estimerad personalkostnad',
+    timeReports: 'Pris med faktisk personalkostnad',
+    timeEstimates: 'Pris med estimerad personalkostnad',
 };
 
 const getDisplayPrice = (entry: BookingChangelogEntry): currency | null => {
