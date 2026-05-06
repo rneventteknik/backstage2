@@ -128,7 +128,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
                 onClick={() => {
                     setEntityToEdit({ ...entity });
                 }}
-                className="mr-2"
+                className="me-2"
             >
                 {readonly ? 'Visa detaljer' : 'Redigera'}
             </Button>
@@ -192,7 +192,7 @@ const BaseEntityWithNamesEditor = <T extends BaseEntityWithName>({
                     }}
                     disabled={readonly}
                 >
-                    <FontAwesomeIcon icon={faPlus} className="mr-1" /> Lägg till
+                    <FontAwesomeIcon icon={faPlus} className="me-1" /> Lägg till
                 </Button>
             </div>
 

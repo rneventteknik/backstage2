@@ -88,7 +88,7 @@ const EquipmentJsonExportPage: React.FC<Props> = ({ user: currentUser, globalSet
             <Card className="mb-3">
                 <Card.Header>
                     <div className="d-flex">
-                        <div className="flex-grow-1 mr-4">Export</div>
+                        <div className="flex-grow-1 me-4">Export</div>
                     </div>
                 </Card.Header>
                 <Card.Body>JSON-koden nedan kan importeras i en annan instans av Backstage2.</Card.Body>

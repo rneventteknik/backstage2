@@ -8,7 +8,7 @@ type Props = {
 
 const InternalReservationTag: React.FC<Props> = ({ booking, className }: Props) =>
     booking.internalReservation ? (
-        <Badge className={className} variant="dark">
+        <Badge className={className} bg="dark">
             Intern reservation
         </Badge>
     ) : null;

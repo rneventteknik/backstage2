@@ -150,7 +150,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                     Hämta debiterad start och sluttid från kalenderhändelse
                                 </strong>
                                 <Button
-                                    className="mr-2"
+                                    className="me-2"
                                     variant=""
                                     size="sm"
                                     onClick={() => setUserHasClosedWizard((x) => !x)}
@@ -165,8 +165,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                     className="d-flex flex-row"
                                 >
                                     <div>
-                                        <Form.Control
-                                            as="select"
+                                        <Form.Select
                                             value={wizardSelectedCalendarEvent}
                                             onChange={(e) => setWizardSelectedCalendarEvent(e.target.value)}
                                         >
@@ -178,7 +177,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                                     {x.label}
                                                 </option>
                                             ))}
-                                        </Form.Control>
+                                        </Form.Select>
                                         <Form.Text className="text-muted">
                                             <a
                                                 href={
@@ -198,7 +197,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                             form={equipmentList.id + 'calendar-wizard'}
                                             type="submit"
                                             variant="secondary"
-                                            className="ml-2"
+                                            className="ms-2"
                                             disabled={!wizardSelectedCalendarEvent}
                                         >
                                             Hämta
@@ -259,8 +258,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                         <Form.Label>
                                             Utlämning <RequiredIndicator />
                                         </Form.Label>
-                                        <Form.Control
-                                            as="select"
+                                        <Form.Select
                                             value={equipmentOutCalenderSelection}
                                             onChange={(e) => {
                                                 const startTime = new Date(
@@ -281,7 +279,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                                     {x.label}
                                                 </option>
                                             ))}
-                                        </Form.Control>
+                                        </Form.Select>
                                         <Form.Text className="text-muted">
                                             <a
                                                 href={
@@ -315,8 +313,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                         <Form.Label>
                                             Återlämning <RequiredIndicator />
                                         </Form.Label>
-                                        <Form.Control
-                                            as="select"
+                                        <Form.Select
                                             value={equipmentInCalenderSelection}
                                             onChange={(e) => {
                                                 const startTime = new Date(
@@ -337,7 +334,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                                     {x.label}
                                                 </option>
                                             ))}
-                                        </Form.Control>
+                                        </Form.Select>
                                         <Form.Text className="text-muted">
                                             <a
                                                 href={

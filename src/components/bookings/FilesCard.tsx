@@ -95,7 +95,7 @@ const FilesCard: React.FC<Props> = ({
             <Card className="mb-3">
                 <Card.Header className="d-flex">
                     <span className="flex-grow-1">Filer</span>
-                    <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+                    <Button className="me-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
                         <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                     </Button>
                     <Button variant="secondary" size="sm" href={link} target="_blank">
@@ -154,7 +154,7 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
                 <ListGroup.Item key={file.id}>
                     <div className="mb-1">
                         <TableStyleLink href={file.link ?? ''} target="_blank" rel="noreferrer">
-                            <FontAwesomeIcon icon={getIcon(file.mimeType)} className="mr-2" />
+                            <FontAwesomeIcon icon={getIcon(file.mimeType)} className="me-2" />
                             {file.name}
                         </TableStyleLink>
                     </div>

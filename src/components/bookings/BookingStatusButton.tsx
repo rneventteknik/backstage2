@@ -49,7 +49,7 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
                                 onClick={() => setShowStatusChangeModal(true)}
                                 disabled={!allEquipmentListsHaveDates}
                             >
-                                <FontAwesomeIcon icon={faCircleCheckRegular} className="mr-1" /> Sätt till bokad
+                                <FontAwesomeIcon icon={faCircleCheckRegular} className="me-1" /> Sätt till bokad
                             </Button>
                         </Dropdown>
                     </OverlayTrigger>
@@ -67,14 +67,14 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
                 <>
                     <Dropdown as={ButtonGroup} className={className}>
                         <Button variant="secondary" onClick={() => setShowStatusChangeModal(true)}>
-                            <FontAwesomeIcon icon={faCircleCheckSolid} className="mr-1" /> Klarmarkera
+                            <FontAwesomeIcon icon={faCircleCheckSolid} className="me-1" /> Klarmarkera
                         </Button>
 
                         <Dropdown.Toggle split variant="secondary" id="booking-status-dropdown" />
 
                         <Dropdown.Menu>
                             <Dropdown.Item onClick={() => changeStatusTo(Status.DRAFT)}>
-                                <FontAwesomeIcon icon={faDotCircle} className="mr-1" /> Gör till utkast
+                                <FontAwesomeIcon icon={faDotCircle} className="me-1" /> Gör till utkast
                             </Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
@@ -91,7 +91,7 @@ const BookingStatusButton: React.FC<Props> = ({ booking, onChange, className }: 
             return (
                 <Dropdown as={ButtonGroup} className={className}>
                     <Button variant="secondary" onClick={() => changeStatusTo(Status.DRAFT)}>
-                        <FontAwesomeIcon icon={faDotCircle} className="mr-1" /> Gör till utkast
+                        <FontAwesomeIcon icon={faDotCircle} className="me-1" /> Gör till utkast
                     </Button>
                 </Dropdown>
             );

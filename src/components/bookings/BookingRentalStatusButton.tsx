@@ -13,7 +13,7 @@ import { Status } from '../../models/enums/Status';
 
 type Props = {
     booking: Partial<Booking>;
-    onChange: (booking: PartialDeep<IBookingObjectionModel, { recurseIntoArrays: true }>) => void;
+    onChange: (booking: PartialDeep<IBookingObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
     alwaysShowRentalControls: boolean;
     className?: string;
 };
@@ -56,7 +56,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({
         return (
             <>
                 <Button variant="secondary" className={className} onClick={() => setShowConfirmOutModal(true)}>
-                    <FontAwesomeIcon icon={faRightFromBracket} className="mr-1" /> Lämna ut
+                    <FontAwesomeIcon icon={faRightFromBracket} className="me-1" /> Lämna ut
                 </Button>
                 <ConfirmModal
                     show={showConfirmOutModal}
@@ -86,7 +86,7 @@ const BookingRentalStatusButton: React.FC<Props> = ({
         return (
             <>
                 <Button variant="secondary" className={className} onClick={() => setShowReturnalNoteModal(true)}>
-                    <FontAwesomeIcon icon={faRightToBracket} className="mr-1" /> Ta emot
+                    <FontAwesomeIcon icon={faRightToBracket} className="me-1" /> Ta emot
                 </Button>
                 <BookingReturnalNoteModal
                     returnalNote={booking.returnalNote}

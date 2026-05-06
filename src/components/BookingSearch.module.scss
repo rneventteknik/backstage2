@@ -1,9 +1,9 @@
-@import '../style/variables';
+@use '../style/variables';
 
 .dropdownItem:hover,
 .dropdownItem[aria-selected='true'] {
-    background-color: $backstage-color-5;
-    color: $backstage-text-color;
+    background-color: variables.$backstage-color-5;
+    color: variables.$backstage-text-color;
 }
 
 .menu {

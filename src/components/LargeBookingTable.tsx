@@ -16,7 +16,7 @@ import {
     getAccountKindName,
 } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Col, Form } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
 import TableStyleLink from '../components/utils/TableStyleLink';
 import RentalStatusTag from './utils/RentalStatusTag';
@@ -34,11 +34,11 @@ const BookingNameDisplayFn = (booking: BookingViewModel) => (
     <>
         <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
 
-        <BookingStatusTag booking={booking} className="ml-1" />
-        <BookingTypeTag booking={booking} className="ml-1" />
-        <RentalStatusTag booking={booking} className="ml-1" />
-        <InternalReservationTag booking={booking} className="ml-1" />
-        <FixedPriceStatusTag booking={booking} className="ml-1" />
+        <BookingStatusTag booking={booking} className="ms-1" />
+        <BookingTypeTag booking={booking} className="ms-1" />
+        <RentalStatusTag booking={booking} className="ms-1" />
+        <InternalReservationTag booking={booking} className="ms-1" />
+        <FixedPriceStatusTag booking={booking} className="ms-1" />
         <p className="text-muted mb-0">{booking.customerName ?? '-'}</p>
     </>
 );
@@ -221,16 +221,16 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         accountKind,
                     )}
                 >
-                    <Form.Row className="mb-2">
+                    <Row className="mb-2 gy-3">
                         <Col md="4">
                             <Form.Group>
                                 <Form.Label>Status</Form.Label>
-                                <Typeahead<{ label: string; value: Status }>
+                                <Typeahead
                                     id="status-typeahead"
                                     multiple
-                                    labelKey={(x) => x.label}
+                                    labelKey="label"
                                     options={statusOptions}
-                                    onChange={(e) => setStatuses(e.map((o) => o.value))}
+                                    onChange={(e) => setStatuses((e as typeof statusOptions).map((o) => o.value))}
                                     placeholder="Filtrera på status"
                                     selected={statuses
                                         .map((id) => statusOptions.find((x) => x.value === id))
@@ -241,12 +241,12 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         <Col md="4">
                             <Form.Group>
                                 <Form.Label>Ansvarig</Form.Label>
-                                <Typeahead<{ label: string; value: number }>
+                                <Typeahead
                                     id="user-typeahead"
                                     multiple
-                                    labelKey={(x) => x.label}
+                                    labelKey="label"
                                     options={ownerUserOptions}
-                                    onChange={(e) => setUserIds(e.map((o) => o.value))}
+                                    onChange={(e) => setUserIds((e as typeof ownerUserOptions).map((o) => o.value))}
                                     placeholder="Filtrera på ansvarig"
                                     selected={userIds
                                         .map((id) => ownerUserOptions.find((x) => x.value === id))
@@ -301,36 +301,33 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         <Col md="4" lg="2">
                             <Form.Group>
                                 <Form.Label>Typ av bokning</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     value={bookingType ?? ''}
                                     onChange={(e) => setBookingType(toIntOrUndefined(e.target.value) as BookingType)}
                                 >
                                     <option value="">Alla typer</option>
                                     <option value={BookingType.GIG}>{getBookingTypeName(BookingType.GIG)}</option>
                                     <option value={BookingType.RENTAL}>{getBookingTypeName(BookingType.RENTAL)}</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col md="4" lg="2">
                             <Form.Group>
                                 <Form.Label>Prisplan</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     value={pricePlan ?? ''}
                                     onChange={(e) => setPricePlan(toIntOrUndefined(e.target.value) as PricePlan)}
                                 >
                                     <option value="">Alla prisplaner</option>
                                     <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
                                     <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col md="4" lg="2">
                             <Form.Group>
                                 <Form.Label>Kontotyp</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     value={accountKind ?? ''}
                                     onChange={(e) => setAccountKind(toIntOrUndefined(e.target.value) as AccountKind)}
                                 >
@@ -341,10 +338,10 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                                     <option value={AccountKind.INTERNAL}>
                                         {getAccountKindName(AccountKind.INTERNAL)}
                                     </option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
                 </AdvancedFilters>
             ) : null}
             <TableDisplay

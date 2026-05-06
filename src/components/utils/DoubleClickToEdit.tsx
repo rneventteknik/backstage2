@@ -112,13 +112,13 @@ export const ClickToEditDropdown = <T,>({
 
     const updateValue = (key: string) => {
         setSelectedKey(key);
-        onChange ? onChange(getSelectedValue(key)) : null;
+        onChange?.(getSelectedValue(key));
     };
 
     const editingComplete = () => {
         setIsEditing(false);
         if (selectedKey !== optionKeyFn(value)) {
-            onClose ? onClose(getSelectedValue(selectedKey)) : null;
+            onClose?.(getSelectedValue(selectedKey));
         }
     };
 
@@ -141,8 +141,7 @@ export const ClickToEditDropdown = <T,>({
     }
 
     return (
-        <Form.Control
-            as="select"
+        <Form.Select
             size={size}
             defaultValue={optionKeyFn(value)}
             onChange={(e) => updateValue(e.target.value)}
@@ -155,6 +154,6 @@ export const ClickToEditDropdown = <T,>({
                     {optionLabelFn(x)}
                 </option>
             ))}
-        </Form.Control>
+        </Form.Select>
     );
 };

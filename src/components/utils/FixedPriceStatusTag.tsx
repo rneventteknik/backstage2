@@ -14,7 +14,7 @@ const FixedPriceStatusTag: React.FC<Props> = ({ booking, className }: Props) => 
 
     if (booking.fixedPrice === 0) {
         return (
-            <Badge variant="dark" className={className}>
+            <Badge bg="dark" className={className}>
                 Fast pris: Gratis
             </Badge>
         );
@@ -22,7 +22,7 @@ const FixedPriceStatusTag: React.FC<Props> = ({ booking, className }: Props) => 
 
     if (booking.fixedPrice > 0) {
         return (
-            <Badge variant="dark" className={className}>
+            <Badge bg="dark" className={className}>
                 Fast pris
             </Badge>
         );

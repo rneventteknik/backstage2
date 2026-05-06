@@ -6,7 +6,7 @@ import {
 } from '../../../lib/apiResponses';
 import { withSessionContext } from '../../../lib/sessionContext';
 import { drive, auth, drive_v3 } from '@googleapis/drive';
-import { GaxiosResponse } from 'googleapis-common';
+import { GaxiosResponseWithHTTP2 } from 'googleapis-common';
 import { FilesResult } from '../../../models/misc/FilesResult';
 import { getValueOrFirst } from '../../../lib/utils';
 
@@ -63,7 +63,7 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
     return;
 });
 
-const mapDriveResponse = (res: GaxiosResponse<drive_v3.Schema$FileList>): Promise<FilesResult[] | null> => {
+const mapDriveResponse = (res: GaxiosResponseWithHTTP2<drive_v3.Schema$FileList>): Promise<FilesResult[] | null> => {
     if (!res.data.files) {
         return Promise.resolve(null);
     }

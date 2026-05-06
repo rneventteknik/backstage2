@@ -58,7 +58,7 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         return <FormLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
-    const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => {
+    const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => {
         const body = { equipmentPackage: equipmentPackage };
 
         const request = {
@@ -114,11 +114,11 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         <Layout title={pageTitle} fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings}>
             <Header title={pageTitle} breadcrumbs={breadcrumbs}>
                 <Button variant="primary" form="editEquipmentPackageForm" type="submit">
-                    <FontAwesomeIcon icon={faSave} className="mr-1" /> Spara utrustningspaket
+                    <FontAwesomeIcon icon={faSave} className="me-1" /> Spara utrustningspaket
                 </Button>
                 <DropdownButton id="dropdown-basic-button" className="d-inline-block" variant="secondary" title="Mer">
                     <Dropdown.Item onClick={() => setShowDeleteModal(true)} className="text-danger">
-                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort utrustningspaket
+                        <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort utrustningspaket
                     </Dropdown.Item>
                 </DropdownButton>
             </Header>

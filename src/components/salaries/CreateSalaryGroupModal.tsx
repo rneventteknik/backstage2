@@ -16,7 +16,7 @@ import { SalaryStatus } from '../../models/enums/SalaryStatus';
 type Props = {
     show: boolean;
     onHide: () => void;
-    onCreate: (salaryGroup: PartialDeep<ISalaryGroupObjectionModel>) => void;
+    onCreate: (salaryGroup: PartialDeep<ISalaryGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
 };
 
 const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Props) => {
@@ -73,7 +73,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
     };
 
     const createGroup = () => {
-        const group: PartialDeep<ISalaryGroupObjectionModel, { recurseIntoArrays: true }> = {
+        const group: PartialDeep<ISalaryGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> = {
             name: selectedGroupName,
             bookings: selectedBookingIds.map((id) => ({ id })),
         };
@@ -97,7 +97,7 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
                 <Modal.Title>Skapa Timarvodesunderlagsgrupp</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Group controlId="formName">
+                <Form.Group controlId="formName" className="mb-3">
                     <Form.Label>Namn</Form.Label>
                     <Form.Control
                         required={true}
@@ -108,23 +108,23 @@ const CreateSalaryGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pro
                         onChange={(e) => setSelectedGroupName(e.target.value)}
                     />
                 </Form.Group>
-                <Button onClick={toggleAllowAllBookings} variant="secondary" className="mr-2 mb-3">
-                    <FontAwesomeIcon className="fa-fw mr-1" icon={allowAllBookings ? faLock : faLockOpen} />
+                <Button onClick={toggleAllowAllBookings} variant="secondary" className="me-2 mb-3">
+                    <FontAwesomeIcon className="fa-fw me-1" icon={allowAllBookings ? faLock : faLockOpen} />
                     {allowAllBookings ? 'Lås irrelevanta' : 'Lås upp irrelevanta'} bokningar
                 </Button>
                 <Button
                     onClick={() => setHideLockedBookings((x) => !x)}
                     variant="secondary"
-                    className="mr-2 mb-3"
+                    className="me-2 mb-3"
                     disabled={allowAllBookings}
                 >
-                    <FontAwesomeIcon className="fa-fw mr-1" icon={hideLockedBookings ? faEye : faEyeSlash} />
+                    <FontAwesomeIcon className="fa-fw me-1" icon={hideLockedBookings ? faEye : faEyeSlash} />
                     {hideLockedBookings ? 'Visa låsta' : 'Dölj låsta'} bokningar
                 </Button>
                 <Button
                     onClick={createGroup}
                     variant="primary"
-                    className="mr-2 mb-3"
+                    className="me-2 mb-3"
                     disabled={selectedBookingIds.length === 0}
                 >
                     Skapa Timarvodesunderlagsgrupp

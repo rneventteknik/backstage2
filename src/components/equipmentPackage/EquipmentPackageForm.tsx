@@ -2,7 +2,8 @@ import React, { FormEvent, useState, useEffect } from 'react';
 import { Button, Col, Form, InputGroup, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { IEquipmentObjectionModel, IEquipmentPackageObjectionModel } from '../../models/objection-models';
-import { Equipment, EquipmentTag } from '../../models/interfaces';
+import { Equipment } from '../../models/interfaces';
+import type { EquipmentTag } from '../../models/interfaces';
 import { toEquipment } from '../../lib/mappers/equipment';
 import useSwr from 'swr';
 import { EquipmentPackage, EquipmentPackageEntry } from '../../models/interfaces/EquipmentPackage';
@@ -18,7 +19,7 @@ import { PricePlan } from '../../models/enums/PricePlan';
 import { getDefaultSelectedPrice } from '../../lib/equipmentListUtils';
 
 type Props = {
-    handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel>) => void;
+    handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
     equipmentPackage?: EquipmentPackage;
     formId: string;
 };
@@ -71,8 +72,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
 
     const EquipmentPackagePriceDisplayFn = (equipmentPackageEntry: EquipmentPackageEntry) => (
         <InputGroup className="mb-1">
-            <Form.Control
-                as="select"
+            <Form.Select
                 defaultValue={equipmentPackageEntry.equipmentPrice?.id}
                 onChange={(e) => {
                     const newEquipmentPrice = equipmentPackageEntry.equipment?.prices.filter(
@@ -92,7 +92,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                         {getPricePlanName(PricePlan.THS)} {formatTHSPrice(x)})
                     </option>
                 ))}
-            </Form.Control>
+            </Form.Select>
         </InputGroup>
     );
 
@@ -239,7 +239,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             return;
         }
 
-        const modifiedEquipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true }> = {
+        const modifiedEquipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> = {
             id: equipmentPackage?.id,
             created: equipmentPackage?.created?.toString(),
             updated: equipmentPackage?.updated?.toString(),
@@ -250,7 +250,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             nameEN: form.equipmentPackageNameEN.value,
             description: form.description.value,
             descriptionEN: form.descriptionEN.value,
-            addAsHeading: form.addAsHeading?.value === 'true' ?? false,
+            addAsHeading: form.addAsHeading?.value === 'true',
 
             tags: selectedTags.map((x) => ({
                 ...x,
@@ -372,14 +372,13 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                         <Col lg="3">
                             <Form.Group controlId="formAddAsHeading">
                                 <Form.Label>Pakettyp</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     name="addAsHeading"
                                     defaultValue={equipmentPackage?.addAsHeading ? 'true' : 'false'}
                                 >
                                     <option value={'false'}>Lägg till rader individuellt</option>
                                     <option value={'true'}>Lägg till rader med paketet som rubrik</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col lg="3">
@@ -397,12 +396,12 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
                         <Col md="6">
                             <Form.Group>
                                 <Form.Label>Taggar</Form.Label>
-                                <Typeahead<EquipmentTag>
+                                <Typeahead
                                     id="tags-typeahead"
                                     multiple
-                                    labelKey={(x) => x.name}
+                                    labelKey="name"
                                     options={equipmentTags ?? []}
-                                    onChange={(e) => setSelectedTags(e)}
+                                    onChange={(e) => setSelectedTags(e as EquipmentTag[])}
                                     placeholder="Taggar"
                                     defaultSelected={equipmentPackage.tags ?? []}
                                 />

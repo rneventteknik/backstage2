@@ -2,7 +2,7 @@ import React from 'react';
 import { faWarning } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
-import { Placement } from 'react-bootstrap/esm/Overlay';
+import { Placement } from 'react-bootstrap/esm/types';
 
 type WarningIconProps = {
     text: string;

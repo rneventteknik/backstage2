@@ -218,56 +218,56 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                         <>
                             <Button
                                 variant="secondary"
-                                className="d-inline-block mr-2 mb-2"
+                                className="d-inline-block me-2 mb-2"
                                 href={`/api/documents/invoice?${getSelectedBookingIds()
                                     ?.map((id) => `bookingId=${id}`)
                                     .join('&')}`}
                                 target="_blank"
                                 disabled={deSelectedBookingIds.length === invoiceGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Exportera
+                                <FontAwesomeIcon icon={faFileDownload} className="me-1 fa-fw" /> Exportera
                                 fakturaunderlag
                             </Button>
 
                             <Button
                                 variant="secondary"
-                                className="mr-2 mb-2"
+                                className="me-2 mb-2"
                                 onClick={() => setBookingPaymentStatus(PaymentStatus.INVOICED, getSelectedBookingIds())}
                                 disabled={deSelectedBookingIds.length === invoiceGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faPaperPlane} className="mr-2 fa-fw" />
+                                <FontAwesomeIcon icon={faPaperPlane} className="me-2 fa-fw" />
                                 Markera som fakturerade
                             </Button>
 
                             <Button
                                 variant="secondary"
-                                className="mr-2 mb-2"
+                                className="me-2 mb-2"
                                 onClick={() =>
                                     setBookingPaymentStatus(PaymentStatus.PAID_WITH_INVOICE, getSelectedBookingIds())
                                 }
                                 disabled={deSelectedBookingIds.length === invoiceGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faCreditCard} className="mr-2 fa-fw" />
+                                <FontAwesomeIcon icon={faCreditCard} className="me-2 fa-fw" />
                                 Markera som betalda
                             </Button>
 
                             <Button
                                 variant="secondary"
-                                className="mr-2 mb-2"
+                                className="me-2 mb-2"
                                 onClick={() => setShowSetInvoiceNumberModal(true)}
                                 disabled={deSelectedBookingIds.length === invoiceGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faReceipt} className="mr-2 fa-fw" />
+                                <FontAwesomeIcon icon={faReceipt} className="me-2 fa-fw" />
                                 Sätt referens
                             </Button>
 
                             <Button
                                 variant="secondary"
-                                className="mr-2 mb-2"
+                                className="me-2 mb-2"
                                 onClick={() => setShowSetInvoiceDateModal(true)}
                                 disabled={deSelectedBookingIds.length === invoiceGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faCalendarDay} className="mr-2 fa-fw" />
+                                <FontAwesomeIcon icon={faCalendarDay} className="me-2 fa-fw" />
                                 Sätt fakturadatum
                             </Button>
 
@@ -278,12 +278,12 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
                                 title="Mer"
                             >
                                 <Dropdown.Item onClick={() => setShowChangeNameModal(true)}>
-                                    <FontAwesomeIcon icon={faPen} className="mr-1 fa-fw" /> Byt namn på
+                                    <FontAwesomeIcon icon={faPen} className="me-1 fa-fw" /> Byt namn på
                                     fakturaunderlagsgrupp
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={() => setShowConfirmDeleteModal(true)} className="text-danger">
-                                    <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort
+                                    <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort
                                     fakturaunderlagsgrupp
                                 </Dropdown.Item>
                             </DropdownButton>

@@ -123,8 +123,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                 <Form.Group>
                                     <Form.Label>Pris</Form.Label>
 
-                                    <Form.Control
-                                        as="select"
+                                    <Form.Select
                                         disabled={!equipmentListEntryToEditViewModel.equipment || readonly}
                                         defaultValue={equipmentListEntryToEditViewModel.equipmentPrice?.id}
                                         onChange={(e) => {
@@ -146,7 +145,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                                                 {x.name} {priceDisplayFn(x)}
                                             </option>
                                         ))}
-                                    </Form.Control>
+                                    </Form.Select>
                                 </Form.Group>
                             </Col>
                             <Col lg={4} xs={6}>
@@ -226,24 +225,25 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                         <Col lg={8} xs={6}>
                             <Form.Group>
                                 <Form.Label>Konto</Form.Label>
-                                <Typeahead<Account>
+                                <Typeahead
                                     id="account-typeahead"
                                     options={invoiceAccounts}
                                     defaultInputValue={equipmentListEntryToEditViewModel.account ?? ''}
                                     labelKey="accountNumber"
                                     disabled={readonly}
                                     renderMenuItemChildren={(option) => {
+                                        const acct = option as Account;
                                         return (
                                             <>
-                                                {option.accountNumber}{' '}
-                                                <span className="text-muted">- {option.description}</span>
+                                                {acct.accountNumber}{' '}
+                                                <span className="text-muted">- {acct.description}</span>
                                             </>
                                         );
                                     }}
                                     onChange={(s) =>
                                         setEquipmentListEntryToEditViewModel({
                                             ...equipmentListEntryToEditViewModel,
-                                            account: s.length > 0 ? s[0].accountNumber : '',
+                                            account: s.length > 0 ? (s[0] as Account).accountNumber : '',
                                         })
                                     }
                                     onInputChange={(s) =>
@@ -281,7 +281,7 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                     {!!equipmentListEntryToEditViewModel.equipment ? (
                         <p className="text-muted">
                             <span>
-                                <FontAwesomeIcon icon={faLink} className="mr-1" size="sm" />
+                                <FontAwesomeIcon icon={faLink} className="me-1" size="sm" />
                                 Den här raden är länkad till utrustningen{' '}
                                 <em>{equipmentListEntryToEditViewModel.equipment.name}</em>.{' '}
                             </span>

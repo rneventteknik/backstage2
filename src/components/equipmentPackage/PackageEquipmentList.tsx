@@ -27,9 +27,9 @@ const PackageEquipmentList: React.FC<Props> = ({ equipmentPackage, language = La
                     </span>
                     <span>
                         {e.isHidden ? (
-                            <FontAwesomeIcon icon={faEyeSlash} className="mr-1" title="Gömd för kund" />
+                            <FontAwesomeIcon icon={faEyeSlash} className="me-1" title="Gömd för kund" />
                         ) : null}
-                        {e.isFree ? <FontAwesomeIcon icon={faCoins} className="mr-1" title="Utan pris" /> : null}
+                        {e.isFree ? <FontAwesomeIcon icon={faCoins} className="me-1" title="Utan pris" /> : null}
                         {e.numberOfUnits != 1 || e.numberOfHours == 0 ? <>{e.numberOfUnits} st</> : null}
                         {e.numberOfUnits != 1 && e.numberOfHours != 0 ? <> / </> : null}
                         {e.numberOfHours > 0 ? <>{e.numberOfHours} h</> : null}

@@ -23,12 +23,12 @@ const BookingPotentialProblemsSection: React.FC<Props> = ({ booking }: Props) =>
             <Card.Header className="p-0 bg-warning" style={{ height: 5 }}></Card.Header>
             <Card.Header>
                 <div className="d-flex">
-                    <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
-                        <FontAwesomeIcon className="mr-2" icon={faWarning} />
+                    <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
+                        <FontAwesomeIcon className="me-2" icon={faWarning} />
                         Potentiella problem
                     </div>
                     <div className="d-flex">
-                        <Button className="mr-2" variant="" onClick={() => setShowContent(!showContent)}>
+                        <Button className="me-2" variant="" onClick={() => setShowContent(!showContent)}>
                             <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                         </Button>
                     </div>

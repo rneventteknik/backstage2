@@ -1,7 +1,7 @@
 import { GetServerSidePropsResult, NextApiRequest } from 'next';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { Role } from '../models/enums/Role';
-import { withSsrSession } from './session';
+import { withSsrSession, RequestWithSession } from './session';
 import { getAndVerifyUser } from './authenticate';
 import { IncomingMessage } from 'http';
 import { fetchSettings } from './db-access/setting';
@@ -20,8 +20,7 @@ const useUser = (
 ) =>
     withSsrSession(
         async ({ req }): Promise<GetServerSidePropsResult<{ user: CurrentUserInfo; globalSettings: KeyValue[] }>> => {
-            // The typing of withSsrSession are incorrect, so we need to cast it to NextApiRequest & IncomingMessage
-            const user = await getAndVerifyUser(req as NextApiRequest & IncomingMessage);
+            const user = await getAndVerifyUser(req as NextApiRequest & IncomingMessage & RequestWithSession);
             const getRedirectUrlParams = () => {
                 if (!attachRequestedUrlAsParameter) {
                     return '';

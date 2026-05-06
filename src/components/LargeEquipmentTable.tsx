@@ -3,7 +3,7 @@ import { Equipment, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
 import { countNotNullorEmpty, notEmpty } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Col, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Col, Form, Row, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faTags } from '@fortawesome/free-solid-svg-icons';
 import TableStyleLink from './utils/TableStyleLink';
@@ -32,12 +32,12 @@ const EquipmentNameDisplayFn = (equipment: Equipment) => (
     <>
         <TableStyleLink href={'equipment/' + equipment.id}>{equipment.name}</TableStyleLink>
         {equipment.publiclyHidden ? (
-            <span className="small text-muted ml-1">
+            <span className="small text-muted ms-1">
                 <FontAwesomeIcon icon={faEyeSlash} title="Gömd i den publika prislistan"></FontAwesomeIcon>
             </span>
         ) : null}
         {equipment.tags.map((x) => (
-            <EquipmentTagDisplay tag={x} key={x.id} className="ml-1" />
+            <EquipmentTagDisplay tag={x} key={x.id} className="ms-1" />
         ))}
         <div className="text-muted mb-0">{equipment.description}</div>
         {equipment.inventoryCount === null ? null : (
@@ -222,16 +222,16 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                     filterPubliclyHidden !== 'all',
                 )}
             >
-                <Form.Row className="mb-2">
+                <Row className="mb-2 gy-3">
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Taggar</Form.Label>
-                            <Typeahead<EquipmentTag>
+                            <Typeahead
                                 id="tags-typeahead"
                                 multiple
-                                labelKey={(x) => x.name}
+                                labelKey="name"
                                 options={equipmentTags ?? []}
-                                onChange={(e) => setFilterTags(e)}
+                                onChange={(e) => setFilterTags(e as EquipmentTag[])}
                                 placeholder="Filtrera på taggar"
                                 selected={
                                     filterTags
@@ -244,12 +244,12 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Platser</Form.Label>
-                            <Typeahead<EquipmentLocation>
+                            <Typeahead
                                 id="tags-typeahead"
                                 multiple
-                                labelKey={(x) => x.name}
+                                labelKey="name"
                                 options={getSortedList(equipmentLocations ?? [])}
-                                onChange={(e) => setFilterLocations(e)}
+                                onChange={(e) => setFilterLocations(e as EquipmentLocation[])}
                                 placeholder="Filtrera på plats"
                                 selected={
                                     filterLocations
@@ -262,8 +262,7 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Publika prislistan</Form.Label>
-                            <Form.Control
-                                as="select"
+                            <Form.Select
                                 name="publiclyHidden"
                                 onChange={(e) => setFilterPubliclyHidden(e.target.value)}
                                 value={filterPubliclyHidden}
@@ -271,10 +270,10 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                                 <option value="all">Visa alla</option>
                                 <option value="false">Synlig i publika prislistan</option>
                                 <option value="true">Gömd</option>
-                            </Form.Control>
+                            </Form.Select>
                         </Form.Group>
                     </Col>
-                </Form.Row>
+                </Row>
             </AdvancedFilters>
 
             <TableDisplay

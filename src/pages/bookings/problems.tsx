@@ -52,11 +52,11 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         <>
               <TableStyleLink href={'/bookings/' + x.booking.id}>{x.booking.name}</TableStyleLink>
 
-        <BookingStatusTag booking={x.booking} className="ml-1" />
-        <BookingTypeTag booking={x.booking} className="ml-1" />
-        <RentalStatusTag booking={x.booking} className="ml-1" />
-        <InternalReservationTag booking={x.booking} className="ml-1" />
-        <FixedPriceStatusTag booking={x.booking} className="ml-1" />
+        <BookingStatusTag booking={x.booking} className="ms-1" />
+        <BookingTypeTag booking={x.booking} className="ms-1" />
+        <RentalStatusTag booking={x.booking} className="ms-1" />
+        <InternalReservationTag booking={x.booking} className="ms-1" />
+        <FixedPriceStatusTag booking={x.booking} className="ms-1" />
         <p className="text-muted mb-0">{x.booking.customerName ?? '-'}</p>
         </>
     );
@@ -76,7 +76,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                 <p className="mb-1">
                     Inte markerat som bokad
                     <WarningIcon
-                        className="ml-2"
+                        className="ms-2"
                         placement="top"
                         text={`Denna bokning lämnas ut ${formatDatetime(result.booking.equipmentOutDatetime)} och är fortfarande inte markerad som bokad.`}
                     />
@@ -86,7 +86,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                 <p className="mb-1">
                     Inte klarmarkerad
                     <WarningIcon
-                        className="ml-2"
+                        className="ms-2"
                         placement="top"
                         text={`Denna bokning återlämnades ${formatDatetime(result.booking.equipmentInDatetime)} och är fortfarande inte klarmarkerad.`}
                     />
@@ -96,7 +96,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                 <p className="mb-1">
                     Inte utlämnad
                     <WarningIcon
-                        className="ml-2"
+                        className="ms-2"
                         placement="top"
                         text={`Denna bokning har utrustningslistor som borde ha lämnats ut men som inte markerats som utlämnade (${result.shouldBeOut.map((x) => x.name).join(', ')}).`}
                     />
@@ -106,7 +106,7 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
                 <p className="mb-1">
                     Inte återlämnad
                     <WarningIcon
-                        className="ml-2"
+                        className="ms-2"
                         placement="top"
                         text={`Denna bokning har utrustningslistor som borde ha återlämnats men som inte markerats som återlämnade (${result.shouldBeIn.map((x) => x.name).join(', ')}).`}
                     />

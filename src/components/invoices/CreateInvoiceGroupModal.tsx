@@ -17,7 +17,7 @@ import { getPaymentStatusName } from '../../lib/utils';
 type Props = {
     show: boolean;
     onHide: () => void;
-    onCreate: (invoiceGroup: PartialDeep<IInvoiceGroupObjectionModel>) => void;
+    onCreate: (invoiceGroup: PartialDeep<IInvoiceGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
 };
 
 const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Props) => {
@@ -65,7 +65,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
     };
 
     const createGroup = () => {
-        const group: PartialDeep<IInvoiceGroupObjectionModel, { recurseIntoArrays: true }> = {
+        const group: PartialDeep<IInvoiceGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> = {
             name: selectedGroupName,
             bookings: selectedBookingIds.map((id) => ({ id })),
         };
@@ -89,7 +89,7 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
                 <Modal.Title>Skapa Fakturaunderlagsgrupp</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form.Group controlId="formName">
+                <Form.Group controlId="formName" className="mb-3">
                     <Form.Label>Namn</Form.Label>
                     <Form.Control
                         required={true}
@@ -100,23 +100,23 @@ const CreateInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onCreate }: Pr
                         onChange={(e) => setSelectedGroupName(e.target.value)}
                     />
                 </Form.Group>
-                <Button onClick={toggleAllowAllBookings} variant="secondary" className="mr-2 mb-3">
-                    <FontAwesomeIcon className="fa-fw mr-1" icon={allowAllBookings ? faLock : faLockOpen} />
+                <Button onClick={toggleAllowAllBookings} variant="secondary" className="me-2 mb-3">
+                    <FontAwesomeIcon className="fa-fw me-1" icon={allowAllBookings ? faLock : faLockOpen} />
                     {allowAllBookings ? 'Lås irrelevanta' : 'Lås upp irrelevanta'} bokningar
                 </Button>
                 <Button
                     onClick={() => setHideLockedBookings((x) => !x)}
                     variant="secondary"
-                    className="mr-2 mb-3"
+                    className="me-2 mb-3"
                     disabled={allowAllBookings}
                 >
-                    <FontAwesomeIcon className="fa-fw mr-1" icon={hideLockedBookings ? faEye : faEyeSlash} />
+                    <FontAwesomeIcon className="fa-fw me-1" icon={hideLockedBookings ? faEye : faEyeSlash} />
                     {hideLockedBookings ? 'Visa låsta' : 'Dölj låsta'} bokningar
                 </Button>
                 <Button
                     onClick={createGroup}
                     variant="primary"
-                    className="mr-2 mb-3"
+                    className="me-2 mb-3"
                     disabled={selectedBookingIds.length === 0}
                 >
                     Skapa Fakturaunderlagsgrupp

@@ -103,9 +103,11 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
         )
             .then((apiResponse) => getResponseContentOrError(apiResponse))
             .then(() => {
-                undo
-                    ? setConfirmingBookingIds((x) => x.filter((id) => id !== bookingId))
-                    : setConfirmingBookingIds((x) => [bookingId, ...x]);
+                if (undo) {
+                    setConfirmingBookingIds((x) => x.filter((id) => id !== bookingId));
+                } else {
+                    setConfirmingBookingIds((x) => [bookingId, ...x]);
+                }
                 showGeneralSuccessMessage(undo ? 'Markering ångrad' : 'Markerad som betald');
             })
             .catch((error: Error) => {
@@ -154,25 +156,25 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
             <Button
                 variant="secondary"
                 size="sm"
-                className="mr-2"
+                className="me-2"
                 href={`/api/documents/price-estimate/${booking.language}/${booking.id}`}
                 target="_blank"
             >
-                <FontAwesomeIcon icon={faFileDownload} className="mr-1" /> Visa prisunderlag
+                <FontAwesomeIcon icon={faFileDownload} className="me-1" /> Visa prisunderlag
             </Button>
 
             {confirmedBookingIds.includes(booking.id) ? (
                 <Button
                     variant="secondary"
                     size="sm"
-                    className="mr-2"
+                    className="me-2"
                     onClick={() => markBookingAsPaidWithCashPayment(booking.id, true)}
                 >
-                    <FontAwesomeIcon icon={faRotateLeft} className="mr-1" /> Ångra
+                    <FontAwesomeIcon icon={faRotateLeft} className="me-1" /> Ångra
                 </Button>
             ) : (
-                <Button variant="primary" size="sm" className="mr-2" onClick={() => setConfirmingBookingId(booking.id)}>
-                    <FontAwesomeIcon icon={faCheck} className="mr-1" /> Markera som betald
+                <Button variant="primary" size="sm" className="me-2" onClick={() => setConfirmingBookingId(booking.id)}>
+                    <FontAwesomeIcon icon={faCheck} className="me-1" /> Markera som betald
                 </Button>
             )}
         </>
@@ -280,7 +282,7 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
                         <UserIcon user={currentUser} />
                     </Dropdown.Toggle>
 
-                    <Dropdown.Menu align="right">
+                    <Dropdown.Menu align="end">
                         <Dropdown.Item disabled={true}>
                             <UserDisplay user={currentUser} />
                         </Dropdown.Item>

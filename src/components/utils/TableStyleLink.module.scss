@@ -1,4 +1,9 @@
-.link,
+.link {
+    color: white;
+    text-decoration: none;
+}
+
 .link:hover {
     color: white;
+    text-decoration: underline;
 }

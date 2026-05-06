@@ -78,7 +78,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
             <Card className="mb-3">
                 <Card.Header>
                     <div className="d-flex">
-                        <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
+                        <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
                             Utrustning
                         </div>
                     </div>
@@ -241,7 +241,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                         </Tooltip>
                     }
                 >
-                    <FontAwesomeIcon icon={faWarning} className="ml-2" />
+                    <FontAwesomeIcon icon={faWarning} className="ms-2" />
                 </OverlayTrigger>
             ) : null}
             <div className="mb-0 text-muted d-md-none">
@@ -255,7 +255,7 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                             </Tooltip>
                         }
                     >
-                        <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
+                        <FontAwesomeIcon className="ms-1" icon={faInfoCircle} />
                     </OverlayTrigger>
                 ) : null}
             </div>
@@ -271,25 +271,25 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                         onClick={() => updateTimeReports(...moveItemUp(timeReports, entry))}
                         disabled={isFirst(timeReports, entry)}
                     >
-                        <FontAwesomeIcon icon={faAngleUp} className="mr-1 fa-fw" /> Flytta upp
+                        <FontAwesomeIcon icon={faAngleUp} className="me-1 fa-fw" /> Flytta upp
                     </Dropdown.Item>
                     <Dropdown.Item
                         onClick={() => updateTimeReports(...moveItemDown(timeReports, entry))}
                         disabled={isLast(timeReports, entry)}
                     >
-                        <FontAwesomeIcon icon={faAngleDown} className="mr-1 fa-fw" /> Flytta ner
+                        <FontAwesomeIcon icon={faAngleDown} className="me-1 fa-fw" /> Flytta ner
                     </Dropdown.Item>
                     <Dropdown.Divider />
                     <Dropdown.Item onClick={() => setTimeReportToDelete(entry)} className="text-danger">
-                        <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort rad
+                        <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort rad
                     </Dropdown.Item>
                     <Dropdown.Item onClick={() => duplicateTimeReport(entry)}>
-                        <FontAwesomeIcon icon={faClone} className="mr-1 fa-fw" /> Duplicera
+                        <FontAwesomeIcon icon={faClone} className="me-1 fa-fw" /> Duplicera
                     </Dropdown.Item>
                 </>
             ) : null}
             <Dropdown.Item onClick={() => setTimeReportToEditViewModel(entry)}>
-                <FontAwesomeIcon icon={faGears} className="mr-1 fa-fw" />{' '}
+                <FontAwesomeIcon icon={faGears} className="me-1 fa-fw" />{' '}
                 {readonly ? 'Visa detaljer' : 'Avancerad redigering'}
             </Dropdown.Item>
         </DropdownButton>
@@ -377,12 +377,12 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
         <Card className="mb-3">
             <Card.Header>
                 <div className="d-flex">
-                    <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
-                        <FontAwesomeIcon className="mr-2" icon={faStopwatch} />
+                    <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
+                        <FontAwesomeIcon className="me-2" icon={faStopwatch} />
                         Tidrapporter
                     </div>
                     <div className="d-flex">
-                        <Button className="mr-2" variant="" onClick={() => setShowContent(!showContent)}>
+                        <Button className="me-2" variant="" onClick={() => setShowContent(!showContent)}>
                             <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                         </Button>
                     </div>
@@ -407,12 +407,12 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
                             disabled={readonly}
                             booking={booking}
                             onAdd={onAdd}
-                            className="ml-2 mr-2 mb-2"
+                            className="ms-2 me-2 mb-2"
                             variant="secondary"
                             size="sm"
                             defaultLaborHourlyRate={defaultLaborHourlyRate}
                         >
-                            <FontAwesomeIcon icon={faPlus} className="mr-1" />
+                            <FontAwesomeIcon icon={faPlus} className="me-1" />
                             Ny tidrapport
                         </TimeReportAddButton>
                     )}

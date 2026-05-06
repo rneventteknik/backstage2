@@ -1,4 +1,4 @@
-@import '../../style/variables';
+@use '../../style/variables';
 
 $danger-bg: #f44336;
 $warning-bg: #ff9800;
@@ -39,6 +39,6 @@ $info-bg: #2196f3;
 .notification {
     min-width: 22em;
     border-radius: 0;
-    background-color: $backstage-color-4;
+    background-color: variables.$backstage-color-4;
     border-width: 0;
 }

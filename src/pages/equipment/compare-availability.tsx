@@ -140,7 +140,7 @@ const CompareAvailabilityPage: React.FC<Props> = ({ user: currentUser, globalSet
                             onSelect={(e) => addFromSearch(e)}
                         />
                     </div>
-                    <div className="ml-3">
+                    <div className="ms-3">
                         <Form.Control
                             type="date"
                             defaultValue={formatDateForForm(defaultDate)}

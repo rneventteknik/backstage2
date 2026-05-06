@@ -82,9 +82,9 @@ const AddUserAsCoOwnerToAllFutureBookingsForUserButton: React.FC<Props> = ({
                 onClick={() => addUserAsCoOwnerToAllFutureBookingsForUser()}
             >
                 {isLoading ? (
-                    <FontAwesomeIcon icon={faCircleNotch} className="mr-1" spin />
+                    <FontAwesomeIcon icon={faCircleNotch} className="me-1" spin />
                 ) : (
-                    <FontAwesomeIcon icon={faPlus} className="mr-1" />
+                    <FontAwesomeIcon icon={faPlus} className="me-1" />
                 )}
                 Favoritmarkera bokningar jag arbetar på
             </Button>

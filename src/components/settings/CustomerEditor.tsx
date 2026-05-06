@@ -16,7 +16,7 @@ type Props = {
 const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Props) => {
     return (
         <>
-            <Form.Group controlId="formName">
+            <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Namn</Form.Label>
                 <Form.Control
                     required
@@ -26,7 +26,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                     onChange={(e) => save({ ...entity, name: e.target.value })}
                 />
             </Form.Group>
-            <Form.Group controlId="formColor">
+            <Form.Group className="mb-3" controlId="formColor">
                 <Form.Label>Hoogia-id</Form.Label>
                 <FormNumberFieldWithoutScroll
                     type="number"
@@ -41,7 +41,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                     }
                 />
             </Form.Group>
-            <Form.Group controlId="formColor">
+            <Form.Group className="mb-3" controlId="formColor">
                 <Form.Label>Fakturaadress</Form.Label>
                 <Form.Control
                     as="textarea"
@@ -52,13 +52,12 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                 />
             </Form.Group>
 
-            <Form.Group controlId="formPricePlan">
+            <Form.Group className="mb-3" controlId="formPricePlan">
                 <Form.Label>Prisplan</Form.Label>
-                <Form.Control
-                    as="select"
+                <Form.Select
                     name="pricePlan"
                     defaultValue={entity.pricePlan ?? ''}
-                    readOnly={readOnly}
+                    disabled={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,
@@ -69,16 +68,15 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                     <option value="">Ingen prisplan</option>
                     <option value={PricePlan.THS}>{getPricePlanName(PricePlan.THS)}</option>
                     <option value={PricePlan.EXTERNAL}>{getPricePlanName(PricePlan.EXTERNAL)}</option>
-                </Form.Control>
+                </Form.Select>
             </Form.Group>
 
-            <Form.Group controlId="formAccountKind">
+            <Form.Group className="mb-3" controlId="formAccountKind">
                 <Form.Label>Kontotyp</Form.Label>
-                <Form.Control
-                    as="select"
+                <Form.Select
                     name="accountKind"
                     defaultValue={entity.accountKind ?? ''}
-                    readOnly={readOnly}
+                    disabled={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,
@@ -89,16 +87,15 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                     <option value="">Ingen kontotyp</option>
                     <option value={AccountKind.EXTERNAL}>{getAccountKindName(AccountKind.EXTERNAL)}</option>
                     <option value={AccountKind.INTERNAL}>{getAccountKindName(AccountKind.INTERNAL)}</option>
-                </Form.Control>
+                </Form.Select>
             </Form.Group>
 
-            <Form.Group controlId="formLanguage">
+            <Form.Group className="mb-3" controlId="formLanguage">
                 <Form.Label>Språk</Form.Label>
-                <Form.Control
-                    as="select"
+                <Form.Select
                     name="language"
                     defaultValue={entity.language ?? Language.SV}
-                    readOnly={readOnly}
+                    disabled={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,
@@ -108,7 +105,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                 >
                     <option value={Language.SV}>{getLanguageName(Language.SV)}</option>
                     <option value={Language.EN}>{getLanguageName(Language.EN)}</option>
-                </Form.Control>
+                </Form.Select>
             </Form.Group>
         </>
     );

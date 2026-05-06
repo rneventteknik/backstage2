@@ -1,4 +1,4 @@
-@import '../../style/variables';
+@use '../../style/variables';
 
 .breadcrumb {
     text-transform: uppercase;
@@ -6,6 +6,6 @@
     font-weight: 600;
 
     a {
-        color: $backstage-dark-text-color;
+        color: variables.$backstage-dark-text-color;
     }
 }

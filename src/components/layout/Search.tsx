@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import * as Typeahead from 'react-bootstrap-typeahead';
+import type { RenderMenuProps, TypeaheadComponentProps } from 'react-bootstrap-typeahead';
 import { useRouter } from 'next/router';
 import { SearchResult } from '../../models/misc/SearchResult';
 import { groupBy, getResponseContentOrError } from '../../lib/utils';
@@ -21,6 +22,9 @@ import { SplitHighlighter } from '../utils/Highlight';
 import EquipmentTagDisplay from '../utils/EquipmentTagDisplay';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import { toEquipmentPackage } from '../../lib/mappers/equipmentPackage';
+
+type Option = TypeaheadComponentProps['options'][number];
+type RenderMenuState = Parameters<NonNullable<TypeaheadComponentProps['renderMenu']>>[2];
 
 enum ResultType {
     BOOKING,
@@ -111,7 +115,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
         results: T[];
         heading: string;
         icon: IconDefinition;
-        state: Typeahead.TypeaheadState<SearchResultViewModel>;
+        state: RenderMenuState;
     };
 
     const ResultSection = <T extends SearchResultViewModel & HasIndex>({
@@ -136,7 +140,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     return (
                         <small>
                             <SplitHighlighter search={highlightText} textToHighlight={equipment.nameEN} />{' '}
-                            {equipment.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />)}
+                            {equipment.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />)}
                         </small>
                     );
 
@@ -149,7 +153,7 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                                 textToHighlight={equipmentPackage.nameEN || equipmentPackage.name}
                             />{' '}
                             {equipmentPackage.tags?.map((x) => (
-                                <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
+                                <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />
                             ))}
                         </small>
                     );
@@ -197,19 +201,19 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
     };
 
     const renderMenu = (
-        results: Typeahead.TypeaheadResult<SearchResultViewModel>[],
-        menuProps: Typeahead.TypeaheadMenuProps<SearchResultViewModel>,
-        state: Typeahead.TypeaheadState<SearchResultViewModel>,
+        results: Option[],
+        menuProps: RenderMenuProps,
+        state: RenderMenuState,
     ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
 
     type MenuProps = {
-        results: Typeahead.TypeaheadResult<SearchResultViewModel>[];
-        menuProps: Typeahead.TypeaheadMenuProps<SearchResultViewModel>;
-        state: Typeahead.TypeaheadState<SearchResultViewModel>;
+        results: Option[];
+        menuProps: RenderMenuProps;
+        state: RenderMenuState;
     };
 
     const Menu = ({ results, menuProps, state }: MenuProps): React.ReactElement => {
-        const resultWithIndex = results.map((res, index) => ({ index: index, ...res }));
+        const resultWithIndex = (results as SearchResultViewModel[]).map((res, index) => ({ index: index, ...res }));
         const res = groupBy(resultWithIndex, (x) => x.type);
 
         return (
@@ -242,11 +246,11 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
         <Typeahead.AsyncTypeahead
             id="search"
             filterBy={() => true}
-            labelKey={(x) => x.name}
+            labelKey={(x: Option) => (x as SearchResultViewModel).name}
             isLoading={isLoading}
             options={searchResult}
             onSearch={fetchSearchResults}
-            onChange={handleSelect}
+            onChange={(selected) => handleSelect(selected as SearchResultViewModel[])}
             renderMenu={renderMenu}
             placeholder="Sök..."
             selected={[]}

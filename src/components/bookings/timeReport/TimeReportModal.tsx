@@ -1,5 +1,5 @@
 import React, { FormEvent } from 'react';
-import { Modal, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { Modal, Col, Form, Row, InputGroup, Button } from 'react-bootstrap';
 import { usersFetcher } from '../../../lib/fetchers';
 import { nameSortFn, toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
@@ -81,7 +81,7 @@ const TimeReportModal: React.FC<Props> = ({
             </Modal.Header>
             <Modal.Body>
                 <Form onSubmit={handleSubmit} id={formId}>
-                    <Form.Row>
+                    <Row>
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>
@@ -142,9 +142,9 @@ const TimeReportModal: React.FC<Props> = ({
                                 />
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
                     <hr />
-                    <Form.Row>
+                    <Row>
                         <Col md={4} xs={6}>
                             <Form.Group>
                                 <Form.Label>
@@ -227,11 +227,10 @@ const TimeReportModal: React.FC<Props> = ({
                                     Användare
                                     <RequiredIndicator />
                                 </Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     defaultValue={timeReport?.userId}
                                     required
-                                    readOnly={readonly}
+                                    disabled={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
@@ -245,10 +244,10 @@ const TimeReportModal: React.FC<Props> = ({
                                             {user.name}
                                         </option>
                                     ))}
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
                     <span className="text-muted">
                         Tidrapporter används för att fakturera kunden för arbetad tid. Vill du skapa en prisuppskattning
                         med personalkostnad i, använd tidsestimat istället.

@@ -26,7 +26,7 @@ const MarkdownCard: React.FC<Props> = ({ text, onSubmit, cardTitle, editModelTit
                     {!readonly ? (
                         <>
                             {text ? (
-                                <Button className="mr-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+                                <Button className="me-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
                                     <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                                 </Button>
                             ) : null}

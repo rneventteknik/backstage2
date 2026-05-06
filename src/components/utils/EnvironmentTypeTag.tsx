@@ -15,7 +15,7 @@ const EnvironmentTypeTag: React.FC<Props> = ({ globalSettings }: Props) => {
         return null;
     }
 
-    return <Badge variant={variant}>{name}</Badge>;
+    return <Badge bg={variant}>{name}</Badge>;
 };
 
 export default EnvironmentTypeTag;

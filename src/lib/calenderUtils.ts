@@ -2,7 +2,7 @@ import { calendar, calendar_v3 } from '@googleapis/calendar';
 import { fetchUserByNameTag } from './db-access/user';
 import { CalendarResult } from '../models/misc/CalendarResult';
 import { fetchFirstBookingByCalendarBookingId } from './db-access/booking';
-import { GaxiosResponse } from 'googleapis-common';
+import { GaxiosResponseWithHTTP2 } from 'googleapis-common';
 import { UserObjectionModel } from '../models/objection-models';
 import { getGlobalSetting } from './utils';
 import { fetchSettings } from './db-access/setting';
@@ -58,7 +58,7 @@ const mapCalendarEvent = async (
 };
 
 const mapCalendarResponse = (
-    res: GaxiosResponse<calendar_v3.Schema$Events>,
+    res: GaxiosResponseWithHTTP2<calendar_v3.Schema$Events>,
     nameTagBlackList: string[],
 ): Promise<CalendarResult[] | null> => {
     if (!res.data.items) {

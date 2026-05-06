@@ -13,7 +13,7 @@ type Props = {
 const EquipmentLocationEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Props) => {
     return (
         <>
-            <Form.Group controlId="formName">
+            <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Namn</Form.Label>
                 <Form.Control
                     required
@@ -23,7 +23,7 @@ const EquipmentLocationEditor: React.FC<Props> = ({ entity, save, readOnly = fal
                     onChange={(e) => save({ ...entity, name: e.target.value })}
                 />
             </Form.Group>
-            <Form.Group controlId="formSortIndex">
+            <Form.Group className="mb-3" controlId="formSortIndex">
                 <Form.Label>Sort Index</Form.Label>
                 <FormNumberFieldWithoutScroll
                     type="number"

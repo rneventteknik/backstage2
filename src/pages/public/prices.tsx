@@ -130,7 +130,7 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
             ) : null}
             <div style={containerStyle}>
                 <h1>{pageTitle}</h1>
-                <ButtonGroup className="mb-3 mr-2">
+                <ButtonGroup className="mb-3 me-2">
                     <Button variant={language === 'sv' ? 'primary' : 'secondary'} onClick={() => setLanguage('sv')}>
                         Svenska
                     </Button>
@@ -138,7 +138,7 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
                         English
                     </Button>
                 </ButtonGroup>
-                <ButtonGroup className="mb-3 mr-2">
+                <ButtonGroup className="mb-3 me-2">
                     <Button variant={includeVat ? 'primary' : 'secondary'} onClick={() => setIncludeVAT(true)}>
                         Inklusive moms
                     </Button>
@@ -185,7 +185,7 @@ const PublicPricePage: React.FC<Props> = ({ equipment, equipmentCategories, glob
                                                 </div>
                                                 <div>
                                                     {equipment.tags?.map((x) => (
-                                                        <EquipmentTagDisplay tag={x} key={x.id} className="mr-1" />
+                                                        <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />
                                                     ))}
                                                 </div>
                                             </td>

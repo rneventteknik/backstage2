@@ -125,7 +125,7 @@ export const toEmailThread = (objectionModel: IEmailThreadObjectionModel) => {
 export const toEquipmentListObjectionModel = (
     clientModel: EquipmentList,
     bookingId: number,
-): PartialDeep<IEquipmentListObjectionModel, { recurseIntoArrays: true }> => {
+): PartialDeep<IEquipmentListObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> => {
     return {
         ...clientModel,
         created: undefined,
@@ -155,7 +155,7 @@ export const toEquipmentListObjectionModel = (
 
 export const toEquipmentListHeadingEntryObjectionModel = (
     clientModel: Partial<EquipmentListHeading>,
-): PartialDeep<IEquipmentListHeadingEntryObjectionModel, { recurseIntoArrays: true }> => {
+): PartialDeep<IEquipmentListHeadingEntryObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> => {
     return {
         ...clientModel,
         created: undefined,

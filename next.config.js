@@ -1,17 +1,34 @@
 // This file is run at build time and saves the current Backstage2 version based on the version
 // number specified in the currentVersion-file, and and the date. The generated data is stored in
-// environment variables which can be accessed by the client and shown to the user. Since this file
-// is run by node.js at build time it is written in plain Javascript and uses CommonJS-require to
-// import modules.
+// environment variables which can be accessed by the client and shown to the user.
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-const versionNumber = JSON.parse(require('fs').readFileSync('package.json').toString()).version;
+import { readFileSync } from 'fs';
+
+const versionNumber = JSON.parse(readFileSync('package.json').toString()).version;
 const currentDate = new Date().toLocaleString('sv-SE', { year: 'numeric', month: 'numeric', day: 'numeric' });
 
-module.exports = {
+const sassOptions = {
+    quietDeps: true,
+    silenceDeprecations: ['import', 'legacy-js-api', 'color-functions', 'global-builtin', 'if-function'],
+};
+
+export default {
     env: {
         NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION: versionNumber,
         NEXT_PUBLIC_BACKSTAGE2_BUILD_DATE: currentDate,
+    },
+    sassOptions,
+    webpack(config) {
+        for (const rule of config.module.rules) {
+            for (const oneOfRule of rule.oneOf ?? []) {
+                for (const use of Array.isArray(oneOfRule.use) ? oneOfRule.use : []) {
+                    if (typeof use.loader === 'string' && use.loader.includes('sass-loader')) {
+                        use.options = { ...use.options, sassOptions };
+                    }
+                }
+            }
+        }
+        return config;
     },
     images: {
         remotePatterns: [

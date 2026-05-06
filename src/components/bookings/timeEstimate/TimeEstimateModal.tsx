@@ -1,5 +1,5 @@
 import React, { FormEvent, useState } from 'react';
-import { Modal, Col, Form, InputGroup, Button, Card } from 'react-bootstrap';
+import { Modal, Col, Form, Row, InputGroup, Button, Card } from 'react-bootstrap';
 import { toIntOrUndefined } from '../../../lib/utils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import RequiredIndicator from '../../utils/RequiredIndicator';
@@ -94,7 +94,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                             <div className="d-flex">
                                 <strong className="flex-grow-1">Beräkna tidsestimat från klockslag</strong>
                                 <Button
-                                    className="mr-2"
+                                    className="me-2"
                                     variant=""
                                     size="sm"
                                     onClick={() => setUserHasClosedWizard((x) => !x)}
@@ -103,44 +103,42 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 </Button>
                             </div>
                             {!userHasClosedWizard ? (
-                                <Form onSubmit={handleSubmitWizard} id={formId + '-wizard'} inline>
+                                <Form onSubmit={handleSubmitWizard} id={formId + '-wizard'} className="d-flex align-items-center mt-2">
                                     <Form.Control
                                         required
                                         defaultValue={wizardNumberOfTechnicians}
                                         placeholder="2"
                                         type="number"
-                                        htmlSize={6}
                                         onChange={(e) => setWizardNumberOfTechnicians(e.target.value)}
-                                        className="mr-2 mt-2"
+                                        className="me-2"
+                                        style={{ width: '80px' }}
                                         min={0}
                                     />
 
-                                    <span className="mr-2 mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                        tekniker mellan klockan
-                                    </span>
+                                    <span className="me-2">tekniker mellan klockan</span>
 
                                     <Form.Control
                                         required
                                         defaultValue={wizardStartHour}
                                         placeholder="12"
                                         type="number"
-                                        htmlSize={7}
                                         onChange={(e) => setWizardStartHour(e.target.value)}
-                                        className="mr-2 mt-2"
+                                        className="me-2"
+                                        style={{ width: '80px' }}
                                         min={0}
                                         max={23}
                                     />
 
-                                    <span className="mr-2 mt-2">och</span>
+                                    <span className="me-2">och</span>
 
                                     <Form.Control
                                         required
                                         defaultValue={wizardEndHour}
                                         placeholder="03"
                                         type="number"
-                                        htmlSize={7}
                                         onChange={(e) => setWizardEndHour(e.target.value)}
-                                        className="mr-2 mt-2"
+                                        className="me-2"
+                                        style={{ width: '80px' }}
                                         min={0}
                                         max={23}
                                     />
@@ -149,7 +147,6 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         form={formId + '-wizard'}
                                         type="submit"
                                         variant="secondary"
-                                        className="mt-2"
                                         disabled={
                                             toIntOrUndefined(wizardNumberOfTechnicians) === undefined ||
                                             toIntOrUndefined(wizardStartHour) === undefined ||
@@ -165,7 +162,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                 ) : null}
 
                 <Form onSubmit={handleSubmit} id={formId}>
-                    <Form.Row>
+                    <Row>
                         <Col md={4}>
                             <Form.Group>
                                 <Form.Label>
@@ -239,7 +236,7 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 ) : null}
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
                 </Form>
             </Modal.Body>
             <Modal.Footer>

@@ -139,24 +139,24 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                         <>
                             <Button
                                 variant="secondary"
-                                className="d-inline-block mr-2 mb-2"
+                                className="d-inline-block me-2 mb-2"
                                 href={`/api/documents/salary-report/${salaryGroup.id}?${getSelectedBookingIds()
                                     ?.map((id) => `bookingId=${id}`)
                                     .join('&')}`}
                                 target="_blank"
                                 disabled={deSelectedBookingIds.length === salaryGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faFileDownload} className="mr-1 fa-fw" /> Exportera
+                                <FontAwesomeIcon icon={faFileDownload} className="me-1 fa-fw" /> Exportera
                                 timarvodesunderlag
                             </Button>
 
                             <Button
                                 variant="secondary"
-                                className="mr-2 mb-2"
+                                className="me-2 mb-2"
                                 onClick={() => setBookingSalaryStatus(SalaryStatus.SENT, getSelectedBookingIds())}
                                 disabled={deSelectedBookingIds.length === salaryGroup.bookings?.length}
                             >
-                                <FontAwesomeIcon icon={faPaperPlane} className="mr-2 fa-fw" />
+                                <FontAwesomeIcon icon={faPaperPlane} className="me-2 fa-fw" />
                                 Markera timarvode som skickat
                             </Button>
 
@@ -167,12 +167,12 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
                                 title="Mer"
                             >
                                 <Dropdown.Item onClick={() => setShowChangeNameModal(true)}>
-                                    <FontAwesomeIcon icon={faPen} className="mr-1 fa-fw" /> Byt namn på
+                                    <FontAwesomeIcon icon={faPen} className="me-1 fa-fw" /> Byt namn på
                                     timarvodesunderlagsgrupp
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                                 <Dropdown.Item onClick={() => setShowConfirmDeleteModal(true)} className="text-danger">
-                                    <FontAwesomeIcon icon={faTrashCan} className="mr-1 fa-fw" /> Ta bort
+                                    <FontAwesomeIcon icon={faTrashCan} className="me-1 fa-fw" /> Ta bort
                                     timarvodesunderlagsgrupp
                                 </Dropdown.Item>
                             </DropdownButton>

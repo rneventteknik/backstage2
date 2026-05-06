@@ -24,7 +24,7 @@ const PreviousBookingsCard: React.FC<Props> = ({ hogiaId, bookingId }: Props) =>
                 <Card.Header>Andra bokningar för kund</Card.Header>
                 <Card.Body>
                     <p className="text-muted mb-0">
-                        <FontAwesomeIcon icon={faInfoCircle} className="mr-2" />
+                        <FontAwesomeIcon icon={faInfoCircle} className="me-2" />
                         Endast tillgängligt för kunder med Hogia Id.
                     </p>
                 </Card.Body>

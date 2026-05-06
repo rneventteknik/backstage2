@@ -42,7 +42,7 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({ displayName, link, icon, exac
             <Link href={link} passHref legacyBehavior>
                 <Nav.Link as="a" href={link}>
                     <FontAwesomeIcon className="fa-fw" icon={icon} />
-                    <span className="ml-3">{displayName}</span>
+                    <span className="ms-3">{displayName}</span>
                 </Nav.Link>
             </Link>
         </Nav.Item>
@@ -58,7 +58,7 @@ type SidebarLinkGroupProps = {
 
 const SidebarLinkGroup: React.FC<SidebarLinkGroupProps> = ({ children, title }: SidebarLinkGroupProps) => (
     <>
-        {title ? <h1 className="ml-4 mt-4">{title}</h1> : null}
+        {title ? <h1 className="ms-4 mt-4">{title}</h1> : null}
         <Nav className={'flex-column ' + styles.main}>{children}</Nav>
     </>
 );

@@ -21,7 +21,7 @@ const TimeReportHourDisplay: React.FC<Props> = ({ timeReport }: Props) => {
                         </Tooltip>
                     }
                 >
-                    <FontAwesomeIcon className="ml-1" icon={faInfoCircle} />
+                    <FontAwesomeIcon className="ms-1" icon={faInfoCircle} />
                 </OverlayTrigger>
             ) : null}
         </>

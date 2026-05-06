@@ -96,7 +96,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
             <Card className="mb-3">
                 <Card.Header>
                     <div className="d-flex">
-                        <div className="flex-grow-1 mr-4" style={{ fontSize: '1.6em' }}>
+                        <div className="flex-grow-1 me-4" style={{ fontSize: '1.6em' }}>
                             {partialList.name}
                         </div>
                     </div>

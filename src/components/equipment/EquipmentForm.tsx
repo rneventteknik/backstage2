@@ -1,7 +1,8 @@
 import React, { FormEvent, useState } from 'react';
-import { Col, Form } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Equipment, EquipmentTag } from '../../models/interfaces';
+import { Equipment } from '../../models/interfaces';
+import type { EquipmentTag } from '../../models/interfaces';
 import { IEquipmentObjectionModel, IEquipmentPriceObjectionModel } from '../../models/objection-models';
 import useSwr from 'swr';
 import { equipmentTagsFetcher, equipmentPublicCategoriesFetcher, equipmentLocationsFetcher } from '../../lib/fetchers';
@@ -13,7 +14,7 @@ import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScr
 import { getSortedList } from '../../lib/sortIndexUtils';
 
 type Props = {
-    handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel>) => void;
+    handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
     equipment?: Equipment;
     formId: string;
 };
@@ -68,7 +69,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
         const getValueFromForm = (key: string): string | undefined => form[key]?.value;
 
-        const modifiedEquipment: PartialDeep<IEquipmentObjectionModel, { recurseIntoArrays: true }> = {
+        const modifiedEquipment: PartialDeep<IEquipmentObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> = {
             id: equipment?.id,
 
             image: equipment?.image,
@@ -99,7 +100,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
-            <Form.Row>
+            <Row>
                 <Col lg="6">
                     <Form.Group controlId="formName">
                         <Form.Label>Namn</Form.Label>
@@ -127,11 +128,11 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         />
                     </Form.Group>
                 </Col>
-            </Form.Row>
+            </Row>
 
             <h2 className="h5 mt-4">Översättningar</h2>
             <hr />
-            <Form.Row>
+            <Row>
                 <Col lg="6">
                     <Form.Group controlId="formNameEN">
                         <Form.Label>Namn (engelska)</Form.Label>
@@ -155,23 +156,23 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         />
                     </Form.Group>
                 </Col>
-            </Form.Row>
+            </Row>
 
             {!equipment ? null : (
                 <>
                     <h2 className="h5 mt-4">Prissättning</h2>
                     <hr />
-                    <Form.Row>
+                    <Row>
                         <Col lg="12">
                             <Form.Group controlId="formPrices">
                                 <PricesEditor prices={prices} onChange={setPrices} />
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
 
                     <h2 className="h5 mt-4">Övriga inställningar</h2>
                     <hr />
-                    <Form.Row>
+                    <Row>
                         <Col lg="6">
                             <Form.Group>
                                 <Form.Label>Söktermer</Form.Label>
@@ -189,12 +190,12 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Col lg="6">
                             <Form.Group>
                                 <Form.Label>Taggar</Form.Label>
-                                <Typeahead<EquipmentTag>
+                                <Typeahead
                                     id="tags-typeahead"
                                     multiple
-                                    labelKey={(x) => x.name}
+                                    labelKey="name"
                                     options={equipmentTags ?? []}
-                                    onChange={(e) => setSelectedTags(e)}
+                                    onChange={(e) => setSelectedTags(e as EquipmentTag[])}
                                     placeholder="Taggar"
                                     defaultSelected={equipment.tags ?? []}
                                 />
@@ -217,21 +218,19 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Col lg="3">
                             <Form.Group controlId="formPubliclyHidden">
                                 <Form.Label>Publika prislistan</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     name="publiclyHidden"
                                     defaultValue={equipment?.publiclyHidden ? 'true' : 'false'}
                                 >
                                     <option value={'false'}>Synlig i publika prislistan</option>
                                     <option value={'true'}>Gömd (visas endast internt)</option>
-                                </Form.Control>
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col lg="3">
                             <Form.Group>
                                 <Form.Label>Publik kategori</Form.Label>
-                                <Form.Control
-                                    as="select"
+                                <Form.Select
                                     name="publicCategory"
                                     defaultValue={equipment?.equipmentPublicCategory?.id}
                                 >
@@ -245,7 +244,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                             {x.name}
                                         </option>
                                     ))}
-                                </Form.Control>
+                                </Form.Select>
                                 <Form.Text className="text-muted">
                                     I den publika prislistan grupperas utrustningen baserat på denna kategori.
                                 </Form.Text>
@@ -254,7 +253,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                         <Col lg="3">
                             <Form.Group>
                                 <Form.Label>Plats</Form.Label>
-                                <Form.Control as="select" name="equipmentLocation">
+                                <Form.Select name="equipmentLocation">
                                     <option value={undefined}>Okänd plats</option>
                                     {getSortedList(equipmentLocations ?? []).map((x) => (
                                         <option
@@ -265,7 +264,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                             {x.name}
                                         </option>
                                     ))}
-                                </Form.Control>
+                                </Form.Select>
                                 <Form.Text className="text-muted">
                                     I packlistan grupperas utrustningen baserat på denna kategori.
                                 </Form.Text>
@@ -283,7 +282,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
                                 />
                             </Form.Group>
                         </Col>
-                    </Form.Row>
+                    </Row>
                 </>
             )}
         </Form>

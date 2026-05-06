@@ -124,7 +124,7 @@ const GeneralSettingsEditor: React.FC<Props> = ({ readonly = false }) => {
                 variant="secondary"
                 size="sm"
                 onClick={() => setSettingToEdit(entry)}
-                className="mr-2"
+                className="me-2"
                 disabled={readonly}
             >
                 Redigera
@@ -193,7 +193,7 @@ const GeneralSettingsEditor: React.FC<Props> = ({ readonly = false }) => {
                     }}
                     disabled={readonly}
                 >
-                    <FontAwesomeIcon icon={faAdd} className="mr-1" /> Lägg till inställning
+                    <FontAwesomeIcon icon={faAdd} className="me-1" /> Lägg till inställning
                 </Button>
             </div>
 

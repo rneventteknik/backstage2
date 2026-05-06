@@ -3,7 +3,7 @@ import { EquipmentPackage, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
 import { countNotNullorEmpty, notEmpty } from '../lib/utils';
 import { Typeahead } from 'react-bootstrap-typeahead';
-import { Col, Form } from 'react-bootstrap';
+import { Col, Form, Row } from 'react-bootstrap';
 import TableStyleLink from './utils/TableStyleLink';
 import useSwr from 'swr';
 import { equipmentTagsFetcher } from '../lib/fetchers';
@@ -15,7 +15,7 @@ const EquipmentPackageNameDisplayFn = (equipmentPackage: EquipmentPackage) => (
     <>
         <TableStyleLink href={'equipmentPackage/' + equipmentPackage.id}>{equipmentPackage.name}</TableStyleLink>
         {equipmentPackage.tags.map((x) => (
-            <EquipmentTagDisplay tag={x} key={x.id} className="ml-1" />
+            <EquipmentTagDisplay tag={x} key={x.id} className="ms-1" />
         ))}
         <div className="text-muted mb-0 d-md-none">
             {equipmentPackage.equipmentEntries.length} delar, {equipmentPackage.estimatedHours} timmar
@@ -101,16 +101,16 @@ const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableS
                 }}
                 activeFilterCount={countNotNullorEmpty(searchText, filterTags)}
             >
-                <Form.Row className="mb-2">
+                <Row className="mb-2 gy-3">
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Taggar</Form.Label>
-                            <Typeahead<EquipmentTag>
+                            <Typeahead
                                 id="tags-typeahead"
                                 multiple
-                                labelKey={(x) => x.name}
+                                labelKey="name"
                                 options={equipmentTags ?? []}
-                                onChange={(e) => setFilterTags(e)}
+                                onChange={(e) => setFilterTags(e as EquipmentTag[])}
                                 placeholder="Filtrera på taggar"
                                 selected={
                                     filterTags
@@ -120,7 +120,7 @@ const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableS
                             />
                         </Form.Group>
                     </Col>
-                </Form.Row>
+                </Row>
             </AdvancedFilters>
 
             <TableDisplay
