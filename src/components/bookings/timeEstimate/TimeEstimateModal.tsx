@@ -103,44 +103,42 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 </Button>
                             </div>
                             {!userHasClosedWizard ? (
-                                <Form onSubmit={handleSubmitWizard} id={formId + '-wizard'} className="d-flex">
+                                <Form onSubmit={handleSubmitWizard} id={formId + '-wizard'} className="d-flex align-items-center mt-2">
                                     <Form.Control
                                         required
                                         defaultValue={wizardNumberOfTechnicians}
                                         placeholder="2"
                                         type="number"
-                                        htmlSize={6}
                                         onChange={(e) => setWizardNumberOfTechnicians(e.target.value)}
-                                        className="me-2 mt-2"
+                                        className="me-2"
+                                        style={{ width: '80px' }}
                                         min={0}
                                     />
 
-                                    <span className="me-2 mt-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                                        tekniker mellan klockan
-                                    </span>
+                                    <span className="me-2">tekniker mellan klockan</span>
 
                                     <Form.Control
                                         required
                                         defaultValue={wizardStartHour}
                                         placeholder="12"
                                         type="number"
-                                        htmlSize={7}
                                         onChange={(e) => setWizardStartHour(e.target.value)}
-                                        className="me-2 mt-2"
+                                        className="me-2"
+                                        style={{ width: '80px' }}
                                         min={0}
                                         max={23}
                                     />
 
-                                    <span className="me-2 mt-2">och</span>
+                                    <span className="me-2">och</span>
 
                                     <Form.Control
                                         required
                                         defaultValue={wizardEndHour}
                                         placeholder="03"
                                         type="number"
-                                        htmlSize={7}
                                         onChange={(e) => setWizardEndHour(e.target.value)}
-                                        className="me-2 mt-2"
+                                        className="me-2"
+                                        style={{ width: '80px' }}
                                         min={0}
                                         max={23}
                                     />
@@ -149,7 +147,6 @@ const TimeEstimateModal: React.FC<Props> = ({
                                         form={formId + '-wizard'}
                                         type="submit"
                                         variant="secondary"
-                                        className="mt-2"
                                         disabled={
                                             toIntOrUndefined(wizardNumberOfTechnicians) === undefined ||
                                             toIntOrUndefined(wizardStartHour) === undefined ||
