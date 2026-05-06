@@ -215,6 +215,12 @@
     }
 }
 
+// Badge custom color: Bootstrap bg-* classes use !important, so we fight back via
+// a CSS custom property set via inline style + our own !important rule.
+.badge[style*='--badge-color'] {
+    background-color: var(--badge-color) !important;
+}
+
 // Bootstrap 4's form-group had margin-bottom: 1rem. In react-bootstrap v2 / Bootstrap 5,
 // Form.Group renders as a plain <div> with no class. Target direct div children of forms
 // (excluding layout helpers) to restore the spacing without touching 284 callsites.
