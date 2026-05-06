@@ -215,6 +215,7 @@ export const fetchBookingWithEquipmentLists = async (id: number): Promise<Bookin
         .withGraphFetched('equipmentLists.listEntries.equipment.equipmentLocation')
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.equipmentLocation')
         .withGraphFetched('timeEstimates')
+        .withGraphFetched('timeReports')
         .withGraphFetched('changelog(changelogInfo)')
         .modifiers({
             changelogInfo: (builder) => {

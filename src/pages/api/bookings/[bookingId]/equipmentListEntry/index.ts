@@ -8,9 +8,11 @@ import {
 } from '../../../../../lib/apiResponses';
 import { SessionContext, withSessionContext } from '../../../../../lib/sessionContext';
 import { fetchBooking } from '../../../../../lib/db-access';
+import { fetchBookingWithEquipmentLists } from '../../../../../lib/db-access/booking';
 import { toBooking } from '../../../../../lib/mappers/booking';
 import { Status } from '../../../../../models/enums/Status';
 import { logChangeToBooking, BookingChangelogEntryType } from '../../../../../lib/changelogUtils';
+import { computePriceSummary } from '../../../../../lib/pricingUtils';
 import {
     insertEquipmentListEntry,
     validateEquipmentListEntryObjectionModel,
@@ -53,12 +55,15 @@ const handler = withSessionContext(
                     isNaN(equipmentListId) ? undefined : equipmentListId,
                     isNaN(equipmentListHeadingId) ? undefined : equipmentListHeadingId,
                 )
-                    .then((result) => {
+                    .then(async (result) => {
+                        const fullBooking = await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                        const priceSnapshot = computePriceSummary(fullBooking);
                         logChangeToBooking(
                             context.currentUser,
                             bookingId,
                             booking.name,
                             BookingChangelogEntryType.EQUIPMENTLIST,
+                            priceSnapshot,
                         ).then(() => res.status(200).json(result));
                     })
                     .catch((err) => res.status(500).json({ statusCode: 500, message: err.message }));

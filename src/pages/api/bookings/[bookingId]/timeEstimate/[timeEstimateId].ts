@@ -16,6 +16,9 @@ import {
 import { Status } from '../../../../../models/enums/Status';
 import { logChangeToBooking, BookingChangelogEntryType, hasChanges } from '../../../../../lib/changelogUtils';
 import { TimeEstimateObjectionModel } from '../../../../../models/objection-models';
+import { fetchBookingWithEquipmentLists } from '../../../../../lib/db-access/booking';
+import { toBooking } from '../../../../../lib/mappers/booking';
+import { computePriceSummary } from '../../../../../lib/pricingUtils';
 
 const handler = withSessionContext(
     async (req: NextApiRequest, res: NextApiResponse, context: SessionContext): Promise<void> => {
@@ -46,11 +49,14 @@ const handler = withSessionContext(
                 }
                 await deleteTimeEstimate(timeEstimateId)
                     .then(async (result) => {
+                        const fullBooking = await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                        const priceSnapshot = computePriceSummary(fullBooking);
                         await logChangeToBooking(
                             context.currentUser,
                             bookingId,
                             booking.name,
                             BookingChangelogEntryType.TIMEESTIMATE,
+                            priceSnapshot,
                         ).then(() => res.status(200).json(result));
                     })
                     .catch((error) => respondWithCustomErrorMessage(res, error.message));
@@ -75,11 +81,14 @@ const handler = withSessionContext(
                         const existingTimeEstimate = booking.timeEstimates?.find((l) => l.id === newTimeEstimate.id);
 
                         if (!existingTimeEstimate || hasChanges(existingTimeEstimate, newTimeEstimate)) {
+                            const fullBooking = await fetchBookingWithEquipmentLists(bookingId).then(toBooking);
+                            const priceSnapshot = computePriceSummary(fullBooking);
                             await logChangeToBooking(
                                 context.currentUser,
                                 bookingId,
                                 booking.name,
                                 BookingChangelogEntryType.TIMEESTIMATE,
+                                priceSnapshot,
                             );
                         }
 
