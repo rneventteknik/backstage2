@@ -355,21 +355,21 @@ const UserCsvImportPage: React.FC<Props> = ({ user: currentUser, globalSettings 
                 },
                 getContentOverride: (row) => {
                     const isSkipped = row.isValid && users.some((u) => u.name === row.name);
-                    if (!row.isValid) return <Badge variant="danger">Ogiltig rad</Badge>;
-                    if (isSkipped) return <Badge variant="secondary">Finns redan</Badge>;
+                    if (!row.isValid) return <Badge bg="danger">Ogiltig rad</Badge>;
+                    if (isSkipped) return <Badge bg="secondary">Finns redan</Badge>;
                     const isUsernameConflict =
                         row.username.length > 0 &&
                         (duplicateUsernamesInCsv.includes(row.username) ||
                             usernamesTakenByExistingUsers.includes(row.username));
                     if (isUsernameConflict)
                         return (
-                            <Badge variant="danger">
+                            <Badge bg="danger">
                                 {duplicateUsernamesInCsv.includes(row.username)
                                     ? 'Dublett användarnamn'
                                     : 'Användarnamn upptaget'}
                             </Badge>
                         );
-                    return <Badge variant="success">Importeras</Badge>;
+                    return <Badge bg="success">Importeras</Badge>;
                 },
             },
         ],
