@@ -16,7 +16,7 @@ type Props = {
 const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Props) => {
     return (
         <>
-            <Form.Group controlId="formName">
+            <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Namn</Form.Label>
                 <Form.Control
                     required
@@ -26,7 +26,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                     onChange={(e) => save({ ...entity, name: e.target.value })}
                 />
             </Form.Group>
-            <Form.Group controlId="formColor">
+            <Form.Group className="mb-3" controlId="formColor">
                 <Form.Label>Hoogia-id</Form.Label>
                 <FormNumberFieldWithoutScroll
                     type="number"
@@ -41,7 +41,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                     }
                 />
             </Form.Group>
-            <Form.Group controlId="formColor">
+            <Form.Group className="mb-3" controlId="formColor">
                 <Form.Label>Fakturaadress</Form.Label>
                 <Form.Control
                     as="textarea"
@@ -52,7 +52,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                 />
             </Form.Group>
 
-            <Form.Group controlId="formPricePlan">
+            <Form.Group className="mb-3" controlId="formPricePlan">
                 <Form.Label>Prisplan</Form.Label>
                 <Form.Select
                     name="pricePlan"
@@ -71,7 +71,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                 </Form.Select>
             </Form.Group>
 
-            <Form.Group controlId="formAccountKind">
+            <Form.Group className="mb-3" controlId="formAccountKind">
                 <Form.Label>Kontotyp</Form.Label>
                 <Form.Select
                     name="accountKind"
@@ -90,7 +90,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                 </Form.Select>
             </Form.Group>
 
-            <Form.Group controlId="formLanguage">
+            <Form.Group className="mb-3" controlId="formLanguage">
                 <Form.Label>Språk</Form.Label>
                 <Form.Select
                     name="language"

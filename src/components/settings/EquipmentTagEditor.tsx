@@ -12,7 +12,7 @@ type Props = {
 const EquipmentTagEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Props) => {
     return (
         <>
-            <Form.Group controlId="formName">
+            <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Namn</Form.Label>
                 <Form.Control
                     type="text"
@@ -21,7 +21,7 @@ const EquipmentTagEditor: React.FC<Props> = ({ entity, save, readOnly = false }:
                     onChange={(e) => save({ ...entity, name: e.target.value })}
                 />
             </Form.Group>
-            <Form.Group controlId="formIsPublic">
+            <Form.Group className="mb-3" controlId="formIsPublic">
                 <Form.Check
                     type="checkbox"
                     label="Visa i publika prislistan"
@@ -30,7 +30,7 @@ const EquipmentTagEditor: React.FC<Props> = ({ entity, save, readOnly = false }:
                     onChange={(e) => save({ ...entity, isPublic: e.target.checked })}
                 />
             </Form.Group>
-            <Form.Group controlId="formColor">
+            <Form.Group className="mb-3" controlId="formColor">
                 <Form.Label>Färg</Form.Label>
                 <Form.Control
                     type="text"
@@ -40,7 +40,7 @@ const EquipmentTagEditor: React.FC<Props> = ({ entity, save, readOnly = false }:
                     onChange={(e) => save({ ...entity, color: e.target.value })}
                 />
             </Form.Group>
-            <Form.Group controlId="preview">
+            <Form.Group className="mb-3" controlId="preview">
                 <Form.Label>Förhandsgranskning</Form.Label>
                 <p>
                     <EquipmentTagDisplay tag={entity} />

@@ -215,17 +215,20 @@
     }
 }
 
-// Restore Bootstrap 4 form-group bottom margin; target form context only to avoid
-// affecting other mb-3 usages (Form.Group renders as div.mb-3 in react-bootstrap)
-form .mb-3 {
+// Bootstrap 4's form-group had margin-bottom: 1rem. In react-bootstrap v2 / Bootstrap 5,
+// Form.Group renders as a plain <div> with no class. Target direct div children of forms
+// (excluding layout helpers) to restore the spacing without touching 284 callsites.
+form > div,
+form .row > [class*='col'] > div,
+form .row > .col > div,
+.modal-body > div,
+.modal-body .row > [class*='col'] > div,
+.modal-body .row > .col > div {
     margin-bottom: 1rem;
 }
 
-// Bootstrap 4's form-group had margin-bottom: 1rem; Form.Group in react-bootstrap v2
-// renders as a plain div with no class, so restore spacing via col bottom margin.
-// Using col children (not row) so spacing works correctly when cols stack on mobile.
-form .row > * {
-    margin-bottom: 1rem;
+.form-label {
+    margin-top: 0.25rem;
 }
 
 .breadcrumb-item a {

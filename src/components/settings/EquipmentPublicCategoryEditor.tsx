@@ -13,7 +13,7 @@ type Props = {
 const EquipmentPublicCategoryEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Props) => {
     return (
         <>
-            <Form.Group controlId="formName">
+            <Form.Group className="mb-3" controlId="formName">
                 <Form.Label>Namn</Form.Label>
                 <Form.Control
                     type="text"
@@ -22,7 +22,7 @@ const EquipmentPublicCategoryEditor: React.FC<Props> = ({ entity, save, readOnly
                     onChange={(e) => save({ ...entity, name: e.target.value })}
                 />
             </Form.Group>
-            <Form.Group controlId="formColor">
+            <Form.Group className="mb-3" controlId="formColor">
                 <Form.Label>Beskrivning</Form.Label>
                 <Form.Control
                     as="textarea"
@@ -32,7 +32,7 @@ const EquipmentPublicCategoryEditor: React.FC<Props> = ({ entity, save, readOnly
                     defaultValue={entity.description}
                 />
             </Form.Group>
-            <Form.Group controlId="formColor">
+            <Form.Group className="mb-3" controlId="formColor">
                 <Form.Label>Sort Index</Form.Label>
                 <FormNumberFieldWithoutScroll
                     type="number"
