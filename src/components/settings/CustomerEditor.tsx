@@ -57,7 +57,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                 <Form.Select
                     name="pricePlan"
                     defaultValue={entity.pricePlan ?? ''}
-                    readOnly={readOnly}
+                    disabled={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,
@@ -76,7 +76,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                 <Form.Select
                     name="accountKind"
                     defaultValue={entity.accountKind ?? ''}
-                    readOnly={readOnly}
+                    disabled={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,
@@ -95,7 +95,7 @@ const CustomerEditor: React.FC<Props> = ({ entity, save, readOnly = false }: Pro
                 <Form.Select
                     name="language"
                     defaultValue={entity.language ?? Language.SV}
-                    readOnly={readOnly}
+                    disabled={readOnly}
                     onChange={(e) =>
                         save({
                             ...entity,

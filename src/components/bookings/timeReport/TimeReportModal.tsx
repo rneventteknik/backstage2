@@ -230,7 +230,7 @@ const TimeReportModal: React.FC<Props> = ({
                                 <Form.Select
                                     defaultValue={timeReport?.userId}
                                     required
-                                    readOnly={readonly}
+                                    disabled={readonly}
                                     onChange={(e) =>
                                         setTimeReport({
                                             ...timeReport,
