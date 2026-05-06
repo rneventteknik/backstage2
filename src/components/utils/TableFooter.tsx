@@ -16,9 +16,9 @@ const TableFooterWithViewCount: React.FC<Props> = ({
 }: Props) => (
     <>
         <hr />
-        <div className="d-flex">
+        <div className="d-flex px-3 pb-2">
             <div>
-                <p className="text-muted">
+                <p className="text-muted mb-0">
                     Visar {Math.min(viewCount, totalCount)} {entityTypeDisplayName} av {totalCount}.
                 </p>
             </div>
