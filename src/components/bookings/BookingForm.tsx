@@ -6,6 +6,7 @@ import {
     getAccountKindName,
     getBookingTypeName,
     getLanguageName,
+    getMemberStatusName,
     getPaymentStatusName,
     getPricePlanName,
     getSalaryStatusName,
@@ -21,6 +22,7 @@ import { Status } from '../../models/enums/Status';
 import { AccountKind } from '../../models/enums/AccountKind';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { SalaryStatus } from '../../models/enums/SalaryStatus';
+import { MemberStatus } from '../../models/enums/MemberStatus';
 import { usersFetcher } from '../../lib/fetchers';
 import RequiredIndicator from '../utils/RequiredIndicator';
 import { PaymentStatus } from '../../models/enums/PaymentStatus';
@@ -294,11 +296,26 @@ const BookingForm: React.FC<Props> = ({
                                 defaultValue={booking.ownerUser?.id ?? booking.ownerUserId}
                                 required={isFieldRequired(Status.DRAFT)}
                             >
-                                {users?.sort(nameSortFn).map((user) => (
-                                    <option key={user.id} value={user.id}>
-                                        {user.name}
-                                    </option>
-                                ))}
+                                {[
+                                    MemberStatus.CHEF,
+                                    MemberStatus.AKTIV,
+                                    MemberStatus.RESURS,
+                                    MemberStatus.ASP,
+                                    MemberStatus.GLÖMD
+                                ].map(statusGroup =>
+                                    <optgroup
+                                        key={getMemberStatusName(statusGroup)}
+                                        label={getMemberStatusName(statusGroup)}
+                                    >
+                                        {users
+                                            ?.filter((user) => user.memberStatus === statusGroup)
+                                            ?.sort(nameSortFn).map((user) => (
+                                                <option key={user.id} value={user.id}>
+                                                    {user.name}
+                                                </option>
+                                            ))}
+                                    </optgroup>
+                                )}
                             </Form.Select>
                         ) : (
                             <ActivityIndicator />
