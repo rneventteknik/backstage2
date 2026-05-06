@@ -105,6 +105,10 @@
     // Badge
     $badge-border-radius: 0.25em,
 
+    // Tooltips 
+    $tooltip-bg: $backstage-color-0,
+    $tooltip-color: $backstage-text-color,
+
     // Grid gutter
     $grid-gutter-width: 20px,
 
@@ -186,11 +190,6 @@
     --bs-list-group-border-color: #{$backstage-color-2};
     --bs-list-group-action-hover-bg: #{$backstage-color-2};
     --bs-list-group-color: #{$backstage-text-color};
-
-    // Tooltips (BS5.3 changed defaults to use --bs-emphasis-color as bg, which is
-    // near-white in our dark theme — override to use a dark background with light text)
-    --bs-tooltip-bg: #{$backstage-color-6};
-    --bs-tooltip-color: #{$backstage-text-color};
 
     color-scheme: dark;
 }
