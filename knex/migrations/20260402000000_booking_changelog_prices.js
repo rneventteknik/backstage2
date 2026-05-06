@@ -1,4 +1,4 @@
-exports.up = function (knex) {
+export function up (knex) {
     return knex.schema.alterTable('BookingChangelogEntry', function (table) {
         table.decimal('equipmentPrice', 10, 2).nullable();
         table.decimal('timeEstimatePrice', 10, 2).nullable();
@@ -7,7 +7,7 @@ exports.up = function (knex) {
     });
 };
 
-exports.down = function (knex) {
+export function down (knex) {
     return knex.schema.alterTable('BookingChangelogEntry', function (table) {
         table.dropColumn('equipmentPrice');
         table.dropColumn('timeEstimatePrice');
