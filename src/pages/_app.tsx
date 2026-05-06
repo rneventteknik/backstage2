@@ -16,11 +16,17 @@ import NotificationsContainer from '../components/layout/NotificationsContainer'
 //
 import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 config.autoAddCss = false;
 
 export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
+    const sensors = useSensors(
+        useSensor(PointerSensor),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        }),
+    );
     useEffect(() => {
         posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
             api_host: '/ingest',
@@ -44,12 +50,12 @@ export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
 
     return (
         <PostHogProvider client={posthog}>
-            <DndProvider backend={HTML5Backend}>
+            <DndContext sensors={sensors} collisionDetection={closestCenter}>
                 <Provider>
                     <NotificationsContainer />
                     <Component {...pageProps} />
                 </Provider>
-            </DndProvider>
+            </DndContext>
         </PostHogProvider>
     );
 }
