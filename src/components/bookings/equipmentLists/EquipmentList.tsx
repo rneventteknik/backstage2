@@ -422,6 +422,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                     disableDelete={otherLists.length === 0}
                     alwaysShowRentalControls={alwaysShowRentalControls}
                     readonly={readonly}
+                    globalSettings={globalSettings}
                 />
             </Card.Header>
 
