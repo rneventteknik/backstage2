@@ -9,7 +9,7 @@ type Props = {
 };
 
 const BookingStatusTag: React.FC<Props> = ({ booking, className }: Props) => (
-    <Badge style={{ backgroundColor: getStatusColor(booking.status) }} className={className}>
+    <Badge bg="dark" style={{ '--badge-color': getStatusColor(booking.status) } as React.CSSProperties} className={className}>
         {getStatusName(booking.status)}
     </Badge>
 );
