@@ -193,8 +193,8 @@ Most development should happen on branches based on `main`.
 
 We use prefixes to indicate what kind of changes every branch contains. The prefixes in use are:
 
--   `feature/` or `feat/` for feature branches
--   `fix/` or `bugfix/` for bug fixes
+-   `feature/` for feature branches
+-   `bugfix/` for bug fixes
 
 The branch name after the prefix should be _descriptive_, _short_ and in `kebab-case`.
 
@@ -203,8 +203,8 @@ The branch name after the prefix should be _descriptive_, _short_ and in `kebab-
 Commits and PR titles use a prefix to indicate the type of change, followed by a short description:
 
 -   `Feature: <description>` for new features
--   `Fix: <description>` for bug fixes
--   `Bugfix: <description>` for bug fixes (both forms are used)
+-   `Bugfix: <description>` for bug fixes 
+-   Other types of commits are not regulated, be descriptive
 
 ### Pull Request Review
 
