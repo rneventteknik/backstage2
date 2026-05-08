@@ -2,25 +2,55 @@
 
 Backstage2 is a web app that is created by RN, for RN, and is used to keep track of all of our events. It is hosted in Heroku.
 
+## Quick Start
+
+```bash
+git clone <repo>
+cd backstage2
+npm install
+echo 'SECRET_COOKIE_PASSWORD=changeme-changeme-changeme-changeme' > .env.local  # any string >32 chars
+npm run reset-sqlite
+npm run dev
+```
+
+Open http://localhost:3000 and log in with `albert` / `dmx`.
+
 ## Tech Stack
 
-## Contributing
+-   **[Next.js](https://nextjs.org/)** — React framework (frontend + API routes)
+-   **[React](https://react.dev/) + [React Bootstrap](https://react-bootstrap.github.io/)** — UI
+-   **[Knex](https://knexjs.org/) + [Objection.js](https://vincit.github.io/objection.js/)** — query builder and ORM
+-   **[SQLite](https://www.sqlite.org/) / [PostgreSQL](https://www.postgresql.org/)** — database (SQLite for local dev, PostgreSQL in production)
+-   **[TypeScript](https://www.typescriptlang.org/)** — language
+-   **[iron-session](https://github.com/vvo/iron-session)** — session management
 
-### Preparing the Dev Environment
+### npm Scripts
 
-Our package manager of choice is [`yarn`](https://yarnpkg.com/). After cloning the repo with `git clone`, run `yarn install` to install all the dependencies.
+| Command               | Description                                              |
+| --------------------- | -------------------------------------------------------- |
+| `npm run dev`         | Start local development server                           |
+| `npm run migrate`     | Run latest Knex migrations                               |
+| `npm run seed`        | Seed database with mock data                             |
+| `npm run reset-sqlite`| Wipe SQLite database, migrate, and seed                  |
+| `npm run tc`          | Type-check with TypeScript                               |
+| `npm run lint`        | Run ESLint and auto-fix                                  |
 
-`yarn migrate` will run the latest Knex migration which will populate your database with the latest schema.
+### Seed Users
 
-`yarn seed` will seed your database with some mock data.
+After running `npm run seed`, the following users are available for local development (see [`knex/seeds/mock.js`](knex/seeds/mock.js) for the up-to-date list):
 
-`yarn reset-sqlite` will remove the existing sqlite database, create a new one, and seed it with data.
+| Username | Password | Role     |
+| -------- | -------- | -------- |
+| albert   | dmx      | Admin    |
+| markus   | xlr      | User     |
+| gabriel  | hog      | Readonly |
 
-`yarn dev` will start a local development server.
+### Database
 
-`yarn tc` will type-check all of the code using _Typescript_.
+The app supports two database backends:
 
-`yarn lint` will run _eslint_ on all relevant files and fix any problems it knows how to fix automatically.
+-   **SQLite** (default for local dev): No configuration needed. A `dev.sqlite3` file is created automatically. Use `npm run reset-sqlite` to wipe and re-seed it.
+-   **PostgreSQL**: Set the `DATABASE_URL` environment variable in `.env.local`. The app will automatically use PostgreSQL when this variable is present.
 
 ### Environment Variables
 
@@ -34,65 +64,149 @@ DB_SSL={true or false} (optional, only needed when using PostgreSQL)
 
 MAX_SESSION_LENGTH={Maximum number of milliseconds a user is allowed to stay logged in.} (optional, defaults to forever if not set)
 
-CALENDAR_API_KEY={Google Calender API Key, with read-access to calendars}
-CALENDAR_ID={Google Calender ID to fetch events from}
+CALENDAR_API_KEY={Google Calendar API Key, with read-access to calendars}
+CALENDAR_ID={Google Calendar ID to fetch events from}
 
 DRIVE_CREDENTIALS={Base64 encoded Google Drive Service Account credentials in JSON format. The account should have write-access to both root folders}
 DRIVE_BOOKING_ROOT_FOLDER_ID={ID of folder which contains booking folders}
 DRIVE_EQUIPMENT_ROOT_FOLDER_ID={ID of folder which contains equipment folders}
 
-SLACK_BOT_TOKEN={API token for slack bot, with chat:write access}
-SLACK_CHANNEL_ID={Slack channel to post message to}
-APPLICATION_BASE_URL={Base URL of application when generating links, for example http://localhost:3000}
-
-API_KEYS={JSON list of API keys, for example [{"key": "XXX", "name": "slackbot"}]} (optional, only needed when using backstage2 as an API from an external service)
-
-NEXT_PUBLIC_MQTT_BROKER_URL={wss://hostname:port}
-MQTT_BROKER_USERNAME={Username to the mqtt broker}
-MQTT_BROKER_PASSWORD={Passowrd to the mqtt broker}
+NEXT_PUBLIC_BASE_URL={Base URL of the application, used for OAuth redirect URIs, for example http://localhost:3000}
 
 GMAIL_CLIENT_ID={Google OAuth2 Client ID for Gmail API}
 GMAIL_CLIENT_SECRET={Google OAuth2 Client Secret for Gmail API}
-GMAIL_REFRESH_TOKEN={OAuth2 refresh token for Gmail API access}
+
+SLACK_BOT_TOKEN={Slack bot token with chat:write and im:write scopes}
+SLACK_CHANNEL_ID={ID of the Slack channel to post booking notifications to}
+APPLICATION_BASE_URL={Base URL of the application when generating links, for example http://localhost:3000}
+
+NEXT_PUBLIC_MQTT_BROKER_URL={WebSocket URL of MQTT broker, e.g. wss://hostname:port}
+MQTT_BROKER_USERNAME={MQTT broker username}
+MQTT_BROKER_PASSWORD={MQTT broker password}
+
+NEXT_PUBLIC_POSTHOG_KEY={PostHog project API key for product analytics}
+
+API_KEYS={JSON list of API keys, for example [{"key": "XXX", "name": "slackbot"}]} (optional, only needed when using backstage2 as an API from an external service)
 ```
 
-### Gmail OAuth Setup
+## Integrations Setup
 
-To set up Gmail integration, you need to:
+### Google Calendar Setup
 
-1. Create a Google Cloud Project and enable the Gmail API
+1. Create a [Google Cloud Project](https://console.cloud.google.com/) and enable the [Google Calendar API](https://console.cloud.google.com/apis/library/calendar-json.googleapis.com)
+2. Create an API key (no OAuth needed — read-only access is sufficient)
+3. Share the calendar with the API key or make it public
+4. Find the Calendar ID under calendar settings in [Google Calendar](https://calendar.google.com/)
+5. Add to `.env.local`:
+
+```
+CALENDAR_API_KEY=AIza...
+CALENDAR_ID=abc123@group.calendar.google.com
+```
+
+### Google Drive Setup
+
+Drive integration uses a Service Account so it can manage folders without user interaction.
+
+1. Create a [Google Cloud Project](https://console.cloud.google.com/) and enable the [Google Drive API](https://console.cloud.google.com/apis/library/drive.googleapis.com)
+2. Create a Service Account and download its JSON credentials file
+3. Share the root Drive folders with the service account's email address (give it Editor access)
+4. Base64-encode the credentials file: `base64 -w 0 credentials.json`
+5. Add to `.env.local`:
+
+```
+DRIVE_CREDENTIALS={base64-encoded credentials JSON}
+DRIVE_BOOKING_ROOT_FOLDER_ID={ID of the folder that will contain booking subfolders}
+DRIVE_EQUIPMENT_ROOT_FOLDER_ID={ID of the folder that will contain equipment subfolders}
+```
+
+The folder ID is the last part of the folder's URL in [Google Drive](https://drive.google.com/): `https://drive.google.com/drive/folders/{ID}`.
+
+### Gmail Setup
+
+Gmail integration uses OAuth2 for read-only access to a mailbox.
+
+1. Create a [Google Cloud Project](https://console.cloud.google.com/) and enable the [Gmail API](https://console.cloud.google.com/apis/library/gmail.googleapis.com)
 2. Create OAuth2 credentials (Web application type)
-3. Add `http://localhost:3000/api/email/authenticate/callback` as an authorized redirect URI (or your production URL for deployment)
-4. Set `GMAIL_CLIENT_ID` and `GMAIL_CLIENT_SECRET` in your `.env.local` file
-5. Start the development server with `yarn dev`
-6. Navigate to `http://localhost:3000/api/email/authenticate`
-7. Follow the Google OAuth flow to authorize the application
-8. Copy the returned `refreshToken` value and add it to your `.env.local` file as `GMAIL_REFRESH_TOKEN`
-9. Restart the development server
-
-Example `.env.local` configuration:
+3. Add `{NEXT_PUBLIC_BASE_URL}/api/email/authenticate/callback` as an authorized redirect URI
+4. Add to `.env.local`:
 
 ```
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
 GMAIL_CLIENT_ID=1095269337813-xxxxxxxxxxxxx.apps.googleusercontent.com
 GMAIL_CLIENT_SECRET=GOCSPX-xxxxxxxxxxxxxxx
-GMAIL_REFRESH_TOKEN=1//0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-### Version Control
+5. Start the dev server and navigate to `/api/email/authenticate` while logged in as an admin
+6. Complete the Google OAuth flow — the refresh token is saved to the database automatically
 
-#### Branching Model
+### Slack Setup
+
+Slack is used to send notifications about bookings to a channel and to open DMs with booking workers.
+
+1. Create a Slack app at [api.slack.com/apps](https://api.slack.com/apps) and install it to your workspace
+2. Add the `chat:write` and `im:write` bot token scopes
+3. Copy the Bot User OAuth Token
+4. Add to `.env.local`:
+
+```
+SLACK_BOT_TOKEN=xoxb-...
+SLACK_CHANNEL_ID={ID of the channel to post to}
+APPLICATION_BASE_URL=http://localhost:3000
+```
+
+The channel ID is found by right-clicking a channel in Slack and selecting _View channel details_.
+
+### MQTT Setup
+
+MQTT is used to display real-time door and key status. Any MQTT broker with WebSocket support will work.
+
+1. Set up an MQTT broker with WebSocket support (e.g. [Mosquitto](https://mosquitto.org/) with the `websockets` listener enabled)
+2. Configure topics for door, key, and alarm status in the app settings
+3. Add to `.env.local`:
+
+```
+NEXT_PUBLIC_MQTT_BROKER_URL=wss://hostname:port
+MQTT_BROKER_USERNAME={broker username}
+MQTT_BROKER_PASSWORD={broker password}
+```
+
+### PostHog Setup
+
+PostHog is used for product analytics. The app uses the EU-hosted PostHog instance.
+
+1. Create a project at [eu.posthog.com](https://eu.posthog.com)
+2. Copy the project API key
+3. Add to `.env.local`:
+
+```
+NEXT_PUBLIC_POSTHOG_KEY=phc_...
+```
+
+Analytics are silently skipped if the key is not set.
+
+## Version Control
+
+### Branching Model
 
 Most development should happen on branches based on `main`.
 
 We use prefixes to indicate what kind of changes every branch contains. The prefixes in use are:
 
--   `feature/` for regular feature branches
--   `bugfix/` for bugfix branches
--   and when needed also `hotfix/` which is branches fixing urgent issues in production.
+-   `feature/` for feature branches
+-   `bugfix/` for bug fixes
 
 The branch name after the prefix should be _descriptive_, _short_ and in `kebab-case`.
 
-#### Pull Request Review
+### Commit and PR Naming
+
+Commits and PR titles use a prefix to indicate the type of change, followed by a short description:
+
+-   `Feature: <description>` for new features
+-   `Bugfix: <description>` for bug fixes 
+-   Other types of commits are not regulated, be descriptive
+
+### Pull Request Review
 
 A pull request review should go through the following:
 
@@ -101,6 +215,6 @@ A pull request review should go through the following:
 -   Think through any corner cases that might exist and check that they are handled.
 -   Check that there are no obvious security holes.
 
-#### Merge Strategy
+### Merge Strategy
 
 We try to avoid merge commits and instead use squashing as our preferred merging strategy. Other strategies can be used if it's motivated.
