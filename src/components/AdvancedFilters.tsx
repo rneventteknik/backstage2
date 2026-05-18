@@ -34,7 +34,7 @@ const AdvancedFilters: React.FC<Props> = ({
                         />
                     </Form.Group>
                 </Col>
-                <Col md="auto">
+                <Col xs="auto">
                     <Form.Group>
                         <Button variant="secondary" onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}>
                             <FontAwesomeIcon icon={faFilter} className="me-1" /> {showAdvancedFilters ? 'Göm' : 'Visa'}{' '}
