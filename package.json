@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.25.0-huckleberry",
+    "version": "1.25.1-huckleberry",
     "type": "module",
     "engines": {
         "node": "^24.0.0"
