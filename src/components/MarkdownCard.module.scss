@@ -5,9 +5,14 @@
     table {
         border-collapse: collapse;
         margin: 1rem 0;
-        td, th {
+        td {
             padding: 0.5rem 0.75rem;
             border: 1px solid variables.$backstage-color-5;
+        }
+        th {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid variables.$backstage-color-5;
+            background: variables.$backstage-color-2;
         }
     }
 
