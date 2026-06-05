@@ -1,0 +1,33 @@
+@use '../style/variables';
+
+.markdownWrapper {
+    overflow-x: auto;
+    table {
+        border-collapse: collapse;
+        margin: 1rem 0;
+        td, th {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid variables.$backstage-color-5;
+        }
+    }
+
+    pre {
+        padding: 1rem;
+        overflow-x: auto;
+        background: variables.$backstage-color-3;
+    }
+    
+    :not(pre) > code {
+        padding: 0.15rem 0.3rem;
+        background: variables.$backstage-color-3;
+    }
+
+    blockquote {
+        margin: 1rem 0;
+        padding: 0.5rem 0 0.1rem 1rem;
+        border-left: 4px solid variables.$backstage-color-5;
+        background: variables.$backstage-color-3;
+    }
+}
+
+
