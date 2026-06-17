@@ -16,6 +16,7 @@ import {
     getPricePlanName,
     getStatusName,
     IsNotInternalReservation,
+    parseBookingPaginationParams,
 } from '../../../../../lib/utils';
 import { AccountKind } from '../../../../../models/enums/AccountKind';
 import { fetchSettings } from '../../../../../lib/db-access/setting';
@@ -37,7 +38,9 @@ const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiRespon
             );
             const renumerationRatioThs = getGlobalSetting('salary.wageRatio.ths', globalSettings);
             const renumerationRatioExternal = getGlobalSetting('salary.wageRatio.external', globalSettings);
-            await fetchBookingsForAnalytics()
+            await Promise.resolve()
+                .then(() => parseBookingPaginationParams(req.query))
+                .then((pagination) => fetchBookingsForAnalytics(pagination))
                 .then((x) => x.map(toBooking))
                 .then((x) => x.map(toBookingViewModel))
                 .then((x) => x.filter(IsNotInternalReservation))
@@ -134,6 +137,10 @@ const mapToAnalytics = (
 };
 
 const mapToCSV = (timeReports: TimeReportsAnalyticsModel[]) => {
+    if (timeReports.length === 0) {
+        return '';
+    }
+
     const headings = Object.keys(timeReports[0]);
     const headerRow = headings.join(',');
 
