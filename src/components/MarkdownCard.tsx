@@ -5,6 +5,7 @@ import { Button, Card } from 'react-bootstrap';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import EditTextModal from './utils/EditTextModal';
+import styles from './MarkdownCard.module.scss';
 
 type Props = {
     text: string;
@@ -37,7 +38,7 @@ const MarkdownCard: React.FC<Props> = ({ text, onSubmit, cardTitle, editModelTit
                     ) : null}
                 </Card.Header>
                 {showContent && text ? (
-                    <Card.Body>
+                    <Card.Body className={styles.markdownWrapper}>
                         <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
                     </Card.Body>
                 ) : null}
