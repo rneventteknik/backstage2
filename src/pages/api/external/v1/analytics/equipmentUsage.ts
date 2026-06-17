@@ -19,6 +19,7 @@ import {
     getPricePlanName,
     getStatusName,
     IsNotInternalReservation,
+    parseBookingPaginationParams,
 } from '../../../../../lib/utils';
 import { AccountKind } from '../../../../../models/enums/AccountKind';
 import { fetchSettings } from '../../../../../lib/db-access/setting';
@@ -36,7 +37,9 @@ const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiRespon
                 'accounts.defaultEquipmentAccount.internal',
                 globalSettings,
             );
-            await fetchBookingsForAnalytics()
+            await Promise.resolve()
+                .then(() => parseBookingPaginationParams(req.query))
+                .then((pagination) => fetchBookingsForAnalytics(pagination))
                 .then((x) => x.map(toBooking))
                 .then((x) => x.map(toBookingViewModel))
                 .then((x) => x.filter(IsNotInternalReservation))
@@ -146,6 +149,10 @@ const mapToAnalytics = (
 };
 
 const mapToCSV = (equipmentUsage: EquipmentUsageAnalyticsModel[]) => {
+    if (equipmentUsage.length === 0) {
+        return '';
+    }
+
     const headings = Object.keys(equipmentUsage[0]);
     const headerRow = headings.join(',');
 

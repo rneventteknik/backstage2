@@ -41,9 +41,19 @@ export const searchBookings = async (searchString: string, count: number): Promi
         .limit(count);
 };
 
+export const DEFAULT_ANALYTICS_PAGE_SIZE = 100;
+
+export interface BookingPagination {
+    pageSize?: number;
+    maxBookingId?: number;
+}
+
 export const fetchActiveBookings = async () => fetchBookings(true);
 
-export const fetchBookings = async (excludeDoneAndCancelledBookings = false): Promise<BookingObjectionModel[]> => {
+export const fetchBookings = async (
+    excludeDoneAndCancelledBookings = false,
+    pagination?: BookingPagination,
+): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
     let query = BookingObjectionModel.query()
@@ -57,13 +67,22 @@ export const fetchBookings = async (excludeDoneAndCancelledBookings = false): Pr
         query = query.where('status', '<>', Status.DONE).andWhere('status', '<>', Status.CANCELED);
     }
 
+    if (pagination) {
+        if (pagination.maxBookingId !== undefined) {
+            query = query.where('id', '<=', pagination.maxBookingId);
+        }
+        query = query.orderBy('id', 'desc').limit(pagination.pageSize ?? DEFAULT_ANALYTICS_PAGE_SIZE);
+    }
+
     return query;
 };
 
-export const fetchBookingsForAnalytics = async (): Promise<BookingObjectionModel[]> => {
+export const fetchBookingsForAnalytics = async (
+    pagination?: BookingPagination,
+): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query()
+    let query = BookingObjectionModel.query()
         .withGraphFetched('ownerUser')
         .withGraphFetched('timeEstimates')
         .withGraphFetched('timeReports.user')
@@ -75,6 +94,15 @@ export const fetchBookingsForAnalytics = async (): Promise<BookingObjectionModel
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.tags')
         .withGraphFetched('equipmentLists.listEntries.equipmentPrice')
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipmentPrice');
+
+    if (pagination) {
+        if (pagination.maxBookingId !== undefined) {
+            query = query.where('id', '<=', pagination.maxBookingId);
+        }
+        query = query.orderBy('id', 'desc').limit(pagination.pageSize ?? DEFAULT_ANALYTICS_PAGE_SIZE);
+    }
+
+    return query;
 };
 
 export const fetchBookingsForUser = async (userId: number): Promise<BookingObjectionModel[]> => {

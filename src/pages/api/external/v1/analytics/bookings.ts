@@ -24,12 +24,15 @@ import {
     getSalaryStatusName,
     getStatusName,
     IsNotInternalReservation,
+    parseBookingPaginationParams,
 } from '../../../../../lib/utils';
 
 const handler = withApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     switch (req.method) {
         case 'GET':
-            await fetchBookings()
+            await Promise.resolve()
+                .then(() => parseBookingPaginationParams(req.query))
+                .then((pagination) => fetchBookings(false, pagination))
                 .then((x) => x.map(toBooking))
                 .then((x) => x.map(toBookingViewModel))
                 .then((x) => x.filter(IsNotInternalReservation))
@@ -118,6 +121,10 @@ const mapToAnalytics = (bookings: BookingViewModel[]): BookingAnalyticsModel[] =
     }));
 
 const mapToCSV = (bookings: BookingAnalyticsModel[]) => {
+    if (bookings.length === 0) {
+        return '';
+    }
+
     const headings = Object.keys(bookings[0]);
     const headerRow = headings.join(',');
 

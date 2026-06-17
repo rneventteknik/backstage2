@@ -13,6 +13,8 @@ import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
 import { getEquipmentOutDatetime, getEquipmentInDatetime, addDays, addHours } from './datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
+import type { NextApiRequest } from 'next';
+import type { BookingPagination } from './db-access/booking';
 
 // Helper functions for array operations
 //
@@ -284,6 +286,33 @@ export const countNotNullorEmpty = (...values: (string | Date | number | null | 
 // Get value or if the input is an array, the first value (useful for parsing url query params)
 //
 export const getValueOrFirst = <T>(data: T | T[]) => (Array.isArray(data) ? data[0] : data);
+
+// Parse the optional pagination query parameters (pageSize, maxBookingId) used by the analytics endpoints.
+// Throws on invalid input so the calling endpoint's error handling can report it.
+//
+export const parseBookingPaginationParams = (query: NextApiRequest['query']): BookingPagination => {
+    const pagination: BookingPagination = {};
+
+    const rawPageSize = getValueOrFirst(query.pageSize);
+    if (rawPageSize !== undefined) {
+        const pageSize = Number(rawPageSize);
+        if (isNaN(pageSize) || pageSize <= 0) {
+            throw new Error(`Invalid pageSize: '${rawPageSize}'. Must be a positive number.`);
+        }
+        pagination.pageSize = pageSize;
+    }
+
+    const rawMaxBookingId = getValueOrFirst(query.maxBookingId);
+    if (rawMaxBookingId !== undefined) {
+        const maxBookingId = Number(rawMaxBookingId);
+        if (isNaN(maxBookingId)) {
+            throw new Error(`Invalid maxBookingId: '${rawMaxBookingId}'. Must be a number.`);
+        }
+        pagination.maxBookingId = maxBookingId;
+    }
+
+    return pagination;
+};
 
 export const toKeyValue = (keyValue: KeyValue): KeyValue => {
     if (!keyValue.key || keyValue.value === undefined) {
