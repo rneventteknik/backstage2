@@ -61,8 +61,6 @@ import { BookingType } from '../../../models/enums/BookingType';
 import CalendarWorkersCard from '../../../components/bookings/CalendarWorkersCard';
 import BookingPotentialProblemsSection from '../../../components/bookings/BookingPotentialProblemsSection';
 import EmailThreadsCard from '../../../components/bookings/EmailThreadsCard';
-import { BookingCalendarEventObjectionModel, IBookingCalendarEventObjectionModel } from '../../../models/objection-models/BookingObjectionModel';
-import { json } from 'stream/consumers';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -395,7 +393,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 </Col>
                 <Col xl={4}>
                     <BookingInfoSection booking={booking} className="d-none d-xl-block mb-3" />
-                    {booking.bookingType === BookingType.GIG ? (
+                    {booking.bookingType === BookingType.GIG || booking.calendarEvents ? (
                         <CalendarWorkersCard
                             bookingId={booking.id}
                             calendarEventIds={booking.calendarEvents?.map(event => event.calendarEventId) ?? []}
