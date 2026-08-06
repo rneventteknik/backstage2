@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Button, Card, Dropdown, DropdownButton, Form, ListGroup, Modal } from 'react-bootstrap';
+import { Alert, Button, Card, Dropdown, DropdownButton, DropdownDivider, Form, ListGroup, Modal } from 'react-bootstrap';
 import useSwr from 'swr';
 import { getMemberStatusName, getResponseContentOrError } from '../../lib/utils';
 import {
@@ -35,6 +35,29 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onS
     const [showContent, setShowContent] = useState(true);
     const [showSelectCalendarEventModal, setShowSelectCalendarEventModal] = useState(false);
 
+    const { showGeneralSuccessMessage, showGeneralDangerMessage } = useNotifications();
+
+    // Send message to booking workers
+    //
+    const sendMessageToCalendarWorkers = (startSlackChannel: boolean) => {
+        const request = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                bookingId: bookingId,
+                startSlackChannel: startSlackChannel,
+            }),
+        };
+
+        fetch('/api/sendMessage/toBookingWorkers', request)
+            .then(getResponseContentOrError)
+            .then(() => showGeneralSuccessMessage('Meddelandet skickades'))
+            .catch((error) => {
+                console.error(error);
+                showGeneralDangerMessage('Fel!', 'Meddelandet kunde inte skickas');
+            });
+    };
+
     return (
         <>
             <Card className="mb-3">
@@ -44,11 +67,22 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onS
                         <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                     </Button>
                     {!readonly ? (
-                        <DropdownButton id="dropdown-calendar-workers-header" variant="secondary" title="Mer" size="sm">
-                            <Dropdown.Item onClick={() => setShowSelectCalendarEventModal(true)}>
-                                <FontAwesomeIcon icon={faCalendar} className="me-1 fa-fw" /> Koppla fler kalenderevent
-                            </Dropdown.Item>
-                        </DropdownButton>
+                        <>
+                            <DropdownButton id="dropdown-calendar-workers-header" variant="secondary" title="Mer" size="sm">
+                                <Dropdown.Item onClick={() => setShowSelectCalendarEventModal(true)}>
+                                    <FontAwesomeIcon icon={faCalendar} className="me-1 fa-fw" /> Koppla fler kalenderevent
+                                </Dropdown.Item>
+                                <DropdownDivider />
+                                <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(false)}>
+                                    <FontAwesomeIcon icon={faMessage} className="me-1 fa-fw" /> Skicka direktmeddelande till
+                                    de som jobbar
+                                </Dropdown.Item>
+                                <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(true)}>
+                                    <FontAwesomeIcon icon={faHashtag} className="me-1 fa-fw" /> Skapa slackkanal med de som
+                                    jobbar
+                                </Dropdown.Item>
+                            </DropdownButton>
+                        </>
                     ) : null}
                 </Card.Header>
                 {showContent ? (
@@ -90,18 +124,14 @@ type CalendarSublistProps = {
 };
 
 const CalendarSublist: React.FC<CalendarSublistProps> = ({
-    bookingId,
     calendarEventId,
     onRemove,
-    readonly,
 }: CalendarSublistProps) => {
     const [showSelectCalendarEventModal, setShowSelectCalendarEventModal] = useState(false);
 
     const { data, error } = useSwr(`/api/calendar/${calendarEventId}`, (url) =>
         fetch(url).then((response) => getResponseContentOrError<CalendarResult>(response)),
     );
-
-    const { showGeneralSuccessMessage, showGeneralDangerMessage } = useNotifications();
 
     // Error handling
     //
@@ -124,27 +154,6 @@ const CalendarSublist: React.FC<CalendarSublistProps> = ({
 
     const workingUsers = data.workingUsers;
 
-    // Send message to booking workers
-    //
-    const sendMessageToCalendarWorkers = (startSlackChannel: boolean) => {
-        const request = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                bookingId: bookingId,
-                startSlackChannel: startSlackChannel,
-            }),
-        };
-
-        fetch('/api/sendMessage/toBookingWorkers', request)
-            .then(getResponseContentOrError)
-            .then(() => showGeneralSuccessMessage('Meddelandet skickades'))
-            .catch((error) => {
-                console.error(error);
-                showGeneralDangerMessage('Fel!', 'Meddelandet kunde inte skickas');
-            });
-    };
-
     // Workers list
     //
     return ( // TODO: Better error handling for missing calendar name
@@ -152,22 +161,10 @@ const CalendarSublist: React.FC<CalendarSublistProps> = ({
             <Card.Header className="d-flex">
                 <span className="flex-grow-1">{getEventNameWithoutNameTags(data.name) || 'Kalender event'}</span>
                 <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
-                    {!readonly && workingUsers.length > 0 ? (
-                        <>
-                            <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(false)}>
-                                <FontAwesomeIcon icon={faMessage} className="me-1 fa-fw" /> Skicka direktmeddelande till
-                                de som jobbar
-                            </Dropdown.Item>
-                            <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(true)}>
-                                <FontAwesomeIcon icon={faHashtag} className="me-1 fa-fw" /> Skapa slackkanal med de som
-                                jobbar
-                            </Dropdown.Item>
-                        </>
-                    ) : null}
                     <Dropdown.Item href={data?.link} target="_blank">
                         <FontAwesomeIcon icon={faExternalLinkAlt} className="me-1 fa-fw" /> Öppna i Google Calendar
                     </Dropdown.Item>
-                    <Dropdown.Item onClick={onRemove}>
+                    <Dropdown.Item onClick={onRemove} className="text-danger">
                         <FontAwesomeIcon icon={faTrash} className="mr-1 fa-fw" /> Ta bort koppling
                     </Dropdown.Item>
                 </DropdownButton>

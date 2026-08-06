@@ -15,7 +15,6 @@ import {
 import { Language } from '../enums/Language';
 import { TimeReportObjectionModel } from './TimeReportObjectionModel';
 import { EmailThreadObjectionModel, IEmailThreadObjectionModel } from './EmailThreadObjectionModel';
-import { BookingCalendarEvent } from '../interfaces';
 
 export interface IBookingObjectionModel extends BaseObjectionModelWithName {
     id: number;
