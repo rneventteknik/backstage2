@@ -254,14 +254,15 @@ export const fetchBookingWithEquipmentLists = async (id: number): Promise<Bookin
         .then((bookings) => bookings[0]);
 };
 
-export const fetchFirstBookingByCalendarBookingId = async (
-    calendarBookingId: string,
-): Promise<BookingObjectionModel> => {
+export const fetchFirstBookingIdByCalendarEventId = async (
+    calendarEventId: string,
+): Promise<number | undefined> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query()
-        .where('calendarBookingId', calendarBookingId)
-        .then((bookings) => bookings[0]);
+    return BookingCalendarEventObjectionModel.query()
+        .where('calendarEventId', calendarEventId)
+        .select('bookingId')
+        .then((events) => events[0]?.bookingId);
 };
 
 export const updateBooking = async (
@@ -353,10 +354,10 @@ export const updateBooking = async (
 export const insertBooking = async (booking: BookingObjectionModel): Promise<BookingObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    const { emailThreads, ...bookingWithoutThreads } = booking;
+    const { emailThreads, calendarEvents, ...bookingWithoutThreadsAndCalendarEvents } = booking;
 
     const insertedBooking = await BookingObjectionModel.query().insert(
-        withCreatedDate(removeIdAndDates(bookingWithoutThreads as BookingObjectionModel)),
+        withCreatedDate(removeIdAndDates(bookingWithoutThreadsAndCalendarEvents as BookingObjectionModel)),
     );
 
     if (emailThreads && emailThreads.length > 0) {
@@ -364,6 +365,14 @@ export const insertBooking = async (booking: BookingObjectionModel): Promise<Boo
             await BookingObjectionModel.relatedQuery('emailThreads')
                 .for(insertedBooking.id)
                 .insert(withCreatedDate(removeIdAndDates(thread)));
+        }
+    }
+
+    if (calendarEvents && calendarEvents.length > 0) {
+        for (const event of calendarEvents) {
+            await BookingObjectionModel.relatedQuery('calendarEvents')
+                .for(insertedBooking.id)
+                .insert(withCreatedDate(removeIdAndDates(event)));
         }
     }
 

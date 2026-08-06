@@ -21,6 +21,7 @@ import Skeleton from 'react-loading-skeleton';
 import { CalendarResult } from '../../models/misc/CalendarResult';
 import { MemberStatus } from '../../models/enums/MemberStatus';
 import { useNotifications } from '../../lib/useNotifications';
+import { getEventNameWithoutNameTags } from '../../lib/calendarEventNameUtils';
 import { getFormattedInterval } from '../../lib/datetimeUtils';
 
 type Props = {
@@ -39,20 +40,16 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onS
             <Card className="mb-3">
                 <Card.Header className="d-flex">
                     <span className="flex-grow-1 mr-2">Uppskrivna i kalendern</span>
-                    {!readonly ? (
-                        <Button
-                            onClick={() => setShowSelectCalendarEventModal(true)}
-                            variant="secondary"
-                            className="mr-2"
-                            size="sm"
-                        >
-                            <FontAwesomeIcon icon={faCalendar} className="mr-1" />
-                            Koppla fler kalenderevent
-                        </Button>
-                    ) : null}
-                    <Button variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
+                    <Button className="me-2" variant="" size="sm" onClick={() => setShowContent((x) => !x)}>
                         <FontAwesomeIcon icon={showContent ? faAngleUp : faAngleDown} />
                     </Button>
+                    {!readonly ? (
+                        <DropdownButton id="dropdown-calendar-workers-header" variant="secondary" title="Mer" size="sm">
+                            <Dropdown.Item onClick={() => setShowSelectCalendarEventModal(true)}>
+                                <FontAwesomeIcon icon={faCalendar} className="me-1 fa-fw" /> Koppla fler kalenderevent
+                            </Dropdown.Item>
+                        </DropdownButton>
+                    ) : null}
                 </Card.Header>
                 {showContent ? (
                     <ListGroup variant="flush">
@@ -63,6 +60,7 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onS
                         ) :
                             calendarEventIds.map(calendarEventId =>
                                 <CalendarSublist
+                                    key={calendarEventId}
                                     bookingId={bookingId}
                                     calendarEventId={calendarEventId}
                                     onRemove={() => onSubmit(calendarEventIds.filter(id => id != calendarEventId))}
@@ -152,7 +150,7 @@ const CalendarSublist: React.FC<CalendarSublistProps> = ({
     return ( // TODO: Better error handling for missing calendar name
         <>
             <Card.Header className="d-flex">
-                <span className="flex-grow-1">{data.name || "Kalender event"}</span>
+                <span className="flex-grow-1">{getEventNameWithoutNameTags(data.name) || 'Kalender event'}</span>
                 <DropdownButton id="dropdown-basic-button" variant="secondary" title="Mer" size="sm">
                     {!readonly && workingUsers.length > 0 ? (
                         <>
@@ -303,7 +301,8 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
                     {cannotFindConnectedEvent ? (
                         <option value={selectedCalendarEvent}>Okänt event ({value})</option>
                     ) : null}
-                    <option value="">Ingen koppling till kalenderevent</option>
+                    <option value="">Välj kalenderevent nedan</option>
+                    <hr />
                     {bookingsCalendarList.map((x) => (
                         <option key={x.id} value={x.key}>
                             {x.label}
@@ -326,6 +325,7 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
                 </Button>
                 <Button
                     variant="primary"
+                    disabled={!selectedCalendarEvent}
                     onClick={() => {
                         hide();
                         onSubmit(selectedCalendarEvent);

@@ -133,8 +133,20 @@ export const toEmailThread = (objectionModel: IEmailThreadObjectionModel) => {
     };
 };
 
-export const toEmailThreadObjectionModel = (emailThread: EmailThread): IEmailThreadObjectionModel => ({
+export const toEmailThreadObjectionModelWithoutBookingId = (
+    emailThread: EmailThread,
+): Partial<IEmailThreadObjectionModel> => ({
     ...emailThread,
+    bookingId: undefined,
+    created: undefined,
+    updated: undefined,
+});
+
+export const toCalendarEventObjectionModelWithoutBookingId = (
+    calendarEvent: BookingCalendarEvent,
+): Partial<IBookingCalendarEventObjectionModel> => ({
+    ...calendarEvent,
+    bookingId: undefined,
     created: undefined,
     updated: undefined,
 });

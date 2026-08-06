@@ -38,6 +38,7 @@ import { EquipmentListEntry } from '../../models/interfaces/EquipmentList';
 import { toEquipmentList } from '../../lib/mappers/booking';
 import EmailThreadSelector from '../../components/bookings/EmailThreadSelector';
 import { EmailThreadResult } from '../../models/misc/EmailThreadResult';
+import { getEventNameWithoutNameTags } from '../../lib/calendarEventNameUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings(Role.USER);
@@ -73,10 +74,10 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         setSelectedDefaultBooking({
             status: Status.DRAFT,
             salaryStatus: SalaryStatus.NOT_SENT,
-            name: calendarBooking?.name?.replace(/\s*\[[^[]*\]\s*/g, '') ?? '',
+            name: getEventNameWithoutNameTags(calendarBooking?.name),
             note: calendarBooking?.description,
             location: calendarBooking?.location,
-            calendarBookingId: calendarBooking?.id,
+            calendarEvents: [{ calendarEventId: calendarBooking?.id ?? '' }] as Booking['calendarEvents'],
             ownerUserId: currentUser.userId,
         });
 

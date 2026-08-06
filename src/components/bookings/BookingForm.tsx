@@ -32,7 +32,7 @@ import BookingSearchCustomerModal from './BookingSearchCustomerModal';
 import PriceWithVATPreview from '../utils/PriceWithVATPreview';
 import currency from 'currency.js';
 import { formatDateForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
-import { toEmailThreadObjectionModel } from '../../lib/mappers/booking';
+import { toCalendarEventObjectionModelWithoutBookingId, toEmailThreadObjectionModelWithoutBookingId } from '../../lib/mappers/booking';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
@@ -114,15 +114,15 @@ const BookingForm: React.FC<Props> = ({
             salaryStatus: toIntOrUndefined(getValueFromForm('salaryStatus')),
             paymentStatus: toIntOrUndefined(getValueFromForm('paymentStatus')),
             returnalNote: getValueFromForm('returnalNote'),
-            calendarBookingId: getValueFromForm('calendarBookingId'),
             driveFolderId: getValueFromForm('driveFolderId'),
             language: getValueFromForm('language') as Language | undefined,
             fixedPrice: toIntOrUndefined(getValueFromForm('fixedPrice')) ?? null,
             invoiceDate: toDatetimeOrUndefined(getValueFromForm('invoiceDate'))
-                ? getValueFromForm('invoiceDate')
-                : null,
+            ? getValueFromForm('invoiceDate')
+            : null,
             internalReservation: getCheckedFromForm('internalReservation') ?? booking.internalReservation,
-            emailThreads: booking.emailThreads?.map(toEmailThreadObjectionModel),
+            calendarEvents: booking.calendarEvents?.map((x) => toCalendarEventObjectionModelWithoutBookingId(x)) as IBookingObjectionModel['calendarEvents'],
+            emailThreads: booking.emailThreads?.map((x) => toEmailThreadObjectionModelWithoutBookingId(x)) as IBookingObjectionModel['emailThreads'],
         };
 
         handleSubmitBooking(modifiedBooking);
@@ -558,17 +558,6 @@ const BookingForm: React.FC<Props> = ({
                             </Form.Group>
                         </Col>
                         <Col lg="4" md="4">
-                            <Form.Group controlId="calendarBookingId">
-                                <Form.Label>Kalender-id</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    placeholder=""
-                                    name="calendarBookingId"
-                                    defaultValue={booking?.calendarBookingId}
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col lg="4" md="4">
                             <Form.Group controlId="driveFolderId">
                                 <Form.Label>Mapp-id</Form.Label>
                                 <Form.Control
@@ -628,7 +617,6 @@ const BookingForm: React.FC<Props> = ({
 
             {!showAdvancedFields ? (
                 <>
-                    <Form.Control type="hidden" name="calendarBookingId" defaultValue={booking?.calendarBookingId} />
                     <Form.Control type="hidden" name="driveFolderId" defaultValue={booking?.driveFolderId} />
                     <Form.Control type="hidden" name="invoiceNumber" defaultValue={booking?.invoiceNumber} />
                     <Form.Control

@@ -52,6 +52,7 @@ type Props = {
     bookingStatus: Status;
     bookingType: BookingType;
     returnalNote: string | undefined;
+    connectedCalendarEventIds: string[];
     showListContent: boolean;
     saveList: (updatedList: EquipmentList) => void;
     addListHeading: (heading: EquipmentListHeading, listId: number) => void;
@@ -77,6 +78,7 @@ type Props = {
 const EquipmentListHeader: React.FC<Props> = ({
     list,
     bookingId,
+    connectedCalendarEventIds,
     pricePlan,
     language,
     bookingStatus,
@@ -465,6 +467,7 @@ const EquipmentListHeader: React.FC<Props> = ({
                             show={showEditDatesModal}
                             onHide={() => setShowEditDatesModal(false)}
                             equipmentList={list}
+                            connectedCalendarEventIds={connectedCalendarEventIds}
                             onSave={(e) => {
                                 setShowEditDatesModal(false);
                                 saveList(e);
