@@ -1,23 +1,12 @@
 import { calendar, calendar_v3 } from '@googleapis/calendar';
 import { fetchUserByNameTag } from './db-access/user';
 import { CalendarResult } from '../models/misc/CalendarResult';
-import { fetchFirstBookingByCalendarBookingId } from './db-access/booking';
+import { fetchFirstBookingIdByCalendarEventId } from './db-access/booking';
 import { GaxiosResponseWithHTTP2 } from 'googleapis-common';
 import { UserObjectionModel } from '../models/objection-models';
 import { getGlobalSetting } from './utils';
 import { fetchSettings } from './db-access/setting';
-
-const getNameTagsFromEventName = (name: string): string[] => {
-    // Get part of string within [] brackets
-    const match = name.match(/\[(.*?)\]/);
-    if (match) {
-        return match[1]
-            .split(/[,/]/)
-            .map((x) => (x.includes(':') ? x.split(':')[1] : x))
-            .map((x) => x.trim());
-    }
-    return [];
-};
+import { getNameTagsFromEventName } from './calendarEventNameUtils';
 
 const getUserByTag = async (tag: string): Promise<Partial<UserObjectionModel>> => {
     const user = await fetchUserByNameTag(tag);
@@ -52,7 +41,7 @@ const mapCalendarEvent = async (
         creator: event.creator?.displayName ?? event.creator?.email ?? undefined,
         start: event.start?.dateTime ?? event.start?.date ?? undefined,
         end: event.end?.dateTime ?? event.start?.date ?? undefined,
-        existingBookingId: (await fetchFirstBookingByCalendarBookingId(event.id as string))?.id,
+        existingBookingId: await fetchFirstBookingIdByCalendarEventId(event.id as string),
         workingUsers: await getUsersFromEventName(event.summary ?? '', nameTagBlackList),
     };
 };

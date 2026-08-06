@@ -14,10 +14,17 @@ type Props = {
     show: boolean;
     onHide: () => void;
     equipmentList: EquipmentList;
+    connectedCalendarEventIds: string[];
     onSave: (entryToSave: EquipmentList) => void;
 };
 
-const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentList, onSave }: Props) => {
+const EditEquipmentListDatesModal: React.FC<Props> = ({
+    show,
+    onHide,
+    equipmentList,
+    connectedCalendarEventIds,
+    onSave,
+}: Props) => {
     const [showInOutFields, setShowInOutFields] = useState<boolean>(
         !!equipmentList.equipmentOutDatetime || !!equipmentList.equipmentInDatetime,
     );
@@ -139,6 +146,12 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
         setUsageEnd(formatDatetimeForForm(new Date(calendarEvent.end ?? '')));
     };
 
+    const connectedCalendarEventIdsSet = new Set(connectedCalendarEventIds);
+    const connectedBookingCalendarEvents =
+        bookingsCalendarList?.filter((x) => connectedCalendarEventIdsSet.has(x.id)) ?? [];
+    const otherBookingCalendarEvents =
+        bookingsCalendarList?.filter((x) => !connectedCalendarEventIdsSet.has(x.id)) ?? [];
+
     return (
         <Modal show={show} onHide={() => onHide()} size="lg" backdrop="static">
             <Modal.Body>
@@ -172,7 +185,16 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({ show, onHide, equipmentL
                                             <option value="" disabled>
                                                 -
                                             </option>
-                                            {bookingsCalendarList.map((x) => (
+                                            {connectedBookingCalendarEvents.length > 0 ? (
+                                                <hr />
+                                            ) : null}
+                                            {connectedBookingCalendarEvents.map((x) => (
+                                                <option key={x.id} value={x.key}>
+                                                    {x.label}
+                                                </option>
+                                            ))}
+                                            <hr />
+                                            {otherBookingCalendarEvents.map((x) => (
                                                 <option key={x.id} value={x.key}>
                                                     {x.label}
                                                 </option>

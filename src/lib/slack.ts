@@ -188,7 +188,7 @@ export const sendMessageToUsersForBooking = async (
     booking: Booking,
     startSlackChannel: boolean,
     userSlackIds: string[],
-    calendarLink: string | undefined = undefined,
+    calendarLinks: string[] = [],
 ) => {
     const uniqueUserSlackIds = userSlackIds.filter(onlyUnique);
     const bookingViewModel = toBookingViewModel(booking);
@@ -200,7 +200,7 @@ export const sendMessageToUsersForBooking = async (
         formattedMessage += `\n<${driveLink}|:google-drive: Google Drive-mapp>`;
     }
 
-    if (calendarLink) {
+    for (const calendarLink of calendarLinks) {
         formattedMessage += `\n<${calendarLink}|:calendar: Google Calendar-event>`;
     }
 

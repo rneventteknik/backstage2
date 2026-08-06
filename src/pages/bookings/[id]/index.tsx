@@ -393,14 +393,12 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 </Col>
                 <Col xl={4}>
                     <BookingInfoSection booking={booking} className="d-none d-xl-block mb-3" />
-                    {booking.bookingType === BookingType.GIG ? (
-                        <CalendarWorkersCard
-                            bookingId={booking.id}
-                            calendarEventId={booking.calendarBookingId}
-                            onSubmit={(calendarBookingId) => saveBooking({ calendarBookingId })}
-                            readonly={readonly}
-                        />
-                    ) : null}
+                    <CalendarWorkersCard
+                        bookingId={booking.id}
+                        calendarEventIds={booking.calendarEvents?.map(event => event.calendarEventId) ?? []}
+                        onSubmit={(calendarEventIds) => saveBooking({ calendarEvents: calendarEventIds.map((calendarEventId) => ({ calendarEventId, bookingId: booking.id })) })}
+                        readonly={readonly}
+                    />
                     <Card className="mb-3">
                         <Card.Header>Prisinformation (ink. moms)</Card.Header>
                         <BookingPriceSummaryDisplay

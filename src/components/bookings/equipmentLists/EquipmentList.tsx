@@ -402,6 +402,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
                 <EquipmentListHeader
                     list={list}
                     bookingId={bookingId}
+                    connectedCalendarEventIds={(booking.calendarEvents ?? []).map((x) => x.calendarEventId)}
                     pricePlan={booking.pricePlan}
                     language={booking.language}
                     bookingStatus={booking.status}

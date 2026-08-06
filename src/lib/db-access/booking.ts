@@ -4,8 +4,8 @@ import { PaymentStatus } from '../../models/enums/PaymentStatus';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { Status } from '../../models/enums/Status';
 import { BookingObjectionModel } from '../../models/objection-models';
-import { EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
 import { EmailThreadObjectionModel } from '../../models/objection-models/EmailThreadObjectionModel';
+import { BookingCalendarEventObjectionModel, EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 import { getPartialSearchStrings, isMemberOfEnum } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
@@ -215,6 +215,7 @@ export const fetchBookingWithUser = async (id: number): Promise<BookingObjection
         .withGraphFetched('equipmentLists.listHeadings.listEntries')
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.prices')
         .withGraphFetched('equipmentLists.listHeadings.listEntries.equipmentPrice')
+        .withGraphFetched('calendarEvents')
         .withGraphFetched('timeEstimates')
         .withGraphFetched('timeReports.user')
         .withGraphFetched('changelog(changelogInfo)')
@@ -253,14 +254,15 @@ export const fetchBookingWithEquipmentLists = async (id: number): Promise<Bookin
         .then((bookings) => bookings[0]);
 };
 
-export const fetchFirstBookingByCalendarBookingId = async (
-    calendarBookingId: string,
-): Promise<BookingObjectionModel> => {
+export const fetchFirstBookingIdByCalendarEventId = async (
+    calendarEventId: string,
+): Promise<number | undefined> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query()
-        .where('calendarBookingId', calendarBookingId)
-        .then((bookings) => bookings[0]);
+    return BookingCalendarEventObjectionModel.query()
+        .where('calendarEventId', calendarEventId)
+        .select('bookingId')
+        .then((events) => events[0]?.bookingId);
 };
 
 export const updateBooking = async (
@@ -273,7 +275,8 @@ export const updateBooking = async (
         .findById(id)
         .orderBy('id')
         .withGraphFetched('equipmentLists.listEntries')
-        .withGraphFetched('emailThreads');
+        .withGraphFetched('emailThreads')
+        .withGraphFetched('calendarEvents');
 
     // EquipmentLists.
     if (booking.equipmentLists !== undefined) {
@@ -320,6 +323,29 @@ export const updateBooking = async (
         });
     }
 
+    // BookingCalendarEvents
+    if (booking.calendarEvents !== undefined) {
+        const {
+            toAdd: bookingCalendarEventToAdd,
+            toDelete: bookingCalendarEventToDelete,
+            toUpdate: bookingCalendarEventToUpdate,
+        } = compareLists(booking.calendarEvents, existingDatabaseModel?.calendarEvents);
+
+        bookingCalendarEventToAdd.map(async (x) => {
+            await BookingObjectionModel.relatedQuery('calendarEvents')
+                .for(id)
+                .insert(withCreatedDate(removeIdAndDates(x)));
+        });
+        
+        bookingCalendarEventToDelete.map(async (x) => {
+            await BookingCalendarEventObjectionModel.query().deleteById(x.id);
+        });
+
+        bookingCalendarEventToUpdate.map(async (x) => {
+            await BookingCalendarEventObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
+        });
+    }
+
     await BookingObjectionModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(booking)));
 
     return fetchBookingWithUser(id);
@@ -328,10 +354,10 @@ export const updateBooking = async (
 export const insertBooking = async (booking: BookingObjectionModel): Promise<BookingObjectionModel> => {
     ensureDatabaseIsInitialized();
 
-    const { emailThreads, ...bookingWithoutThreads } = booking;
+    const { emailThreads, calendarEvents, ...bookingWithoutThreadsAndCalendarEvents } = booking;
 
     const insertedBooking = await BookingObjectionModel.query().insert(
-        withCreatedDate(removeIdAndDates(bookingWithoutThreads as BookingObjectionModel)),
+        withCreatedDate(removeIdAndDates(bookingWithoutThreadsAndCalendarEvents as BookingObjectionModel)),
     );
 
     if (emailThreads && emailThreads.length > 0) {
@@ -339,6 +365,14 @@ export const insertBooking = async (booking: BookingObjectionModel): Promise<Boo
             await BookingObjectionModel.relatedQuery('emailThreads')
                 .for(insertedBooking.id)
                 .insert(withCreatedDate(removeIdAndDates(thread)));
+        }
+    }
+
+    if (calendarEvents && calendarEvents.length > 0) {
+        for (const event of calendarEvents) {
+            await BookingObjectionModel.relatedQuery('calendarEvents')
+                .for(insertedBooking.id)
+                .insert(withCreatedDate(removeIdAndDates(event)));
         }
     }
 
