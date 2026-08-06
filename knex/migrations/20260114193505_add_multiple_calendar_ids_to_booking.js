@@ -8,7 +8,7 @@ export function up(knex) {
         table.foreign('bookingId').references('id').inTable('Booking');
         table.string('calendarEventId').notNullable();
     }).then(async () => {
-        const rows = await knex('Booking').select('id', 'updated', 'calendarBookingId').whereRaw('calendarBookingId IS NOT NULL');
+        const rows = await knex('Booking').select('id', 'updated', 'calendarBookingId').whereNotNull('calendarBookingId');
         if (rows.length > 0) {
             await knex('BookingCalendarEvent').insert(
                 rows.map(row => ({
