@@ -4,7 +4,7 @@ export function up(knex) {
         table.increments('id');
         table.dateTime('created');
         table.dateTime('updated');
-        table.int('bookingId').notNullable();
+        table.integer('bookingId').notNullable();
         table.foreign('bookingId').references('id').inTable('Booking');
         table.string('calendarEventId').notNullable();
     }).then(async () => {
