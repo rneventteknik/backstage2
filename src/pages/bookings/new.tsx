@@ -77,7 +77,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             name: getEventNameWithoutNameTags(calendarBooking?.name),
             note: calendarBooking?.description,
             location: calendarBooking?.location,
-            calendarEvents: [{ calendarEventId: calendarBooking?.id ?? '' }] as Booking['calendarEvents'],
+            calendarEvents: calendarBooking ? [{ calendarEventId: calendarBooking.id }] : [] as Booking['calendarEvents'],
             ownerUserId: currentUser.userId,
         });
 
