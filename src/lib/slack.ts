@@ -188,7 +188,7 @@ export const sendMessageToUsersForBooking = async (
     booking: Booking,
     startSlackChannel: boolean,
     userSlackIds: string[],
-    calendarLinks: string[] = [],
+    calendarLinks: { link: string; name?: string }[] = [],
 ) => {
     const uniqueUserSlackIds = userSlackIds.filter(onlyUnique);
     const bookingViewModel = toBookingViewModel(booking);
@@ -201,7 +201,7 @@ export const sendMessageToUsersForBooking = async (
     }
 
     for (const calendarLink of calendarLinks) {
-        formattedMessage += `\n<${calendarLink}|:calendar: Google Calendar-event>`;
+        formattedMessage += `\n<${calendarLink.link}|:calendar: ${calendarLink.name ?? 'Google Calendar-event'}>`;
     }
 
     formattedMessage += '\n\nHa ett trevligt gigg! :dancing_penguin:';
