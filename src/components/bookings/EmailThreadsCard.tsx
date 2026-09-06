@@ -371,6 +371,7 @@ export const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
     const { data: thread, error } = useSwr(threadId ? `/api/email/${threadId}` : null, (url) =>
         fetch(url).then((response) => getResponseContentOrError<EmailThreadResult>(response)),
     );
+    const [expandedIds, setExpandedIds] = useState<Set<string> | null>(null);
 
     // Error handling
     if (error) {
@@ -418,6 +419,29 @@ export const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
         );
     }
 
+    const isExpanded = (message: EmailMessageResult, index: number) =>
+        expandedIds ? expandedIds.has(message.id) : index === thread.messages.length - 1;
+
+    const toggleExpanded = (message: EmailMessageResult) => {
+        const next = new Set(thread.messages.filter((m, i) => isExpanded(m, i)).map((m) => m.id));
+        if (next.has(message.id)) {
+            next.delete(message.id);
+        } else {
+            next.add(message.id);
+        }
+        setExpandedIds(next);
+    };
+
+    const getBodySnippet = (message: EmailMessageResult, maxLength = 140) => {
+        if (!message.body) {
+            return '';
+        }
+        const text = DOMPurify.sanitize(message.body, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] })
+            .replace(/\s+/g, ' ')
+            .trim();
+        return text.length > maxLength ? `${text.slice(0, maxLength)}…` : text;
+    };
+
     const sanitizeMessageBody = (message: EmailMessageResult) =>
         message.body
             ? DOMPurify.sanitize(message.body, {
@@ -460,39 +484,53 @@ export const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
                     {thread.messageCount} meddelande{thread.messageCount !== 1 ? 'n' : ''} i tråden
                 </div>
                 <ListGroup>
-                    {thread.messages.map((message: EmailMessageResult, index: number) => (
-                        <ListGroup.Item key={message.id} className="mb-3">
-                            <div className="mb-2">
-                                <strong>#{index + 1}</strong>
-                                {message.subject && message.subject !== thread.subject ? (
-                                    <span className="ms-2">{message.subject}</span>
-                                ) : null}
-                            </div>
-                            <div className="mb-2">
-                                <div className="text-muted small">
-                                    <strong>Från:</strong> {message.from || '(Okänd avsändare)'}
-                                </div>
-                                <div className="text-muted small">
-                                    <strong>Till:</strong> {message.to || '(Okänd mottagare)'}
-                                </div>
-                                <div className="text-muted small">
-                                    <strong>Datum:</strong>{' '}
-                                    {message.date
-                                        ? formatDatetimeForForm(toDatetimeOrUndefined(message.date))
-                                        : '(Okänt datum)'}
-                                </div>
-                            </div>
-                            {message.body ? (
+                    {thread.messages.map((message: EmailMessageResult, index: number) => {
+                        const expanded = isExpanded(message, index);
+                        return (
+                            <ListGroup.Item key={message.id} className="mb-3">
                                 <div
-                                    className="mt-2 p-3 border rounded"
-                                    style={{ backgroundColor: '#f5f5f5', color: '#000000' }}
-                                    dangerouslySetInnerHTML={{
-                                        __html: sanitizeMessageBody(message),
-                                    }}
-                                />
-                            ) : null}
-                        </ListGroup.Item>
-                    ))}
+                                    className="mb-2 d-flex align-items-start"
+                                    role="button"
+                                    onClick={() => toggleExpanded(message)}
+                                >
+                                    <div className="flex-grow-1">
+                                        <strong>#{index + 1}</strong>
+                                        {message.subject && message.subject !== thread.subject ? (
+                                            <span className="ms-2">{message.subject}</span>
+                                        ) : null}
+                                    </div>
+                                    <FontAwesomeIcon icon={expanded ? faAngleUp : faAngleDown} className="ms-2" />
+                                </div>
+                                <div className="mb-2">
+                                    <div className="text-muted small">
+                                        <strong>Från:</strong> {message.from || '(Okänd avsändare)'}
+                                    </div>
+                                    <div className="text-muted small">
+                                        <strong>Till:</strong> {message.to || '(Okänd mottagare)'}
+                                    </div>
+                                    <div className="text-muted small">
+                                        <strong>Datum:</strong>{' '}
+                                        {message.date
+                                            ? formatDatetimeForForm(toDatetimeOrUndefined(message.date))
+                                            : '(Okänt datum)'}
+                                    </div>
+                                </div>
+                                {expanded ? (
+                                    message.body ? (
+                                        <div
+                                            className="mt-2 p-3 border rounded"
+                                            style={{ backgroundColor: '#f5f5f5', color: '#000000' }}
+                                            dangerouslySetInnerHTML={{
+                                                __html: sanitizeMessageBody(message),
+                                            }}
+                                        />
+                                    ) : null
+                                ) : message.body ? (
+                                    <div className="text-muted small text-truncate">{getBodySnippet(message)}</div>
+                                ) : null}
+                            </ListGroup.Item>
+                        );
+                    })}
                 </ListGroup>
             </Modal.Body>
             <Modal.Footer>
