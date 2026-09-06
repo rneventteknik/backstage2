@@ -152,7 +152,7 @@ const CalendarSublist: React.FC<CalendarSublistProps> = ({
         return <Skeleton height={150} className="mb-3" />;
     }
 
-    const workingUsers = data.workingUsers;
+    const workingUsers = data.workingUsers ?? [];
 
     // Workers list
     //
