@@ -484,7 +484,8 @@ export const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
                     {thread.messageCount} meddelande{thread.messageCount !== 1 ? 'n' : ''} i tråden
                 </div>
                 <ListGroup>
-                    {thread.messages.map((message: EmailMessageResult, index: number) => {
+                    {[...thread.messages].reverse().map((message: EmailMessageResult, displayIndex: number) => {
+                        const index = thread.messages.length - 1 - displayIndex;
                         const expanded = isExpanded(message, index);
                         return (
                             <ListGroup.Item key={message.id} className="mb-3">
