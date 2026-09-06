@@ -480,8 +480,23 @@ export const ViewThreadDetailsModal: React.FC<ViewThreadDetailsModalProps> = ({
                 <Modal.Title>{thread.subject || '(Inget ämne)'}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <div className="mb-3 text-muted">
-                    {thread.messageCount} meddelande{thread.messageCount !== 1 ? 'n' : ''} i tråden
+                <div className="mb-3 text-muted d-flex align-items-center">
+                    <span className="ms-2">
+                        {thread.messageCount} meddelande{thread.messageCount !== 1 ? 'n' : ''} i tråden
+                    </span>
+                    <div className="ms-auto d-flex me-1">
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            className="me-2"
+                            onClick={() => setExpandedIds(new Set(thread.messages.map((m) => m.id)))}
+                        >
+                            Öppna alla
+                        </Button>
+                        <Button variant="secondary" size="sm" onClick={() => setExpandedIds(new Set())}>
+                            Stäng alla
+                        </Button>
+                    </div>
                 </div>
                 <ListGroup>
                     {[...thread.messages].reverse().map((message: EmailMessageResult, displayIndex: number) => {
