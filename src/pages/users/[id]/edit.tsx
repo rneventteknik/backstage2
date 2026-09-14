@@ -22,6 +22,8 @@ import { faKey, faLock, faSave, faTrashCan, faUserPen } from '@fortawesome/free-
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
+import UserCardForm, { UserCardRequest } from '../../../components/users/UserCardForm';
+import UserCardList from '../../../components/users/UserCardList';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -31,6 +33,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [showDeleteAuthModal, setShowDeleteAuthModal] = useState(false);
     const [showEditAuthModal, setShowEditAuthModal] = useState(false);
+    const [showEditCardModal, setShowEditCardModal] = useState(false);
 
     const {
         showSaveSuccessNotification,
@@ -132,6 +135,65 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
             });
     };
 
+    const handleUserCardSubmit = (userCardRequest: UserCardRequest) => {
+        const body = { userCardRequest: userCardRequest };
+
+        const request = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        fetch('/api/users/usercard/' + router.query.id, request)
+            .then((response) => getResponseContentOrError<{ userId: number; cardAdded?: boolean; cardId?: number; cardName?: string }>(response))
+            .then((data) => {
+                // Update user cards array based on the response
+                const nextUserCards = [...(user.userCards ?? [])];
+
+                if (data.cardAdded && data.cardId) {
+                    // Add the new card to the list
+                    const now = new Date();
+                    nextUserCards.push({
+                        id: data.cardId,
+                        userId: user.id,
+                        cardName: data.cardName ?? 'NFC Kort',
+                        created: now,
+                    });
+                }
+
+                mutate({ ...user, userCards: nextUserCards }, false);
+                showSaveSuccessNotification('NFC-kortet');
+                setShowEditCardModal(false);
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('NFC-kortet');
+            });
+    };
+
+    const handleRemoveCard = (cardId: number) => {
+        const body = { userCardRequest: { removeCardId: cardId, existingPassword: '' } };
+
+        const request = {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        };
+
+        fetch('/api/users/usercard/' + router.query.id, request)
+            .then((response) => getResponseContentOrError<{ userId: number; cardRemoved?: boolean }>(response))
+            .then(() => {
+                // Remove the card from the list
+                const nextUserCards = (user.userCards ?? []).filter((card) => card.id !== cardId);
+                mutate({ ...user, userCards: nextUserCards }, false);
+                showSaveSuccessNotification('Kort borttaget');
+            })
+            .catch((error: Error) => {
+                console.error(error);
+                showSaveFailedNotification('Kort kunde inte tas bort');
+            });
+    };
+
     // Delete user auth
     //
     const deleteUserAuth = () => {
@@ -174,6 +236,9 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     <Button variant="secondary" onClick={() => setShowEditAuthModal(true)}>
                         <FontAwesomeIcon icon={faUserPen} className="me-1 fa-fw" /> Redigera inloggningsuppgifter
                     </Button>
+                    <Button variant="secondary" onClick={() => setShowEditCardModal(true)}>
+                        <FontAwesomeIcon icon={faKey} className="me-1 fa-fw" /> Registrera NFC-kort
+                    </Button>
                 </IfNotAdmin>
 
                 <IfAdmin currentUser={currentUser}>
@@ -183,6 +248,9 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                 <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
                                     <FontAwesomeIcon icon={faUserPen} className="me-1 fa-fw" /> Redigera
                                     inloggningsuppgifter
+                                </Dropdown.Item>
+                                <Dropdown.Item onClick={() => setShowEditCardModal(true)}>
+                                    <FontAwesomeIcon icon={faKey} className="me-1 fa-fw" /> Registrera NFC-kort
                                 </Dropdown.Item>
                                 <IfAdmin and={currentUser.userId !== user.id} currentUser={currentUser}>
                                     <Dropdown.Divider />
@@ -196,6 +264,9 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                             <>
                                 <Dropdown.Item onClick={() => setShowEditAuthModal(true)}>
                                     <FontAwesomeIcon icon={faKey} className="me-1 fa-fw" /> Skapa inloggningsuppgifter
+                                </Dropdown.Item>
+                                <Dropdown.Item onClick={() => setShowEditCardModal(true)}>
+                                    <FontAwesomeIcon icon={faKey} className="me-1 fa-fw" /> Registrera NFC-kort
                                 </Dropdown.Item>
                                 <Dropdown.Divider />
                             </>
@@ -253,6 +324,37 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     </Button>
                     <Button variant="primary" form="editUserAuthForm" type="submit">
                         Spara inloggningsuppgifter
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal show={showEditCardModal} onHide={() => setShowEditCardModal(false)} backdrop="static">
+                <Modal.Header closeButton>
+                    <Modal.Title>Hantera NFC-kort</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div>
+                        <h6 className="mb-3">Registrerade kort</h6>
+                        <UserCardList cards={user.userCards ?? []} onRemoveCard={handleRemoveCard} />
+
+                        <hr className="my-4" />
+
+                        <h6 className="mb-3">Lägg till nytt kort</h6>
+                        <UserCardForm
+                            formId="editUserCardForm"
+                            handleSubmit={handleUserCardSubmit}
+                            userId={user.id}
+                            requirePasswordConfirmation={true}
+                            hasExistingCard={false}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowEditCardModal(false)}>
+                        Stäng
+                    </Button>
+                    <Button variant="primary" form="editUserCardForm" type="submit">
+                        Lägg till kort
                     </Button>
                 </Modal.Footer>
             </Modal>
