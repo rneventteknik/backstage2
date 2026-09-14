@@ -14,5 +14,11 @@ export const toUser = (objectionModel: IUserObjectionModel): User => {
         role: objectionModel?.userAuth?.role,
         updated: toDatetimeOrUndefined(objectionModel.updated),
         created: toDatetimeOrUndefined(objectionModel.created),
+        userCards: objectionModel.userCards?.map((card) => ({
+            id: card.id!,
+            userId: card.userId,
+            cardName: card.cardName,
+            created: toDatetimeOrUndefined(card.created),
+        })),
     };
 };

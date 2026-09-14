@@ -1,5 +1,6 @@
 export { BookingObjectionModel } from './BookingObjectionModel';
-export { UserObjectionModel } from './UserObjectionModel';
+export { UserObjectionModel, UserAuthObjectionModel } from './UserObjectionModel';
+export { UserCardObjectionModel } from './UserCardObjectionModel';
 export {
     EquipmentObjectionModel,
     EquipmentTagObjectionModel,
@@ -12,6 +13,7 @@ export { TimeEstimateObjectionModel } from './TimeEstimateObjectionModel';
 
 export type { IBookingObjectionModel } from './BookingObjectionModel';
 export type { IUserObjectionModel, IUserAuthObjectionModel } from './UserObjectionModel';
+export type { IUserCardObjectionModel } from './UserCardObjectionModel';
 export type {
     IEquipmentObjectionModel,
     IEquipmentTagObjectionModel,
