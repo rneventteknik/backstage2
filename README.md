@@ -17,23 +17,23 @@ Open http://localhost:3000 and log in with `albert` / `dmx`.
 
 ## Tech Stack
 
--   **[Next.js](https://nextjs.org/)** — React framework (frontend + API routes)
--   **[React](https://react.dev/) + [React Bootstrap](https://react-bootstrap.github.io/)** — UI
--   **[Knex](https://knexjs.org/) + [Objection.js](https://vincit.github.io/objection.js/)** — query builder and ORM
--   **[SQLite](https://www.sqlite.org/) / [PostgreSQL](https://www.postgresql.org/)** — database (SQLite for local dev, PostgreSQL in production)
--   **[TypeScript](https://www.typescriptlang.org/)** — language
--   **[iron-session](https://github.com/vvo/iron-session)** — session management
+- **[Next.js](https://nextjs.org/)** — React framework (frontend + API routes)
+- **[React](https://react.dev/) + [React Bootstrap](https://react-bootstrap.github.io/)** — UI
+- **[Knex](https://knexjs.org/) + [Objection.js](https://vincit.github.io/objection.js/)** — query builder and ORM
+- **[SQLite](https://www.sqlite.org/) / [PostgreSQL](https://www.postgresql.org/)** — database (SQLite for local dev, PostgreSQL in production)
+- **[TypeScript](https://www.typescriptlang.org/)** — language
+- **[iron-session](https://github.com/vvo/iron-session)** — session management
 
 ### npm Scripts
 
-| Command               | Description                                              |
-| --------------------- | -------------------------------------------------------- |
-| `npm run dev`         | Start local development server                           |
-| `npm run migrate`     | Run latest Knex migrations                               |
-| `npm run seed`        | Seed database with mock data                             |
-| `npm run reset-sqlite`| Wipe SQLite database, migrate, and seed                  |
-| `npm run tc`          | Type-check with TypeScript                               |
-| `npm run lint`        | Run ESLint and auto-fix                                  |
+| Command                | Description                             |
+| ---------------------- | --------------------------------------- |
+| `npm run dev`          | Start local development server          |
+| `npm run migrate`      | Run latest Knex migrations              |
+| `npm run seed`         | Seed database with mock data            |
+| `npm run reset-sqlite` | Wipe SQLite database, migrate, and seed |
+| `npm run tc`           | Type-check with TypeScript              |
+| `npm run lint`         | Run ESLint and auto-fix                 |
 
 ### Seed Users
 
@@ -49,8 +49,8 @@ After running `npm run seed`, the following users are available for local develo
 
 The app supports two database backends:
 
--   **SQLite** (default for local dev): No configuration needed. A `dev.sqlite3` file is created automatically. Use `npm run reset-sqlite` to wipe and re-seed it.
--   **PostgreSQL**: Set the `DATABASE_URL` environment variable in `.env.local`. The app will automatically use PostgreSQL when this variable is present.
+- **SQLite** (default for local dev): No configuration needed. A `dev.sqlite3` file is created automatically. Use `npm run reset-sqlite` to wipe and re-seed it.
+- **PostgreSQL**: Set the `DATABASE_URL` environment variable in `.env.local`. The app will automatically use PostgreSQL when this variable is present.
 
 ### Environment Variables
 
@@ -193,8 +193,8 @@ Most development should happen on branches based on `main`.
 
 We use prefixes to indicate what kind of changes every branch contains. The prefixes in use are:
 
--   `feature/` for feature branches
--   `bugfix/` for bug fixes
+- `feature/` for feature branches
+- `bugfix/` for bug fixes
 
 The branch name after the prefix should be _descriptive_, _short_ and in `kebab-case`.
 
@@ -202,18 +202,18 @@ The branch name after the prefix should be _descriptive_, _short_ and in `kebab-
 
 Commits and PR titles use a prefix to indicate the type of change, followed by a short description:
 
--   `Feature: <description>` for new features
--   `Bugfix: <description>` for bug fixes 
--   Other types of commits are not regulated, be descriptive
+- `Feature: <description>` for new features
+- `Bugfix: <description>` for bug fixes
+- Other types of commits are not regulated, be descriptive
 
 ### Pull Request Review
 
 A pull request review should go through the following:
 
--   The code should follow existing design patterns.
--   The code should optimally be self documenting. In cases where it's not, it should have descriptive comments.
--   Think through any corner cases that might exist and check that they are handled.
--   Check that there are no obvious security holes.
+- The code should follow existing design patterns.
+- The code should optimally be self documenting. In cases where it's not, it should have descriptive comments.
+- Think through any corner cases that might exist and check that they are handled.
+- Check that there are no obvious security holes.
 
 ### Merge Strategy
 

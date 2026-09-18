@@ -106,7 +106,12 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
 
     const booking = toBookingViewModel(data);
 
-    const saveBooking = async (booking: PartialDeep<IBookingObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => {
+    const saveBooking = async (
+        booking: PartialDeep<
+            IBookingObjectionModel,
+            { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
+        >,
+    ) => {
         const body = { booking: { ...booking, id: router.query.id } };
 
         const request = {
@@ -395,8 +400,15 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                     <BookingInfoSection booking={booking} className="d-none d-xl-block mb-3" />
                     <CalendarWorkersCard
                         bookingId={booking.id}
-                        calendarEventIds={booking.calendarEvents?.map(event => event.calendarEventId) ?? []}
-                        onSubmit={(calendarEventIds) => saveBooking({ calendarEvents: calendarEventIds.map((calendarEventId) => ({ calendarEventId, bookingId: booking.id })) })}
+                        calendarEventIds={booking.calendarEvents?.map((event) => event.calendarEventId) ?? []}
+                        onSubmit={(calendarEventIds) =>
+                            saveBooking({
+                                calendarEvents: calendarEventIds.map((calendarEventId) => ({
+                                    calendarEventId,
+                                    bookingId: booking.id,
+                                })),
+                            })
+                        }
                         readonly={readonly}
                     />
                     <Card className="mb-3">

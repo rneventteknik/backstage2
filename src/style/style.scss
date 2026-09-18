@@ -1,4 +1,4 @@
-@use "sass:color";
+@use 'sass:color';
 @use './variables' as *;
 
 // =============================================================================
@@ -136,7 +136,7 @@
     $nav-link-padding-y: 0.5rem,
     $nav-link-padding-x: 1rem,
     $list-group-item-padding-y: 0.75rem,
-    $list-group-item-padding-x: 1.25rem,
+    $list-group-item-padding-x: 1.25rem
 );
 
 // =============================================================================

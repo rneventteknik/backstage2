@@ -5,7 +5,10 @@ import { PricePlan } from '../../models/enums/PricePlan';
 import { Status } from '../../models/enums/Status';
 import { BookingObjectionModel } from '../../models/objection-models';
 import { EmailThreadObjectionModel } from '../../models/objection-models/EmailThreadObjectionModel';
-import { BookingCalendarEventObjectionModel, EquipmentListObjectionModel } from '../../models/objection-models/BookingObjectionModel';
+import {
+    BookingCalendarEventObjectionModel,
+    EquipmentListObjectionModel,
+} from '../../models/objection-models/BookingObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 import { getPartialSearchStrings, isMemberOfEnum } from '../utils';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
@@ -77,9 +80,7 @@ export const fetchBookings = async (
     return query;
 };
 
-export const fetchBookingsForAnalytics = async (
-    pagination?: BookingPagination,
-): Promise<BookingObjectionModel[]> => {
+export const fetchBookingsForAnalytics = async (pagination?: BookingPagination): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
     let query = BookingObjectionModel.query()
@@ -254,9 +255,7 @@ export const fetchBookingWithEquipmentLists = async (id: number): Promise<Bookin
         .then((bookings) => bookings[0]);
 };
 
-export const fetchFirstBookingIdByCalendarEventId = async (
-    calendarEventId: string,
-): Promise<number | undefined> => {
+export const fetchFirstBookingIdByCalendarEventId = async (calendarEventId: string): Promise<number | undefined> => {
     ensureDatabaseIsInitialized();
 
     return BookingCalendarEventObjectionModel.query()
@@ -336,13 +335,16 @@ export const updateBooking = async (
                 .for(id)
                 .insert(withCreatedDate(removeIdAndDates(x)));
         });
-        
+
         bookingCalendarEventToDelete.map(async (x) => {
             await BookingCalendarEventObjectionModel.query().deleteById(x.id);
         });
 
         bookingCalendarEventToUpdate.map(async (x) => {
-            await BookingCalendarEventObjectionModel.query().patchAndFetchById(x.id, withUpdatedDate(removeIdAndDates(x)));
+            await BookingCalendarEventObjectionModel.query().patchAndFetchById(
+                x.id,
+                withUpdatedDate(removeIdAndDates(x)),
+            );
         });
     }
 

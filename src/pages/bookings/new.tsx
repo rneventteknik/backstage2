@@ -77,7 +77,9 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
             name: getEventNameWithoutNameTags(calendarBooking?.name),
             note: calendarBooking?.description,
             location: calendarBooking?.location,
-            calendarEvents: (calendarBooking ? [{ calendarEventId: calendarBooking.id }] : []) as Booking['calendarEvents'],
+            calendarEvents: (calendarBooking
+                ? [{ calendarEventId: calendarBooking.id }]
+                : []) as Booking['calendarEvents'],
             ownerUserId: currentUser.userId,
         });
 
@@ -139,12 +141,22 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                 getResponseContentOrError<EmailThreadResult>(response),
             );
 
-            const bookingAddress = getGlobalSetting('email.bookingSiteAddress', globalSettings, 'booking@rneventteknik.se');
-            const attachmentFileName = getGlobalSetting('email.bookingSiteAttachmentFileName', globalSettings, 'booking.txt');
+            const bookingAddress = getGlobalSetting(
+                'email.bookingSiteAddress',
+                globalSettings,
+                'booking@rneventteknik.se',
+            );
+            const attachmentFileName = getGlobalSetting(
+                'email.bookingSiteAttachmentFileName',
+                globalSettings,
+                'booking.txt',
+            );
 
             // Look for a message from the booking site with the expected attachment
             const bookingMessage = thread.messages.find(
-                (msg) => msg.from?.includes(bookingAddress) && msg.attachments?.some((a) => a.filename === attachmentFileName),
+                (msg) =>
+                    msg.from?.includes(bookingAddress) &&
+                    msg.attachments?.some((a) => a.filename === attachmentFileName),
             );
 
             if (bookingMessage) {
@@ -310,10 +322,16 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                     <p className="text-muted flex-grow-1 mb-0">
                                         <strong>Steg 2 av 4</strong> Sök efter en kund nedan eller fortsätt utan kund.
                                     </p>
-                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="me-2 text-nowrap">
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => resetSelectedBooking()}
+                                        className="me-2 text-nowrap"
+                                    >
                                         Avbryt
                                     </Button>
-                                    <Button onClick={() => selectCustomer(null)} className="text-nowrap">Fyll i kunddetaljer manuellt</Button>
+                                    <Button onClick={() => selectCustomer(null)} className="text-nowrap">
+                                        Fyll i kunddetaljer manuellt
+                                    </Button>
                                 </div>
                             </Card.Body>
                         </Card>
@@ -331,12 +349,22 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                             <Card.Body>
                                 <div className="d-flex align-items-center">
                                     <p className="text-muted flex-grow-1 mb-0">
-                                        <strong>Steg 3 av 4</strong> Välj en emailtråd att koppla till bokningen. Innehåller emailet en bokningsfil från externsidan kommer bokningsinformationen hämtas automatiskt från den.
+                                        <strong>Steg 3 av 4</strong> Välj en emailtråd att koppla till bokningen.
+                                        Innehåller emailet en bokningsfil från externsidan kommer bokningsinformationen
+                                        hämtas automatiskt från den.
                                     </p>
-                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="me-2 text-nowrap">
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => resetSelectedBooking()}
+                                        className="me-2 text-nowrap"
+                                    >
                                         Avbryt
                                     </Button>
-                                    <Button variant={loadingAttachment || parsedSpecData ? 'secondary' : 'primary'} onClick={() => createBookingFromFile()} className="text-nowrap">
+                                    <Button
+                                        variant={loadingAttachment || parsedSpecData ? 'secondary' : 'primary'}
+                                        onClick={() => createBookingFromFile()}
+                                        className="text-nowrap"
+                                    >
                                         Koppla inte emailtråd
                                     </Button>
                                 </div>
@@ -345,9 +373,7 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                         {selectedDefaultBooking && wizardStep == 'step-three' ? (
                             loadingAttachment ? (
                                 <Card className="mb-3">
-                                    <Card.Body className="text-center text-muted">
-                                        Laddar emailtråd...
-                                    </Card.Body>
+                                    <Card.Body className="text-center text-muted">Laddar emailtråd...</Card.Body>
                                 </Card>
                             ) : parsedSpecData ? (
                                 <BookingSpecificationUploader
@@ -367,10 +393,19 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
                                     <p className="text-muted flex-grow-1 mb-0">
                                         <strong>Steg 4 av 4</strong> Fyll i bokningsdetaljerna nedan.
                                     </p>
-                                    <Button variant="secondary" onClick={() => resetSelectedBooking()} className="me-2 text-nowrap">
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => resetSelectedBooking()}
+                                        className="me-2 text-nowrap"
+                                    >
                                         Avbryt
                                     </Button>
-                                    <Button variant="primary" form="editBookingForm" type="submit" className="text-nowrap">
+                                    <Button
+                                        variant="primary"
+                                        form="editBookingForm"
+                                        type="submit"
+                                        className="text-nowrap"
+                                    >
                                         <FontAwesomeIcon icon={faSave} className="me-1" /> Lägg till bokning
                                     </Button>
                                 </div>

@@ -36,9 +36,7 @@ export const upsertSetting = async (key: string, value: string): Promise<Setting
         );
     }
 
-    return SettingObjectionModel.query().insert(
-        withCreatedDate({ key, value, note: '' } as SettingObjectionModel),
-    );
+    return SettingObjectionModel.query().insert(withCreatedDate({ key, value, note: '' } as SettingObjectionModel));
 };
 
 export const deleteSetting = async (id: number): Promise<boolean> => {

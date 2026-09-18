@@ -312,11 +312,9 @@ const TimeReportList: React.FC<Props> = ({ bookingId, currentUser, readonly, def
     };
 
     const sortFn = (a: TimeReport, b: TimeReport) => sortIndexSortFn(a, b);
-    const moveFn = (a: TimeReport, b: TimeReport, position: 'before' | 'after' = 'before') => 
+    const moveFn = (a: TimeReport, b: TimeReport, position: 'before' | 'after' = 'before') =>
         updateTimeReports(
-            ...(position === 'after' 
-                ? moveItemAfterItem(timeReports, a, b)
-                : moveItemToItem(timeReports, a, b))
+            ...(position === 'after' ? moveItemAfterItem(timeReports, a, b) : moveItemToItem(timeReports, a, b)),
         );
 
     const tableSettings: TableConfiguration<TimeReport> = {

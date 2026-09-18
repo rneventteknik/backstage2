@@ -1,6 +1,12 @@
 import type { SessionOptions, IronSession } from 'iron-session';
 import { getIronSession } from 'iron-session';
-import { GetServerSidePropsContext, GetServerSidePropsResult, NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
+import {
+    GetServerSidePropsContext,
+    GetServerSidePropsResult,
+    NextApiHandler,
+    NextApiRequest,
+    NextApiResponse,
+} from 'next';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { IncomingMessage, ServerResponse } from 'http';
 
@@ -23,7 +29,9 @@ export const getSession = (req: IncomingMessage | NextApiRequest, res: ServerRes
     return getIronSession<SessionData>(req, res, options);
 };
 
-export const withApiSession = (handler: (req: NextApiRequest & RequestWithSession, res: NextApiResponse) => void | Promise<void>): NextApiHandler => {
+export const withApiSession = (
+    handler: (req: NextApiRequest & RequestWithSession, res: NextApiResponse) => void | Promise<void>,
+): NextApiHandler => {
     return async (req, res) => {
         const session = await getSession(req, res);
         Object.assign(req, { session });
