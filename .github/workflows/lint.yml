@@ -1,4 +1,4 @@
-name: Lint & Typecheck
+name: Lint, Format & Typecheck
 
 on:
     pull_request:
@@ -20,3 +20,4 @@ jobs:
             - run: npm install
             - run: npm run tc
             - run: npm run lint
+            - run: npm run format:check

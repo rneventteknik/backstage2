@@ -48,7 +48,7 @@ const ViewSalaryGroupModal: React.FC<Props> = ({ show, onHide, onMutate, salaryG
 
     const setBookingSalaryStatus = (salaryStatus: SalaryStatus, bookingIds: number[] | null = null) => {
         // If not bookings are specified, set status of all
-        bookingIds = bookingIds ? bookingIds : salaryGroup?.bookings?.map((b) => b.id) ?? [];
+        bookingIds = bookingIds ? bookingIds : (salaryGroup?.bookings?.map((b) => b.id) ?? []);
 
         bookingIds.forEach((bookingId) => {
             const body = {

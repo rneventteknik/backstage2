@@ -12,14 +12,25 @@ import EquipmentSearch from '../EquipmentSearch';
 import { equipmentTagsFetcher } from '../../lib/fetchers';
 import { PartialDeep } from 'type-fest';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
-import { fixSortIndexUniqueness, getNextSortIndex, moveItemToItem, moveItemAfterItem, sortIndexSortFn } from '../../lib/sortIndexUtils';
+import {
+    fixSortIndexUniqueness,
+    getNextSortIndex,
+    moveItemToItem,
+    moveItemAfterItem,
+    sortIndexSortFn,
+} from '../../lib/sortIndexUtils';
 import { getPricePlanName, getResponseContentOrError, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
 import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { getDefaultSelectedPrice } from '../../lib/equipmentListUtils';
 
 type Props = {
-    handleSubmitEquipmentPackage: (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
+    handleSubmitEquipmentPackage: (
+        equipmentPackage: PartialDeep<
+            IEquipmentPackageObjectionModel,
+            { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
+        >,
+    ) => void;
     equipmentPackage?: EquipmentPackage;
     formId: string;
 };
@@ -158,7 +169,7 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
         setSelectedEquipmentPackageEntries(
             updateItemsInArrayById(
                 selectedEquipmentPackageEntries,
-                ...(position === 'after' 
+                ...(position === 'after'
                     ? moveItemAfterItem(selectedEquipmentPackageEntries, a, b)
                     : moveItemToItem(selectedEquipmentPackageEntries, a, b)),
             ),
@@ -241,7 +252,10 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipmentPackage, equipmen
             return;
         }
 
-        const modifiedEquipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> = {
+        const modifiedEquipmentPackage: PartialDeep<
+            IEquipmentPackageObjectionModel,
+            { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
+        > = {
             id: equipmentPackage?.id,
             created: equipmentPackage?.created?.toString(),
             updated: equipmentPackage?.updated?.toString(),

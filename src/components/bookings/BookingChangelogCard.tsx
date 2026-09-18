@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
 import { Card, ListGroup, Modal } from 'react-bootstrap';
 import { formatDatetimeWithYear } from '../../lib/datetimeUtils';
-import { addVAT, formatCurrency, getCorrectPriceBasedOnBookingState, getPriceCalculationType, PriceCalculationType } from '../../lib/pricingUtils';
+import {
+    addVAT,
+    formatCurrency,
+    getCorrectPriceBasedOnBookingState,
+    getPriceCalculationType,
+    PriceCalculationType,
+} from '../../lib/pricingUtils';
 import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 import BookingPriceSummaryDisplay from './BookingPriceSummary';
 import currency from 'currency.js';
@@ -117,14 +123,15 @@ const BookingChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
                 {selectedEntry !== null && hasPriceInformation(selectedEntry) ? (
                     <>
                         <Modal.Header closeButton>
-                            <Modal.Title>{selectedEntry.updated ? formatDatetimeWithYear(selectedEntry.updated) : 'N/A'} - {selectedEntry?.name}</Modal.Title>
+                            <Modal.Title>
+                                {selectedEntry.updated ? formatDatetimeWithYear(selectedEntry.updated) : 'N/A'} -{' '}
+                                {selectedEntry?.name}
+                            </Modal.Title>
                         </Modal.Header>
 
                         <Modal.Body className="p-0">
                             <Card className="mt-3">
-                                <Card.Header>
-                                    Prisinformation (inkl. moms)
-                                </Card.Header>
+                                <Card.Header>Prisinformation (inkl. moms)</Card.Header>
                                 <Card.Body>
                                     <BookingPriceSummaryDisplay
                                         bookingPriceSummary={{

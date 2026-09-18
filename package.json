@@ -12,6 +12,7 @@
         "tc": "tsc",
         "lint": "eslint .",
         "format": "prettier -w .",
+        "format:check": "prettier -c .",
         "tcl": "tsc && eslint .",
         "migrate": "knex migrate:latest",
         "migrate:down": "knex migrate:down",

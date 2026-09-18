@@ -50,9 +50,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
         e.preventDefault();
 
         const formData = new FormData(e.currentTarget);
-        const body = Object.fromEntries(
-            ['username', 'password'].map(key => [key, formData.get(key)])
-        );
+        const body = Object.fromEntries(['username', 'password'].map((key) => [key, formData.get(key)]));
         const request = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -110,16 +108,11 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
             </h1>
             <Form action="/api/users/login" method="post" onSubmit={handleSubmit}>
                 <FormGroup className="mb-3">
-                    <FormControl
-                        type="text"
-                        placeholder="Användarnamn"
-                        name="username"
-                        ref={usernameFieldRef}
-                    />
+                    <FormControl type="text" placeholder="Användarnamn" name="username" ref={usernameFieldRef} />
                 </FormGroup>
                 <FormGroup className="mb-3">
                     <FormControl
-                        type={!showPassword ? "password" : "text"}
+                        type={!showPassword ? 'password' : 'text'}
                         placeholder="Lösenord"
                         name="password"
                         autoComplete="off"

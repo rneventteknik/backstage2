@@ -1,5 +1,5 @@
-import { BaseEntity } from "./BaseEntity";
+import { BaseEntity } from './BaseEntity';
 
 export interface BookingCalendarEvent extends BaseEntity {
-	calendarEventId: string;
+    calendarEventId: string;
 }

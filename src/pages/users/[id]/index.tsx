@@ -153,9 +153,9 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                                     <ListGroup.Item>
                                         <div className="mb-1">Adress</div>
                                         <div className="text-muted">
-                                            {user.homeAddress
-                                                ?.split('\n')
-                                                .map((addressLine, i) => <div key={i}>{addressLine}</div>)}
+                                            {user.homeAddress?.split('\n').map((addressLine, i) => (
+                                                <div key={i}>{addressLine}</div>
+                                            ))}
                                         </div>
                                     </ListGroup.Item>
                                 </ListGroup>

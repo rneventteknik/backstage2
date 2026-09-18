@@ -10,7 +10,10 @@ import { ErrorPage } from '../../components/layout/ErrorPage';
 import { countNotNullorEmpty, getStatusColor, getStatusName } from '../../lib/utils';
 import { formatDatetime, getBookingDateHeadingValue } from '../../lib/datetimeUtils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
-import { BookingsWithPotentialProblemsResult, getBookingsWithPotentialProblems } from '../../lib/bookingsWithPotentialProblemsUtils';
+import {
+    BookingsWithPotentialProblemsResult,
+    getBookingsWithPotentialProblems,
+} from '../../lib/bookingsWithPotentialProblemsUtils';
 import { TableConfiguration, TableDisplay } from '../../components/TableDisplay';
 import BookingStatusTag from '../../components/utils/BookingStatusTag';
 import BookingTypeTag from '../../components/utils/BookingTypeTag';
@@ -48,16 +51,16 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
-     const BookingNameDisplayFn = (x: BookingsWithPotentialProblemsResult) => (
+    const BookingNameDisplayFn = (x: BookingsWithPotentialProblemsResult) => (
         <>
-              <TableStyleLink href={'/bookings/' + x.booking.id}>{x.booking.name}</TableStyleLink>
+            <TableStyleLink href={'/bookings/' + x.booking.id}>{x.booking.name}</TableStyleLink>
 
-        <BookingStatusTag booking={x.booking} className="ms-1" />
-        <BookingTypeTag booking={x.booking} className="ms-1" />
-        <RentalStatusTag booking={x.booking} className="ms-1" />
-        <InternalReservationTag booking={x.booking} className="ms-1" />
-        <FixedPriceStatusTag booking={x.booking} className="ms-1" />
-        <p className="text-muted mb-0">{x.booking.customerName ?? '-'}</p>
+            <BookingStatusTag booking={x.booking} className="ms-1" />
+            <BookingTypeTag booking={x.booking} className="ms-1" />
+            <RentalStatusTag booking={x.booking} className="ms-1" />
+            <InternalReservationTag booking={x.booking} className="ms-1" />
+            <FixedPriceStatusTag booking={x.booking} className="ms-1" />
+            <p className="text-muted mb-0">{x.booking.customerName ?? '-'}</p>
         </>
     );
 
@@ -128,34 +131,36 @@ const BookingListPage: React.FC<Props> = ({ user: currentUser, globalSettings }:
             },
         ],
         columns: [
-{
-            key: 'name',
-            displayName: 'Bokning',
-            getValue: (x: BookingsWithPotentialProblemsResult) => x.booking.name,
-            getContentOverride: BookingNameDisplayFn,
-        },
-        {
-            key: 'date',
-            displayName: 'Datum',
-            getValue: (x: BookingsWithPotentialProblemsResult) => x.booking.isoFormattedUsageStartString,
-            getHeadingValue: x => getBookingDateHeadingValue(x.booking),
-            getContentOverride: BookingUsageIntervalDisplayFn,
-        },
-        {
-            key: 'ownerUser',
-            displayName: 'Ansvarig',
-            getValue: (x: BookingsWithPotentialProblemsResult) => x.booking.ownerUser?.name ?? '-',
-            getHeadingValue: (booking: BookingsWithPotentialProblemsResult) => booking.booking.ownerUser?.name ?? '-',
-            cellHideSize: 'lg',
-            columnWidth: 180,
-        },
-        {
-            key: 'problem',
-            displayName: 'Potentiella problem',
-            getValue: (x: BookingsWithPotentialProblemsResult) => countNotNullorEmpty(x.shouldBeBooked, x.shouldBeDone, x.shouldBeOut, x.shouldBeIn),
-            getContentOverride: BookingProblemsDisplayFn,
-            columnWidth: 220,
-        },
+            {
+                key: 'name',
+                displayName: 'Bokning',
+                getValue: (x: BookingsWithPotentialProblemsResult) => x.booking.name,
+                getContentOverride: BookingNameDisplayFn,
+            },
+            {
+                key: 'date',
+                displayName: 'Datum',
+                getValue: (x: BookingsWithPotentialProblemsResult) => x.booking.isoFormattedUsageStartString,
+                getHeadingValue: (x) => getBookingDateHeadingValue(x.booking),
+                getContentOverride: BookingUsageIntervalDisplayFn,
+            },
+            {
+                key: 'ownerUser',
+                displayName: 'Ansvarig',
+                getValue: (x: BookingsWithPotentialProblemsResult) => x.booking.ownerUser?.name ?? '-',
+                getHeadingValue: (booking: BookingsWithPotentialProblemsResult) =>
+                    booking.booking.ownerUser?.name ?? '-',
+                cellHideSize: 'lg',
+                columnWidth: 180,
+            },
+            {
+                key: 'problem',
+                displayName: 'Potentiella problem',
+                getValue: (x: BookingsWithPotentialProblemsResult) =>
+                    countNotNullorEmpty(x.shouldBeBooked, x.shouldBeDone, x.shouldBeOut, x.shouldBeIn),
+                getContentOverride: BookingProblemsDisplayFn,
+                columnWidth: 220,
+            },
         ],
     };
 

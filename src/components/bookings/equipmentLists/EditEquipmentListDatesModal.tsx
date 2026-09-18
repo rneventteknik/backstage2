@@ -185,9 +185,7 @@ const EditEquipmentListDatesModal: React.FC<Props> = ({
                                             <option value="" disabled>
                                                 -
                                             </option>
-                                            {connectedBookingCalendarEvents.length > 0 ? (
-                                                <hr />
-                                            ) : null}
+                                            {connectedBookingCalendarEvents.length > 0 ? <hr /> : null}
                                             {connectedBookingCalendarEvents.map((x) => (
                                                 <option key={x.id} value={x.key}>
                                                     {x.label}

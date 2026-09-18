@@ -65,11 +65,7 @@ const UserAuthForm: React.FC<Props> = ({
                         Behörighet
                         <RequiredIndicator />
                     </Form.Label>
-                    <Form.Select
-                        name="userRole"
-                        defaultValue={previousRole ?? Role.USER}
-                        disabled={hideRoleInput}
-                    >
+                    <Form.Select name="userRole" defaultValue={previousRole ?? Role.USER} disabled={hideRoleInput}>
                         <option value={Role.ADMIN}> {getRoleName(Role.ADMIN)}</option>
                         <option value={Role.USER}> {getRoleName(Role.USER)}</option>
                         <option value={Role.READONLY}> {getRoleName(Role.READONLY)}</option>
