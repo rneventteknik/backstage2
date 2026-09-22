@@ -228,11 +228,9 @@ const TimeEstimateList: React.FC<Props> = ({ bookingId, readonly, defaultLaborHo
     };
 
     const sortFn = (a: TimeEstimate, b: TimeEstimate) => sortIndexSortFn(a, b);
-    const moveFn = (a: TimeEstimate, b: TimeEstimate, position: 'before' | 'after' = 'before') => 
+    const moveFn = (a: TimeEstimate, b: TimeEstimate, position: 'before' | 'after' = 'before') =>
         updateTimeEstimates(
-            ...(position === 'after' 
-                ? moveItemAfterItem(timeEstimates, a, b)
-                : moveItemToItem(timeEstimates, a, b))
+            ...(position === 'after' ? moveItemAfterItem(timeEstimates, a, b) : moveItemToItem(timeEstimates, a, b)),
         );
 
     const tableSettings: TableConfiguration<TimeEstimate> = {

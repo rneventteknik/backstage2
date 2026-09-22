@@ -55,8 +55,14 @@ const handler = withSessionContext(
                     fetchBookingWithEquipmentLists(booking.id)
                         .then(toBooking)
                         .then(computePriceSummary)
-                        .then((priceSummary) => 
-                            logMessageSentToBookingOwner(context.currentUser, booking.id, booking.ownerUser.name, priceSummary));
+                        .then((priceSummary) =>
+                            logMessageSentToBookingOwner(
+                                context.currentUser,
+                                booking.id,
+                                booking.ownerUser.name,
+                                priceSummary,
+                            ),
+                        );
                 }),
             );
 

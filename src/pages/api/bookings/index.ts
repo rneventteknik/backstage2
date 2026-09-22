@@ -38,9 +38,9 @@ const handler = withSessionContext(
                 await insertBooking(req.body.booking)
                     .then(async (result) => {
                         const priceSummary = await fetchBookingWithEquipmentLists(result.id)
-                        .then(toBooking)
-                        .then(computePriceSummary);
-                        
+                            .then(toBooking)
+                            .then(computePriceSummary);
+
                         logChangeToBooking(
                             context.currentUser,
                             result.id,

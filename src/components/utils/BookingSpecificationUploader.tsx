@@ -23,9 +23,7 @@ type Props = {
 };
 
 const BookingSpecificationUploader = ({ onSave, initialData }: Props): React.ReactElement => {
-    const [fileContent, setFileContent] = React.useState<BookingSpecificationImportModel | null>(
-        initialData ?? null,
-    );
+    const [fileContent, setFileContent] = React.useState<BookingSpecificationImportModel | null>(initialData ?? null);
     const [rows, setRows] = React.useState<BookingSpecificationEquipmentModel[] | null>(null);
     const { data: equipment, error } = useSwr('/api/equipment', equipmentsFetcher);
     const [missingEquipment, setMissingEquipment] = useState<boolean>(false);
@@ -63,7 +61,7 @@ const BookingSpecificationUploader = ({ onSave, initialData }: Props): React.Rea
             setSelectedRowIds(rowsWithEquipment.map((e) => e.id) ?? []);
             setInitialDataProcessed(true);
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialData, equipment, initialDataProcessed]);
 
     if (error) {

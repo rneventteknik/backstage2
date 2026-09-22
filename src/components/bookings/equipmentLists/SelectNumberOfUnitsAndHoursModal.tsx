@@ -58,11 +58,11 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
     const { data: conflictData } = useSwr(
         startDatetime && endDatetime
             ? '/api/conflict-detection/booking-with-equipment?equipmentId=' +
-            equipment.id +
-            '&startDatetime=' +
-            startDatetime?.toISOString() +
-            '&endDatetime=' +
-            endDatetime?.toISOString()
+                  equipment.id +
+                  '&startDatetime=' +
+                  startDatetime?.toISOString() +
+                  '&endDatetime=' +
+                  endDatetime?.toISOString()
             : null,
         bookingsFetcher,
     );
@@ -173,8 +173,10 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                                     );
                                     return (
                                         <ListGroup.Item key={booking.id}>
-                                            <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
-                                            <span> - </span> 
+                                            <TableStyleLink href={'/bookings/' + booking.id}>
+                                                {booking.name}
+                                            </TableStyleLink>
+                                            <span> - </span>
                                             <span className="text-muted">{unitsUsed} st</span>
                                         </ListGroup.Item>
                                     );
@@ -183,9 +185,9 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                         </Card>
                     ) : null}
                     {startDatetime &&
-                        endDatetime &&
-                        equipment.inventoryCount &&
-                        equipment.inventoryCount <= numberOfUnitsUsed ? (
+                    endDatetime &&
+                    equipment.inventoryCount &&
+                    equipment.inventoryCount <= numberOfUnitsUsed ? (
                         <Alert variant="warning">
                             All utrustning av den här typen ({title}) används redan den här tiden.
                         </Alert>

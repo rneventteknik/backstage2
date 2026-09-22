@@ -190,7 +190,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         onSubmit={(driveFolderId) => handleSubmit({ name: equipment.name, driveFolderId })}
                         readonly={currentUser.role === Role.READONLY}
                     />
-                    
+
                     <EquipmentChangelogCard changelog={equipment.changelog ?? []} />
                 </Col>
                 <Col xl={8}>

@@ -173,7 +173,9 @@ const EquipmentSearch: React.FC<Props> = ({
                 </div>
                 <div>
                     <small>
-                        {typedEntity.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />)}
+                        {typedEntity.tags?.map((x) => (
+                            <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />
+                        ))}
                     </small>
                 </div>
                 {entity.aiSuggestion ? (
@@ -188,11 +190,9 @@ const EquipmentSearch: React.FC<Props> = ({
         );
     };
 
-    const renderMenu = (
-        results: Option[],
-        menuProps: RenderMenuProps,
-        state: RenderMenuState,
-    ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
+    const renderMenu = (results: Option[], menuProps: RenderMenuProps, state: RenderMenuState) => (
+        <Menu results={results} menuProps={menuProps} state={state}></Menu>
+    );
 
     type MenuProps = {
         results: Option[];

@@ -147,7 +147,6 @@ export const moveItemAfterItem = <T extends Sortable>(list: T[], item: T, target
     return resetSortIndexes(sortedList);
 };
 
-
 export const getNextSortIndex = <T extends Sortable>(list: T[]): number => {
     if (!list) {
         throw new Error('Invalid list');
