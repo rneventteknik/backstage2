@@ -18,6 +18,7 @@ export async function seed(knex) {
     await knex('Booking').del();
     await knex('User').del();
     await knex('Setting').del();
+    await knex('UserCard').del();
 
     // Users and authentication
     //

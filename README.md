@@ -59,6 +59,9 @@ A few environment variables are needed to get this app to run. To configure thes
 ```
 SECRET_COOKIE_PASSWORD={session cookie secret; >32 chars (mandatory, used to encrypt the session)}
 
+CARD_HASH_SECRET={secret used to hash card IDs; >32 chars (mandatory, used to hash card IDs before storing them in the database)}
+CF_ORIGIN_SECRET={secret used to verify requests from Cloudflare; >32 chars (mandatory in production, not used in local dev)}
+
 DATABASE_URL=postgres://{user}:{password}@{hostname}:{port}/{database-name} (optional, only needed when using PostgreSQL)
 DB_SSL={true or false} (optional, only needed when using PostgreSQL)
 

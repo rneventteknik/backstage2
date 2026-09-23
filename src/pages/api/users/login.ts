@@ -1,16 +1,23 @@
-import { setSessionCookie, authenticate } from '../../../lib/authenticate';
+import { setSessionCookie, authenticate, authenticateByCardId } from '../../../lib/authenticate';
 import { withApiSession } from '../../../lib/session';
 
 const handler = withApiSession(async (req, res) => {
-    const requestBody: { username: string; password: string } = await req.body;
+    const requestBody: { username?: string; password?: string; cardId?: string } = await req.body;
     const username = requestBody.username;
     const password = requestBody.password;
+    const cardId = requestBody.cardId;
 
-    if (!username || !password) {
-        res.status(403).json({ statusCode: 403, message: 'Missing login' });
-        return;
+    let authUser = null;
+    if (cardId) {
+        authUser = await authenticateByCardId(cardId);
+    } else {
+        if (!username || !password) {
+            res.status(403).json({ statusCode: 403, message: 'Missing login' });
+            return;
+        }
+        authUser = await authenticate(username, password);
     }
-    const authUser = await authenticate(username, password);
+
     if (authUser) {
         await setSessionCookie(req, authUser).then((user) => res.status(200).json(user));
     } else {
