@@ -32,7 +32,10 @@ import BookingSearchCustomerModal from './BookingSearchCustomerModal';
 import PriceWithVATPreview from '../utils/PriceWithVATPreview';
 import currency from 'currency.js';
 import { formatDateForForm, toDatetimeOrUndefined } from '../../lib/datetimeUtils';
-import { toCalendarEventObjectionModelWithoutBookingId, toEmailThreadObjectionModelWithoutBookingId } from '../../lib/mappers/booking';
+import {
+    toCalendarEventObjectionModelWithoutBookingId,
+    toEmailThreadObjectionModelWithoutBookingId,
+} from '../../lib/mappers/booking';
 
 type Props = {
     handleSubmitBooking: (booking: Partial<IBookingObjectionModel>) => void;
@@ -118,11 +121,15 @@ const BookingForm: React.FC<Props> = ({
             language: getValueFromForm('language') as Language | undefined,
             fixedPrice: toIntOrUndefined(getValueFromForm('fixedPrice')) ?? null,
             invoiceDate: toDatetimeOrUndefined(getValueFromForm('invoiceDate'))
-            ? getValueFromForm('invoiceDate')
-            : null,
+                ? getValueFromForm('invoiceDate')
+                : null,
             internalReservation: getCheckedFromForm('internalReservation') ?? booking.internalReservation,
-            calendarEvents: booking.calendarEvents?.map((x) => toCalendarEventObjectionModelWithoutBookingId(x)) as IBookingObjectionModel['calendarEvents'],
-            emailThreads: booking.emailThreads?.map((x) => toEmailThreadObjectionModelWithoutBookingId(x)) as IBookingObjectionModel['emailThreads'],
+            calendarEvents: booking.calendarEvents?.map((x) =>
+                toCalendarEventObjectionModelWithoutBookingId(x),
+            ) as IBookingObjectionModel['calendarEvents'],
+            emailThreads: booking.emailThreads?.map((x) =>
+                toEmailThreadObjectionModelWithoutBookingId(x),
+            ) as IBookingObjectionModel['emailThreads'],
         };
 
         handleSubmitBooking(modifiedBooking);
@@ -303,21 +310,22 @@ const BookingForm: React.FC<Props> = ({
                                     MemberStatus.AKTIV,
                                     MemberStatus.RESURS,
                                     MemberStatus.ASP,
-                                    MemberStatus.GLÖMD
-                                ].map(statusGroup =>
+                                    MemberStatus.GLÖMD,
+                                ].map((statusGroup) => (
                                     <optgroup
                                         key={getMemberStatusName(statusGroup)}
                                         label={getMemberStatusName(statusGroup)}
                                     >
                                         {users
                                             ?.filter((user) => user.memberStatus === statusGroup)
-                                            ?.sort(nameSortFn).map((user) => (
+                                            ?.sort(nameSortFn)
+                                            .map((user) => (
                                                 <option key={user.id} value={user.id}>
                                                     {user.name}
                                                 </option>
                                             ))}
                                     </optgroup>
-                                )}
+                                ))}
                             </Form.Select>
                         ) : (
                             <ActivityIndicator />

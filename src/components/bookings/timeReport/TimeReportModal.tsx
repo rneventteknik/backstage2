@@ -245,21 +245,22 @@ const TimeReportModal: React.FC<Props> = ({
                                         MemberStatus.AKTIV,
                                         MemberStatus.RESURS,
                                         MemberStatus.ASP,
-                                        MemberStatus.GLÖMD
-                                    ].map(statusGroup =>
+                                        MemberStatus.GLÖMD,
+                                    ].map((statusGroup) => (
                                         <optgroup
                                             key={getMemberStatusName(statusGroup)}
                                             label={getMemberStatusName(statusGroup)}
                                         >
                                             {users
                                                 ?.filter((user) => user.memberStatus === statusGroup)
-                                                ?.sort(nameSortFn).map((user) => (
+                                                ?.sort(nameSortFn)
+                                                .map((user) => (
                                                     <option key={user.id} value={user.id}>
                                                         {user.name}
                                                     </option>
                                                 ))}
                                         </optgroup>
-                                    )}
+                                    ))}
                                 </Form.Select>
                             </Form.Group>
                         </Col>

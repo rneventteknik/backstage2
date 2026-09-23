@@ -80,12 +80,15 @@ export const setSessionCookie = async (
     return user;
 };
 
-export const destroySessionCookie = (req: NextApiRequest & IncomingMessage & RequestWithSession): void => req.session.destroy();
+export const destroySessionCookie = (req: NextApiRequest & IncomingMessage & RequestWithSession): void =>
+    req.session.destroy();
 
 export const getUserFromReq = (req: NextApiRequest & IncomingMessage & RequestWithSession): CurrentUserInfo =>
     req.session.user ?? { isLoggedIn: false };
 
-export const getAndVerifyUser = async (req: NextApiRequest & IncomingMessage & RequestWithSession): Promise<CurrentUserInfo> => {
+export const getAndVerifyUser = async (
+    req: NextApiRequest & IncomingMessage & RequestWithSession,
+): Promise<CurrentUserInfo> => {
     const currentUser = getUserFromReq(req);
 
     // We only need to verify the user if we are logged in

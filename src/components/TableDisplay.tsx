@@ -78,7 +78,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
 
     // Check if we should use the tables filter field or the filter string from the parent
     //
-    const filterString = configuration.hideTableFilter ? filterStringFromParent ?? '' : storedFilterString;
+    const filterString = configuration.hideTableFilter ? (filterStringFromParent ?? '') : storedFilterString;
 
     const getHeadingValue = configuration.columns.find((c) => c.key === sortKey)?.getHeadingValue ?? (() => null);
     const getHeadingContentOverride =
@@ -229,7 +229,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     return (
         <div>
             {configuration.hideTableFilter ? null : (
-                <FormGroup className="mb-3 mt-2 mx-3">
+                <FormGroup className="mb-3 mt-2">
                     <FormControl placeholder="Filter" onChange={setFilterConfiguration}></FormControl>
                 </FormGroup>
             )}
@@ -245,7 +245,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                         {configuration.columns.map((p) => (
                             <th
                                 key={p.key}
-                                style={{ width: p.columnWidth }}
+                                style={{ width: p.columnWidth, verticalAlign: 'middle' }}
                                 className={
                                     getTextAlignmentClassName(p.textAlignment) +
                                     ' ' +
@@ -274,29 +274,36 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                     <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                         <SortableContext items={sortableItems} strategy={verticalListSortingStrategy}>
                             {rowsToShow.map((x) =>
-                        hasEntity(x) ? (
-                            <TableRow
-                                key={x.entity.id}
-                                entity={x.entity}
-                                configuration={configuration}
-                                isSubItem={isSubItem}
-                                showMoveControl={!!configuration.moveFn && sortDirection === SortDirection.Custom}
-                            />
-                        ) : (
-                            <tr key={'heading-' + x.heading} className={styles.headingRow}>
-                                {configuration.statusColumns?.map((p) => <td key={p.key} className={'p-0'}></td>)}
-                                <td
-                                    colSpan={configuration.columns.length + (configuration.statusColumns?.length ?? 0)}
-                                    className="pt-4"
-                                >
-                                    {x.contentOverride === null ? (
-                                        <strong>{x.heading?.toString()}</strong>
-                                    ) : (
-                                        x.contentOverride
-                                    )}
-                                </td>
-                            </tr>
-                            ),
+                                hasEntity(x) ? (
+                                    <TableRow
+                                        key={x.entity.id}
+                                        entity={x.entity}
+                                        configuration={configuration}
+                                        isSubItem={isSubItem}
+                                        showMoveControl={
+                                            !!configuration.moveFn && sortDirection === SortDirection.Custom
+                                        }
+                                    />
+                                ) : (
+                                    <tr key={'heading-' + x.heading} className={styles.headingRow}>
+                                        {configuration.statusColumns?.map((p) => (
+                                            <td key={p.key} className={'p-0'}></td>
+                                        ))}
+                                        <td
+                                            colSpan={
+                                                configuration.columns.length +
+                                                (configuration.statusColumns?.length ?? 0)
+                                            }
+                                            className="pt-4"
+                                        >
+                                            {x.contentOverride === null ? (
+                                                <strong>{x.heading?.toString()}</strong>
+                                            ) : (
+                                                x.contentOverride
+                                            )}
+                                        </td>
+                                    </tr>
+                                ),
                             )}
                         </SortableContext>
                     </DndContext>
@@ -422,7 +429,7 @@ const TableRow = <T extends HasId | HasStringId>({
                             ' align-middle'
                         }
                     >
-                        {p.getContentOverride ? p.getContentOverride(entity) : p.getValue(entity)?.toString() ?? ''}
+                        {p.getContentOverride ? p.getContentOverride(entity) : (p.getValue(entity)?.toString() ?? '')}
                     </td>
                 ))}
             </tr>

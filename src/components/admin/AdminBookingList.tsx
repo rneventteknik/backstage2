@@ -402,7 +402,9 @@ const AdminBookingList: React.FC<Props> = ({
                                 multiple
                                 labelKey="label"
                                 options={bookingStatusOptions}
-                                onChange={(e) => setBookingStatuses((e as typeof bookingStatusOptions).map((o) => o.value))}
+                                onChange={(e) =>
+                                    setBookingStatuses((e as typeof bookingStatusOptions).map((o) => o.value))
+                                }
                                 placeholder="Filtrera på status"
                                 selected={bookingStatuses
                                     .map((id) => bookingStatusOptions.find((x) => x.value === id))
@@ -418,7 +420,9 @@ const AdminBookingList: React.FC<Props> = ({
                                 multiple
                                 labelKey="label"
                                 options={paymentStatusOptions}
-                                onChange={(e) => setPaymentStatuses((e as typeof paymentStatusOptions).map((o) => o.value))}
+                                onChange={(e) =>
+                                    setPaymentStatuses((e as typeof paymentStatusOptions).map((o) => o.value))
+                                }
                                 placeholder="Filtrera på betalningsstatus"
                                 selected={paymentStatuses
                                     .map((id) => paymentStatusOptions.find((x) => x.value === id))
@@ -434,7 +438,9 @@ const AdminBookingList: React.FC<Props> = ({
                                 multiple
                                 labelKey="label"
                                 options={salaryStatusOptions}
-                                onChange={(e) => setSalaryStatuses((e as typeof salaryStatusOptions).map((o) => o.value))}
+                                onChange={(e) =>
+                                    setSalaryStatuses((e as typeof salaryStatusOptions).map((o) => o.value))
+                                }
                                 placeholder="Filtrera på timarvodestatus"
                                 selected={salaryStatuses
                                     .map((id) => salaryStatusOptions.find((x) => x.value === id))

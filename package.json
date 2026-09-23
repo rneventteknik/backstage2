@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.25.4-huckleberry",
+    "version": "1.25.5-huckleberry",
     "type": "module",
     "engines": {
         "node": "^24.0.0"
@@ -12,6 +12,7 @@
         "tc": "tsc",
         "lint": "eslint .",
         "format": "prettier -w .",
+        "format:check": "prettier -c .",
         "tcl": "tsc && eslint .",
         "migrate": "knex migrate:latest",
         "migrate:down": "knex migrate:down",

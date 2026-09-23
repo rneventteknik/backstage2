@@ -90,7 +90,7 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
 
     const setBookingPaymentStatus = (paymentStatus: PaymentStatus, bookingIds: number[] | null = null) => {
         // If not bookings are specified, set status of all
-        bookingIds = bookingIds ? bookingIds : invoiceGroup?.bookings?.map((b) => b.id) ?? [];
+        bookingIds = bookingIds ? bookingIds : (invoiceGroup?.bookings?.map((b) => b.id) ?? []);
 
         bookingIds.forEach((bookingId) => {
             const body = {
@@ -106,7 +106,7 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
 
     const setBookingInvoiceDates = (invoiceDate: Date | null, bookingIds: number[] | null = null) => {
         // If not bookings are specified, set status of all
-        bookingIds = bookingIds ? bookingIds : invoiceGroup?.bookings?.map((b) => b.id) ?? [];
+        bookingIds = bookingIds ? bookingIds : (invoiceGroup?.bookings?.map((b) => b.id) ?? []);
 
         bookingIds.forEach((bookingId) => {
             const body = {
@@ -132,7 +132,7 @@ const ViewInvoiceGroupModal: React.FC<Props> = ({ show, onHide, onMutate, invoic
         }
 
         // If not bookings are specified, set status of all
-        bookingIds = bookingIds ? bookingIds : invoiceGroup?.bookings?.map((b) => b.id) ?? [];
+        bookingIds = bookingIds ? bookingIds : (invoiceGroup?.bookings?.map((b) => b.id) ?? []);
 
         bookingIds.forEach((bookingId, i) => {
             const body = {
