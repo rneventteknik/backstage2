@@ -43,7 +43,9 @@ const UserCardForm: React.FC<Props> = ({
         if (!hasExistingCard && !cardId) {
             cardIdField?.setCustomValidity('Ange kortvärdet som ska registreras.');
         } else if (!hasExistingCard && !isValidCardId) {
-            cardIdField?.setCustomValidity('Ogiltigt NFC-kortvärde. Ange ett hexadecimalt UID på 4- eller 7-byte format (t.ex. 04A23B4C eller 04:A2:3B:4C:5D:6E:7F).');
+            cardIdField?.setCustomValidity(
+                'Ogiltigt NFC-kortvärde. Ange ett hexadecimalt UID på 4- eller 7-byte format (t.ex. 04A23B4C eller 04:A2:3B:4C:5D:6E:7F).',
+            );
         } else {
             cardIdField?.setCustomValidity('');
         }
@@ -54,7 +56,11 @@ const UserCardForm: React.FC<Props> = ({
             passwordField?.setCustomValidity('');
         }
 
-        if ((!hasExistingCard && !cardId) || (!hasExistingCard && !isValidCardId) || (requirePasswordConfirmation && !existingPassword)) {
+        if (
+            (!hasExistingCard && !cardId) ||
+            (!hasExistingCard && !isValidCardId) ||
+            (requirePasswordConfirmation && !existingPassword)
+        ) {
             setValidated(true);
             return;
         }
@@ -71,37 +77,33 @@ const UserCardForm: React.FC<Props> = ({
 
     return (
         <Form id={formId} onSubmit={handleSubmit} noValidate validated={validated}>
-                    <Form.Group controlId="formCardId" className="mt-3">
-                        <Form.Label>
-                            Kort-ID
-                            <RequiredIndicator />
-                        </Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="cardId"
-                            placeholder="Blippa kortet eller ange UID/hex-ID"
-                            autoComplete="off"
-                            autoFocus
-                        />
-                        <Form.Text className="text-muted">
-                            Ange NFC-taggens faktiska UID/hex-ID, inte det textvärde som är skrivet på kortet.
-                        </Form.Text>
-                    </Form.Group>
+            <Form.Group controlId="formCardId" className="mt-3">
+                <Form.Label>
+                    Kort-ID
+                    <RequiredIndicator />
+                </Form.Label>
+                <Form.Control
+                    type="text"
+                    name="cardId"
+                    placeholder="Blippa kortet eller ange UID/hex-ID"
+                    autoComplete="off"
+                    autoFocus
+                />
+                <Form.Text className="text-muted">
+                    Ange NFC-taggens faktiska UID/hex-ID, inte det textvärde som är skrivet på kortet.
+                </Form.Text>
+            </Form.Group>
 
-                    <Form.Group controlId="formCardName" className="mt-3">
-                        <Form.Label>
-                            Kortnamn
-                        </Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="cardName"
-                            placeholder="T.ex. Huvudkortet, Reservkortet"
-                            autoComplete="off"
-                        />
-                        <Form.Text className="text-muted">
-                            Ett användarvänligt namn för att identifiera kortet.
-                        </Form.Text>
-                    </Form.Group>
+            <Form.Group controlId="formCardName" className="mt-3">
+                <Form.Label>Kortnamn</Form.Label>
+                <Form.Control
+                    type="text"
+                    name="cardName"
+                    placeholder="T.ex. Huvudkortet, Reservkortet"
+                    autoComplete="off"
+                />
+                <Form.Text className="text-muted">Ett användarvänligt namn för att identifiera kortet.</Form.Text>
+            </Form.Group>
 
             {requirePasswordConfirmation && (
                 <>

@@ -23,7 +23,9 @@ export const fetchUserAuthById = async (id: number): Promise<UserAuthObjectionMo
     return UserAuthObjectionModel.query().findById(id).withGraphFetched('user');
 };
 
-export const fetchUserAuthByHashedCardId = async (hashedCardId: string): Promise<UserAuthObjectionModel | undefined> => {
+export const fetchUserAuthByHashedCardId = async (
+    hashedCardId: string,
+): Promise<UserAuthObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
     const userCard = await UserCardObjectionModel.query().where('hashedCardId', hashedCardId).first();

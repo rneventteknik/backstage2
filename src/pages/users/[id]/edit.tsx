@@ -145,7 +145,11 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
         };
 
         fetch('/api/users/usercard/' + router.query.id, request)
-            .then((response) => getResponseContentOrError<{ userId: number; cardAdded?: boolean; cardId?: number; cardName?: string }>(response))
+            .then((response) =>
+                getResponseContentOrError<{ userId: number; cardAdded?: boolean; cardId?: number; cardName?: string }>(
+                    response,
+                ),
+            )
             .then((data) => {
                 // Update user cards array based on the response
                 const nextUserCards = [...(user.userCards ?? [])];

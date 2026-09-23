@@ -41,4 +41,3 @@ const UserCardList: React.FC<Props> = ({ cards, onRemoveCard }: Props) => {
 };
 
 export default UserCardList;
-

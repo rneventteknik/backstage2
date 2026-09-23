@@ -46,4 +46,3 @@ export class UserCardObjectionModel extends Model implements IUserCardObjectionM
     updated?: string;
     user?: UserObjectionModel;
 }
-

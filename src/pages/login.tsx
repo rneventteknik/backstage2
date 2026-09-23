@@ -237,7 +237,6 @@ const LoginPage: React.FC<Props> = ({ globalSettings, initialMtlsValid }) => {
                         disabled={waitingForResponse}
                     />
 
-
                     <h4>Blippa ditt Kort </h4>
                     <p className="text-muted">Kortläsaren är redo. Blip ditt kort nu...</p>
 
