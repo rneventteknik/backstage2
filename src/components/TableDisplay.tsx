@@ -229,7 +229,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     return (
         <div>
             {configuration.hideTableFilter ? null : (
-                <FormGroup className="mb-3 mt-2 mx-3">
+                <FormGroup className="mb-3 mt-2">
                     <FormControl placeholder="Filter" onChange={setFilterConfiguration}></FormControl>
                 </FormGroup>
             )}
@@ -245,7 +245,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
                         {configuration.columns.map((p) => (
                             <th
                                 key={p.key}
-                                style={{ width: p.columnWidth }}
+                                style={{ width: p.columnWidth, verticalAlign: 'middle' }}
                                 className={
                                     getTextAlignmentClassName(p.textAlignment) +
                                     ' ' +
