@@ -14,6 +14,7 @@ import { IfCashPaymentManager, IfNotCashPaymentManager } from '../components/uti
 import TableStyleLink from '../components/utils/TableStyleLink';
 import UserDisplay from '../components/utils/UserDisplay';
 import UserIcon from '../components/utils/UserIcon';
+import { getBookingDateDisplayValues } from '../lib/datetimeUtils';
 import { bookingsFetcher } from '../lib/fetchers';
 import { addVAT, formatCurrency, getBookingPrice } from '../lib/pricingUtils';
 import { useNotifications } from '../lib/useNotifications';
@@ -143,6 +144,11 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
             <span>Ska betalas</span>
         );
 
+    const BookingDateDisplayFn = (booking: Booking) => {
+        const { displayUsageInterval } = getBookingDateDisplayValues(booking);
+        return <span>{displayUsageInterval.replace(' - ', '\xa0- ')}</span>;
+    };
+
     const BookingPriceDisplayFn = (booking: Booking) => (
         <>
             <span style={{ fontSize: '1.2em' }} className="text-monospace">
@@ -203,12 +209,20 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
                 columnWidth: 120,
             },
             {
+                key: 'date',
+                displayName: 'Datum',
+                disableSort: true,
+                getValue: () => '',
+                getContentOverride: BookingDateDisplayFn,
+                columnWidth: 160,
+            },
+            {
                 key: 'amount',
                 displayName: 'Att betala (inklusive moms)',
                 getValue: (booking: Booking) => getBookingPrice(booking).value,
                 textTruncation: true,
                 getContentOverride: BookingPriceDisplayFn,
-                columnWidth: 200,
+                columnWidth: 130,
             },
             {
                 key: 'actions',
@@ -243,6 +257,14 @@ const CashPaymentsPage: React.FC<Props> = ({ user: currentUser, globalSettings }
                 getValue: () => '',
                 getContentOverride: BookingStatusDisplayFn,
                 columnWidth: 120,
+            },
+            {
+                key: 'date',
+                displayName: 'Datum',
+                disableSort: true,
+                getValue: () => '',
+                getContentOverride: BookingDateDisplayFn,
+                columnWidth: 160,
             },
             {
                 key: 'amount',
