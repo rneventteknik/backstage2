@@ -1,11 +1,13 @@
 import bcrypt from 'bcryptjs';
+import { createHmac } from 'crypto';
 import { fetchUserAuth } from './db-access';
 import { UserAuthObjectionModel } from '../models/objection-models/UserObjectionModel';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { NextApiRequest } from 'next';
-import { fetchUserAuthById } from './db-access/userAuth';
+import { fetchUserAuthByHashedCardId, fetchUserAuthById } from './db-access/userAuth';
 import { IncomingMessage } from 'http';
 import { RequestWithSession } from './session';
+import { normalizeCardId } from './cardId';
 
 export const authenticate = async (username: string, password: string): Promise<UserAuthObjectionModel | null> => {
     const user = await fetchUserAuth(username.toLowerCase());
@@ -32,6 +34,27 @@ export const authenticateById = async (
     }
 
     return bcrypt.compare(password, user.hashedPassword).then((isAuthenticated) => (isAuthenticated ? user : null));
+};
+
+export const getHashedCardId = (cardId: string): string => {
+    const secret = process.env.CARD_HASH_SECRET;
+
+    if (!secret) {
+        throw new Error('CARD_HASH_SECRET is not configured');
+    }
+
+    return createHmac('sha256', secret).update(normalizeCardId(cardId)).digest('hex');
+};
+
+export const authenticateByCardId = async (cardId: string): Promise<UserAuthObjectionModel | null> => {
+    const hashedCardId = getHashedCardId(cardId);
+    const user = await fetchUserAuthByHashedCardId(hashedCardId);
+
+    if (!user) {
+        return null;
+    }
+
+    return user;
 };
 
 export const getHashedPassword = async (password: string): Promise<string> => {

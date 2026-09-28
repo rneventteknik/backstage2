@@ -23,7 +23,7 @@ export const fetchUser = async (
 ): Promise<UserObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
-    const query = UserObjectionModel.query().findById(id).withGraphFetched('userAuth');
+    const query = UserObjectionModel.query().findById(id).withGraphFetched('userAuth').withGraphFetched('userCards');
 
     if (includePersonalInformation) {
         return query.select(
@@ -76,7 +76,8 @@ export const fetchUsers = async (): Promise<UserObjectionModel[]> => {
     // Since all users can view this list, we do not include personal information here
     return UserObjectionModel.query()
         .select('id', 'name', 'created', 'updated', 'memberStatus', 'nameTag', 'phoneNumber', 'slackId', 'emailAddress')
-        .withGraphFetched('userAuth');
+        .withGraphFetched('userAuth')
+        .withGraphFetched('userCards');
 };
 
 export const updateUser = async (id: number, user: UserObjectionModel): Promise<UserObjectionModel> => {

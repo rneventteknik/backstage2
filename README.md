@@ -59,6 +59,9 @@ A few environment variables are needed to get this app to run. To configure thes
 ```
 SECRET_COOKIE_PASSWORD={session cookie secret; >32 chars (mandatory, used to encrypt the session)}
 
+CARD_HASH_SECRET={secret used to hash card IDs; >32 chars (mandatory, used to hash card IDs before storing them in the database)}
+CF_ORIGIN_SECRET={secret used to verify requests from Cloudflare; >32 chars (mandatory in production, not used in local dev). Card login is disabled in production if this is not set}
+
 DATABASE_URL=postgres://{user}:{password}@{hostname}:{port}/{database-name} (optional, only needed when using PostgreSQL)
 DB_SSL={true or false} (optional, only needed when using PostgreSQL)
 
@@ -184,6 +187,20 @@ NEXT_PUBLIC_POSTHOG_KEY=phc_...
 ```
 
 Analytics are silently skipped if the key is not set.
+
+### Cloudflare Setup (NFC card login)
+
+Card login is only allowed from computers with a Cloudflare client certificate (mTLS). The app is also reachable directly on Heroku, so it only trusts certificate information from requests that carry `CF_ORIGIN_SECRET`.
+
+1. Under SSL/TLS → Client Certificates, create a certificate for each card login computer and enable mTLS for the app's hostname
+2. Add a Transform Rule (Modify Request Header) matching all requests, which **sets** (not adds) these headers:
+    - `x-origin-secret` = static value `CF_ORIGIN_SECRET`
+    - `x-client-cert-verified` = dynamic value `to_string(cf.tls_client_auth.cert_verified)`
+3. Add a WAF custom rule that blocks card login without a certificate:
+    ```
+    (http.request.uri.path eq "/api/users/login/card" and not cf.tls_client_auth.cert_verified)
+    ```
+4. Optionally add a Rate Limiting rule for `/api/users/login*`
 
 ## Version Control
 
