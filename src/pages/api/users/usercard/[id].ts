@@ -10,13 +10,14 @@ import {
     respondWithInvalidMethodResponse,
 } from '../../../../lib/apiResponses';
 import { authenticateById, getHashedCardId } from '../../../../lib/authenticate';
-import { insertUserCard, deleteUserCard } from '../../../../lib/db-access/userAuth';
+import { isValidCardId } from '../../../../lib/cardId';
+import { insertUserCard, deleteUserCards, isUserCardRegistered } from '../../../../lib/db-access/userAuth';
 
 type UserCardRequest = {
     cardId?: string;
     cardName?: string;
     existingPassword?: string;
-    removeCardId?: number;
+    removeCardIds?: number[];
 };
 
 const handler = withSessionContext(
@@ -33,36 +34,15 @@ const handler = withSessionContext(
             return;
         }
 
-        // Handle DELETE requests for removing individual cards (no password required)
-        if (req.method === 'DELETE') {
-            const body = req.body.userCardRequest as UserCardRequest;
-            const { removeCardId } = body;
-
-            if (!removeCardId) {
-                respondWithInvalidDataResponse(res);
-                return;
-            }
-
-            const deleted = await deleteUserCard(removeCardId);
-
-            if (!deleted) {
-                respondWithEntityNotFoundResponse(res);
-                return;
-            }
-
-            res.status(200).json({ userId: userId, cardRemoved: true });
-            return;
-        }
-
-        // Handle POST/PUT requests for adding cards
-        if (req.method !== 'PUT' && req.method !== 'POST') {
+        if (req.method !== 'POST' && req.method !== 'DELETE') {
             respondWithInvalidMethodResponse(res);
             return;
         }
 
         const body = req.body.userCardRequest as UserCardRequest;
-        const { cardId, existingPassword, cardName } = body;
+        const { cardId, existingPassword, cardName, removeCardIds } = body;
 
+        // Both adding and removing cards require the password of the current user
         if (!existingPassword) {
             respondWithInvalidDataResponse(res);
             return;
@@ -73,8 +53,39 @@ const handler = withSessionContext(
             return;
         }
 
-        if (!cardId) {
+        // Handle DELETE requests for removing cards
+        if (req.method === 'DELETE') {
+            if (
+                !Array.isArray(removeCardIds) ||
+                removeCardIds.length === 0 ||
+                !removeCardIds.every((id) => Number.isInteger(id))
+            ) {
+                respondWithInvalidDataResponse(res);
+                return;
+            }
+
+            const removedCount = await deleteUserCards(userId, removeCardIds);
+
+            if (removedCount === 0) {
+                respondWithEntityNotFoundResponse(res);
+                return;
+            }
+
+            res.status(200).json({ userId: userId, removedCount: removedCount });
+            return;
+        }
+
+        // Handle POST requests for adding cards
+        if (!cardId || !isValidCardId(cardId)) {
             respondWithInvalidDataResponse(res);
+            return;
+        }
+
+        const hashedCardId = getHashedCardId(cardId);
+
+        // Card IDs are unique, so a card can only be registered to one user
+        if (await isUserCardRegistered(hashedCardId)) {
+            res.status(409).json({ statusCode: 409, message: 'Card is already registered' });
             return;
         }
 
@@ -82,7 +93,7 @@ const handler = withSessionContext(
         const newCard = new UserCardObjectionModel();
         newCard.userId = userId;
         newCard.cardName = cardName || 'NFC Kort';
-        newCard.hashedCardId = getHashedCardId(cardId);
+        newCard.hashedCardId = hashedCardId;
 
         await insertUserCard(newCard)
             .then((result: UserCardObjectionModel) =>

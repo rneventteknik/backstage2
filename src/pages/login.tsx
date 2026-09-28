@@ -9,6 +9,8 @@ import { KeyValue } from '../models/interfaces/KeyValue';
 import Head from 'next/head';
 import EnvironmentTypeTag from '../components/utils/EnvironmentTypeTag';
 import { GetServerSidePropsContext } from 'next';
+import { hasVerifiedClientCertificate } from '../lib/clientCertificate';
+import { isValidCardId } from '../lib/cardId';
 
 const containerStyle = {
     margin: 'auto',
@@ -27,22 +29,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
         return userCheck;
     }
 
-    const req = context.req;
-    let isMtlsValid = false;
-
-    if (process.env.NODE_ENV === 'production') {
-        // Security check: Verify origin came through Cloudflare
-        const originSecret = req.headers['x-origin-secret'];
-        const isFromCloudflare = originSecret === process.env.CF_ORIGIN_SECRET;
-
-        if (isFromCloudflare) {
-            const certStatus = req.headers['cf-client-cert-verify'];
-            isMtlsValid = certStatus === 'SUCCESS';
-        }
-    } else {
-        // Local Dev Mock
-        isMtlsValid = true;
-    }
+    const isMtlsValid = hasVerifiedClientCertificate(context.req);
 
     return {
         props: {
@@ -131,6 +118,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings, initialMtlsValid }) => {
 
     const [showWrongPasswordError, setShowWrongPasswordError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
+    const [showUnreadableCardError, setShowUnreadableCardError] = useState(false);
     const [waitingForResponse, setWaitingForResponse] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
@@ -152,10 +140,11 @@ const LoginPage: React.FC<Props> = ({ globalSettings, initialMtlsValid }) => {
         return url;
     };
 
-    const handleLoginSubmit = async (body: Record<string, unknown>) => {
+    const handleLoginSubmit = async (url: string, body: Record<string, unknown>) => {
         setWaitingForResponse(true);
         setShowWrongPasswordError(false);
         setShowServerError(false);
+        setShowUnreadableCardError(false);
 
         const request = {
             method: 'POST',
@@ -163,7 +152,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings, initialMtlsValid }) => {
             body: JSON.stringify(body),
         };
 
-        fetch('/api/users/login', request)
+        fetch(url, request)
             .then((res) => {
                 if (res.status !== 200 && res.status !== 403) {
                     throw new Error(res.statusText);
@@ -190,11 +179,23 @@ const LoginPage: React.FC<Props> = ({ globalSettings, initialMtlsValid }) => {
             });
     };
 
+    const handleCardSubmit = (cardId: string) => {
+        // Partial or garbled reads are caught here instead of being sent to the server
+        if (!isValidCardId(cardId)) {
+            setShowWrongPasswordError(false);
+            setShowServerError(false);
+            setShowUnreadableCardError(true);
+            return;
+        }
+
+        handleLoginSubmit('/api/users/login/card', { cardId });
+    };
+
     const handlePasswordSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         const body = Object.fromEntries(['username', 'password'].map((key) => [key, formData.get(key)]));
-        handleLoginSubmit(body);
+        handleLoginSubmit('/api/users/login', body);
     };
 
     return (
@@ -223,6 +224,14 @@ const LoginPage: React.FC<Props> = ({ globalSettings, initialMtlsValid }) => {
                 </Alert>
             ) : null}
 
+            {showUnreadableCardError && authMethod === 'NFC' ? (
+                <Alert variant="warning" onClose={() => setShowUnreadableCardError(false)} dismissible>
+                    <Alert.Heading as="h6">Kortet kunde inte läsas</Alert.Heading>
+                    Håll kortet stilla mot läsaren och försök igen. Fungerar det fortfarande inte, logga in med
+                    användarnamn och lösenord.
+                </Alert>
+            ) : null}
+
             {showServerError ? (
                 <Alert variant="danger">
                     <strong>Serverfel</strong> Det gick inte att logga in, försök igen senare.
@@ -232,10 +241,7 @@ const LoginPage: React.FC<Props> = ({ globalSettings, initialMtlsValid }) => {
             {/* CARD READER MODE */}
             {authMethod === 'NFC' ? (
                 <div className="p-4 text-center border rounded position-relative">
-                    <CardReaderInput
-                        onCardSubmit={(cardId) => handleLoginSubmit({ cardId })}
-                        disabled={waitingForResponse}
-                    />
+                    <CardReaderInput onCardSubmit={handleCardSubmit} disabled={waitingForResponse} />
 
                     <h4>Blippa ditt Kort </h4>
                     <p className="text-muted">Kortläsaren är redo. Blip ditt kort nu...</p>

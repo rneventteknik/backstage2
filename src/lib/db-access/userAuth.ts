@@ -36,18 +36,26 @@ export const fetchUserAuthByHashedCardId = async (
 
     return UserAuthObjectionModel.query().findById(userCard.userId).withGraphFetched('user');
 };
+export const isUserCardRegistered = async (hashedCardId: string): Promise<boolean> => {
+    ensureDatabaseIsInitialized();
+
+    return UserCardObjectionModel.query()
+        .where('hashedCardId', hashedCardId)
+        .first()
+        .then((card) => !!card);
+};
+
 export const insertUserCard = async (userCard: UserCardObjectionModel): Promise<UserCardObjectionModel> => {
     ensureDatabaseIsInitialized();
 
     return UserCardObjectionModel.query().insert(userCard);
 };
 
-export const deleteUserCard = async (cardId: number): Promise<boolean> => {
+// Only deletes cards belonging to the given user, so a card id from another user is ignored
+export const deleteUserCards = async (userId: number, cardIds: number[]): Promise<number> => {
     ensureDatabaseIsInitialized();
 
-    return UserCardObjectionModel.query()
-        .deleteById(cardId)
-        .then((res) => res > 0);
+    return UserCardObjectionModel.query().delete().where('userId', userId).whereIn('id', cardIds);
 };
 export const updateUserAuth = async (id: number, user: UserAuthObjectionModel): Promise<UserAuthObjectionModel> => {
     ensureDatabaseIsInitialized();

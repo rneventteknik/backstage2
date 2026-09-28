@@ -23,7 +23,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import ConfirmModal from '../../../components/utils/ConfirmModal';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import UserCardForm, { UserCardRequest } from '../../../components/users/UserCardForm';
-import UserCardList from '../../../components/users/UserCardList';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -135,67 +134,47 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
             });
     };
 
-    const handleUserCardSubmit = (userCardRequest: UserCardRequest) => {
-        const body = { userCardRequest: userCardRequest };
+    const handleUserCardSubmit = async (userCardRequest: UserCardRequest) => {
+        const { removeCardIds, cardId, cardName, existingPassword } = userCardRequest;
+        let nextUserCards = [...(user.userCards ?? [])];
 
-        const request = {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
+        const sendUserCardRequest = <T,>(method: string, body: Partial<UserCardRequest>) =>
+            fetch('/api/users/usercard/' + router.query.id, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userCardRequest: { ...body, existingPassword } }),
+            }).then((response) => getResponseContentOrError<T>(response));
 
-        fetch('/api/users/usercard/' + router.query.id, request)
-            .then((response) =>
-                getResponseContentOrError<{ userId: number; cardAdded?: boolean; cardId?: number; cardName?: string }>(
-                    response,
-                ),
-            )
-            .then((data) => {
-                // Update user cards array based on the response
-                const nextUserCards = [...(user.userCards ?? [])];
+        try {
+            if (removeCardIds.length > 0) {
+                await sendUserCardRequest<{ userId: number; removedCount: number }>('DELETE', { removeCardIds });
+                nextUserCards = nextUserCards.filter((card) => !removeCardIds.includes(card.id!));
+            }
 
-                if (data.cardAdded && data.cardId) {
-                    // Add the new card to the list
-                    const now = new Date();
-                    nextUserCards.push({
-                        id: data.cardId,
-                        userId: user.id,
-                        cardName: data.cardName ?? 'NFC Kort',
-                        created: now,
-                    });
-                }
+            if (cardId) {
+                const data = await sendUserCardRequest<{ userId: number; cardId: number; cardName: string }>('POST', {
+                    cardId,
+                    cardName,
+                });
+                nextUserCards.push({ id: data.cardId, userId: user.id, cardName: data.cardName, created: new Date() });
+            }
 
-                mutate({ ...user, userCards: nextUserCards }, false);
-                showSaveSuccessNotification('NFC-kortet');
-                setShowEditCardModal(false);
-            })
-            .catch((error: Error) => {
-                console.error(error);
-                showSaveFailedNotification('NFC-kortet');
-            });
-    };
+            showSaveSuccessNotification('NFC-korten');
+            setShowEditCardModal(false);
+        } catch (error) {
+            console.error(error);
 
-    const handleRemoveCard = (cardId: number) => {
-        const body = { userCardRequest: { removeCardId: cardId, existingPassword: '' } };
-
-        const request = {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        };
-
-        fetch('/api/users/usercard/' + router.query.id, request)
-            .then((response) => getResponseContentOrError<{ userId: number; cardRemoved?: boolean }>(response))
-            .then(() => {
-                // Remove the card from the list
-                const nextUserCards = (user.userCards ?? []).filter((card) => card.id !== cardId);
-                mutate({ ...user, userCards: nextUserCards }, false);
-                showSaveSuccessNotification('Kort borttaget');
-            })
-            .catch((error: Error) => {
-                console.error(error);
-                showSaveFailedNotification('Kort kunde inte tas bort');
-            });
+            if (error instanceof Error && error.message.startsWith('Error 403')) {
+                showGeneralDangerMessage('Fel lösenord', 'NFC-korten sparades inte, kontrollera ditt lösenord.');
+            } else if (error instanceof Error && error.message.startsWith('Error 409')) {
+                showGeneralDangerMessage('Kortet är redan registrerat', 'Ta bort det från den andra användaren först.');
+            } else {
+                showSaveFailedNotification('NFC-korten');
+            }
+        } finally {
+            // Removals may have succeeded even if adding the new card failed
+            mutate({ ...user, userCards: nextUserCards }, false);
+        }
     };
 
     // Delete user auth
@@ -337,28 +316,19 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                     <Modal.Title>Hantera NFC-kort</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div>
-                        <h6 className="mb-3">Registrerade kort</h6>
-                        <UserCardList cards={user.userCards ?? []} onRemoveCard={handleRemoveCard} />
-
-                        <hr className="my-4" />
-
-                        <h6 className="mb-3">Lägg till nytt kort</h6>
-                        <UserCardForm
-                            formId="editUserCardForm"
-                            handleSubmit={handleUserCardSubmit}
-                            userId={user.id}
-                            requirePasswordConfirmation={true}
-                            hasExistingCard={false}
-                        />
-                    </div>
+                    <UserCardForm
+                        formId="editUserCardForm"
+                        handleSubmit={handleUserCardSubmit}
+                        userId={user.id}
+                        cards={user.userCards ?? []}
+                    />
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowEditCardModal(false)}>
                         Stäng
                     </Button>
                     <Button variant="primary" form="editUserCardForm" type="submit">
-                        Lägg till kort
+                        Spara
                     </Button>
                 </Modal.Footer>
             </Modal>

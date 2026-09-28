@@ -7,6 +7,7 @@ import { NextApiRequest } from 'next';
 import { fetchUserAuthByHashedCardId, fetchUserAuthById } from './db-access/userAuth';
 import { IncomingMessage } from 'http';
 import { RequestWithSession } from './session';
+import { normalizeCardId } from './cardId';
 
 export const authenticate = async (username: string, password: string): Promise<UserAuthObjectionModel | null> => {
     const user = await fetchUserAuth(username.toLowerCase());
@@ -42,7 +43,7 @@ export const getHashedCardId = (cardId: string): string => {
         throw new Error('CARD_HASH_SECRET is not configured');
     }
 
-    return createHmac('sha256', secret).update(cardId.trim()).digest('hex');
+    return createHmac('sha256', secret).update(normalizeCardId(cardId)).digest('hex');
 };
 
 export const authenticateByCardId = async (cardId: string): Promise<UserAuthObjectionModel | null> => {
