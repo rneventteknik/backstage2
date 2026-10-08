@@ -34,11 +34,6 @@ const handler = withSessionContext(
             return;
         }
 
-        if (req.method !== 'POST' && req.method !== 'DELETE') {
-            respondWithInvalidMethodResponse(res);
-            return;
-        }
-
         const body = req.body.userCardRequest as UserCardRequest;
         const { cardId, existingPassword, cardName, removeCardIds } = body;
 
@@ -53,55 +48,66 @@ const handler = withSessionContext(
             return;
         }
 
-        // Handle DELETE requests for removing cards
-        if (req.method === 'DELETE') {
-            if (
-                !Array.isArray(removeCardIds) ||
-                removeCardIds.length === 0 ||
-                !removeCardIds.every((id) => Number.isInteger(id))
-            ) {
-                respondWithInvalidDataResponse(res);
-                return;
-            }
+        switch (req.method) {
+            case 'DELETE':
+                if (
+                    !Array.isArray(removeCardIds) ||
+                    removeCardIds.length === 0 ||
+                    !removeCardIds.every((id) => Number.isInteger(id))
+                ) {
+                    respondWithInvalidDataResponse(res);
+                    return;
+                }
 
-            const removedCount = await deleteUserCards(userId, removeCardIds);
+                const removedCount = await deleteUserCards(userId, removeCardIds);
 
-            if (removedCount === 0) {
-                respondWithEntityNotFoundResponse(res);
-                return;
-            }
+                if (removedCount === 0) {
+                    respondWithEntityNotFoundResponse(res);
+                    return;
+                }
 
-            res.status(200).json({ userId: userId, removedCount: removedCount });
-            return;
+                res.status(200).json({ userId: userId, removedCount: removedCount });
+
+                break;
+
+            case 'POST':
+                if (!cardId || !isValidCardId(cardId)) {
+                    respondWithInvalidDataResponse(res);
+                    return;
+                }
+
+                const hashedCardId = getHashedCardId(cardId);
+
+                // Card IDs are unique, so a card can only be registered to one user
+                if (await isUserCardRegistered(hashedCardId)) {
+                    res.status(409).json({ statusCode: 409, message: 'Card is already registered' });
+                    return;
+                }
+
+                // Create new user card
+                const newCard = new UserCardObjectionModel();
+                newCard.userId = userId;
+                newCard.cardName = cardName || 'NFC Kort';
+                newCard.hashedCardId = hashedCardId;
+
+                await insertUserCard(newCard)
+                    .then((result: UserCardObjectionModel) =>
+                        res
+                            .status(200)
+                            .json({
+                                userId: result.userId,
+                                cardId: result.id,
+                                cardName: result.cardName,
+                                cardAdded: true,
+                            }),
+                    )
+                    .catch((error: Error) => respondWithCustomErrorMessage(res, error.message));
+
+                break;
+
+            default:
+                respondWithInvalidMethodResponse(res);
         }
-
-        // Handle POST requests for adding cards
-        if (!cardId || !isValidCardId(cardId)) {
-            respondWithInvalidDataResponse(res);
-            return;
-        }
-
-        const hashedCardId = getHashedCardId(cardId);
-
-        // Card IDs are unique, so a card can only be registered to one user
-        if (await isUserCardRegistered(hashedCardId)) {
-            res.status(409).json({ statusCode: 409, message: 'Card is already registered' });
-            return;
-        }
-
-        // Create new user card
-        const newCard = new UserCardObjectionModel();
-        newCard.userId = userId;
-        newCard.cardName = cardName || 'NFC Kort';
-        newCard.hashedCardId = hashedCardId;
-
-        await insertUserCard(newCard)
-            .then((result: UserCardObjectionModel) =>
-                res
-                    .status(200)
-                    .json({ userId: result.userId, cardId: result.id, cardName: result.cardName, cardAdded: true }),
-            )
-            .catch((error: Error) => respondWithCustomErrorMessage(res, error.message));
     },
 );
 
