@@ -1,4 +1,5 @@
 import { UserAuthObjectionModel } from '../../models/objection-models/UserObjectionModel';
+import { UserCardObjectionModel } from '../../models/objection-models/UserCardObjectionModel';
 import { Role } from '../../models/enums/Role';
 import { ensureDatabaseIsInitialized } from '../database';
 import { isMemberOfEnum } from '../utils';
@@ -22,6 +23,40 @@ export const fetchUserAuthById = async (id: number): Promise<UserAuthObjectionMo
     return UserAuthObjectionModel.query().findById(id).withGraphFetched('user');
 };
 
+export const fetchUserAuthByHashedCardId = async (
+    hashedCardId: string,
+): Promise<UserAuthObjectionModel | undefined> => {
+    ensureDatabaseIsInitialized();
+
+    const userCard = await UserCardObjectionModel.query().where('hashedCardId', hashedCardId).first();
+
+    if (!userCard) {
+        return undefined;
+    }
+
+    return UserAuthObjectionModel.query().findById(userCard.userId).withGraphFetched('user');
+};
+export const isUserCardRegistered = async (hashedCardId: string): Promise<boolean> => {
+    ensureDatabaseIsInitialized();
+
+    return UserCardObjectionModel.query()
+        .where('hashedCardId', hashedCardId)
+        .first()
+        .then((card) => !!card);
+};
+
+export const insertUserCard = async (userCard: UserCardObjectionModel): Promise<UserCardObjectionModel> => {
+    ensureDatabaseIsInitialized();
+
+    return UserCardObjectionModel.query().insert(userCard);
+};
+
+// Only deletes cards belonging to the given user, so a card id from another user is ignored
+export const deleteUserCards = async (userId: number, cardIds: number[]): Promise<number> => {
+    ensureDatabaseIsInitialized();
+
+    return UserCardObjectionModel.query().delete().where('userId', userId).whereIn('id', cardIds);
+};
 export const updateUserAuth = async (id: number, user: UserAuthObjectionModel): Promise<UserAuthObjectionModel> => {
     ensureDatabaseIsInitialized();
 

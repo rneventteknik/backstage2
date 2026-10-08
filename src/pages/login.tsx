@@ -8,6 +8,9 @@ import { getGlobalSetting, getRoleName, getValueOrFirst } from '../lib/utils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import Head from 'next/head';
 import EnvironmentTypeTag from '../components/utils/EnvironmentTypeTag';
+import { GetServerSidePropsContext } from 'next';
+import { hasVerifiedClientCertificate } from '../lib/clientCertificate';
+import { isValidCardId } from '../lib/cardId';
 
 const containerStyle = {
     margin: 'auto',
@@ -17,24 +20,115 @@ const containerStyle = {
     padding: '2rem',
 };
 
-// Redirect to '/' if the user is already logged in
-// eslint-disable-next-line react-hooks/rules-of-hooks
-export const getServerSideProps = useUser(undefined, undefined, '/');
-type Props = { globalSettings: KeyValue[] };
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+    // 1. Check existing session (redirects to '/' if logged in)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const userCheck = await useUser(undefined, undefined, '/')(context);
 
-const LoginPage: React.FC<Props> = ({ globalSettings }) => {
+    if ('redirect' in userCheck) {
+        return userCheck;
+    }
+
+    const isMtlsValid = hasVerifiedClientCertificate(context.req);
+
+    return {
+        props: {
+            ...('props' in userCheck ? userCheck.props : {}),
+            initialMtlsValid: isMtlsValid,
+        },
+    };
+};
+
+// --- Hidden Auto-Focusing Input for USB Keyboard-Emulation Readers ---
+type CardReaderInputProps = {
+    onCardSubmit: (cardId: string) => void;
+    disabled?: boolean;
+};
+
+const CardReaderInput: React.FC<CardReaderInputProps> = ({ onCardSubmit, disabled }) => {
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [value, setValue] = useState('');
+
+    useEffect(() => {
+        const focusInput = () => {
+            if (inputRef.current && !disabled) {
+                inputRef.current.focus();
+            }
+        };
+
+        focusInput();
+        document.addEventListener('click', focusInput);
+
+        return () => {
+            document.removeEventListener('click', focusInput);
+        };
+    }, [disabled]);
+
+    const handleBlur = () => {
+        if (!disabled) {
+            setTimeout(() => {
+                inputRef.current?.focus();
+            }, 10);
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const trimmed = value.trim();
+            if (trimmed) {
+                onCardSubmit(trimmed);
+                setValue('');
+            }
+        }
+    };
+
+    return (
+        <input
+            ref={inputRef}
+            type="password"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={handleBlur}
+            onKeyDown={handleKeyDown}
+            disabled={disabled}
+            autoComplete="off"
+            aria-label="NFC Card Reader Input"
+            style={{
+                position: 'absolute',
+                opacity: 0,
+                top: '-9999px',
+                left: '-9999px',
+                width: '1px',
+                height: '1px',
+                pointerEvents: 'none',
+            }}
+        />
+    );
+};
+
+// --- Main Page Component ---
+type Props = {
+    globalSettings: KeyValue[];
+    initialMtlsValid: boolean;
+};
+
+const LoginPage: React.FC<Props> = ({ globalSettings, initialMtlsValid }) => {
+    const [authMethod, setAuthMethod] = useState<'NFC' | 'PASSWORD'>(initialMtlsValid ? 'NFC' : 'PASSWORD');
+
     const [showWrongPasswordError, setShowWrongPasswordError] = useState(false);
     const [showServerError, setShowServerError] = useState(false);
+    const [showUnreadableCardError, setShowUnreadableCardError] = useState(false);
     const [waitingForResponse, setWaitingForResponse] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
     const usernameFieldRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        if (usernameFieldRef && usernameFieldRef.current && usernameFieldRef.current.focus) {
+        if (authMethod === 'PASSWORD' && usernameFieldRef.current?.focus) {
             usernameFieldRef.current.focus();
         }
-    }, [usernameFieldRef]);
+    }, [authMethod]);
 
     const getRedirectUrl = () => {
         const url = getValueOrFirst(Router.query.redirectUrl);
@@ -46,18 +140,19 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
         return url;
     };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleLoginSubmit = async (url: string, body: Record<string, unknown>) => {
+        setWaitingForResponse(true);
+        setShowWrongPasswordError(false);
+        setShowServerError(false);
+        setShowUnreadableCardError(false);
 
-        const formData = new FormData(e.currentTarget);
-        const body = Object.fromEntries(['username', 'password'].map((key) => [key, formData.get(key)]));
         const request = {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
         };
 
-        fetch('/api/users/login', request)
+        fetch(url, request)
             .then((res) => {
                 if (res.status !== 200 && res.status !== 403) {
                     throw new Error(res.statusText);
@@ -82,9 +177,25 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                 setShowServerError(true);
                 setWaitingForResponse(false);
             });
+    };
 
-        setWaitingForResponse(true);
-        setShowWrongPasswordError(false);
+    const handleCardSubmit = (cardId: string) => {
+        // Partial or garbled reads are caught here instead of being sent to the server
+        if (!isValidCardId(cardId)) {
+            setShowWrongPasswordError(false);
+            setShowServerError(false);
+            setShowUnreadableCardError(true);
+            return;
+        }
+
+        handleLoginSubmit('/api/users/login/card', { cardId });
+    };
+
+    const handlePasswordSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const body = Object.fromEntries(['username', 'password'].map((key) => [key, formData.get(key)]));
+        handleLoginSubmit('/api/users/login', body);
     };
 
     return (
@@ -106,43 +217,104 @@ const LoginPage: React.FC<Props> = ({ globalSettings }) => {
                     <EnvironmentTypeTag globalSettings={globalSettings} />
                 </span>
             </h1>
-            <Form action="/api/users/login" method="post" onSubmit={handleSubmit}>
-                <FormGroup className="mb-3">
-                    <FormControl type="text" placeholder="Användarnamn" name="username" ref={usernameFieldRef} />
-                </FormGroup>
-                <FormGroup className="mb-3">
-                    <FormControl
-                        type={!showPassword ? 'password' : 'text'}
-                        placeholder="Lösenord"
-                        name="password"
-                        autoComplete="off"
-                    />
-                </FormGroup>
-                <FormGroup className="mb-3">
-                    <Form.Check
-                        type="switch"
-                        name="show password"
-                        id="showPasswordToggle"
-                        label="Visa lösenord"
-                        onChange={(e) => setShowPassword(e.target.checked)}
-                    />
-                </FormGroup>
-                {showWrongPasswordError ? <Alert variant="danger">Felaktigt användarnamn eller lösenord</Alert> : null}
-                {showServerError ? (
-                    <Alert variant="danger">
-                        <strong>Serverfel</strong> Det gick inte att logga in, försök igen senare.
-                    </Alert>
-                ) : null}
-                {waitingForResponse ? (
-                    <Button variant="outline-primary" type="submit" disabled>
-                        <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Loggar in...
+
+            {showWrongPasswordError ? (
+                <Alert variant="danger">
+                    {authMethod === 'NFC' ? 'Felaktigt eller okänt kort.' : 'Felaktigt användarnamn eller lösenord.'}
+                </Alert>
+            ) : null}
+
+            {showUnreadableCardError && authMethod === 'NFC' ? (
+                <Alert variant="warning" onClose={() => setShowUnreadableCardError(false)} dismissible>
+                    <Alert.Heading as="h6">Kortet kunde inte läsas</Alert.Heading>
+                    Håll kortet stilla mot läsaren och försök igen. Fungerar det fortfarande inte, logga in med
+                    användarnamn och lösenord.
+                </Alert>
+            ) : null}
+
+            {showServerError ? (
+                <Alert variant="danger">
+                    <strong>Serverfel</strong> Det gick inte att logga in, försök igen senare.
+                </Alert>
+            ) : null}
+
+            {/* CARD READER MODE */}
+            {authMethod === 'NFC' ? (
+                <div className="p-4 text-center border rounded position-relative">
+                    <CardReaderInput onCardSubmit={handleCardSubmit} disabled={waitingForResponse} />
+
+                    <h4>Blippa ditt Kort </h4>
+                    <p className="text-muted">Kortläsaren är redo. Blip ditt kort nu...</p>
+
+                    {waitingForResponse ? (
+                        <div className="d-flex align-items-center justify-content-center gap-2 text-primary mt-3">
+                            <Spinner animation="border" size="sm" />
+                            <span>Verifierar kort...</span>
+                        </div>
+                    ) : (
+                        <div className="text-success small fw-bold mt-2">Väntar på kort-indata</div>
+                    )}
+
+                    <hr className="my-4" />
+
+                    <Button
+                        variant="link"
+                        size="sm"
+                        onClick={() => setAuthMethod('PASSWORD')}
+                        className="text-decoration-none"
+                    >
+                        Använd användarnamn och lösenord istället
                     </Button>
-                ) : (
-                    <Button variant="outline-primary" type="submit">
-                        Logga in
-                    </Button>
-                )}
-            </Form>
+                </div>
+            ) : (
+                /* USERNAME / PASSWORD MODE */
+                <Form action="/api/users/login" method="post" onSubmit={handlePasswordSubmit}>
+                    <FormGroup className="mb-3">
+                        <FormControl type="text" placeholder="Användarnamn" name="username" ref={usernameFieldRef} />
+                    </FormGroup>
+                    <FormGroup className="mb-3">
+                        <FormControl
+                            type={!showPassword ? 'password' : 'text'}
+                            placeholder="Lösenord"
+                            name="password"
+                            autoComplete="off"
+                        />
+                    </FormGroup>
+                    <FormGroup className="mb-3">
+                        <Form.Check
+                            type="switch"
+                            name="show password"
+                            id="showPasswordToggle"
+                            label="Visa lösenord"
+                            onChange={(e) => setShowPassword(e.target.checked)}
+                        />
+                    </FormGroup>
+
+                    {waitingForResponse ? (
+                        <Button variant="outline-primary" type="submit" disabled className="w-100">
+                            <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> Loggar
+                            in...
+                        </Button>
+                    ) : (
+                        <Button variant="outline-primary" type="submit" className="w-100">
+                            Logga in
+                        </Button>
+                    )}
+
+                    {initialMtlsValid && (
+                        <div className="text-center mt-3">
+                            <Button
+                                variant="link"
+                                size="sm"
+                                onClick={() => setAuthMethod('NFC')}
+                                className="text-decoration-none"
+                            >
+                                Använd kortläsare istället
+                            </Button>
+                        </div>
+                    )}
+                </Form>
+            )}
         </div>
     );
 };

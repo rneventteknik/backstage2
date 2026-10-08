@@ -1,6 +1,7 @@
 import { Model, RelationMappingsThunk } from 'objection';
 import { BaseObjectionModelWithName, BookingObjectionModel } from '.';
 import { IBookingObjectionModel } from './BookingObjectionModel';
+import { UserCardObjectionModel, IUserCardObjectionModel } from './UserCardObjectionModel';
 
 export interface IUserObjectionModel extends BaseObjectionModelWithName {
     id?: number;
@@ -13,7 +14,7 @@ export interface IUserObjectionModel extends BaseObjectionModelWithName {
     slackId: string;
     emailAddress: string;
 
-    // The below properties contain personal information and are threrefore not included in all api endpoints.
+    // The below properties contain personal information and are therefore not included in all api endpoints.
     personalIdentityNumber?: string;
     bankName?: string;
     clearingNumber?: string;
@@ -22,6 +23,7 @@ export interface IUserObjectionModel extends BaseObjectionModelWithName {
 
     bookings?: IBookingObjectionModel[];
     userAuth?: IUserAuthObjectionModel;
+    userCards?: IUserCardObjectionModel[];
 }
 
 export class UserObjectionModel extends Model implements IUserObjectionModel {
@@ -43,6 +45,14 @@ export class UserObjectionModel extends Model implements IUserObjectionModel {
             join: {
                 from: 'User.id',
                 to: 'UserAuth.userId',
+            },
+        },
+        userCards: {
+            relation: Model.HasManyRelation,
+            modelClass: UserCardObjectionModel,
+            join: {
+                from: 'User.id',
+                to: 'UserCard.userId',
             },
         },
         coOwnerBookings: {
@@ -76,6 +86,7 @@ export class UserObjectionModel extends Model implements IUserObjectionModel {
 
     bookings?: BookingObjectionModel[];
     userAuth?: UserAuthObjectionModel;
+    userCards?: UserCardObjectionModel[];
 }
 
 export interface IUserAuthObjectionModel {
