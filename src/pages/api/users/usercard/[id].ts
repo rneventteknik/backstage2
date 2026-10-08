@@ -92,14 +92,12 @@ const handler = withSessionContext(
 
                 await insertUserCard(newCard)
                     .then((result: UserCardObjectionModel) =>
-                        res
-                            .status(200)
-                            .json({
-                                userId: result.userId,
-                                cardId: result.id,
-                                cardName: result.cardName,
-                                cardAdded: true,
-                            }),
+                        res.status(200).json({
+                            userId: result.userId,
+                            cardId: result.id,
+                            cardName: result.cardName,
+                            cardAdded: true,
+                        }),
                     )
                     .catch((error: Error) => respondWithCustomErrorMessage(res, error.message));
 
