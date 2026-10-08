@@ -43,7 +43,7 @@ export const getHashedCardId = (cardId: string): string => {
         throw new Error('CARD_HASH_SECRET is not configured');
     }
 
-    return createHmac('sha256', secret).update(normalizeCardId(cardId)).digest('hex');
+    return createHmac('sha512', secret).update(normalizeCardId(cardId)).digest('hex');
 };
 
 export const authenticateByCardId = async (cardId: string): Promise<UserAuthObjectionModel | null> => {
