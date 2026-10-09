@@ -195,12 +195,27 @@ Card login is only allowed from computers with a Cloudflare client certificate (
 1. Under SSL/TLS → Client Certificates, create a certificate for each card login computer and enable mTLS for the app's hostname
 2. Add a Transform Rule (Modify Request Header) matching all requests, which **sets** (not adds) these headers:
     - `x-origin-secret` = static value `CF_ORIGIN_SECRET`
-    - `x-client-cert-verified` = dynamic value `to_string(cf.tls_client_auth.cert_verified)`
 3. Add a WAF custom rule that blocks card login without a certificate:
     ```
     (http.request.uri.path eq "/api/users/login/card" and not cf.tls_client_auth.cert_verified)
     ```
 4. Optionally add a Rate Limiting rule for `/api/users/login*`
+
+### mTLS Certificate install intructions
+
+1. Generate cert at Cloudflare: SSL/TLS -> Client Certificates
+2. Export and save as .pem and .key
+3. Label certificate with location tag in Cloudflare
+4. Convert to .p12 format: `openssl pkcs12 -export -legacy -out cert.p12 -inkey keyfile.key -in certfile.pem` (Legacy flag required by MacOS)
+
+5. Install cert:
+
+- 5a. Windows: Double-click file, save in `Personal` keystore
+- 5b. Mac: Double-click file, save in `System` keychain, then set which apps are allowed to use cert
+- 5c. Linux: install cert in browser at chrome://certificate-manager/clientcerts
+
+6. Remove previous cert, if exists
+7. Check in browser at link above if new certificate is shown
 
 ## Version Control
 
