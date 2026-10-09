@@ -47,7 +47,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                 <div className={styles.search}>
                     <Search onFocus={() => setSearchActive(true)} onBlur={() => setSearchActive(false)} />
                 </div>
-                <Button className="d-none d-sm-block" variant="secondary" onClick={logOut}>
+                <Button className="d-none d-sm-block text-nowrap" variant="secondary" onClick={logOut}>
                     Logga ut
                 </Button>
                 <Dropdown>
