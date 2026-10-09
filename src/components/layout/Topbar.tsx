@@ -69,7 +69,9 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                         </Link>
                         <Dropdown.Item onClick={() => setShowHelpModal(true)}>Hjälp</Dropdown.Item>
                         <Dropdown.Divider className="d-sm-none" />
-                        <Dropdown.Item className="d-sm-none" onClick={logOut}>Logga ut</Dropdown.Item>
+                        <Dropdown.Item className="d-sm-none" onClick={logOut}>
+                            Logga ut
+                        </Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </Navbar>
