@@ -5,9 +5,10 @@ import { IncomingMessage } from 'http';
 // Heroku app is also reachable directly (bypassing Cloudflare), that header is only trusted when the request
 // also carries the origin secret, which is set by the same Transform Rule.
 const originSecretHeader = 'x-origin-secret';
-const clientCertVerifiedHeader = 'x-client-cert-verified';
+const clientCertVerifiedHeader = 'cf-cert-verified';
 
 const getHeader = (req: IncomingMessage, name: string): string | undefined => {
+    console.log(req.headers);
     const value = req.headers[name];
     return Array.isArray(value) ? value[0] : value;
 };
@@ -33,5 +34,5 @@ export const hasVerifiedClientCertificate = (req: IncomingMessage): boolean => {
         return true;
     }
 
-    return isFromCloudflare(req) && getHeader(req, clientCertVerifiedHeader) === 'true';
+    return isFromCloudflare(req) && getHeader(req, clientCertVerifiedHeader) == 'true';
 };
