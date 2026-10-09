@@ -47,7 +47,7 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                 <div className={styles.search}>
                     <Search onFocus={() => setSearchActive(true)} onBlur={() => setSearchActive(false)} />
                 </div>
-                <Button className="d-block d-md-none" variant="none" onClick={logOut}>
+                <Button className="d-none d-sm-block" variant="none" onClick={logOut}>
                     Logga ut
                 </Button>
                 <Dropdown>
@@ -68,8 +68,8 @@ const Topbar: React.FC<Props> = ({ currentUser, globalSettings, toggleSidebar }:
                             </Dropdown.Item>
                         </Link>
                         <Dropdown.Item onClick={() => setShowHelpModal(true)}>Hjälp</Dropdown.Item>
-                        <Dropdown.Divider className="d-none d-md-block" />
-                        <Dropdown.Item className="d-none d-md-block" onClick={logOut}>Logga ut</Dropdown.Item>
+                        <Dropdown.Divider className="d-sm-none" />
+                        <Dropdown.Item className="d-sm-none" onClick={logOut}>Logga ut</Dropdown.Item>
                     </Dropdown.Menu>
                 </Dropdown>
             </Navbar>
