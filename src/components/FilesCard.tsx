@@ -120,7 +120,7 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
         fetch(url)
             .then((response) => getResponseContentOrError<FilesResult[]>(response))
             .then((list) =>
-                list.map((x) => ({
+                list.map(useShortcutDest).map((x) => ({
                     ...x,
                     date: x.modifiedTime ? new Date(x.modifiedTime) : null,
                     sortIndex: x.modifiedTime ? -new Date(x.modifiedTime).getTime() : 0,
@@ -171,6 +171,21 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
             ) : null}
         </ListGroup>
     );
+};
+
+const useShortcutDest = (x: FilesResult): FilesResult => {
+    if (x.mimeType != 'application/vnd.google-apps.shortcut' || !x.shortcutDetails?.targetId) {
+        return x;
+    }
+    let link = `https://drive.google.com/open?id=${x.shortcutDetails.targetId}`;
+    if (x.shortcutDetails.targetResourceKey) {
+        link += `&resourcekey=${x.shortcutDetails.targetResourceKey}`;
+    }
+    return {
+        ...x,
+        link,
+        mimeType: x.shortcutDetails.targetMimeType,
+    };
 };
 
 const getIcon = (mimeType: string | undefined) => {
