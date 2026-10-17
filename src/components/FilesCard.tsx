@@ -11,11 +11,16 @@ import {
     faExternalLinkAlt,
     faFile,
     faFileExcel,
+    faFileCsv,
+    faFilePowerpoint,
+    faFileContract,
     faFileImage,
     faFileLines,
     faFilePdf,
     faFileWaveform,
+    faFileVideo,
     faFolder,
+    faFileZipper,
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -144,6 +149,9 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
         return <Skeleton height={150} className="mb-3" />;
     }
 
+    console.log(list.map((thing) => [thing.name, thing.mimeType]));
+    console.log(list);
+
     // Files list
     //
     return (
@@ -170,20 +178,64 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
 
 const getIcon = (mimeType: string | undefined) => {
     switch (mimeType) {
+        // Folder
         case 'application/vnd.google-apps.folder':
             return faFolder;
+
+        // Document
         case 'application/vnd.google-apps.document':
+        case 'application/msword':
+        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
             return faFileLines;
+
+        // Spreadsheet
         case 'application/vnd.google-apps.spreadsheet':
+        case 'application/vnd.ms-excel':
+        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
             return faFileExcel;
+        case 'text/csv':
+            return faFileCsv;
+
+        // Slides
+        case 'application/vnd.google-apps.presentation':
+        case 'application/vnd.ms-powerpoint':
+        case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+            return faFilePowerpoint;
+
+        // Pdf
         case 'application/pdf':
             return faFilePdf;
+
+        // Image
         case 'image/png':
-            return faFileImage;
         case 'image/jpeg':
+        case 'image/svg+xml':
+        case 'application/postscript':
             return faFileImage;
+
+        // Audio
         case 'audio/mpeg':
+        case 'audio/wav':
+        case 'audio/mid':
             return faFileWaveform;
+
+        // Video
+        case 'video/mp4':
+        case 'video/quicktime':
+        case 'video/avi':
+        case 'video/matroska':
+        case 'application/vnd.google-apps.vid':
+            return faFileVideo;
+
+        // Form
+        case 'application/vnd.google-apps.form':
+            return faFileContract;
+
+        // Zip
+        case 'application/zip':
+        case 'application/x-zip-compressed':
+            return faFileZipper;
+
         default:
             return faFile;
     }
