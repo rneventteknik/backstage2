@@ -24,7 +24,7 @@ import {
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { getSortedList } from '../lib/sortIndexUtils';
+import { nameCollator } from '../lib/sortIndexUtils';
 import TableStyleLink from './utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import { useNotifications } from '../lib/useNotifications';
@@ -120,14 +120,15 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
         fetch(url)
             .then((response) => getResponseContentOrError<FilesResult[]>(response))
             .then((list) =>
-                list.map(useShortcutDest).map((x) => ({
-                    ...x,
-                    date: x.modifiedTime ? new Date(x.modifiedTime) : null,
-                    sortIndex: x.modifiedTime ? -new Date(x.modifiedTime).getTime() : 0,
-                    displayDate: x.modifiedTime ? formatDatetimeForForm(new Date(x.modifiedTime)) : '-',
-                })),
-            )
-            .then((list) => getSortedList(list)),
+                list
+                    .map(useShortcutDest)
+                    .sort(fileSortFn)
+                    .map((x) => ({
+                        ...x,
+                        date: x.modifiedTime ? new Date(x.modifiedTime) : null,
+                        displayDate: x.modifiedTime ? formatDatetimeForForm(new Date(x.modifiedTime)) : '-',
+                    })),
+            ),
     );
 
     // Error handling
@@ -186,6 +187,42 @@ const useShortcutDest = (x: FilesResult): FilesResult => {
         link,
         mimeType: x.shortcutDetails.targetMimeType,
     };
+};
+
+const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder';
+
+const fileSortFn = (a: FilesResult, b: FilesResult) => {
+    let aUndefined = !a.mimeType || !a.name;
+    let bUndefined = !b.mimeType || !b.name;
+
+    // Undefined files get put last!!!
+    if (!aUndefined && bUndefined) {
+        return -1;
+    }
+    if (aUndefined && !bUndefined) {
+        return 1;
+    }
+    if (aUndefined && bUndefined) {
+        // Both undefined, then compare IDs
+        if ((a.id ?? '') < (b.id ?? '')) {
+            return -1;
+        }
+        if ((a.id ?? '') > (b.id ?? '')) {
+            return 1;
+        }
+        return 0;
+    }
+
+    // Folders get put first
+    if (a.mimeType == FOLDER_MIME_TYPE && b.mimeType != FOLDER_MIME_TYPE) {
+        return -1;
+    }
+    if (a.mimeType != FOLDER_MIME_TYPE && b.mimeType == FOLDER_MIME_TYPE) {
+        return 1;
+    }
+
+    // Otherwise do alphabetical ordering
+    return nameCollator.compare(a.name!, b.name!);
 };
 
 const getIcon = (mimeType: string | undefined) => {

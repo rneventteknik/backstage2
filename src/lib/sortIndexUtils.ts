@@ -28,7 +28,7 @@ export const nameSortFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
     return idSortFn(a, b);
 };
 
-const nameCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+export const nameCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
 
 // Function to sort entities by name, but with a collator making stuff like [name3_a, name10_a] sort correctly.
 export const nameSortCollateFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
