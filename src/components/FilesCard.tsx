@@ -10,15 +10,15 @@ import {
     faExclamationCircle,
     faExternalLinkAlt,
     faFile,
-    faFileExcel,
+    faTable,
     faFileCsv,
-    faFilePowerpoint,
-    faFileContract,
-    faFileImage,
+    faWindowRestore,
+    faTableList,
+    faImage,
     faFileLines,
     faFilePdf,
-    faFileWaveform,
-    faFileVideo,
+    faHeadphones,
+    faClapperboard,
     faFolder,
     faFileZipper,
     faPlus,
@@ -241,7 +241,7 @@ const getIcon = (mimeType: string | undefined) => {
         case 'application/vnd.google-apps.spreadsheet':
         case 'application/vnd.ms-excel':
         case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
-            return faFileExcel;
+            return faTable;
         case 'text/csv':
             return faFileCsv;
 
@@ -249,7 +249,7 @@ const getIcon = (mimeType: string | undefined) => {
         case 'application/vnd.google-apps.presentation':
         case 'application/vnd.ms-powerpoint':
         case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
-            return faFilePowerpoint;
+            return faWindowRestore;
 
         // Pdf
         case 'application/pdf':
@@ -261,13 +261,13 @@ const getIcon = (mimeType: string | undefined) => {
         case 'image/svg+xml':
         case 'application/vnd.google-apps.drawing':
         case 'application/postscript':
-            return faFileImage;
+            return faImage;
 
         // Audio
         case 'audio/mpeg':
         case 'audio/wav':
         case 'audio/mid':
-            return faFileWaveform;
+            return faHeadphones;
 
         // Video
         case 'video/mp4':
@@ -275,11 +275,11 @@ const getIcon = (mimeType: string | undefined) => {
         case 'video/avi':
         case 'video/matroska':
         case 'application/vnd.google-apps.vid':
-            return faFileVideo;
+            return faClapperboard;
 
         // Form
         case 'application/vnd.google-apps.form':
-            return faFileContract;
+            return faTableList;
 
         // Zip
         case 'application/zip':
