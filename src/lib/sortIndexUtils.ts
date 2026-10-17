@@ -28,6 +28,21 @@ export const nameSortFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
     return idSortFn(a, b);
 };
 
+const nameCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
+// Function to sort entities by name, but with a collator making stuff like [name3_a, name10_a] sort correctly.
+export const nameSortCollateFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
+    let comparison = nameCollator.compare(a.name ?? '', b.name ?? '');
+    if (comparison < 0) {
+        return -1;
+    }
+    if (comparison > 0) {
+        return 1;
+    }
+    // Use id for sorting as fallback if the nameCollator returns 0
+    return idSortFn(a, b);
+};
+
 export interface HasSortIndex {
     sortIndex: number;
 }
