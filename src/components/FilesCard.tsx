@@ -149,9 +149,6 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
         return <Skeleton height={150} className="mb-3" />;
     }
 
-    console.log(list.map((thing) => [thing.name, thing.mimeType]));
-    console.log(list);
-
     // Files list
     //
     return (
@@ -210,6 +207,7 @@ const getIcon = (mimeType: string | undefined) => {
         case 'image/png':
         case 'image/jpeg':
         case 'image/svg+xml':
+        case 'application/vnd.google-apps.drawing':
         case 'application/postscript':
             return faFileImage;
 
