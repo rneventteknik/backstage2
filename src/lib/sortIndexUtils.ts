@@ -1,5 +1,32 @@
-import { HasId, HasStringId } from '../models/interfaces/BaseEntity';
+import { BaseEntity, BaseEntityWithName, HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import { updateItemsInArrayById } from './utils';
+
+// Function to sort entities by created date
+
+export const createdSortFn = (a: BaseEntity, b: BaseEntity) => {
+    if ((a.created ?? 0) < (b.created ?? 0)) {
+        return 1;
+    }
+    if ((a.created ?? 0) > (b.created ?? 0)) {
+        return -1;
+    }
+
+    // Use id for sorting as a fallback
+    return idSortFn(a, b);
+};
+// Function to sort entities by name
+
+export const nameSortFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
+    if ((a.name ?? '') < (b.name ?? '')) {
+        return -1;
+    }
+    if ((a.name ?? '') > (b.name ?? '')) {
+        return 1;
+    }
+
+    // Use id for sorting as a fallback
+    return idSortFn(a, b);
+};
 
 export interface HasSortIndex {
     sortIndex: number;

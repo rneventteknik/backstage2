@@ -1,7 +1,8 @@
 import React, { FormEvent } from 'react';
 import { Modal, Col, Form, Row, InputGroup, Button } from 'react-bootstrap';
 import { usersFetcher } from '../../../lib/fetchers';
-import { getMemberStatusName, nameSortFn, toIntOrUndefined } from '../../../lib/utils';
+import { getMemberStatusName, toIntOrUndefined } from '../../../lib/utils';
+import { nameSortFn } from '../../../lib/sortIndexUtils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import useSwr from 'swr';
 import RequiredIndicator from '../../utils/RequiredIndicator';

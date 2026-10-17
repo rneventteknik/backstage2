@@ -8,13 +8,13 @@ import useSwr from 'swr';
 import TinyBookingTable from '../components/TinyBookingTable';
 import { bookingsFetcher } from '../lib/fetchers';
 import {
-    createdSortFn,
     IsBookingDraftOrBooked,
     IsBookingOut,
     IsBookingUpcomingRental,
     IsNotInternalReservation,
     onlyUniqueById,
 } from '../lib/utils';
+import { createdSortFn } from '../lib/sortIndexUtils';
 import { formatDatetime, toBookingViewModel } from '../lib/datetimeUtils';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

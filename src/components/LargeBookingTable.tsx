@@ -6,7 +6,6 @@ import {
     countNotNullorEmpty,
     getStatusColor,
     getStatusName,
-    nameSortFn,
     notEmpty,
     onlyUnique,
     onlyUniqueById,
@@ -15,6 +14,7 @@ import {
     getPricePlanName,
     getAccountKindName,
 } from '../lib/utils';
+import { nameSortFn } from '../lib/sortIndexUtils';
 import { Typeahead } from 'react-bootstrap-typeahead';
 import { Col, Form, Row } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
