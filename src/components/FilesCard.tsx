@@ -121,7 +121,7 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
             .then((response) => getResponseContentOrError<FilesResult[]>(response))
             .then((list) =>
                 list
-                    .map(useShortcutDest)
+                    .map(getShortcutDest)
                     .sort(fileSortFn)
                     .map((x) => ({
                         ...x,
@@ -174,17 +174,16 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
     );
 };
 
-const useShortcutDest = (x: FilesResult): FilesResult => {
+/** Replace shortcuts with the mimetype of the shortcut destination, and fixes the link so it redirects to the target of the shortcut. */
+const getShortcutDest = (x: FilesResult): FilesResult => {
     if (x.mimeType != 'application/vnd.google-apps.shortcut' || !x.shortcutDetails?.targetId) {
         return x;
     }
-    let link = `https://drive.google.com/open?id=${x.shortcutDetails.targetId}`;
-    if (x.shortcutDetails.targetResourceKey) {
-        link += `&resourcekey=${x.shortcutDetails.targetResourceKey}`;
-    }
     return {
         ...x,
-        link,
+        link: x.shortcutDetails.targetResourceKey
+            ? `https://drive.google.com/open?id=${x.shortcutDetails.targetId}&resourcekey=${x.shortcutDetails.targetResourceKey}`
+            : `https://drive.google.com/open?id=${x.shortcutDetails.targetId}`,
         mimeType: x.shortcutDetails.targetMimeType,
     };
 };
