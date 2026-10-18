@@ -11,7 +11,7 @@ import { useTextResources } from '../useTextResources';
 import { TotalPriceSection } from './shared/totalPriceSection';
 import { EquipmentListInfo } from './shared/equipmentListInfo';
 import { TimeEstimateListInfo } from './shared/timeEstimateListInfo';
-import { getSortedList } from '../../lib/sortIndexUtils';
+import { getSortedList } from '../../lib/sortUtils';
 import { KeyValue } from '../../models/interfaces/KeyValue';
 
 type Props = {

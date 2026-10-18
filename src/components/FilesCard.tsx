@@ -24,7 +24,7 @@ import {
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { nameCollator } from '../lib/sortIndexUtils';
+import { nameCollator } from '../lib/sortUtils';
 import TableStyleLink from './utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import { useNotifications } from '../lib/useNotifications';

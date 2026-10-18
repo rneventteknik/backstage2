@@ -21,7 +21,7 @@ import { useTextResources } from '../../useTextResources';
 import { getNumberOfDays } from '../../../lib/datetimeUtils';
 import { Booking } from '../../../models/interfaces';
 import { EquipmentListDateInfo } from './equipmentListDateInfo';
-import { getSortedList } from '../../../lib/sortIndexUtils';
+import { getSortedList } from '../../../lib/sortUtils';
 import currency from 'currency.js';
 import { EquipmentListDiscountInfo } from './equipmentListDiscountInfo';
 

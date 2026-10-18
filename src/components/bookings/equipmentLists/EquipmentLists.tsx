@@ -20,7 +20,7 @@ import {
     isLast,
     moveItemDown,
     moveItemUp,
-} from '../../../lib/sortIndexUtils';
+} from '../../../lib/sortUtils';
 import EquipmentListDisplay from './EquipmentList';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import { getDefaultEquipmentListName } from '../../../lib/equipmentListUtils';

@@ -14,7 +14,7 @@ import {
     replaceEmptyStringWithNull,
     toIntOrUndefined,
 } from '../../lib/utils';
-import { nameSortFn } from '../../lib/sortIndexUtils';
+import { nameSortFn } from '../../lib/sortUtils';
 import useSwr from 'swr';
 import { BookingType } from '../../models/enums/BookingType';
 import ActivityIndicator from '../utils/ActivityIndicator';

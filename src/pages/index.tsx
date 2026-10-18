@@ -14,7 +14,7 @@ import {
     IsNotInternalReservation,
     onlyUniqueById,
 } from '../lib/utils';
-import { createdSortFn } from '../lib/sortIndexUtils';
+import { createdSortFn } from '../lib/sortUtils';
 import { formatDatetime, toBookingViewModel } from '../lib/datetimeUtils';
 import { faAdd } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';

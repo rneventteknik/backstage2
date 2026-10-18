@@ -11,7 +11,7 @@ import PricesEditor from './PricesEditor';
 import { toEquipmentPriceObjectionModel } from '../../lib/mappers/equipment';
 import { toIntOrUndefined } from '../../lib/utils';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
-import { getSortedList } from '../../lib/sortIndexUtils';
+import { getSortedList } from '../../lib/sortUtils';
 
 type Props = {
     handleSubmitEquipment: (

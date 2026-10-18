@@ -5,7 +5,7 @@ import { getTimeEstimatePrice, getTotalTimeEstimatesPrice, addVAT, formatCurrenc
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { useTextResources } from '../../useTextResources';
 import { Booking } from '../../../models/interfaces';
-import { getSortedList } from '../../../lib/sortIndexUtils';
+import { getSortedList } from '../../../lib/sortUtils';
 
 const styles = StyleSheet.create({
     ...commonStyles,

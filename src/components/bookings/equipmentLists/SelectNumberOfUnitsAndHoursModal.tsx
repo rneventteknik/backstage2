@@ -11,7 +11,7 @@ import TableStyleLink from '../../utils/TableStyleLink';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
 import { getDefaultSelectedPrice } from '../../../lib/equipmentListUtils';
-import { idSortFn } from '../../../lib/sortIndexUtils';
+import { idSortFn } from '../../../lib/sortUtils';
 
 type Props = {
     show: boolean;

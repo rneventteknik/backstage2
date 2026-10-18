@@ -10,7 +10,7 @@ import { Footer } from './shared/footer';
 import { useTextResources } from '../useTextResources';
 import { EquipmentListPackingInfo } from './shared/equipmentListPackingInfo';
 import { KeyValue } from '../../models/interfaces/KeyValue';
-import { getSortedList } from '../../lib/sortIndexUtils';
+import { getSortedList } from '../../lib/sortUtils';
 
 type Props = {
     booking: Booking;

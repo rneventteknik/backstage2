@@ -8,7 +8,7 @@ import { Header } from './shared/header';
 import { MainContent } from './shared/mainContent';
 import { Footer } from './shared/footer';
 import { useTextResources } from '../useTextResources';
-import { getSortedList } from '../../lib/sortIndexUtils';
+import { getSortedList } from '../../lib/sortUtils';
 import { EquipmentListInfo } from './shared/equipmentListInfo';
 import { TimeEstimateListInfo } from './shared/timeEstimateListInfo';
 import { TotalPriceSection } from './shared/totalPriceSection';

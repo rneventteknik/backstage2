@@ -15,7 +15,7 @@ import { BookingViewModel, TimeReport } from '../../../models/interfaces';
 import TableStyleLink from '../../../components/utils/TableStyleLink';
 import { getBookingDateHeadingValue, getFormattedInterval, toBookingViewModel } from '../../../lib/datetimeUtils';
 import { getGlobalSetting, groupBy } from '../../../lib/utils';
-import { getSortedList } from '../../../lib/sortIndexUtils';
+import { getSortedList } from '../../../lib/sortUtils';
 import { formatCurrency, formatNumberAsCurrency, getSalaryForTimeReport } from '../../../lib/pricingUtils';
 import { SalaryStatus } from '../../../models/enums/SalaryStatus';
 import TimeReportHourDisplay from '../../../components/utils/TimeReportHourDisplay';

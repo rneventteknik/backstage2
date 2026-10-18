@@ -18,7 +18,7 @@ import {
     moveItemToItem,
     moveItemAfterItem,
     sortIndexSortFn,
-} from '../../lib/sortIndexUtils';
+} from '../../lib/sortUtils';
 import { getPricePlanName, getResponseContentOrError, toIntOrUndefined, updateItemsInArrayById } from '../../lib/utils';
 import { formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
 import { PricePlan } from '../../models/enums/PricePlan';

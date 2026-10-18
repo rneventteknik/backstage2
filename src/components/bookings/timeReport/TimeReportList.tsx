@@ -34,7 +34,7 @@ import {
     moveItemAfterItem,
     moveItemUp,
     sortIndexSortFn,
-} from '../../../lib/sortIndexUtils';
+} from '../../../lib/sortUtils';
 import { formatDateForForm, formatDatetime, toBookingViewModel } from '../../../lib/datetimeUtils';
 import TimeReportAddButton from './TimeReportAddButton';
 import TimeReportModal from './TimeReportModal';

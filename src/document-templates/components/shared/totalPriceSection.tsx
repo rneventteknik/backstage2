@@ -12,7 +12,7 @@ import {
 import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { Booking } from '../../../models/interfaces';
 import { useTextResources } from '../../useTextResources';
-import { getSortedList } from '../../../lib/sortIndexUtils';
+import { getSortedList } from '../../../lib/sortUtils';
 
 const styles = StyleSheet.create({
     ...commonStyles,

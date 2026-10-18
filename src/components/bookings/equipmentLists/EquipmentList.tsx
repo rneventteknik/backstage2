@@ -21,7 +21,7 @@ import { useNotifications } from '../../../lib/useNotifications';
 import Skeleton from 'react-loading-skeleton';
 import { formatPrice, formatTHSPrice } from '../../../lib/pricingUtils';
 import { PricePlan } from '../../../models/enums/PricePlan';
-import { getNextSortIndex } from '../../../lib/sortIndexUtils';
+import { getNextSortIndex } from '../../../lib/sortUtils';
 import EditEquipmentListEntryModal from './EditEquipmentListEntryModal';
 import {
     addTimeEstimateApiCall,
