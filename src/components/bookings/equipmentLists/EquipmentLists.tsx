@@ -13,14 +13,7 @@ import {
 import { toEquipmentList } from '../../../lib/mappers/booking';
 import { useNotifications } from '../../../lib/useNotifications';
 import Skeleton from 'react-loading-skeleton';
-import {
-    getNextSortIndex,
-    getSortedList,
-    isFirst,
-    isLast,
-    moveItemDown,
-    moveItemUp,
-} from '../../../lib/sortUtils';
+import { getNextSortIndex, getSortedList, isFirst, isLast, moveItemDown, moveItemUp } from '../../../lib/sortUtils';
 import EquipmentListDisplay from './EquipmentList';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import { getDefaultEquipmentListName } from '../../../lib/equipmentListUtils';
