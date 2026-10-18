@@ -32,7 +32,7 @@ export const nameCollator = new Intl.Collator(undefined, { numeric: true, sensit
 
 // Function to sort entities by name, but with a collator making stuff like [name3_a, name10_a] sort correctly.
 export const nameSortCollateFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
-    let comparison = nameCollator.compare(a.name ?? '', b.name ?? '');
+    const comparison = nameCollator.compare(a.name ?? '', b.name ?? '');
     if (comparison < 0) {
         return -1;
     }
