@@ -192,8 +192,8 @@ const useShortcutDest = (x: FilesResult): FilesResult => {
 const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder';
 
 const fileSortFn = (a: FilesResult, b: FilesResult) => {
-    let aUndefined = !a.mimeType || !a.name;
-    let bUndefined = !b.mimeType || !b.name;
+    const aUndefined = !a.mimeType || !a.name;
+    const bUndefined = !b.mimeType || !b.name;
 
     // Undefined files get put last!!!
     if (!aUndefined && bUndefined) {
