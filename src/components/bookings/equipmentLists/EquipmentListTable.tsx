@@ -41,7 +41,7 @@ import {
     moveItemToItem,
     moveItemAfterItem,
     sortIndexSortFn,
-} from '../../../lib/sortIndexUtils';
+} from '../../../lib/sortUtils';
 import EquipmentListEntryConflictStatus from './EquipmentListEntryConflictStatus';
 import { getEquipmentInDatetime, getEquipmentOutDatetime, getNumberOfDays } from '../../../lib/datetimeUtils';
 import { Language } from '../../../models/enums/Language';

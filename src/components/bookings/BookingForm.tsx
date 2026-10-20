@@ -11,10 +11,10 @@ import {
     getPricePlanName,
     getSalaryStatusName,
     getStatusName,
-    nameSortFn,
     replaceEmptyStringWithNull,
     toIntOrUndefined,
 } from '../../lib/utils';
+import { nameSortFn } from '../../lib/sortUtils';
 import useSwr from 'swr';
 import { BookingType } from '../../models/enums/BookingType';
 import ActivityIndicator from '../utils/ActivityIndicator';

@@ -15,7 +15,7 @@ import {
     toEquipmentListObjectionModel,
 } from './mappers/booking';
 import { getResponseContentOrError } from './utils';
-import { getNextSortIndex, moveItemUp, moveItemDown, getSortedList } from './sortIndexUtils';
+import { getNextSortIndex, moveItemUp, moveItemDown, getSortedList } from './sortUtils';
 import { ITimeEstimateObjectionModel, ITimeReportObjectionModel } from '../models/objection-models';
 import { toTimeEstimate } from './mappers/timeEstimate';
 import { EquipmentPackageEntry } from '../models/interfaces/EquipmentPackage';

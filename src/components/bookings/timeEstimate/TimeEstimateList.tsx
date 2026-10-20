@@ -31,7 +31,7 @@ import {
     moveItemAfterItem,
     moveItemUp,
     sortIndexSortFn,
-} from '../../../lib/sortIndexUtils';
+} from '../../../lib/sortUtils';
 import TimeEstimateAddButton from './TimeEstimateAddButton';
 import TimeEstimateModal from './TimeEstimateModal';
 import currency from 'currency.js';

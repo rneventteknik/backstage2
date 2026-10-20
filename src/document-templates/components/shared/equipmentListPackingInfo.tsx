@@ -6,7 +6,7 @@ import { TableRow, TableCellAutoWidth, TableCellFixedWidth } from './utils';
 import { groupBy, onlyUniqueById } from '../../../lib/utils';
 import { useTextResources } from '../../useTextResources';
 import { EquipmentLocation } from '../../../models/interfaces/EquipmentLocation';
-import { getSortedList } from '../../../lib/sortIndexUtils';
+import { getSortedList } from '../../../lib/sortUtils';
 import { Booking } from '../../../models/interfaces';
 import { EquipmentListDateInfo } from './equipmentListDateInfo';
 

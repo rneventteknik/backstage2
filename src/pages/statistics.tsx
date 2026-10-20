@@ -21,7 +21,7 @@ import { TableConfiguration, TableDisplay } from '../components/TableDisplay';
 import { BookingViewModel } from '../models/interfaces';
 import { getPrice, formatNumberAsCurrency, getBookingPrice } from '../lib/pricingUtils';
 import { PricePlan } from '../models/enums/PricePlan';
-import { getSortedList } from '../lib/sortIndexUtils';
+import { getSortedList } from '../lib/sortUtils';
 import { Status } from '../models/enums/Status';
 import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';

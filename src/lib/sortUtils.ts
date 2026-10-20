@@ -1,5 +1,47 @@
-import { HasId, HasStringId } from '../models/interfaces/BaseEntity';
+import { BaseEntity, BaseEntityWithName, HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import { updateItemsInArrayById } from './utils';
+
+// Function to sort entities by created date
+
+export const createdSortFn = (a: BaseEntity, b: BaseEntity) => {
+    if ((a.created ?? 0) < (b.created ?? 0)) {
+        return 1;
+    }
+    if ((a.created ?? 0) > (b.created ?? 0)) {
+        return -1;
+    }
+
+    // Use id for sorting as a fallback
+    return idSortFn(a, b);
+};
+// Function to sort entities by name
+
+export const nameSortFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
+    if ((a.name ?? '') < (b.name ?? '')) {
+        return -1;
+    }
+    if ((a.name ?? '') > (b.name ?? '')) {
+        return 1;
+    }
+
+    // Use id for sorting as a fallback
+    return idSortFn(a, b);
+};
+
+export const nameCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' });
+
+// Function to sort entities by name, but with a collator making stuff like [name3_a, name10_a] sort correctly.
+export const nameSortCollateFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
+    const comparison = nameCollator.compare(a.name ?? '', b.name ?? '');
+    if (comparison < 0) {
+        return -1;
+    }
+    if (comparison > 0) {
+        return 1;
+    }
+    // Use id for sorting as fallback if the nameCollator returns 0
+    return idSortFn(a, b);
+};
 
 export interface HasSortIndex {
     sortIndex: number;

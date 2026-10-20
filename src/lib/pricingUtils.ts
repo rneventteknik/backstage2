@@ -7,7 +7,7 @@ import { SalaryGroup } from '../models/interfaces/SalaryGroup';
 import { InvoiceCustomer, InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../models/misc/Invoice';
 import { SalaryReport, UserSalaryReport } from '../models/misc/Salary';
 import { formatDateForForm, getBookingDateDisplayValues, getNumberOfDays } from './datetimeUtils';
-import { getSortedList } from './sortIndexUtils';
+import { getSortedList } from './sortUtils';
 import { getTotalNumberOfHoursReported, groupBy } from './utils';
 import currency from 'currency.js';
 

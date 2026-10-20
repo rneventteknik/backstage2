@@ -10,7 +10,7 @@ import ConfirmModal from '../utils/ConfirmModal';
 import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { formatDatetimeForForm } from '../../lib/datetimeUtils';
-import { HasSortIndex, sortIndexSortFn } from '../../lib/sortIndexUtils';
+import { HasSortIndex, sortIndexSortFn } from '../../lib/sortUtils';
 
 type Props<T extends BaseEntityWithName> = {
     fetcher: (s: string) => Promise<T[]>;
