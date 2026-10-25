@@ -15,7 +15,7 @@ import {
     getAccountKindName,
 } from '../lib/utils';
 import { nameSortFn } from '../lib/sortUtils';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { TypedTypeahead } from './utils/TypedTypeahead';
 import { Col, Form, Row } from 'react-bootstrap';
 import { Status } from '../models/enums/Status';
 import TableStyleLink from '../components/utils/TableStyleLink';
@@ -225,12 +225,12 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         <Col md="4">
                             <Form.Group>
                                 <Form.Label>Status</Form.Label>
-                                <Typeahead
+                                <TypedTypeahead
                                     id="status-typeahead"
                                     multiple
                                     labelKey="label"
                                     options={statusOptions}
-                                    onChange={(e) => setStatuses((e as typeof statusOptions).map((o) => o.value))}
+                                    onChange={(e) => setStatuses(e.map((o) => o.value))}
                                     placeholder="Filtrera på status"
                                     selected={statuses
                                         .map((id) => statusOptions.find((x) => x.value === id))
@@ -241,12 +241,12 @@ const LargeBookingTable: React.FC<Props> = ({ bookings, tableSettingsOverride, s
                         <Col md="4">
                             <Form.Group>
                                 <Form.Label>Ansvarig</Form.Label>
-                                <Typeahead
+                                <TypedTypeahead
                                     id="user-typeahead"
                                     multiple
                                     labelKey="label"
                                     options={ownerUserOptions}
-                                    onChange={(e) => setUserIds((e as typeof ownerUserOptions).map((o) => o.value))}
+                                    onChange={(e) => setUserIds(e.map((o) => o.value))}
                                     placeholder="Filtrera på ansvarig"
                                     selected={userIds
                                         .map((id) => ownerUserOptions.find((x) => x.value === id))

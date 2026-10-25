@@ -6,7 +6,7 @@ import { getGlobalSetting, replaceEmptyStringWithNull, toIntOrUndefined } from '
 import { faLink } from '@fortawesome/free-solid-svg-icons';
 import { FormNumberFieldWithoutScroll } from '../../utils/FormNumberFieldWithoutScroll';
 import { EquipmentPrice } from '../../../models/interfaces';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { TypedTypeahead } from '../../utils/TypedTypeahead';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import { KeyValue } from '../../../models/interfaces/KeyValue';
 import RequiredIndicator from '../../utils/RequiredIndicator';
@@ -225,25 +225,22 @@ const EditEquipmentListEntryModal: React.FC<Props> = ({
                         <Col lg={8} xs={6}>
                             <Form.Group>
                                 <Form.Label>Konto</Form.Label>
-                                <Typeahead
+                                <TypedTypeahead
                                     id="account-typeahead"
                                     options={invoiceAccounts}
                                     defaultInputValue={equipmentListEntryToEditViewModel.account ?? ''}
                                     labelKey="accountNumber"
                                     disabled={readonly}
-                                    renderMenuItemChildren={(option) => {
-                                        const acct = option as Account;
-                                        return (
-                                            <>
-                                                {acct.accountNumber}{' '}
-                                                <span className="text-muted">- {acct.description}</span>
-                                            </>
-                                        );
-                                    }}
+                                    renderMenuItemChildren={(account) => (
+                                        <>
+                                            {account.accountNumber}{' '}
+                                            <span className="text-muted">- {account.description}</span>
+                                        </>
+                                    )}
                                     onChange={(s) =>
                                         setEquipmentListEntryToEditViewModel({
                                             ...equipmentListEntryToEditViewModel,
-                                            account: s.length > 0 ? (s[0] as Account).accountNumber : '',
+                                            account: s.length > 0 ? s[0].accountNumber : '',
                                         })
                                     }
                                     onInputChange={(s) =>
