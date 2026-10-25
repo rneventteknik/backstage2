@@ -1,5 +1,4 @@
-import { NotificationData } from '../components/layout/NotificationsArea';
-import { Emitter } from 'mitt';
+import type { NotificationData } from '../components/layout/NotificationsArea';
 import {
     faCheckCircle,
     faExclamationCircle,
@@ -7,14 +6,12 @@ import {
     faInfoCircle,
     IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
-import { useBus } from 'react-bus';
-
-type BusEvents = Record<string | symbol, unknown>;
+import { EventBus, useEventBus } from './eventBus';
 
 // This is the internal function which emits a add-notification event on the event bus. The
 // notification area listens for these events and adds the notification to the list.
 const emitNotification = (
-    bus: Emitter<BusEvents>,
+    bus: EventBus,
     variant: 'success' | 'warning' | 'danger' | 'info',
     icon: IconDefinition,
     title: string,
@@ -33,16 +30,16 @@ const emitNotification = (
     bus.emit('notification.add', notification);
 };
 
-const showGeneralInfoMessage = (bus: Emitter<BusEvents>, title: string, description?: string, body?: string): void =>
+const showGeneralInfoMessage = (bus: EventBus, title: string, description?: string, body?: string): void =>
     emitNotification(bus, 'info', faInfoCircle, title, description, body);
 
-const showGeneralSuccessMessage = (bus: Emitter<BusEvents>, title: string, description?: string, body?: string): void =>
+const showGeneralSuccessMessage = (bus: EventBus, title: string, description?: string, body?: string): void =>
     emitNotification(bus, 'success', faCheckCircle, title, description, body);
 
-const showGeneralWarningMessage = (bus: Emitter<BusEvents>, title: string, description?: string, body?: string): void =>
+const showGeneralWarningMessage = (bus: EventBus, title: string, description?: string, body?: string): void =>
     emitNotification(bus, 'warning', faExclamationTriangle, title, description, body);
 
-const showGeneralDangerMessage = (bus: Emitter<BusEvents>, title: string, description?: string, body?: string): void =>
+const showGeneralDangerMessage = (bus: EventBus, title: string, description?: string, body?: string): void =>
     emitNotification(bus, 'danger', faExclamationCircle, title, description, body);
 
 // Export hook
@@ -62,7 +59,7 @@ type UseNotificationsType = {
 };
 
 export const useNotifications = (): UseNotificationsType => {
-    const bus = useBus();
+    const bus = useEventBus();
     return {
         // First the general messages
         //

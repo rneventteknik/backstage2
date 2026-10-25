@@ -2,9 +2,9 @@ import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { Toast } from 'react-bootstrap';
-import { useListener } from 'react-bus';
 import { v4 as generateGuid } from 'uuid';
 import styles from './NotificationsArea.module.scss';
+import { useEventListener } from '../../lib/eventBus';
 
 export type NotificationData = {
     title: string;
@@ -81,8 +81,7 @@ const NotificationsArea: React.FC = () => {
 
     // Configure listener to add notifications and handler to remove
     //
-    useListener('notification.add', (event: unknown) => {
-        const notification = event as NotificationData | undefined;
+    useEventListener('notification.add', (notification) => {
         if (notification) {
             const notificationWithInternalData = { ...notification, id: generateGuid(), show: false };
 
