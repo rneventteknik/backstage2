@@ -52,6 +52,22 @@ The app supports two database backends:
 - **SQLite** (default for local dev): No configuration needed. A `dev.sqlite3` file is created automatically. Use `npm run reset-sqlite` to wipe and re-seed it.
 - **PostgreSQL**: Set the `DATABASE_URL` environment variable in `.env.local`. The app will automatically use PostgreSQL when this variable is present.
 
+#### Running PostgreSQL locally
+
+`docker-compose.yml` runs the same PostgreSQL major version as production (17). To use it:
+
+1. Start the database: `docker compose up -d`
+2. Add to `.env.local`:
+
+    ```
+    DATABASE_URL=postgres://backstage2:backstage2@localhost:5432/backstage2
+    DB_SSL=false
+    ```
+
+3. Create the tables and add mock data: `npm run migrate && npm run seed`
+
+To start over with an empty database, run `docker compose down -v` and repeat the steps. To go back to SQLite, remove `DATABASE_URL` from `.env.local`.
+
 ### Environment Variables
 
 A few environment variables are needed to get this app to run. To configure these, the file `.env.local` can be added to this folder. It should contain the following:

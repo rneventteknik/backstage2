@@ -1,0 +1,19 @@
+services:
+    postgres:
+        image: postgres:17-alpine
+        environment:
+            POSTGRES_USER: backstage2
+            POSTGRES_PASSWORD: backstage2
+            POSTGRES_DB: backstage2
+        ports:
+            - '5432:5432'
+        volumes:
+            - postgres-data:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U backstage2 -d backstage2']
+            interval: 2s
+            timeout: 5s
+            retries: 15
+
+volumes:
+    postgres-data:
