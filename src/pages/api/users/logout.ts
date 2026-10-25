@@ -1,9 +1,10 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import { destroySessionCookie } from '../../../lib/authenticate';
-import { withApiSession } from '../../../lib/session';
+import { getSession } from '../../../lib/session';
 
-const handler = withApiSession((req, res) => {
-    destroySessionCookie(req);
+const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+    destroySessionCookie(await getSession(req, res));
     res.status(200).json({ isLoggedIn: false });
-});
+};
 
 export default handler;

@@ -6,7 +6,7 @@ import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { NextApiRequest } from 'next';
 import { fetchUserAuthByHashedCardId, fetchUserAuthById } from './db-access/userAuth';
 import { IncomingMessage } from 'http';
-import { RequestWithSession } from './session';
+import { Session } from './session';
 import { normalizeCardId } from './cardId';
 
 export const authenticate = async (username: string, password: string): Promise<UserAuthObjectionModel | null> => {
@@ -62,7 +62,7 @@ export const getHashedPassword = async (password: string): Promise<string> => {
 };
 
 export const setSessionCookie = async (
-    req: IncomingMessage & RequestWithSession,
+    session: Session,
     authUser: UserAuthObjectionModel,
     userInfoOverride: Partial<CurrentUserInfo> = {},
 ): Promise<CurrentUserInfo> => {
@@ -75,22 +75,16 @@ export const setSessionCookie = async (
         ...userInfoOverride,
     };
 
-    req.session.user = user;
-    await req.session.save();
+    session.user = user;
+    await session.save();
 
     return user;
 };
 
-export const destroySessionCookie = (req: NextApiRequest & IncomingMessage & RequestWithSession): void =>
-    req.session.destroy();
+export const destroySessionCookie = (session: Session): void => session.destroy();
 
-export const getUserFromReq = (req: NextApiRequest & IncomingMessage & RequestWithSession): CurrentUserInfo =>
-    req.session.user ?? { isLoggedIn: false };
-
-export const getAndVerifyUser = async (
-    req: NextApiRequest & IncomingMessage & RequestWithSession,
-): Promise<CurrentUserInfo> => {
-    const currentUser = getUserFromReq(req);
+export const getAndVerifyUser = async (session: Session): Promise<CurrentUserInfo> => {
+    const currentUser = session.user ?? { isLoggedIn: false };
 
     // We only need to verify the user if we are logged in
     if (!currentUser.isLoggedIn || !currentUser.userId) {
@@ -103,7 +97,7 @@ export const getAndVerifyUser = async (
         (currentUser.loginDate ?? 0) + parseInt(process.env.MAX_SESSION_LENGTH) < Date.now()
     ) {
         // User has been logged in longer than MAX_SESSION_LENGTH: Log out
-        destroySessionCookie(req);
+        destroySessionCookie(session);
         return { isLoggedIn: false };
     }
 
@@ -111,13 +105,13 @@ export const getAndVerifyUser = async (
 
     if (!userFromDb) {
         // User has been removed: Log out
-        destroySessionCookie(req);
+        destroySessionCookie(session);
         return { isLoggedIn: false };
     }
 
     if (userFromDb.role != currentUser.role || userFromDb.user?.name != currentUser.name) {
         // User has changed: Set a new session cookie, but do not change login date
-        return await setSessionCookie(req, userFromDb, { loginDate: currentUser.loginDate });
+        return await setSessionCookie(session, userFromDb, { loginDate: currentUser.loginDate });
     }
 
     // User from cookie is ok, return it and do not change any cookies

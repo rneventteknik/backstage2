@@ -1,7 +1,8 @@
+import { NextApiRequest, NextApiResponse } from 'next';
 import { setSessionCookie, authenticate } from '../../../lib/authenticate';
-import { withApiSession } from '../../../lib/session';
+import { getSession } from '../../../lib/session';
 
-const handler = withApiSession(async (req, res) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
     const requestBody: { username?: string; password?: string } = await req.body;
     const username = requestBody.username;
     const password = requestBody.password;
@@ -14,10 +15,10 @@ const handler = withApiSession(async (req, res) => {
     const authUser = await authenticate(username, password);
 
     if (authUser) {
-        await setSessionCookie(req, authUser).then((user) => res.status(200).json(user));
+        await setSessionCookie(await getSession(req, res), authUser).then((user) => res.status(200).json(user));
     } else {
         res.status(403).json({ statusCode: 403, message: 'Invalid login' });
     }
-});
+};
 
 export default handler;
