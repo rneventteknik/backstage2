@@ -89,7 +89,7 @@ export const TableDisplay = <T extends HasId | HasStringId>({
     type WrappedEntity = { entity: T };
     type WrappedHeading = {
         heading: string | number | boolean | Date | null;
-        contentOverride: React.ReactChild | null;
+        contentOverride: React.ReactElement | string | number | null;
     };
     const hasEntity = (wrapperObject: WrappedEntity | WrappedHeading): wrapperObject is WrappedEntity =>
         !!wrapperObject && !!(wrapperObject as WrappedEntity).entity;

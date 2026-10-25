@@ -67,11 +67,7 @@ export const fetchEquipments = async (fetchArchived = false): Promise<EquipmentO
         query = query.where('isArchived', '<>', 1);
     }
 
-    return query
-        .withGraphFetched('prices')
-        .withGraphFetched('tags')
-        .withGraphFetched('equipmentPublicCategory')
-        .withGraphFetched('equipmentLocation');
+    return query.withGraphFetched('[prices, tags, equipmentPublicCategory, equipmentLocation]');
 };
 
 // This function fetches the bookings, but only with information that should be publicly available.

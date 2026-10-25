@@ -4,7 +4,7 @@ import { fetchBookingWithUser } from '../../../../lib/db-access/booking';
 import { toBooking } from '../../../../lib/mappers/booking';
 import { withSessionContext } from '../../../../lib/sessionContext';
 import { getTextResource } from '../../../../document-templates/useTextResources';
-import archiver from 'archiver';
+import { ZipArchive } from 'archiver';
 import { respondWithCustomErrorMessage, respondWithEntityNotFoundResponse } from '../../../../lib/apiResponses';
 import {
     getHogiaInvoiceFileName,
@@ -108,7 +108,7 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
 
     return Promise.all(bookingIds.map((id) => getEncodedInvoices(id)))
         .then((responses) => {
-            const zip = archiver('zip');
+            const zip = new ZipArchive();
             res.setHeader('Content-Disposition', `attachment; filename="fakturor.zip"`);
             zip.pipe(res);
 

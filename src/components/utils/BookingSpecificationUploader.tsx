@@ -61,7 +61,6 @@ const BookingSpecificationUploader = ({ onSave, initialData }: Props): React.Rea
             setSelectedRowIds(rowsWithEquipment.map((e) => e.id) ?? []);
             setInitialDataProcessed(true);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialData, equipment, initialDataProcessed]);
 
     if (error) {

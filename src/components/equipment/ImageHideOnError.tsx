@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Card } from 'react-bootstrap';
 
 export const ImageCardHideOnError = ({ src, altText }: { src: string; altText: string }) => {

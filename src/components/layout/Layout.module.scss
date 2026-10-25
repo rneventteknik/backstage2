@@ -56,11 +56,6 @@ $sidebar-bottom-off-screen-length: 100px;
     bottom: 0;
 }
 
-:export {
-    skeletonColorBase: variables.$backstage-color-1;
-    skeletonColorHighlight: variables.$backstage-color-4;
-}
-
 // Handle sidebar toggle and responsive design
 //
 [data-sidebar-toggle-status='true'] .sidebar {

@@ -18,19 +18,8 @@ export default {
         NEXT_PUBLIC_BACKSTAGE2_BUILD_DATE: currentDate,
     },
     sassOptions,
-    webpack(config) {
-        for (const rule of config.module.rules) {
-            for (const oneOfRule of rule.oneOf ?? []) {
-                for (const use of Array.isArray(oneOfRule.use) ? oneOfRule.use : []) {
-                    if (typeof use.loader === 'string' && use.loader.includes('sass-loader')) {
-                        use.options = { ...use.options, sassOptions };
-                    }
-                }
-            }
-        }
-        return config;
-    },
     images: {
+        minimumCacheTTL: 60,
         remotePatterns: [
             {
                 protocol: 'https',

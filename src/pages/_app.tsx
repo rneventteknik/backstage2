@@ -1,5 +1,5 @@
 import '../style/style.scss';
-import React, { useEffect } from 'react';
+import { ReactElement, useEffect } from 'react';
 import { AppProps } from 'next/app';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import 'react-loading-skeleton/dist/skeleton.css';
@@ -20,7 +20,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 config.autoAddCss = false;
 
-export default function MyApp({ Component, pageProps }: AppProps): JSX.Element {
+export default function MyApp({ Component, pageProps }: AppProps): ReactElement {
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {

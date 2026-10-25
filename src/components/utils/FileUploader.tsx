@@ -35,7 +35,7 @@ const FileUploader = <T,>({ onFileUpload, label }: Props<T>): React.ReactElement
         },
         [onFileUpload, showErrorMessage, showGeneralSuccessMessage],
     );
-    const { getRootProps, getInputProps, isDragAccept } = useDropzone({ onDrop });
+    const { getRootProps, getInputProps, isDragAccept } = useDropzone({ onDrop, noPaste: true });
 
     return (
         <div

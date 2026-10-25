@@ -1,4 +1,4 @@
-import Objection from 'objection';
+import * as Objection from 'objection';
 import {
     EquipmentListEntryObjectionModel,
     EquipmentListObjectionModel,
@@ -35,9 +35,9 @@ export const fetchEquipmentList = async (
 
 export const fetchEquipmentLists = async (): Promise<EquipmentListObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return EquipmentListObjectionModel.query()
-        .withGraphFetched('listEntries.equipment')
-        .withGraphFetched('listHeadings.listEntries.equipment');
+    return EquipmentListObjectionModel.query().withGraphFetched(
+        '[listEntries.equipment, listHeadings.listEntries.equipment]',
+    );
 };
 
 export const fetchEquipmentListsForBooking = async (bookingId: number): Promise<EquipmentListObjectionModel[]> => {
@@ -66,8 +66,7 @@ export const fetchOutEquipmentLists = async (): Promise<EquipmentListObjectionMo
                 .where('usageEndDatetime', '>=', now)
                 .whereNot({ status: Status.CANCELED }),
         )
-        .withGraphFetched('listEntries.equipment')
-        .withGraphFetched('listHeadings.listEntries.equipment');
+        .withGraphFetched('[listEntries.equipment, listHeadings.listEntries.equipment]');
 };
 
 export const updateEquipmentList = async (
