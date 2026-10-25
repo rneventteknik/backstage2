@@ -15,10 +15,17 @@ export interface SessionContext {
 // user is logged in this function calls the specified handler with the standard req and res parameters,
 // as well as a context object with information about the context of the request (such as the current user)
 export const withSessionContext = (
-    handler: (req: NextApiRequest & IncomingMessage & RequestWithSession, res: NextApiResponse, context: SessionContext) => void,
+    handler: (
+        req: NextApiRequest & IncomingMessage & RequestWithSession,
+        res: NextApiResponse,
+        context: SessionContext,
+    ) => void,
     requiredRole: Role | null = Role.READONLY,
 ): NextApiHandler => {
-    const internalHandler = async (req: NextApiRequest & IncomingMessage & RequestWithSession, res: NextApiResponse) => {
+    const internalHandler = async (
+        req: NextApiRequest & IncomingMessage & RequestWithSession,
+        res: NextApiResponse,
+    ) => {
         const currentUser = await getAndVerifyUser(req);
 
         if (!currentUser.isLoggedIn) {
@@ -38,9 +45,16 @@ export const withSessionContext = (
 };
 
 export const withApiKeyContext = (
-    handler: (req: NextApiRequest & IncomingMessage & RequestWithSession, res: NextApiResponse, context: SessionContext) => void,
+    handler: (
+        req: NextApiRequest & IncomingMessage & RequestWithSession,
+        res: NextApiResponse,
+        context: SessionContext,
+    ) => void,
 ): NextApiHandler => {
-    const internalHandler = async (req: NextApiRequest & IncomingMessage & RequestWithSession, res: NextApiResponse) => {
+    const internalHandler = async (
+        req: NextApiRequest & IncomingMessage & RequestWithSession,
+        res: NextApiResponse,
+    ) => {
         const currentUser = await getAndVerifyApiKey(req);
 
         if (!currentUser.isLoggedIn) {

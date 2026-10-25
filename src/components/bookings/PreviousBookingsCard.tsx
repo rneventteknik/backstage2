@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TableStyleLink from '../utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import { bookingsFetcher } from '../../lib/fetchers';
-import { getSortedList } from '../../lib/sortIndexUtils';
+import { getSortedList } from '../../lib/sortUtils';
 import LargeBookingTable from '../LargeBookingTable';
 
 type Props = {

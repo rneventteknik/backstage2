@@ -17,23 +17,23 @@ Open http://localhost:3000 and log in with `albert` / `dmx`.
 
 ## Tech Stack
 
--   **[Next.js](https://nextjs.org/)** — React framework (frontend + API routes)
--   **[React](https://react.dev/) + [React Bootstrap](https://react-bootstrap.github.io/)** — UI
--   **[Knex](https://knexjs.org/) + [Objection.js](https://vincit.github.io/objection.js/)** — query builder and ORM
--   **[SQLite](https://www.sqlite.org/) / [PostgreSQL](https://www.postgresql.org/)** — database (SQLite for local dev, PostgreSQL in production)
--   **[TypeScript](https://www.typescriptlang.org/)** — language
--   **[iron-session](https://github.com/vvo/iron-session)** — session management
+- **[Next.js](https://nextjs.org/)** — React framework (frontend + API routes)
+- **[React](https://react.dev/) + [React Bootstrap](https://react-bootstrap.github.io/)** — UI
+- **[Knex](https://knexjs.org/) + [Objection.js](https://vincit.github.io/objection.js/)** — query builder and ORM
+- **[SQLite](https://www.sqlite.org/) / [PostgreSQL](https://www.postgresql.org/)** — database (SQLite for local dev, PostgreSQL in production)
+- **[TypeScript](https://www.typescriptlang.org/)** — language
+- **[iron-session](https://github.com/vvo/iron-session)** — session management
 
 ### npm Scripts
 
-| Command               | Description                                              |
-| --------------------- | -------------------------------------------------------- |
-| `npm run dev`         | Start local development server                           |
-| `npm run migrate`     | Run latest Knex migrations                               |
-| `npm run seed`        | Seed database with mock data                             |
-| `npm run reset-sqlite`| Wipe SQLite database, migrate, and seed                  |
-| `npm run tc`          | Type-check with TypeScript                               |
-| `npm run lint`        | Run ESLint and auto-fix                                  |
+| Command                | Description                             |
+| ---------------------- | --------------------------------------- |
+| `npm run dev`          | Start local development server          |
+| `npm run migrate`      | Run latest Knex migrations              |
+| `npm run seed`         | Seed database with mock data            |
+| `npm run reset-sqlite` | Wipe SQLite database, migrate, and seed |
+| `npm run tc`           | Type-check with TypeScript              |
+| `npm run lint`         | Run ESLint and auto-fix                 |
 
 ### Seed Users
 
@@ -49,8 +49,8 @@ After running `npm run seed`, the following users are available for local develo
 
 The app supports two database backends:
 
--   **SQLite** (default for local dev): No configuration needed. A `dev.sqlite3` file is created automatically. Use `npm run reset-sqlite` to wipe and re-seed it.
--   **PostgreSQL**: Set the `DATABASE_URL` environment variable in `.env.local`. The app will automatically use PostgreSQL when this variable is present.
+- **SQLite** (default for local dev): No configuration needed. A `dev.sqlite3` file is created automatically. Use `npm run reset-sqlite` to wipe and re-seed it.
+- **PostgreSQL**: Set the `DATABASE_URL` environment variable in `.env.local`. The app will automatically use PostgreSQL when this variable is present.
 
 ### Environment Variables
 
@@ -58,6 +58,9 @@ A few environment variables are needed to get this app to run. To configure thes
 
 ```
 SECRET_COOKIE_PASSWORD={session cookie secret; >32 chars (mandatory, used to encrypt the session)}
+
+CARD_HASH_SECRET={secret used to hash card IDs; >32 chars (mandatory, used to hash card IDs before storing them in the database)}
+CF_ORIGIN_SECRET={secret used to verify requests from Cloudflare; >32 chars (mandatory in production, not used in local dev). Card login is disabled in production if this is not set}
 
 DATABASE_URL=postgres://{user}:{password}@{hostname}:{port}/{database-name} (optional, only needed when using PostgreSQL)
 DB_SSL={true or false} (optional, only needed when using PostgreSQL)
@@ -185,6 +188,35 @@ NEXT_PUBLIC_POSTHOG_KEY=phc_...
 
 Analytics are silently skipped if the key is not set.
 
+### Cloudflare Setup (NFC card login)
+
+Card login is only allowed from computers with a Cloudflare client certificate (mTLS). The app is also reachable directly on Heroku, so it only trusts certificate information from requests that carry `CF_ORIGIN_SECRET`.
+
+1. Under SSL/TLS → Client Certificates, create a certificate for each card login computer and enable mTLS for the app's hostname
+2. Add a Transform Rule (Modify Request Header) matching all requests, which **sets** (not adds) these headers:
+    - `x-origin-secret` = static value `CF_ORIGIN_SECRET`
+3. Add a WAF custom rule that blocks card login without a certificate:
+    ```
+    (http.request.uri.path eq "/api/users/login/card" and not cf.tls_client_auth.cert_verified)
+    ```
+4. Optionally add a Rate Limiting rule for `/api/users/login*`
+
+### mTLS Certificate install intructions
+
+1. Generate cert at Cloudflare: SSL/TLS -> Client Certificates
+2. Export and save as .pem and .key
+3. Label certificate with location tag in Cloudflare
+4. Convert to .p12 format: `openssl pkcs12 -export -legacy -out cert.p12 -inkey keyfile.key -in certfile.pem` (Legacy flag required by MacOS)
+
+5. Install cert:
+
+- 5a. Windows: Double-click file, save in `Personal` keystore
+- 5b. Mac: Double-click file, save in `System` keychain, then set which apps are allowed to use cert
+- 5c. Linux: install cert in browser at chrome://certificate-manager/clientcerts
+
+6. Remove previous cert, if exists
+7. Check in browser at link above if new certificate is shown
+
 ## Version Control
 
 ### Branching Model
@@ -193,8 +225,8 @@ Most development should happen on branches based on `main`.
 
 We use prefixes to indicate what kind of changes every branch contains. The prefixes in use are:
 
--   `feature/` for feature branches
--   `bugfix/` for bug fixes
+- `feature/` for feature branches
+- `bugfix/` for bug fixes
 
 The branch name after the prefix should be _descriptive_, _short_ and in `kebab-case`.
 
@@ -202,18 +234,18 @@ The branch name after the prefix should be _descriptive_, _short_ and in `kebab-
 
 Commits and PR titles use a prefix to indicate the type of change, followed by a short description:
 
--   `Feature: <description>` for new features
--   `Bugfix: <description>` for bug fixes 
--   Other types of commits are not regulated, be descriptive
+- `Feature: <description>` for new features
+- `Bugfix: <description>` for bug fixes
+- Other types of commits are not regulated, be descriptive
 
 ### Pull Request Review
 
 A pull request review should go through the following:
 
--   The code should follow existing design patterns.
--   The code should optimally be self documenting. In cases where it's not, it should have descriptive comments.
--   Think through any corner cases that might exist and check that they are handled.
--   Check that there are no obvious security holes.
+- The code should follow existing design patterns.
+- The code should optimally be self documenting. In cases where it's not, it should have descriptive comments.
+- Think through any corner cases that might exist and check that they are handled.
+- Check that there are no obvious security holes.
 
 ### Merge Strategy
 

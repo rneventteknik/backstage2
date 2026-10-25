@@ -8,7 +8,7 @@ import BookingSearch from '../../BookingSearch';
 import { getResponseContentOrError, toIntOrUndefined } from '../../../lib/utils';
 import { toBooking } from '../../../lib/mappers/booking';
 import { IBookingObjectionModel } from '../../../models/objection-models';
-import { getSortedList, sortIndexSortFn } from '../../../lib/sortIndexUtils';
+import { getSortedList, sortIndexSortFn } from '../../../lib/sortUtils';
 import { formatCurrency, formatPrice } from '../../../lib/pricingUtils';
 import { Booking, Equipment } from '../../../models/interfaces';
 import { PricePlan } from '../../../models/enums/PricePlan';

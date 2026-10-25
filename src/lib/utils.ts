@@ -1,4 +1,4 @@
-import { BaseEntity, BaseEntityWithName, HasId, HasStringId } from '../models/interfaces/BaseEntity';
+import { BaseEntity, HasId, HasStringId } from '../models/interfaces/BaseEntity';
 import { MemberStatus } from '../models/enums/MemberStatus';
 import { Role } from '../models/enums/Role';
 import { Status } from '../models/enums/Status';
@@ -442,46 +442,6 @@ export const getPartialSearchStrings = (searchString: string) =>
         .trim()
         .split(/\s+/)
         .map((x) => '%' + x + '%');
-
-// Function to sort entitied by created date
-export const createdSortFn = (a: BaseEntity, b: BaseEntity) => {
-    if ((a.created ?? 0) < (b.created ?? 0)) {
-        return 1;
-    }
-    if ((a.created ?? 0) > (b.created ?? 0)) {
-        return -1;
-    }
-
-    // Use id for sorting as a fallback
-    if (a.id < b.id) {
-        return -1;
-    }
-    if (a.id > b.id) {
-        return 1;
-    }
-
-    return 0;
-};
-
-// Function to sort entitied by name
-export const nameSortFn = (a: BaseEntityWithName, b: BaseEntityWithName) => {
-    if ((a.name ?? '') < (b.name ?? '')) {
-        return -1;
-    }
-    if ((a.name ?? '') > (b.name ?? '')) {
-        return 1;
-    }
-
-    // Use id for sorting as a fallback
-    if (a.id < b.id) {
-        return -1;
-    }
-    if (a.id > b.id) {
-        return 1;
-    }
-
-    return 0;
-};
 
 const formatOperationalYear = (year: number) => `${year}-${year + 1}`;
 

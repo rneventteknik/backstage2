@@ -1,7 +1,7 @@
 import React from 'react';
-import { faWarning } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { faWarning } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Placement } from 'react-bootstrap/esm/types';
 
 type WarningIconProps = {
@@ -10,7 +10,7 @@ type WarningIconProps = {
     className: string;
 };
 
-const WarningIcon: React.FC<WarningIconProps> = ({ text, placement = "right", className }: WarningIconProps) => (
+const WarningIcon: React.FC<WarningIconProps> = ({ text, placement = 'right', className }: WarningIconProps) => (
     <OverlayTrigger
         placement={placement}
         overlay={

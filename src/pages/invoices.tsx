@@ -56,7 +56,12 @@ const InvoiceGroupPage: React.FC<Props> = ({ user: currentUser, globalSettings }
         return <TableLoadingPage fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
-    const createInvoiceGroup = (newInvoiceGroup: PartialDeep<IInvoiceGroupObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => {
+    const createInvoiceGroup = (
+        newInvoiceGroup: PartialDeep<
+            IInvoiceGroupObjectionModel,
+            { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
+        >,
+    ) => {
         const body = { invoiceGroup: { ...newInvoiceGroup, userId: currentUser.userId } };
 
         const request = {

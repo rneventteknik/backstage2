@@ -1,13 +1,13 @@
 import React, { FormEvent } from 'react';
 import { Modal, Col, Form, Row, InputGroup, Button } from 'react-bootstrap';
 import { usersFetcher } from '../../../lib/fetchers';
-import { getMemberStatusName, nameSortFn, toIntOrUndefined } from '../../../lib/utils';
+import { getMemberStatusName, toIntOrUndefined } from '../../../lib/utils';
+import { nameSortFn, getNextSortIndex } from '../../../lib/sortUtils';
 import PriceWithVATPreview from '../../utils/PriceWithVATPreview';
 import useSwr from 'swr';
 import RequiredIndicator from '../../utils/RequiredIndicator';
 import { BookingViewModel, TimeReport } from '../../../models/interfaces';
 import { formatDatetimeForForm } from '../../../lib/datetimeUtils';
-import { getNextSortIndex } from '../../../lib/sortIndexUtils';
 import { ITimeReportObjectionModel } from '../../../models/objection-models';
 import { formatNumberAsCurrency } from '../../../lib/pricingUtils';
 import currency from 'currency.js';
@@ -245,21 +245,22 @@ const TimeReportModal: React.FC<Props> = ({
                                         MemberStatus.AKTIV,
                                         MemberStatus.RESURS,
                                         MemberStatus.ASP,
-                                        MemberStatus.GLÖMD
-                                    ].map(statusGroup =>
+                                        MemberStatus.GLÖMD,
+                                    ].map((statusGroup) => (
                                         <optgroup
                                             key={getMemberStatusName(statusGroup)}
                                             label={getMemberStatusName(statusGroup)}
                                         >
                                             {users
                                                 ?.filter((user) => user.memberStatus === statusGroup)
-                                                ?.sort(nameSortFn).map((user) => (
+                                                ?.sort(nameSortFn)
+                                                .map((user) => (
                                                     <option key={user.id} value={user.id}>
                                                         {user.name}
                                                     </option>
                                                 ))}
                                         </optgroup>
-                                    )}
+                                    ))}
                                 </Form.Select>
                             </Form.Group>
                         </Col>

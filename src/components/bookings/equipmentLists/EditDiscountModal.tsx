@@ -27,7 +27,7 @@ const parsePresets = (globalSettings: KeyValue[]) => {
     } catch {
         return null;
     }
-}
+};
 
 const EditDiscountModal: React.FC<Props> = ({ show, hide, onSubmit, discountPercentage, globalSettings }: Props) => {
     const [value, setValue] = useState(discountPercentage.toString());
@@ -97,4 +97,3 @@ const EditDiscountModal: React.FC<Props> = ({ show, hide, onSubmit, discountPerc
 };
 
 export default EditDiscountModal;
-

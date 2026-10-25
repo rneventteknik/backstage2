@@ -5,7 +5,7 @@ import { TimeEstimate } from '../../../models/interfaces/TimeEstimate';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Booking } from '../../../models/interfaces';
 import TimeEstimateModal from './TimeEstimateModal';
-import { getNextSortIndex } from '../../../lib/sortIndexUtils';
+import { getNextSortIndex } from '../../../lib/sortUtils';
 import { addTimeEstimateApiCall } from '../../../lib/equipmentListUtils';
 import currency from 'currency.js';
 

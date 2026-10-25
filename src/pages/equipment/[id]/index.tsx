@@ -29,7 +29,7 @@ import { IEquipmentObjectionModel } from '../../../models/objection-models';
 import { useNotifications } from '../../../lib/useNotifications';
 import { Role } from '../../../models/enums/Role';
 import { ImageCardHideOnError } from '../../../components/equipment/ImageHideOnError';
-import { idSortFn } from '../../../lib/sortIndexUtils';
+import { idSortFn } from '../../../lib/sortUtils';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -190,7 +190,7 @@ const UserPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Props)
                         onSubmit={(driveFolderId) => handleSubmit({ name: equipment.name, driveFolderId })}
                         readonly={currentUser.role === Role.READONLY}
                     />
-                    
+
                     <EquipmentChangelogCard changelog={equipment.changelog ?? []} />
                 </Col>
                 <Col xl={8}>

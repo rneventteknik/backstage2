@@ -103,7 +103,11 @@ const TimeEstimateModal: React.FC<Props> = ({
                                 </Button>
                             </div>
                             {!userHasClosedWizard ? (
-                                <Form onSubmit={handleSubmitWizard} id={formId + '-wizard'} className="d-flex align-items-center mt-2">
+                                <Form
+                                    onSubmit={handleSubmitWizard}
+                                    id={formId + '-wizard'}
+                                    className="d-flex align-items-center mt-2"
+                                >
                                     <Form.Control
                                         required
                                         defaultValue={wizardNumberOfTechnicians}

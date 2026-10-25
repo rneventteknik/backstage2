@@ -35,17 +35,15 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         revalidateOnReconnect: false,
     });
 
-    
-
     useEffect(() => {
         const getDocumentUrl = () =>
             `/api/documents/price-estimate/${booking?.language}/${booking?.id}?override-price-estimate.title=${title}&override-price-estimate.legal-note.title=${legalTitle}&override-price-estimate.legal-note.content=${legalContent}` +
             (showLegalLink ? '' : '&override-price-estimate.legal-note.shown-url=');
 
         const handler = setTimeout(() => setDebouncedUrl(getDocumentUrl()), 500);
-    
+
         return () => clearTimeout(handler);
-      }, [booking, title, legalTitle, legalContent, showLegalLink]);
+    }, [booking, title, legalTitle, legalContent, showLegalLink]);
 
     if (error) {
         return (
@@ -70,8 +68,6 @@ const BookingPage: React.FC<Props> = ({ user: currentUser, globalSettings }: Pro
         { link: '/bookings/' + booking.id, displayName: pageTitle },
         { link: '/bookings/' + booking.id + '/custom-document-export', displayName: 'Anpassad dokumentexport' },
     ];
-
-
 
     return (
         <Layout title={pageTitle} fixedWidth={false} currentUser={currentUser} globalSettings={globalSettings}>

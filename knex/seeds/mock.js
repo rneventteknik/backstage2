@@ -106,6 +106,14 @@ export async function seed(knex) {
         },
     ]);
 
+    await knex('UserCard').insert([
+        {
+            userId: firstUserId,
+            cardName: 'Alberts Kort',
+            hashedCardId: 'f8318f5f6d18f7451c79e06e01d5361cc7a8c8e7c5a1af494ce3c652104524a3',
+        },
+    ]);
+
     // Equipment
     //
     const firstEquipmentPublicCategoryId = await knex('EquipmentPublicCategory')

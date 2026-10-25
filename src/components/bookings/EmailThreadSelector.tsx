@@ -50,20 +50,10 @@ const EmailThreadSelector: React.FC<Props> = ({ onSelect }: Props) => {
 
     const EmailThreadActionsDisplayFn = (thread: EmailThreadResult) => (
         <>
-            <Button
-                variant="secondary"
-                size="sm"
-                className="me-2"
-                onClick={() => setViewThreadId(thread.id)}
-            >
+            <Button variant="secondary" size="sm" className="me-2" onClick={() => setViewThreadId(thread.id)}>
                 Visa
             </Button>
-            <Button
-                variant="primary"
-                size="sm"
-                className="me-2"
-                onClick={() => onSelect(thread.id)}
-            >
+            <Button variant="primary" size="sm" className="me-2" onClick={() => onSelect(thread.id)}>
                 Välj
             </Button>
         </>

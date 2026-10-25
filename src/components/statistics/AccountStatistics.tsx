@@ -6,7 +6,7 @@ import { Card, Modal } from 'react-bootstrap';
 import { TableConfiguration, TableDisplay } from '../TableDisplay';
 import { formatCurrency, formatNumberAsCurrency, getInvoiceRows } from '../../lib/pricingUtils';
 import { InvoiceRowType, PricedInvoiceRow } from '../../models/misc/Invoice';
-import { getSortedList } from '../../lib/sortIndexUtils';
+import { getSortedList } from '../../lib/sortUtils';
 import TableStyleLink from '../utils/TableStyleLink';
 import { getTextResource } from '../../document-templates/useTextResources';
 import { getTextResourcesFromGlobalSettings } from '../../document-templates/utils';

@@ -87,10 +87,7 @@ const UserForm: React.FC<Props> = ({ handleSubmitUser, user, formId }: Props) =>
                             Medlemsstatus
                             <RequiredIndicator />
                         </Form.Label>
-                        <Form.Select
-                            name="memberStatus"
-                            defaultValue={user?.memberStatus ?? MemberStatus.AKTIV}
-                        >
+                        <Form.Select name="memberStatus" defaultValue={user?.memberStatus ?? MemberStatus.AKTIV}>
                             <option value={MemberStatus.CHEF}>{getMemberStatusName(MemberStatus.CHEF)}</option>
                             <option value={MemberStatus.AKTIV}>{getMemberStatusName(MemberStatus.AKTIV)}</option>
                             <option value={MemberStatus.ASP}>{getMemberStatusName(MemberStatus.ASP)}</option>

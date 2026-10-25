@@ -124,17 +124,16 @@ const BookingsWithPotentialProblemsCard: React.FC<Props> = ({ bookings }: Props)
                 <Card.Header className="d-flex justify-content-between">
                     Dina bokningar med potentiella problem
                     <Link href="/bookings/problems" passHref>
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            as="span"
-                        >
+                        <Button variant="secondary" size="sm" as="span">
                             <FontAwesomeIcon icon={faList} /> Visa alla
                         </Button>
                     </Link>
                 </Card.Header>
-                {bookingsWithPotentialProblems.length === 0 ? <Card.Body>Inga bokningar med potentiella problem.</Card.Body> :
-                <TableDisplay entities={bookingsWithPotentialProblemsWithId} configuration={tableSettings} />}
+                {bookingsWithPotentialProblems.length === 0 ? (
+                    <Card.Body>Inga bokningar med potentiella problem.</Card.Body>
+                ) : (
+                    <TableDisplay entities={bookingsWithPotentialProblemsWithId} configuration={tableSettings} />
+                )}
             </Card>
         </>
     );

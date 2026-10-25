@@ -24,7 +24,11 @@ const getEmailClient = async () => {
         return null;
     }
 
-    const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000');
+    const oauth2Client = new google.auth.OAuth2(
+        clientId,
+        clientSecret,
+        process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+    );
 
     oauth2Client.setCredentials({
         refresh_token: refreshToken,

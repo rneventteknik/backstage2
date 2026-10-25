@@ -12,7 +12,7 @@ import { equipmentLocationsFetcher, equipmentTagsFetcher } from '../lib/fetchers
 import { formatPrice, addVATToPriceWithTHS, formatTHSPrice, addVAT } from '../lib/pricingUtils';
 import EquipmentTagDisplay from './utils/EquipmentTagDisplay';
 import { EquipmentLocation } from '../models/interfaces/EquipmentLocation';
-import { getSortedList } from '../lib/sortIndexUtils';
+import { getSortedList } from '../lib/sortUtils';
 import AdvancedFilters from './AdvancedFilters';
 import { useSessionStorageState } from '../lib/useSessionStorageState';
 import { ImageHideOnError } from './equipment/ImageHideOnError';

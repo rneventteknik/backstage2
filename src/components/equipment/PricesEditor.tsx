@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { Badge, Button, Dropdown, DropdownButton, Form, InputGroup } from 'react-bootstrap';
 import { addVATToPriceWithTHS, formatPrice, formatTHSPrice } from '../../lib/pricingUtils';
-import { idSortFn } from '../../lib/sortIndexUtils';
+import { idSortFn } from '../../lib/sortUtils';
 import { getPricePlanName, updateItemsInArrayById } from '../../lib/utils';
 import { PricePlan } from '../../models/enums/PricePlan';
 import { EquipmentPrice } from '../../models/interfaces';

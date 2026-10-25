@@ -11,10 +11,15 @@ import PricesEditor from './PricesEditor';
 import { toEquipmentPriceObjectionModel } from '../../lib/mappers/equipment';
 import { toIntOrUndefined } from '../../lib/utils';
 import { FormNumberFieldWithoutScroll } from '../utils/FormNumberFieldWithoutScroll';
-import { getSortedList } from '../../lib/sortIndexUtils';
+import { getSortedList } from '../../lib/sortUtils';
 
 type Props = {
-    handleSubmitEquipment: (equipment: PartialDeep<IEquipmentObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => void;
+    handleSubmitEquipment: (
+        equipment: PartialDeep<
+            IEquipmentObjectionModel,
+            { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
+        >,
+    ) => void;
     equipment?: Equipment;
     formId: string;
 };
@@ -70,7 +75,10 @@ const EquipmentForm: React.FC<Props> = ({ handleSubmitEquipment, equipment: equi
 
         const getValueFromForm = (key: string): string | undefined => form[key]?.value;
 
-        const modifiedEquipment: PartialDeep<IEquipmentObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> = {
+        const modifiedEquipment: PartialDeep<
+            IEquipmentObjectionModel,
+            { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
+        > = {
             id: equipment?.id,
 
             image: equipment?.image,

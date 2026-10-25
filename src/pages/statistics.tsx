@@ -21,7 +21,7 @@ import { TableConfiguration, TableDisplay } from '../components/TableDisplay';
 import { BookingViewModel } from '../models/interfaces';
 import { getPrice, formatNumberAsCurrency, getBookingPrice } from '../lib/pricingUtils';
 import { PricePlan } from '../models/enums/PricePlan';
-import { getSortedList } from '../lib/sortIndexUtils';
+import { getSortedList } from '../lib/sortUtils';
 import { Status } from '../models/enums/Status';
 import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
@@ -255,9 +255,9 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
     // Table display functions
     //
     const totalNumberOfUnitHoursDisplayFn = (model: EquipmentStatisticViewModel) =>
-        model.totalNumberOfUnitHours ?? 0 > 0 ? model.totalNumberOfUnitHours + ' h' : '-';
+        (model.totalNumberOfUnitHours ?? 0 > 0) ? model.totalNumberOfUnitHours + ' h' : '-';
     const totalNumberOfUnitDaysDisplayFn = (model: EquipmentStatisticViewModel) =>
-        model.totalNumberOfUnitDays ?? 0 > 0 ? model.totalNumberOfUnitDays + ' st' : '-';
+        (model.totalNumberOfUnitDays ?? 0 > 0) ? model.totalNumberOfUnitDays + ' st' : '-';
 
     const totalNumberOfHoursDisplayFn = (model: CustomerStatisticViewModel) => model.totalNumberOfHours + ' h';
 

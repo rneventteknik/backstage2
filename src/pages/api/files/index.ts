@@ -42,7 +42,7 @@ const handler = withSessionContext(async (req: NextApiRequest, res: NextApiRespo
             await driveClient.files
                 .list({
                     q: `\'${driveFolderId}\' in parents and trashed=false`,
-                    fields: 'files(id, name, mimeType, modifiedTime, webViewLink)',
+                    fields: 'files(id, name, mimeType, modifiedTime, webViewLink, shortcutDetails)',
                     includeItemsFromAllDrives: true,
                     supportsAllDrives: true,
                 })
@@ -89,6 +89,13 @@ const mapDriveResponse = (res: GaxiosResponseWithHTTP2<drive_v3.Schema$FileList>
             link: x.webViewLink ?? undefined,
             mimeType: x.mimeType ?? undefined,
             modifiedTime: x.modifiedTime ?? undefined,
+            shortcutDetails: x.shortcutDetails?.targetId
+                ? {
+                      targetId: x.shortcutDetails.targetId,
+                      targetMimeType: x.shortcutDetails.targetMimeType ?? undefined,
+                      targetResourceKey: x.shortcutDetails.targetResourceKey ?? undefined,
+                  }
+                : undefined,
         })),
     );
 };

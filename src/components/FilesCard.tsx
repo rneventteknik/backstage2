@@ -10,16 +10,21 @@ import {
     faExclamationCircle,
     faExternalLinkAlt,
     faFile,
-    faFileExcel,
-    faFileImage,
+    faTable,
+    faFileCsv,
+    faWindowRestore,
+    faTableList,
+    faImage,
     faFileLines,
     faFilePdf,
-    faFileWaveform,
+    faHeadphones,
+    faClapperboard,
     faFolder,
+    faFileZipper,
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { getSortedList } from '../lib/sortIndexUtils';
+import { nameCollator } from '../lib/sortUtils';
 import TableStyleLink from './utils/TableStyleLink';
 import Skeleton from 'react-loading-skeleton';
 import { useNotifications } from '../lib/useNotifications';
@@ -115,14 +120,15 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
         fetch(url)
             .then((response) => getResponseContentOrError<FilesResult[]>(response))
             .then((list) =>
-                list.map((x) => ({
-                    ...x,
-                    date: x.modifiedTime ? new Date(x.modifiedTime) : null,
-                    sortIndex: x.modifiedTime ? -new Date(x.modifiedTime).getTime() : 0,
-                    displayDate: x.modifiedTime ? formatDatetimeForForm(new Date(x.modifiedTime)) : '-',
-                })),
-            )
-            .then((list) => getSortedList(list)),
+                list
+                    .map(getShortcutDest)
+                    .sort(fileSortFn)
+                    .map((x) => ({
+                        ...x,
+                        date: x.modifiedTime ? new Date(x.modifiedTime) : null,
+                        displayDate: x.modifiedTime ? formatDatetimeForForm(new Date(x.modifiedTime)) : '-',
+                    })),
+            ),
     );
 
     // Error handling
@@ -168,22 +174,117 @@ const FilesCardList: React.FC<FilesCardListProps> = ({ driveFolderId }: FilesCar
     );
 };
 
+/** Replace shortcuts with the mimetype of the shortcut destination, and fixes the link so it redirects to the target of the shortcut. */
+const getShortcutDest = (x: FilesResult): FilesResult => {
+    if (x.mimeType != 'application/vnd.google-apps.shortcut' || !x.shortcutDetails?.targetId) {
+        return x;
+    }
+    return {
+        ...x,
+        link: x.shortcutDetails.targetResourceKey
+            ? `https://drive.google.com/open?id=${x.shortcutDetails.targetId}&resourcekey=${x.shortcutDetails.targetResourceKey}`
+            : `https://drive.google.com/open?id=${x.shortcutDetails.targetId}`,
+        mimeType: x.shortcutDetails.targetMimeType,
+    };
+};
+
+const FOLDER_MIME_TYPE = 'application/vnd.google-apps.folder';
+
+const fileSortFn = (a: FilesResult, b: FilesResult) => {
+    const aUndefined = !a.mimeType || !a.name;
+    const bUndefined = !b.mimeType || !b.name;
+
+    // Undefined files get put last!!!
+    if (!aUndefined && bUndefined) {
+        return -1;
+    }
+    if (aUndefined && !bUndefined) {
+        return 1;
+    }
+    if (aUndefined && bUndefined) {
+        // Both undefined, then compare IDs
+        if ((a.id ?? '') < (b.id ?? '')) {
+            return -1;
+        }
+        if ((a.id ?? '') > (b.id ?? '')) {
+            return 1;
+        }
+        return 0;
+    }
+
+    // Folders get put first
+    if (a.mimeType == FOLDER_MIME_TYPE && b.mimeType != FOLDER_MIME_TYPE) {
+        return -1;
+    }
+    if (a.mimeType != FOLDER_MIME_TYPE && b.mimeType == FOLDER_MIME_TYPE) {
+        return 1;
+    }
+
+    // Otherwise do alphabetical ordering
+    return nameCollator.compare(a.name!, b.name!);
+};
+
 const getIcon = (mimeType: string | undefined) => {
     switch (mimeType) {
+        // Folder
         case 'application/vnd.google-apps.folder':
             return faFolder;
+
+        // Document
         case 'application/vnd.google-apps.document':
+        case 'application/msword':
+        case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
             return faFileLines;
+
+        // Spreadsheet
         case 'application/vnd.google-apps.spreadsheet':
-            return faFileExcel;
+        case 'application/vnd.ms-excel':
+        case 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet':
+            return faTable;
+        case 'text/csv':
+            return faFileCsv;
+
+        // Slides
+        case 'application/vnd.google-apps.presentation':
+        case 'application/vnd.ms-powerpoint':
+        case 'application/vnd.openxmlformats-officedocument.presentationml.presentation':
+            return faWindowRestore;
+
+        // Pdf
         case 'application/pdf':
             return faFilePdf;
+
+        // Image
         case 'image/png':
-            return faFileImage;
         case 'image/jpeg':
-            return faFileImage;
+        case 'image/svg+xml':
+        case 'application/vnd.google-apps.drawing':
+        case 'application/postscript':
+            return faImage;
+
+        // Audio
         case 'audio/mpeg':
-            return faFileWaveform;
+        case 'audio/wav':
+        case 'audio/mid':
+            return faHeadphones;
+
+        // Video
+        case 'video/mp4':
+        case 'video/quicktime':
+        case 'video/avi':
+        case 'video/matroska':
+        case 'application/vnd.google-apps.vid':
+            return faClapperboard;
+
+        // Form
+        case 'application/vnd.google-apps.form':
+            return faTableList;
+
+        // Zip
+        case 'application/zip':
+        case 'application/x-zip-compressed':
+            return faFileZipper;
+
         default:
             return faFile;
     }

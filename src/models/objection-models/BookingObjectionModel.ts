@@ -148,7 +148,7 @@ export class BookingObjectionModel extends Model {
             join: {
                 from: 'Booking.id',
                 to: 'BookingCalendarEvent.bookingId',
-            }
+            },
         },
     });
 
@@ -393,7 +393,7 @@ export interface IBookingCalendarEventObjectionModel extends BaseObjectionModel 
 }
 
 export class BookingCalendarEventObjectionModel extends Model implements IBookingCalendarEventObjectionModel {
-    static tableName = 'BookingCalendarEvent'
+    static tableName = 'BookingCalendarEvent';
 
     id!: number;
     created!: string;

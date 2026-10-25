@@ -58,7 +58,12 @@ const EquipmentPackagePage: React.FC<Props> = ({ user: currentUser, globalSettin
         return <FormLoadingPage fixedWidth={true} currentUser={currentUser} globalSettings={globalSettings} />;
     }
 
-    const handleSubmit = async (equipmentPackage: PartialDeep<IEquipmentPackageObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }>) => {
+    const handleSubmit = async (
+        equipmentPackage: PartialDeep<
+            IEquipmentPackageObjectionModel,
+            { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
+        >,
+    ) => {
         const body = { equipmentPackage: equipmentPackage };
 
         const request = {

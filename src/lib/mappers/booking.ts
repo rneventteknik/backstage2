@@ -35,7 +35,9 @@ export const toBooking = (objectionModel: IBookingObjectionModel): Booking => {
         timeEstimates: objectionModel.timeEstimates ? objectionModel.timeEstimates.map(toTimeEstimate) : undefined,
         changelog: objectionModel.changelog ? objectionModel.changelog.map(toBookingChangelogEntry) : undefined,
         timeReports: objectionModel.timeReports ? objectionModel.timeReports.map(toTimeReport) : undefined,
-        calendarEvents: objectionModel.calendarEvents ? objectionModel.calendarEvents.map(toBookingCalendarEvent) : undefined,
+        calendarEvents: objectionModel.calendarEvents
+            ? objectionModel.calendarEvents.map(toBookingCalendarEvent)
+            : undefined,
         invoiceDate: toDatetimeOrUndefined(objectionModel.invoiceDate),
         emailThreads: objectionModel.emailThreads ? objectionModel.emailThreads.map(toEmailThread) : undefined,
     };
@@ -184,7 +186,10 @@ export const toEquipmentListObjectionModel = (
 
 export const toEquipmentListHeadingEntryObjectionModel = (
     clientModel: Partial<EquipmentListHeading>,
-): PartialDeep<IEquipmentListHeadingEntryObjectionModel, { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }> => {
+): PartialDeep<
+    IEquipmentListHeadingEntryObjectionModel,
+    { recurseIntoArrays: true; allowUndefinedInNonTupleArrays: false }
+> => {
     return {
         ...clientModel,
         created: undefined,
@@ -214,9 +219,7 @@ export const toEquipmentListEntryObjectionModel = (
     };
 };
 
-export const toBookingCalendarEvent = (
-    objectionModel: IBookingCalendarEventObjectionModel,
-): BookingCalendarEvent => {
+export const toBookingCalendarEvent = (objectionModel: IBookingCalendarEventObjectionModel): BookingCalendarEvent => {
     if (!objectionModel.id) {
         throw new Error('Invalid booking calendar event entry');
     }
@@ -228,4 +231,3 @@ export const toBookingCalendarEvent = (
         created: toDatetimeOrUndefined(objectionModel.created),
     };
 };
-

@@ -15,7 +15,7 @@ import {
     toEquipmentListObjectionModel,
 } from './mappers/booking';
 import { getResponseContentOrError } from './utils';
-import { getNextSortIndex, moveItemUp, moveItemDown, getSortedList } from './sortIndexUtils';
+import { getNextSortIndex, moveItemUp, moveItemDown, getSortedList } from './sortUtils';
 import { ITimeEstimateObjectionModel, ITimeReportObjectionModel } from '../models/objection-models';
 import { toTimeEstimate } from './mappers/timeEstimate';
 import { EquipmentPackageEntry } from '../models/interfaces/EquipmentPackage';
@@ -88,7 +88,7 @@ export const getHeaderOfEntity = (entity: EquipmentListEntry, list: EquipmentLis
 // The peers of the entity is all the items in the same list or under the same heading, including the supplied item.
 export const getPeersOfViewModel = (viewModel: EquipmentListEntityViewModel, list: EquipmentList) =>
     viewModel.parentId
-        ? getSubEntitiesToDisplay(list).find((x) => x.parentId === viewModel.parentId)?.entities ?? []
+        ? (getSubEntitiesToDisplay(list).find((x) => x.parentId === viewModel.parentId)?.entities ?? [])
         : getEntitiesToDisplay(list);
 
 export const getEquipmentFromViewModel = (viewModel: EquipmentListEntityViewModel) => {
@@ -256,7 +256,7 @@ export const addEquipmentPackage = (
 ) => {
     if (equipmentPackage.addAsHeading) {
         addHeadingEntry(
-            language === Language.SV ? equipmentPackage.name : equipmentPackage.nameEN ?? equipmentPackage.name,
+            language === Language.SV ? equipmentPackage.name : (equipmentPackage.nameEN ?? equipmentPackage.name),
             list,
             pricePlan,
             language,

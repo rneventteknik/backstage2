@@ -35,7 +35,9 @@ const handler = withSessionContext(
                 booking.calendarEvents.map((e) => getCalendarEvent(e.calendarEventId)),
             );
 
-            const bookingWorkersSlackIds = calendarEvents.flatMap((e) => e.workingUsers?.map((user) => user.slackId) ?? []);
+            const bookingWorkersSlackIds = calendarEvents.flatMap(
+                (e) => e.workingUsers?.map((user) => user.slackId) ?? [],
+            );
             const calendarEventLinks = calendarEvents
                 .filter((e) => notEmpty(e.link))
                 .map((e) => ({ link: e.link!, name: e.name }));

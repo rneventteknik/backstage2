@@ -103,11 +103,9 @@ const EquipmentSearch: React.FC<Props> = ({ id, placeholder = '', onSelect, onFo
         );
     };
 
-    const renderMenu = (
-        results: Option[],
-        menuProps: RenderMenuProps,
-        state: RenderMenuState,
-    ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
+    const renderMenu = (results: Option[], menuProps: RenderMenuProps, state: RenderMenuState) => (
+        <Menu results={results} menuProps={menuProps} state={state}></Menu>
+    );
 
     type MenuProps = {
         results: Option[];

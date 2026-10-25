@@ -140,7 +140,9 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
                     return (
                         <small>
                             <SplitHighlighter search={highlightText} textToHighlight={equipment.nameEN} />{' '}
-                            {equipment.tags?.map((x) => <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />)}
+                            {equipment.tags?.map((x) => (
+                                <EquipmentTagDisplay tag={x} key={x.id} className="me-1" />
+                            ))}
                         </small>
                     );
 
@@ -200,11 +202,9 @@ const Search: React.FC<Props> = ({ onFocus, onBlur }: Props) => {
         );
     };
 
-    const renderMenu = (
-        results: Option[],
-        menuProps: RenderMenuProps,
-        state: RenderMenuState,
-    ) => <Menu results={results} menuProps={menuProps} state={state}></Menu>;
+    const renderMenu = (results: Option[], menuProps: RenderMenuProps, state: RenderMenuState) => (
+        <Menu results={results} menuProps={menuProps} state={state}></Menu>
+    );
 
     type MenuProps = {
         results: Option[];

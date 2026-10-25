@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { Alert, Button, Card, Dropdown, DropdownButton, DropdownDivider, Form, ListGroup, Modal } from 'react-bootstrap';
+import {
+    Alert,
+    Button,
+    Card,
+    Dropdown,
+    DropdownButton,
+    DropdownDivider,
+    Form,
+    ListGroup,
+    Modal,
+} from 'react-bootstrap';
 import useSwr from 'swr';
 import { getMemberStatusName, getResponseContentOrError } from '../../lib/utils';
 import {
@@ -68,18 +78,24 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onS
                     </Button>
                     {!readonly ? (
                         <>
-                            <DropdownButton id="dropdown-calendar-workers-header" variant="secondary" title="Mer" size="sm">
+                            <DropdownButton
+                                id="dropdown-calendar-workers-header"
+                                variant="secondary"
+                                title="Mer"
+                                size="sm"
+                            >
                                 <Dropdown.Item onClick={() => setShowSelectCalendarEventModal(true)}>
-                                    <FontAwesomeIcon icon={faCalendar} className="me-1 fa-fw" /> Koppla fler kalenderevent
+                                    <FontAwesomeIcon icon={faCalendar} className="me-1 fa-fw" /> Koppla fler
+                                    kalenderevent
                                 </Dropdown.Item>
                                 <DropdownDivider />
                                 <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(false)}>
-                                    <FontAwesomeIcon icon={faMessage} className="me-1 fa-fw" /> Skicka direktmeddelande till
-                                    de som jobbar
+                                    <FontAwesomeIcon icon={faMessage} className="me-1 fa-fw" /> Skicka direktmeddelande
+                                    till de som jobbar
                                 </Dropdown.Item>
                                 <Dropdown.Item onClick={() => sendMessageToCalendarWorkers(true)}>
-                                    <FontAwesomeIcon icon={faHashtag} className="me-1 fa-fw" /> Skapa slackkanal med de som
-                                    jobbar
+                                    <FontAwesomeIcon icon={faHashtag} className="me-1 fa-fw" /> Skapa slackkanal med de
+                                    som jobbar
                                 </Dropdown.Item>
                             </DropdownButton>
                         </>
@@ -91,17 +107,17 @@ const CalendarWorkersCard: React.FC<Props> = ({ bookingId, calendarEventIds, onS
                             <ListGroup.Item className="text-center font-italic text-muted">
                                 Koppla bokningen till kalenderevent för att se uppskrivna arbetare.
                             </ListGroup.Item>
-                        ) :
-                            calendarEventIds.map(calendarEventId =>
+                        ) : (
+                            calendarEventIds.map((calendarEventId) => (
                                 <CalendarSublist
                                     key={calendarEventId}
                                     bookingId={bookingId}
                                     calendarEventId={calendarEventId}
-                                    onRemove={() => onSubmit(calendarEventIds.filter(id => id != calendarEventId))}
+                                    onRemove={() => onSubmit(calendarEventIds.filter((id) => id != calendarEventId))}
                                     readonly={readonly}
                                 />
-                            )
-                        }
+                            ))
+                        )}
                     </ListGroup>
                 ) : null}
             </Card>
@@ -123,10 +139,7 @@ type CalendarSublistProps = {
     readonly: boolean;
 };
 
-const CalendarSublist: React.FC<CalendarSublistProps> = ({
-    calendarEventId,
-    onRemove,
-}: CalendarSublistProps) => {
+const CalendarSublist: React.FC<CalendarSublistProps> = ({ calendarEventId, onRemove }: CalendarSublistProps) => {
     const [showSelectCalendarEventModal, setShowSelectCalendarEventModal] = useState(false);
 
     const { data, error } = useSwr(`/api/calendar/${calendarEventId}`, (url) =>
@@ -152,11 +165,12 @@ const CalendarSublist: React.FC<CalendarSublistProps> = ({
         return <Skeleton height={150} className="mb-3" />;
     }
 
-    const workingUsers = data.workingUsers;
+    const workingUsers = data.workingUsers ?? [];
 
     // Workers list
     //
-    return ( // TODO: Better error handling for missing calendar name
+    return (
+        // TODO: Better error handling for missing calendar name
         <>
             <Card.Header className="d-flex">
                 <span className="flex-grow-1">{getEventNameWithoutNameTags(data.name) || 'Kalender event'}</span>
@@ -291,10 +305,7 @@ const SelectCalendarEventModal: React.FC<SelectCalendarEventModalProps> = ({
                         <p className="text-monospace mt-2 mb-0">Id: {value}</p>
                     </Alert>
                 ) : null}
-                <Form.Select
-                    value={selectedCalendarEvent}
-                    onChange={(e) => setSelectedCalendarEvent(e.target.value)}
-                >
+                <Form.Select value={selectedCalendarEvent} onChange={(e) => setSelectedCalendarEvent(e.target.value)}>
                     {cannotFindConnectedEvent ? (
                         <option value={selectedCalendarEvent}>Okänt event ({value})</option>
                     ) : null}
