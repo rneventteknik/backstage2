@@ -1,6 +1,6 @@
 {
     "name": "backstage2",
-    "version": "1.26.0-lingonberry",
+    "version": "1.26.1-lingonberry",
     "type": "module",
     "engines": {
         "node": "^26.0.0"
