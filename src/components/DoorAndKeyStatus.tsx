@@ -41,6 +41,11 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({
     const alarmTopic = getGlobalSetting('mqtt.alarmTopic', globalSettings, '');
 
     useEffect(() => {
+        const topics = [keyTopic, doorTopic, alarmTopic].filter((topic) => topic.length > 0);
+        if (topics.length === 0) {
+            return;
+        }
+
         fetch('api/auth/mqtt-credentials').then(async (response) => {
             const credentials = await response.json();
 
@@ -58,7 +63,7 @@ const DoorAndKeyStatusContent: React.FC<DoorAndKeyStatusContentProps> = ({
             }
 
             mqttConnection.current.on('connect', () => {
-                mqttConnection.current?.subscribe([keyTopic, doorTopic, alarmTopic], (error) => {
+                mqttConnection.current?.subscribe(topics, (error) => {
                     if (error) {
                         console.error('Error subscribing', error);
                     }
