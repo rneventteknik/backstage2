@@ -112,7 +112,7 @@ export const fetchBookingsForUser = async (userId: number): Promise<BookingObjec
     return BookingObjectionModel.query()
         .where('ownerUserId', userId)
         .withGraphFetched('equipmentLists')
-        .withGraphFetched('changelog(changelogInfo)')
+        .withGraphFetched('changelog(changelogInfo)', { limitPerParent: false })
         .modifiers({
             changelogInfo: (builder) => {
                 builder.orderBy('updated', 'desc').limit(25);
@@ -127,7 +127,7 @@ export const fetchBookingsForCoOwnerUser = async (userId: number): Promise<Booki
         .withGraphFetched('equipmentLists')
         .joinRelated('coOwnerUsers')
         .where('coOwnerUsers.id', userId)
-        .withGraphFetched('changelog(changelogInfo)')
+        .withGraphFetched('changelog(changelogInfo)', { limitPerParent: false })
         .modifiers({
             changelogInfo: (builder) => {
                 builder.orderBy('updated', 'desc').limit(25);
@@ -168,11 +168,7 @@ export const fetchBookingsForEquipment = async (equipmentId: number): Promise<Bo
                 .where('equipmentLists:listHeadings:listEntries.equipmentId', equipmentId)
                 .select('Booking.id'),
         )
-        .withGraphFetched('equipmentLists')
-        .withGraphFetched('equipmentLists.listEntries')
-        .withGraphFetched('equipmentLists.listEntries.equipment')
-        .withGraphFetched('equipmentLists.listHeadings.listEntries')
-        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment');
+        .withGraphFetched('equipmentLists.[listEntries.equipment, listHeadings.listEntries.equipment]');
 };
 
 export const fetchBookingsReadyForCashPayment = async (): Promise<BookingObjectionModel[]> => {
@@ -180,9 +176,7 @@ export const fetchBookingsReadyForCashPayment = async (): Promise<BookingObjecti
 
     return BookingObjectionModel.query()
         .where('Booking.paymentStatus', PaymentStatus.READY_FOR_CASH_PAYMENT)
-        .withGraphFetched('equipmentLists.listEntries')
-        .withGraphFetched('equipmentLists.listHeadings.listEntries')
-        .withGraphFetched('timeReports');
+        .withGraphFetched('[equipmentLists.[listEntries, listHeadings.listEntries], timeReports]');
 };
 
 export const fetchBookingsPaidWithCash = async (): Promise<BookingObjectionModel[]> => {
@@ -190,9 +184,7 @@ export const fetchBookingsPaidWithCash = async (): Promise<BookingObjectionModel
 
     return BookingObjectionModel.query()
         .where('Booking.paymentStatus', PaymentStatus.PAID_WITH_CASH)
-        .withGraphFetched('equipmentLists.listEntries')
-        .withGraphFetched('equipmentLists.listHeadings.listEntries')
-        .withGraphFetched('timeReports');
+        .withGraphFetched('[equipmentLists.[listEntries, listHeadings.listEntries], timeReports]');
 };
 
 export const fetchBooking = async (id: number): Promise<BookingObjectionModel> => {
@@ -348,7 +340,10 @@ export const updateBooking = async (
         });
     }
 
-    await BookingObjectionModel.query().patchAndFetchById(id, withUpdatedDate(removeIdAndDates(booking)));
+    await BookingObjectionModel.query().patchAndFetchById(
+        id,
+        BookingObjectionModel.fromJson(withUpdatedDate(removeIdAndDates(booking)), { patch: true }),
+    );
 
     return fetchBookingWithUser(id);
 };

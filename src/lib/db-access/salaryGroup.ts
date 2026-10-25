@@ -1,4 +1,4 @@
-import Objection from 'objection';
+import * as Objection from 'objection';
 import { SalaryGroupObjectionModel } from '../../models/objection-models/SalaryGroupObjectionModel';
 import { ensureDatabaseIsInitialized } from '../database';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
@@ -11,11 +11,7 @@ export const fetchSalaryGroup = async (
 
     return SalaryGroupObjectionModel.query(trx)
         .findById(id)
-        .withGraphFetched('user')
-        .withGraphFetched('bookings')
-        .withGraphFetched('bookings.ownerUser')
-        .withGraphFetched('bookings.equipmentLists.listEntries')
-        .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
+        .withGraphFetched('[user, bookings.[ownerUser, equipmentLists.[listEntries, listHeadings.listEntries]]]');
 };
 
 export const fetchSalaryGroupWithSalaryInformation = async (
@@ -39,11 +35,9 @@ export const fetchSalaryGroupWithSalaryInformation = async (
 
 export const fetchSalaryGroups = async (): Promise<SalaryGroupObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return SalaryGroupObjectionModel.query()
-        .withGraphFetched('user')
-        .withGraphFetched('bookings.equipmentLists')
-        .withGraphFetched('bookings.equipmentLists.listEntries')
-        .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
+    return SalaryGroupObjectionModel.query().withGraphFetched(
+        '[user, bookings.equipmentLists.[listEntries, listHeadings.listEntries]]',
+    );
 };
 
 export const updateSalaryGroup = async (

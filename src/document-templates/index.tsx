@@ -1,4 +1,5 @@
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
+import { DocumentProps } from '@react-pdf/renderer';
 import { PriceEstimateDocument } from './components/priceEstimateDocument';
 import { Booking } from '../models/interfaces';
 import { getTextResourcesFromGlobalSettings, overrideTranslations, registerFonts } from './utils';
@@ -22,7 +23,7 @@ export const getPriceEstimateDocument = (
     documentLanguage: Language,
     globalSettings: KeyValue[],
     textResourcesOverrides: Record<string, string> = {},
-): ReactElement => (
+): ReactElement<DocumentProps> => (
     <TextResourcesContext.Provider
         value={{
             language: documentLanguage,
@@ -66,7 +67,7 @@ export const getPackingListDocument = (
     globalSettings: KeyValue[],
     equipmentListId?: number,
     textResourcesOverrides: Record<string, string> = {},
-): ReactElement => (
+): ReactElement<DocumentProps> => (
     <TextResourcesContext.Provider
         value={{
             language: documentLanguage,
@@ -99,7 +100,7 @@ export const getRentalConfirmationDocument = (
     documentLanguage: Language,
     globalSettings: KeyValue[],
     textResourcesOverrides: Record<string, string> = {},
-): ReactElement => (
+): ReactElement<DocumentProps> => (
     <TextResourcesContext.Provider
         value={{
             language: documentLanguage,
@@ -127,9 +128,10 @@ export const getRentalConfirmationDocumentFileName = (
 
 // Salary Report (no language support)
 //
-export const getSalaryReportDocument = (salaryReport: SalaryReport, globalSettings: KeyValue[]): ReactElement => (
-    <SalaryReportDocument salaryReport={salaryReport} globalSettings={globalSettings} />
-);
+export const getSalaryReportDocument = (
+    salaryReport: SalaryReport,
+    globalSettings: KeyValue[],
+): ReactElement<DocumentProps> => <SalaryReportDocument salaryReport={salaryReport} globalSettings={globalSettings} />;
 
 export const getSalaryReportDocumentFileName = (salaryReport: SalaryReport): string => `${salaryReport.name}.pdf`;
 
@@ -140,7 +142,7 @@ export const getInvoiceDocument = (
     documentLanguage: Language,
     globalSettings: KeyValue[],
     textResourcesOverrides: Record<string, string> = {},
-): ReactElement => (
+): ReactElement<DocumentProps> => (
     <TextResourcesContext.Provider
         value={{
             language: documentLanguage,

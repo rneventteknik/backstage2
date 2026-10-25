@@ -1,4 +1,4 @@
-import Objection from 'objection';
+import * as Objection from 'objection';
 import {
     EquipmentPackageEntryObjectionModel,
     EquipmentPackageObjectionModel,
@@ -42,17 +42,14 @@ export const fetchEquipmentPackage = async (
 
     return EquipmentPackageObjectionModel.query(trx)
         .findById(id)
-        .withGraphFetched('equipmentEntries.equipment.prices')
-        .withGraphFetched('equipmentEntries.equipmentPrice')
-        .withGraphFetched('tags');
+        .withGraphFetched('[equipmentEntries.[equipment.prices, equipmentPrice], tags]');
 };
 
 export const fetchEquipmentPackages = async (): Promise<EquipmentPackageObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return EquipmentPackageObjectionModel.query()
-        .withGraphFetched('equipmentEntries.equipment')
-        .withGraphFetched('equipmentEntries.equipmentPrice')
-        .withGraphFetched('tags');
+    return EquipmentPackageObjectionModel.query().withGraphFetched(
+        '[equipmentEntries.[equipment, equipmentPrice], tags]',
+    );
 };
 
 export const updateEquipmentPackage = async (

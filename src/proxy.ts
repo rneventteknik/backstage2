@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
     const currentEnv = process.env.NODE_ENV as 'production' | 'development' | 'other';
 
     if (currentEnv === 'production' && req.headers.get('x-forwarded-proto') !== 'https') {

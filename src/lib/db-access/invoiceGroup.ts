@@ -1,4 +1,4 @@
-import Objection from 'objection';
+import * as Objection from 'objection';
 import { InvoiceGroupObjectionModel } from '../../models/objection-models/InvoiceGroupObjectionModel';
 import { ensureDatabaseIsInitialized } from '../database';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
@@ -11,20 +11,14 @@ export const fetchInvoiceGroup = async (
 
     return InvoiceGroupObjectionModel.query(trx)
         .findById(id)
-        .withGraphFetched('user')
-        .withGraphFetched('bookings.ownerUser')
-        .withGraphFetched('bookings.equipmentLists.listEntries')
-        .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
+        .withGraphFetched('[user, bookings.[ownerUser, equipmentLists.[listEntries, listHeadings.listEntries]]]');
 };
 
 export const fetchInvoiceGroups = async (): Promise<InvoiceGroupObjectionModel[]> => {
     ensureDatabaseIsInitialized();
-    return InvoiceGroupObjectionModel.query()
-        .withGraphFetched('user')
-        .withGraphFetched('bookings.ownerUser')
-        .withGraphFetched('bookings.equipmentLists')
-        .withGraphFetched('bookings.equipmentLists.listEntries')
-        .withGraphFetched('bookings.equipmentLists.listHeadings.listEntries');
+    return InvoiceGroupObjectionModel.query().withGraphFetched(
+        '[user, bookings.[ownerUser, equipmentLists.[listEntries, listHeadings.listEntries]]]',
+    );
 };
 
 export const updateInvoiceGroup = async (

@@ -201,6 +201,10 @@
     --bs-list-group-color: #{$backstage-text-color};
 
     color-scheme: dark;
+
+    // Loading skeletons (react-loading-skeleton)
+    --backstage-skeleton-base-color: #{$backstage-color-1};
+    --backstage-skeleton-highlight-color: #{$backstage-color-4};
 }
 
 // =============================================================================

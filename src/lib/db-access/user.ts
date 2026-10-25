@@ -76,8 +76,7 @@ export const fetchUsers = async (): Promise<UserObjectionModel[]> => {
     // Since all users can view this list, we do not include personal information here
     return UserObjectionModel.query()
         .select('id', 'name', 'created', 'updated', 'memberStatus', 'nameTag', 'phoneNumber', 'slackId', 'emailAddress')
-        .withGraphFetched('userAuth')
-        .withGraphFetched('userCards');
+        .withGraphFetched('[userAuth, userCards]');
 };
 
 export const updateUser = async (id: number, user: UserObjectionModel): Promise<UserObjectionModel> => {

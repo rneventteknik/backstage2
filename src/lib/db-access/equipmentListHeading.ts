@@ -1,4 +1,4 @@
-import Objection from 'objection';
+import * as Objection from 'objection';
 import {
     EquipmentListEntryObjectionModel,
     EquipmentListHeadingObjectionModel,
@@ -16,9 +16,7 @@ export const fetchEquipmentListHeading = async (
     return EquipmentListHeadingObjectionModel.query(trx)
         .findById(id)
         .orderBy('id')
-        .withGraphFetched('listEntries.equipment.prices')
-        .withGraphFetched('listEntries.equipment.equipmentLocation')
-        .withGraphFetched('listEntries.equipmentPrice');
+        .withGraphFetched('listEntries.[equipment.[prices, equipmentLocation], equipmentPrice]');
 };
 
 export const updateEquipmentListHeading = async (

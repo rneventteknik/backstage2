@@ -50,8 +50,8 @@ const Layout: React.FC<Props> = ({
             </aside>
 
             <SkeletonTheme
-                baseColor={styles.skeletonColorBase}
-                highlightColor={styles.skeletonColorHighlight}
+                baseColor="var(--backstage-skeleton-base-color)"
+                highlightColor="var(--backstage-skeleton-highlight-color)"
                 borderRadius={0}
             >
                 <section className={styles.mainContentContainer + ' p-4'}>

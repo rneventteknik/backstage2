@@ -9,7 +9,7 @@ type Props = {
     resetAdvancedFilters: () => void;
     activeFilterCount: number;
     searchText: string;
-    children: React.ReactChild | React.ReactChild[];
+    children: React.ReactNode;
 };
 
 const AdvancedFilters: React.FC<Props> = ({

@@ -2,7 +2,9 @@ import React, { FormEvent, useEffect, useRef, useState } from 'react';
 import { Form, FormControl, Button, FormGroup, Alert, Spinner } from 'react-bootstrap';
 import Router from 'next/router';
 import posthog from 'posthog-js';
-import { useUser } from '../lib/useUser';
+// Imported under a non-hook name: when a `use*` function is called inside getServerSideProps, Turbopack's dev
+// server does not strip the import from the client bundle, which then pulls server-only modules into the browser.
+import { useUser as checkUser } from '../lib/useUser';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { getGlobalSetting, getRoleName, getValueOrFirst } from '../lib/utils';
 import { KeyValue } from '../models/interfaces/KeyValue';
@@ -22,8 +24,7 @@ const containerStyle = {
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
     // 1. Check existing session (redirects to '/' if logged in)
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const userCheck = await useUser(undefined, undefined, '/')(context);
+    const userCheck = await checkUser(undefined, undefined, '/')(context);
 
     if ('redirect' in userCheck) {
         return userCheck;

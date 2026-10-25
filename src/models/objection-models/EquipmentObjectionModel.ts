@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
 import { Model, RelationMappingsThunk } from 'objection';
 import { BaseObjectionModelWithName } from '.';
 

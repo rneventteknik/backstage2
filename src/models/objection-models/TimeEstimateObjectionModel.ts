@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-interface */
 import { Model } from 'objection';
 import { BaseObjectionModelWithName } from '.';
 
