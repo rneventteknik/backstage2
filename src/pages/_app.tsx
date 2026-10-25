@@ -3,7 +3,7 @@ import { ReactElement, useEffect } from 'react';
 import { AppProps } from 'next/app';
 import 'react-bootstrap-typeahead/css/Typeahead.css';
 import 'react-loading-skeleton/dist/skeleton.css';
-import { Provider } from 'react-bus';
+import { EventBusProvider } from '../lib/eventBus';
 import posthog from 'posthog-js';
 import { PostHogProvider } from 'posthog-js/react';
 
@@ -51,10 +51,10 @@ export default function MyApp({ Component, pageProps }: AppProps): ReactElement 
     return (
         <PostHogProvider client={posthog}>
             <DndContext sensors={sensors} collisionDetection={closestCenter}>
-                <Provider>
+                <EventBusProvider>
                     <NotificationsContainer />
                     <Component {...pageProps} />
-                </Provider>
+                </EventBusProvider>
             </DndContext>
         </PostHogProvider>
     );
