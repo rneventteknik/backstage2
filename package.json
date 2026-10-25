@@ -94,5 +94,11 @@
     "overrides": {
         "@types/react": "$@types/react",
         "strip-ansi": "6.0.1"
+    },
+    "allowScripts": {
+        "core-js": false,
+        "unrs-resolver": false,
+        "@parcel/watcher": false,
+        "better-sqlite3": false
     }
 }
