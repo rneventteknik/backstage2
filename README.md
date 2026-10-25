@@ -4,6 +4,8 @@ Backstage2 is a web app that is created by RN, for RN, and is used to keep track
 
 ## Quick Start
 
+Requires Node.js 26 (see `engines` in [`package.json`](package.json)).
+
 ```bash
 git clone <repo>
 cd backstage2
@@ -26,14 +28,22 @@ Open http://localhost:3000 and log in with `albert` / `dmx`.
 
 ### npm Scripts
 
-| Command                | Description                             |
-| ---------------------- | --------------------------------------- |
-| `npm run dev`          | Start local development server          |
-| `npm run migrate`      | Run latest Knex migrations              |
-| `npm run seed`         | Seed database with mock data            |
-| `npm run reset-sqlite` | Wipe SQLite database, migrate, and seed |
-| `npm run tc`           | Type-check with TypeScript              |
-| `npm run lint`         | Run ESLint and auto-fix                 |
+| Command                       | Description                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ |
+| `npm run dev`                 | Start local development server                                                                   |
+| `npm run build`               | Build for production                                                                             |
+| `npm run start`               | Start the production server (run `npm run build` first)                                          |
+| `npm run migrate`             | Run latest Knex migrations                                                                       |
+| `npm run migrate:down`        | Undo the last migration                                                                          |
+| `npm run migrate:make <name>` | Create a new migration file in `knex/migrations`                                                 |
+| `npm run seed`                | Seed database with mock data                                                                     |
+| `npm run seed:init`           | Delete users, bookings, equipment and settings, and create a single admin user (`admin` / `dmx`) |
+| `npm run reset-sqlite`        | Wipe SQLite database, migrate, and seed                                                          |
+| `npm run tc`                  | Type-check with TypeScript                                                                       |
+| `npm run lint`                | Run ESLint                                                                                       |
+| `npm run tcl`                 | Type-check and lint                                                                              |
+| `npm run format`              | Format all files with Prettier                                                                   |
+| `npm run format:check`        | Check formatting with Prettier (runs in CI together with `tc` and `lint`)                        |
 
 ### Seed Users
 
