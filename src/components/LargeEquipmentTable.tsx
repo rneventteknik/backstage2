@@ -2,7 +2,7 @@ import React, { ChangeEvent } from 'react';
 import { Equipment, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
 import { countNotNullorEmpty, notEmpty } from '../lib/utils';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { TypedTypeahead } from './utils/TypedTypeahead';
 import { Col, Form, Row, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEyeSlash, faTags } from '@fortawesome/free-solid-svg-icons';
@@ -226,12 +226,12 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Taggar</Form.Label>
-                            <Typeahead
+                            <TypedTypeahead
                                 id="tags-typeahead"
                                 multiple
                                 labelKey="name"
                                 options={equipmentTags ?? []}
-                                onChange={(e) => setFilterTags(e as EquipmentTag[])}
+                                onChange={(e) => setFilterTags(e)}
                                 placeholder="Filtrera på taggar"
                                 selected={
                                     filterTags
@@ -244,12 +244,12 @@ const LargeEquipmentTable: React.FC<Props> = ({ equipment, tableSettingsOverride
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Platser</Form.Label>
-                            <Typeahead
+                            <TypedTypeahead
                                 id="tags-typeahead"
                                 multiple
                                 labelKey="name"
                                 options={getSortedList(equipmentLocations ?? [])}
-                                onChange={(e) => setFilterLocations(e as EquipmentLocation[])}
+                                onChange={(e) => setFilterLocations(e)}
                                 placeholder="Filtrera på plats"
                                 selected={
                                     filterLocations

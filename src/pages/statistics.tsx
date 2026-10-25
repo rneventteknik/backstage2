@@ -27,7 +27,7 @@ import { getNumberOfDays, toBookingViewModel } from '../lib/datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import AccountStatistics from '../components/statistics/AccountStatistics';
 import currency from 'currency.js';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { TypedTypeahead } from '../components/utils/TypedTypeahead';
 
 // eslint-disable-next-line react-hooks/rules-of-hooks
 export const getServerSideProps = useUserWithDefaultAccessAndWithSettings();
@@ -442,12 +442,12 @@ const StatisticsPage: React.FC<Props> = ({ user: currentUser, globalSettings }: 
                     <Form className="d-flex">
                         <Form.Group controlId="statuses" className="d-flex align-items-center me-3">
                             <Form.Label className="me-2">Status</Form.Label>
-                            <Typeahead
+                            <TypedTypeahead
                                 id="status-typeahead"
                                 multiple
                                 labelKey="label"
                                 options={statusOptions}
-                                onChange={(e) => setStatuses((e as typeof statusOptions).map((o) => o.value))}
+                                onChange={(e) => setStatuses(e.map((o) => o.value))}
                                 placeholder="Filtrera på status"
                                 selected={statuses
                                     .map((id) => statusOptions.find((x) => x.value === id))

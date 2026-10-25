@@ -2,7 +2,7 @@ import React, { ChangeEvent } from 'react';
 import { EquipmentPackage, EquipmentTag } from '../models/interfaces';
 import { TableDisplay, TableConfiguration } from './TableDisplay';
 import { countNotNullorEmpty, notEmpty } from '../lib/utils';
-import { Typeahead } from 'react-bootstrap-typeahead';
+import { TypedTypeahead } from './utils/TypedTypeahead';
 import { Col, Form, Row } from 'react-bootstrap';
 import TableStyleLink from './utils/TableStyleLink';
 import useSwr from 'swr';
@@ -105,12 +105,12 @@ const LargeEquipmentPackageTable: React.FC<Props> = ({ equipmentPackages, tableS
                     <Col md="4">
                         <Form.Group>
                             <Form.Label>Taggar</Form.Label>
-                            <Typeahead
+                            <TypedTypeahead
                                 id="tags-typeahead"
                                 multiple
                                 labelKey="name"
                                 options={equipmentTags ?? []}
-                                onChange={(e) => setFilterTags(e as EquipmentTag[])}
+                                onChange={(e) => setFilterTags(e)}
                                 placeholder="Filtrera på taggar"
                                 selected={
                                     filterTags
