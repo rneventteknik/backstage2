@@ -28,15 +28,10 @@ const toWebRequest = (req: NextApiRequest): Request => {
     });
 };
 
-const handler = withMcpApiKeyContext(async (req: NextApiRequest, res: NextApiResponse, context): Promise<void> => {
+const handler = withMcpApiKeyContext(async (req: NextApiRequest, res: NextApiResponse, authInfo): Promise<void> => {
     const response = await mcpHandler.fetch(toWebRequest(req), {
         parsedBody: req.body === '' ? undefined : req.body,
-        authInfo: {
-            // Required by the SDK's AuthInfo type, but nothing reads it; the key is verified in withMcpApiKeyContext.
-            token: '',
-            clientId: context.currentUser.name ?? '',
-            scopes: context.currentUser.scopes ?? [],
-        },
+        authInfo,
     });
 
     res.status(response.status);
