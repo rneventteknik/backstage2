@@ -3,7 +3,7 @@ import * as z from 'zod';
 import { BookingType } from '../../models/enums/BookingType';
 import { Status } from '../../models/enums/Status';
 import { BookingViewModel, Equipment } from '../../models/interfaces';
-import { getEquipmentInDatetime, getEquipmentOutDatetime, toBookingViewModel } from '../datetimeUtils';
+import { toBookingViewModel } from '../datetimeUtils';
 import { EquipmentConflictStatus } from '../equipmentConflicts';
 import { filterBookings, groupBookingsByEquipmentUsageTime } from '../bookingFilters';
 import { searchBookings } from '../db-access';
@@ -13,6 +13,7 @@ import {
     fetchBookingsForEquipment,
     fetchBookingsWithEquipmentInInterval,
 } from '../db-access/booking';
+import { fetchEquipmentConflictsForBooking } from '../db-access/equipmentConflicts';
 import { fetchEquipment, fetchEquipments, searchEquipment } from '../db-access/equipment';
 import { fetchSettings } from '../db-access/setting';
 import { fetchUserNamesAndTags } from '../db-access/user';
@@ -20,12 +21,7 @@ import { getCalendarEvent } from '../calenderUtils';
 import { toBooking } from '../mappers/booking';
 import { toEquipment } from '../mappers/equipment';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
-import {
-    CONFLICT_STATUS_NAMES,
-    getCheckableEquipment,
-    getCheckableEquipmentLists,
-    toMcpBookingConflicts,
-} from './mappers/bookingConflicts';
+import { CONFLICT_STATUS_NAMES, toMcpBookingConflicts } from './mappers/bookingConflicts';
 import { toMcpBookingDetail, toMcpBookingSearchResult, toMcpCalendarEvent } from './mappers/bookingDetail';
 import { getFirstName, PII_SCOPE } from './mappers/primitives';
 import {
@@ -506,43 +502,35 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
             annotations: { readOnlyHint: true },
         },
         async ({ bookingId, includeAll }) => {
-            const bookingModel = await fetchBookingForMcp(bookingId);
+            const [bookingModel] = await fetchBookingSummariesForMcp([bookingId]);
 
             if (!bookingModel) {
                 return toErrorResult(`Booking ${bookingId} not found`);
             }
 
-            const booking = toBookingViewModel(toBooking(bookingModel));
-
-            // One query per equipment, covering every list in the booking that uses it. The mapper narrows the
-            // result down to the lists overlapping each of the booking's lists.
-            const intervalByEquipmentId = new Map<number, { from: Date; to: Date }>();
-            getCheckableEquipmentLists(booking).forEach((list) => {
-                const listOut = getEquipmentOutDatetime(list)!;
-                const listIn = getEquipmentInDatetime(list)!;
-                getCheckableEquipment(list).forEach((equipment) => {
-                    const interval = intervalByEquipmentId.get(equipment.id);
-                    intervalByEquipmentId.set(equipment.id, {
-                        from: interval && interval.from < listOut ? interval.from : listOut,
-                        to: interval && interval.to > listIn ? interval.to : listIn,
-                    });
-                });
-            });
-
-            const otherBookingsByEquipmentId = new Map(
-                await Promise.all(
-                    [...intervalByEquipmentId].map(async ([equipmentId, { from, to }]) => {
-                        const bookingModels = await fetchBookingsWithEquipmentInInterval(equipmentId, from, to);
-                        const otherBookings = bookingModels
-                            .map(toBooking)
-                            .map(toBookingViewModel)
-                            .filter((other) => other.id !== booking.id);
-                        return [equipmentId, otherBookings] as const;
-                    }),
-                ),
+            const { rows, overlaps } = await fetchEquipmentConflictsForBooking(bookingId);
+            const otherBookingIds = [...new Set(overlaps.map((x) => x.otherBookingId))].filter(
+                (id) => id !== bookingId,
+            );
+            const otherBookingModels =
+                otherBookingIds.length > 0 ? await fetchBookingSummariesForMcp(otherBookingIds) : [];
+            const bookingsById = new Map(
+                [bookingModel, ...otherBookingModels].map((x) => {
+                    const booking = toBookingViewModel(toBooking(x));
+                    return [booking.id, booking] as const;
+                }),
             );
 
-            return toJsonResult(toMcpBookingConflicts(booking, otherBookingsByEquipmentId, includeAll, canSeePii));
+            return toJsonResult(
+                toMcpBookingConflicts(
+                    bookingsById.get(bookingId)!,
+                    rows,
+                    overlaps,
+                    bookingsById,
+                    includeAll,
+                    canSeePii,
+                ),
+            );
         },
     );
 
