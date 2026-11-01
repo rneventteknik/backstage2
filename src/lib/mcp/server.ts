@@ -11,7 +11,13 @@ import { fetchUserNamesAndTags } from '../db-access/user';
 import { getCalendarEvent } from '../calenderUtils';
 import { toBooking } from '../mappers/booking';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
-import { PII_SCOPE, toMcpBookingDetail, toMcpBookingSearchResult, toMcpCalendarEvent } from './bookingMappers';
+import {
+    getFirstName,
+    PII_SCOPE,
+    toMcpBookingDetail,
+    toMcpBookingSearchResult,
+    toMcpCalendarEvent,
+} from './bookingMappers';
 import { toSwedishKeys } from './swedishKeys';
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -44,9 +50,16 @@ const toErrorResult = (message: string) => ({
 });
 
 // Matches each name tag or name to exactly one user: an exact name tag, then an exact name, then a unique partial
-// name. Returns an error message for entries that match no user or several users.
-const resolveUserIds = async (namesOrTags: string[]): Promise<{ userIds: number[] } | { error: string }> => {
-    const users = await fetchUserNamesAndTags();
+// name. Returns an error message for entries that match no user or several users. Without access to personal data,
+// names are matched and listed by first name only, so the filter can't be used to look up full names.
+const resolveUserIds = async (
+    namesOrTags: string[],
+    canSeePii: boolean,
+): Promise<{ userIds: number[] } | { error: string }> => {
+    const users = (await fetchUserNamesAndTags()).map((user) => ({
+        ...user,
+        name: canSeePii ? user.name : getFirstName(user.name),
+    }));
     const formatUser = (user: { name: string; nameTag?: string }) => `${user.name} (${user.nameTag ?? '-'})`;
 
     const userIds: number[] = [];
@@ -117,7 +130,7 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                     .optional()
                     .describe(
                         'Only include bookings whose responsible member (ansvarigMedlem) matches one of these name ' +
-                            'tags (e.g. "PJ") or names. Like the other filters, it is applied to the ' +
+                            'tags (e.g. "PJ") or names, as listed in ansvarigMedlem. Like the other filters, it is applied to the ' +
                             `${SEARCH_RESULT_LIMIT} bookings a query searches.`,
                     ),
                 from: z.iso.date().optional().describe('Only include bookings whose usage starts after this date'),
@@ -137,7 +150,7 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
         async ({ query, status, bookingType, responsibleUser, from, to, pageSize, maxBookingId }) => {
             const [bookings, resolvedUsers] = await Promise.all([
                 query?.trim() ? searchBookings(query, SEARCH_RESULT_LIMIT) : fetchBookings(),
-                responsibleUser?.length ? resolveUserIds(responsibleUser) : undefined,
+                responsibleUser?.length ? resolveUserIds(responsibleUser, canSeePii) : undefined,
             ]);
 
             if (resolvedUsers && 'error' in resolvedUsers) {

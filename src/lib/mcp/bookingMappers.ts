@@ -44,7 +44,7 @@ export interface DefaultAccounts {
 
 const getLinkToBooking = (bookingId: number): string => process.env.APPLICATION_BASE_URL + '/bookings/' + bookingId;
 
-const getFirstName = (name: string): string => name.trim().split(/\s+/)[0];
+export const getFirstName = (name: string): string => name.trim().split(/\s+/)[0];
 
 // Personal data (full names and customer contact details) is only exposed to API keys with this scope.
 export const PII_SCOPE = 'pii';
