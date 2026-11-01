@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Button, Card, Form, InputGroup, ListGroup, Modal } from 'react-bootstrap';
 import useSwr from 'swr';
-import { getMaximumNumberOfUnitUsedByBookings } from '../../../lib/equipmentConflicts';
-import { bookingsFetcher } from '../../../lib/fetchers';
-import { getMaximumNumberOfUnitUsed, toIntOrUndefined } from '../../../lib/utils';
-import { Status } from '../../../models/enums/Status';
+import { equipmentUsageFetcher } from '../../../lib/fetchers';
+import { toIntOrUndefined } from '../../../lib/utils';
 import { Equipment } from '../../../models/interfaces';
 import MarkdownCard from '../../MarkdownCard';
 import RequiredIndicator from '../../utils/RequiredIndicator';
@@ -56,21 +54,20 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
         }
     }, [numberOfUnitsRef, numberOfHoursRef]);
 
-    const { data: conflictData } = useSwr(
+    const { data: equipmentUsage } = useSwr(
         startDatetime && endDatetime
-            ? '/api/conflict-detection/booking-with-equipment?equipmentId=' +
+            ? '/api/conflict-detection/equipment-usage?equipmentId=' +
                   equipment.id +
                   '&startDatetime=' +
                   startDatetime?.toISOString() +
                   '&endDatetime=' +
                   endDatetime?.toISOString()
             : null,
-        bookingsFetcher,
+        equipmentUsageFetcher,
     );
 
-    // Filter bookings
-    const bookings = conflictData?.filter((x) => x.status !== Status.CANCELED) ?? [];
-    const numberOfUnitsUsed = getMaximumNumberOfUnitUsedByBookings(bookings, equipment);
+    const bookings = equipmentUsage?.bookings ?? [];
+    const numberOfUnitsUsed = equipmentUsage?.maxUnitsUsed ?? 0;
 
     const getDescription = () => {
         if (!startDatetime || !endDatetime) {
@@ -166,21 +163,13 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                         <Card className="mb-0">
                             <Card.Header>Överlappande bokningar ({numberOfUnitsUsed} st används)</Card.Header>
                             <ListGroup variant="flush">
-                                {bookings.map((booking) => {
-                                    const unitsUsed = getMaximumNumberOfUnitUsed(
-                                        booking.equipmentLists ?? [],
-                                        equipment,
-                                    );
-                                    return (
-                                        <ListGroup.Item key={booking.id}>
-                                            <TableStyleLink href={'/bookings/' + booking.id}>
-                                                {booking.name}
-                                            </TableStyleLink>
-                                            <span> - </span>
-                                            <span className="text-muted">{unitsUsed} st</span>
-                                        </ListGroup.Item>
-                                    );
-                                })}
+                                {bookings.map((booking) => (
+                                    <ListGroup.Item key={booking.id}>
+                                        <TableStyleLink href={'/bookings/' + booking.id}>{booking.name}</TableStyleLink>
+                                        <span> - </span>
+                                        <span className="text-muted">{booking.maxUnitsUsed} st</span>
+                                    </ListGroup.Item>
+                                ))}
                             </ListGroup>
                         </Card>
                     ) : null}

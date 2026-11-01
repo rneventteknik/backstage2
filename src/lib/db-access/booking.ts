@@ -470,53 +470,6 @@ export const validateBookingObjectionModel = (booking: BookingObjectionModel): b
     return true;
 };
 
-export const fetchBookingsWithEquipmentInInterval = async (
-    equipmentId: number,
-    startDatetime?: Date,
-    endDatetime?: Date,
-    ignoreEquipmentListId?: number,
-): Promise<BookingObjectionModel[]> => {
-    ensureDatabaseIsInitialized();
-
-    let query = BookingObjectionModel.query()
-        .withGraphJoined('ownerUser')
-        .withGraphJoined('equipmentLists.listEntries')
-        .withGraphJoined('equipmentLists.listHeadings.listEntries')
-        .where((builder) =>
-            builder
-                .where('equipmentLists:listEntries.equipmentId', equipmentId)
-                .orWhere('equipmentLists:listHeadings:listEntries.equipmentId', equipmentId),
-        );
-
-    if (endDatetime && startDatetime) {
-        query = query
-            .andWhere((builder) =>
-                builder
-                    .where('equipmentLists.equipmentOutDatetime', '<=', endDatetime.toISOString())
-                    .orWhere((builder) =>
-                        builder
-                            .whereNull('equipmentLists.equipmentOutDatetime')
-                            .andWhere('equipmentLists.usageStartDatetime', '<=', endDatetime.toISOString()),
-                    ),
-            )
-            .andWhere((builder) =>
-                builder
-                    .where('equipmentLists.equipmentInDatetime', '>=', startDatetime.toISOString())
-                    .orWhere((builder) =>
-                        builder
-                            .whereNull('equipmentLists.equipmentInDatetime')
-                            .andWhere('equipmentLists.usageEndDatetime', '>=', startDatetime.toISOString()),
-                    ),
-            );
-    }
-
-    if (ignoreEquipmentListId) {
-        query = query.whereNot('equipmentLists.id', ignoreEquipmentListId);
-    }
-
-    return query.select();
-};
-
 export const registerUserAsCoOwnerForBooking = async (
     userId: number,
     bookingId: number,

@@ -1,6 +1,10 @@
 import React from 'react';
 import { Button, Card } from 'react-bootstrap';
 import useSwr from 'swr';
+import {
+    useReloadEquipmentConflicts,
+    useReloadEquipmentConflictsWithBooking,
+} from '../../../lib/useEquipmentConflicts';
 import { bookingFetcher } from '../../../lib/fetchers';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationCircle, faPlus } from '@fortawesome/free-solid-svg-icons';
@@ -36,7 +40,14 @@ const EquipmentLists: React.FC<Props> = ({
     alwaysShowRentalControls,
     globalSettings,
 }: Props) => {
-    const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
+    const {
+        data: booking,
+        mutate,
+        error,
+        isValidating,
+    } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
+    useReloadEquipmentConflictsWithBooking(bookingId, isValidating);
+    const reloadEquipmentConflicts = useReloadEquipmentConflicts(bookingId);
 
     const {
         showCreateSuccessNotification,
@@ -131,6 +142,7 @@ const EquipmentLists: React.FC<Props> = ({
             .then(getResponseContentOrError)
             .then(() => {
                 showDeleteSuccessNotification('Listan');
+                reloadEquipmentConflicts();
             })
             .catch((error) => {
                 console.error(error);

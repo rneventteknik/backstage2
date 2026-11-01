@@ -1,7 +1,12 @@
 import { BookingViewModel } from '../../../models/interfaces';
-import { EquipmentConflictOverlap, EquipmentConflictRow } from '../../db-access/equipmentConflicts';
 import { formatDatetimeForAnalyticsExport, getEquipmentInDatetime, getEquipmentOutDatetime } from '../../datetimeUtils';
-import { EquipmentConflictStatus, equipmentListHasDatetimes } from '../../equipmentConflicts';
+import {
+    EquipmentConflictStatus,
+    EquipmentListConflict,
+    EquipmentUsageBooking,
+    equipmentListHasDatetimes,
+} from '../../equipmentConflicts';
+import { getRentalStatusName } from '../../utils';
 import { toMcpBookingSummary } from './bookingSummary';
 import { getLinkToBooking, getLinkToEquipment } from './primitives';
 
@@ -15,44 +20,43 @@ export const CONFLICT_STATUS_NAMES: Record<EquipmentConflictStatus, string> = {
 
 const PROBLEM_STATUSES = [EquipmentConflictStatus.CONFLICT, EquipmentConflictStatus.EXCEEDS_INVENTORY];
 
-const toMcpEquipmentConflict = (
-    row: EquipmentConflictRow,
-    overlaps: EquipmentConflictOverlap[],
+// The bookings in the usage, summarised with the full bookings from bookingsById.
+export const toMcpEquipmentUsageBookings = (
+    bookings: EquipmentUsageBooking[],
     bookingsById: Map<number, BookingViewModel>,
     canSeePii: boolean,
-) => {
-    const overlapsByBookingId = new Map<number, EquipmentConflictOverlap[]>();
-    overlaps.forEach((x) =>
-        overlapsByBookingId.set(x.otherBookingId, [...(overlapsByBookingId.get(x.otherBookingId) ?? []), x]),
-    );
-
-    return {
-        equipmentId: row.equipmentId,
-        equipmentName: row.equipmentName,
-        link: getLinkToEquipment(row.equipmentId),
-        conflictStatus: CONFLICT_STATUS_NAMES[row.status],
-        numberOfUnits: row.numberOfUnits,
-        maxUnitsBooked: row.numberOfUnits + row.unitsUsedByOthers,
-        inventoryCount: row.inventoryCount,
-        bookings: [...overlapsByBookingId].map(([bookingId, lists]) => ({
-            ...toMcpBookingSummary(bookingsById.get(bookingId)!, canSeePii),
-            equipmentLists: lists.map((other) => ({
-                id: other.otherEquipmentListId,
-                name: other.otherEquipmentListName,
-                equipmentOutDatetime: formatDatetimeForAnalyticsExport(other.equipmentOutDatetime),
-                equipmentInDatetime: formatDatetimeForAnalyticsExport(other.equipmentInDatetime),
-                numberOfUnits: other.numberOfUnits,
-            })),
+) =>
+    bookings.map((booking) => ({
+        ...toMcpBookingSummary(bookingsById.get(booking.id)!, canSeePii),
+        equipmentLists: booking.equipmentLists.map((list) => ({
+            id: list.id,
+            name: list.name,
+            rentalStatus: list.rentalStatus != null ? getRentalStatusName(list.rentalStatus) : null,
+            equipmentOutDatetime: formatDatetimeForAnalyticsExport(list.equipmentOutDatetime),
+            equipmentInDatetime: formatDatetimeForAnalyticsExport(list.equipmentInDatetime),
+            numberOfUnits: list.numberOfUnits,
         })),
-    };
-};
+    }));
 
-// rows and overlaps come from fetchEquipmentConflictsForBooking; bookingsById holds the booking and every booking in
-// overlaps, with their equipment lists.
+const toMcpEquipmentConflict = (
+    conflict: EquipmentListConflict,
+    bookingsById: Map<number, BookingViewModel>,
+    canSeePii: boolean,
+) => ({
+    equipmentId: conflict.equipmentId,
+    equipmentName: conflict.equipmentName,
+    link: getLinkToEquipment(conflict.equipmentId),
+    conflictStatus: CONFLICT_STATUS_NAMES[conflict.status],
+    numberOfUnits: conflict.numberOfUnits,
+    maxUnitsBooked: conflict.maxUnitsUsed,
+    inventoryCount: conflict.inventoryCount,
+    bookings: toMcpEquipmentUsageBookings(conflict.overlappingBookings, bookingsById, canSeePii),
+});
+
+// conflicts come from fetchEquipmentConflictsForBooking; bookingsById holds the booking and every overlapping booking.
 export const toMcpBookingConflicts = (
     booking: BookingViewModel,
-    rows: EquipmentConflictRow[],
-    overlaps: EquipmentConflictOverlap[],
+    conflicts: EquipmentListConflict[],
     bookingsById: Map<number, BookingViewModel>,
     includeAll: boolean,
     canSeePii: boolean,
@@ -62,24 +66,17 @@ export const toMcpBookingConflicts = (
         name: list.name,
         equipmentOutDatetime: formatDatetimeForAnalyticsExport(getEquipmentOutDatetime(list)),
         equipmentInDatetime: formatDatetimeForAnalyticsExport(getEquipmentInDatetime(list)),
-        rows: rows
-            .filter((row) => row.equipmentListId === list.id)
-            .map((row) =>
-                toMcpEquipmentConflict(
-                    row,
-                    overlaps.filter((x) => x.equipmentListId === list.id && x.equipmentId === row.equipmentId),
-                    bookingsById,
-                    canSeePii,
-                ),
-            ),
+        rows: conflicts
+            .filter((conflict) => conflict.equipmentListId === list.id)
+            .map((conflict) => toMcpEquipmentConflict(conflict, bookingsById, canSeePii)),
     }));
 
     return {
         id: booking.id,
         name: booking.name,
         link: getLinkToBooking(booking.id),
-        checkedRowsCount: rows.length,
-        conflictCount: rows.filter((row) => PROBLEM_STATUSES.includes(row.status)).length,
+        checkedRowsCount: conflicts.length,
+        conflictCount: conflicts.filter((conflict) => PROBLEM_STATUSES.includes(conflict.status)).length,
         skippedEquipmentLists: (booking.equipmentLists ?? [])
             .filter((list) => !equipmentListHasDatetimes(list))
             .map((list) => ({ id: list.id, name: list.name })),

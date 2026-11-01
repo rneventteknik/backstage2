@@ -5,10 +5,7 @@ import { Button, Card, Form, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { addDays, formatDate, formatWeekDay, getWeekNumber } from '../../lib/datetimeUtils';
-import { bookingsFetcher } from '../../lib/fetchers';
-import { getMaximumNumberOfUnitUsedByBookings } from '../../lib/equipmentConflicts';
-import { getMaximumNumberOfUnitUsed } from '../../lib/utils';
-import { Status } from '../../models/enums/Status';
+import { equipmentUsageFetcher } from '../../lib/fetchers';
 import { Equipment } from '../../models/interfaces';
 import styles from './EquipmentCalendar.module.scss';
 import Link from 'next/link';
@@ -149,13 +146,13 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
     highlightCriteria,
 }: EquipmentCalendarDayProps) => {
     const { data, error, isValidating } = useSwr(
-        '/api/conflict-detection/booking-with-equipment?equipmentId=' +
+        '/api/conflict-detection/equipment-usage?equipmentId=' +
             equipment.id +
             '&startDatetime=' +
             startDatetime.toISOString() +
             '&endDatetime=' +
             endDatetime.toISOString(),
-        bookingsFetcher,
+        equipmentUsageFetcher,
     );
 
     if (isValidating && !data) {
@@ -177,10 +174,8 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
         );
     }
 
-    // Filter bookings
-    const bookings = data?.filter((x) => x.status !== Status.CANCELED) ?? [];
-
-    const maxNumberOfUnitsUsed = getMaximumNumberOfUnitUsedByBookings(bookings, equipment);
+    const bookings = data?.bookings ?? [];
+    const maxNumberOfUnitsUsed = data?.maxUnitsUsed ?? 0;
 
     const getClassName = () => {
         if (maxNumberOfUnitsUsed === 0) {
@@ -250,14 +245,8 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
                                         <div>{booking.name}</div>
                                         <div className="text-small font-italic">
                                             {booking.equipmentLists
-                                                ?.map(
-                                                    (list) =>
-                                                        `${list.name} (${getMaximumNumberOfUnitUsed(
-                                                            [list],
-                                                            equipment,
-                                                        )} st)`,
-                                                )
-                                                ?.join(', ')}
+                                                .map((list) => `${list.name} (${list.numberOfUnits} st)`)
+                                                .join(', ')}
                                         </div>
                                     </div>
                                 ))}

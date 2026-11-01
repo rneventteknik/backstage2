@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card } from 'react-bootstrap';
 import useSwr from 'swr';
 import { bookingFetcher } from '../../../lib/fetchers';
+import { useEquipmentConflicts } from '../../../lib/useEquipmentConflicts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
@@ -69,6 +70,7 @@ const EquipmentListDisplay: React.FC<Props> = ({
     globalSettings,
 }: Props) => {
     const { data: booking, mutate, error } = useSwr('/api/bookings/' + bookingId, (url) => bookingFetcher(url));
+    const equipmentConflicts = useEquipmentConflicts(bookingId);
 
     const {
         showSaveSuccessNotification,
@@ -430,7 +432,8 @@ const EquipmentListDisplay: React.FC<Props> = ({
             {showListContent ? (
                 <EquipmentListTable
                     list={list}
-                    otherLists={otherLists}
+                    equipmentConflicts={equipmentConflicts.data}
+                    equipmentConflictsError={equipmentConflicts.error}
                     pricePlan={booking.pricePlan}
                     bookingType={booking.bookingType}
                     language={booking.language}

@@ -7,13 +7,12 @@ import { toBookingViewModel } from '../datetimeUtils';
 import { EquipmentConflictStatus } from '../equipmentConflicts';
 import { filterBookings, groupBookingsByEquipmentUsageTime } from '../bookingFilters';
 import { searchBookings } from '../db-access';
+import { fetchBookingForMcp, fetchBookingSummariesForMcp, fetchBookingsForEquipment } from '../db-access/booking';
 import {
-    fetchBookingForMcp,
-    fetchBookingSummariesForMcp,
-    fetchBookingsForEquipment,
-    fetchBookingsWithEquipmentInInterval,
-} from '../db-access/booking';
-import { fetchEquipmentConflictsForBooking } from '../db-access/equipmentConflicts';
+    fetchEquipmentConflictsForBooking,
+    fetchEquipmentUnitsPerBooking,
+    fetchEquipmentUsage,
+} from '../db-access/equipmentConflicts';
 import { fetchEquipment, fetchEquipments, searchEquipment } from '../db-access/equipment';
 import { fetchSettings } from '../db-access/setting';
 import { fetchUserNamesAndTags } from '../db-access/user';
@@ -79,6 +78,18 @@ const compareBookingsBy =
         const diff = bDate.getTime() - aDate.getTime();
         return diff !== 0 ? diff : b.id - a.id;
     };
+
+// The bookings with the given ids, with their owners and equipment lists (without rows), by id.
+const fetchBookingViewModelsForMcp = async (ids: number[]): Promise<Map<number, BookingViewModel>> => {
+    const uniqueIds = [...new Set(ids)];
+    const bookingModels = uniqueIds.length > 0 ? await fetchBookingSummariesForMcp(uniqueIds) : [];
+    return new Map(
+        bookingModels.map((x) => {
+            const booking = toBookingViewModel(toBooking(x));
+            return [booking.id, booking] as const;
+        }),
+    );
+};
 
 const toJsonResult = (result: object) => {
     const translatedResult = toSwedishKeys(result) as Record<string, unknown>;
@@ -402,9 +413,10 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
             annotations: { readOnlyHint: true },
         },
         async ({ equipmentId }) => {
-            const [equipmentModel, bookingModels] = await Promise.all([
+            const [equipmentModel, bookingModels, unitsPerBooking] = await Promise.all([
                 fetchEquipment(equipmentId),
                 fetchBookingsForEquipment(equipmentId),
+                fetchEquipmentUnitsPerBooking(equipmentId),
             ]);
 
             if (!equipmentModel) {
@@ -415,7 +427,12 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
             const bookings = bookingModels.map(toBooking).map(toBookingViewModel);
 
             return toJsonResult(
-                toMcpEquipmentDetail(equipment, groupBookingsByEquipmentUsageTime(bookings, equipment), canSeePii),
+                toMcpEquipmentDetail(
+                    equipment,
+                    groupBookingsByEquipmentUsageTime(bookings, equipment),
+                    unitsPerBooking,
+                    canSeePii,
+                ),
             );
         },
     );
@@ -450,23 +467,26 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                 return toErrorResult('from must be before to');
             }
 
-            const [equipmentModel, bookingModels] = await Promise.all([
+            const [equipmentModel, usage] = await Promise.all([
                 fetchEquipment(equipmentId),
-                fetchBookingsWithEquipmentInInterval(equipmentId, fromDate, toDate),
+                fetchEquipmentUsage(equipmentId, fromDate, toDate),
             ]);
 
             if (!equipmentModel) {
                 return toErrorResult(`Equipment ${equipmentId} not found`);
             }
 
-            const bookings = bookingModels
-                .map(toBooking)
-                .map(toBookingViewModel)
-                .filter((booking) => booking.status !== Status.CANCELED)
-                .sort((a, b) => (a.equipmentOutDatetime?.getTime() ?? 0) - (b.equipmentOutDatetime?.getTime() ?? 0));
+            const bookingsById = await fetchBookingViewModelsForMcp(usage.bookings.map((x) => x.id));
 
             return toJsonResult(
-                toMcpEquipmentAvailability(toEquipment(equipmentModel), fromDate, toDate, bookings, canSeePii),
+                toMcpEquipmentAvailability(
+                    toEquipment(equipmentModel),
+                    fromDate,
+                    toDate,
+                    usage,
+                    bookingsById,
+                    canSeePii,
+                ),
             );
         },
     );
@@ -502,35 +522,18 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
             annotations: { readOnlyHint: true },
         },
         async ({ bookingId, includeAll }) => {
-            const [bookingModel] = await fetchBookingSummariesForMcp([bookingId]);
+            const conflicts = await fetchEquipmentConflictsForBooking(bookingId);
+            const bookingsById = await fetchBookingViewModelsForMcp([
+                bookingId,
+                ...conflicts.flatMap((x) => x.overlappingBookings.map((booking) => booking.id)),
+            ]);
+            const booking = bookingsById.get(bookingId);
 
-            if (!bookingModel) {
+            if (!booking) {
                 return toErrorResult(`Booking ${bookingId} not found`);
             }
 
-            const { rows, overlaps } = await fetchEquipmentConflictsForBooking(bookingId);
-            const otherBookingIds = [...new Set(overlaps.map((x) => x.otherBookingId))].filter(
-                (id) => id !== bookingId,
-            );
-            const otherBookingModels =
-                otherBookingIds.length > 0 ? await fetchBookingSummariesForMcp(otherBookingIds) : [];
-            const bookingsById = new Map(
-                [bookingModel, ...otherBookingModels].map((x) => {
-                    const booking = toBookingViewModel(toBooking(x));
-                    return [booking.id, booking] as const;
-                }),
-            );
-
-            return toJsonResult(
-                toMcpBookingConflicts(
-                    bookingsById.get(bookingId)!,
-                    rows,
-                    overlaps,
-                    bookingsById,
-                    includeAll,
-                    canSeePii,
-                ),
-            );
+            return toJsonResult(toMcpBookingConflicts(booking, conflicts, bookingsById, includeAll, canSeePii));
         },
     );
 

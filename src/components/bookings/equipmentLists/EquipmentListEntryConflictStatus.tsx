@@ -4,53 +4,29 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
-import useSwr from 'swr';
-import { bookingsFetcher } from '../../../lib/fetchers';
-import { EquipmentConflictStatus, getEquipmentListConflict } from '../../../lib/equipmentConflicts';
-import { getMaximumNumberOfUnitUsed } from '../../../lib/utils';
+import { EquipmentConflictStatus, EquipmentListConflict } from '../../../lib/equipmentConflicts';
 import { Equipment } from '../../../models/interfaces';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 
 type Props = {
     equipment: Equipment;
     equipmentList: EquipmentList;
-    otherLists: EquipmentList[];
-    startDatetime: Date;
-    endDatetime: Date;
+    // The conflicts of every list in the booking, from useEquipmentConflicts.
+    equipmentConflicts: EquipmentListConflict[] | undefined;
+    error: Error | undefined;
 };
 
 const EquipmentListEntryConflictStatus: React.FC<Props> = ({
     equipment,
-    startDatetime,
-    endDatetime,
     equipmentList,
-    otherLists,
+    equipmentConflicts,
+    error,
 }: Props) => {
-    const { data, error, isValidating } = useSwr(
-        '/api/conflict-detection/booking-with-equipment?equipmentId=' +
-            equipment.id +
-            '&startDatetime=' +
-            startDatetime.toISOString() +
-            '&endDatetime=' +
-            endDatetime.toISOString() +
-            '&ignoreEquipmentListId=' +
-            equipmentList.id,
-        bookingsFetcher,
-    );
-
-    if (isValidating && !data) {
-        return (
-            <span>
-                <Skeleton width={12} height={12} />
-            </span>
-        );
-    }
-
     if (equipment.inventoryCount === null) {
         return null;
     }
 
-    if (error) {
+    if (error && !equipmentConflicts) {
         return (
             <span className="text-danger">
                 {' '}
@@ -69,16 +45,25 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
         );
     }
 
-    const conflict = getEquipmentListConflict(equipmentList, equipment, otherLists, data ?? []);
+    const conflict = equipmentConflicts?.find(
+        (x) => x.equipmentListId === equipmentList.id && x.equipmentId === equipment.id,
+    );
 
-    // The overlapping lists, grouped per booking. Lists in this booking are taken from the client, since they may have
-    // unsaved changes.
-    const overlappingBookings = [
-        ...(conflict.overlappingLocalLists.length > 0
-            ? [{ key: 'local', name: 'Denna bokning', lists: conflict.overlappingLocalLists }]
-            : []),
-        ...conflict.overlappingRemoteBookings.map((x) => ({ key: x.booking.id, name: x.booking.name, lists: x.lists })),
-    ];
+    // Rows are missing until the conflicts have loaded, and briefly after a change until they are reloaded.
+    if (!conflict) {
+        return (
+            <span>
+                <Skeleton width={12} height={12} />
+            </span>
+        );
+    }
+
+    const overlappingBookings = conflict.overlappingBookings.map((booking) => ({
+        key: booking.id,
+        name: booking.id === conflict.bookingId ? 'Denna bokning' : booking.name,
+        lists: booking.equipmentLists,
+    }));
+
     if (conflict.status === EquipmentConflictStatus.NONE) {
         return (
             <OverlayTrigger
@@ -129,12 +114,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                             <div key={booking.key}>
                                 <div>{booking.name}</div>
                                 <div className="text-small font-italic">
-                                    {booking.lists
-                                        .map(
-                                            (list) =>
-                                                `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`,
-                                        )
-                                        .join(', ')}
+                                    {booking.lists.map((list) => `${list.name} (${list.numberOfUnits} st)`).join(', ')}
                                 </div>
                             </div>
                         ))}
@@ -159,9 +139,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                         <div key={booking.key}>
                             <div>{booking.name}</div>
                             <div className="text-small font-italic">
-                                {booking.lists
-                                    .map((list) => `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`)
-                                    .join(', ')}
+                                {booking.lists.map((list) => `${list.name} (${list.numberOfUnits} st)`).join(', ')}
                             </div>
                         </div>
                     ))}
