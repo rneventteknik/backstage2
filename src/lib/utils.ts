@@ -395,59 +395,53 @@ export const getTotalNumberOfHoursReported = (timeReports: TimeReport[]) =>
 // know the maximum will be at one of these point since it is not possible to
 // increase the number of used equipments without starting a new equipment list.
 //
-// Lists that touch (one returned at the same time as the other is handed out) count as
-// overlapping, unless isSameBooking says the two lists are on the same booking.
-export const getMaximumNumberOfUnitUsed = (
-    equipmentLists: EquipmentList[],
-    equipment: Equipment,
-    isSameBooking: (a: EquipmentList, b: EquipmentList) => boolean = () => false,
-) =>
-    Math.max(
+// The lists are grouped by booking. A list returned at the same time as another is handed out overlaps it, unless they
+// are on the same booking, since the equipment can then go straight from one list to the next.
+export const getMaximumNumberOfUnitUsedByBookingLists = (listsByBooking: EquipmentList[][], equipment: Equipment) => {
+    const lists = listsByBooking.flatMap((bookingLists, booking) => bookingLists.map((list) => ({ list, booking })));
+
+    return Math.max(
         0,
-        ...equipmentLists.map((startingList) => {
-            const datetime = getEquipmentOutDatetime(startingList) ?? new Date(0); // Datetime to check
-
-            return equipmentLists
-                .filter(
-                    // Find the lists which overlap the datetime
-                    (list) => {
-                        const out = getEquipmentOutDatetime(list);
-                        const _in = getEquipmentInDatetime(list);
-                        if (!out || !_in || out > datetime) {
-                            return false;
-                        }
-                        return (
-                            _in > datetime ||
-                            (_in.getTime() === datetime.getTime() && !isSameBooking(list, startingList))
-                        );
-                    },
-                )
-                .reduce(
-                    // Sum the equipment, first over all lists and within the lists over all entries
-                    (sum, list) =>
-                        sum +
-                        list.listEntries
-                            .filter((x) => x.equipmentId === equipment.id)
-                            .reduce((sum, x) => sum + x.numberOfUnits, 0) +
-                        list.listHeadings.reduce(
-                            (sum, headingList) =>
-                                sum +
-                                headingList.listEntries
-                                    .filter((x) => x.equipmentId === equipment.id)
-                                    .reduce((sum, x) => sum + x.numberOfUnits, 0),
-                            0,
-                        ),
-                    0,
-                );
-        }),
+        ...lists
+            // Calculate datetimes to check
+            .map((x) => ({ booking: x.booking, datetime: getEquipmentOutDatetime(x.list) ?? new Date(0) }))
+            .map(({ booking, datetime }) =>
+                lists
+                    .filter(
+                        // Find the lists which overlap the datetime
+                        (x) =>
+                            getEquipmentOutDatetime(x.list) &&
+                            (getEquipmentOutDatetime(x.list) ?? new Date()) <= datetime &&
+                            getEquipmentInDatetime(x.list) &&
+                            (x.booking === booking
+                                ? (getEquipmentInDatetime(x.list) ?? new Date()) > datetime
+                                : (getEquipmentInDatetime(x.list) ?? new Date()) >= datetime),
+                    )
+                    .map((x) => x.list)
+                    .reduce(
+                        // Sum the equipment, first over all lists and within the lists over all entries
+                        (sum, list) =>
+                            sum +
+                            list.listEntries
+                                .filter((x) => x.equipmentId === equipment.id)
+                                .reduce((sum, x) => sum + x.numberOfUnits, 0) +
+                            list.listHeadings.reduce(
+                                (sum, headingList) =>
+                                    sum +
+                                    headingList.listEntries
+                                        .filter((x) => x.equipmentId === equipment.id)
+                                        .reduce((sum, x) => sum + x.numberOfUnits, 0),
+                                0,
+                            ),
+                        0,
+                    ),
+            ),
     );
-
-// Build an isSameBooking function for getMaximumNumberOfUnitUsed from the bookings the lists were taken from.
-export const isSameBookingFromBookings = (bookings: { id: number; equipmentLists?: EquipmentList[] }[]) => {
-    const bookingIdByListId = new Map(bookings.flatMap((b) => (b.equipmentLists ?? []).map((l) => [l.id, b.id])));
-    return (a: EquipmentList, b: EquipmentList) =>
-        bookingIdByListId.has(a.id) && bookingIdByListId.get(a.id) === bookingIdByListId.get(b.id);
 };
+
+// The max number of equipment used at the same time by lists on the same booking.
+export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equipment: Equipment) =>
+    getMaximumNumberOfUnitUsedByBookingLists([equipmentLists], equipment);
 
 export const listContainsEquipment = (list: EquipmentList, equipment: HasId) =>
     list.listEntries.some((entry) => entry.equipment?.id === equipment.id) ||

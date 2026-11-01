@@ -21,7 +21,7 @@ const toMcpEquipmentChangelogEntry = (entry: EquipmentChangelogEntry) => ({
 // How many units of the equipment a booking uses at most at the same time, over all its equipment lists.
 const toMcpEquipmentBooking = (booking: BookingViewModel, equipment: Equipment, canSeePii: boolean) => ({
     ...toMcpBookingSummary(booking, canSeePii),
-    numberOfUnits: getMaximumNumberOfUnitUsed(booking.equipmentLists ?? [], equipment, () => true),
+    numberOfUnits: getMaximumNumberOfUnitUsed(booking.equipmentLists ?? [], equipment),
 });
 
 const sortByEquipmentOut = (bookings: BookingViewModel[], descending = false) =>
