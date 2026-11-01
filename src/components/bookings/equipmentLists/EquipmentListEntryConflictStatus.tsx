@@ -6,11 +6,10 @@ import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { bookingsFetcher } from '../../../lib/fetchers';
-import { getMaximumNumberOfUnitUsed, listContainsEquipment } from '../../../lib/utils';
-import { Status } from '../../../models/enums/Status';
+import { EquipmentConflictStatus, getEquipmentListConflict } from '../../../lib/equipmentConflicts';
+import { getMaximumNumberOfUnitUsed } from '../../../lib/utils';
 import { Equipment } from '../../../models/interfaces';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
-import { getEquipmentInDatetime, getEquipmentOutDatetime } from '../../../lib/datetimeUtils';
 
 type Props = {
     equipment: Equipment;
@@ -70,38 +69,28 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
         );
     }
 
-    // Check local lists in client for conflicts. These override the remote lists if they have the same id.
-    const startTime = getEquipmentOutDatetime(equipmentList);
-    const endTime = getEquipmentInDatetime(equipmentList);
+    const conflict = getEquipmentListConflict(equipmentList, equipment, otherLists, data ?? []);
 
-    const localOverlappingLists = otherLists
-        .filter((list) => listContainsEquipment(list, equipment))
-        .filter((list) => {
-            const equipmentOut = getEquipmentOutDatetime(list);
-            const equipmentIn = getEquipmentInDatetime(list);
+    // The overlapping lists, grouped per booking. Lists in this booking are taken from the client, since they may have
+    // unsaved changes.
+    const overlappingBookings = [
+        ...(conflict.overlappingLocalLists.length > 0
+            ? [{ key: 'local', name: 'Denna bokning', lists: conflict.overlappingLocalLists }]
+            : []),
+        ...conflict.overlappingRemoteBookings.map((x) => ({ key: x.booking.id, name: x.booking.name, lists: x.lists })),
+    ];
+    const overlappingBookingsList = overlappingBookings.map((booking) => (
+        <div key={booking.key}>
+            <div>{booking.name}</div>
+            <div className="text-small font-italic">
+                {booking.lists
+                    .map((list) => `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`)
+                    .join(', ')}
+            </div>
+        </div>
+    ));
 
-            if (!equipmentOut || !equipmentIn || !startTime || !endTime) {
-                return false;
-            }
-
-            return equipmentOut <= endTime && equipmentIn >= startTime;
-        });
-
-    // Filter bookings
-    const bookings = data?.filter((x) => x.status !== Status.CANCELED) ?? [];
-
-    // Sum the number of units used locally
-    const numberOfUnitsUsedByThisList = getMaximumNumberOfUnitUsed([equipmentList], equipment);
-
-    // Calculate the max number of units used at the same time.
-    const remoteOverlappingEquipmentLists = bookings
-        .flatMap((x) => x.equipmentLists ?? [])
-        .filter((list) => !otherLists.some((x) => x.id === list.id));
-    const overlappingEquipmentLists = [...localOverlappingLists, ...remoteOverlappingEquipmentLists];
-    const numberOfUnitsUsedByOthers = getMaximumNumberOfUnitUsed(overlappingEquipmentLists, equipment);
-    const maxNumberOfUnitsUsed = numberOfUnitsUsedByOthers + numberOfUnitsUsedByThisList;
-
-    if (numberOfUnitsUsedByOthers === 0 && numberOfUnitsUsedByThisList <= equipment.inventoryCount) {
+    if (conflict.status === EquipmentConflictStatus.NONE) {
         return (
             <OverlayTrigger
                 placement="right"
@@ -119,7 +108,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
         );
     }
 
-    if (numberOfUnitsUsedByThisList > equipment.inventoryCount) {
+    if (conflict.status === EquipmentConflictStatus.EXCEEDS_INVENTORY) {
         return (
             <OverlayTrigger
                 placement="right"
@@ -137,29 +126,17 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
         );
     }
 
-    if (maxNumberOfUnitsUsed > equipment.inventoryCount) {
+    if (conflict.status === EquipmentConflictStatus.CONFLICT) {
         return (
             <OverlayTrigger
                 placement="right"
                 overlay={
                     <Tooltip id="1">
                         <strong>
-                            Totalt används fler av denna utrustning än vad som finns ({maxNumberOfUnitsUsed}/
+                            Totalt används fler av denna utrustning än vad som finns ({conflict.maxUnitsUsed}/
                             {equipment.inventoryCount} st). Konflikterande utrustningslistor:
                         </strong>
-                        {bookings.map((booking) => (
-                            <div key={booking.id}>
-                                <div>{booking.name}</div>
-                                <div className="text-small font-italic">
-                                    {booking.equipmentLists
-                                        ?.map(
-                                            (list) =>
-                                                `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`,
-                                        )
-                                        ?.join(', ')}
-                                </div>
-                            </div>
-                        ))}
+                        {overlappingBookingsList}
                     </Tooltip>
                 }
             >
@@ -177,18 +154,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                         Notera att samma typ av utrustning används samma tid av följande andra utrustningslistor (totalt
                         finns {equipment.inventoryCount} st):
                     </strong>
-                    {bookings.map((booking) => (
-                        <div key={booking.id}>
-                            <div>{booking.name}</div>
-                            <div className="text-small font-italic">
-                                {booking.equipmentLists
-                                    ?.map(
-                                        (list) => `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`,
-                                    )
-                                    ?.join(', ')}
-                            </div>
-                        </div>
-                    ))}
+                    {overlappingBookingsList}
                 </Tooltip>
             }
         >

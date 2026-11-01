@@ -3,6 +3,7 @@ import { EquipmentChangelogEntry } from '../../../models/interfaces/ChangeLogEnt
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 import { BookingsByUsageTime } from '../../bookingFilters';
 import { formatDatetimeForAnalyticsExport, getEquipmentInDatetime, getEquipmentOutDatetime } from '../../datetimeUtils';
+import { getMaximumNumberOfUnitUsedByBookings } from '../../equipmentConflicts';
 import { getMaximumNumberOfUnitUsed, getRentalStatusName } from '../../utils';
 import { toMcpBookingSummary } from './bookingSummary';
 import { toMcpEquipmentSummary } from './equipmentSummary';
@@ -73,8 +74,7 @@ export const toMcpEquipmentAvailability = (
     bookings: BookingViewModel[],
     canSeePii: boolean,
 ) => {
-    const equipmentLists = bookings.flatMap((booking) => booking.equipmentLists ?? []);
-    const maxUnitsBooked = getMaximumNumberOfUnitUsed(equipmentLists, equipment);
+    const maxUnitsBooked = getMaximumNumberOfUnitUsedByBookings(bookings, equipment);
 
     return {
         id: equipment.id,

@@ -4,6 +4,7 @@ import { BookingType } from '../../models/enums/BookingType';
 import { Status } from '../../models/enums/Status';
 import { BookingViewModel, Equipment } from '../../models/interfaces';
 import { getEquipmentInDatetime, getEquipmentOutDatetime, toBookingViewModel } from '../datetimeUtils';
+import { EquipmentConflictStatus } from '../equipmentConflicts';
 import { filterBookings, groupBookingsByEquipmentUsageTime } from '../bookingFilters';
 import { fetchBookings, searchBookings } from '../db-access';
 import {
@@ -19,7 +20,7 @@ import { toBooking } from '../mappers/booking';
 import { toEquipment } from '../mappers/equipment';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
 import {
-    CONFLICT_STATUS,
+    CONFLICT_STATUS_NAMES,
     getCheckableEquipment,
     getCheckableEquipmentLists,
     toMcpBookingConflicts,
@@ -483,12 +484,12 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                 'equipment, the units the list uses (antal) are added to the most units used at the same time by ' +
                 'overlapping lists in other bookings and in the same booking (cancelled bookings are not counted, ' +
                 'draft bookings are), and compared to the inventory count. konfliktstatus is one of: ' +
-                `${CONFLICT_STATUS.none} (no other list uses it at the same time), ${CONFLICT_STATUS.shared} ` +
-                `(other lists use it at the same time but there are enough units), ${CONFLICT_STATUS.conflict} ` +
-                `(more units are used in total than the inventory count) and ${CONFLICT_STATUS.exceedsInventory} ` +
+                `${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.NONE]} (no other list uses it at the same time), ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.SHARED]} ` +
+                `(other lists use it at the same time but there are enough units), ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.CONFLICT]} ` +
+                `(more units are used in total than the inventory count) and ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.EXCEEDS_INVENTORY]} ` +
                 '(this list alone uses more units than the inventory count). By default only rows with another ' +
-                `status than ${CONFLICT_STATUS.none} are listed; antalKonflikter counts the rows with ` +
-                `${CONFLICT_STATUS.conflict} or ${CONFLICT_STATUS.exceedsInventory}. Equipment without an inventory ` +
+                `status than ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.NONE]} are listed; antalKonflikter counts the rows with ` +
+                `${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.CONFLICT]} or ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.EXCEEDS_INVENTORY]}. Equipment without an inventory ` +
                 'count and rows not linked to equipment are not checked, and lists without equipment out and in ' +
                 'times are listed in ejKontrolleradeUtrustningslistor. Use get_equipment_availability to check a ' +
                 'single piece of equipment for an arbitrary time period. Field names and values are in Swedish, ' +
@@ -496,7 +497,10 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                 personalDataDescription,
             inputSchema: z.object({
                 bookingId: z.number().int(),
-                includeAll: z.boolean().default(false).describe(`Also list rows with status ${CONFLICT_STATUS.none}`),
+                includeAll: z
+                    .boolean()
+                    .default(false)
+                    .describe(`Also list rows with status ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.NONE]}`),
             }),
             annotations: { readOnlyHint: true },
         },
@@ -531,7 +535,7 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                         const otherBookings = bookingModels
                             .map(toBooking)
                             .map(toBookingViewModel)
-                            .filter((other) => other.id !== booking.id && other.status !== Status.CANCELED);
+                            .filter((other) => other.id !== booking.id);
                         return [equipmentId, otherBookings] as const;
                     }),
                 ),

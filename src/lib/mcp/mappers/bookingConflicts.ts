@@ -1,29 +1,18 @@
 import { BookingViewModel, Equipment } from '../../../models/interfaces';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 import { formatDatetimeForAnalyticsExport, getEquipmentInDatetime, getEquipmentOutDatetime } from '../../datetimeUtils';
-import { getMaximumNumberOfUnitUsed, listContainsEquipment } from '../../utils';
+import { EquipmentConflictStatus, equipmentListHasDatetimes, getEquipmentListConflict } from '../../equipmentConflicts';
+import { getMaximumNumberOfUnitUsed } from '../../utils';
 import { toMcpBookingSummary } from './bookingSummary';
 import { getLinkToBooking, getLinkToEquipment } from './primitives';
 
 // Conflict statuses, matching the icons and tooltips next to each row in the equipment lists in Backstage2.
-export const CONFLICT_STATUS = {
-    none: 'Ingen konflikt',
-    shared: 'Delas med andra listor',
-    conflict: 'Konflikt',
-    exceedsInventory: 'Fler än inventarieantalet',
-} as const;
-type ConflictStatus = (typeof CONFLICT_STATUS)[keyof typeof CONFLICT_STATUS];
-
-const overlaps = (a: EquipmentList, b: EquipmentList): boolean => {
-    const aOut = getEquipmentOutDatetime(a);
-    const aIn = getEquipmentInDatetime(a);
-    const bOut = getEquipmentOutDatetime(b);
-    const bIn = getEquipmentInDatetime(b);
-    return !!aOut && !!aIn && !!bOut && !!bIn && aOut <= bIn && aIn >= bOut;
+export const CONFLICT_STATUS_NAMES: Record<EquipmentConflictStatus, string> = {
+    [EquipmentConflictStatus.NONE]: 'Ingen konflikt',
+    [EquipmentConflictStatus.SHARED]: 'Delas med andra listor',
+    [EquipmentConflictStatus.CONFLICT]: 'Konflikt',
+    [EquipmentConflictStatus.EXCEEDS_INVENTORY]: 'Fler än inventarieantalet',
 };
-
-const hasDatetimes = (list: EquipmentList): boolean =>
-    !!getEquipmentOutDatetime(list) && !!getEquipmentInDatetime(list);
 
 // Every equipment in a list with a known inventory count, once per equipment even if it is on several rows.
 export const getCheckableEquipment = (list: EquipmentList): Equipment[] => {
@@ -37,10 +26,9 @@ export const getCheckableEquipment = (list: EquipmentList): Equipment[] => {
 };
 
 export const getCheckableEquipmentLists = (booking: BookingViewModel): EquipmentList[] =>
-    (booking.equipmentLists ?? []).filter(hasDatetimes);
+    (booking.equipmentLists ?? []).filter(equipmentListHasDatetimes);
 
-// Mirrors EquipmentListEntryConflictStatus: units used by overlapping lists (other bookings' lists as well as this
-// booking's other lists) are added to the units this list uses and compared to the inventory count.
+// The same check as the conflict icon next to each row in the equipment lists (EquipmentListEntryConflictStatus).
 const toMcpEquipmentConflict = (
     booking: BookingViewModel,
     list: EquipmentList,
@@ -48,43 +36,20 @@ const toMcpEquipmentConflict = (
     otherBookings: BookingViewModel[],
     canSeePii: boolean,
 ) => {
-    const inventoryCount = equipment.inventoryCount ?? 0;
-    const ownOverlappingLists = getCheckableEquipmentLists(booking).filter(
-        (other) => other.id !== list.id && listContainsEquipment(other, equipment) && overlaps(other, list),
-    );
+    const conflict = getEquipmentListConflict(list, equipment, getCheckableEquipmentLists(booking), otherBookings);
     const overlappingBookings = [
-        ...(ownOverlappingLists.length > 0 ? [{ booking, lists: ownOverlappingLists }] : []),
-        ...otherBookings
-            .map((other) => ({
-                booking: other,
-                lists: (other.equipmentLists ?? []).filter((other) => overlaps(other, list)),
-            }))
-            .filter((x) => x.lists.length > 0),
+        ...(conflict.overlappingLocalLists.length > 0 ? [{ booking, lists: conflict.overlappingLocalLists }] : []),
+        ...conflict.overlappingRemoteBookings,
     ];
-
-    const unitsUsedByThisList = getMaximumNumberOfUnitUsed([list], equipment);
-    const unitsUsedByOthers = getMaximumNumberOfUnitUsed(
-        overlappingBookings.flatMap((x) => x.lists),
-        equipment,
-    );
-    const maxUnitsBooked = unitsUsedByThisList + unitsUsedByOthers;
-
-    const conflictStatus: ConflictStatus =
-        unitsUsedByThisList > inventoryCount
-            ? CONFLICT_STATUS.exceedsInventory
-            : maxUnitsBooked > inventoryCount
-              ? CONFLICT_STATUS.conflict
-              : unitsUsedByOthers > 0
-                ? CONFLICT_STATUS.shared
-                : CONFLICT_STATUS.none;
 
     return {
         equipmentId: equipment.id,
         equipmentName: equipment.name,
         link: getLinkToEquipment(equipment.id),
-        conflictStatus,
-        numberOfUnits: unitsUsedByThisList,
-        maxUnitsBooked,
+        // Only equipment with an inventory count is checked, so the status is never null.
+        conflictStatus: CONFLICT_STATUS_NAMES[conflict.status!],
+        numberOfUnits: conflict.unitsUsedByThisList,
+        maxUnitsBooked: conflict.maxUnitsUsed,
         inventoryCount: equipment.inventoryCount,
         bookings: overlappingBookings.map((x) => ({
             ...toMcpBookingSummary(x.booking, canSeePii),
@@ -127,8 +92,11 @@ export const toMcpBookingConflicts = (
     });
 
     const allRows = equipmentLists.flatMap((list) => list.rows);
-    const isProblem = (row: { conflictStatus: ConflictStatus }) =>
-        row.conflictStatus === CONFLICT_STATUS.conflict || row.conflictStatus === CONFLICT_STATUS.exceedsInventory;
+    const problemStatusNames = [
+        CONFLICT_STATUS_NAMES[EquipmentConflictStatus.CONFLICT],
+        CONFLICT_STATUS_NAMES[EquipmentConflictStatus.EXCEEDS_INVENTORY],
+    ];
+    const isProblem = (row: { conflictStatus: string }) => problemStatusNames.includes(row.conflictStatus);
 
     return {
         id: booking.id,
@@ -137,12 +105,16 @@ export const toMcpBookingConflicts = (
         checkedRowsCount: allRows.length,
         conflictCount: allRows.filter(isProblem).length,
         skippedEquipmentLists: (booking.equipmentLists ?? [])
-            .filter((list) => !hasDatetimes(list))
+            .filter((list) => !equipmentListHasDatetimes(list))
             .map((list) => ({ id: list.id, name: list.name })),
         equipmentLists: equipmentLists
             .map((list) => ({
                 ...list,
-                rows: includeAll ? list.rows : list.rows.filter((row) => row.conflictStatus !== CONFLICT_STATUS.none),
+                rows: includeAll
+                    ? list.rows
+                    : list.rows.filter(
+                          (row) => row.conflictStatus !== CONFLICT_STATUS_NAMES[EquipmentConflictStatus.NONE],
+                      ),
             }))
             .filter((list) => includeAll || list.rows.length > 0),
     };

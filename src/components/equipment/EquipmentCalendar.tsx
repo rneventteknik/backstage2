@@ -6,6 +6,7 @@ import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { addDays, formatDate, formatWeekDay, getWeekNumber } from '../../lib/datetimeUtils';
 import { bookingsFetcher } from '../../lib/fetchers';
+import { getMaximumNumberOfUnitUsedByBookings } from '../../lib/equipmentConflicts';
 import { getMaximumNumberOfUnitUsed } from '../../lib/utils';
 import { Status } from '../../models/enums/Status';
 import { Equipment } from '../../models/interfaces';
@@ -179,9 +180,7 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
     // Filter bookings
     const bookings = data?.filter((x) => x.status !== Status.CANCELED) ?? [];
 
-    // Calculate the max number of equipment used at the same time.
-    const equipmentLists = bookings.flatMap((x) => x.equipmentLists ?? []);
-    const maxNumberOfUnitsUsed = getMaximumNumberOfUnitUsed(equipmentLists, equipment);
+    const maxNumberOfUnitsUsed = getMaximumNumberOfUnitUsedByBookings(bookings, equipment);
 
     const getClassName = () => {
         if (maxNumberOfUnitsUsed === 0) {
