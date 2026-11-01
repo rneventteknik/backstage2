@@ -2,7 +2,7 @@ import { BookingViewModel, Equipment } from '../../../models/interfaces';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 import { formatDatetimeForAnalyticsExport, getEquipmentInDatetime, getEquipmentOutDatetime } from '../../datetimeUtils';
 import { EquipmentConflictStatus, equipmentListHasDatetimes, getEquipmentListConflict } from '../../equipmentConflicts';
-import { getMaximumNumberOfUnitUsed } from '../../utils';
+import { getMaximumNumberOfUnitUsedInBooking } from '../../utils';
 import { toMcpBookingSummary } from './bookingSummary';
 import { getLinkToBooking, getLinkToEquipment } from './primitives';
 
@@ -58,7 +58,7 @@ const toMcpEquipmentConflict = (
                 name: other.name,
                 equipmentOutDatetime: formatDatetimeForAnalyticsExport(getEquipmentOutDatetime(other)),
                 equipmentInDatetime: formatDatetimeForAnalyticsExport(getEquipmentInDatetime(other)),
-                numberOfUnits: getMaximumNumberOfUnitUsed([other], equipment),
+                numberOfUnits: getMaximumNumberOfUnitUsedInBooking([other], equipment),
             })),
         })),
     };

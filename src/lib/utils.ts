@@ -394,21 +394,30 @@ export const getTotalNumberOfHoursReported = (timeReports: TimeReport[]) =>
 // at the start of each equipment list and check how many equipments are used. We
 // know the maximum will be at one of these point since it is not possible to
 // increase the number of used equipments without starting a new equipment list.
-export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equipment: Equipment) =>
-    Math.max(
+//
+// The lists are grouped by booking. A list returned at the same time as another is handed out overlaps it, unless they
+// are on the same booking, since the equipment can then go straight from one list to the next.
+export const getMaximumNumberOfUnitUsed = (listsByBooking: EquipmentList[][], equipment: Equipment) => {
+    const lists = listsByBooking.flatMap((bookingLists, booking) => bookingLists.map((list) => ({ list, booking })));
+
+    return Math.max(
         0,
-        ...equipmentLists
-            .map((x) => getEquipmentOutDatetime(x) ?? new Date(0)) // Calculate datetimes to check
-            .map((datetime) =>
-                equipmentLists
+        ...lists
+            // Calculate datetimes to check
+            .map((x) => ({ booking: x.booking, datetime: getEquipmentOutDatetime(x.list) ?? new Date(0) }))
+            .map(({ booking, datetime }) =>
+                lists
                     .filter(
                         // Find the lists which overlap the datetime
-                        (list) =>
-                            getEquipmentOutDatetime(list) &&
-                            (getEquipmentOutDatetime(list) ?? new Date()) <= datetime &&
-                            getEquipmentInDatetime(list) &&
-                            (getEquipmentInDatetime(list) ?? new Date()) >= datetime,
+                        (x) =>
+                            getEquipmentOutDatetime(x.list) &&
+                            (getEquipmentOutDatetime(x.list) ?? new Date()) <= datetime &&
+                            getEquipmentInDatetime(x.list) &&
+                            (x.booking === booking
+                                ? (getEquipmentInDatetime(x.list) ?? new Date()) > datetime
+                                : (getEquipmentInDatetime(x.list) ?? new Date()) >= datetime),
                     )
+                    .map((x) => x.list)
                     .reduce(
                         // Sum the equipment, first over all lists and within the lists over all entries
                         (sum, list) =>
@@ -428,6 +437,11 @@ export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equi
                     ),
             ),
     );
+};
+
+// The max number of equipment used at the same time by lists that are all on the same booking.
+export const getMaximumNumberOfUnitUsedInBooking = (equipmentLists: EquipmentList[], equipment: Equipment) =>
+    getMaximumNumberOfUnitUsed([equipmentLists], equipment);
 
 export const listContainsEquipment = (list: EquipmentList, equipment: HasId) =>
     list.listEntries.some((entry) => entry.equipment?.id === equipment.id) ||

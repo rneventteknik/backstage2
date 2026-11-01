@@ -4,7 +4,7 @@ import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 import { BookingsByUsageTime } from '../../bookingFilters';
 import { formatDatetimeForAnalyticsExport, getEquipmentInDatetime, getEquipmentOutDatetime } from '../../datetimeUtils';
 import { getMaximumNumberOfUnitUsedByBookings } from '../../equipmentConflicts';
-import { getMaximumNumberOfUnitUsed, getRentalStatusName } from '../../utils';
+import { getMaximumNumberOfUnitUsedInBooking, getRentalStatusName } from '../../utils';
 import { toMcpBookingSummary } from './bookingSummary';
 import { toMcpEquipmentSummary } from './equipmentSummary';
 import { getLinkToEquipment } from './primitives';
@@ -21,7 +21,7 @@ const toMcpEquipmentChangelogEntry = (entry: EquipmentChangelogEntry) => ({
 // How many units of the equipment a booking uses at most at the same time, over all its equipment lists.
 const toMcpEquipmentBooking = (booking: BookingViewModel, equipment: Equipment, canSeePii: boolean) => ({
     ...toMcpBookingSummary(booking, canSeePii),
-    numberOfUnits: getMaximumNumberOfUnitUsed(booking.equipmentLists ?? [], equipment),
+    numberOfUnits: getMaximumNumberOfUnitUsedInBooking(booking.equipmentLists ?? [], equipment),
 });
 
 const sortByEquipmentOut = (bookings: BookingViewModel[], descending = false) =>
@@ -64,7 +64,7 @@ const toMcpAvailabilityEquipmentList = (list: EquipmentList, equipment: Equipmen
     rentalStatus: list.rentalStatus != null ? getRentalStatusName(list.rentalStatus) : null,
     equipmentOutDatetime: formatDatetimeForAnalyticsExport(getEquipmentOutDatetime(list)),
     equipmentInDatetime: formatDatetimeForAnalyticsExport(getEquipmentInDatetime(list)),
-    numberOfUnits: getMaximumNumberOfUnitUsed([list], equipment),
+    numberOfUnits: getMaximumNumberOfUnitUsedInBooking([list], equipment),
 });
 
 export const toMcpEquipmentAvailability = (

@@ -7,7 +7,7 @@ import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { bookingsFetcher } from '../../../lib/fetchers';
 import { EquipmentConflictStatus, getEquipmentListConflict } from '../../../lib/equipmentConflicts';
-import { getMaximumNumberOfUnitUsed } from '../../../lib/utils';
+import { getMaximumNumberOfUnitUsedInBooking } from '../../../lib/utils';
 import { Equipment } from '../../../models/interfaces';
 import { EquipmentList } from '../../../models/interfaces/EquipmentList';
 
@@ -132,7 +132,7 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                                     {booking.lists
                                         .map(
                                             (list) =>
-                                                `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`,
+                                                `${list.name} (${getMaximumNumberOfUnitUsedInBooking([list], equipment)} st)`,
                                         )
                                         .join(', ')}
                                 </div>
@@ -160,7 +160,10 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                             <div>{booking.name}</div>
                             <div className="text-small font-italic">
                                 {booking.lists
-                                    .map((list) => `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`)
+                                    .map(
+                                        (list) =>
+                                            `${list.name} (${getMaximumNumberOfUnitUsedInBooking([list], equipment)} st)`,
+                                    )
                                     .join(', ')}
                             </div>
                         </div>
