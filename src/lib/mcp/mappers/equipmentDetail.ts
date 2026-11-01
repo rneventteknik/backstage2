@@ -52,9 +52,9 @@ export const toMcpEquipmentDetail = (equipment: Equipment, bookings: BookingsByU
         : {}),
 });
 
-export const toMcpEquipmentSearchResult = (equipment: Equipment[], nextMaxEquipmentId: number | null) => ({
+export const toMcpEquipmentSearchResult = (equipment: Equipment[], nextOffset: number | null) => ({
     equipment: equipment.map(toMcpEquipmentSummary),
-    nextMaxEquipmentId,
+    nextOffset,
 });
 
 const toMcpAvailabilityEquipmentList = (list: EquipmentList, equipment: Equipment) => ({

@@ -118,7 +118,6 @@ const swedishKeys: Record<McpKey, string> = {
 
     // Equipment search result
     equipment: 'utrustning',
-    nextMaxEquipmentId: 'nästaMaxUtrustningsId',
 
     // Equipment
     nameEN: 'engelsktNamn',

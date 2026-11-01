@@ -313,18 +313,19 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                     .describe('Only include equipment in this public price list category (publikKategori)'),
                 location: z.string().optional().describe('Only include equipment stored at this location (plats)'),
                 pageSize: z.number().int().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
-                maxEquipmentId: z
+                offset: z
                     .number()
                     .int()
-                    .optional()
+                    .min(0)
+                    .default(0)
                     .describe(
-                        'Only include equipment with this id or lower. Use nästaMaxUtrustningsId from the previous ' +
-                            'response to get the next page.',
+                        'Number of equipment items to skip. Use nästaOffset from the previous response to get the ' +
+                            'next page.',
                     ),
             }),
             annotations: { readOnlyHint: true },
         },
-        async ({ query, tag, publicCategory, location, pageSize, maxEquipmentId }) => {
+        async ({ query, tag, publicCategory, location, pageSize, offset }) => {
             const [equipmentModels, searchResult] = await Promise.all([
                 fetchEquipments(),
                 query?.trim() ? searchEquipment(query, EQUIPMENT_SEARCH_RESULT_LIMIT) : Promise.resolve(null),
@@ -337,17 +338,12 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                 .filter((equipment) => !tag || equipment.tags.some((x) => matchesName(x.name, tag)))
                 .filter((equipment) => matchesName(equipment.equipmentPublicCategory?.name, publicCategory))
                 .filter((equipment) => matchesName(equipment.equipmentLocation?.name, location))
-                .filter((equipment) => maxEquipmentId === undefined || equipment.id <= maxEquipmentId)
                 .sort((a, b) => b.id - a.id);
 
-            const page = matchingEquipment.slice(0, pageSize);
+            const page = matchingEquipment.slice(offset, offset + pageSize);
+            const nextOffset = offset + pageSize < matchingEquipment.length ? offset + pageSize : null;
 
-            return toJsonResult(
-                toMcpEquipmentSearchResult(
-                    page,
-                    matchingEquipment.length > pageSize ? page[page.length - 1].id - 1 : null,
-                ),
-            );
+            return toJsonResult(toMcpEquipmentSearchResult(page, nextOffset));
         },
     );
 
