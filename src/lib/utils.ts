@@ -397,7 +397,7 @@ export const getTotalNumberOfHoursReported = (timeReports: TimeReport[]) =>
 //
 // The lists are grouped by booking. A list returned at the same time as another is handed out overlaps it, unless they
 // are on the same booking, since the equipment can then go straight from one list to the next.
-export const getMaximumNumberOfUnitUsedByBookingLists = (listsByBooking: EquipmentList[][], equipment: Equipment) => {
+export const getMaximumNumberOfUnitUsed = (listsByBooking: EquipmentList[][], equipment: Equipment) => {
     const lists = listsByBooking.flatMap((bookingLists, booking) => bookingLists.map((list) => ({ list, booking })));
 
     return Math.max(
@@ -439,9 +439,9 @@ export const getMaximumNumberOfUnitUsedByBookingLists = (listsByBooking: Equipme
     );
 };
 
-// The max number of equipment used at the same time by lists on the same booking.
-export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equipment: Equipment) =>
-    getMaximumNumberOfUnitUsedByBookingLists([equipmentLists], equipment);
+// The max number of equipment used at the same time by lists that are all on the same booking.
+export const getMaximumNumberOfUnitUsedInBooking = (equipmentLists: EquipmentList[], equipment: Equipment) =>
+    getMaximumNumberOfUnitUsed([equipmentLists], equipment);
 
 export const listContainsEquipment = (list: EquipmentList, equipment: HasId) =>
     list.listEntries.some((entry) => entry.equipment?.id === equipment.id) ||

@@ -3,7 +3,7 @@ import { Alert, Button, Card, Form, InputGroup, ListGroup, Modal } from 'react-b
 import useSwr from 'swr';
 import { getMaximumNumberOfUnitUsedByBookings } from '../../../lib/equipmentConflicts';
 import { bookingsFetcher } from '../../../lib/fetchers';
-import { getMaximumNumberOfUnitUsed, toIntOrUndefined } from '../../../lib/utils';
+import { getMaximumNumberOfUnitUsedInBooking, toIntOrUndefined } from '../../../lib/utils';
 import { Status } from '../../../models/enums/Status';
 import { Equipment } from '../../../models/interfaces';
 import MarkdownCard from '../../MarkdownCard';
@@ -167,7 +167,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                             <Card.Header>Överlappande bokningar ({numberOfUnitsUsed} st används)</Card.Header>
                             <ListGroup variant="flush">
                                 {bookings.map((booking) => {
-                                    const unitsUsed = getMaximumNumberOfUnitUsed(
+                                    const unitsUsed = getMaximumNumberOfUnitUsedInBooking(
                                         booking.equipmentLists ?? [],
                                         equipment,
                                     );

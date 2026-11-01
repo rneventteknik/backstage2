@@ -7,7 +7,7 @@ import useSwr from 'swr';
 import { addDays, formatDate, formatWeekDay, getWeekNumber } from '../../lib/datetimeUtils';
 import { bookingsFetcher } from '../../lib/fetchers';
 import { getMaximumNumberOfUnitUsedByBookings } from '../../lib/equipmentConflicts';
-import { getMaximumNumberOfUnitUsed } from '../../lib/utils';
+import { getMaximumNumberOfUnitUsedInBooking } from '../../lib/utils';
 import { Status } from '../../models/enums/Status';
 import { Equipment } from '../../models/interfaces';
 import styles from './EquipmentCalendar.module.scss';
@@ -252,7 +252,7 @@ const EquipmentCalendarDay: React.FC<EquipmentCalendarDayProps> = ({
                                             {booking.equipmentLists
                                                 ?.map(
                                                     (list) =>
-                                                        `${list.name} (${getMaximumNumberOfUnitUsed(
+                                                        `${list.name} (${getMaximumNumberOfUnitUsedInBooking(
                                                             [list],
                                                             equipment,
                                                         )} st)`,

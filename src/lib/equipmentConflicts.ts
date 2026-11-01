@@ -2,7 +2,7 @@ import { Status } from '../models/enums/Status';
 import { Booking, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { getEquipmentInDatetime, getEquipmentOutDatetime } from './datetimeUtils';
-import { getMaximumNumberOfUnitUsed, getMaximumNumberOfUnitUsedByBookingLists, listContainsEquipment } from './utils';
+import { getMaximumNumberOfUnitUsed, getMaximumNumberOfUnitUsedInBooking, listContainsEquipment } from './utils';
 
 export enum EquipmentConflictStatus {
     // No other list uses the equipment at the same time.
@@ -39,7 +39,7 @@ export const getMaximumNumberOfUnitUsedByBookings = (
     bookings: BookingWithEquipmentLists[],
     equipment: Equipment,
 ): number =>
-    getMaximumNumberOfUnitUsedByBookingLists(
+    getMaximumNumberOfUnitUsed(
         bookings.filter((x) => x.status !== Status.CANCELED).map((x) => x.equipmentLists ?? []),
         equipment,
     );
@@ -72,8 +72,8 @@ export const getEquipmentListConflict = <T extends BookingWithEquipmentLists>(
         }))
         .filter((x) => x.lists.length > 0);
 
-    const unitsUsedByThisList = getMaximumNumberOfUnitUsed([list], equipment);
-    const unitsUsedByOthers = getMaximumNumberOfUnitUsedByBookingLists(
+    const unitsUsedByThisList = getMaximumNumberOfUnitUsedInBooking([list], equipment);
+    const unitsUsedByOthers = getMaximumNumberOfUnitUsed(
         [overlappingLocalLists, ...overlappingRemoteBookings.map((x) => x.lists)],
         equipment,
     );
