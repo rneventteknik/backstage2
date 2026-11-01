@@ -149,13 +149,12 @@ export const getAndVerifyApiKey = async (req: NextApiRequest & IncomingMessage):
 export const getAndVerifyMcpApiKey = async (req: NextApiRequest & IncomingMessage): Promise<CurrentUserInfo> => {
     const authorizationHeader = req.headers['authorization'];
     const bearerToken = authorizationHeader?.startsWith('Bearer ') ? authorizationHeader.slice('Bearer '.length) : null;
-    const apiKey = bearerToken ?? req.headers['x-api-key'];
     const acceptedApiKeys = JSON.parse(process.env.MCP_API_KEYS ?? '[]') as {
         key: string;
         name: string;
     }[];
 
-    const authInformation = apiKey ? acceptedApiKeys.find((x) => x.key === apiKey) : undefined;
+    const authInformation = bearerToken ? acceptedApiKeys.find((x) => x.key === bearerToken) : undefined;
 
     if (authInformation) {
         return {
