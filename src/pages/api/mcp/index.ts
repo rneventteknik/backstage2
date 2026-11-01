@@ -5,9 +5,9 @@ import { createMcpHandler } from '@modelcontextprotocol/server';
 import { withMcpApiKeyContext } from '../../../lib/sessionContext';
 import { createMcpServer } from '../../../lib/mcp/server';
 
-// Each request gets a fresh server instance, so the endpoint is stateless. Only the 2026-07-28 protocol revision is
-// served; clients using the 2025-era initialize handshake are rejected with an unsupported-protocol-version error.
-const mcpHandler = createMcpHandler(createMcpServer, { responseMode: 'json', legacy: 'reject' });
+// Each request gets a fresh server instance, so the endpoint is stateless. Clients on the 2025-era protocol (such as
+// mcp-remote, which Claude Desktop needs to reach remote servers) are served statelessly alongside 2026-07-28 clients.
+const mcpHandler = createMcpHandler(createMcpServer, { responseMode: 'json', legacy: 'stateless' });
 
 const toWebRequest = (req: NextApiRequest): Request => {
     const headers = new Headers();
