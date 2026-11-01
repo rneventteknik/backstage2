@@ -23,7 +23,7 @@ type McpKey =
 const swedishKeys: Record<McpKey, string> = {
     // Search result
     bookings: 'bokningar',
-    nextMaxBookingId: 'nästaMaxBokningsId',
+    nextOffset: 'nästaOffset',
 
     // Booking
     id: 'id',

@@ -13,6 +13,8 @@ export interface BookingFilter {
     statuses?: Status[];
     startDate?: Date | null;
     endDate?: Date | null;
+    createdFrom?: Date | null;
+    createdTo?: Date | null;
     customerName?: string;
     location?: string;
     bookingType?: BookingType;
@@ -20,11 +22,22 @@ export interface BookingFilter {
     accountKind?: AccountKind;
 }
 
-// Empty or undefined filter values do not filter anything. The date filters keep bookings whose usage period lies
-// within the given dates.
+// Empty or undefined filter values do not filter anything. The usage date filters keep bookings whose usage period
+// lies within the given dates. The created date filters keep bookings created within the given dates.
 export const filterBookings = (bookings: BookingViewModel[], filter: BookingFilter): BookingViewModel[] => {
-    const { userIds, statuses, startDate, endDate, customerName, location, bookingType, pricePlan, accountKind } =
-        filter;
+    const {
+        userIds,
+        statuses,
+        startDate,
+        endDate,
+        createdFrom,
+        createdTo,
+        customerName,
+        location,
+        bookingType,
+        pricePlan,
+        accountKind,
+    } = filter;
 
     return bookings
         .filter(
@@ -44,6 +57,10 @@ export const filterBookings = (bookings: BookingViewModel[], filter: BookingFilt
             (booking) =>
                 !endDate || !validDate(endDate) || (booking.usageEndDatetime && booking.usageEndDatetime < endDate),
         )
+        .filter(
+            (booking) => !createdFrom || !validDate(createdFrom) || (booking.created && booking.created > createdFrom),
+        )
+        .filter((booking) => !createdTo || !validDate(createdTo) || (booking.created && booking.created < createdTo))
         .filter((booking) => !customerName || booking.customerName?.toLowerCase().includes(customerName.toLowerCase()))
         .filter((booking) => !location || booking.location?.toLowerCase().includes(location.toLowerCase()))
         .filter((booking) => bookingType == undefined || booking.bookingType === bookingType)

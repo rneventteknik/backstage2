@@ -2,6 +2,7 @@ import { McpRequestContext, McpServer } from '@modelcontextprotocol/server';
 import * as z from 'zod';
 import { BookingType } from '../../models/enums/BookingType';
 import { Status } from '../../models/enums/Status';
+import { BookingViewModel } from '../../models/interfaces';
 import { toBookingViewModel } from '../datetimeUtils';
 import { filterBookings, groupBookingsByEquipmentUsageTime } from '../bookingFilters';
 import { fetchBookings, searchBookings } from '../db-access';
@@ -33,6 +34,9 @@ const SEARCH_RESULT_LIMIT = 1000;
 // Equipment search is only used to find matching ids within the full equipment list, so it can include all matches.
 const EQUIPMENT_SEARCH_RESULT_LIMIT = 10000;
 
+const SORT_BY_OPTIONS = ['created', 'usageStart'] as const;
+type SortBy = (typeof SORT_BY_OPTIONS)[number];
+
 // Filters take the same Swedish display names as the response data, e.g. 'Bokad' or 'Gigg'.
 const statusByName = new Map(
     [Status.DRAFT, Status.BOOKED, Status.DONE, Status.CANCELED].map((status) => [getStatusName(status), status]),
@@ -43,6 +47,34 @@ const bookingTypeByName = new Map(
 const statusNames = [...statusByName.keys()] as [string, ...string[]];
 const bookingTypeNames = [...bookingTypeByName.keys()] as [string, ...string[]];
 const [draftName, bookedName, doneName, canceledName] = statusNames;
+
+const getSortDatetime = (booking: BookingViewModel, sortBy: SortBy): Date | undefined => {
+    switch (sortBy) {
+        case 'created':
+            return booking.created;
+        case 'usageStart':
+            return booking.usageStartDatetime;
+    }
+};
+
+// Newest first; bookings missing the sort datetime go last. Id descending breaks ties.
+const compareBookingsBy =
+    (sortBy: SortBy) =>
+    (a: BookingViewModel, b: BookingViewModel): number => {
+        const aDate = getSortDatetime(a, sortBy);
+        const bDate = getSortDatetime(b, sortBy);
+        if (!aDate && !bDate) {
+            return b.id - a.id;
+        }
+        if (!aDate) {
+            return 1;
+        }
+        if (!bDate) {
+            return -1;
+        }
+        const diff = bDate.getTime() - aDate.getTime();
+        return diff !== 0 ? diff : b.id - a.id;
+    };
 
 const toJsonResult = (result: object) => {
     const translatedResult = toSwedishKeys(result) as Record<string, unknown>;
@@ -115,11 +147,12 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
         {
             title: 'Search bookings',
             description:
-                'Search and list bookings, newest first. Without a query all bookings matching the filters are ' +
-                'listed. The query matches booking name, contact person name, invoice number and customer name, ' +
-                `and every word must match. A query searches the ${SEARCH_RESULT_LIMIT} most recently updated ` +
-                'matching bookings. Use get_booking for full details on a booking. Field names and values are in ' +
-                'Swedish, matching the Backstage2 user interface.\n\n' +
+                'Search and list bookings, newest first by creation time by default (sortBy=created). Without a ' +
+                'query all bookings matching the filters are listed. The query matches booking name, contact ' +
+                'person name, invoice number and customer name, and every word must match. A query searches the ' +
+                `${SEARCH_RESULT_LIMIT} most recently updated matching bookings. Use from/to to filter on usage ` +
+                'dates and createdFrom/createdTo to filter on creation time. Use get_booking for full details on ' +
+                'a booking. Field names and values are in Swedish, matching the Backstage2 user interface.\n\n' +
                 `Booking statuses: ${draftName} (draft, not yet confirmed), ${bookedName} (confirmed), ` +
                 `${doneName} (finished, possibly still to be invoiced) and ${canceledName} (cancelled). Active ` +
                 `bookings are those with status ${draftName} or ${bookedName}, so filter with status ` +
@@ -146,19 +179,40 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                     ),
                 from: z.iso.date().optional().describe('Only include bookings whose usage starts after this date'),
                 to: z.iso.date().optional().describe('Only include bookings whose usage ends before this date'),
+                createdFrom: z.iso.date().optional().describe('Only include bookings created after this date'),
+                createdTo: z.iso.date().optional().describe('Only include bookings created before this date'),
+                sortBy: z
+                    .enum(SORT_BY_OPTIONS)
+                    .default('created')
+                    .describe(
+                        'Sort newest first by creation time (created) or usage start (usageStart). Defaults to created.',
+                    ),
                 pageSize: z.number().int().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
-                maxBookingId: z
+                offset: z
                     .number()
                     .int()
-                    .optional()
+                    .min(0)
+                    .default(0)
                     .describe(
-                        'Only include bookings with this id or lower. Use nästaMaxBokningsId from the previous ' +
-                            'response to get the next page.',
+                        'Number of bookings to skip. Use nästaOffset from the previous response to get the next ' +
+                            'page.',
                     ),
             }),
             annotations: { readOnlyHint: true },
         },
-        async ({ query, status, bookingType, responsibleUser, from, to, pageSize, maxBookingId }) => {
+        async ({
+            query,
+            status,
+            bookingType,
+            responsibleUser,
+            from,
+            to,
+            createdFrom,
+            createdTo,
+            sortBy,
+            pageSize,
+            offset,
+        }) => {
             const [bookings, resolvedUsers] = await Promise.all([
                 query?.trim() ? searchBookings(query, SEARCH_RESULT_LIMIT) : fetchBookings(),
                 responsibleUser?.length ? resolveUserIds(responsibleUser, canSeePii) : undefined,
@@ -174,19 +228,14 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                 bookingType: bookingType !== undefined ? bookingTypeByName.get(bookingType) : undefined,
                 startDate: from ? new Date(from) : undefined,
                 endDate: to ? new Date(to) : undefined,
-            })
-                .filter((booking) => maxBookingId === undefined || booking.id <= maxBookingId)
-                .sort((a, b) => b.id - a.id);
+                createdFrom: createdFrom ? new Date(createdFrom) : undefined,
+                createdTo: createdTo ? new Date(createdTo) : undefined,
+            }).sort(compareBookingsBy(sortBy));
 
-            const page = matchingBookings.slice(0, pageSize);
+            const page = matchingBookings.slice(offset, offset + pageSize);
+            const nextOffset = offset + pageSize < matchingBookings.length ? offset + pageSize : null;
 
-            return toJsonResult(
-                toMcpBookingSearchResult(
-                    page,
-                    matchingBookings.length > pageSize ? page[page.length - 1].id - 1 : null,
-                    canSeePii,
-                ),
-            );
+            return toJsonResult(toMcpBookingSearchResult(page, nextOffset, canSeePii));
         },
     );
 

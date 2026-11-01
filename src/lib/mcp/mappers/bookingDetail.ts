@@ -196,9 +196,9 @@ export const toMcpBookingDetail = (
 
 export const toMcpBookingSearchResult = (
     bookings: BookingViewModel[],
-    nextMaxBookingId: number | null,
+    nextOffset: number | null,
     canSeePii: boolean,
 ) => ({
     bookings: bookings.map((booking) => toMcpBookingSummary(booking, canSeePii)),
-    nextMaxBookingId,
+    nextOffset,
 });
