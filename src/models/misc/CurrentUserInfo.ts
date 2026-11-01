@@ -6,4 +6,5 @@ export interface CurrentUserInfo {
     name?: string;
     role?: Role;
     loginDate?: number;
+    scopes?: string[];
 }

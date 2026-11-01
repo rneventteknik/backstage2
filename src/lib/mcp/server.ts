@@ -1,4 +1,4 @@
-import { McpServer } from '@modelcontextprotocol/server';
+import { McpRequestContext, McpServer } from '@modelcontextprotocol/server';
 import * as z from 'zod';
 import { BookingType } from '../../models/enums/BookingType';
 import { Status } from '../../models/enums/Status';
@@ -11,7 +11,7 @@ import { fetchUserNamesAndTags } from '../db-access/user';
 import { getCalendarEvent } from '../calenderUtils';
 import { toBooking } from '../mappers/booking';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
-import { toMcpBookingDetail, toMcpBookingSearchResult, toMcpCalendarEvent } from './bookingMappers';
+import { PII_SCOPE, toMcpBookingDetail, toMcpBookingSearchResult, toMcpCalendarEvent } from './bookingMappers';
 import { toSwedishKeys } from './swedishKeys';
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -73,7 +73,13 @@ const resolveUserIds = async (namesOrTags: string[]): Promise<{ userIds: number[
     return errors.length > 0 ? { error: errors.join(' ') } : { userIds };
 };
 
-export const createMcpServer = (): McpServer => {
+export const createMcpServer = (ctx: McpRequestContext): McpServer => {
+    const canSeePii = ctx.authInfo?.scopes.includes(PII_SCOPE) ?? false;
+    const personalDataDescription = canSeePii
+        ? ''
+        : ' Personal data is limited: people are listed by first name only, and customer contact details are not ' +
+          'included. The customer name (kundnamn) is only included for customers with a Hogia ID (hogiaId).';
+
     const server = new McpServer({
         name: 'backstage2',
         version: process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION ?? 'unknown',
@@ -93,7 +99,8 @@ export const createMcpServer = (): McpServer => {
                 `${doneName} (finished, possibly still to be invoiced) and ${canceledName} (cancelled). Active ` +
                 `bookings are those with status ${draftName} or ${bookedName}, so filter with status ` +
                 `["${draftName}", "${bookedName}"] to get only active bookings, or ["${doneName}", ` +
-                `"${canceledName}"] for inactive ones.`,
+                `"${canceledName}"] for inactive ones.` +
+                personalDataDescription,
             inputSchema: z.object({
                 query: z.string().optional().describe('Free-text search string'),
                 status: z
@@ -152,6 +159,7 @@ export const createMcpServer = (): McpServer => {
                 toMcpBookingSearchResult(
                     page,
                     matchingBookings.length > pageSize ? page[page.length - 1].id - 1 : null,
+                    canSeePii,
                 ),
             );
         },
@@ -165,7 +173,8 @@ export const createMcpServer = (): McpServer => {
                 'Get all details about a booking: people, customer and invoice information, notes, pricing, ' +
                 'equipment lists with prices, time estimates, time reports, the latest changelog entries and ' +
                 'linked calendar events. Prices are in SEK, both excluding (exklMoms) and including (inklMoms) ' +
-                'VAT. Field names and values are in Swedish, matching the Backstage2 user interface.',
+                'VAT. Field names and values are in Swedish, matching the Backstage2 user interface.' +
+                personalDataDescription,
             inputSchema: z.object({
                 bookingId: z.number().int(),
             }),
@@ -184,8 +193,8 @@ export const createMcpServer = (): McpServer => {
             const calendarEvents = await Promise.all(
                 (booking.calendarEvents ?? []).map(({ calendarEventId }) =>
                     getCalendarEvent(calendarEventId)
-                        .then(toMcpCalendarEvent)
-                        .catch(() => toMcpCalendarEvent({ id: calendarEventId, workingUsers: [] })),
+                        .then((event) => toMcpCalendarEvent(event, canSeePii))
+                        .catch(() => toMcpCalendarEvent({ id: calendarEventId, workingUsers: [] }, canSeePii)),
                 ),
             );
 
@@ -203,6 +212,7 @@ export const createMcpServer = (): McpServer => {
                         ),
                     },
                     calendarEvents,
+                    canSeePii,
                 ),
             );
         },
