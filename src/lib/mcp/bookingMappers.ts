@@ -251,7 +251,8 @@ export const toMcpBookingDetail = (
                 totalPrice: toMcpPrice(getTimeReportPrice(timeReport)),
             })) ?? [],
 
-        changelog: booking.changelog?.map(toMcpChangelogEntry) ?? [],
+        // Changelog descriptions are free text starting with the full names of the people involved.
+        ...(canSeePii ? { changelog: booking.changelog?.map(toMcpChangelogEntry) ?? [] } : {}),
 
         calendarEvents,
     };

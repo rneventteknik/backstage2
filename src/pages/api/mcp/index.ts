@@ -32,7 +32,8 @@ const handler = withMcpApiKeyContext(async (req: NextApiRequest, res: NextApiRes
     const response = await mcpHandler.fetch(toWebRequest(req), {
         parsedBody: req.body === '' ? undefined : req.body,
         authInfo: {
-            token: req.headers['authorization']?.replace(/^Bearer /, '') ?? '',
+            // Required by the SDK's AuthInfo type, but nothing reads it; the key is verified in withMcpApiKeyContext.
+            token: '',
             clientId: context.currentUser.name ?? '',
             scopes: context.currentUser.scopes ?? [],
         },

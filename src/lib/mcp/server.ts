@@ -77,8 +77,10 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
     const canSeePii = ctx.authInfo?.scopes.includes(PII_SCOPE) ?? false;
     const personalDataDescription = canSeePii
         ? ''
-        : ' Personal data is limited: people are listed by first name only, and customer contact details are not ' +
-          'included. The customer name (kundnamn) is only included for customers with a Hogia ID (hogiaId).';
+        : ' Personal data is limited: people are listed by first name only, customer contact details and the ' +
+          'changelog are not included, and the customer name (kundnamn) is only included for customers with a ' +
+          'Hogia ID (hogiaId). Free-text fields such as booking names, notes, time report names and calendar ' +
+          'event names are returned as entered and may still mention people.';
 
     const server = new McpServer({
         name: 'backstage2',
