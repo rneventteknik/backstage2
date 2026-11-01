@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, Button, Card, Form, InputGroup, ListGroup, Modal } from 'react-bootstrap';
 import useSwr from 'swr';
+import { getMaximumNumberOfUnitUsedByBookings } from '../../../lib/equipmentConflicts';
 import { bookingsFetcher } from '../../../lib/fetchers';
 import { getMaximumNumberOfUnitUsed, toIntOrUndefined } from '../../../lib/utils';
 import { Status } from '../../../models/enums/Status';
@@ -69,8 +70,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
 
     // Filter bookings
     const bookings = conflictData?.filter((x) => x.status !== Status.CANCELED) ?? [];
-    const overlappingEquipmentLists = bookings.flatMap((x) => x.equipmentLists ?? []);
-    const numberOfUnitsUsed = getMaximumNumberOfUnitUsed(overlappingEquipmentLists, equipment);
+    const numberOfUnitsUsed = getMaximumNumberOfUnitUsedByBookings(bookings, equipment);
 
     const getDescription = () => {
         if (!startDatetime || !endDatetime) {

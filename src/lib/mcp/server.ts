@@ -2,8 +2,9 @@ import { McpRequestContext, McpServer } from '@modelcontextprotocol/server';
 import * as z from 'zod';
 import { BookingType } from '../../models/enums/BookingType';
 import { Status } from '../../models/enums/Status';
-import { BookingViewModel } from '../../models/interfaces';
-import { toBookingViewModel } from '../datetimeUtils';
+import { BookingViewModel, Equipment } from '../../models/interfaces';
+import { getEquipmentInDatetime, getEquipmentOutDatetime, toBookingViewModel } from '../datetimeUtils';
+import { EquipmentConflictStatus } from '../equipmentConflicts';
 import { filterBookings, groupBookingsByEquipmentUsageTime } from '../bookingFilters';
 import { fetchBookings, searchBookings } from '../db-access';
 import {
@@ -18,6 +19,12 @@ import { getCalendarEvent } from '../calenderUtils';
 import { toBooking } from '../mappers/booking';
 import { toEquipment } from '../mappers/equipment';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
+import {
+    CONFLICT_STATUS_NAMES,
+    getCheckableEquipment,
+    getCheckableEquipmentLists,
+    toMcpBookingConflicts,
+} from './mappers/bookingConflicts';
 import { toMcpBookingDetail, toMcpBookingSearchResult, toMcpCalendarEvent } from './mappers/bookingDetail';
 import { getFirstName, PII_SCOPE } from './mappers/primitives';
 import {
@@ -86,6 +93,24 @@ const toJsonResult = (result: object) => {
 
 const matchesName = (name: string | undefined, filter: string | undefined) =>
     !filter || name?.toLowerCase() === filter.trim().toLowerCase();
+
+// The equipment filters match names exactly, so a misspelled or made-up name is reported with the valid names instead
+// of silently giving an empty result.
+const findUnknownFilterValues = (
+    equipment: Equipment[],
+    filters: { label: string; value: string | undefined; getNames: (equipment: Equipment) => (string | undefined)[] }[],
+): string | null => {
+    const errors = filters
+        .filter(({ value }) => value !== undefined)
+        .map(({ label, value, getNames }) => {
+            const validNames = [...new Set(equipment.flatMap(getNames).filter((x): x is string => !!x))].sort();
+            return validNames.some((name) => matchesName(name, value))
+                ? null
+                : `No equipment has ${label} "${value}". Valid values: ${validNames.map((x) => `"${x}"`).join(', ')}.`;
+        })
+        .filter((x): x is string => x !== null);
+    return errors.length > 0 ? errors.join(' ') : null;
+};
 
 const toErrorResult = (message: string) => ({
     content: [{ type: 'text' as const, text: message }],
@@ -301,7 +326,8 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                 'Without a query all equipment matching the filters is listed. The query matches the Swedish ' +
                 'name, English name and search keywords, and every word must match. Use get_equipment for full ' +
                 'details and bookings of a piece of equipment, and get_equipment_availability to check how many ' +
-                'units are free during a time period. Field names and values are in Swedish, matching the ' +
+                'units are free during a time period. The tag, publicCategory and location filters must match a ' +
+                'name exactly (case-insensitive); an unknown name gives an error listing the valid names. Field names and values are in Swedish, matching the ' +
                 'Backstage2 user interface. Prices are in SEK, both excluding (exklMoms) and including (inklMoms) ' +
                 'VAT; the THS prices are used for bookings with the THS price plan.',
             inputSchema: z.object({
@@ -331,9 +357,22 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                 query?.trim() ? searchEquipment(query, EQUIPMENT_SEARCH_RESULT_LIMIT) : Promise.resolve(null),
             ]);
             const matchingIds = searchResult ? new Set(searchResult.map((x) => x.id)) : null;
+            const allEquipment = equipmentModels.map(toEquipment);
 
-            const matchingEquipment = equipmentModels
-                .map(toEquipment)
+            const filterError = findUnknownFilterValues(allEquipment, [
+                { label: 'tag', value: tag, getNames: (x) => x.tags.map((tag) => tag.name) },
+                {
+                    label: 'publicCategory',
+                    value: publicCategory,
+                    getNames: (x) => [x.equipmentPublicCategory?.name],
+                },
+                { label: 'location', value: location, getNames: (x) => [x.equipmentLocation?.name] },
+            ]);
+            if (filterError) {
+                return toErrorResult(filterError);
+            }
+
+            const matchingEquipment = allEquipment
                 .filter((equipment) => !matchingIds || matchingIds.has(equipment.id))
                 .filter((equipment) => !tag || equipment.tags.some((x) => matchesName(x.name, tag)))
                 .filter((equipment) => matchesName(equipment.equipmentPublicCategory?.name, publicCategory))
@@ -432,6 +471,77 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
             return toJsonResult(
                 toMcpEquipmentAvailability(toEquipment(equipmentModel), fromDate, toDate, bookings, canSeePii),
             );
+        },
+    );
+
+    server.registerTool(
+        'check_booking_conflicts',
+        {
+            title: 'Check booking conflicts',
+            description:
+                'Check every equipment list in a booking for equipment conflicts, using the same conflict ' +
+                'detection as the icons next to each row in the equipment lists in Backstage2. For each list and ' +
+                'equipment, the units the list uses (antal) are added to the most units used at the same time by ' +
+                'overlapping lists in other bookings and in the same booking (cancelled bookings are not counted, ' +
+                'draft bookings are), and compared to the inventory count. konfliktstatus is one of: ' +
+                `${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.NONE]} (no other list uses it at the same time), ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.SHARED]} ` +
+                `(other lists use it at the same time but there are enough units), ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.CONFLICT]} ` +
+                `(more units are used in total than the inventory count) and ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.EXCEEDS_INVENTORY]} ` +
+                '(this list alone uses more units than the inventory count). By default only rows with another ' +
+                `status than ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.NONE]} are listed; antalKonflikter counts the rows with ` +
+                `${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.CONFLICT]} or ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.EXCEEDS_INVENTORY]}. Equipment without an inventory ` +
+                'count and rows not linked to equipment are not checked, and lists without equipment out and in ' +
+                'times are listed in ejKontrolleradeUtrustningslistor. Use get_equipment_availability to check a ' +
+                'single piece of equipment for an arbitrary time period. Field names and values are in Swedish, ' +
+                'matching the Backstage2 user interface.' +
+                personalDataDescription,
+            inputSchema: z.object({
+                bookingId: z.number().int(),
+                includeAll: z
+                    .boolean()
+                    .default(false)
+                    .describe(`Also list rows with status ${CONFLICT_STATUS_NAMES[EquipmentConflictStatus.NONE]}`),
+            }),
+            annotations: { readOnlyHint: true },
+        },
+        async ({ bookingId, includeAll }) => {
+            const bookingModel = await fetchBookingForMcp(bookingId);
+
+            if (!bookingModel) {
+                return toErrorResult(`Booking ${bookingId} not found`);
+            }
+
+            const booking = toBookingViewModel(toBooking(bookingModel));
+
+            // One query per equipment, covering every list in the booking that uses it. The mapper narrows the
+            // result down to the lists overlapping each of the booking's lists.
+            const intervalByEquipmentId = new Map<number, { from: Date; to: Date }>();
+            getCheckableEquipmentLists(booking).forEach((list) => {
+                const listOut = getEquipmentOutDatetime(list)!;
+                const listIn = getEquipmentInDatetime(list)!;
+                getCheckableEquipment(list).forEach((equipment) => {
+                    const interval = intervalByEquipmentId.get(equipment.id);
+                    intervalByEquipmentId.set(equipment.id, {
+                        from: interval && interval.from < listOut ? interval.from : listOut,
+                        to: interval && interval.to > listIn ? interval.to : listIn,
+                    });
+                });
+            });
+
+            const otherBookingsByEquipmentId = new Map(
+                await Promise.all(
+                    [...intervalByEquipmentId].map(async ([equipmentId, { from, to }]) => {
+                        const bookingModels = await fetchBookingsWithEquipmentInInterval(equipmentId, from, to);
+                        const otherBookings = bookingModels
+                            .map(toBooking)
+                            .map(toBookingViewModel)
+                            .filter((other) => other.id !== booking.id);
+                        return [equipmentId, otherBookings] as const;
+                    }),
+                ),
+            );
+
+            return toJsonResult(toMcpBookingConflicts(booking, otherBookingsByEquipmentId, includeAll, canSeePii));
         },
     );
 
