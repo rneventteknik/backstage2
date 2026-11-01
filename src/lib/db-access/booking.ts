@@ -29,6 +29,7 @@ export const searchBookings = async (searchString: string, count: number): Promi
                 builder.andWhere('contactPersonName', getCaseInsensitiveComparisonKeyword(), partialSearchString);
             });
         })
+        .withGraphFetched('ownerUser')
         .withGraphFetched('equipmentLists')
         .orWhere((builder) => {
             searchStrings.forEach((partialSearchString) => {
@@ -42,6 +43,42 @@ export const searchBookings = async (searchString: string, count: number): Promi
         })
         .orderBy('updated', 'desc')
         .limit(count);
+};
+
+export const fetchBookingForMcp = async (id: number): Promise<BookingObjectionModel | undefined> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .where('id', id)
+        .withGraphFetched('ownerUser')
+        .withGraphFetched('coOwnerUsers')
+        .withGraphFetched('equipmentLists.listEntries.equipment.[equipmentPublicCategory, tags]')
+        .withGraphFetched('equipmentLists.listEntries.equipmentPrice')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.[equipmentPublicCategory, tags]')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipmentPrice')
+        .withGraphFetched('calendarEvents')
+        .withGraphFetched('timeEstimates')
+        .withGraphFetched('timeReports.user')
+        .withGraphFetched('changelog(changelogInfo)')
+        .withGraphFetched('emailThreads')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(50);
+            },
+        })
+        .modifyGraph('equipmentLists', (builder) => {
+            builder.orderBy('sortIndex');
+        })
+        .modifyGraph('equipmentLists.listEntries', (builder) => {
+            builder.orderBy('sortIndex');
+        })
+        .modifyGraph('equipmentLists.listHeadings', (builder) => {
+            builder.orderBy('sortIndex');
+        })
+        .modifyGraph('equipmentLists.listHeadings.listEntries', (builder) => {
+            builder.orderBy('sortIndex');
+        })
+        .then((bookings) => bookings[0]);
 };
 
 export const DEFAULT_ANALYTICS_PAGE_SIZE = 100;

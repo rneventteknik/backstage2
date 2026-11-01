@@ -1,7 +1,7 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 import { CurrentUserInfo } from '../models/misc/CurrentUserInfo';
 import { respondWithAccessDeniedResponse } from './apiResponses';
-import { getAndVerifyApiKey, getAndVerifyUser } from './authenticate';
+import { getAndVerifyApiKey, getAndVerifyMcpApiKey, getAndVerifyUser } from './authenticate';
 import { withApiSession, RequestWithSession } from './session';
 import { IncomingMessage } from 'http';
 import { Role } from '../models/enums/Role';
@@ -56,6 +56,30 @@ export const withApiKeyContext = (
         res: NextApiResponse,
     ) => {
         const currentUser = await getAndVerifyApiKey(req);
+
+        if (!currentUser.isLoggedIn) {
+            respondWithAccessDeniedResponse(res);
+            return;
+        }
+
+        return handler(req, res, { currentUser: currentUser });
+    };
+
+    return withApiSession(internalHandler);
+};
+
+export const withMcpApiKeyContext = (
+    handler: (
+        req: NextApiRequest & IncomingMessage & RequestWithSession,
+        res: NextApiResponse,
+        context: SessionContext,
+    ) => void,
+): NextApiHandler => {
+    const internalHandler = async (
+        req: NextApiRequest & IncomingMessage & RequestWithSession,
+        res: NextApiResponse,
+    ) => {
+        const currentUser = await getAndVerifyMcpApiKey(req);
 
         if (!currentUser.isLoggedIn) {
             respondWithAccessDeniedResponse(res);

@@ -3,6 +3,7 @@ import { AccountKind } from '../models/enums/AccountKind';
 import { Booking, BookingViewModel, TimeEstimate, TimeReport } from '../models/interfaces';
 import { PricedEntity, PricedEntityWithTHS } from '../models/interfaces/BaseEntity';
 import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../models/interfaces/EquipmentList';
+import { BookingChangelogEntry } from '../models/interfaces/ChangeLogEntry';
 import { SalaryGroup } from '../models/interfaces/SalaryGroup';
 import { InvoiceCustomer, InvoiceData, InvoiceRow, InvoiceRowType, PricedInvoiceRow } from '../models/misc/Invoice';
 import { SalaryReport, UserSalaryReport } from '../models/misc/Salary';
@@ -155,6 +156,25 @@ export const getPriceCalculationType = (
     }
     return 'timeEstimates';
 };
+
+const priceCalculationTypeLabels: Record<PriceCalculationType, string> = {
+    fixedPrice: 'Fast pris',
+    timeReports: 'Pris med faktisk personalkostnad',
+    timeEstimates: 'Pris med estimerad personalkostnad',
+};
+
+export const getPriceCalculationTypeLabel = (summary: BookingPriceSummary): string =>
+    priceCalculationTypeLabels[getPriceCalculationType(summary)];
+
+export const getPriceSummaryFromChangelogEntry = (entry: BookingChangelogEntry): BookingPriceSummary => ({
+    equipmentPrice: entry.equipmentPrice ?? currency(0),
+    timeEstimatePrice: entry.timeEstimatePrice ?? currency(0),
+    timeReportsPrice: entry.timeReportsPrice ?? null,
+    fixedPrice: entry.fixedPrice ?? null,
+});
+
+export const changelogEntryHasPriceInformation = (entry: BookingChangelogEntry): boolean =>
+    entry.equipmentPrice !== null && entry.equipmentPrice !== undefined;
 
 export const getCorrectPriceBasedOnBookingState = (
     summary: BookingPriceSummary,

@@ -3,10 +3,11 @@ import { Card, ListGroup, Modal } from 'react-bootstrap';
 import { formatDatetimeWithYear } from '../../lib/datetimeUtils';
 import {
     addVAT,
+    changelogEntryHasPriceInformation,
     formatCurrency,
     getCorrectPriceBasedOnBookingState,
-    getPriceCalculationType,
-    PriceCalculationType,
+    getPriceCalculationTypeLabel,
+    getPriceSummaryFromChangelogEntry,
 } from '../../lib/pricingUtils';
 import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
 import BookingPriceSummaryDisplay from './BookingPriceSummary';
@@ -18,31 +19,15 @@ type Props = {
 
 const defaultListLength = 3;
 
-const getPriceSummaryFromEntry = (entry: BookingChangelogEntry) => ({
-    equipmentPrice: entry.equipmentPrice ?? currency(0),
-    timeEstimatePrice: entry.timeEstimatePrice ?? currency(0),
-    timeReportsPrice: entry.timeReportsPrice ?? null,
-    fixedPrice: entry.fixedPrice ?? null,
-});
-
-const priceCalculationTypeLabels: Record<PriceCalculationType, string> = {
-    fixedPrice: 'Fast pris',
-    timeReports: 'Pris med faktisk personalkostnad',
-    timeEstimates: 'Pris med estimerad personalkostnad',
-};
-
 const getDisplayPrice = (entry: BookingChangelogEntry): currency | null => {
-    if (!hasPriceInformation(entry)) return null;
-    return addVAT(getCorrectPriceBasedOnBookingState(getPriceSummaryFromEntry(entry)));
+    if (!changelogEntryHasPriceInformation(entry)) return null;
+    return addVAT(getCorrectPriceBasedOnBookingState(getPriceSummaryFromChangelogEntry(entry)));
 };
 
 const getPriceTypeLabel = (entry: BookingChangelogEntry): string | null => {
-    if (!hasPriceInformation(entry)) return null;
-    return priceCalculationTypeLabels[getPriceCalculationType(getPriceSummaryFromEntry(entry))];
+    if (!changelogEntryHasPriceInformation(entry)) return null;
+    return getPriceCalculationTypeLabel(getPriceSummaryFromChangelogEntry(entry));
 };
-
-const hasPriceInformation = (entry: BookingChangelogEntry): boolean =>
-    entry.equipmentPrice !== null && entry.equipmentPrice !== undefined;
 
 const ChangelogEntryContent: React.FC<{ entry: BookingChangelogEntry; onClick?: () => void }> = ({
     entry,
@@ -72,7 +57,7 @@ const BookingChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
     const [selectedEntry, setSelectedEntry] = useState<BookingChangelogEntry | null>(null);
 
     const handleEntryClick = (entry: BookingChangelogEntry) => {
-        if (hasPriceInformation(entry)) {
+        if (changelogEntryHasPriceInformation(entry)) {
             setSelectedEntry(entry);
         }
     };
@@ -91,7 +76,9 @@ const BookingChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
                         <ChangelogEntryContent
                             key={entry.id}
                             entry={entry}
-                            onClick={hasPriceInformation(entry) ? () => handleEntryClick(entry) : undefined}
+                            onClick={
+                                changelogEntryHasPriceInformation(entry) ? () => handleEntryClick(entry) : undefined
+                            }
                         />
                     ))}
                 </ListGroup>
@@ -107,7 +94,7 @@ const BookingChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
                             key={entry.id}
                             entry={entry}
                             onClick={
-                                hasPriceInformation(entry)
+                                changelogEntryHasPriceInformation(entry)
                                     ? () => {
                                           setShowAllModal(false);
                                           setSelectedEntry(entry);
@@ -120,7 +107,7 @@ const BookingChangelogCard: React.FC<Props> = ({ changelog }: Props) => {
             </Modal>
 
             <Modal show={selectedEntry !== null} onHide={() => setSelectedEntry(null)} size="lg">
-                {selectedEntry !== null && hasPriceInformation(selectedEntry) ? (
+                {selectedEntry !== null && changelogEntryHasPriceInformation(selectedEntry) ? (
                     <>
                         <Modal.Header closeButton>
                             <Modal.Title>
