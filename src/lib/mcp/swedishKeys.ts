@@ -1,3 +1,4 @@
+import { toMcpBookingConflicts } from './mappers/bookingConflicts';
 import { toMcpBookingDetail, toMcpBookingSearchResult } from './mappers/bookingDetail';
 import {
     toMcpEquipmentAvailability,
@@ -16,7 +17,8 @@ type McpKey =
     | DeepKeys<ReturnType<typeof toMcpBookingSearchResult>>
     | DeepKeys<ReturnType<typeof toMcpEquipmentDetail>>
     | DeepKeys<ReturnType<typeof toMcpEquipmentSearchResult>>
-    | DeepKeys<ReturnType<typeof toMcpEquipmentAvailability>>;
+    | DeepKeys<ReturnType<typeof toMcpEquipmentAvailability>>
+    | DeepKeys<ReturnType<typeof toMcpBookingConflicts>>;
 
 // The MCP data is built with English keys and translated as a last step, so the agent sees the same Swedish terms
 // as Backstage2's users. Names are taken from the labels in the frontend where one exists.
@@ -139,6 +141,12 @@ const swedishKeys: Record<McpKey, string> = {
     to: 'till',
     maxUnitsBooked: 'maxAntalBokade',
     availableUnits: 'tillgängligtAntal',
+
+    // Booking conflicts
+    conflictStatus: 'konfliktstatus',
+    checkedRowsCount: 'antalKontrolleradeRader',
+    conflictCount: 'antalKonflikter',
+    skippedEquipmentLists: 'ejKontrolleradeUtrustningslistor',
 };
 
 const isMcpKey = (key: string): key is McpKey => key in swedishKeys;
