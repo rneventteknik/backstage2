@@ -7,6 +7,7 @@ import { filterBookings } from '../bookingFilters';
 import { fetchBookings, searchBookings } from '../db-access';
 import { fetchBookingForMcp } from '../db-access/booking';
 import { fetchSettings } from '../db-access/setting';
+import { fetchUserNamesAndTags } from '../db-access/user';
 import { getCalendarEvent } from '../calenderUtils';
 import { toBooking } from '../mappers/booking';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
@@ -42,6 +43,36 @@ const toErrorResult = (message: string) => ({
     isError: true,
 });
 
+// Matches each name tag or name to exactly one user: an exact name tag, then an exact name, then a unique partial
+// name. Returns an error message for entries that match no user or several users.
+const resolveUserIds = async (namesOrTags: string[]): Promise<{ userIds: number[] } | { error: string }> => {
+    const users = await fetchUserNamesAndTags();
+    const formatUser = (user: { name: string; nameTag?: string }) => `${user.name} (${user.nameTag ?? '-'})`;
+
+    const userIds: number[] = [];
+    const errors: string[] = [];
+
+    for (const nameOrTag of namesOrTags) {
+        const searchString = nameOrTag.trim().toLowerCase();
+        const exactMatch =
+            users.find((user) => user.nameTag?.toLowerCase() === searchString) ??
+            users.find((user) => user.name.toLowerCase() === searchString);
+        const candidates = exactMatch
+            ? [exactMatch]
+            : users.filter((user) => user.name.toLowerCase().includes(searchString));
+
+        if (candidates.length === 1) {
+            userIds.push(candidates[0].id!);
+        } else if (candidates.length === 0) {
+            errors.push(`No user matches "${nameOrTag}".`);
+        } else {
+            errors.push(`"${nameOrTag}" matches several users: ${candidates.map(formatUser).join(', ')}.`);
+        }
+    }
+
+    return errors.length > 0 ? { error: errors.join(' ') } : { userIds };
+};
+
 export const createMcpServer = (): McpServer => {
     const server = new McpServer({
         name: 'backstage2',
@@ -73,6 +104,14 @@ export const createMcpServer = (): McpServer => {
                             'active bookings.',
                     ),
                 bookingType: z.enum(bookingTypeNames).optional(),
+                responsibleUser: z
+                    .array(z.string())
+                    .optional()
+                    .describe(
+                        'Only include bookings whose responsible member (ansvarigMedlem) matches one of these name ' +
+                            'tags (e.g. "PJ") or names. Like the other filters, it is applied to the ' +
+                            `${SEARCH_RESULT_LIMIT} bookings a query searches.`,
+                    ),
                 from: z.iso.date().optional().describe('Only include bookings whose usage starts after this date'),
                 to: z.iso.date().optional().describe('Only include bookings whose usage ends before this date'),
                 pageSize: z.number().int().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
@@ -87,10 +126,18 @@ export const createMcpServer = (): McpServer => {
             }),
             annotations: { readOnlyHint: true },
         },
-        async ({ query, status, bookingType, from, to, pageSize, maxBookingId }) => {
-            const bookings = await (query?.trim() ? searchBookings(query, SEARCH_RESULT_LIMIT) : fetchBookings());
+        async ({ query, status, bookingType, responsibleUser, from, to, pageSize, maxBookingId }) => {
+            const [bookings, resolvedUsers] = await Promise.all([
+                query?.trim() ? searchBookings(query, SEARCH_RESULT_LIMIT) : fetchBookings(),
+                responsibleUser?.length ? resolveUserIds(responsibleUser) : undefined,
+            ]);
+
+            if (resolvedUsers && 'error' in resolvedUsers) {
+                return toErrorResult(resolvedUsers.error);
+            }
 
             const matchingBookings = filterBookings(bookings.map(toBooking).map(toBookingViewModel), {
+                userIds: resolvedUsers?.userIds,
                 statuses: status?.map((name) => statusByName.get(name)!),
                 bookingType: bookingType !== undefined ? bookingTypeByName.get(bookingType) : undefined,
                 startDate: from ? new Date(from) : undefined,
