@@ -28,9 +28,10 @@ const toWebRequest = (req: NextApiRequest): Request => {
     });
 };
 
-const handler = withMcpApiKeyContext(async (req: NextApiRequest, res: NextApiResponse): Promise<void> => {
+const handler = withMcpApiKeyContext(async (req: NextApiRequest, res: NextApiResponse, authInfo): Promise<void> => {
     const response = await mcpHandler.fetch(toWebRequest(req), {
         parsedBody: req.body === '' ? undefined : req.body,
+        authInfo,
     });
 
     res.status(response.status);

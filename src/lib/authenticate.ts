@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { AuthInfo } from '@modelcontextprotocol/server';
 import { createHmac } from 'crypto';
 import { fetchUserAuth } from './db-access';
 import { UserAuthObjectionModel } from '../models/objection-models/UserObjectionModel';
@@ -145,25 +146,24 @@ export const getAndVerifyApiKey = async (req: NextApiRequest & IncomingMessage):
     return { isLoggedIn: false };
 };
 
-// MCP clients send the key as a bearer token by default, x-api-key is accepted for consistency with the external API.
-export const getAndVerifyMcpApiKey = async (req: NextApiRequest & IncomingMessage): Promise<CurrentUserInfo> => {
+// MCP clients send the key as a bearer token.
+export const getAndVerifyMcpApiKey = async (req: NextApiRequest & IncomingMessage): Promise<AuthInfo | null> => {
     const authorizationHeader = req.headers['authorization'];
     const bearerToken = authorizationHeader?.startsWith('Bearer ') ? authorizationHeader.slice('Bearer '.length) : null;
     const acceptedApiKeys = JSON.parse(process.env.MCP_API_KEYS ?? '[]') as {
         key: string;
         name: string;
+        scopes?: string[];
     }[];
 
     const authInformation = bearerToken ? acceptedApiKeys.find((x) => x.key === bearerToken) : undefined;
 
-    if (authInformation) {
+    if (bearerToken && authInformation) {
         return {
-            isLoggedIn: true,
-            name: authInformation.name,
-            loginDate: Date.now(),
-            role: undefined,
-            userId: undefined,
+            token: bearerToken,
+            clientId: authInformation.name,
+            scopes: authInformation.scopes ?? [],
         };
     }
-    return { isLoggedIn: false };
+    return null;
 };

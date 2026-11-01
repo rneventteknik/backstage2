@@ -44,10 +44,38 @@ export interface DefaultAccounts {
 
 const getLinkToBooking = (bookingId: number): string => process.env.APPLICATION_BASE_URL + '/bookings/' + bookingId;
 
+export const getFirstName = (name: string): string => name.trim().split(/\s+/)[0];
+
+// Personal data (full names and customer contact details) is only exposed to API keys with this scope.
+export const PII_SCOPE = 'pii';
+
 // Users carry personal data (contact details, personal identity number, bank details), so only identifying fields
 // are exposed.
-const toMcpUser = (user: Pick<User, 'id' | 'name' | 'nameTag'> | undefined) =>
-    user ? { id: user.id, name: user.name, nameTag: user.nameTag } : null;
+const toMcpUser = (user: Pick<User, 'id' | 'name' | 'nameTag'> | undefined, canSeePii: boolean) =>
+    user ? { id: user.id, name: canSeePii ? user.name : getFirstName(user.name), nameTag: user.nameTag } : null;
+
+// Without the pii scope only the Hogia ID is exposed, plus the customer name when the customer is registered in Hogia.
+const toMcpCustomerSummary = (booking: BookingViewModel, canSeePii: boolean) =>
+    canSeePii
+        ? {
+              customerName: booking.customerName,
+              contactPersonName: booking.contactPersonName,
+              invoiceHogiaId: booking.invoiceHogiaId,
+          }
+        : {
+              ...(booking.invoiceHogiaId != null ? { customerName: booking.customerName } : {}),
+              invoiceHogiaId: booking.invoiceHogiaId,
+          };
+
+const toMcpCustomerContactDetails = (booking: BookingViewModel, canSeePii: boolean) =>
+    canSeePii
+        ? {
+              contactPersonPhone: booking.contactPersonPhone,
+              contactPersonEmail: booking.contactPersonEmail,
+              invoiceAddress: booking.invoiceAddress,
+              invoiceTag: booking.invoiceTag,
+          }
+        : {};
 
 const toMcpPrice = (price: currency) => ({
     excludingVAT: price.value,
@@ -59,7 +87,7 @@ const toMcpPriceOrNull = (price: currency | null) => (price ? toMcpPrice(price) 
 const sumHours = <T>(entries: T[] | undefined, getHours: (entry: T) => number): number =>
     entries?.reduce((sum, entry) => sum + getHours(entry), 0) ?? 0;
 
-export const toMcpBookingSummary = (booking: BookingViewModel) => ({
+export const toMcpBookingSummary = (booking: BookingViewModel, canSeePii: boolean) => ({
     id: booking.id,
     name: booking.name,
     link: getLinkToBooking(booking.id),
@@ -67,9 +95,8 @@ export const toMcpBookingSummary = (booking: BookingViewModel) => ({
     status: getStatusName(booking.status),
     paymentStatus: getPaymentStatusName(booking.paymentStatus),
     internalReservation: Boolean(booking.internalReservation),
-    ownerUser: toMcpUser(booking.ownerUser),
-    customerName: booking.customerName,
-    contactPersonName: booking.contactPersonName,
+    ownerUser: toMcpUser(booking.ownerUser, canSeePii),
+    ...toMcpCustomerSummary(booking, canSeePii),
     location: booking.location,
     invoiceNumber: booking.invoiceNumber,
     usageStartDatetime: formatDatetimeForAnalyticsExport(booking.usageStartDatetime),
@@ -147,7 +174,7 @@ const toMcpChangelogEntry = (entry: BookingChangelogEntry) => {
     };
 };
 
-export const toMcpCalendarEvent = (event: CalendarResult) => ({
+export const toMcpCalendarEvent = (event: CalendarResult, canSeePii: boolean) => ({
     id: event.id,
     name: event.name ?? null,
     start: event.start ?? null,
@@ -155,7 +182,7 @@ export const toMcpCalendarEvent = (event: CalendarResult) => ({
     link: event.link ?? null,
     workingUsers: event.workingUsers.map((user) => ({
         id: user.id ?? null,
-        name: user.name ?? null,
+        name: user.name ? (canSeePii ? user.name : getFirstName(user.name)) : null,
         nameTag: user.nameTag ?? null,
     })),
 });
@@ -164,6 +191,7 @@ export const toMcpBookingDetail = (
     booking: BookingViewModel,
     defaultAccounts: DefaultAccounts,
     calendarEvents: ReturnType<typeof toMcpCalendarEvent>[],
+    canSeePii: boolean,
 ) => {
     const priceSummary = computePriceSummary(booking);
     const equipmentInDatetime = getEquipmentInDatetime(booking);
@@ -173,18 +201,14 @@ export const toMcpBookingDetail = (
             : defaultAccounts.equipmentInternal;
 
     return {
-        ...toMcpBookingSummary(booking),
+        ...toMcpBookingSummary(booking, canSeePii),
         salaryStatus: getSalaryStatusName(booking.salaryStatus),
         pricePlan: getPricePlanName(booking.pricePlan),
         accountKind: getAccountKindName(booking.accountKind),
         language: getLanguageName(booking.language),
         note: booking.note,
         returnalNote: booking.returnalNote,
-        contactPersonPhone: booking.contactPersonPhone,
-        contactPersonEmail: booking.contactPersonEmail,
-        invoiceAddress: booking.invoiceAddress,
-        invoiceTag: booking.invoiceTag,
-        invoiceHogiaId: booking.invoiceHogiaId,
+        ...toMcpCustomerContactDetails(booking, canSeePii),
         invoiceDate: formatDatetimeForAnalyticsExport(booking.invoiceDate),
         operationalYear: equipmentInDatetime ? getOperationalYear(equipmentInDatetime, true) : null,
 
@@ -218,7 +242,7 @@ export const toMcpBookingDetail = (
             booking.timeReports?.map((timeReport) => ({
                 id: timeReport.id,
                 name: timeReport.name,
-                user: toMcpUser(timeReport.user),
+                user: toMcpUser(timeReport.user, canSeePii),
                 startDatetime: formatDatetimeForAnalyticsExport(timeReport.startDatetime),
                 endDatetime: formatDatetimeForAnalyticsExport(timeReport.endDatetime),
                 actualWorkingHours: timeReport.actualWorkingHours,
@@ -227,13 +251,18 @@ export const toMcpBookingDetail = (
                 totalPrice: toMcpPrice(getTimeReportPrice(timeReport)),
             })) ?? [],
 
-        changelog: booking.changelog?.map(toMcpChangelogEntry) ?? [],
+        // Changelog descriptions are free text starting with the full names of the people involved.
+        ...(canSeePii ? { changelog: booking.changelog?.map(toMcpChangelogEntry) ?? [] } : {}),
 
         calendarEvents,
     };
 };
 
-export const toMcpBookingSearchResult = (bookings: BookingViewModel[], nextOffset: number | null) => ({
-    bookings: bookings.map(toMcpBookingSummary),
+export const toMcpBookingSearchResult = (
+    bookings: BookingViewModel[],
+    nextOffset: number | null,
+    canSeePii: boolean,
+) => ({
+    bookings: bookings.map((booking) => toMcpBookingSummary(booking, canSeePii)),
     nextOffset,
 });

@@ -80,6 +80,12 @@ export const fetchUsers = async (): Promise<UserObjectionModel[]> => {
         .withGraphFetched('userCards');
 };
 
+export const fetchUserNamesAndTags = async (): Promise<UserObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return UserObjectionModel.query().select('id', 'name', 'nameTag');
+};
+
 export const updateUser = async (id: number, user: UserObjectionModel): Promise<UserObjectionModel> => {
     ensureDatabaseIsInitialized();
 

@@ -62,6 +62,22 @@ The app supports two database backends:
 - **SQLite** (default for local dev): No configuration needed. A `dev.sqlite3` file is created automatically. Use `npm run reset-sqlite` to wipe and re-seed it.
 - **PostgreSQL**: Set the `DATABASE_URL` environment variable in `.env.local`. The app will automatically use PostgreSQL when this variable is present.
 
+#### Running PostgreSQL locally
+
+`docker-compose.yml` runs the same PostgreSQL major version as production (17). To use it:
+
+1. Start the database: `docker compose up -d`
+2. Add to `.env.local`:
+
+    ```
+    DATABASE_URL=postgres://backstage2:backstage2@localhost:5432/backstage2
+    DB_SSL=false
+    ```
+
+3. Create the tables and add mock data: `npm run migrate && npm run seed`
+
+To start over with an empty database, run `docker compose down -v` and repeat the steps. To go back to SQLite, remove `DATABASE_URL` from `.env.local`.
+
 ### Environment Variables
 
 A few environment variables are needed to get this app to run. To configure these, the file `.env.local` can be added to this folder. It should contain the following:
@@ -100,7 +116,7 @@ MQTT_BROKER_PASSWORD={MQTT broker password}
 NEXT_PUBLIC_POSTHOG_KEY={PostHog project API key for product analytics}
 
 API_KEYS={JSON list of API keys, for example [{"key": "XXX", "name": "slackbot"}]} (optional, only needed when using backstage2 as an API from an external service)
-MCP_API_KEYS={JSON list of API keys for the MCP endpoint at /api/mcp, same format as API_KEYS} (optional, only needed when connecting MCP clients)
+MCP_API_KEYS={JSON list of API keys for the MCP endpoint at /api/mcp, same format as API_KEYS. Add "scopes": ["pii"] to a key to include personal data (full names and customer contact details); without it, people are listed by first name only and customers only by Hogia ID and, when they have one, customer name} (optional, only needed when connecting MCP clients)
 ```
 
 ## Integrations Setup
