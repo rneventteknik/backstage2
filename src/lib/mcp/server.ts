@@ -43,10 +43,19 @@ export const createMcpServer = (): McpServer => {
                 'Search and list bookings, newest first. Without a query all bookings matching the filters are ' +
                 'listed. The query matches booking name, contact person name, invoice number and customer name, ' +
                 `and every word must match. A query searches the ${SEARCH_RESULT_LIMIT} most recently updated ` +
-                'matching bookings. Use get_booking for full details on a booking.',
+                'matching bookings. Use get_booking for full details on a booking.\n\n' +
+                'Booking statuses: DRAFT (not yet confirmed), BOOKED (confirmed), DONE (finished, possibly ' +
+                'still to be invoiced) and CANCELED. Active bookings are those with status DRAFT or BOOKED, so ' +
+                'filter with status ["DRAFT", "BOOKED"] to get only active bookings, or ["DONE", "CANCELED"] for ' +
+                'inactive ones.',
             inputSchema: z.object({
                 query: z.string().optional().describe('Free-text search string'),
-                status: z.array(z.enum(statusKeys)).optional().describe('Only include bookings with these statuses'),
+                status: z
+                    .array(z.enum(statusKeys))
+                    .optional()
+                    .describe(
+                        'Only include bookings with these statuses. Use ["DRAFT", "BOOKED"] for active bookings.',
+                    ),
                 bookingType: z.enum(bookingTypeKeys).optional(),
                 from: z.iso.date().optional().describe('Only include bookings whose usage starts after this date'),
                 to: z.iso.date().optional().describe('Only include bookings whose usage ends before this date'),
