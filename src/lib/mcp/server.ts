@@ -6,9 +6,10 @@ import { BookingViewModel, Equipment } from '../../models/interfaces';
 import { getEquipmentInDatetime, getEquipmentOutDatetime, toBookingViewModel } from '../datetimeUtils';
 import { EquipmentConflictStatus } from '../equipmentConflicts';
 import { filterBookings, groupBookingsByEquipmentUsageTime } from '../bookingFilters';
-import { fetchBookings, searchBookings } from '../db-access';
+import { searchBookings } from '../db-access';
 import {
     fetchBookingForMcp,
+    fetchBookingSummariesForMcp,
     fetchBookingsForEquipment,
     fetchBookingsWithEquipmentInInterval,
 } from '../db-access/booking';
@@ -239,7 +240,7 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
             offset,
         }) => {
             const [bookings, resolvedUsers] = await Promise.all([
-                query?.trim() ? searchBookings(query, SEARCH_RESULT_LIMIT) : fetchBookings(),
+                query?.trim() ? searchBookings(query, SEARCH_RESULT_LIMIT) : fetchBookingSummariesForMcp(),
                 responsibleUser?.length ? resolveUserIds(responsibleUser, canSeePii) : undefined,
             ]);
 
