@@ -233,7 +233,7 @@ export const toMcpBookingDetail = (
     };
 };
 
-export const toMcpBookingSearchResult = (bookings: BookingViewModel[], nextMaxBookingId: number | null) => ({
+export const toMcpBookingSearchResult = (bookings: BookingViewModel[], nextOffset: number | null) => ({
     bookings: bookings.map(toMcpBookingSummary),
-    nextMaxBookingId,
+    nextOffset,
 });
