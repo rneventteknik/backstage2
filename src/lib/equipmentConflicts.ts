@@ -2,7 +2,7 @@ import { Status } from '../models/enums/Status';
 import { Booking, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { getEquipmentInDatetime, getEquipmentOutDatetime } from './datetimeUtils';
-import { getMaximumNumberOfUnitUsed, listContainsEquipment } from './utils';
+import { getMaximumNumberOfUnitUsed, isSameBookingFromBookings, listContainsEquipment } from './utils';
 
 export enum EquipmentConflictStatus {
     // No other list uses the equipment at the same time.
@@ -15,18 +15,22 @@ export enum EquipmentConflictStatus {
     EXCEEDS_INVENTORY = 'exceedsInventory',
 }
 
-type BookingWithEquipmentLists = Pick<Booking, 'status' | 'equipmentLists'>;
+type BookingWithEquipmentLists = Pick<Booking, 'id' | 'status' | 'equipmentLists'>;
 
 export const equipmentListHasDatetimes = (list: EquipmentList): boolean =>
     !!getEquipmentOutDatetime(list) && !!getEquipmentInDatetime(list);
 
 // Out and in datetimes are inclusive, so a list returned at the same time as another is handed out overlaps it.
-export const equipmentListsOverlap = (a: EquipmentList, b: EquipmentList): boolean => {
+// Lists on the same booking are the exception: the equipment can go straight from one list to the next.
+export const equipmentListsOverlap = (a: EquipmentList, b: EquipmentList, sameBooking = false): boolean => {
     const aOut = getEquipmentOutDatetime(a);
     const aIn = getEquipmentInDatetime(a);
     const bOut = getEquipmentOutDatetime(b);
     const bIn = getEquipmentInDatetime(b);
-    return !!aOut && !!aIn && !!bOut && !!bIn && aOut <= bIn && aIn >= bOut;
+    if (!aOut || !aIn || !bOut || !bIn) {
+        return false;
+    }
+    return sameBooking ? aOut < bIn && aIn > bOut : aOut <= bIn && aIn >= bOut;
 };
 
 // The most units of the equipment used at the same time by the bookings' equipment lists. Cancelled bookings are not
@@ -34,11 +38,14 @@ export const equipmentListsOverlap = (a: EquipmentList, b: EquipmentList): boole
 export const getMaximumNumberOfUnitUsedByBookings = (
     bookings: BookingWithEquipmentLists[],
     equipment: Equipment,
-): number =>
-    getMaximumNumberOfUnitUsed(
-        bookings.filter((x) => x.status !== Status.CANCELED).flatMap((x) => x.equipmentLists ?? []),
+): number => {
+    const activeBookings = bookings.filter((x) => x.status !== Status.CANCELED);
+    return getMaximumNumberOfUnitUsed(
+        activeBookings.flatMap((x) => x.equipmentLists ?? []),
         equipment,
+        isSameBookingFromBookings(activeBookings),
     );
+};
 
 // Checks the equipment in a list against every list using it at the same time:
 // - localLists are the other lists in the same booking. They take precedence over remote lists with the same id, since
@@ -52,25 +59,29 @@ export const getEquipmentListConflict = <T extends BookingWithEquipmentLists>(
     localLists: EquipmentList[],
     remoteBookings: T[],
 ) => {
-    const overlapsList = (other: EquipmentList) => other.id !== list.id && equipmentListsOverlap(other, list);
+    const overlapsList = (other: EquipmentList, sameBooking: boolean) =>
+        other.id !== list.id && equipmentListsOverlap(other, list, sameBooking);
 
     const overlappingLocalLists = localLists.filter(
-        (other) => overlapsList(other) && listContainsEquipment(other, equipment),
+        (other) => overlapsList(other, true) && listContainsEquipment(other, equipment),
     );
     const overlappingRemoteBookings = remoteBookings
         .filter((booking) => booking.status !== Status.CANCELED)
         .map((booking) => ({
             booking,
             lists: (booking.equipmentLists ?? []).filter(
-                (other) => overlapsList(other) && !localLists.some((x) => x.id === other.id),
+                (other) => overlapsList(other, false) && !localLists.some((x) => x.id === other.id),
             ),
         }))
         .filter((x) => x.lists.length > 0);
 
     const unitsUsedByThisList = getMaximumNumberOfUnitUsed([list], equipment);
+    const localListIds = new Set(localLists.map((x) => x.id));
+    const isSameRemoteBooking = isSameBookingFromBookings(overlappingRemoteBookings.map((x) => x.booking));
     const unitsUsedByOthers = getMaximumNumberOfUnitUsed(
         [...overlappingLocalLists, ...overlappingRemoteBookings.flatMap((x) => x.lists)],
         equipment,
+        (a, b) => (localListIds.has(a.id) && localListIds.has(b.id)) || isSameRemoteBooking(a, b),
     );
     const maxUnitsUsed = unitsUsedByThisList + unitsUsedByOthers;
 

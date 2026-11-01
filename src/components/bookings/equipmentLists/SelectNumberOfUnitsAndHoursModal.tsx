@@ -170,6 +170,7 @@ const SelectNumberOfUnitsAndHoursModal: React.FC<Props> = ({
                                     const unitsUsed = getMaximumNumberOfUnitUsed(
                                         booking.equipmentLists ?? [],
                                         equipment,
+                                        () => true,
                                     );
                                     return (
                                         <ListGroup.Item key={booking.id}>
