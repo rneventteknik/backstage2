@@ -1,13 +1,9 @@
 import currency from 'currency.js';
 import { AccountKind } from '../../models/enums/AccountKind';
-import { BookingType } from '../../models/enums/BookingType';
-import { PaymentStatus } from '../../models/enums/PaymentStatus';
-import { PricePlan } from '../../models/enums/PricePlan';
-import { RentalStatus } from '../../models/enums/RentalStatus';
-import { SalaryStatus } from '../../models/enums/SalaryStatus';
-import { Status } from '../../models/enums/Status';
 import { BookingViewModel, User } from '../../models/interfaces';
-import { EquipmentList, EquipmentListEntry } from '../../models/interfaces/EquipmentList';
+import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../models/interfaces/EquipmentList';
+import { CalendarResult } from '../../models/misc/CalendarResult';
 import {
     formatDatetimeForAnalyticsExport,
     getEquipmentInDatetime,
@@ -15,15 +11,20 @@ import {
     getNumberOfDays,
 } from '../datetimeUtils';
 import {
+    addVAT,
+    changelogEntryHasPriceInformation,
     computePriceSummary,
     getCalculatedDiscount,
     getCorrectPriceBasedOnBookingState,
+    getEquipmentListHeadingPrice,
     getEquipmentListPrice,
     getPrice,
-    getPriceCalculationType,
+    getPriceCalculationTypeLabel,
+    getPriceSummaryFromChangelogEntry,
     getTimeEstimatePrice,
     getTimeReportPrice,
 } from '../pricingUtils';
+import { getSortedList } from '../sortUtils';
 import {
     getAccountKindName,
     getBookingTypeName,
@@ -45,7 +46,15 @@ const getLinkToBooking = (bookingId: number): string => process.env.APPLICATION_
 
 // Users carry personal data (contact details, personal identity number, bank details), so only identifying fields
 // are exposed.
-const toMcpUser = (user: User | undefined) => (user ? { id: user.id, name: user.name, nameTag: user.nameTag } : null);
+const toMcpUser = (user: Pick<User, 'id' | 'name' | 'nameTag'> | undefined) =>
+    user ? { id: user.id, name: user.name, nameTag: user.nameTag } : null;
+
+const toMcpPrice = (price: currency) => ({
+    excludingVAT: price.value,
+    includingVAT: addVAT(price).value,
+});
+
+const toMcpPriceOrNull = (price: currency | null) => (price ? toMcpPrice(price) : null);
 
 const sumHours = <T>(entries: T[] | undefined, getHours: (entry: T) => number): number =>
     entries?.reduce((sum, entry) => sum + getHours(entry), 0) ?? 0;
@@ -54,14 +63,11 @@ export const toMcpBookingSummary = (booking: BookingViewModel) => ({
     id: booking.id,
     name: booking.name,
     link: getLinkToBooking(booking.id),
-    bookingType: BookingType[booking.bookingType],
-    bookingTypeName: getBookingTypeName(booking.bookingType),
-    status: Status[booking.status],
-    statusName: getStatusName(booking.status),
-    paymentStatus: PaymentStatus[booking.paymentStatus],
-    paymentStatusName: getPaymentStatusName(booking.paymentStatus),
+    bookingType: getBookingTypeName(booking.bookingType),
+    status: getStatusName(booking.status),
+    paymentStatus: getPaymentStatusName(booking.paymentStatus),
     internalReservation: Boolean(booking.internalReservation),
-    ownerUser: booking.ownerUser ? { id: booking.ownerUser.id, name: booking.ownerUser.name } : null,
+    ownerUser: toMcpUser(booking.ownerUser),
     customerName: booking.customerName,
     contactPersonName: booking.contactPersonName,
     location: booking.location,
@@ -71,10 +77,10 @@ export const toMcpBookingSummary = (booking: BookingViewModel) => ({
     equipmentOutDatetime: formatDatetimeForAnalyticsExport(booking.equipmentOutDatetime),
     equipmentInDatetime: formatDatetimeForAnalyticsExport(booking.equipmentInDatetime),
     created: formatDatetimeForAnalyticsExport(booking.created),
-    updated: formatDatetimeForAnalyticsExport(booking.updated),
 });
 
 const toMcpEquipmentListEntry = (entry: EquipmentListEntry, list: EquipmentList, defaultAccount: string) => ({
+    type: 'rad' as const,
     id: entry.id,
     name: entry.name,
     description: entry.description,
@@ -84,41 +90,81 @@ const toMcpEquipmentListEntry = (entry: EquipmentListEntry, list: EquipmentList,
     equipmentTags: entry.equipment?.tags?.map((tag) => tag.name) ?? [],
     numberOfUnits: entry.numberOfUnits,
     numberOfHours: entry.numberOfHours,
-    pricePerUnit: entry.pricePerUnit.value,
-    pricePerHour: entry.pricePerHour.value,
+    pricePerUnit: toMcpPrice(entry.pricePerUnit),
+    pricePerHour: toMcpPrice(entry.pricePerHour),
     equipmentPriceName: entry.equipmentPrice?.name ?? null,
-    discountFixed: entry.discount.value,
-    totalDiscount: getCalculatedDiscount(entry, getNumberOfDays(list), list.discountPercentage).value,
-    totalPrice: getPrice(entry, getNumberOfDays(list), list.discountPercentage).value,
+    discountFixed: toMcpPrice(entry.discount),
+    totalDiscount: toMcpPrice(getCalculatedDiscount(entry, getNumberOfDays(list), list.discountPercentage)),
+    totalPrice: toMcpPrice(getPrice(entry, getNumberOfDays(list), list.discountPercentage)),
     account: entry.account ?? defaultAccount,
     isHidden: Boolean(entry.isHidden),
     isPacked: Boolean(entry.isPacked),
 });
 
+const toMcpEquipmentListHeading = (heading: EquipmentListHeading, list: EquipmentList, defaultAccount: string) => ({
+    type: 'rubrikrad' as const,
+    id: heading.id,
+    name: heading.name,
+    description: heading.description,
+    totalPrice: toMcpPrice(getEquipmentListHeadingPrice(heading, getNumberOfDays(list), list.discountPercentage)),
+    entries: getSortedList(heading.listEntries).map((entry) => toMcpEquipmentListEntry(entry, list, defaultAccount)),
+});
+
+// Entries and headings are shown as a single list ordered by sortIndex in Backstage2, with the entries belonging to a
+// heading listed under it.
+const toMcpEquipmentListRows = (list: EquipmentList, defaultAccount: string) =>
+    getSortedList([
+        ...list.listEntries.map((entry) => ({ id: 'E' + entry.id, sortIndex: entry.sortIndex, entry })),
+        ...list.listHeadings.map((heading) => ({ id: 'H' + heading.id, sortIndex: heading.sortIndex, heading })),
+    ]).map((row) =>
+        'heading' in row
+            ? toMcpEquipmentListHeading(row.heading, list, defaultAccount)
+            : toMcpEquipmentListEntry(row.entry, list, defaultAccount),
+    );
+
 const toMcpEquipmentList = (list: EquipmentList, defaultAccount: string) => ({
     id: list.id,
     name: list.name,
-    rentalStatus: list.rentalStatus != null ? RentalStatus[list.rentalStatus] : null,
-    rentalStatusName: list.rentalStatus != null ? getRentalStatusName(list.rentalStatus) : null,
+    rentalStatus: list.rentalStatus != null ? getRentalStatusName(list.rentalStatus) : null,
     usageStartDatetime: formatDatetimeForAnalyticsExport(list.usageStartDatetime),
     usageEndDatetime: formatDatetimeForAnalyticsExport(list.usageEndDatetime),
     equipmentOutDatetime: formatDatetimeForAnalyticsExport(getEquipmentOutDatetime(list)),
     equipmentInDatetime: formatDatetimeForAnalyticsExport(getEquipmentInDatetime(list)),
     numberOfDays: getNumberOfDays(list),
     discountPercentage: list.discountPercentage,
-    totalPrice: getEquipmentListPrice(list).value,
-    entries: list.listEntries.map((entry) => toMcpEquipmentListEntry(entry, list, defaultAccount)),
-    headings: list.listHeadings.map((heading) => ({
-        id: heading.id,
-        name: heading.name,
-        description: heading.description,
-        entries: heading.listEntries.map((entry) => toMcpEquipmentListEntry(entry, list, defaultAccount)),
+    totalPrice: toMcpPrice(getEquipmentListPrice(list)),
+    rows: toMcpEquipmentListRows(list, defaultAccount),
+});
+
+const toMcpChangelogEntry = (entry: BookingChangelogEntry) => {
+    const priceSummary = changelogEntryHasPriceInformation(entry) ? getPriceSummaryFromChangelogEntry(entry) : null;
+
+    return {
+        description: entry.name,
+        updated: formatDatetimeForAnalyticsExport(entry.updated),
+        totalPrice: priceSummary ? toMcpPrice(getCorrectPriceBasedOnBookingState(priceSummary)) : null,
+        priceCalculationType: priceSummary ? getPriceCalculationTypeLabel(priceSummary) : null,
+    };
+};
+
+export const toMcpCalendarEvent = (event: CalendarResult) => ({
+    id: event.id,
+    name: event.name ?? null,
+    start: event.start ?? null,
+    end: event.end ?? null,
+    link: event.link ?? null,
+    workingUsers: event.workingUsers.map((user) => ({
+        id: user.id ?? null,
+        name: user.name ?? null,
+        nameTag: user.nameTag ?? null,
     })),
 });
 
-const toValueOrNull = (value: currency | null) => (value ? value.value : null);
-
-export const toMcpBookingDetail = (booking: BookingViewModel, defaultAccounts: DefaultAccounts) => {
+export const toMcpBookingDetail = (
+    booking: BookingViewModel,
+    defaultAccounts: DefaultAccounts,
+    calendarEvents: ReturnType<typeof toMcpCalendarEvent>[],
+) => {
     const priceSummary = computePriceSummary(booking);
     const equipmentInDatetime = getEquipmentInDatetime(booking);
     const defaultEquipmentAccount =
@@ -128,16 +174,10 @@ export const toMcpBookingDetail = (booking: BookingViewModel, defaultAccounts: D
 
     return {
         ...toMcpBookingSummary(booking),
-        coOwnerUsers: booking.coOwnerUsers?.map(toMcpUser) ?? [],
-        ownerUser: toMcpUser(booking.ownerUser),
-        salaryStatus: SalaryStatus[booking.salaryStatus],
-        salaryStatusName: getSalaryStatusName(booking.salaryStatus),
-        pricePlan: PricePlan[booking.pricePlan],
-        pricePlanName: getPricePlanName(booking.pricePlan),
-        accountKind: booking.accountKind != null ? AccountKind[booking.accountKind] : null,
-        accountKindName: getAccountKindName(booking.accountKind),
-        language: booking.language,
-        languageName: getLanguageName(booking.language),
+        salaryStatus: getSalaryStatusName(booking.salaryStatus),
+        pricePlan: getPricePlanName(booking.pricePlan),
+        accountKind: getAccountKindName(booking.accountKind),
+        language: getLanguageName(booking.language),
         note: booking.note,
         returnalNote: booking.returnalNote,
         contactPersonPhone: booking.contactPersonPhone,
@@ -147,15 +187,14 @@ export const toMcpBookingDetail = (booking: BookingViewModel, defaultAccounts: D
         invoiceHogiaId: booking.invoiceHogiaId,
         invoiceDate: formatDatetimeForAnalyticsExport(booking.invoiceDate),
         operationalYear: equipmentInDatetime ? getOperationalYear(equipmentInDatetime, true) : null,
-        fiscalYear: booking.invoiceDate ? getOperationalYear(booking.invoiceDate, true) : null,
 
         pricing: {
-            priceCalculationType: getPriceCalculationType(priceSummary),
-            totalPriceExcludingVAT: getCorrectPriceBasedOnBookingState(priceSummary).value,
-            fixedPrice: toValueOrNull(priceSummary.fixedPrice),
-            equipmentPrice: priceSummary.equipmentPrice.value,
-            timeEstimatePrice: priceSummary.timeEstimatePrice.value,
-            timeReportsPrice: toValueOrNull(priceSummary.timeReportsPrice),
+            priceCalculationType: getPriceCalculationTypeLabel(priceSummary),
+            totalPrice: toMcpPrice(getCorrectPriceBasedOnBookingState(priceSummary)),
+            fixedPrice: toMcpPriceOrNull(priceSummary.fixedPrice),
+            equipmentPrice: toMcpPrice(priceSummary.equipmentPrice),
+            timeEstimatePrice: toMcpPrice(priceSummary.timeEstimatePrice),
+            timeReportsPrice: toMcpPriceOrNull(priceSummary.timeReportsPrice),
         },
 
         hours: {
@@ -171,30 +210,30 @@ export const toMcpBookingDetail = (booking: BookingViewModel, defaultAccounts: D
                 id: timeEstimate.id,
                 name: timeEstimate.name,
                 numberOfHours: timeEstimate.numberOfHours,
-                pricePerHour: timeEstimate.pricePerHour.value,
-                totalPrice: getTimeEstimatePrice(timeEstimate).value,
+                pricePerHour: toMcpPrice(timeEstimate.pricePerHour),
+                totalPrice: toMcpPrice(getTimeEstimatePrice(timeEstimate)),
             })) ?? [],
 
         timeReports:
             booking.timeReports?.map((timeReport) => ({
                 id: timeReport.id,
                 name: timeReport.name,
-                user: timeReport.user ? { id: timeReport.user.id, name: timeReport.user.name } : null,
+                user: toMcpUser(timeReport.user),
                 startDatetime: formatDatetimeForAnalyticsExport(timeReport.startDatetime),
                 endDatetime: formatDatetimeForAnalyticsExport(timeReport.endDatetime),
                 actualWorkingHours: timeReport.actualWorkingHours,
                 billableWorkingHours: timeReport.billableWorkingHours,
-                pricePerHour: timeReport.pricePerHour.value,
-                totalPrice: getTimeReportPrice(timeReport).value,
+                pricePerHour: toMcpPrice(timeReport.pricePerHour),
+                totalPrice: toMcpPrice(getTimeReportPrice(timeReport)),
             })) ?? [],
 
-        changelog:
-            booking.changelog?.map((entry) => ({
-                description: entry.name,
-                updated: formatDatetimeForAnalyticsExport(entry.updated),
-            })) ?? [],
+        changelog: booking.changelog?.map(toMcpChangelogEntry) ?? [],
 
-        calendarEventIds: booking.calendarEvents?.map((x) => x.calendarEventId) ?? [],
-        emailThreadIds: booking.emailThreads?.map((x) => x.threadId) ?? [],
+        calendarEvents,
     };
 };
+
+export const toMcpBookingSearchResult = (bookings: BookingViewModel[], nextMaxBookingId: number | null) => ({
+    bookings: bookings.map(toMcpBookingSummary),
+    nextMaxBookingId,
+});
