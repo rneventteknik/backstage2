@@ -1,5 +1,9 @@
-import { toMcpBookingDetail, toMcpBookingSearchResult } from './bookingMappers';
-import { toMcpEquipmentAvailability, toMcpEquipmentDetail, toMcpEquipmentSearchResult } from './equipmentMappers';
+import { toMcpBookingDetail, toMcpBookingSearchResult } from './mappers/bookingDetail';
+import {
+    toMcpEquipmentAvailability,
+    toMcpEquipmentDetail,
+    toMcpEquipmentSearchResult,
+} from './mappers/equipmentDetail';
 
 type DeepKeys<T> = T extends (infer U)[]
     ? DeepKeys<U>

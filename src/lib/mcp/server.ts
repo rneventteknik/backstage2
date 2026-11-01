@@ -17,14 +17,13 @@ import { getCalendarEvent } from '../calenderUtils';
 import { toBooking } from '../mappers/booking';
 import { toEquipment } from '../mappers/equipment';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
+import { toMcpBookingDetail, toMcpBookingSearchResult, toMcpCalendarEvent } from './mappers/bookingDetail';
+import { getFirstName, PII_SCOPE } from './mappers/primitives';
 import {
-    getFirstName,
-    PII_SCOPE,
-    toMcpBookingDetail,
-    toMcpBookingSearchResult,
-    toMcpCalendarEvent,
-} from './bookingMappers';
-import { toMcpEquipmentAvailability, toMcpEquipmentDetail, toMcpEquipmentSearchResult } from './equipmentMappers';
+    toMcpEquipmentAvailability,
+    toMcpEquipmentDetail,
+    toMcpEquipmentSearchResult,
+} from './mappers/equipmentDetail';
 import { toSwedishKeys } from './swedishKeys';
 
 const DEFAULT_PAGE_SIZE = 25;

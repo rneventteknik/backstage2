@@ -1,39 +1,16 @@
-import { BookingViewModel, Equipment, EquipmentPrice } from '../../models/interfaces';
-import { EquipmentChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
-import { EquipmentList } from '../../models/interfaces/EquipmentList';
-import { BookingsByUsageTime } from '../bookingFilters';
-import { formatDatetimeForAnalyticsExport, getEquipmentInDatetime, getEquipmentOutDatetime } from '../datetimeUtils';
-import { getMaximumNumberOfUnitUsed, getRentalStatusName } from '../utils';
-import { toMcpBookingSummary, toMcpPrice } from './bookingMappers';
+import { BookingViewModel, Equipment } from '../../../models/interfaces';
+import { EquipmentChangelogEntry } from '../../../models/interfaces/ChangeLogEntry';
+import { EquipmentList } from '../../../models/interfaces/EquipmentList';
+import { BookingsByUsageTime } from '../../bookingFilters';
+import { formatDatetimeForAnalyticsExport, getEquipmentInDatetime, getEquipmentOutDatetime } from '../../datetimeUtils';
+import { getMaximumNumberOfUnitUsed, getRentalStatusName } from '../../utils';
+import { toMcpBookingSummary } from './bookingSummary';
+import { toMcpEquipmentSummary } from './equipmentSummary';
+import { getLinkToEquipment } from './primitives';
 
 // The equipment page only lists the most recent part of long histories, and so does the MCP.
 const MAX_PAST_BOOKINGS = 10;
 const MAX_CHANGELOG_ENTRIES = 50;
-
-const getLinkToEquipment = (equipmentId: number): string =>
-    process.env.APPLICATION_BASE_URL + '/equipment/' + equipmentId;
-
-const toMcpEquipmentPrice = (price: EquipmentPrice) => ({
-    name: price.name,
-    pricePerUnit: toMcpPrice(price.pricePerUnit),
-    pricePerHour: toMcpPrice(price.pricePerHour),
-    pricePerUnitTHS: toMcpPrice(price.pricePerUnitTHS),
-    pricePerHourTHS: toMcpPrice(price.pricePerHourTHS),
-});
-
-export const toMcpEquipmentSummary = (equipment: Equipment) => ({
-    id: equipment.id,
-    name: equipment.name,
-    nameEN: equipment.nameEN,
-    link: getLinkToEquipment(equipment.id),
-    inventoryCount: equipment.inventoryCount,
-    location: equipment.equipmentLocation?.name ?? null,
-    equipmentPublicCategory: equipment.equipmentPublicCategory?.name ?? null,
-    equipmentTags: equipment.tags.map((tag) => tag.name),
-    publiclyVisible: !equipment.publiclyHidden,
-    isArchived: Boolean(equipment.isArchived),
-    prices: [...equipment.prices].sort((a, b) => a.id - b.id).map(toMcpEquipmentPrice),
-});
 
 const toMcpEquipmentChangelogEntry = (entry: EquipmentChangelogEntry) => ({
     description: entry.name,
