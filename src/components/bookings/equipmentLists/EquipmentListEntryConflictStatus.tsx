@@ -79,17 +79,6 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
             : []),
         ...conflict.overlappingRemoteBookings.map((x) => ({ key: x.booking.id, name: x.booking.name, lists: x.lists })),
     ];
-    const overlappingBookingsList = overlappingBookings.map((booking) => (
-        <div key={booking.key}>
-            <div>{booking.name}</div>
-            <div className="text-small font-italic">
-                {booking.lists
-                    .map((list) => `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`)
-                    .join(', ')}
-            </div>
-        </div>
-    ));
-
     if (conflict.status === EquipmentConflictStatus.NONE) {
         return (
             <OverlayTrigger
@@ -136,7 +125,19 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                             Totalt används fler av denna utrustning än vad som finns ({conflict.maxUnitsUsed}/
                             {equipment.inventoryCount} st). Konflikterande utrustningslistor:
                         </strong>
-                        {overlappingBookingsList}
+                        {overlappingBookings.map((booking) => (
+                            <div key={booking.key}>
+                                <div>{booking.name}</div>
+                                <div className="text-small font-italic">
+                                    {booking.lists
+                                        .map(
+                                            (list) =>
+                                                `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`,
+                                        )
+                                        .join(', ')}
+                                </div>
+                            </div>
+                        ))}
                     </Tooltip>
                 }
             >
@@ -154,7 +155,16 @@ const EquipmentListEntryConflictStatus: React.FC<Props> = ({
                         Notera att samma typ av utrustning används samma tid av följande andra utrustningslistor (totalt
                         finns {equipment.inventoryCount} st):
                     </strong>
-                    {overlappingBookingsList}
+                    {overlappingBookings.map((booking) => (
+                        <div key={booking.key}>
+                            <div>{booking.name}</div>
+                            <div className="text-small font-italic">
+                                {booking.lists
+                                    .map((list) => `${list.name} (${getMaximumNumberOfUnitUsed([list], equipment)} st)`)
+                                    .join(', ')}
+                            </div>
+                        </div>
+                    ))}
                 </Tooltip>
             }
         >

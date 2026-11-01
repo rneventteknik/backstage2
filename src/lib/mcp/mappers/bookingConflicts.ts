@@ -8,7 +8,7 @@ import { getLinkToBooking, getLinkToEquipment } from './primitives';
 
 // Conflict statuses, matching the icons and tooltips next to each row in the equipment lists in Backstage2.
 export const CONFLICT_STATUS_NAMES: Record<EquipmentConflictStatus, string> = {
-    [EquipmentConflictStatus.NONE]: 'Ingen konflikt',
+    [EquipmentConflictStatus.NONE]: 'Inga konflikter',
     [EquipmentConflictStatus.SHARED]: 'Delas med andra listor',
     [EquipmentConflictStatus.CONFLICT]: 'Konflikt',
     [EquipmentConflictStatus.EXCEEDS_INVENTORY]: 'Fler än inventarieantalet',
