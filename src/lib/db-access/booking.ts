@@ -45,6 +45,14 @@ export const searchBookings = async (searchString: string, count: number): Promi
         .limit(count);
 };
 
+// Loads only what MCP search results and their filters need. The booking dates are derived from the equipment lists'
+// own dates, so their entries are not needed.
+export const fetchBookingSummariesForMcp = async (): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query().withGraphFetched('ownerUser').withGraphFetched('equipmentLists');
+};
+
 export const fetchBookingForMcp = async (id: number): Promise<BookingObjectionModel | undefined> => {
     ensureDatabaseIsInitialized();
 
