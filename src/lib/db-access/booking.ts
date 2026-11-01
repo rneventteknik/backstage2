@@ -47,10 +47,22 @@ export const searchBookings = async (searchString: string, count: number): Promi
 
 // Loads only what MCP search results and their filters need. The booking dates are derived from the equipment lists'
 // own dates, so their entries are not needed.
-export const fetchBookingSummariesForMcp = async (): Promise<BookingObjectionModel[]> => {
+// All bookings, or only the given ids, with the owner and the equipment lists without their rows.
+export const fetchBookingSummariesForMcp = async (ids?: number[]): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    return BookingObjectionModel.query().withGraphFetched('ownerUser').withGraphFetched('equipmentLists');
+    let query = BookingObjectionModel.query()
+        .withGraphFetched('ownerUser')
+        .withGraphFetched('equipmentLists')
+        .modifyGraph('equipmentLists', (builder) => {
+            builder.orderBy('sortIndex');
+        });
+
+    if (ids) {
+        query = query.whereIn('id', ids);
+    }
+
+    return query;
 };
 
 export const fetchBookingForMcp = async (id: number): Promise<BookingObjectionModel | undefined> => {
@@ -456,53 +468,6 @@ export const validateBookingObjectionModel = (booking: BookingObjectionModel): b
         return false;
 
     return true;
-};
-
-export const fetchBookingsWithEquipmentInInterval = async (
-    equipmentId: number,
-    startDatetime?: Date,
-    endDatetime?: Date,
-    ignoreEquipmentListId?: number,
-): Promise<BookingObjectionModel[]> => {
-    ensureDatabaseIsInitialized();
-
-    let query = BookingObjectionModel.query()
-        .withGraphJoined('ownerUser')
-        .withGraphJoined('equipmentLists.listEntries')
-        .withGraphJoined('equipmentLists.listHeadings.listEntries')
-        .where((builder) =>
-            builder
-                .where('equipmentLists:listEntries.equipmentId', equipmentId)
-                .orWhere('equipmentLists:listHeadings:listEntries.equipmentId', equipmentId),
-        );
-
-    if (endDatetime && startDatetime) {
-        query = query
-            .andWhere((builder) =>
-                builder
-                    .where('equipmentLists.equipmentOutDatetime', '<=', endDatetime.toISOString())
-                    .orWhere((builder) =>
-                        builder
-                            .whereNull('equipmentLists.equipmentOutDatetime')
-                            .andWhere('equipmentLists.usageStartDatetime', '<=', endDatetime.toISOString()),
-                    ),
-            )
-            .andWhere((builder) =>
-                builder
-                    .where('equipmentLists.equipmentInDatetime', '>=', startDatetime.toISOString())
-                    .orWhere((builder) =>
-                        builder
-                            .whereNull('equipmentLists.equipmentInDatetime')
-                            .andWhere('equipmentLists.usageEndDatetime', '>=', startDatetime.toISOString()),
-                    ),
-            );
-    }
-
-    if (ignoreEquipmentListId) {
-        query = query.whereNot('equipmentLists.id', ignoreEquipmentListId);
-    }
-
-    return query.select();
 };
 
 export const registerUserAsCoOwnerForBooking = async (

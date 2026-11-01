@@ -1,8 +1,11 @@
+import { RentalStatus } from '../models/enums/RentalStatus';
 import { Status } from '../models/enums/Status';
-import { Booking, Equipment } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { getEquipmentInDatetime, getEquipmentOutDatetime } from './datetimeUtils';
-import { getMaximumNumberOfUnitUsed, listContainsEquipment } from './utils';
+
+// Conflict detection runs in the database (lib/db-access/equipmentConflicts), so that the equipment list icons, the
+// equipment calendar, the number of units modal and the MCP tools all use the same rules. This file only holds the
+// result types, which are shared with the client.
 
 export enum EquipmentConflictStatus {
     // No other list uses the equipment at the same time.
@@ -15,84 +18,60 @@ export enum EquipmentConflictStatus {
     EXCEEDS_INVENTORY = 'exceedsInventory',
 }
 
-type BookingWithEquipmentLists = Pick<Booking, 'status' | 'equipmentLists'>;
-
 export const equipmentListHasDatetimes = (list: EquipmentList): boolean =>
     !!getEquipmentOutDatetime(list) && !!getEquipmentInDatetime(list);
 
-// Out and in datetimes are inclusive, so a list returned at the same time as another is handed out overlaps it.
-export const equipmentListsOverlap = (a: EquipmentList, b: EquipmentList): boolean => {
-    const aOut = getEquipmentOutDatetime(a);
-    const aIn = getEquipmentInDatetime(a);
-    const bOut = getEquipmentOutDatetime(b);
-    const bIn = getEquipmentInDatetime(b);
-    return !!aOut && !!aIn && !!bOut && !!bIn && aOut <= bIn && aIn >= bOut;
-};
+// An equipment list using the equipment, with the number of units of it on the list.
+export interface EquipmentUsageList {
+    id: number;
+    name: string;
+    rentalStatus: RentalStatus | null;
+    equipmentOutDatetime: Date;
+    equipmentInDatetime: Date;
+    numberOfUnits: number;
+}
 
-// The most units of the equipment used at the same time by the bookings' equipment lists. Cancelled bookings are not
-// counted.
-export const getMaximumNumberOfUnitUsedByBookings = (
-    bookings: BookingWithEquipmentLists[],
-    equipment: Equipment,
-): number =>
-    getMaximumNumberOfUnitUsed(
-        bookings.filter((x) => x.status !== Status.CANCELED).flatMap((x) => x.equipmentLists ?? []),
-        equipment,
-    );
+// A booking using the equipment, with the most units its lists use at the same time.
+export interface EquipmentUsageBooking {
+    id: number;
+    name: string;
+    status: Status;
+    maxUnitsUsed: number;
+    equipmentLists: EquipmentUsageList[];
+}
 
-// Checks the equipment in a list against every list using it at the same time:
-// - localLists are the other lists in the same booking. They take precedence over remote lists with the same id, since
-//   they may have unsaved changes.
-// - remoteBookings are bookings using the equipment, e.g. from /api/conflict-detection/booking-with-equipment.
-//   Cancelled bookings are not counted.
-// Returns a status of null when the inventory count is unknown, since nothing can be in conflict then.
-export const getEquipmentListConflict = <T extends BookingWithEquipmentLists>(
-    list: EquipmentList,
-    equipment: Equipment,
-    localLists: EquipmentList[],
-    remoteBookings: T[],
-) => {
-    const overlapsList = (other: EquipmentList) => other.id !== list.id && equipmentListsOverlap(other, list);
+// The bookings using an equipment during a period, and the most units they use at the same time.
+export interface EquipmentUsage {
+    maxUnitsUsed: number;
+    bookings: EquipmentUsageBooking[];
+}
 
-    const overlappingLocalLists = localLists.filter(
-        (other) => overlapsList(other) && listContainsEquipment(other, equipment),
-    );
-    const overlappingRemoteBookings = remoteBookings
-        .filter((booking) => booking.status !== Status.CANCELED)
-        .map((booking) => ({
-            booking,
-            lists: (booking.equipmentLists ?? []).filter(
-                (other) => overlapsList(other) && !localLists.some((x) => x.id === other.id),
-            ),
-        }))
-        .filter((x) => x.lists.length > 0);
+// The conflict status of one equipment on one equipment list.
+export interface EquipmentListConflict {
+    bookingId: number;
+    equipmentListId: number;
+    equipmentId: number;
+    equipmentName: string;
+    inventoryCount: number;
+    // Units of the equipment on this list.
+    numberOfUnits: number;
+    // The most units used at the same time by the other lists overlapping this one.
+    unitsUsedByOthers: number;
+    // numberOfUnits + unitsUsedByOthers.
+    maxUnitsUsed: number;
+    status: EquipmentConflictStatus;
+    // The other lists overlapping this one, grouped by booking. Lists in the same booking come first.
+    overlappingBookings: EquipmentUsageBooking[];
+}
 
-    const unitsUsedByThisList = getMaximumNumberOfUnitUsed([list], equipment);
-    const unitsUsedByOthers = getMaximumNumberOfUnitUsed(
-        [...overlappingLocalLists, ...overlappingRemoteBookings.flatMap((x) => x.lists)],
-        equipment,
-    );
-    const maxUnitsUsed = unitsUsedByThisList + unitsUsedByOthers;
+// Dates are sent as strings over the API.
+const toEquipmentUsageList = (list: EquipmentUsageList): EquipmentUsageList => ({
+    ...list,
+    equipmentOutDatetime: new Date(list.equipmentOutDatetime),
+    equipmentInDatetime: new Date(list.equipmentInDatetime),
+});
 
-    const getStatus = (): EquipmentConflictStatus | null => {
-        if (equipment.inventoryCount === null) {
-            return null;
-        }
-        if (unitsUsedByThisList > equipment.inventoryCount) {
-            return EquipmentConflictStatus.EXCEEDS_INVENTORY;
-        }
-        if (maxUnitsUsed > equipment.inventoryCount) {
-            return EquipmentConflictStatus.CONFLICT;
-        }
-        return unitsUsedByOthers > 0 ? EquipmentConflictStatus.SHARED : EquipmentConflictStatus.NONE;
-    };
-
-    return {
-        status: getStatus(),
-        unitsUsedByThisList,
-        unitsUsedByOthers,
-        maxUnitsUsed,
-        overlappingLocalLists,
-        overlappingRemoteBookings,
-    };
-};
+export const toEquipmentUsageBooking = (booking: EquipmentUsageBooking): EquipmentUsageBooking => ({
+    ...booking,
+    equipmentLists: booking.equipmentLists.map(toEquipmentUsageList),
+});

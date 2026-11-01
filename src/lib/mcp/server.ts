@@ -3,16 +3,16 @@ import * as z from 'zod';
 import { BookingType } from '../../models/enums/BookingType';
 import { Status } from '../../models/enums/Status';
 import { BookingViewModel, Equipment } from '../../models/interfaces';
-import { getEquipmentInDatetime, getEquipmentOutDatetime, toBookingViewModel } from '../datetimeUtils';
+import { toBookingViewModel } from '../datetimeUtils';
 import { EquipmentConflictStatus } from '../equipmentConflicts';
 import { filterBookings, groupBookingsByEquipmentUsageTime } from '../bookingFilters';
 import { searchBookings } from '../db-access';
+import { fetchBookingForMcp, fetchBookingSummariesForMcp, fetchBookingsForEquipment } from '../db-access/booking';
 import {
-    fetchBookingForMcp,
-    fetchBookingSummariesForMcp,
-    fetchBookingsForEquipment,
-    fetchBookingsWithEquipmentInInterval,
-} from '../db-access/booking';
+    fetchEquipmentConflictsForBooking,
+    fetchEquipmentUnitsPerBooking,
+    fetchEquipmentUsage,
+} from '../db-access/equipmentConflicts';
 import { fetchEquipment, fetchEquipments, searchEquipment } from '../db-access/equipment';
 import { fetchSettings } from '../db-access/setting';
 import { fetchUserNamesAndTags } from '../db-access/user';
@@ -20,12 +20,7 @@ import { getCalendarEvent } from '../calenderUtils';
 import { toBooking } from '../mappers/booking';
 import { toEquipment } from '../mappers/equipment';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
-import {
-    CONFLICT_STATUS_NAMES,
-    getCheckableEquipment,
-    getCheckableEquipmentLists,
-    toMcpBookingConflicts,
-} from './mappers/bookingConflicts';
+import { CONFLICT_STATUS_NAMES, toMcpBookingConflicts } from './mappers/bookingConflicts';
 import { toMcpBookingDetail, toMcpBookingSearchResult, toMcpCalendarEvent } from './mappers/bookingDetail';
 import { getFirstName, PII_SCOPE } from './mappers/primitives';
 import {
@@ -83,6 +78,18 @@ const compareBookingsBy =
         const diff = bDate.getTime() - aDate.getTime();
         return diff !== 0 ? diff : b.id - a.id;
     };
+
+// The bookings with the given ids, with their owners and equipment lists (without rows), by id.
+const fetchBookingViewModelsForMcp = async (ids: number[]): Promise<Map<number, BookingViewModel>> => {
+    const uniqueIds = [...new Set(ids)];
+    const bookingModels = uniqueIds.length > 0 ? await fetchBookingSummariesForMcp(uniqueIds) : [];
+    return new Map(
+        bookingModels.map((x) => {
+            const booking = toBookingViewModel(toBooking(x));
+            return [booking.id, booking] as const;
+        }),
+    );
+};
 
 const toJsonResult = (result: object) => {
     const translatedResult = toSwedishKeys(result) as Record<string, unknown>;
@@ -406,9 +413,10 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
             annotations: { readOnlyHint: true },
         },
         async ({ equipmentId }) => {
-            const [equipmentModel, bookingModels] = await Promise.all([
+            const [equipmentModel, bookingModels, unitsPerBooking] = await Promise.all([
                 fetchEquipment(equipmentId),
                 fetchBookingsForEquipment(equipmentId),
+                fetchEquipmentUnitsPerBooking(equipmentId),
             ]);
 
             if (!equipmentModel) {
@@ -419,7 +427,12 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
             const bookings = bookingModels.map(toBooking).map(toBookingViewModel);
 
             return toJsonResult(
-                toMcpEquipmentDetail(equipment, groupBookingsByEquipmentUsageTime(bookings, equipment), canSeePii),
+                toMcpEquipmentDetail(
+                    equipment,
+                    groupBookingsByEquipmentUsageTime(bookings, equipment),
+                    unitsPerBooking,
+                    canSeePii,
+                ),
             );
         },
     );
@@ -454,23 +467,26 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                 return toErrorResult('from must be before to');
             }
 
-            const [equipmentModel, bookingModels] = await Promise.all([
+            const [equipmentModel, usage] = await Promise.all([
                 fetchEquipment(equipmentId),
-                fetchBookingsWithEquipmentInInterval(equipmentId, fromDate, toDate),
+                fetchEquipmentUsage(equipmentId, fromDate, toDate),
             ]);
 
             if (!equipmentModel) {
                 return toErrorResult(`Equipment ${equipmentId} not found`);
             }
 
-            const bookings = bookingModels
-                .map(toBooking)
-                .map(toBookingViewModel)
-                .filter((booking) => booking.status !== Status.CANCELED)
-                .sort((a, b) => (a.equipmentOutDatetime?.getTime() ?? 0) - (b.equipmentOutDatetime?.getTime() ?? 0));
+            const bookingsById = await fetchBookingViewModelsForMcp(usage.bookings.map((x) => x.id));
 
             return toJsonResult(
-                toMcpEquipmentAvailability(toEquipment(equipmentModel), fromDate, toDate, bookings, canSeePii),
+                toMcpEquipmentAvailability(
+                    toEquipment(equipmentModel),
+                    fromDate,
+                    toDate,
+                    usage,
+                    bookingsById,
+                    canSeePii,
+                ),
             );
         },
     );
@@ -506,43 +522,18 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
             annotations: { readOnlyHint: true },
         },
         async ({ bookingId, includeAll }) => {
-            const bookingModel = await fetchBookingForMcp(bookingId);
+            const conflicts = await fetchEquipmentConflictsForBooking(bookingId);
+            const bookingsById = await fetchBookingViewModelsForMcp([
+                bookingId,
+                ...conflicts.flatMap((x) => x.overlappingBookings.map((booking) => booking.id)),
+            ]);
+            const booking = bookingsById.get(bookingId);
 
-            if (!bookingModel) {
+            if (!booking) {
                 return toErrorResult(`Booking ${bookingId} not found`);
             }
 
-            const booking = toBookingViewModel(toBooking(bookingModel));
-
-            // One query per equipment, covering every list in the booking that uses it. The mapper narrows the
-            // result down to the lists overlapping each of the booking's lists.
-            const intervalByEquipmentId = new Map<number, { from: Date; to: Date }>();
-            getCheckableEquipmentLists(booking).forEach((list) => {
-                const listOut = getEquipmentOutDatetime(list)!;
-                const listIn = getEquipmentInDatetime(list)!;
-                getCheckableEquipment(list).forEach((equipment) => {
-                    const interval = intervalByEquipmentId.get(equipment.id);
-                    intervalByEquipmentId.set(equipment.id, {
-                        from: interval && interval.from < listOut ? interval.from : listOut,
-                        to: interval && interval.to > listIn ? interval.to : listIn,
-                    });
-                });
-            });
-
-            const otherBookingsByEquipmentId = new Map(
-                await Promise.all(
-                    [...intervalByEquipmentId].map(async ([equipmentId, { from, to }]) => {
-                        const bookingModels = await fetchBookingsWithEquipmentInInterval(equipmentId, from, to);
-                        const otherBookings = bookingModels
-                            .map(toBooking)
-                            .map(toBookingViewModel)
-                            .filter((other) => other.id !== booking.id);
-                        return [equipmentId, otherBookings] as const;
-                    }),
-                ),
-            );
-
-            return toJsonResult(toMcpBookingConflicts(booking, otherBookingsByEquipmentId, includeAll, canSeePii));
+            return toJsonResult(toMcpBookingConflicts(booking, conflicts, bookingsById, includeAll, canSeePii));
         },
     );
 

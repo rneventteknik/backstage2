@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Badge, Dropdown, DropdownButton, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import posthog from 'posthog-js';
+import { EquipmentListConflict } from '../../../lib/equipmentConflicts';
 import { Equipment, EquipmentPackage, EquipmentPrice, TimeEstimate } from '../../../models/interfaces';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -78,7 +79,8 @@ import { BookingType } from '../../../models/enums/BookingType';
 
 type Props = {
     list: EquipmentList;
-    otherLists: EquipmentList[];
+    equipmentConflicts: EquipmentListConflict[] | undefined;
+    equipmentConflictsError: Error | undefined;
     pricePlan: PricePlan;
     bookingType: BookingType;
     language: Language;
@@ -101,7 +103,8 @@ type Props = {
 
 const EquipmentListTable: React.FC<Props> = ({
     list,
-    otherLists,
+    equipmentConflicts,
+    equipmentConflictsError,
     pricePlan,
     bookingType,
     language,
@@ -204,9 +207,8 @@ const EquipmentListTable: React.FC<Props> = ({
                                 <EquipmentListEntryConflictStatus
                                     equipment={entry.equipment}
                                     equipmentList={list}
-                                    otherLists={otherLists}
-                                    startDatetime={getEquipmentOutDatetime(list) ?? new Date()}
-                                    endDatetime={getEquipmentInDatetime(list) ?? new Date()}
+                                    equipmentConflicts={equipmentConflicts}
+                                    error={equipmentConflictsError}
                                 />
                             </span>
                         ) : null}

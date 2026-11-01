@@ -9,6 +9,7 @@ import { toInvoiceGroup } from './mappers/invoiceGroup';
 import { toSetting } from './mappers/setting';
 import { toSalaryGroup } from './mappers/salaryGroup';
 import { toCustomer } from './mappers/customer';
+import { EquipmentListConflict, EquipmentUsage, toEquipmentUsageBooking } from './equipmentConflicts';
 
 // Since all fetchers follow the same pattern we have these two helper functions to
 // generate a fetcher for a specified mapper.
@@ -47,6 +48,15 @@ export const equipmentListsFetcher = generateListFetcher(toEquipmentList);
 
 export const bookingFetcher = generateFetcher(toBooking);
 export const bookingsFetcher = generateListFetcher(toBooking);
+
+export const equipmentConflictsFetcher = generateListFetcher((conflict: EquipmentListConflict) => ({
+    ...conflict,
+    overlappingBookings: conflict.overlappingBookings.map(toEquipmentUsageBooking),
+}));
+export const equipmentUsageFetcher = generateFetcher((usage: EquipmentUsage) => ({
+    ...usage,
+    bookings: usage.bookings.map(toEquipmentUsageBooking),
+}));
 
 export const userFetcher = generateFetcher(toUser);
 export const usersFetcher = generateListFetcher(toUser);

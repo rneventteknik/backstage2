@@ -8,10 +8,10 @@ import { BookingType } from '../models/enums/BookingType';
 import { SalaryStatus } from '../models/enums/SalaryStatus';
 import { PaymentStatus } from '../models/enums/PaymentStatus';
 import { RentalStatus } from '../models/enums/RentalStatus';
-import { BookingViewModel, Equipment, TimeReport } from '../models/interfaces';
+import { BookingViewModel, TimeReport } from '../models/interfaces';
 import { EquipmentList } from '../models/interfaces/EquipmentList';
 import { Language } from '../models/enums/Language';
-import { getEquipmentOutDatetime, getEquipmentInDatetime, addDays, addHours } from './datetimeUtils';
+import { getEquipmentOutDatetime, addDays, addHours } from './datetimeUtils';
 import { KeyValue } from '../models/interfaces/KeyValue';
 import type { NextApiRequest } from 'next';
 import type { BookingPagination } from './db-access/booking';
@@ -389,45 +389,6 @@ export const IsBookingUpcomingRental = (booking: BookingViewModel) => {
 
 export const getTotalNumberOfHoursReported = (timeReports: TimeReport[]) =>
     timeReports.reduce((hours, timeReport) => hours + timeReport.billableWorkingHours, 0);
-
-// Calculate the max number of equipment used at the same time. To do this, we look
-// at the start of each equipment list and check how many equipments are used. We
-// know the maximum will be at one of these point since it is not possible to
-// increase the number of used equipments without starting a new equipment list.
-export const getMaximumNumberOfUnitUsed = (equipmentLists: EquipmentList[], equipment: Equipment) =>
-    Math.max(
-        0,
-        ...equipmentLists
-            .map((x) => getEquipmentOutDatetime(x) ?? new Date(0)) // Calculate datetimes to check
-            .map((datetime) =>
-                equipmentLists
-                    .filter(
-                        // Find the lists which overlap the datetime
-                        (list) =>
-                            getEquipmentOutDatetime(list) &&
-                            (getEquipmentOutDatetime(list) ?? new Date()) <= datetime &&
-                            getEquipmentInDatetime(list) &&
-                            (getEquipmentInDatetime(list) ?? new Date()) >= datetime,
-                    )
-                    .reduce(
-                        // Sum the equipment, first over all lists and within the lists over all entries
-                        (sum, list) =>
-                            sum +
-                            list.listEntries
-                                .filter((x) => x.equipmentId === equipment.id)
-                                .reduce((sum, x) => sum + x.numberOfUnits, 0) +
-                            list.listHeadings.reduce(
-                                (sum, headingList) =>
-                                    sum +
-                                    headingList.listEntries
-                                        .filter((x) => x.equipmentId === equipment.id)
-                                        .reduce((sum, x) => sum + x.numberOfUnits, 0),
-                                0,
-                            ),
-                        0,
-                    ),
-            ),
-    );
 
 export const listContainsEquipment = (list: EquipmentList, equipment: HasId) =>
     list.listEntries.some((entry) => entry.equipment?.id === equipment.id) ||

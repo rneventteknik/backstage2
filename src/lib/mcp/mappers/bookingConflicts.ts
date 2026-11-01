@@ -1,8 +1,12 @@
-import { BookingViewModel, Equipment } from '../../../models/interfaces';
-import { EquipmentList } from '../../../models/interfaces/EquipmentList';
+import { BookingViewModel } from '../../../models/interfaces';
 import { formatDatetimeForAnalyticsExport, getEquipmentInDatetime, getEquipmentOutDatetime } from '../../datetimeUtils';
-import { EquipmentConflictStatus, equipmentListHasDatetimes, getEquipmentListConflict } from '../../equipmentConflicts';
-import { getMaximumNumberOfUnitUsed } from '../../utils';
+import {
+    EquipmentConflictStatus,
+    EquipmentListConflict,
+    EquipmentUsageBooking,
+    equipmentListHasDatetimes,
+} from '../../equipmentConflicts';
+import { getRentalStatusName } from '../../utils';
 import { toMcpBookingSummary } from './bookingSummary';
 import { getLinkToBooking, getLinkToEquipment } from './primitives';
 
@@ -14,96 +18,65 @@ export const CONFLICT_STATUS_NAMES: Record<EquipmentConflictStatus, string> = {
     [EquipmentConflictStatus.EXCEEDS_INVENTORY]: 'Fler än inventarieantalet',
 };
 
-// Every equipment in a list with a known inventory count, once per equipment even if it is on several rows.
-export const getCheckableEquipment = (list: EquipmentList): Equipment[] => {
-    const equipmentById = new Map<number, Equipment>();
-    [...list.listEntries, ...list.listHeadings.flatMap((heading) => heading.listEntries)].forEach((entry) => {
-        if (entry.equipment && entry.equipment.inventoryCount !== null) {
-            equipmentById.set(entry.equipment.id, entry.equipment);
-        }
-    });
-    return [...equipmentById.values()];
-};
+const PROBLEM_STATUSES = [EquipmentConflictStatus.CONFLICT, EquipmentConflictStatus.EXCEEDS_INVENTORY];
 
-export const getCheckableEquipmentLists = (booking: BookingViewModel): EquipmentList[] =>
-    (booking.equipmentLists ?? []).filter(equipmentListHasDatetimes);
-
-// The same check as the conflict icon next to each row in the equipment lists (EquipmentListEntryConflictStatus).
-const toMcpEquipmentConflict = (
-    booking: BookingViewModel,
-    list: EquipmentList,
-    equipment: Equipment,
-    otherBookings: BookingViewModel[],
+// The bookings in the usage, summarised with the full bookings from bookingsById.
+export const toMcpEquipmentUsageBookings = (
+    bookings: EquipmentUsageBooking[],
+    bookingsById: Map<number, BookingViewModel>,
     canSeePii: boolean,
-) => {
-    const conflict = getEquipmentListConflict(list, equipment, getCheckableEquipmentLists(booking), otherBookings);
-    const overlappingBookings = [
-        ...(conflict.overlappingLocalLists.length > 0 ? [{ booking, lists: conflict.overlappingLocalLists }] : []),
-        ...conflict.overlappingRemoteBookings,
-    ];
-
-    return {
-        equipmentId: equipment.id,
-        equipmentName: equipment.name,
-        link: getLinkToEquipment(equipment.id),
-        // Only equipment with an inventory count is checked, so the status is never null.
-        conflictStatus: CONFLICT_STATUS_NAMES[conflict.status!],
-        numberOfUnits: conflict.unitsUsedByThisList,
-        maxUnitsBooked: conflict.maxUnitsUsed,
-        inventoryCount: equipment.inventoryCount,
-        bookings: overlappingBookings.map((x) => ({
-            ...toMcpBookingSummary(x.booking, canSeePii),
-            equipmentLists: x.lists.map((other) => ({
-                id: other.id,
-                name: other.name,
-                equipmentOutDatetime: formatDatetimeForAnalyticsExport(getEquipmentOutDatetime(other)),
-                equipmentInDatetime: formatDatetimeForAnalyticsExport(getEquipmentInDatetime(other)),
-                numberOfUnits: getMaximumNumberOfUnitUsed([other], equipment),
-            })),
+) =>
+    bookings.map((booking) => ({
+        ...toMcpBookingSummary(bookingsById.get(booking.id)!, canSeePii),
+        equipmentLists: booking.equipmentLists.map((list) => ({
+            id: list.id,
+            name: list.name,
+            rentalStatus: list.rentalStatus != null ? getRentalStatusName(list.rentalStatus) : null,
+            equipmentOutDatetime: formatDatetimeForAnalyticsExport(list.equipmentOutDatetime),
+            equipmentInDatetime: formatDatetimeForAnalyticsExport(list.equipmentInDatetime),
+            numberOfUnits: list.numberOfUnits,
         })),
-    };
-};
+    }));
 
-// otherBookingsByEquipmentId holds the other, non-cancelled bookings with lists using each equipment during this
-// booking's lists, pruned to those lists.
+const toMcpEquipmentConflict = (
+    conflict: EquipmentListConflict,
+    bookingsById: Map<number, BookingViewModel>,
+    canSeePii: boolean,
+) => ({
+    equipmentId: conflict.equipmentId,
+    equipmentName: conflict.equipmentName,
+    link: getLinkToEquipment(conflict.equipmentId),
+    conflictStatus: CONFLICT_STATUS_NAMES[conflict.status],
+    numberOfUnits: conflict.numberOfUnits,
+    maxUnitsBooked: conflict.maxUnitsUsed,
+    inventoryCount: conflict.inventoryCount,
+    bookings: toMcpEquipmentUsageBookings(conflict.overlappingBookings, bookingsById, canSeePii),
+});
+
+// conflicts come from fetchEquipmentConflictsForBooking; bookingsById holds the booking and every overlapping booking.
 export const toMcpBookingConflicts = (
     booking: BookingViewModel,
-    otherBookingsByEquipmentId: Map<number, BookingViewModel[]>,
+    conflicts: EquipmentListConflict[],
+    bookingsById: Map<number, BookingViewModel>,
     includeAll: boolean,
     canSeePii: boolean,
 ) => {
-    const equipmentLists = getCheckableEquipmentLists(booking).map((list) => {
-        const rows = getCheckableEquipment(list).map((equipment) =>
-            toMcpEquipmentConflict(
-                booking,
-                list,
-                equipment,
-                otherBookingsByEquipmentId.get(equipment.id) ?? [],
-                canSeePii,
-            ),
-        );
-        return {
-            id: list.id,
-            name: list.name,
-            equipmentOutDatetime: formatDatetimeForAnalyticsExport(getEquipmentOutDatetime(list)),
-            equipmentInDatetime: formatDatetimeForAnalyticsExport(getEquipmentInDatetime(list)),
-            rows,
-        };
-    });
-
-    const allRows = equipmentLists.flatMap((list) => list.rows);
-    const problemStatusNames = [
-        CONFLICT_STATUS_NAMES[EquipmentConflictStatus.CONFLICT],
-        CONFLICT_STATUS_NAMES[EquipmentConflictStatus.EXCEEDS_INVENTORY],
-    ];
-    const isProblem = (row: { conflictStatus: string }) => problemStatusNames.includes(row.conflictStatus);
+    const equipmentLists = (booking.equipmentLists ?? []).filter(equipmentListHasDatetimes).map((list) => ({
+        id: list.id,
+        name: list.name,
+        equipmentOutDatetime: formatDatetimeForAnalyticsExport(getEquipmentOutDatetime(list)),
+        equipmentInDatetime: formatDatetimeForAnalyticsExport(getEquipmentInDatetime(list)),
+        rows: conflicts
+            .filter((conflict) => conflict.equipmentListId === list.id)
+            .map((conflict) => toMcpEquipmentConflict(conflict, bookingsById, canSeePii)),
+    }));
 
     return {
         id: booking.id,
         name: booking.name,
         link: getLinkToBooking(booking.id),
-        checkedRowsCount: allRows.length,
-        conflictCount: allRows.filter(isProblem).length,
+        checkedRowsCount: conflicts.length,
+        conflictCount: conflicts.filter((conflict) => PROBLEM_STATUSES.includes(conflict.status)).length,
         skippedEquipmentLists: (booking.equipmentLists ?? [])
             .filter((list) => !equipmentListHasDatetimes(list))
             .map((list) => ({ id: list.id, name: list.name })),
