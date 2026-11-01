@@ -1,17 +1,15 @@
-import currency from 'currency.js';
-import { AccountKind } from '../../models/enums/AccountKind';
-import { BookingViewModel, User } from '../../models/interfaces';
-import { BookingChangelogEntry } from '../../models/interfaces/ChangeLogEntry';
-import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../models/interfaces/EquipmentList';
-import { CalendarResult } from '../../models/misc/CalendarResult';
+import { AccountKind } from '../../../models/enums/AccountKind';
+import { BookingViewModel } from '../../../models/interfaces';
+import { BookingChangelogEntry } from '../../../models/interfaces/ChangeLogEntry';
+import { EquipmentList, EquipmentListEntry, EquipmentListHeading } from '../../../models/interfaces/EquipmentList';
+import { CalendarResult } from '../../../models/misc/CalendarResult';
 import {
     formatDatetimeForAnalyticsExport,
     getEquipmentInDatetime,
     getEquipmentOutDatetime,
     getNumberOfDays,
-} from '../datetimeUtils';
+} from '../../datetimeUtils';
 import {
-    addVAT,
     changelogEntryHasPriceInformation,
     computePriceSummary,
     getCalculatedDiscount,
@@ -23,88 +21,26 @@ import {
     getPriceSummaryFromChangelogEntry,
     getTimeEstimatePrice,
     getTimeReportPrice,
-} from '../pricingUtils';
-import { getSortedList } from '../sortUtils';
+} from '../../pricingUtils';
+import { getSortedList } from '../../sortUtils';
+import { toMcpBookingSummary } from './bookingSummary';
+import { getFirstName, toMcpCustomerContactDetails, toMcpPrice, toMcpPriceOrNull, toMcpUser } from './primitives';
 import {
     getAccountKindName,
-    getBookingTypeName,
     getLanguageName,
     getOperationalYear,
-    getPaymentStatusName,
     getPricePlanName,
     getRentalStatusName,
     getSalaryStatusName,
-    getStatusName,
-} from '../utils';
+} from '../../utils';
 
 export interface DefaultAccounts {
     equipmentExternal: string;
     equipmentInternal: string;
 }
 
-const getLinkToBooking = (bookingId: number): string => process.env.APPLICATION_BASE_URL + '/bookings/' + bookingId;
-
-export const getFirstName = (name: string): string => name.trim().split(/\s+/)[0];
-
-// Personal data (full names and customer contact details) is only exposed to API keys with this scope.
-export const PII_SCOPE = 'pii';
-
-// Users carry personal data (contact details, personal identity number, bank details), so only identifying fields
-// are exposed.
-const toMcpUser = (user: Pick<User, 'id' | 'name' | 'nameTag'> | undefined, canSeePii: boolean) =>
-    user ? { id: user.id, name: canSeePii ? user.name : getFirstName(user.name), nameTag: user.nameTag } : null;
-
-// Without the pii scope only the Hogia ID is exposed, plus the customer name when the customer is registered in Hogia.
-const toMcpCustomerSummary = (booking: BookingViewModel, canSeePii: boolean) =>
-    canSeePii
-        ? {
-              customerName: booking.customerName,
-              contactPersonName: booking.contactPersonName,
-              invoiceHogiaId: booking.invoiceHogiaId,
-          }
-        : {
-              ...(booking.invoiceHogiaId != null ? { customerName: booking.customerName } : {}),
-              invoiceHogiaId: booking.invoiceHogiaId,
-          };
-
-const toMcpCustomerContactDetails = (booking: BookingViewModel, canSeePii: boolean) =>
-    canSeePii
-        ? {
-              contactPersonPhone: booking.contactPersonPhone,
-              contactPersonEmail: booking.contactPersonEmail,
-              invoiceAddress: booking.invoiceAddress,
-              invoiceTag: booking.invoiceTag,
-          }
-        : {};
-
-const toMcpPrice = (price: currency) => ({
-    excludingVAT: price.value,
-    includingVAT: addVAT(price).value,
-});
-
-const toMcpPriceOrNull = (price: currency | null) => (price ? toMcpPrice(price) : null);
-
 const sumHours = <T>(entries: T[] | undefined, getHours: (entry: T) => number): number =>
     entries?.reduce((sum, entry) => sum + getHours(entry), 0) ?? 0;
-
-export const toMcpBookingSummary = (booking: BookingViewModel, canSeePii: boolean) => ({
-    id: booking.id,
-    name: booking.name,
-    link: getLinkToBooking(booking.id),
-    bookingType: getBookingTypeName(booking.bookingType),
-    status: getStatusName(booking.status),
-    paymentStatus: getPaymentStatusName(booking.paymentStatus),
-    internalReservation: Boolean(booking.internalReservation),
-    ownerUser: toMcpUser(booking.ownerUser, canSeePii),
-    ...toMcpCustomerSummary(booking, canSeePii),
-    location: booking.location,
-    invoiceNumber: booking.invoiceNumber,
-    usageStartDatetime: formatDatetimeForAnalyticsExport(booking.usageStartDatetime),
-    usageEndDatetime: formatDatetimeForAnalyticsExport(booking.usageEndDatetime),
-    equipmentOutDatetime: formatDatetimeForAnalyticsExport(booking.equipmentOutDatetime),
-    equipmentInDatetime: formatDatetimeForAnalyticsExport(booking.equipmentInDatetime),
-    created: formatDatetimeForAnalyticsExport(booking.created),
-});
 
 const toMcpEquipmentListEntry = (entry: EquipmentListEntry, list: EquipmentList, defaultAccount: string) => ({
     type: 'rad' as const,

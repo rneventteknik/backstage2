@@ -4,9 +4,8 @@ import Skeleton from 'react-loading-skeleton';
 import useSwr from 'swr';
 import { toBookingViewModel } from '../../lib/datetimeUtils';
 import { bookingsFetcher } from '../../lib/fetchers';
-import { listContainsEquipment } from '../../lib/utils';
-import { RentalStatus } from '../../models/enums/RentalStatus';
-import { BookingViewModel, Equipment } from '../../models/interfaces';
+import { groupBookingsByEquipmentUsageTime } from '../../lib/bookingFilters';
+import { Equipment } from '../../models/interfaces';
 import TinyBookingTable from '../TinyBookingTable';
 
 type Props = {
@@ -18,34 +17,9 @@ const EquipmentBookings: React.FC<Props> = ({ equipment }: Props) => {
 
     const bookingViewModels = bookings?.map(toBookingViewModel) ?? [];
 
-    const bookingHasNonReturnedListWithEquipment = (booking: BookingViewModel) =>
-        booking.equipmentLists?.some(
-            (list) => list.rentalStatus === RentalStatus.OUT && listContainsEquipment(list, equipment),
-        );
-
-    const currentBookings = bookingViewModels.filter(
-        (x) =>
-            (x.equipmentOutDatetime &&
-                x.equipmentInDatetime &&
-                x.equipmentOutDatetime.getTime() < Date.now() &&
-                x.equipmentInDatetime.getTime() > Date.now()) ||
-            bookingHasNonReturnedListWithEquipment(x),
-    );
-    const futureBookings = bookingViewModels.filter(
-        (x) =>
-            x.equipmentOutDatetime &&
-            x.equipmentInDatetime &&
-            x.equipmentOutDatetime.getTime() > Date.now() &&
-            x.equipmentInDatetime.getTime() > Date.now() &&
-            !bookingHasNonReturnedListWithEquipment(x),
-    );
-    const pastBookings = bookingViewModels.filter(
-        (x) =>
-            x.equipmentOutDatetime &&
-            x.equipmentInDatetime &&
-            x.equipmentOutDatetime.getTime() < Date.now() &&
-            x.equipmentInDatetime.getTime() < Date.now() &&
-            !bookingHasNonReturnedListWithEquipment(x),
+    const { currentBookings, futureBookings, pastBookings } = groupBookingsByEquipmentUsageTime(
+        bookingViewModels,
+        equipment,
     );
 
     if (!equipment || !bookings) {

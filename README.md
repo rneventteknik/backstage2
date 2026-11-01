@@ -116,7 +116,7 @@ MQTT_BROKER_PASSWORD={MQTT broker password}
 NEXT_PUBLIC_POSTHOG_KEY={PostHog project API key for product analytics}
 
 API_KEYS={JSON list of API keys, for example [{"key": "XXX", "name": "slackbot"}]} (optional, only needed when using backstage2 as an API from an external service)
-MCP_API_KEYS={JSON list of API keys for the MCP endpoint at /api/mcp, same format as API_KEYS. Add "scopes": ["pii"] to a key to include personal data (full names and customer contact details); without it, people are listed by first name only and customers only by Hogia ID and, when they have one, customer name} (optional, only needed when connecting MCP clients)
+MCP_API_KEYS={JSON list of API keys for the MCP endpoint at /api/mcp, same format as API_KEYS. Add "scopes": ["pii"] to a key to include personal data (full names and customer contact details); without it, people are listed by first name only, customers only by Hogia ID and, when they have one, customer name, and booking and equipment changelogs are left out} (optional, only needed when connecting MCP clients)
 ```
 
 ## Integrations Setup
