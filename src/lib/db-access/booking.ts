@@ -11,37 +11,145 @@ import {
 } from '../../models/objection-models/BookingObjectionModel';
 import { ensureDatabaseIsInitialized, getCaseInsensitiveComparisonKeyword } from '../database';
 import { getPartialSearchStrings, isMemberOfEnum } from '../utils';
+import { QueryBuilder } from 'objection';
 import { compareLists, removeIdAndDates, withCreatedDate, withUpdatedDate } from './utils';
+
+// Matches bookings where every word of the search string is found in the name, contact person name, invoice number
+// or customer name. The conditions are added as a single group so they can be combined with other filters.
+const whereMatchesSearchString = <T extends QueryBuilder<BookingObjectionModel, BookingObjectionModel[]>>(
+    query: T,
+    searchString: string,
+): T => {
+    const searchStrings = getPartialSearchStrings(searchString);
+    const matchesAllPartialSearchStrings = (column: string) => (builder: typeof query) => {
+        searchStrings.forEach((partialSearchString) => {
+            builder.andWhere(column, getCaseInsensitiveComparisonKeyword(), partialSearchString);
+        });
+    };
+
+    return query.where((builder) =>
+        builder
+            .where(matchesAllPartialSearchStrings('name'))
+            .orWhere(matchesAllPartialSearchStrings('contactPersonName'))
+            .orWhere(matchesAllPartialSearchStrings('invoiceNumber'))
+            .orWhere(matchesAllPartialSearchStrings('customerName')),
+    );
+};
 
 export const searchBookings = async (searchString: string, count: number): Promise<BookingObjectionModel[]> => {
     ensureDatabaseIsInitialized();
 
-    const searchStrings = getPartialSearchStrings(searchString);
-
-    return BookingObjectionModel.query()
-        .where((builder) => {
-            searchStrings.forEach((partialSearchString) => {
-                builder.andWhere('name', getCaseInsensitiveComparisonKeyword(), partialSearchString);
-            });
-        })
-        .orWhere((builder) => {
-            searchStrings.forEach((partialSearchString) => {
-                builder.andWhere('contactPersonName', getCaseInsensitiveComparisonKeyword(), partialSearchString);
-            });
-        })
+    return whereMatchesSearchString(BookingObjectionModel.query(), searchString)
         .withGraphFetched('equipmentLists')
-        .orWhere((builder) => {
-            searchStrings.forEach((partialSearchString) => {
-                builder.andWhere('invoiceNumber', getCaseInsensitiveComparisonKeyword(), partialSearchString);
-            });
-        })
-        .orWhere((builder) => {
-            searchStrings.forEach((partialSearchString) => {
-                builder.andWhere('customerName', getCaseInsensitiveComparisonKeyword(), partialSearchString);
-            });
-        })
         .orderBy('updated', 'desc')
         .limit(count);
+};
+
+export interface McpBookingFilter {
+    searchString?: string;
+    statuses?: Status[];
+    bookingType?: BookingType;
+    from?: Date;
+    to?: Date;
+    pageSize: number;
+    maxBookingId?: number;
+}
+
+export const fetchBookingsForMcp = async (filter: McpBookingFilter): Promise<BookingObjectionModel[]> => {
+    ensureDatabaseIsInitialized();
+
+    let query = BookingObjectionModel.query()
+        .withGraphFetched('ownerUser')
+        .withGraphFetched('equipmentLists')
+        .orderBy('id', 'desc')
+        .limit(filter.pageSize);
+
+    if (filter.searchString?.trim()) {
+        query = whereMatchesSearchString(query, filter.searchString);
+    }
+
+    if (filter.statuses && filter.statuses.length > 0) {
+        query = query.whereIn('status', filter.statuses);
+    }
+
+    if (filter.bookingType !== undefined) {
+        query = query.where('bookingType', filter.bookingType);
+    }
+
+    if (filter.maxBookingId !== undefined) {
+        query = query.where('id', '<=', filter.maxBookingId);
+    }
+
+    if (filter.from || filter.to) {
+        const { from, to } = filter;
+        // Equipment out/in datetimes are optional and fall back to the usage datetimes, see getEquipmentOutDatetime
+        // and getEquipmentInDatetime.
+        const overlappingEquipmentLists = EquipmentListObjectionModel.query()
+            .select('bookingId')
+            .modify((builder) => {
+                if (to) {
+                    builder.where((b) =>
+                        b
+                            .where('equipmentOutDatetime', '<=', to.toISOString())
+                            .orWhere((b) =>
+                                b
+                                    .whereNull('equipmentOutDatetime')
+                                    .andWhere('usageStartDatetime', '<=', to.toISOString()),
+                            ),
+                    );
+                }
+                if (from) {
+                    builder.where((b) =>
+                        b
+                            .where('equipmentInDatetime', '>=', from.toISOString())
+                            .orWhere((b) =>
+                                b
+                                    .whereNull('equipmentInDatetime')
+                                    .andWhere('usageEndDatetime', '>=', from.toISOString()),
+                            ),
+                    );
+                }
+            });
+        query = query.whereIn('id', overlappingEquipmentLists);
+    }
+
+    return query;
+};
+
+export const fetchBookingForMcp = async (id: number): Promise<BookingObjectionModel | undefined> => {
+    ensureDatabaseIsInitialized();
+
+    return BookingObjectionModel.query()
+        .where('id', id)
+        .withGraphFetched('ownerUser')
+        .withGraphFetched('coOwnerUsers')
+        .withGraphFetched('equipmentLists.listEntries.equipment.[equipmentPublicCategory, tags]')
+        .withGraphFetched('equipmentLists.listEntries.equipmentPrice')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipment.[equipmentPublicCategory, tags]')
+        .withGraphFetched('equipmentLists.listHeadings.listEntries.equipmentPrice')
+        .withGraphFetched('calendarEvents')
+        .withGraphFetched('timeEstimates')
+        .withGraphFetched('timeReports.user')
+        .withGraphFetched('changelog(changelogInfo)')
+        .withGraphFetched('emailThreads')
+        .modifiers({
+            changelogInfo: (builder) => {
+                builder.orderBy('updated', 'desc').limit(50);
+            },
+        })
+        .modifyGraph('equipmentLists', (builder) => {
+            builder.orderBy('sortIndex');
+        })
+        .modifyGraph('equipmentLists.listEntries', (builder) => {
+            builder.orderBy('sortIndex');
+        })
+        .modifyGraph('equipmentLists.listHeadings', (builder) => {
+            builder.orderBy('sortIndex');
+        })
+        .modifyGraph('equipmentLists.listHeadings.listEntries', (builder) => {
+            builder.orderBy('sortIndex');
+        })
+        .then((bookings) => bookings[0]);
 };
 
 export const DEFAULT_ANALYTICS_PAGE_SIZE = 100;

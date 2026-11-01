@@ -144,3 +144,27 @@ export const getAndVerifyApiKey = async (req: NextApiRequest & IncomingMessage):
     }
     return { isLoggedIn: false };
 };
+
+// MCP clients send the key as a bearer token by default, x-api-key is accepted for consistency with the external API.
+export const getAndVerifyMcpApiKey = async (req: NextApiRequest & IncomingMessage): Promise<CurrentUserInfo> => {
+    const authorizationHeader = req.headers['authorization'];
+    const bearerToken = authorizationHeader?.startsWith('Bearer ') ? authorizationHeader.slice('Bearer '.length) : null;
+    const apiKey = bearerToken ?? req.headers['x-api-key'];
+    const acceptedApiKeys = JSON.parse(process.env.MCP_API_KEYS ?? '[]') as {
+        key: string;
+        name: string;
+    }[];
+
+    const authInformation = apiKey ? acceptedApiKeys.find((x) => x.key === apiKey) : undefined;
+
+    if (authInformation) {
+        return {
+            isLoggedIn: true,
+            name: authInformation.name,
+            loginDate: Date.now(),
+            role: undefined,
+            userId: undefined,
+        };
+    }
+    return { isLoggedIn: false };
+};

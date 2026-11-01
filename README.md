@@ -90,6 +90,7 @@ MQTT_BROKER_PASSWORD={MQTT broker password}
 NEXT_PUBLIC_POSTHOG_KEY={PostHog project API key for product analytics}
 
 API_KEYS={JSON list of API keys, for example [{"key": "XXX", "name": "slackbot"}]} (optional, only needed when using backstage2 as an API from an external service)
+MCP_API_KEYS={JSON list of API keys for the MCP endpoint at /api/mcp, same format as API_KEYS} (optional, only needed when connecting MCP clients)
 ```
 
 ## Integrations Setup
