@@ -13,7 +13,7 @@ type McpKey = DeepKeys<ReturnType<typeof toMcpBookingDetail>> | DeepKeys<ReturnT
 const swedishKeys: Record<McpKey, string> = {
     // Search result
     bookings: 'bokningar',
-    nextMaxBookingId: 'nästaMaxBokningsId',
+    nextOffset: 'nästaOffset',
 
     // Booking
     id: 'id',
