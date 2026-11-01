@@ -1,4 +1,4 @@
-import { McpServer } from '@modelcontextprotocol/server';
+import { McpRequestContext, McpServer } from '@modelcontextprotocol/server';
 import * as z from 'zod';
 import { BookingType } from '../../models/enums/BookingType';
 import { Status } from '../../models/enums/Status';
@@ -11,7 +11,13 @@ import { fetchUserNamesAndTags } from '../db-access/user';
 import { getCalendarEvent } from '../calenderUtils';
 import { toBooking } from '../mappers/booking';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
-import { toMcpBookingDetail, toMcpBookingSearchResult, toMcpCalendarEvent } from './bookingMappers';
+import {
+    getFirstName,
+    PII_SCOPE,
+    toMcpBookingDetail,
+    toMcpBookingSearchResult,
+    toMcpCalendarEvent,
+} from './bookingMappers';
 import { toSwedishKeys } from './swedishKeys';
 
 const DEFAULT_PAGE_SIZE = 25;
@@ -44,9 +50,16 @@ const toErrorResult = (message: string) => ({
 });
 
 // Matches each name tag or name to exactly one user: an exact name tag, then an exact name, then a unique partial
-// name. Returns an error message for entries that match no user or several users.
-const resolveUserIds = async (namesOrTags: string[]): Promise<{ userIds: number[] } | { error: string }> => {
-    const users = await fetchUserNamesAndTags();
+// name. Returns an error message for entries that match no user or several users. Without access to personal data,
+// names are matched and listed by first name only, so the filter can't be used to look up full names.
+const resolveUserIds = async (
+    namesOrTags: string[],
+    canSeePii: boolean,
+): Promise<{ userIds: number[] } | { error: string }> => {
+    const users = (await fetchUserNamesAndTags()).map((user) => ({
+        ...user,
+        name: canSeePii ? user.name : getFirstName(user.name),
+    }));
     const formatUser = (user: { name: string; nameTag?: string }) => `${user.name} (${user.nameTag ?? '-'})`;
 
     const userIds: number[] = [];
@@ -73,7 +86,14 @@ const resolveUserIds = async (namesOrTags: string[]): Promise<{ userIds: number[
     return errors.length > 0 ? { error: errors.join(' ') } : { userIds };
 };
 
-export const createMcpServer = (): McpServer => {
+export const createMcpServer = (ctx: McpRequestContext): McpServer => {
+    const canSeePii = ctx.authInfo?.scopes.includes(PII_SCOPE) ?? false;
+    const personalDataDescription = canSeePii
+        ? ''
+        : ' Personal data is limited: people are listed by first name only, customer contact details and the ' +
+          'changelog are not included, and the customer name (kundnamn) is only included for customers with a ' +
+          'Hogia ID (hogiaId).';
+
     const server = new McpServer({
         name: 'backstage2',
         version: process.env.NEXT_PUBLIC_BACKSTAGE2_CURRENT_VERSION ?? 'unknown',
@@ -93,7 +113,8 @@ export const createMcpServer = (): McpServer => {
                 `${doneName} (finished, possibly still to be invoiced) and ${canceledName} (cancelled). Active ` +
                 `bookings are those with status ${draftName} or ${bookedName}, so filter with status ` +
                 `["${draftName}", "${bookedName}"] to get only active bookings, or ["${doneName}", ` +
-                `"${canceledName}"] for inactive ones.`,
+                `"${canceledName}"] for inactive ones.` +
+                personalDataDescription,
             inputSchema: z.object({
                 query: z.string().optional().describe('Free-text search string'),
                 status: z
@@ -109,7 +130,7 @@ export const createMcpServer = (): McpServer => {
                     .optional()
                     .describe(
                         'Only include bookings whose responsible member (ansvarigMedlem) matches one of these name ' +
-                            'tags (e.g. "PJ") or names. Like the other filters, it is applied to the ' +
+                            'tags (e.g. "PJ") or names, as listed in ansvarigMedlem. Like the other filters, it is applied to the ' +
                             `${SEARCH_RESULT_LIMIT} bookings a query searches.`,
                     ),
                 from: z.iso.date().optional().describe('Only include bookings whose usage starts after this date'),
@@ -129,7 +150,7 @@ export const createMcpServer = (): McpServer => {
         async ({ query, status, bookingType, responsibleUser, from, to, pageSize, maxBookingId }) => {
             const [bookings, resolvedUsers] = await Promise.all([
                 query?.trim() ? searchBookings(query, SEARCH_RESULT_LIMIT) : fetchBookings(),
-                responsibleUser?.length ? resolveUserIds(responsibleUser) : undefined,
+                responsibleUser?.length ? resolveUserIds(responsibleUser, canSeePii) : undefined,
             ]);
 
             if (resolvedUsers && 'error' in resolvedUsers) {
@@ -152,6 +173,7 @@ export const createMcpServer = (): McpServer => {
                 toMcpBookingSearchResult(
                     page,
                     matchingBookings.length > pageSize ? page[page.length - 1].id - 1 : null,
+                    canSeePii,
                 ),
             );
         },
@@ -165,7 +187,8 @@ export const createMcpServer = (): McpServer => {
                 'Get all details about a booking: people, customer and invoice information, notes, pricing, ' +
                 'equipment lists with prices, time estimates, time reports, the latest changelog entries and ' +
                 'linked calendar events. Prices are in SEK, both excluding (exklMoms) and including (inklMoms) ' +
-                'VAT. Field names and values are in Swedish, matching the Backstage2 user interface.',
+                'VAT. Field names and values are in Swedish, matching the Backstage2 user interface.' +
+                personalDataDescription,
             inputSchema: z.object({
                 bookingId: z.number().int(),
             }),
@@ -184,8 +207,8 @@ export const createMcpServer = (): McpServer => {
             const calendarEvents = await Promise.all(
                 (booking.calendarEvents ?? []).map(({ calendarEventId }) =>
                     getCalendarEvent(calendarEventId)
-                        .then(toMcpCalendarEvent)
-                        .catch(() => toMcpCalendarEvent({ id: calendarEventId, workingUsers: [] })),
+                        .then((event) => toMcpCalendarEvent(event, canSeePii))
+                        .catch(() => toMcpCalendarEvent({ id: calendarEventId, workingUsers: [] }, canSeePii)),
                 ),
             );
 
@@ -203,6 +226,7 @@ export const createMcpServer = (): McpServer => {
                         ),
                     },
                     calendarEvents,
+                    canSeePii,
                 ),
             );
         },
