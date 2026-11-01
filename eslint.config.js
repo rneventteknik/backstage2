@@ -8,7 +8,7 @@ import globals from 'globals';
 
 export default [
     {
-        ignores: ['.next/', 'knex/migrations_stub.js', 'next-env.d.ts'],
+        ignores: ['.next/', 'knex/migrations_stub.js', 'next-env.d.ts', 'playwright-report/', 'test-results/'],
     },
     ...tsPlugin.configs['flat/recommended'],
     reactPlugin.configs.flat.recommended,
@@ -47,6 +47,13 @@ export default [
         files: ['**/*.js'],
         rules: {
             '@typescript-eslint/explicit-module-boundary-types': 'off',
+        },
+    },
+    // Playwright fixtures receive a callback named `use`, which the hooks rule mistakes for React's `use`
+    {
+        files: ['tests/**'],
+        rules: {
+            'react-hooks/rules-of-hooks': 'off',
         },
     },
     // Must be last, so that it can turn off formatting rules from the configs above that conflict with prettier.

@@ -4,7 +4,7 @@ dotenv.config({ path: './.env.local' });
 const sqliteConfiguration = {
     client: 'better-sqlite3',
     connection: {
-        filename: './dev.sqlite3',
+        filename: process.env.SQLITE_FILENAME || './dev.sqlite3',
     },
     useNullAsDefault: true,
 };
