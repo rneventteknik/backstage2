@@ -77,7 +77,7 @@ const toMcpCustomerContactDetails = (booking: BookingViewModel, canSeePii: boole
           }
         : {};
 
-const toMcpPrice = (price: currency) => ({
+export const toMcpPrice = (price: currency) => ({
     excludingVAT: price.value,
     includingVAT: addVAT(price).value,
 });

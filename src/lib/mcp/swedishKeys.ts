@@ -1,4 +1,5 @@
 import { toMcpBookingDetail, toMcpBookingSearchResult } from './bookingMappers';
+import { toMcpEquipmentAvailability, toMcpEquipmentDetail, toMcpEquipmentSearchResult } from './equipmentMappers';
 
 type DeepKeys<T> = T extends (infer U)[]
     ? DeepKeys<U>
@@ -6,7 +7,12 @@ type DeepKeys<T> = T extends (infer U)[]
       ? { [K in keyof T & string]: K | DeepKeys<T[K]> }[keyof T & string]
       : never;
 
-type McpKey = DeepKeys<ReturnType<typeof toMcpBookingDetail>> | DeepKeys<ReturnType<typeof toMcpBookingSearchResult>>;
+type McpKey =
+    | DeepKeys<ReturnType<typeof toMcpBookingDetail>>
+    | DeepKeys<ReturnType<typeof toMcpBookingSearchResult>>
+    | DeepKeys<ReturnType<typeof toMcpEquipmentDetail>>
+    | DeepKeys<ReturnType<typeof toMcpEquipmentSearchResult>>
+    | DeepKeys<ReturnType<typeof toMcpEquipmentAvailability>>;
 
 // The MCP data is built with English keys and translated as a last step, so the agent sees the same Swedish terms
 // as Backstage2's users. Names are taken from the labels in the frontend where one exists.
@@ -105,6 +111,31 @@ const swedishKeys: Record<McpKey, string> = {
     calendarEvents: 'kalenderevent',
     start: 'start',
     end: 'slut',
+
+    // Equipment search result
+    equipment: 'utrustning',
+    nextMaxEquipmentId: 'nästaMaxUtrustningsId',
+
+    // Equipment
+    nameEN: 'engelsktNamn',
+    descriptionEN: 'engelskBeskrivning',
+    searchKeywords: 'sökord',
+    inventoryCount: 'inventarieantal',
+    publiclyVisible: 'synligIPublikaPrislistan',
+    isArchived: 'arkiverad',
+    prices: 'priser',
+    pricePerUnitTHS: 'prisPerStyckTHS',
+    pricePerHourTHS: 'prisPerTimmeTHS',
+    currentBookings: 'pågåendeBokningar',
+    upcomingBookings: 'kommandeBokningar',
+    pastBookings: 'tidigareBokningar',
+    pastBookingsCount: 'antalTidigareBokningar',
+
+    // Equipment availability
+    from: 'från',
+    to: 'till',
+    maxUnitsBooked: 'maxAntalBokade',
+    availableUnits: 'tillgängligtAntal',
 };
 
 const isMcpKey = (key: string): key is McpKey => key in swedishKeys;

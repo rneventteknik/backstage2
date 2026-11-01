@@ -3,13 +3,19 @@ import * as z from 'zod';
 import { BookingType } from '../../models/enums/BookingType';
 import { Status } from '../../models/enums/Status';
 import { toBookingViewModel } from '../datetimeUtils';
-import { filterBookings } from '../bookingFilters';
+import { filterBookings, groupBookingsByEquipmentUsageTime } from '../bookingFilters';
 import { fetchBookings, searchBookings } from '../db-access';
-import { fetchBookingForMcp } from '../db-access/booking';
+import {
+    fetchBookingForMcp,
+    fetchBookingsForEquipment,
+    fetchBookingsWithEquipmentInInterval,
+} from '../db-access/booking';
+import { fetchEquipment, fetchEquipments, searchEquipment } from '../db-access/equipment';
 import { fetchSettings } from '../db-access/setting';
 import { fetchUserNamesAndTags } from '../db-access/user';
 import { getCalendarEvent } from '../calenderUtils';
 import { toBooking } from '../mappers/booking';
+import { toEquipment } from '../mappers/equipment';
 import { getBookingTypeName, getGlobalSetting, getStatusName } from '../utils';
 import {
     getFirstName,
@@ -18,12 +24,15 @@ import {
     toMcpBookingSearchResult,
     toMcpCalendarEvent,
 } from './bookingMappers';
+import { toMcpEquipmentAvailability, toMcpEquipmentDetail, toMcpEquipmentSearchResult } from './equipmentMappers';
 import { toSwedishKeys } from './swedishKeys';
 
 const DEFAULT_PAGE_SIZE = 25;
 const MAX_PAGE_SIZE = 100;
 // searchBookings returns the most recently updated matches first, so this bounds how far back a free-text search reaches.
 const SEARCH_RESULT_LIMIT = 1000;
+// Equipment search is only used to find matching ids within the full equipment list, so it can include all matches.
+const EQUIPMENT_SEARCH_RESULT_LIMIT = 10000;
 
 // Filters take the same Swedish display names as the response data, e.g. 'Bokad' or 'Gigg'.
 const statusByName = new Map(
@@ -43,6 +52,9 @@ const toJsonResult = (result: object) => {
         structuredContent: translatedResult,
     };
 };
+
+const matchesName = (name: string | undefined, filter: string | undefined) =>
+    !filter || name?.toLowerCase() === filter.trim().toLowerCase();
 
 const toErrorResult = (message: string) => ({
     content: [{ type: 'text' as const, text: message }],
@@ -228,6 +240,153 @@ export const createMcpServer = (ctx: McpRequestContext): McpServer => {
                     calendarEvents,
                     canSeePii,
                 ),
+            );
+        },
+    );
+
+    server.registerTool(
+        'search_equipment',
+        {
+            title: 'Search equipment',
+            description:
+                'Search and list equipment in the inventory, newest first. Archived equipment is not included. ' +
+                'Without a query all equipment matching the filters is listed. The query matches the Swedish ' +
+                'name, English name and search keywords, and every word must match. Use get_equipment for full ' +
+                'details and bookings of a piece of equipment, and get_equipment_availability to check how many ' +
+                'units are free during a time period. Field names and values are in Swedish, matching the ' +
+                'Backstage2 user interface. Prices are in SEK, both excluding (exklMoms) and including (inklMoms) ' +
+                'VAT; the THS prices are used for bookings with the THS price plan.',
+            inputSchema: z.object({
+                query: z.string().optional().describe('Free-text search string'),
+                tag: z.string().optional().describe('Only include equipment with this tag (taggar), e.g. "Ljud"'),
+                publicCategory: z
+                    .string()
+                    .optional()
+                    .describe('Only include equipment in this public price list category (publikKategori)'),
+                location: z.string().optional().describe('Only include equipment stored at this location (plats)'),
+                pageSize: z.number().int().min(1).max(MAX_PAGE_SIZE).default(DEFAULT_PAGE_SIZE),
+                maxEquipmentId: z
+                    .number()
+                    .int()
+                    .optional()
+                    .describe(
+                        'Only include equipment with this id or lower. Use nästaMaxUtrustningsId from the previous ' +
+                            'response to get the next page.',
+                    ),
+            }),
+            annotations: { readOnlyHint: true },
+        },
+        async ({ query, tag, publicCategory, location, pageSize, maxEquipmentId }) => {
+            const [equipmentModels, searchResult] = await Promise.all([
+                fetchEquipments(),
+                query?.trim() ? searchEquipment(query, EQUIPMENT_SEARCH_RESULT_LIMIT) : Promise.resolve(null),
+            ]);
+            const matchingIds = searchResult ? new Set(searchResult.map((x) => x.id)) : null;
+
+            const matchingEquipment = equipmentModels
+                .map(toEquipment)
+                .filter((equipment) => !matchingIds || matchingIds.has(equipment.id))
+                .filter((equipment) => !tag || equipment.tags.some((x) => matchesName(x.name, tag)))
+                .filter((equipment) => matchesName(equipment.equipmentPublicCategory?.name, publicCategory))
+                .filter((equipment) => matchesName(equipment.equipmentLocation?.name, location))
+                .filter((equipment) => maxEquipmentId === undefined || equipment.id <= maxEquipmentId)
+                .sort((a, b) => b.id - a.id);
+
+            const page = matchingEquipment.slice(0, pageSize);
+
+            return toJsonResult(
+                toMcpEquipmentSearchResult(
+                    page,
+                    matchingEquipment.length > pageSize ? page[page.length - 1].id - 1 : null,
+                ),
+            );
+        },
+    );
+
+    server.registerTool(
+        'get_equipment',
+        {
+            title: 'Get equipment',
+            description:
+                'Get all details about a piece of equipment: names, descriptions, inventory count (inventarieantal), ' +
+                'storage location, tags, prices, notes, the latest changelog entries, and the bookings using it. ' +
+                'Bookings are grouped as in Backstage2 into current (out right now, or not yet returned), upcoming ' +
+                'and past (only the most recent are listed, antalTidigareBokningar is the total). antal on a ' +
+                'booking is the most units of this equipment the booking uses at the same time. Prices are in SEK, ' +
+                'both excluding (exklMoms) and including (inklMoms) VAT. Field names and values are in Swedish, ' +
+                'matching the Backstage2 user interface.' +
+                personalDataDescription,
+            inputSchema: z.object({
+                equipmentId: z.number().int(),
+            }),
+            annotations: { readOnlyHint: true },
+        },
+        async ({ equipmentId }) => {
+            const [equipmentModel, bookingModels] = await Promise.all([
+                fetchEquipment(equipmentId),
+                fetchBookingsForEquipment(equipmentId),
+            ]);
+
+            if (!equipmentModel) {
+                return toErrorResult(`Equipment ${equipmentId} not found`);
+            }
+
+            const equipment = toEquipment(equipmentModel);
+            const bookings = bookingModels.map(toBooking).map(toBookingViewModel);
+
+            return toJsonResult(
+                toMcpEquipmentDetail(equipment, groupBookingsByEquipmentUsageTime(bookings, equipment), canSeePii),
+            );
+        },
+    );
+
+    server.registerTool(
+        'get_equipment_availability',
+        {
+            title: 'Get equipment availability',
+            description:
+                'Check how many units of a piece of equipment are booked and available during a time period, ' +
+                'using the same conflict detection as the equipment lists in Backstage2. Lists the bookings ' +
+                'whose equipment lists use the equipment during the period, with the number of units (antal) ' +
+                'each list uses. Cancelled bookings are not counted. maxAntalBokade is the most units booked at ' +
+                'the same time during the period and tillgängligtAntal is the inventory count minus that; both ' +
+                'count units in draft bookings. tillgängligtAntal is null when the inventory count is unknown. ' +
+                'Field names and values are in Swedish, matching the Backstage2 user interface.' +
+                personalDataDescription,
+            inputSchema: z.object({
+                equipmentId: z.number().int(),
+                from: z.iso
+                    .datetime({ offset: true })
+                    .describe('Start of the period, e.g. "2026-11-07T16:00:00+01:00"'),
+                to: z.iso.datetime({ offset: true }).describe('End of the period, e.g. "2026-11-08T12:00:00+01:00"'),
+            }),
+            annotations: { readOnlyHint: true },
+        },
+        async ({ equipmentId, from, to }) => {
+            const fromDate = new Date(from);
+            const toDate = new Date(to);
+
+            if (fromDate > toDate) {
+                return toErrorResult('from must be before to');
+            }
+
+            const [equipmentModel, bookingModels] = await Promise.all([
+                fetchEquipment(equipmentId),
+                fetchBookingsWithEquipmentInInterval(equipmentId, fromDate, toDate),
+            ]);
+
+            if (!equipmentModel) {
+                return toErrorResult(`Equipment ${equipmentId} not found`);
+            }
+
+            const bookings = bookingModels
+                .map(toBooking)
+                .map(toBookingViewModel)
+                .filter((booking) => booking.status !== Status.CANCELED)
+                .sort((a, b) => (a.equipmentOutDatetime?.getTime() ?? 0) - (b.equipmentOutDatetime?.getTime() ?? 0));
+
+            return toJsonResult(
+                toMcpEquipmentAvailability(toEquipment(equipmentModel), fromDate, toDate, bookings, canSeePii),
             );
         },
     );

@@ -205,6 +205,7 @@ export const fetchBookingsForEquipment = async (equipmentId: number): Promise<Bo
                 .where('equipmentLists:listHeadings:listEntries.equipmentId', equipmentId)
                 .select('Booking.id'),
         )
+        .withGraphFetched('ownerUser')
         .withGraphFetched('equipmentLists')
         .withGraphFetched('equipmentLists.listEntries')
         .withGraphFetched('equipmentLists.listEntries.equipment')
@@ -458,6 +459,7 @@ export const fetchBookingsWithEquipmentInInterval = async (
     ensureDatabaseIsInitialized();
 
     let query = BookingObjectionModel.query()
+        .withGraphJoined('ownerUser')
         .withGraphJoined('equipmentLists.listEntries')
         .withGraphJoined('equipmentLists.listHeadings.listEntries')
         .where((builder) =>
